@@ -95,11 +95,11 @@ class Transformator:
         redhat_dir = os.path.join(self.repo.working_tree_dir, "redhat")
         spec = os.path.join(redhat_dir, f"{self.package_name}.spec")
         rpmbuild_cmd = ["rpmbuild", "-bs", f"{spec}",
-                        "--define", f"\"_sourcedir {redhat_dir}\"",
-                        "--define", f"\"_specdir {redhat_dir}\"",
-                        "--define", f"\"_buildir {redhat_dir}\"",
-                        "--define", f"\"_srcrpmdir {redhat_dir}\"",
-                        "--define", f"\"_rpmdir {redhat_dir}\"",
+                        "--define", f"_sourcedir {redhat_dir}",
+                        "--define", f"_specdir {redhat_dir}",
+                        "--define", f"_buildir {redhat_dir}",
+                        "--define", f"_srcrpmdir {pwd}",
+                        "--define", f"_rpmdir {redhat_dir}",
                         ]
         print(f"CMD: {' '.join(rpmbuild_cmd)}")
         try:
@@ -129,8 +129,6 @@ def main():
 
     try:
         t.create_srpm()
-        # TODO: submit the srpm as a build to koji and wait for it to complete
-        # TODO: update status on github to reflect whether the build was successful or not
     finally:
         t.clean()
 
