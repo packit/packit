@@ -39,7 +39,9 @@ class Holyrood:
             instance_url="https://src.fedoraproject.org/"
         )
         try:
-            source_git = package_mapping[msg["msg"]["pullrequest"]["project"]["name"]]["source-git"]
+            project_name = msg["msg"]["pullrequest"]["project"]["name"]
+            print(project_name)
+            source_git = package_mapping[project_name]["source-git"]
         except KeyError:
             print("invalid message format or source git not found")
             return
