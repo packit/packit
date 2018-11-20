@@ -1,22 +1,49 @@
 # source-git
 
-This project provides tooling to integrate upstream open source projects with
-Fedora operating system.
+This project provides tooling and automation to integrate upstream open source
+projects into Fedora operating system.
+
 
 ## What and why?
 
- * One of the intents is stability: only merge, build and compose components
-   which integrate well with the rest of the operating system. The biggest
-   impact will be on Fedora Rawhide and when working on a new release.
+ * Our intent is to bring downstream and upstream communities closer: provide
+   feedback from downstream to upstream. (e.g. *"Hello \<upstream project Y>,
+   your newest release doesn't work in Fedora rawhide, it breaks \<Z>, here is
+   a link to logs."*)
+
+ * One of the implications is that it's trivial to propose changes back to
+   upstream or cherry-pick fixes from upstream to downstream.
+
+ * One of the targeted outcomes is stability: only merge, build and compose
+   components which integrate well with the rest of the operating system. The
+   biggest impact of such behavior will be on Fedora rawhide and when working
+   on a new release.
 
  * Developing in dist-git is cumbersome. Editing patch files and moving
    tarballs around is not fun. Why not working with the source code itself?
    With source git, you'll have an upstream repository and the dist-git content
    stuffed in a dedicated directory.
 
+ * Let's use modern development techniques such as pull requests, code review,
+   modern git forges, automation and continuous integration. We have computers
+   to do all the mundane tasks. Why we, as humans, should do such work?
+
+ * We want dist-git to be "a database of content in a release" rather a place
+   to do actual work. On the other hand, you'll still be able to interact with
+   dist-git the same way. We are not taking that away. Source git is meant to
+   be the modern, better alternative.
+
  * Automatically pull and validate new upstream releases. This can be a trivial
    thing to do, why should maintainers waste their times on work which can be
    automated.
+
+
+## Current status
+
+Right now we are aiming for a proof of concept. The work is being tracked [in
+this milestone](https://github.com/user-cont/source-git/milestone/1). Once it's
+done, we'll create a demo and present it at [DevConf.cz](https://devconf.cz/)
+
 
 ## Plans
 
@@ -25,16 +52,26 @@ Fedora operating system.
      are reported back to the pull request.
 
  * Synchronize changes downstream
-   * Once a change is merged in a source git repo, it can synchronized
+   * Once a change is merged in a source git repo, it can be synchronized
      downstream — either directly or as a pull request on pagure.
 
  * Automatically pull new upstream releases.
 
  * Automate creation of source git repos.
    * Take a dist-git repo as an input and create a source git repo (e.g.
-     [rpms/python-docker](https://src.fedoraproject.org/rpms/python-docker) → [TomasTomecek/docker-py-source-git](https://github.com/TomasTomecek/docker-py-source-git))
+     [rpms/python-docker](https://src.fedoraproject.org/rpms/python-docker) →
+     [TomasTomecek/docker-py-source-git](https://github.com/TomasTomecek/docker-py-source-git))
+
+ * Enable local development in source git:
+   * Some of the changes described above make it hard to perform a build
+     locally. We want to preserve such workflow where maintainers verify
+     locally that they changes work before pushing them out.
+
+ * Support other git forges: pagure.io, gitlab.
 
 
 ## Resources
 
-https://github.com/projectatomic/rpmdistro-gitoverlay/blob/master/doc/reworking-fedora-releng.md
+ * An excellent document by Colin Walters which describes a modern way of
+   developing a distribution:
+   * https://github.com/projectatomic/rpmdistro-gitoverlay/blob/master/doc/reworking-fedora-releng.md
