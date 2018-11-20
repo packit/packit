@@ -23,6 +23,7 @@ def sg2dg(upstream_ref, package_name, dest_dir, repo, dist_git, name, version):
                            dest_dir=dest_dir) as t:
             t.clone_dist_git_repo(dist_git_url=dist_git)
             t.create_archive()
+            t.copy_redhat_content_to_dest_dir()
             patches = t.create_patches(upstream=upstream_ref)
             t.add_patches_to_specfile(patch_list=patches)
 

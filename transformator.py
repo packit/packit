@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import tempfile
 # decorator for cached properties, in python >=3.8 use cached_property
+from distutils.dir_util import copy_tree
 from functools import lru_cache
 
 import git
@@ -48,6 +49,11 @@ class Transformator:
         print(f"Creating archive: {archive}")
         return archive
 
+    @property
+    @lru_cache()
+    def redhat_source_git_dir(self):
+        return os.path.join(self.repo.working_tree_dir, "redhat")
+
     def clean(self):
         print(f"Cleaning: {self.temp_dir}")
         shutil.rmtree(self.temp_dir)
@@ -86,7 +92,7 @@ class Transformator:
 
         pwd = os.path.abspath(os.path.curdir)
         print(f"PWD: {pwd}")
-        redhat_dir = os.path.join(self.repo.working_tree_dir, "redhat")
+        redhat_dir = self.redhat_source_git_dir
         spec = os.path.join(redhat_dir, f"{self.package_name}.spec")
         rpmbuild_cmd = ["rpmbuild", "-bs", f"{spec}",
                         "--define", f"_sourcedir {redhat_dir}",
@@ -129,7 +135,10 @@ class Transformator:
 
             patch_name = f"{i+1:04d}-{commit.hexsha}.patch"
             patch_path = os.path.join(self.dest_dir, patch_name)
-            patch_list.append(patch_name)
+            patch_list.append(
+                (patch_name,
+                 f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>")
+            )
 
             print(f"PATCH: {patch_path}")
             with open(patch_path, mode="w") as patch_file:
@@ -158,11 +167,18 @@ class Transformator:
             spec_file.seek(last_source_position)
 
             spec_file.write("\n\n# PATCHES FROM SOURCE GIT:\n")
-            for i, patch in enumerate(patch_list):
+            for i, (patch, msg) in enumerate(patch_list):
+                commented_msg = "\n# " + '\n# '.join(msg.split('\n')) + "\n"
+                spec_file.write(commented_msg)
                 spec_file.write(f"Patch{i+1:04d}: {patch}\n")
+
             spec_file.write(rest_of_the_file)
 
         print(f"SPECFILE UPDATED: {specfile_path}")
+
+    def copy_redhat_content_to_dest_dir(self):
+        copy_tree(src=self.redhat_source_git_dir,
+                  dst=self.dest_dir)
 
     def __enter__(self):
         return self
