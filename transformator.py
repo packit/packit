@@ -53,7 +53,7 @@ class Transformator:
         shutil.rmtree(self.temp_dir)
         self._temp_dir = None
 
-    def create_archive(self, path=None, name="{project}-{version}.tar.gz", prefix=None):
+    def create_archive(self, path=None, name="{project}-{version}.tar.gz"):
         """
         Create archive from the provided git repo. The archive needs to be able to be used to build
         the project using rpmbuild command. The expectation is that the directory within the archive
@@ -118,6 +118,7 @@ class Transformator:
 
     def create_patches(self, upstream):
         commits = self.get_commits_to_upstream(upstream)
+        patch_list = []
         for i, commit in enumerate(commits[1:]):
             parent = commits[i]
 
@@ -126,16 +127,42 @@ class Transformator:
             print(" ".join(git_diff_cmd))
             diff = subprocess.check_output(git_diff_cmd, cwd=self.repo.working_tree_dir).decode()
 
-            patch_name = f"patch-{i+1:04d}-{commit.hexsha}.patch"
+            patch_name = f"{i+1:04d}-{commit.hexsha}.patch"
             patch_path = os.path.join(self.dest_dir, patch_name)
+            patch_list.append(patch_name)
 
             print(f"PATCH: {patch_path}")
             with open(patch_path, mode="w") as patch_file:
                 patch_file.write(diff)
 
+        return patch_list
+
     def clone_dist_git_repo(self, dist_git_url):
         return git.repo.Repo.clone_from(url=dist_git_url,
                                         to_path=self.dest_dir)
+
+    def add_patches_to_specfile(self, patch_list):
+        specfile_path = os.path.join(self.dest_dir, f"{self.package_name}.spec")
+
+        with open(file=specfile_path, mode="r+") as spec_file:
+            last_source_position = None
+            line = spec_file.readline()
+            while line:
+                if line.startswith("Source"):
+                    last_source_position = spec_file.tell()
+
+                line = spec_file.readline()
+
+            spec_file.seek(last_source_position)
+            rest_of_the_file = spec_file.read()
+            spec_file.seek(last_source_position)
+
+            spec_file.write("\n\n# PATCHES FROM SOURCE GIT:\n")
+            for i, patch in enumerate(patch_list):
+                spec_file.write(f"Patch{i+1:04d}: {patch}\n")
+            spec_file.write(rest_of_the_file)
+
+        print(f"SPECFILE UPDATED: {specfile_path}")
 
     def __enter__(self):
         return self
