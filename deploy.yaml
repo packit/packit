@@ -1,0 +1,9 @@
+---
+- name: Deploy source-git
+  hosts: all
+  tasks:
+  - command: podman run -d --name watcher \
+              -e GITHUB_TOKEN={{ github_token }} \
+              -e PAGURE_TOKEN={{ pagure_token }} \
+              {{ source_git_image }} \
+              sourcegit watch-fedora-ci
