@@ -70,6 +70,32 @@ done, we'll create a demo and present it at [DevConf.cz](https://devconf.cz/)
  * Support other git forges: pagure.io, gitlab.
 
 
+## Usage
+
+The software is far from being even an alpha quality. Most of the values and
+configuration is hard-coded inside the scripts. Once we prove this project,
+we'll start working on configuration and user experience. You've been warned.
+
+There is a makefile in this repository which can be used to build the container
+images and run them locally with podman.
+
+Before that, you should create a file secrets.yaml and store your github and
+[pagure API tokens](https://src.fedoraproject.org/settings#nav-api-tab) in
+there. This file is then used during deployment as a source for ansible
+variables which are utilized by the containers:
+```
+$ cat ./secrets.yaml
+github_token: 123456
+pagure_token: 456789
+```
+
+Let's build and run now:
+```
+$ make build
+$ make run-local
+```
+
+
 ## Resources
 
  * An excellent document by Colin Walters which describes a modern way of
