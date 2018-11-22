@@ -54,6 +54,17 @@ class Transformator:
     def redhat_source_git_dir(self):
         return os.path.join(self.repo.working_tree_dir, "redhat")
 
+    @property
+    @lru_cache()
+    def version_from_specfile(self):
+        specfile_path = os.path.join(self.redhat_source_git_dir, f"{self.package_name}.spec")
+        get_version_from_spec_cmd = ["rpmspec", "-q", "--qf", "'%{version}\\n'", "--srpm",
+                                     specfile_path]
+        print(f"CMD: {' '.join(get_version_from_spec_cmd)}")
+        version_raw = subprocess.check_output(get_version_from_spec_cmd).decode()
+        version = version_raw.strip("'\\\n")
+        return version
+
     def clean(self):
         print(f"Cleaning: {self.temp_dir}")
         shutil.rmtree(self.temp_dir)
@@ -109,9 +120,12 @@ class Transformator:
 
     @lru_cache()
     def get_commits_to_upstream(self, upstream):
-        upstream_ref = f"origin/{upstream}"
-        if upstream_ref not in self.repo.refs:
-            raise Exception(f"Upstream {upstream_ref} not found.")
+        if upstream in self.repo.tags:
+            upstream_ref = upstream
+        else:
+            upstream_ref = f"origin/{upstream}"
+            if upstream_ref not in self.repo.refs:
+                raise Exception(f"Upstream {upstream_ref} branch nor {upstream} tag not found.")
 
         commits = list(
             self.repo.iter_commits(rev=f"{upstream_ref}..{self.branch}",
@@ -122,7 +136,10 @@ class Transformator:
         print(f"Delta ({upstream_ref}..{self.branch}): {len(commits)}")
         return commits
 
-    def create_patches(self, upstream):
+    def create_patches(self, upstream=None):
+
+        upstream = upstream or self.version_from_specfile
+
         commits = self.get_commits_to_upstream(upstream)
         patch_list = []
         for i, commit in enumerate(commits[1:]):
