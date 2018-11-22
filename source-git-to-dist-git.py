@@ -14,7 +14,6 @@ from transformator import Transformator
 @click.argument("name")
 @click.argument("version")
 def sg2dg(upstream_ref, package_name, dest_dir, repo, dist_git, name, version):
-    upstream_ref = upstream_ref or version
     try:
         with Transformator(url=repo,
                            upstream_name=name,
