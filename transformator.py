@@ -93,6 +93,9 @@ class Transformator:
         return archive_path
 
     def add_exclude_redhat_to_gitattributes(self):
+        """
+        Add a line to .gitattributes to export-ignore redhat dir.
+        """
         gitattributes_path = os.path.join(self.repo.working_tree_dir, '.gitattributes')
         with open(gitattributes_path, 'a') as gitattributes_file:
             gitattributes_file.writelines(["redhat/ export-ignore\n"])
@@ -143,18 +146,25 @@ class Transformator:
 
         commits = list(
             self.repo.iter_commits(rev=f"{upstream_ref}..{self.branch}",
-                                   first_parent=True,
-                                   reverse=True))
+                                   reverse=True,
+                                   **rev_list_option_args))
         commits.insert(0, self.repo.refs[f"{upstream_ref}"].commit)
 
         print(f"Delta ({upstream_ref}..{self.branch}): {len(commits)}")
         return commits
 
-    def create_patches(self, upstream=None):
+    def create_patches(self, upstream=None, rev_list_option=None):
+        """
+        Create patches from downstream commits.
+
+        :param upstream: str -- git branch or tag
+        :param rev_list_option: [str] -- list of options forwarded to `git rev-list`
+                                in form `key` or `key=val`.
+        :return: [(patch_name, msg)] list of created patches (tuple of the file name and commit msg)
+        """
 
         upstream = upstream or self.version_from_specfile
-
-        commits = self.get_commits_to_upstream(upstream)
+        commits = self.get_commits_to_upstream(upstream, rev_list_option)
         patch_list = []
         for i, commit in enumerate(commits[1:]):
             parent = commits[i]
@@ -178,10 +188,21 @@ class Transformator:
         return patch_list
 
     def clone_dist_git_repo(self, dist_git_url):
+        """
+        Clone the dist_git repository to the destination dir.
+
+        :param dist_git_url: link to git repo
+        :return: git.Repo instance
+        """
         return git.repo.Repo.clone_from(url=dist_git_url,
                                         to_path=self.dest_dir)
 
     def add_patches_to_specfile(self, patch_list):
+        """
+        Add the given list of (patch_name, msg) to the specfile.
+
+        :param patch_list: [(patch_name, msg)]
+        """
         specfile_path = os.path.join(self.dest_dir, f"{self.package_name}.spec")
 
         with open(file=specfile_path, mode="r+") as spec_file:
@@ -208,6 +229,9 @@ class Transformator:
         print(f"SPECFILE UPDATED: {specfile_path}")
 
     def copy_redhat_content_to_dest_dir(self):
+        """
+        Copy content of the redhat dir in source-git to destination directory.
+        """
         copy_tree(src=self.redhat_source_git_dir,
                   dst=self.dest_dir)
 
