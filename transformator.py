@@ -8,6 +8,8 @@ from functools import lru_cache
 
 import git
 
+from utils import get_rev_list_kwargs
+
 
 class Transformator:
     def __init__(self, url,
@@ -119,7 +121,19 @@ class Transformator:
             raise
 
     @lru_cache()
-    def get_commits_to_upstream(self, upstream):
+    def get_commits_to_upstream(self, upstream, rev_list_option=None):
+        """
+        Return the list of commits from current branch to upstream rev/tag.
+
+        :param upstream: str -- git branch or tag
+        :param rev_list_option: [str] -- list of options forwarded to `git rev-list`
+                                in form `key` or `key=val`.
+        :return: list of commits (last commit on the current branch.).
+        """
+
+        rev_list_option = rev_list_option or ["first_parent"]
+        rev_list_option_args = get_rev_list_kwargs(rev_list_option)
+
         if upstream in self.repo.tags:
             upstream_ref = upstream
         else:
