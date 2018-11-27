@@ -46,7 +46,8 @@ def sg2dg(debug,
     5. The output is the directory (= dirty git repo)
     """
     if verbose:
-        _set_logging(level=logging.INFO)
+        _set_logging(level=logging.INFO,
+                     format="%(message)s")
 
     if debug:
         _set_logging(level=logging.DEBUG)
