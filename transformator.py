@@ -66,7 +66,6 @@ class Transformator:
     @lru_cache()
     def archive(self):
         archive = self.create_archive()
-        logger.debug(f"Creating archive: {archive}")
         return archive
 
     @property
@@ -182,6 +181,10 @@ class Transformator:
 
         :return: git.Repo instance
         """
+        if os.path.isdir(os.path.join(self.dest_dir, ".git")):
+            logger.info(f"Dist-git already present: {self.dest_dir}")
+            return git.repo.Repo(self.dest_dir)
+
         logger.info(f"Cloning dist-git repo: {self.dist_git_url} -> {self.dest_dir}")
         return git.repo.Repo.clone_from(url=self.dist_git_url,
                                         to_path=self.dest_dir)
