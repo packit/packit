@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import git
 
-from utils import get_rev_list_kwargs, FedPKG, run_command
+from sourcegit.utils import get_rev_list_kwargs, FedPKG, run_command
 
 logger = logging.getLogger("source_git")
 
