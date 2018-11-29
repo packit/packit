@@ -2,8 +2,8 @@ import logging
 
 import click
 
-from transformator import Transformator
-from utils import _set_logging
+from sourcegit.transformator import Transformator
+from sourcegit.utils import _set_logging
 
 logger = logging.getLogger("source_git")
 

@@ -12,7 +12,7 @@ It is expected to do this:
 """
 import sys
 
-from transformator import Transformator
+from sourcegit.transformator import Transformator
 
 
 def usage():
