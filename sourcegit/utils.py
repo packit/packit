@@ -92,7 +92,7 @@ class FedPKG:
                            fail=True)
 
 
-def _set_logging(
+def set_logging(
         logger_name="source_git",
         level=logging.INFO,
         handler_class=logging.StreamHandler,
