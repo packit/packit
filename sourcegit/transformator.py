@@ -131,15 +131,13 @@ class Transformator:
         archive = self.create_archive()
         logger.debug(f"Using archive: {archive}")
 
-        pwd = os.path.abspath(os.path.curdir)
-
         redhat_dir = self.redhat_source_git_dir
         spec = os.path.join(redhat_dir, f"{self.package_name}.spec")
         run_command(cmd=["rpmbuild", "-bs", f"{spec}",
                          "--define", f"_sourcedir {redhat_dir}",
                          "--define", f"_specdir {redhat_dir}",
                          "--define", f"_buildir {redhat_dir}",
-                         "--define", f"_srcrpmdir {pwd}",
+                         "--define", f"_srcrpmdir {self.dest_dir}",
                          "--define", f"_rpmdir {redhat_dir}",
                          ],
                     fail=True)
