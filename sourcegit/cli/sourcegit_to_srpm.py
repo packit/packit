@@ -1,7 +1,11 @@
+import logging
+
 import click
 
 from sourcegit.config import pass_config, get_context_settings
 from sourcegit.transformator import Transformator
+
+logger = logging.getLogger(__name__)
 
 
 @click.command("srpm", context_settings=get_context_settings())
