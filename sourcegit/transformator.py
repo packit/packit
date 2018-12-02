@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import shutil
@@ -10,40 +11,69 @@ import git
 
 from sourcegit.utils import get_rev_list_kwargs, FedPKG, run_command
 
-logger = logging.getLogger("source_git")
+logger = logging.getLogger(__name__)
+
+
+def get_package_mapping():
+    mapping_file = "sourcegit-mapping.json"
+    if os.path.exists(mapping_file):
+        with open(file=mapping_file) as fp:
+            return json.load(fp)
+    return {}
 
 
 class Transformator:
-    def __init__(self, url,
+    def __init__(self,
                  upstream_name,
-                 package_name,
-                 version,
+                 package_name=None,
+                 branch=None,
+                 version=None,
                  dest_dir=None,
                  dist_git_url=None,
-                 fas_username=None):
+                 fas_username=None,
+                 url=None,
+                 repo=None):
 
-        self.repo_url = url
+        self._repo = repo
+        if repo:
+            self._branch = branch or repo.active_branch
+            self.repo_url = url or list(repo.remote().urls)[0]
+        else:
+            self._branch = branch
+            self.repo_url = url
 
-        self.upstream_name = upstream_name
-        self.package_name = package_name
-        self.dest_dir = dest_dir or tempfile.mkdtemp()
-
-        self.branch = f"upstream-{version}"
-        self.version = version
-
+        self._version = version
         self._temp_dir = None
-        self.dist_git_url = dist_git_url
 
         self.fas_username = fas_username
 
+        self.upstream_name = upstream_name
+        self.package_name = package_name or upstream_name
+        self.dist_git_url = dist_git_url
+        self.dest_dir = dest_dir or tempfile.mkdtemp()
+
     @property
-    @lru_cache()
+    def branch(self):
+        """
+        Source branch in the source-git repo.
+        """
+        if not self._branch:
+            self._branch = f"upstream-{self.version}"
+        return self._branch
+
+    @property
     def repo(self):
-        repo_path = os.path.join(self.temp_dir, self.upstream_name)
-        logger.info(f"Cloning source-git repo: {self.repo_url} ({self.branch})-> {repo_path}")
-        return git.repo.Repo.clone_from(url=self.repo_url,
-                                        to_path=repo_path,
-                                        branch=self.branch)
+        """
+        Repository used as a source.
+        """
+        if not self._repo:
+            repo_path = os.path.join(self.temp_dir, self.upstream_name)
+            logger.info(f"Cloning source-git repo: {self.repo_url} ({self.branch})-> {repo_path}")
+            self._repo = git.repo.Repo.clone_from(url=self.repo_url,
+                                                  to_path=repo_path,
+                                                  branch=self.branch,
+                                                  tags=True)
+        return self._repo
 
     @property
     @lru_cache()
@@ -57,6 +87,9 @@ class Transformator:
 
     @property
     def temp_dir(self):
+        """
+        Dir used for storing temp. content. e.g. source-git repo.
+        """
         if not self._temp_dir:
             self._temp_dir = tempfile.mkdtemp()
             logger.debug(f"Creating temp dir: {self._temp_dir}")
@@ -65,17 +98,32 @@ class Transformator:
     @property
     @lru_cache()
     def archive(self):
+        """
+        Path of the archive generated from the source-git.
+        If not exists, the archive will be created in the destination directory.
+        """
         archive = self.create_archive()
         return archive
 
     @property
     @lru_cache()
     def redhat_source_git_dir(self):
+        """
+        Git dir with the source-git repo content.
+        """
         return os.path.join(self.repo.working_tree_dir, "redhat")
 
     @property
     @lru_cache()
+    def version(self):
+        return self._version or self.version_from_specfile
+
+    @property
+    @lru_cache()
     def version_from_specfile(self):
+        """
+        Version extracted from the specfile.
+        """
         specfile_path = os.path.join(self.redhat_source_git_dir, f"{self.package_name}.spec")
         version_raw = run_command(cmd=["rpmspec", "-q", "--qf", "'%{version}\\n'", "--srpm",
                                        specfile_path],
@@ -87,11 +135,17 @@ class Transformator:
     @property
     @lru_cache()
     def fedpkg(self):
+        """
+        Instance of the FedPKG class (wrapper on top of the fedpkg command.)
+        """
         return FedPKG(fas_username=self.fas_username,
                       repo_path=self.dist_git_url,
                       directory=self.dest_dir)
 
     def clean(self):
+        """
+        Clean te temporary dir.
+        """
         logger.debug(f"Cleaning: {self.temp_dir}")
         shutil.rmtree(self.temp_dir)
         self._temp_dir = None
@@ -185,7 +239,8 @@ class Transformator:
 
         logger.info(f"Cloning dist-git repo: {self.dist_git_url} -> {self.dest_dir}")
         return git.repo.Repo.clone_from(url=self.dist_git_url,
-                                        to_path=self.dest_dir)
+                                        to_path=self.dest_dir,
+                                        tags=True)
 
     def create_patches(self, upstream=None, rev_list_option=None):
         """
@@ -258,6 +313,10 @@ class Transformator:
                   dst=self.dest_dir)
 
     def upload_archive_to_lookaside_cache(self, keytab):
+        """
+        Upload the archive to the lookaside cache using fedpkg.
+        (If not exists, the archive will be created.)
+        """
         logger.info("Uploading the archive to lookaside cache.")
         self.fedpkg.init_ticket(keytab)
         self.fedpkg.new_sources(sources=self.archive,

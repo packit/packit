@@ -1,0 +1,7 @@
+{
+  "https://github.com/TomasTomecek/docker-py-source-git": {
+    "upstream_name": "docker",
+    "package_name": "python-docker",
+    "dist_git_url": "https://src.fedoraproject.org/rpms/python-docker.git"
+  }
+}
