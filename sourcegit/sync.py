@@ -7,6 +7,7 @@ from functools import lru_cache
 import git
 
 from sourcegit.transformator import Transformator, get_package_mapping
+from sourcegit.utils import commits_to_nice_str
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +29,21 @@ class Synchronizer:
             source_ref=fedmsg_dict["msg"]["pull_request"]["head"]["ref"],
             top_commit=fedmsg_dict["msg"]["pull_request"]["head"]["sha"],
             pr_id=fedmsg_dict["msg"]["pull_request"]["number"],
+            title=fedmsg_dict["msg"]["pull_request"]["title"],
+            pr_url=fedmsg_dict["msg"]["pull_request"]["html_url"],
         )
 
-    def sync(self, source_url, target_url, source_ref, target_ref, top_commit, pr_id):
+    def sync(
+            self,
+            source_url,
+            target_url,
+            source_ref,
+            target_ref,
+            top_commit,
+            pr_id,
+            pr_url,
+            title,
+    ):
 
         repo = self.get_repo(url=target_url)
         self.checkout_pr(repo=repo, pr_id=pr_id)
@@ -40,14 +53,22 @@ class Synchronizer:
         with Transformator(
                 url=target_url, repo=repo, branch=repo.active_branch, **package_config
         ) as t:
+            t.clone_dist_git_repo()
             t.create_archive()
             t.copy_redhat_content_to_dest_dir()
             patches = t.create_patches()
             t.add_patches_to_specfile(patch_list=patches)
+            t.repo.index.write()
 
-            # Commit
-            # Force push
-            # Create a pr in dist-git (fork if needed)
+            commits = t.get_commits_to_upstream(upstream=target_ref)
+            commits_nice_str = commits_to_nice_str(commits)
+
+            logger.debug(f"Commits in source-git PR:\n{commits_nice_str}")
+
+            msg = f"{pr_url}\n\n{commits_nice_str}"
+            t.commit_distgit(title=title, msg=msg)
+
+            # Create pr in dist-git (fork if needed)
 
     @lru_cache()
     def get_repo(self, url, directory=None):

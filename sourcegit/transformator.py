@@ -32,7 +32,8 @@ class Transformator:
                  dist_git_url=None,
                  fas_username=None,
                  url=None,
-                 repo=None):
+                 repo=None,
+                 rev_list_option=None):
 
         self._repo = repo
         if repo:
@@ -44,6 +45,7 @@ class Transformator:
 
         self._version = version
         self._temp_dir = None
+        self.rev_list_option_args = get_rev_list_kwargs(rev_list_option or ["first_parent"])
 
         self.fas_username = fas_username
 
@@ -197,18 +199,13 @@ class Transformator:
                     fail=True)
 
     @lru_cache()
-    def get_commits_to_upstream(self, upstream, rev_list_option=None):
+    def get_commits_to_upstream(self, upstream, add_usptream_head_commit=False):
         """
         Return the list of commits from current branch to upstream rev/tag.
 
         :param upstream: str -- git branch or tag
-        :param rev_list_option: [str] -- list of options forwarded to `git rev-list`
-                                in form `key` or `key=val`.
         :return: list of commits (last commit on the current branch.).
         """
-
-        rev_list_option = rev_list_option or ["first_parent"]
-        rev_list_option_args = get_rev_list_kwargs(rev_list_option)
 
         if upstream in self.repo.tags:
             upstream_ref = upstream
@@ -220,8 +217,9 @@ class Transformator:
         commits = list(
             self.repo.iter_commits(rev=f"{upstream_ref}..{self.branch}",
                                    reverse=True,
-                                   **rev_list_option_args))
-        commits.insert(0, self.repo.refs[f"{upstream_ref}"].commit)
+                                   **self.rev_list_option_args))
+        if add_usptream_head_commit:
+            commits.insert(0, self.repo.refs[f"{upstream_ref}"].commit)
 
         logger.debug(f"Delta ({upstream_ref}..{self.branch}): {len(commits)}")
         return commits
@@ -253,7 +251,7 @@ class Transformator:
         """
 
         upstream = upstream or self.version_from_specfile
-        commits = self.get_commits_to_upstream(upstream, rev_list_option)
+        commits = self.get_commits_to_upstream(upstream, add_usptream_head_commit=True)
         patch_list = []
         for i, commit in enumerate(commits[1:]):
             parent = commits[i]
@@ -321,6 +319,12 @@ class Transformator:
         self.fedpkg.init_ticket(keytab)
         self.fedpkg.new_sources(sources=self.archive,
                                 fail=False)
+
+    def commit_distgit(self, title, msg):
+        main_msg = f"[source-git] {title}"
+        self.dist_git_repo.git.add("-A")
+        self.dist_git_repo.index.write()
+        self.dist_git_repo.git.commit("-S", "-s", "-m", main_msg, "-m", msg)
 
     def __enter__(self):
         return self

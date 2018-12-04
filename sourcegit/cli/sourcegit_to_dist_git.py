@@ -49,11 +49,12 @@ def sg2dg(config,
                        version=version,
                        dest_dir=dest_dir,
                        dist_git_url=dist_git,
-                       fas_username=config.fas_user) as t:
+                       fas_username=config.fas_user,
+                       rev_list_option=rev_list_option) as t:
         t.clone_dist_git_repo()
         t.create_archive()
         t.copy_redhat_content_to_dest_dir()
-        patches = t.create_patches(upstream=upstream_ref, rev_list_option=rev_list_option)
+        patches = t.create_patches(upstream=upstream_ref)
         t.add_patches_to_specfile(patch_list=patches)
         if not no_new_sources:
             t.upload_archive_to_lookaside_cache(config.keytab)
