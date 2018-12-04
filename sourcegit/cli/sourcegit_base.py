@@ -21,12 +21,12 @@ logger = logging.getLogger(__name__)
 @click.pass_context
 def sourcegit_base(ctx, **kwargs):
     ctx.obj = Config(**kwargs)
-    if ctx.obj.verbose:
-        set_logging(level=logging.INFO,
-                    format="%(message)s")
-
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
+
+    elif ctx.obj.verbose:
+        set_logging(level=logging.INFO,
+                    format="%(message)s")
 
 
 @click.command("version")

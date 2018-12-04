@@ -122,3 +122,12 @@ def set_logging(
             formatter = logging.Formatter(format, date_format)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
+
+
+def commits_to_nice_str(commits):
+    return "\n".join(
+        f"{commit.summary}\n"
+        f"Author: {commit.author.name} <{commit.author.email}>\n"
+        f"{commit.hexsha}\n"
+        for commit in commits
+    )
