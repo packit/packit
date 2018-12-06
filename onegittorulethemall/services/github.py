@@ -43,10 +43,10 @@ class GithubService(GitService):
     @staticmethod
     def is_fork_of(user_repo, target_repo):
         """ is provided repo fork of gh.com/{parent_repo}/? """
-        return user_repo.create_fork and user_repo.parent and \
+        return user_repo.fork_create and user_repo.parent and \
                user_repo.parent.full_name == target_repo
 
-    def create_fork(self, target_repo):
+    def fork_create(self, target_repo):
 
         target_repo_org, target_repo_name = target_repo.split("/", 1)
 
@@ -85,7 +85,7 @@ class GithubService(GitService):
             logger.error("repository doesn't exist")
             raise RuntimeError("repo %s not found" % target_repo)
         logger.info("forking repo %s", target_repo)
-        return self.user.create_fork(target_repo)
+        return self.user.fork_create(target_repo)
 
     def pr_create(self, target_remote, target_branch, current_branch):
         """
