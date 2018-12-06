@@ -1,13 +1,24 @@
 class GitService:
-    def __init__(self, token=None):
-        self.token = token
+    def __init__(self):
+        pass
 
     @classmethod
     def create_from_remote_url(cls, remote_url):
         """ create instance of service from provided remote_url """
         raise NotImplementedError()
 
-    def create_fork(self, target_repo):
+    def get_project(self, namespace=None, user=None, repo=None):
+        raise NotImplementedError
+
+
+class GitProject:
+
+    @property
+    def branches(self):
+        raise NotImplementedError()
+
+    @property
+    def description(self):
         raise NotImplementedError()
 
     def pr_create(self, title, body, target_project, target_branch, current_branch):
@@ -28,9 +39,13 @@ class GitService:
     def pr_merge(self, pr_id):
         raise NotImplementedError()
 
-    def branches(self):
+    @property
+    def fork(self):
         raise NotImplementedError()
 
-    def get_fork(self):
+    @property
+    def is_forked(self):
         raise NotImplementedError()
 
+    def fork_create(self):
+        raise NotImplementedError()
