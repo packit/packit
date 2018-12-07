@@ -1,18 +1,19 @@
+BASE_IMAGE := registry.fedoraproject.org/fedora:29
 TEST_TARGET := ./tests/
 PY_PACKAGE := sourcegit
-KNIFE := sg-knife
+SOURCE_GIT_IMAGE := sourcegit
 
-build-knife:
-	ansible-bender build ./knife.yml registry.fedoraproject.org/fedora:29 $(KNIFE)
+build: recipe.yaml
+	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
 
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
 
-shell-in-knife:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash
+shell:
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash -c '\
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
@@ -23,3 +24,10 @@ check-pypi-packaging:
 		&& python3 -c "import sourcegit; assert sourcegit.__version__" \
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
 		'
+
+secrets.yaml:
+	stat secrets.yaml || echo "Please create a file secrets.yaml and add two keys there: github_token and pagure_token"
+
+run-local: secrets.yaml
+	ansible-playbook -e source_git_image=$(SOURCE_GIT_IMAGE) -e @secrets.yaml -i inventory-local -c local ./deploy.yaml
+	podman logs -f watcher
