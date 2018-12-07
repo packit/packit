@@ -4,13 +4,14 @@ This bot will listen on fedmsg for finished CI runs and will update respective s
 
 import os
 import re
-import sys
 
+import click
 import fedmsg
 import libpagure
 import github
 import requests
 
+from sourcegit.config import get_context_settings
 
 package_mapping = {
     "python-docker": {
@@ -84,7 +85,9 @@ class Holyrood:
         )
 
 
-def main():
+@click.command("watch-fedora-ci", context_settings=get_context_settings())
+@click.argument("message_id", required=False)
+def watcher(message_id):
     """
     watch for flags on PRs: try to process those which we know mapping for
 
@@ -93,25 +96,18 @@ def main():
     # we can watch for runs directly:
     # "org.centos.prod.ci.pipeline.allpackages.complete"
     topic = "org.fedoraproject.prod.pagure.pull-request.flag.added"
+    import ipdb; ipdb.set_trace()
 
     h = Holyrood()
-    try:
-        message_id = sys.argv[1]
-    except IndexError:
-        print(f"Listening on fedmsg, topic={topic}")
-    else:
-        if message_id in ["-h", "--help"]:
-            print(f"Usage: {sys.argv[0]} [FEDMSG_UUID]")
-            return 0
+
+    if message_id:
         url = f"https://apps.fedoraproject.org/datagrepper/id?id={message_id}&is_raw=true"
         response = requests.get(url)
         h.process_pr(response.json())
         return 0
 
+    print(f"Listening on fedmsg, topic={topic}")
+
     for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
         h.process_pr(msg)
     return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main())
