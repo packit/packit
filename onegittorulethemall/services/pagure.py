@@ -91,7 +91,7 @@ class PagureProject(GitProject):
     def pr_merge(self, pr_id):
         return self.pagure.merge_request(request_id=pr_id)
 
-    def pr_create(self, title, body, target_project, target_branch, source_branch):
+    def pr_create(self, title, body, target_branch, source_branch):
         return self.pagure.create_request(
             title=title,
             body=body,

@@ -120,7 +120,7 @@ class OurPagure(libpagure.Pagure):
             }
         """
         request_url = self.get_api_url(
-            "fork", self.username, self.namespace, self.repo, "pull-request", "new"
+            self.namespace, self.repo_name, "pull-request", "new"
         )
 
         return_value = self._call_api(

@@ -21,7 +21,7 @@ class GitProject:
     def description(self):
         raise NotImplementedError()
 
-    def pr_create(self, title, body, target_project, target_branch, current_branch):
+    def pr_create(self, title, body, target_branch, current_branch):
         raise NotImplementedError()
 
     def pr_list(self):
