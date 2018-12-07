@@ -8,7 +8,12 @@ from onegittorulethemall.services.pagure import PagureService
 
 @pytest.fixture()
 def pagure_token():
-    return os.environ["PAGURE_API_TOKEN"]
+    return os.environ["PAGURE_TOKEN"]
+
+
+@pytest.fixture()
+def pagure_user():
+    return os.environ["PAGURE_USER"]
 
 
 @pytest.fixture()
@@ -131,3 +136,7 @@ def test_create_fork(docker_py_project):
     assert not docker_py_project.fork
     docker_py_project.fork_create()
     assert docker_py_project.fork.exists
+
+
+def test_username(pagure_service, pagure_user):
+    assert pagure_service.token_username == pagure_user

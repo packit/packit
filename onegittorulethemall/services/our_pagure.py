@@ -26,6 +26,12 @@ class OurPagure(libpagure.Pagure):
 
         return self.api_url + "/".join(args_list)
 
+    def whoami(self):
+        request_url = self.get_api_url("-", "whoami")
+
+        return_value = self._call_api(url=request_url, method="POST", data={})
+        return return_value["username"]
+
     def create_request(self, title, body, target_branch, source_branch):
         """
         PAGURE DOCS:
