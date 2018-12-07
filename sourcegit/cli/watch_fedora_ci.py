@@ -43,10 +43,10 @@ class Holyrood:
         )
         try:
             project_name = msg["msg"]["pullrequest"]["project"]["name"]
-            print(project_name)
+            logger.info("new flag for PR for %s", project_name)
             source_git = package_mapping[project_name]["source-git"]
         except KeyError:
-            print("invalid message format or source git not found")
+            logger.info("invalid message format or source git not found")
             return
         pr_id = msg["msg"]["pullrequest"]["id"]
         pr_info = pagure.request_info(pr_id)
@@ -57,7 +57,7 @@ class Holyrood:
         try:
             sg_pr_id = int(re_search[1])
         except (IndexError, ValueError):
-            print("Source git PR not found")
+            logger.info("source git PR not found")
             return
 
         # check the commit which tests were running for
@@ -65,7 +65,7 @@ class Holyrood:
         try:
             commit = re_search[1]
         except (IndexError, ValueError):
-            print("Source git commit not found")
+            logger.error("source git commit not found")
             return
 
         repo = self.g.get_repo(source_git)
@@ -107,7 +107,7 @@ def watcher(message_id):
         h.process_pr(response.json())
         return 0
 
-    print(f"Listening on fedmsg, topic={topic}")
+    logger.info("listening on fedmsg, topic=%s", topic)
 
     for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
         h.process_pr(msg)
