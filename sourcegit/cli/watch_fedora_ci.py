@@ -1,14 +1,14 @@
 """
 This bot will listen on fedmsg for finished CI runs and will update respective source gits
 """
-
+import logging
 import os
 import re
 
 import click
 import fedmsg
-import libpagure
 import github
+import libpagure
 import requests
 
 from sourcegit.config import get_context_settings
@@ -18,6 +18,8 @@ package_mapping = {
         "source-git": "TomasTomecek/docker-py-source-git"
     }
 }
+
+logger = logging.getLogger(__name__)
 
 
 class Holyrood:
@@ -96,7 +98,6 @@ def watcher(message_id):
     # we can watch for runs directly:
     # "org.centos.prod.ci.pipeline.allpackages.complete"
     topic = "org.fedoraproject.prod.pagure.pull-request.flag.added"
-    import ipdb; ipdb.set_trace()
 
     h = Holyrood()
 
