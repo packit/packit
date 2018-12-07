@@ -22,6 +22,7 @@ check-pypi-packaging:
 		&& pip3 show $(PY_PACKAGE) \
 		&& twine check ./dist/* \
 		&& python3 -c "import sourcegit; assert sourcegit.__version__" \
+		&& python3 -c "import onegittorulethemall" \
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
 		'
 
