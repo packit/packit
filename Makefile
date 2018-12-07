@@ -30,4 +30,4 @@ secrets.yaml:
 
 run-local: secrets.yaml
 	ansible-playbook -e source_git_image=$(SOURCE_GIT_IMAGE) -e @secrets.yaml -i inventory-local -c local ./deploy.yaml
-	podman logs -f watcher
+	podman logs -f watcher & podman logs -f syncer & sleep 999999
