@@ -74,7 +74,7 @@ class Synchronizer:
             t.commit_distgit(title=title, msg=msg)
 
             package_name = package_config["package_name"]
-            pagure = PagureService(token=self.pagure_token, username=self.pagure_user)
+            pagure = PagureService(token=self.pagure_token)
 
             project = pagure.get_project(repo=package_name, namespace="rpms")
 
@@ -102,12 +102,7 @@ class Synchronizer:
     @property
     @lru_cache()
     def pagure_token(self):
-        return os.environ["PAGURE_API_TOKEN"]
-
-    @property
-    @lru_cache()
-    def pagure_user(self):
-        return os.environ["PAGURE_USER"]
+        return os.environ["PAGURE_TOKEN"]
 
     @lru_cache()
     def get_repo(self, url, directory=None):

@@ -1,4 +1,5 @@
 import logging
+from functools import lru_cache
 
 from onegittorulethemall.services.abstract import GitService, GitProject
 from onegittorulethemall.services.our_pagure import OurPagure
@@ -36,6 +37,10 @@ class PagureService(GitService):
             instance_url=self.instance_url, token=self.token, **project_kwargs
         )
 
+    @property
+    def token_username(self):
+        return self.pagure.whoami()
+
 
 class PagureProject(GitProject):
     def __init__(
@@ -51,7 +56,7 @@ class PagureProject(GitProject):
         super().__init__()
         self.repo = repo
         self.namespace = namespace
-        self.username = username
+        self._username = username
         self.instance_url = instance_url
         self.token = token
         self._is_fork = is_fork or False
@@ -65,6 +70,11 @@ class PagureProject(GitProject):
             instance_url=instance_url,
             **kwargs,
         )
+
+    @property
+    @lru_cache()
+    def username(self):
+        return self._username or self.pagure.whoami()
 
     @property
     def branches(self):
