@@ -1,8 +1,10 @@
 import logging
+import re
 from functools import lru_cache
 
 from onegittorulethemall.services.abstract import GitService, GitProject
 from onegittorulethemall.services.our_pagure import OurPagure
+from sourcegit.constants import dg_pr_key_sg_pr, dg_pr_key_sg_commit
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +73,12 @@ class PagureProject(GitProject):
             **kwargs,
         )
 
+    def __str__(self):
+        return f"namespace={self.namespace} repo={self.repo} username={self.username}"
+
+    def __repr__(self):
+        return f"PagureProject(namespace={self.namespace}, repo={self.repo}, username={self.username})"
+
     @property
     @lru_cache()
     def username(self):
@@ -84,7 +92,7 @@ class PagureProject(GitProject):
     def description(self):
         return self.pagure.project_description
 
-    def pr_list(self, status="open"):
+    def pr_list(self, status="Open"):
         return self.pagure.list_requests(status=status)
 
     def pr_comment(self, pr_id, body, commit=None, filename=None, row=None):
@@ -97,6 +105,57 @@ class PagureProject(GitProject):
 
     def pr_info(self, pr_id):
         return self.pagure.request_info(request_id=pr_id)
+
+    def search_in_pr_comments(self, pr_id, regex, pr_info=None):
+        """
+        Use re.search using the given regex on PR comments, default to PR description
+
+        :param pr_id: str, ID of the pull request
+        :param regex: str, regular expression
+        :param pr_info, dict, existing pr_info dict = optimization and saving queries
+        :return: return value of re.search
+        """
+        r = re.compile(regex)
+        pr_info = pr_info or self.pr_info(pr_id)
+        pr_comments = pr_info["comments"]
+        # let's start with the recent ones first
+        pr_comments = reversed(pr_comments)
+        pr_description = pr_info["initial_comment"]
+        for c in pr_comments:
+            out = r.search(c["comment"])
+            if out:
+                return out
+        return r.search(pr_description)
+
+    def get_sg_top_commit(self, pr_id, pr_info=None):
+        """
+        Find source-git top commit ID in description of the selected dist-git pull request
+
+        :param pr_id: str, ID of the pull request
+        :param pr_info, dict, existing pr_info dict = optimization and saving queries
+        :return: int or None
+        """
+        re_search = self.search_in_pr_comments(pr_id, r"%s:\s*(\w+)" % dg_pr_key_sg_commit, pr_info=pr_info)
+        try:
+            return re_search[1]
+        except (IndexError, ValueError):
+            logger.error("source git commit not found")
+            return
+
+    def get_sg_pr_id(self, pr_id, pr_info=None):
+        """
+        Find source-git PR ID in description of the selected dist-git pull request
+
+        :param pr_id: str, ID of the pull request
+        :param pr_info, dict, existing pr_info dict = optimization and saving queries
+        :return: int or None
+        """
+        re_search = self.search_in_pr_comments(pr_id, r"%s:\s*(\d+)" % dg_pr_key_sg_pr, pr_info=pr_info)
+        try:
+            return int(re_search[1])
+        except (IndexError, ValueError):
+            logger.info("source git PR not found")
+            return
 
     def pr_merge(self, pr_id):
         return self.pagure.merge_request(request_id=pr_id)
