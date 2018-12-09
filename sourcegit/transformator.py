@@ -324,7 +324,10 @@ class Transformator:
         main_msg = f"[source-git] {title}"
         self.dist_git_repo.git.add("-A")
         self.dist_git_repo.index.write()
-        self.dist_git_repo.git.commit("-S", "-s", "-m", main_msg, "-m", msg)
+        # TODO: implement signing properly: we need to create a cert for the bot, distribute it to the container,
+        #       prepare git config and then we can start signing
+        # TODO: make -s configurable
+        self.dist_git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
 
     def __enter__(self):
         return self
