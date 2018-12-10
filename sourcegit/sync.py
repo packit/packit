@@ -110,7 +110,6 @@ class Synchronizer:
             # https://pagure.io/pagure/issue/4111
             # Short-term solution: keep adding comments and get updated info about sg PR ID and commit desc
             for pr in project.pr_list():
-                import ipdb; ipdb.set_trace()
                 dg_pr_id = pr["id"]
                 # let's save a few queries by passing the pr_info dict
                 sg_pr_id = project.get_sg_pr_id(dg_pr_id, pr_info=pr)
@@ -118,16 +117,19 @@ class Synchronizer:
                 if sg_pr_id and commit:
                     if sg_pr_id == pr_id:
                         # yep, we got it, this is the right PR (if sg & dg are 1:1 and not n:1)
-                        msg = (f"New changes were pushed to the upstream pull request\n"
-                               f"{dg_pr_key_sg_pr}: {pr_id}\n{dg_pr_key_sg_commit}: {top_commit}")
+                        msg = (f"New changes were pushed to the upstream pull request\n\n"
+                               f"[{dg_pr_key_sg_pr}: {pr_id}]({pr_url})\n"
+                               f"{dg_pr_key_sg_commit}: {top_commit}")
                         # FIXME: consider storing the data above as a git note of the top commit
+                        project.pagure.change_token(self.pagure_edit_token)
                         project.pr_comment(dg_pr_id, msg)
                         logger.info("new comment added on PR %s", sg_pr_id)
                         break
             else:
                 msg = (f"This pull request contains changes from upstream "
                        f"and is meant to integrate them into Fedora\n\n"
-                       f"{dg_pr_key_sg_pr}: {pr_id}\n{dg_pr_key_sg_commit}: {top_commit}")
+                       f"[{dg_pr_key_sg_pr}: {pr_id}]({pr_url})\n"
+                       f"{dg_pr_key_sg_commit}: {top_commit}")
                 dist_git_pr_id = project.fork.pr_create(
                     title=f"[source-git] {title}",
                     body=msg,
@@ -140,6 +142,11 @@ class Synchronizer:
     @lru_cache()
     def pagure_token(self):
         return os.environ["PAGURE_TOKEN"]
+
+    @property
+    @lru_cache()
+    def pagure_edit_token(self):
+        return os.environ["PAGURE_EDIT_TOKEN"]
 
     @lru_cache()
     def get_repo(self, url, directory=None):
