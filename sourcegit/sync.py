@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import shutil
@@ -24,16 +25,25 @@ class Synchronizer:
 
         :param fedmsg_dict: dict, fedmsg of a newly opened PR
         """
-        return self.sync(
-            target_url=fedmsg_dict["msg"]["pull_request"]["base"]["repo"]["html_url"],
-            target_ref=fedmsg_dict["msg"]["pull_request"]["base"]["ref"],
-            source_url=fedmsg_dict["msg"]["pull_request"]["head"]["repo"]["html_url"],
-            source_ref=fedmsg_dict["msg"]["pull_request"]["head"]["ref"],
-            top_commit=fedmsg_dict["msg"]["pull_request"]["head"]["sha"],
-            pr_id=fedmsg_dict["msg"]["pull_request"]["number"],
-            title=fedmsg_dict["msg"]["pull_request"]["title"],
-            pr_url=fedmsg_dict["msg"]["pull_request"]["html_url"],
-        )
+
+        try:
+            msg_id = fedmsg_dict["msg_id"]
+            nice_msg = json.dumps(fedmsg_dict, indent=4)
+            logger.debug(f"Processing fedmsg:\n{nice_msg}")
+            return self.sync(
+                target_url=fedmsg_dict["msg"]["pull_request"]["base"]["repo"]["html_url"],
+                target_ref=fedmsg_dict["msg"]["pull_request"]["base"]["ref"],
+                source_url=fedmsg_dict["msg"]["pull_request"]["head"]["repo"]["html_url"],
+                source_ref=fedmsg_dict["msg"]["pull_request"]["head"]["ref"],
+                top_commit=fedmsg_dict["msg"]["pull_request"]["head"]["sha"],
+                pr_id=fedmsg_dict["msg"]["pull_request"]["number"],
+                title=fedmsg_dict["msg"]["pull_request"]["title"],
+                pr_url=fedmsg_dict["msg"]["pull_request"]["html_url"],
+            )
+        except Exception as ex:
+            logger.warning(f"Error on processing a msg {msg_id}")
+            logger.debug(ex)
+            return None
 
     def sync(
             self,
