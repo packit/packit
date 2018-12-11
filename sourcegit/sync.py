@@ -63,7 +63,11 @@ class Synchronizer:
         repo = self.get_repo(url=target_url)
         self.checkout_pr(repo=repo, pr_id=pr_id)
 
-        package_config = get_package_mapping().get(target_url, {})
+        try:
+            package_config = get_package_mapping()[target_url]
+        except KeyError:
+            logger.info("no source-git mapping for project %s", target_url)
+            return
 
         # FIXME: branch name should be tied to the sg PR, so something like this: f"source-git-{pr_id}"
         with Transformator(
