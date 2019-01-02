@@ -28,6 +28,10 @@ class Synchronizer:
 
         try:
             msg_id = fedmsg_dict["msg_id"]
+        except KeyError:
+            logger.error("provided message is not a fedmsg (missing msg_id)")
+            return
+        try:
             nice_msg = json.dumps(fedmsg_dict, indent=4)
             logger.debug(f"Processing fedmsg:\n{nice_msg}")
             return self.sync(
@@ -43,7 +47,7 @@ class Synchronizer:
         except Exception as ex:
             logger.warning(f"Error on processing a msg {msg_id}")
             logger.debug(ex)
-            return None
+            return
 
     def sync(
             self,
