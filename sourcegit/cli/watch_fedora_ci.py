@@ -26,7 +26,7 @@ class Holyrood:
     """ such a good gin """
 
     def __init__(self):
-        self.pagure_token = os.environ["PAGURE_TOKEN"]
+        self.pagure_token = os.environ["PAGURE_READ_TOKEN"]
         self.github_token = os.environ["GITHUB_TOKEN"]
         self.g = github.Github(login_or_token=self.github_token)
 

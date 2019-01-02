@@ -103,7 +103,7 @@ class Synchronizer:
             t.commit_distgit(title=title, msg=msg)
 
             package_name = package_config["package_name"]
-            pagure = PagureService(token=self.pagure_token)
+            pagure = PagureService(token=self.pagure_read_token)
 
             project = pagure.get_project(repo=package_name, namespace="rpms")
 
@@ -154,12 +154,14 @@ class Synchronizer:
 
     @property
     @lru_cache()
-    def pagure_token(self):
-        return os.environ["PAGURE_TOKEN"]
+    def pagure_read_token(self):
+        return os.environ["PAGURE_READ_TOKEN"]
 
     @property
     @lru_cache()
     def pagure_edit_token(self):
+        """ this token is used to comment on pull requests """
+        # FIXME: make this more easier to be used -- no need for a dedicated token
         return os.environ["PAGURE_EDIT_TOKEN"]
 
     @lru_cache()
