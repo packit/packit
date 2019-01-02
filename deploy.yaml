@@ -5,11 +5,12 @@
   - name: Run watcher locally
     command: sudo podman run -d --name watcher \
               -e GITHUB_TOKEN={{ github_token }} \
-              -e PAGURE_TOKEN={{ pagure_token }} \
+              -e PAGURE_EDIT_TOKEN={{ pagure_edit_token }} \
+              -e PAGURE_READ_TOKEN={{ pagure_read_token }} \
               {{ source_git_image }} \
               sourcegit -d watch-fedora-ci
   - name: Run syncer locally
-              -e PAGURE_TOKEN={{ pagure_token }} \
     command: sudo podman run -d --name syncer \
+              -e PAGURE_TOKEN={{ pagure_edit_token }} \
               {{ source_git_image }} \
               sourcegit -d watch-pr --updated
