@@ -4,16 +4,16 @@ PY_PACKAGE := sourcegit
 SOURCE_GIT_IMAGE := sourcegit
 
 build: recipe.yaml
-	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
+	sudo ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
 
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
 
 shell:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash
+	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash -c '\
+	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
