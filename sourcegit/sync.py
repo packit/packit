@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 class Synchronizer:
     def __init__(self) -> None:
+        # FIXME: there is an easy race condition here: if two threads use the same instance and
+        #        one starts cleaning, the other gets borked; rework this so there is no such attribute
+        #        on the class
         self._tempdirs = []
 
     def sync_using_fedmsg_dict(self, fedmsg_dict):
