@@ -3,6 +3,9 @@
   hosts: all
   become: true
   tasks:
+  - name: Gracefully remove syncer and watcher
+    command: podman rm -f watcher syncer
+    ignore_errors: true
   - name: Run watcher locally
     command: podman run -d --name watcher \
               -e GITHUB_TOKEN={{ github_token }} \
