@@ -30,7 +30,7 @@ secrets.yaml:
 	stat secrets.yaml || echo "Please create a file secrets.yaml and add two keys there: github_token and pagure_token"
 
 run-local: secrets.yaml
-	ansible-playbook -e source_git_image=$(SOURCE_GIT_IMAGE) -e @secrets.yaml -i inventory-local -c local ./deploy.yaml
+	ansible-playbook -K -e source_git_image=$(SOURCE_GIT_IMAGE) -e @secrets.yaml -i inventory-local -c local ./deploy.yaml
 	sudo podman logs -f watcher & sudo podman logs -f syncer & sleep 999999
 
 stop-local:
