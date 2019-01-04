@@ -28,6 +28,18 @@ class Synchronizer:
 
         :param fedmsg_dict: dict, fedmsg of a newly opened PR
         """
+        try:
+            target_url = fedmsg_dict["msg"]["pull_request"]["base"]["repo"]["html_url"]
+        except (KeyError, ValueError) as ex:
+            logger.debug("ex = %s", ex)
+            logger.error("invalid fedmsg format")
+            return
+
+        try:
+            package_config = get_package_mapping()[target_url]
+        except KeyError:
+            logger.info("no source-git mapping for project %s", target_url)
+            return
 
         try:
             msg_id = fedmsg_dict["msg_id"]
@@ -46,6 +58,7 @@ class Synchronizer:
                 pr_id=fedmsg_dict["msg"]["pull_request"]["number"],
                 title=fedmsg_dict["msg"]["pull_request"]["title"],
                 pr_url=fedmsg_dict["msg"]["pull_request"]["html_url"],
+                package_config=package_config
             )
         except Exception as ex:
             logger.warning(f"Error on processing a msg {msg_id}")
@@ -62,6 +75,7 @@ class Synchronizer:
             pr_id,
             pr_url,
             title,
+            package_config,
     ):
         """
         synchronize selected source-git pull request to respective downstream dist-git repo via a pagure pull request
@@ -74,17 +88,12 @@ class Synchronizer:
         :param pr_id:
         :param pr_url:
         :param title:
+        :param package_config: dict, configuration of the sg - dg mapping
         :return:
         """
-
+        logger.info("starting sync for project %s", target_url)
         repo = self.get_repo(url=target_url)
         self.checkout_pr(repo=repo, pr_id=pr_id)
-
-        try:
-            package_config = get_package_mapping()[target_url]
-        except KeyError:
-            logger.info("no source-git mapping for project %s", target_url)
-            return
 
         # FIXME: branch name should be tied to the sg PR, so something like this: f"source-git-{pr_id}"
         with Transformator(
