@@ -3,15 +3,15 @@ This bot will listen on fedmsg for finished CI runs and will update respective s
 """
 import logging
 import os
-import re
 
 import click
 import fedmsg
 import github
-import libpagure
 import requests
 
+from onegittorulethemall.services.pagure import PagureService
 from sourcegit.config import get_context_settings
+
 
 package_mapping = {
     "python-docker": {
@@ -26,7 +26,7 @@ class Holyrood:
     """ such a good gin """
 
     def __init__(self):
-        self.pagure_token = os.environ["PAGURE_TOKEN"]
+        self.pagure_token = os.environ["PAGURE_READ_TOKEN"]
         self.github_token = os.environ["GITHUB_TOKEN"]
         self.g = github.Github(login_or_token=self.github_token)
 
@@ -36,36 +36,27 @@ class Holyrood:
         :param msg:
         :return:
         """
-        pagure = libpagure.Pagure(
-            pagure_token=self.pagure_token,
-            pagure_repository=msg["msg"]["pullrequest"]["project"]["fullname"],
-            instance_url="https://src.fedoraproject.org/"
-        )
+        project_name = msg["msg"]["pullrequest"]["project"]["name"]
+
+        ps = PagureService(token=self.pagure_token)
+        project = ps.get_project(repo=project_name, namespace="rpms")
+
         try:
-            project_name = msg["msg"]["pullrequest"]["project"]["name"]
-            print(project_name)
+            logger.info("new flag for PR for %s", project_name)
             source_git = package_mapping[project_name]["source-git"]
         except KeyError:
-            print("invalid message format or source git not found")
+            logger.info("source git not found")
             return
         pr_id = msg["msg"]["pullrequest"]["id"]
-        pr_info = pagure.request_info(pr_id)
-        pr_description = pr_info["initial_comment"]
 
         # find info for the matching source git pr
-        re_search = re.search(r"Source-git pull request ID:\s*(\d+)", pr_description)
-        try:
-            sg_pr_id = int(re_search[1])
-        except (IndexError, ValueError):
-            print("Source git PR not found")
-            return
+        sg_pr_id = project.get_sg_pr_id(pr_id)
 
         # check the commit which tests were running for
-        re_search = re.search(r"Source-git commit:\s*(\w+)", pr_description)
-        try:
-            commit = re_search[1]
-        except (IndexError, ValueError):
-            print("Source git commit not found")
+        commit = project.get_sg_top_commit(pr_id)
+
+        if not (sg_pr_id and commit):
+            logger.info("this doesn't seem to be a source-git related event")
             return
 
         repo = self.g.get_repo(source_git)
@@ -107,7 +98,7 @@ def watcher(message_id):
         h.process_pr(response.json())
         return 0
 
-    print(f"Listening on fedmsg, topic={topic}")
+    logger.info("listening on fedmsg, topic=%s", topic)
 
     for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
         h.process_pr(msg)
