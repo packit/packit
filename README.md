@@ -14,7 +14,7 @@ projects into Fedora operating system.
  * One of the implications is that it's trivial to propose changes back to
    upstream or cherry-pick fixes from upstream to downstream.
 
- * One of the targeted outcomes is stability: only merge, build and compose
+ * We expect that stability will increases: only merge, build and compose
    components which integrate well with the rest of the operating system. The
    biggest impact of such behavior will be on Fedora rawhide and when working
    on a new release.
@@ -43,6 +43,10 @@ projects into Fedora operating system.
 Right now we are aiming for a proof of concept. The work is being tracked [in
 this milestone](https://github.com/user-cont/source-git/milestone/1). Once it's
 done, we'll create a demo and present it at [DevConf.cz](https://devconf.cz/)
+
+The talk: [Auto-maintain your Package](https://devconfcz2019.sched.com/event/Jch1/auto-maintain-your-package)  
+Time: Friday, January 25 • 4:00pm - 4:25pm  
+Location: E112  
 
 
 ## Plans
@@ -83,10 +87,18 @@ Before that, you should create a file secrets.yaml and store your github and
 [pagure API tokens](https://src.fedoraproject.org/settings#nav-api-tab) in
 there. This file is then used during deployment as a source for ansible
 variables which are utilized by the containers:
-```
+```yaml
 $ cat ./secrets.yaml
 github_token: 123456
-pagure_token: 456789
+
+# This token is needed to access data in pagure.
+# This can be an API token of your user.
+pagure_read_token: 456789
+
+# We need this token to be able to comment on a pagure pull request.
+# If you don't have commit access to the package, you should ask maintainer of
+# the package to generate a token for the specific dist-git repository.
+pagure_edit_token: 456789
 ```
 
 Let's build and run now:

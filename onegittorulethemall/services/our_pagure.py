@@ -139,7 +139,7 @@ class OurPagure(libpagure.Pagure):
                 "initial_comment": body,
             },
         )
-        return return_value["id"]
+        return return_value
 
     def get_fork(self):
 
@@ -264,3 +264,7 @@ class OurPagure(libpagure.Pagure):
 
         return_value = self._call_api(url=request_url, method="GET", data={})
         return return_value["flags"]
+
+    def change_token(self, token):
+        self.token = token
+        self.header = {"Authorization": "token " + self.token}
