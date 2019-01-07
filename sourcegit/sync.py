@@ -8,15 +8,21 @@ from functools import lru_cache
 import git
 
 from onegittorulethemall.services.pagure import PagureService
+
 from sourcegit.constants import dg_pr_key_sg_commit, dg_pr_key_sg_pr
 from sourcegit.transformator import Transformator, get_package_mapping
 from sourcegit.utils import commits_to_nice_str
+
 
 logger = logging.getLogger(__name__)
 
 
 class Synchronizer:
-    def __init__(self) -> None:
+    def __init__(self, pagure_user_token, pagure_package_token, pagure_fork_token) -> None:
+        self.pagure_user_token = pagure_user_token
+        self.pagure_package_token = pagure_package_token
+        self.pagure_fork_token = pagure_fork_token
+
         # FIXME: there is an easy race condition here: if two threads use the same instance and
         #        one starts cleaning, the other gets borked; rework this so there is no such attribute
         #        on the class
@@ -119,7 +125,7 @@ class Synchronizer:
             t.commit_distgit(title=title, msg=msg)
 
             package_name = package_config["package_name"]
-            pagure = PagureService(token=self.pagure_read_token)
+            pagure = PagureService(token=self.pagure_user_token)
 
             project = pagure.get_project(repo=package_name, namespace="rpms")
 
@@ -151,7 +157,7 @@ class Synchronizer:
                                f"[{dg_pr_key_sg_pr}: {pr_id}]({pr_url})\n"
                                f"{dg_pr_key_sg_commit}: {top_commit}")
                         # FIXME: consider storing the data above as a git note of the top commit
-                        project.pagure.change_token(self.pagure_edit_token)
+                        project.pagure.change_token(self.pagure_package_token)
                         project.pr_comment(dg_pr_id, msg)
                         logger.info("new comment added on PR %s", sg_pr_id)
                         break
@@ -160,6 +166,8 @@ class Synchronizer:
                        f"and is meant to integrate them into Fedora\n\n"
                        f"[{dg_pr_key_sg_pr}: {pr_id}]({pr_url})\n"
                        f"{dg_pr_key_sg_commit}: {top_commit}")
+                # This pagure call requires token from the package's FORK
+                project.fork.pagure.change_token(self.pagure_fork_token)
                 dist_git_pr_id = project.fork.pr_create(
                     title=f"[source-git] {title}",
                     body=msg,
@@ -167,18 +175,6 @@ class Synchronizer:
                     target_branch="master",
                 )["id"]
                 logger.info(f"PR created: {dist_git_pr_id}")
-
-    @property
-    @lru_cache()
-    def pagure_read_token(self):
-        return os.environ["PAGURE_READ_TOKEN"]
-
-    @property
-    @lru_cache()
-    def pagure_edit_token(self):
-        """ this token is used to comment on pull requests """
-        # FIXME: make this more easier to be used -- no need for a dedicated token
-        return os.environ["PAGURE_EDIT_TOKEN"]
 
     @lru_cache()
     def get_repo(self, url, directory=None):

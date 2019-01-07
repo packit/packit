@@ -25,6 +25,15 @@
       - python3-libpagure
       - python3-fedmsg
       state: present
+  - name: Install dependencies for syncer
+    dnf:
+      name:
+      - rpm-build
+      state: present
+  - name: Set up git
+    command: git config --global user.email "source-git@example.org"
+  - name: Set up git a bit more
+    command: git config --global user.name "Source Git"
   - name: stat /src
     stat:
       path: /src
