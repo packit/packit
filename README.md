@@ -107,6 +107,15 @@ pagure_package_token: ABCDEF
 pagure_fork_token: QWERTY
 ```
 
+The next thing you need, in order for the tooling to be able to push to your fork in Fedora dist-git, SSH keys.
+
+Please place two files to the root of this repo:
+ * bigger-secret — public key
+ * biggest-secret — private key
+
+Both of them are in .gitignore so they will not land in git.
+
+
 Let's build and run now:
 ```
 $ make build
