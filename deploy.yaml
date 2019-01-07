@@ -1,3 +1,12 @@
+# This is the deployment playbook.
+#
+# If you need a debugger, I suggest to:
+# 1. Change the command to bash
+# 2. Run this playbook
+# 3. sudo podman attach {syncer,watcher} bash
+# 4. Insert ipdb probes in the code and run sourcegit:
+#   $ sourcegit -d watch-pr --updated 2019-e693608f-d77c-41ab-8b2b-99825b6170f4
+# Good luck!
 ---
 - name: Deploy source-git
   hosts: all
@@ -15,6 +24,7 @@
               -e PYTHONPATH=/src \
               -v {{ playbook_dir }}:/src:Z \
               -w /src \
+              -ti \
               {{ source_git_image }} \
               sourcegit -d watch-fedora-ci
   - name: Run syncer locally
@@ -25,5 +35,6 @@
               -e PYTHONPATH=/src \
               -v {{ playbook_dir }}:/src:Z \
               -w /src \
+              -ti \
               {{ source_git_image }} \
               sourcegit -d watch-pr --updated
