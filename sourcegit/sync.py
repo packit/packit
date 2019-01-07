@@ -187,6 +187,7 @@ class Synchronizer:
             self._tempdirs.append(tempdir)
             directory = tempdir
 
+        # TODO: optimize cloning: single branch and last n commits?
         if os.path.isdir(os.path.join(directory, ".git")):
             logger.debug("Source git repo exists.")
             repo = git.repo.Repo(directory)

@@ -231,6 +231,7 @@ class Transformator:
 
         :return: git.Repo instance
         """
+        # TODO: optimize cloning: single branch and last 3 commits?
         if os.path.isdir(os.path.join(self.dest_dir, ".git")):
             logger.info(f"Dist-git already present: {self.dest_dir}")
             return git.repo.Repo(self.dest_dir)
