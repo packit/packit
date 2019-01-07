@@ -9,7 +9,7 @@ from sourcegit.constants import dg_pr_key_sg_pr, dg_pr_key_sg_commit
 logger = logging.getLogger(__name__)
 
 
-def replace_username_with_username(dictionary):
+def sanitize_fork_username(dictionary):
     result = dictionary.copy()
     if "username" in result and "fork_username" not in result:
         result["fork_username"] = result["username"]
@@ -29,7 +29,7 @@ class PagureService(GitService):
         self.pagure = OurPagure(
             pagure_token=token,
             instance_url=instance_url,
-            **replace_username_with_username(kwargs),
+            **sanitize_fork_username(kwargs),
         )
 
     def get_project(self, **kwargs):
@@ -63,6 +63,7 @@ class PagureProject(GitProject):
         self.token = token
         self._is_fork = is_fork or False
         self.pagure_kwargs = kwargs
+        self.forked_project = None
 
         self.pagure = OurPagure(
             pagure_token=token,
@@ -174,22 +175,26 @@ class PagureProject(GitProject):
     @property
     def fork(self):
         """PagureRepo instance of the fork of this repo."""
-        kwargs = replace_username_with_username(self.pagure_kwargs)
-        kwargs.update(
-            repo=self.repo,
-            namespace=self.namespace,
-            username=self.username,
-            instance_url=self.instance_url,
-            token=self.token,
-            is_fork=True,
-        )
-        fork_project = PagureProject(**kwargs)
-        try:
-            if fork_project.exists and fork_project.pagure.parent:
-                return fork_project
-        except:
-            return None
-        return None
+        if self.forked_project is None:
+            kwargs = sanitize_fork_username(self.pagure_kwargs)
+            kwargs.update(
+                repo=self.repo,
+                namespace=self.namespace,
+                username=self.username,
+                instance_url=self.instance_url,
+                token=self.token,
+                is_fork=True,
+            )
+            self.forked_project = PagureProject(**kwargs)
+            try:
+                # why do we do this harakiri?
+                if not (self.forked_project.exists and
+                        self.forked_project.pagure.parent):
+                    self.forked_project = None
+            except Exception as ex:
+                logger.info("exception while getting the forked project: %s", ex)
+                self.forked_project = None
+        return self.forked_project
 
     @property
     def is_fork(self):

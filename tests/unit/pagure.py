@@ -2,7 +2,7 @@ import pytest
 
 from onegittorulethemall.services.pagure import (
     PagureService,
-    replace_username_with_username,
+    sanitize_fork_username,
 )
 
 
@@ -76,7 +76,7 @@ def test_get_api_url_username(pagure_service_username, args_list, result):
     ],
 )
 def test_replace_username_with_username(dictionary, result):
-    assert replace_username_with_username(dictionary) == result
+    assert sanitize_fork_username(dictionary) == result
 
 
 def test_non_fork(pagure_service_username):
