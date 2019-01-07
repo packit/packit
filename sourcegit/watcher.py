@@ -2,9 +2,9 @@
 Watch CI and report results back to upstream.
 """
 import logging
-import os
 
 import github
+
 from onegittorulethemall.services.pagure import PagureService
 
 
@@ -20,9 +20,9 @@ package_mapping = {
 class Holyrood:
     """ such a good gin """
 
-    def __init__(self):
-        self.pagure_token = os.environ["PAGURE_READ_TOKEN"]
-        self.github_token = os.environ["GITHUB_TOKEN"]
+    def __init__(self, github_token, pagure_user_token):
+        self.pagure_token = pagure_user_token
+        self.github_token = github_token
         self.g = github.Github(login_or_token=self.github_token)
 
     def process_pr(self, msg):

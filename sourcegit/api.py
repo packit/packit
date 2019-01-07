@@ -3,6 +3,8 @@ This is the official python interface for source-git. This is used exclusively i
 """
 
 import logging
+import os
+from functools import lru_cache
 
 import requests
 
@@ -30,8 +32,7 @@ class SourceGitAPI:
         msg_dict = response.json()
         return msg_dict
 
-    @staticmethod
-    def sync_upstream_pr_to_distgit(fedmsg_dict):
+    def sync_upstream_pr_to_distgit(self, fedmsg_dict):
         """
         Take the input fedmsg (github push or pr create) and sync the content into dist-git
 
@@ -39,16 +40,39 @@ class SourceGitAPI:
         :return: path to working dir
         """
         logger.info("syncing the upstream code to downstream")
-        with Synchronizer() as sync:
+        with Synchronizer(self.pagure_user_token, self.pagure_package_token, self.pagure_fork_token) as sync:
             return sync.sync_using_fedmsg_dict(fedmsg_dict)
 
-    @staticmethod
-    def process_ci_result(fedmsg_dict):
+    def process_ci_result(self, fedmsg_dict):
         """
         Take the CI result, figure out if it's related to source-git and if it is, report back to upstream
 
         :param fedmsg_dict: dict, flag added in pagure
         :return:
         """
-        h = Holyrood()
+        h = Holyrood(self.github_token, self.pagure_user_token)
         h.process_pr(fedmsg_dict)
+
+    @property
+    @lru_cache()
+    def github_token(self):
+        return os.environ["GITHUB_TOKEN"]
+
+    @property
+    @lru_cache()
+    def pagure_user_token(self):
+        return os.environ["PAGURE_USER_TOKEN"]
+
+    @property
+    @lru_cache()
+    def pagure_package_token(self):
+        """ this token is used to comment on pull requests """
+        # FIXME: make this more easier to be used -- no need for a dedicated token
+        return os.environ["PAGURE_PACKAGE_TOKEN"]
+
+    @property
+    @lru_cache()
+    def pagure_fork_token(self):
+        """ this is needed to create pull requests """
+        # FIXME: make this more easier to be used -- no need for a dedicated token
+        return os.environ["PAGURE_FORK_TOKEN"]

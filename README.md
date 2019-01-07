@@ -92,13 +92,19 @@ $ cat ./secrets.yaml
 github_token: 123456
 
 # This token is needed to access data in pagure.
-# This can be an API token of your user.
-pagure_read_token: 456789
+# This is meant to be an API token of your user
+# https://src.fedoraproject.org/settings#nav-api-tab
+pagure_user_token: 456789
 
 # We need this token to be able to comment on a pagure pull request.
 # If you don't have commit access to the package, you should ask maintainer of
 # the package to generate a token for the specific dist-git repository.
-pagure_edit_token: 456789
+# https://src.fedoraproject.org/rpms/<package>/settings#apikeys-tab
+pagure_package_token: ABCDEF
+
+# This token is needed to create a pull request
+# https://src.fedoraproject.org/fork/<user>/rpms/<package>/settings#apikeys-tab
+pagure_fork_token: QWERTY
 ```
 
 Let's build and run now:
