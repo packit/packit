@@ -23,10 +23,12 @@ def sourcegit_base(ctx, **kwargs):
     ctx.obj = Config(**kwargs)
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
+        logger.debug("logging set to DEBUG")
 
     elif ctx.obj.verbose:
         set_logging(level=logging.INFO,
                     format="%(message)s")
+        logger.debug("logging set to INFO")
 
 
 @click.command("version")
