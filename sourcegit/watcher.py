@@ -32,16 +32,17 @@ class Holyrood:
         :return:
         """
         project_name = msg["msg"]["pullrequest"]["project"]["name"]
-
-        ps = PagureService(token=self.pagure_token)
-        project = ps.get_project(repo=project_name, namespace="rpms")
+        logger.info("new flag for PR for %s", project_name)
 
         try:
-            logger.info("new flag for PR for %s", project_name)
             source_git = package_mapping[project_name]["source-git"]
         except KeyError:
             logger.info("source git not found")
             return
+
+        ps = PagureService(token=self.pagure_token)
+        project = ps.get_project(repo=project_name, namespace="rpms")
+
         pr_id = msg["msg"]["pullrequest"]["id"]
 
         # find info for the matching source git pr
