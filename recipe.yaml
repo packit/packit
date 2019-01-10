@@ -11,12 +11,7 @@
       - python3-setuptools_scm
       - python3-setuptools_scm_git_archive
       - python3-wheel  # for bdist_wheel
-  - name: Install latest twine for sake of check command
-    pip:
-      name:
-      - twine  # we need newest twine, b/c of the check command
-      - readme_renderer[md]
-      state: latest
+      - python3-ipdb  # for easy debugging
   - name: Install dependencies for CI watcher
     dnf:
       name:
@@ -25,6 +20,38 @@
       - python3-libpagure
       - python3-fedmsg
       state: present
+  - name: Install dependencies for syncer
+    dnf:
+      name:
+      - rpm-build
+      state: present
+  - name: Install latest twine for sake of check command
+    pip:
+      name:
+      - twine  # we need newest twine, b/c of the check command
+      - readme_renderer[md]
+      state: latest
+  - name: "Set up git: user.email"
+    command: git config --global user.email "source-git@example.org"
+  - name: "Set up git: user.name"
+    command: git config --global user.name "Source Git"
+  - name: Create .ssh
+    file:
+      state: directory
+      path: /root/.ssh
+      mode: 0700
+  - name: Copy keys in there
+    copy:
+      src: '{{ item.source }}'
+      dest: /root/.ssh/{{ item.dest }}
+      mode: 0400
+    with_items:
+    - {source: "bigger-secret", dest: "id_rsa.pub"}
+    - {source: "biggest-secret", dest: "id_rsa"}
+  - name: Copy ssh_config
+    copy:
+      src: files/ssh_config
+      dest: /root/.ssh/config
   - name: stat /src
     stat:
       path: /src
