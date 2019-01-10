@@ -6,26 +6,45 @@ import logging
 import github
 
 from onegittorulethemall.services.pagure import PagureService
-
+from sourcegit.downstream_checks import DownstreamCheck
+from sourcegit.transformator import get_package_mapping
 
 logger = logging.getLogger(__name__)
-# FIXME: create a global config and move this data in there
-package_mapping = {
-    "python-docker": {
-        "source-git": "TomasTomecek/docker-py-source-git"
-    }
-}
 
 
-class Holyrood:
-    """ such a good gin """
+class SourceGitCheckHelper:
+    """
+    This class provides functionality to operate on github pull request checks
+    """
 
     def __init__(self, github_token, pagure_user_token):
         self.pagure_token = pagure_user_token
         self.github_token = github_token
-        self.g = github.Github(login_or_token=self.github_token)
+        self.gh = github.Github(login_or_token=self.github_token)
 
-    def process_pr(self, msg):
+    def set_init_check(self, full_name: str, pr_id: str, check: DownstreamCheck):
+        """
+        Reset status for the selected check to the init state
+
+        :param full_name: str, name of the github repo
+        :param pr_id: str, ID of the github pull request
+        :param check instance of DownstreamCheck
+        :return:
+        """
+
+        repo = self.gh.get_repo(full_name)
+        sg_pull = repo.get_pull(pr_id)
+        top_commit = list(sg_pull.get_commits())[-1]
+
+        top_commit.create_status(
+            check.status,
+            target_url=check.url,
+            description=check.description,
+            context=check.name,
+        )
+
+    # TODO: split this method: fedmsg parsing vs. the actual work
+    def process_new_dg_flag(self, msg):
         """
         Process flags from the PR and update source git PR with those flags
         :param msg:
@@ -35,7 +54,7 @@ class Holyrood:
         logger.info("new flag for PR for %s", project_name)
 
         try:
-            source_git = package_mapping[project_name]["source-git"]
+            source_git = get_package_mapping()[project_name]["source-git"]
         except KeyError:
             logger.info("source git not found")
             return
@@ -55,7 +74,7 @@ class Holyrood:
             logger.info("this doesn't seem to be a source-git related event")
             return
 
-        repo = self.g.get_repo(source_git)
+        repo = self.gh.get_repo(source_git)
         sg_pull = repo.get_pull(sg_pr_id)
         for c in sg_pull.get_commits():
             if c.sha == commit:
