@@ -37,4 +37,4 @@
               -w /src \
               -ti \
               {{ source_git_image }} \
-              sourcegit -d watch-pr --updated
+              sourcegit -d watch-pr

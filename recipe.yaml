@@ -12,13 +12,15 @@
       - python3-setuptools_scm_git_archive
       - python3-wheel  # for bdist_wheel
       - python3-ipdb  # for easy debugging
+      - python3-fedmsg
+      # - python3-fedora-messaging
+      # - fedora-messaging
   - name: Install dependencies for CI watcher
     dnf:
       name:
       - python3-requests
       - python3-pygithub
       - python3-libpagure
-      - python3-fedmsg
       state: present
   - name: Install dependencies for syncer
     dnf:
