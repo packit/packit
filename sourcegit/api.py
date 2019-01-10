@@ -67,8 +67,8 @@ class SourceGitAPI:
         :param fedmsg_dict: dict, flag added in pagure
         :return:
         """
-        h = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
-        h.process_pr(fedmsg_dict)
+        sg = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
+        sg.process_new_dg_flag(fedmsg_dict)
 
     def keep_fwding_ci_results(self):
         """

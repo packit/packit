@@ -44,7 +44,7 @@ class SourceGitCheckHelper:
         )
 
     # TODO: split this method: fedmsg parsing vs. the actual work
-    def process_pr(self, msg):
+    def process_new_dg_flag(self, msg):
         """
         Process flags from the PR and update source git PR with those flags
         :param msg:
