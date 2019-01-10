@@ -10,15 +10,18 @@ import git
 from onegittorulethemall.services.pagure import PagureService
 
 from sourcegit.constants import dg_pr_key_sg_commit, dg_pr_key_sg_pr
+from sourcegit.downstream_checks import get_check_by_name
 from sourcegit.transformator import Transformator, get_package_mapping
 from sourcegit.utils import commits_to_nice_str
+from sourcegit.watcher import SourceGitCheckHelper
 
 
 logger = logging.getLogger(__name__)
 
 
 class Synchronizer:
-    def __init__(self, pagure_user_token, pagure_package_token, pagure_fork_token) -> None:
+    def __init__(self, github_token, pagure_user_token, pagure_package_token, pagure_fork_token) -> None:
+        self.github_token = github_token
         self.pagure_user_token = pagure_user_token
         self.pagure_package_token = pagure_package_token
         self.pagure_fork_token = pagure_fork_token
@@ -27,6 +30,21 @@ class Synchronizer:
         #        one starts cleaning, the other gets borked; rework this so there is no such attribute
         #        on the class
         self._tempdirs = []
+
+    def reset_checks(self, full_name: str, pr_id: str, checks_list: list):
+        """
+        Before syncing a new change downstream, we need to reset status of checks for all the configured tests
+        and wait for testing systems to get us the new ones.
+
+        :param full_name: name of the repo: namespace/repo
+        :param pr_id: ID of the pr
+        :param checks_list: list of checks to set
+        :return:
+        """
+        h = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
+        for c in checks_list:
+            check = get_check_by_name(c["name"])
+            h.set_init_check(full_name, pr_id, check)
 
     def sync_using_fedmsg_dict(self, fedmsg_dict):
         """
@@ -58,13 +76,13 @@ class Synchronizer:
             return self.sync(
                 target_url=fedmsg_dict["msg"]["pull_request"]["base"]["repo"]["html_url"],
                 target_ref=fedmsg_dict["msg"]["pull_request"]["base"]["ref"],
-                source_url=fedmsg_dict["msg"]["pull_request"]["head"]["repo"]["html_url"],
                 source_ref=fedmsg_dict["msg"]["pull_request"]["head"]["ref"],
+                full_name=fedmsg_dict["msg"]["pull_request"]["head"]["repo"]["full_name"],
                 top_commit=fedmsg_dict["msg"]["pull_request"]["head"]["sha"],
                 pr_id=fedmsg_dict["msg"]["pull_request"]["number"],
-                title=fedmsg_dict["msg"]["pull_request"]["title"],
                 pr_url=fedmsg_dict["msg"]["pull_request"]["html_url"],
-                package_config=package_config
+                title=fedmsg_dict["msg"]["pull_request"]["title"],
+                package_config=package_config,
             )
         except Exception as ex:
             logger.warning(f"Error on processing a msg {msg_id}")
@@ -73,10 +91,10 @@ class Synchronizer:
 
     def sync(
             self,
-            source_url,
             target_url,
-            source_ref,
             target_ref,
+            source_ref,
+            full_name,
             top_commit,
             pr_id,
             pr_url,
@@ -86,10 +104,10 @@ class Synchronizer:
         """
         synchronize selected source-git pull request to respective downstream dist-git repo via a pagure pull request
 
-        :param source_url:
         :param target_url:
-        :param source_ref:
         :param target_ref:
+        :param source_ref:
+        :param full_name: str, name of the github repo (e.g. user-cont/source-git)
         :param top_commit: str, commit hash of the top commit in source-git PR
         :param pr_id:
         :param pr_url:
@@ -103,7 +121,9 @@ class Synchronizer:
 
         # FIXME: branch name should be tied to the sg PR, so something like this: f"source-git-{pr_id}"
         with Transformator(
-                url=target_url, repo=repo, branch=repo.active_branch, **package_config
+                url=target_url, repo=repo, branch=repo.active_branch,
+                upstream_name=package_config["upstream_name"], package_name=package_config["package_name"],
+                dist_git_url=package_config["dist_git_url"]
         ) as t:
             t.clone_dist_git_repo()
 
@@ -141,6 +161,8 @@ class Synchronizer:
             t.dist_git_repo.remote("origin-fork").push(
                 refspec=source_ref, force=is_push_force
             )
+
+            self.reset_checks(full_name, pr_id, package_config["checks"])
 
             # Sadly, pagure does not support editing initial comments of a PR via the API
             # https://pagure.io/pagure/issue/4111

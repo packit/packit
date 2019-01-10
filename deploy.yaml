@@ -29,6 +29,7 @@
               sourcegit -d watch-fedora-ci
   - name: Run syncer locally
     command: podman run -d --name syncer \
+              -e GITHUB_TOKEN={{ github_token }} \
               -e PAGURE_PACKAGE_TOKEN={{ pagure_package_token }} \
               -e PAGURE_USER_TOKEN={{ pagure_user_token }} \
               -e PAGURE_FORK_TOKEN={{ pagure_fork_token }} \

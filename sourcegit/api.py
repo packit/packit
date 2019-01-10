@@ -10,7 +10,8 @@ import requests
 
 from sourcegit.fed_mes_consume import Consumerino
 from sourcegit.sync import Synchronizer
-from sourcegit.watcher import Holyrood
+from sourcegit.watcher import SourceGitCheckHelper
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,8 @@ class SourceGitAPI:
         :return: path to working dir
         """
         logger.info("syncing the upstream code to downstream")
-        with Synchronizer(self.pagure_user_token, self.pagure_package_token, self.pagure_fork_token) as sync:
+        with Synchronizer(self.github_token, self.pagure_user_token, self.pagure_package_token,
+                          self.pagure_fork_token) as sync:
             return sync.sync_using_fedmsg_dict(fedmsg_dict)
 
     def keep_syncing_upstream_pulls(self):
@@ -65,7 +67,7 @@ class SourceGitAPI:
         :param fedmsg_dict: dict, flag added in pagure
         :return:
         """
-        h = Holyrood(self.github_token, self.pagure_user_token)
+        h = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
         h.process_pr(fedmsg_dict)
 
     def keep_fwding_ci_results(self):
