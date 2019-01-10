@@ -20,10 +20,10 @@ def watch_pr(message_id):
 
     :return: int, retcode
     """
-    a = SourceGitAPI()
+    api = SourceGitAPI()
     if message_id:
         for msg_id in message_id:
-            fedmsg_dict = a.fetch_fedmsg_dict(msg_id)
-            a.sync_upstream_pr_to_distgit(fedmsg_dict)
+            fedmsg_dict = api.fetch_fedmsg_dict(msg_id)
+            api.sync_upstream_pr_to_distgit(fedmsg_dict)
     else:
-        a.keep_syncing_upstream_pulls()
+        api.keep_syncing_upstream_pulls()

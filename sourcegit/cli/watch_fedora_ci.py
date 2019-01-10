@@ -20,12 +20,12 @@ def watcher(message_id):
 
     :return: int, retcode
     """
-    a = SourceGitAPI()
+    api = SourceGitAPI()
 
     if message_id:
         for msg_id in message_id:
-            fedmsg_dict = a.fetch_fedmsg_dict(msg_id)
-            a.process_ci_result(fedmsg_dict)
+            fedmsg_dict = api.fetch_fedmsg_dict(msg_id)
+            api.process_ci_result(fedmsg_dict)
             return
     else:
-        a.keep_fwding_ci_results()
+        api.keep_fwding_ci_results()
