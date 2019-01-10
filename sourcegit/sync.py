@@ -41,10 +41,10 @@ class Synchronizer:
         :param checks_list: list of checks to set
         :return:
         """
-        h = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
-        for c in checks_list:
-            check = get_check_by_name(c["name"])
-            h.set_init_check(full_name, pr_id, check)
+        sg = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
+        for check_dict in checks_list:
+            check = get_check_by_name(check_dict["name"])
+            sg.set_init_check(full_name, pr_id, check)
 
     def sync_using_fedmsg_dict(self, fedmsg_dict):
         """
@@ -124,25 +124,25 @@ class Synchronizer:
                 url=target_url, repo=repo, branch=repo.active_branch,
                 upstream_name=package_config["upstream_name"], package_name=package_config["package_name"],
                 dist_git_url=package_config["dist_git_url"]
-        ) as t:
-            t.clone_dist_git_repo()
+        ) as transformator:
+            transformator.clone_dist_git_repo()
 
-            dist_git_new_branch = t.dist_git_repo.create_head(source_ref)
+            dist_git_new_branch = transformator.dist_git_repo.create_head(source_ref)
             dist_git_new_branch.checkout()
 
-            t.create_archive()
-            t.copy_redhat_content_to_dest_dir()
-            patches = t.create_patches()
-            t.add_patches_to_specfile(patch_list=patches)
-            t.repo.index.write()
+            transformator.create_archive()
+            transformator.copy_redhat_content_to_dest_dir()
+            patches = transformator.create_patches()
+            transformator.add_patches_to_specfile(patch_list=patches)
+            transformator.repo.index.write()
 
-            commits = t.get_commits_to_upstream(upstream=target_ref)
+            commits = transformator.get_commits_to_upstream(upstream=target_ref)
             commits_nice_str = commits_to_nice_str(commits)
 
             logger.debug(f"Commits in source-git PR:\n{commits_nice_str}")
 
             msg = f"upstream commit: {top_commit}\n\nupstream repo: {target_url}"
-            t.commit_distgit(title=title, msg=msg)
+            transformator.commit_distgit(title=title, msg=msg)
 
             package_name = package_config["package_name"]
             pagure = PagureService(token=self.pagure_user_token)
@@ -154,11 +154,11 @@ class Synchronizer:
                 project.fork_create()
 
             is_push_force = source_ref in project.fork.branches
-            t.dist_git_repo.create_remote(
+            transformator.dist_git_repo.create_remote(
                 name="origin-fork", url=project.fork.git_urls["ssh"]
             )
             # I suggest to comment this one while testing when the push is not needed
-            t.dist_git_repo.remote("origin-fork").push(
+            transformator.dist_git_repo.remote("origin-fork").push(
                 refspec=source_ref, force=is_push_force
             )
 
