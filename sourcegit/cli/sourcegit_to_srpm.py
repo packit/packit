@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 @click.command("srpm", context_settings=get_context_settings())
 @click.option("--dest-dir")
-@click.option("--no-new-sources", is_flag=True)
+# @click.option("--no-new-sources", is_flag=True)
 @click.option("--package-name")
 @click.option("--rev-list-option", multiple=True)
 @click.option("--upstream-ref")
@@ -29,9 +29,9 @@ def sg2srpm(config,
             name,
             version):
     """
-    Generate srpm from sourcegit.
+    Generate s srpm from sourcegit.
 
-    This script is meant to accept source git repo with a branch as an input and build it in Fedora.
+    This script is meant to accept a source git repo with a branch as an input and produce a SRPM.
 
     It is expected to do this:
 
@@ -40,12 +40,6 @@ def sg2srpm(config,
     2. create archive out of the sources
 
     3. create SRPM
-
-    4. (x) submit the SRPM to koji
-
-    5. (x) wait for the build to finish
-
-    6. (x) update github status to reflect the result of the build
     """
 
     with Transformator(url=repo,
@@ -54,6 +48,7 @@ def sg2srpm(config,
                        version=version,
                        dest_dir=dest_dir,
                        dist_git_url=dist_git,
+                       branch=upstream_ref,
                        fas_username=config.fas_user) as t:
         t.clone_dist_git_repo()
         t.create_archive()
