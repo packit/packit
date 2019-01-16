@@ -29,7 +29,7 @@ def sg2srpm(config,
             name,
             version):
     """
-    Generate s srpm from sourcegit.
+    Generate a srpm from sourcegit.
 
     This script is meant to accept a source git repo with a branch as an input and produce a SRPM.
 
