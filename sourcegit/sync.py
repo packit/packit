@@ -121,9 +121,12 @@ class Synchronizer:
 
         # FIXME: branch name should be tied to the sg PR, so something like this: f"source-git-{pr_id}"
         with Transformator(
-                url=target_url, repo=repo, branch=repo.active_branch,
-                upstream_name=package_config["upstream_name"], package_name=package_config["package_name"],
-                dist_git_url=package_config["dist_git_url"]
+                url=target_url,
+                repo=repo,
+                branch=repo.active_branch,
+                upstream_name=package_config["upstream_name"],
+                package_name=package_config["package_name"],
+                dist_git_url=package_config["dist_git_url"],
         ) as transformator:
             transformator.clone_dist_git_repo()
 
@@ -163,40 +166,8 @@ class Synchronizer:
             )
 
             self.reset_checks(full_name, pr_id, package_config["checks"])
-
-            # Sadly, pagure does not support editing initial comments of a PR via the API
-            # https://pagure.io/pagure/issue/4111
-            # Short-term solution: keep adding comments and get updated info about sg PR ID and commit desc
-            for pr in project.pr_list():
-                dg_pr_id = pr["id"]
-                # let's save a few queries by passing the pr_info dict
-                sg_pr_id = project.get_sg_pr_id(dg_pr_id, pr_info=pr)
-                commit = project.get_sg_top_commit(dg_pr_id, pr_info=pr)
-                if sg_pr_id and commit:
-                    if sg_pr_id == pr_id:
-                        # yep, we got it, this is the right PR (if sg & dg are 1:1 and not n:1)
-                        msg = (f"New changes were pushed to the upstream pull request\n\n"
-                               f"[{dg_pr_key_sg_pr}: {pr_id}]({pr_url})\n"
-                               f"{dg_pr_key_sg_commit}: {top_commit}")
-                        # FIXME: consider storing the data above as a git note of the top commit
-                        project.pagure.change_token(self.pagure_package_token)
-                        project.pr_comment(dg_pr_id, msg)
-                        logger.info("new comment added on PR %s", sg_pr_id)
-                        break
-            else:
-                msg = (f"This pull request contains changes from upstream "
-                       f"and is meant to integrate them into Fedora\n\n"
-                       f"[{dg_pr_key_sg_pr}: {pr_id}]({pr_url})\n"
-                       f"{dg_pr_key_sg_commit}: {top_commit}")
-                # This pagure call requires token from the package's FORK
-                project.fork.pagure.change_token(self.pagure_fork_token)
-                dist_git_pr_id = project.fork.pr_create(
-                    title=f"[source-git] {title}",
-                    body=msg,
-                    source_branch=source_ref,
-                    target_branch="master",
-                )["id"]
-                logger.info(f"PR created: {dist_git_pr_id}")
+            self._update_or_create_dist_git_pr(project, pr_id, pr_url, top_commit, title,
+                                               source_ref)
 
     @lru_cache()
     def get_repo(self, url, directory=None):

@@ -5,7 +5,7 @@ import logging
 
 import github
 
-from onegittorulethemall.services.pagure import PagureService
+from ogr.services.pagure import PagureService
 from sourcegit.downstream_checks import DownstreamCheck
 from sourcegit.transformator import get_package_mapping
 
