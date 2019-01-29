@@ -4,6 +4,7 @@ import os
 import shutil
 import tempfile
 from functools import lru_cache
+from typing import List
 
 import git
 
@@ -19,7 +20,11 @@ logger = logging.getLogger(__name__)
 
 class Synchronizer:
     def __init__(
-            self, github_token, pagure_user_token, pagure_package_token, pagure_fork_token
+            self,
+            github_token: str,
+            pagure_user_token: str,
+            pagure_package_token: str,
+            pagure_fork_token: str,
     ) -> None:
         self.github_token = github_token
         self.pagure_user_token = pagure_user_token
@@ -29,9 +34,9 @@ class Synchronizer:
         # FIXME: there is an easy race condition here: if two threads use the same instance and
         #        one starts cleaning, the other gets borked; rework this so there is no such attribute
         #        on the class
-        self._tempdirs = []
+        self._tempdirs: List[str] = []
 
-    def reset_checks(self, full_name: str, pr_id: int, checks_list: list):
+    def reset_checks(self, full_name: str, pr_id: int, checks_list: list) -> None:
         """
         Before syncing a new change downstream, we need to reset status of checks for all the configured tests
         and wait for testing systems to get us the new ones.
@@ -46,7 +51,7 @@ class Synchronizer:
             check = get_check_by_name(check_dict["name"])
             sg.set_init_check(full_name, pr_id, check)
 
-    def sync_using_fedmsg_dict(self, fedmsg_dict):
+    def sync_using_fedmsg_dict(self, fedmsg_dict: dict) -> None:
         """
         Sync the pr to the dist-git.
 
@@ -73,7 +78,7 @@ class Synchronizer:
         try:
             nice_msg = json.dumps(fedmsg_dict, indent=4)
             logger.debug(f"Processing fedmsg:\n{nice_msg}")
-            return self.sync(
+            self.sync(
                 target_url=fedmsg_dict["msg"]["pull_request"]["base"]["repo"][
                     "html_url"
                 ],
@@ -90,7 +95,7 @@ class Synchronizer:
             )
         except Exception as ex:
             logger.warning(f"Error on processing a msg {msg_id}")
-            logger.debug(ex)
+            logger.debug(str(ex))
             return
 
     def sync(
@@ -134,7 +139,9 @@ class Synchronizer:
             transformator.clone_dist_git_repo()
 
             dist_git_branch_name = f"source-git-{pr_id}"
-            dist_git_new_branch = transformator.dist_git_repo.create_head(dist_git_branch_name)
+            dist_git_new_branch = transformator.dist_git_repo.create_head(
+                dist_git_branch_name
+            )
             dist_git_new_branch.checkout()
 
             transformator.create_archive()
@@ -168,12 +175,18 @@ class Synchronizer:
             # I suggest to comment this one while testing when the push is not needed
             transformator.dist_git_repo.remote("origin-fork").push(
                 refspec=dist_git_branch_name,
-                force=dist_git_branch_name in project_fork.get_branches()
+                force=dist_git_branch_name in project_fork.get_branches(),
             )
 
             self.reset_checks(full_name, pr_id, package_config["checks"])
-            self._update_or_create_dist_git_pr(project, pr_id, pr_url, top_commit, title,
-                                               source_ref=dist_git_branch_name)
+            self._update_or_create_dist_git_pr(
+                project,
+                pr_id,
+                pr_url,
+                top_commit,
+                title,
+                source_ref=dist_git_branch_name,
+            )
 
     @lru_cache()
     def get_repo(self, url, directory=None):
@@ -196,7 +209,9 @@ class Synchronizer:
         repo.remote().fetch(refspec=f"pull/{pr_id}/head:pull/{pr_id}")
         repo.refs[f"pull/{pr_id}"].checkout()
 
-    def _update_or_create_dist_git_pr(self, project, pr_id, pr_url, top_commit, title, source_ref):
+    def _update_or_create_dist_git_pr(
+            self, project, pr_id, pr_url, top_commit, title, source_ref
+    ):
         # Sadly, pagure does not support editing initial comments of a PR via the API
         # https://pagure.io/pagure/issue/4111
         # Short-term solution: keep adding comments
@@ -215,8 +230,9 @@ class Synchronizer:
 
             sg_pr_id = sg_pr_id_match[1]
             if sg_pr_id_match[1] != str(pr_id):
-                logger.debug(f"Dist-git PR `{pr.id}` does not match "
-                             f"source-git PR `{pr_id}`.")
+                logger.debug(
+                    f"Dist-git PR `{pr.id}` does not match " f"source-git PR `{pr_id}`."
+                )
                 continue
 
             commit_match = project.search_in_pr(
@@ -226,8 +242,10 @@ class Synchronizer:
                 description=True,
             )
             if not commit_match:
-                logger.debug(f"Dist-git PR `{pr.id}` does not contain top-commit of the "
-                             f"source-git PR `{pr_id}`.")
+                logger.debug(
+                    f"Dist-git PR `{pr.id}` does not contain top-commit of the "
+                    f"source-git PR `{pr_id}`."
+                )
                 continue
 
             logger.debug(f"Adding a new comment with update to existing PR.")
