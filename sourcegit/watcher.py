@@ -22,7 +22,7 @@ class SourceGitCheckHelper:
         self.github_token = github_token
         self.gh = github.Github(login_or_token=self.github_token)
 
-    def set_init_check(self, full_name: str, pr_id: str, check: DownstreamCheck):
+    def set_init_check(self, full_name: str, pr_id: int, check: DownstreamCheck):
         """
         Reset status for the selected check to the init state
 
