@@ -11,13 +11,14 @@ projects into Fedora operating system.
    your newest release doesn't work in Fedora rawhide, it breaks \<Z>, here is
    a link to logs."*)
 
- * One of the implications is that it's trivial to propose changes back to
-   upstream or cherry-pick fixes from upstream to downstream.
-
  * We expect that stability will increases: only merge, build and compose
    components which integrate well with the rest of the operating system. The
    biggest impact of such behavior will be on Fedora rawhide and when working
    on a new release.
+
+ * Automatically pull and validate new upstream releases. This can be a trivial
+   thing to do, why should maintainers waste their times on work which can be
+   automated.
 
  * Developing in dist-git is cumbersome. Editing patch files and moving
    tarballs around is not fun. Why not working with the source code itself?
@@ -33,45 +34,20 @@ projects into Fedora operating system.
    dist-git the same way. We are not taking that away. Source git is meant to
    be the modern, better alternative.
 
- * Automatically pull and validate new upstream releases. This can be a trivial
-   thing to do, why should maintainers waste their times on work which can be
-   automated.
+
+## Plan
+
+* Automatically release to Fedora Rawhide (by the end of February 2019).
+  * Once there is a new upstream release, create a PR in downstream pagure.
+  * Send new downstream changes back to upstream. (so the spec files are in sync)
+
+* Provide feedback on upstream pull requests.
+  * Run RPM builds in COPR and integrate the results into Github.
 
 
 ## Current status
 
-Right now we are aiming for a proof of concept. The work is being tracked [in
-this milestone](https://github.com/user-cont/source-git/milestone/1). Once it's
-done, we'll create a demo and present it at [DevConf.cz](https://devconf.cz/)
-
-The talk: [Auto-maintain your Package](https://devconfcz2019.sched.com/event/Jch1/auto-maintain-your-package)  
-Time: Friday, January 25 • 4:00pm - 4:25pm  
-Location: E112  
-
-
-## Plans
-
- * Validate proposed changes
-   * This means that a change is built and tested in downstream, and results
-     are reported back to the pull request.
-
- * Synchronize changes downstream
-   * Once a change is merged in a source git repo, it can be synchronized
-     downstream — either directly or as a pull request on pagure.
-
- * Automatically pull new upstream releases.
-
- * Automate creation of source git repos.
-   * Take a dist-git repo as an input and create a source git repo (e.g.
-     [rpms/python-docker](https://src.fedoraproject.org/rpms/python-docker) →
-     [TomasTomecek/docker-py-source-git](https://github.com/TomasTomecek/docker-py-source-git))
-
- * Enable local development in source git:
-   * Some of the changes described above make it hard to perform a build
-     locally. We want to preserve such workflow where maintainers verify
-     locally that they changes work before pushing them out.
-
- * Support other git forges: pagure.io, gitlab.
+Right now we are aiming for a proof of concept.
 
 
 ## Usage
