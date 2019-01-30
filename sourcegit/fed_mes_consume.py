@@ -4,12 +4,11 @@ The code here handles receiving messages about events and has wrappers to proces
 This module is meant to be imported in API and should be independent.
 """
 import logging
-
 # not yet: https://github.com/fedora-infra/fedora-messaging/issues/111
 # from fedora_messaging import api
+from typing import Iterable, Tuple
 
 import fedmsg
-
 
 logger = logging.getLogger(__name__)
 
@@ -18,10 +17,12 @@ class Consumerino:
     """
     A class which provides an interface to consume messages via a callback
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         """
 
         """
+        pass
         # timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         # self.binding = {
         #     'exchange': 'amq.topic',  # The AMQP exchange to bind our queue to
@@ -35,7 +36,7 @@ class Consumerino:
     #     api.consume(callback, self.binding)
 
     @staticmethod
-    def iterate_gh_pulls() -> (str, str, dict):
+    def iterate_gh_pulls() -> Iterable[Tuple[str, str, dict]]:
         """
         Provide messages for all github pull-request-related events
 
@@ -55,7 +56,7 @@ class Consumerino:
                 yield topic, action, msg
 
     @staticmethod
-    def iterate_dg_pr_flags() -> (str, dict):
+    def iterate_dg_pr_flags() -> Iterable[Tuple[str, dict]]:
         """
         Provide messages when a flag is added to a pull request in dist-git
 
