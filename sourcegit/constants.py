@@ -1,2 +1,2 @@
-dg_pr_key_sg_pr = "Source-git pull request ID"
-dg_pr_key_sg_commit = "Source-git commit"
+DG_PR_COMMENT_KEY_SG_PR = "Source-git pull request ID"
+DG_PR_COMMENT_KEY_SG_COMMIT = "Source-git commit"

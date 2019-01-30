@@ -5,7 +5,7 @@ import logging
 
 import github
 
-from onegittorulethemall.services.pagure import PagureService
+from ogr.services.pagure import PagureService
 from sourcegit.downstream_checks import DownstreamCheck
 from sourcegit.transformator import get_package_mapping
 
@@ -22,7 +22,7 @@ class SourceGitCheckHelper:
         self.github_token = github_token
         self.gh = github.Github(login_or_token=self.github_token)
 
-    def set_init_check(self, full_name: str, pr_id: str, check: DownstreamCheck):
+    def set_init_check(self, full_name: str, pr_id: int, check: DownstreamCheck):
         """
         Reset status for the selected check to the init state
 
