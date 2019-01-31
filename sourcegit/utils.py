@@ -131,3 +131,15 @@ def commits_to_nice_str(commits):
         f"{commit.hexsha}\n"
         for commit in commits
     )
+
+
+def exclude_from_dict(raw_dict: dict, *args: str):
+    result = []
+    for arg in args:
+        if arg in raw_dict:
+            result.append(raw_dict[arg])
+            del raw_dict[arg]
+        else:
+            result.append(None)
+    result.append(raw_dict)
+    return result
