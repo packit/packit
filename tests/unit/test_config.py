@@ -115,13 +115,13 @@ def test_job_config_parse(raw, expected_config):
 
 def test_package_config_equal():
     assert PackageConfig(
-        specfile="fedora/package.spec",
+        specfile_path="fedora/package.spec",
         synced_files=["a", "b"],
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
         hooks={"a": "b"},
         metadata={"c": "d"},
     ) == PackageConfig(
-        specfile="fedora/package.spec",
+        specfile_path="fedora/package.spec",
         synced_files=["a", "b"],
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
         hooks={"a": "b"},
@@ -133,7 +133,7 @@ def test_package_config_equal():
     "not_equal_package_config",
     [
         PackageConfig(
-            specfile="fedora/other-package.spec",
+            specfile_path="fedora/other-package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
@@ -142,7 +142,7 @@ def test_package_config_equal():
             metadata={"c": "d"},
         ),
         PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["b"],
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
@@ -151,7 +151,7 @@ def test_package_config_equal():
             metadata={"c": "d"},
         ),
         PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(
@@ -162,7 +162,7 @@ def test_package_config_equal():
             metadata={"c": "d"},
         ),
         PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f29"], metadata={})
@@ -171,7 +171,7 @@ def test_package_config_equal():
             metadata={"c": "d"},
         ),
         PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(
@@ -182,7 +182,7 @@ def test_package_config_equal():
             metadata={"c": "d"},
         ),
         PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
@@ -191,7 +191,7 @@ def test_package_config_equal():
             metadata={"c": "d"},
         ),
         PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
@@ -204,7 +204,7 @@ def test_package_config_equal():
 def test_package_config_not_equal(not_equal_package_config):
     assert (
         not PackageConfig(
-            specfile="fedora/package.spec",
+            specfile_path="fedora/package.spec",
             synced_files=["a", "b"],
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
@@ -220,12 +220,12 @@ def test_package_config_not_equal(not_equal_package_config):
     "raw,is_valid",
     [
         ({}, False),
-        ({"specfile": "fedora/package.spec"}, False),
+        ({"specfile_path": "fedora/package.spec"}, False),
         ({"synced_files": ["fedora/package.spec"]}, False),
         ({"jobs": [{"trigger": "release", "release_to": ["f28"]}]}, False),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": ["fedora/package.spec"],
                     "jobs": [{"trigger": "release", "release_to": ["f28"]}],
                 },
@@ -233,7 +233,7 @@ def test_package_config_not_equal(not_equal_package_config):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": ["fedora/package.spec", "other", "directory"],
                     "jobs": [
                         {"trigger": "release", "release_to": ["f28"]},
@@ -244,7 +244,7 @@ def test_package_config_not_equal(not_equal_package_config):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": [],
                     "jobs": [
                         {"trigger": "release", "release_to": ["f28"]},
@@ -260,7 +260,7 @@ def test_package_config_not_equal(not_equal_package_config):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": [],
                     "jobs": [
                         {"trigger": "release", "release_to": ["f28"]},
@@ -300,12 +300,12 @@ def test_package_config_parse_error(raw):
     [
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": ["fedora/package.spec"],
                     "jobs": [{"trigger": "release", "release_to": ["f28"]}],
                 },
                 PackageConfig(
-                    specfile="fedora/package.spec",
+                    specfile_path="fedora/package.spec",
                     synced_files=["fedora/package.spec"],
                     jobs=[
                         JobConfig(
@@ -318,7 +318,7 @@ def test_package_config_parse_error(raw):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": [
                         "fedora/package.spec",
                         "some",
@@ -328,7 +328,7 @@ def test_package_config_parse_error(raw):
                     "jobs": [{"trigger": "release", "release_to": ["f28"]}],
                 },
                 PackageConfig(
-                    specfile="fedora/package.spec",
+                    specfile_path="fedora/package.spec",
                     synced_files=[
                         "fedora/package.spec",
                         "some",
@@ -346,7 +346,7 @@ def test_package_config_parse_error(raw):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": [
                         "fedora/package.spec",
                         "some",
@@ -357,7 +357,7 @@ def test_package_config_parse_error(raw):
                     "hooks": {},
                 },
                 PackageConfig(
-                    specfile="fedora/package.spec",
+                    specfile_path="fedora/package.spec",
                     synced_files=[
                         "fedora/package.spec",
                         "some",
@@ -375,7 +375,7 @@ def test_package_config_parse_error(raw):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": [
                         "fedora/package.spec",
                         "some",
@@ -386,7 +386,7 @@ def test_package_config_parse_error(raw):
                     "something": "stupid",
                 },
                 PackageConfig(
-                    specfile="fedora/package.spec",
+                    specfile_path="fedora/package.spec",
                     synced_files=[
                         "fedora/package.spec",
                         "some",
@@ -404,7 +404,7 @@ def test_package_config_parse_error(raw):
         ),
         (
                 {
-                    "specfile": "fedora/package.spec",
+                    "specfile_path": "fedora/package.spec",
                     "synced_files": [
                         "fedora/package.spec",
                         "some",
@@ -416,7 +416,7 @@ def test_package_config_parse_error(raw):
                     "hooks": {"pre": "pre_hook.sh", "post": "post_hook.sh"},
                 },
                 PackageConfig(
-                    specfile="fedora/package.spec",
+                    specfile_path="fedora/package.spec",
                     synced_files=[
                         "fedora/package.spec",
                         "some",
