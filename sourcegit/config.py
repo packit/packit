@@ -75,7 +75,6 @@ class PackageConfig:
     specfile_path: str
     synced_files: List[str]
     jobs: List[JobConfig]
-    hooks: Optional[Dict[str, str]]  # action_name: script
     metadata: dict
 
     @classmethod
@@ -83,8 +82,8 @@ class PackageConfig:
         if validate and not PackageConfig.is_dict_valid(raw_dict):
             raise Exception("Package config not valid.")
 
-        specfile_path, synced_files, raw_jobs, hooks, metadata = exclude_from_dict(
-            raw_dict, "specfile_path", "synced_files", "jobs", "hooks"
+        specfile_path, synced_files, raw_jobs, metadata = exclude_from_dict(
+            raw_dict, "specfile_path", "synced_files", "jobs"
         )
 
         return PackageConfig(
@@ -93,7 +92,6 @@ class PackageConfig:
             jobs=[
                 JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
             ],
-            hooks=hooks,
             metadata=metadata,
         )
 
@@ -117,7 +115,6 @@ PACKAGE_CONFIG_SCHEMA = {
         "specfile_path": {"type": "string"},
         "synced_files": {"type": "array", "items": {"type": "string"}},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
-        "hooks": {"type": "object", "items": {"type": "string"}},
     },
     "required": ["specfile_path", "synced_files", "jobs"],
 }

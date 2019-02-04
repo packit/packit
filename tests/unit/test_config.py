@@ -118,13 +118,11 @@ def test_package_config_equal():
         specfile_path="fedora/package.spec",
         synced_files=["a", "b"],
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
-        hooks={"a": "b"},
         metadata={"c": "d"},
     ) == PackageConfig(
         specfile_path="fedora/package.spec",
         synced_files=["a", "b"],
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
-        hooks={"a": "b"},
         metadata={"c": "d"},
     )
 
@@ -138,7 +136,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            hooks={"a": "b"},
             metadata={"c": "d"},
         ),
         PackageConfig(
@@ -147,7 +144,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            hooks={"a": "b"},
             metadata={"c": "d"},
         ),
         PackageConfig(
@@ -158,7 +154,6 @@ def test_package_config_equal():
                     trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
                 )
             ],
-            hooks={"a": "b"},
             metadata={"c": "d"},
         ),
         PackageConfig(
@@ -167,7 +162,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f29"], metadata={})
             ],
-            hooks={"a": "b"},
             metadata={"c": "d"},
         ),
         PackageConfig(
@@ -178,7 +172,6 @@ def test_package_config_equal():
                     trigger=TriggerType.release, release_to=["f28"], metadata={"a": "b"}
                 )
             ],
-            hooks={"a": "b"},
             metadata={"c": "d"},
         ),
         PackageConfig(
@@ -187,16 +180,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            hooks={"aaa": "b"},
-            metadata={"c": "d"},
-        ),
-        PackageConfig(
-            specfile_path="fedora/package.spec",
-            synced_files=["a", "b"],
-            jobs=[
-                JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
-            ],
-            hooks={"a": "b"},
             metadata={"c": "dddd"},
         ),
     ],
@@ -209,10 +192,9 @@ def test_package_config_not_equal(not_equal_package_config):
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            hooks={"a": "b"},
             metadata={"c": "d"},
         )
-            == not_equal_package_config
+        == not_equal_package_config
     )
 
 
@@ -271,7 +253,6 @@ def test_package_config_not_equal(not_equal_package_config):
                             "branch": "master",
                         },
                     ],
-                    "hooks": {"something": "stupid"},
                 },
                 True,
         ),
@@ -312,7 +293,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    hooks=None,
                     metadata={},
                 ),
         ),
@@ -340,7 +320,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    hooks=None,
                     metadata={},
                 ),
         ),
@@ -354,7 +333,6 @@ def test_package_config_parse_error(raw):
                         "directory/files",
                     ],
                     "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                    "hooks": {},
                 },
                 PackageConfig(
                     specfile_path="fedora/package.spec",
@@ -369,7 +347,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    hooks={},
                     metadata={},
                 ),
         ),
@@ -398,7 +375,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    hooks=None,
                     metadata={"something": "stupid"},
                 ),
         ),
@@ -413,7 +389,6 @@ def test_package_config_parse_error(raw):
                     ],
                     "jobs": [{"trigger": "release", "release_to": ["f28"]}],
                     "something": "stupid",
-                    "hooks": {"pre": "pre_hook.sh", "post": "post_hook.sh"},
                 },
                 PackageConfig(
                     specfile_path="fedora/package.spec",
@@ -428,7 +403,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    hooks={"pre": "pre_hook.sh", "post": "post_hook.sh"},
                     metadata={"something": "stupid"},
                 ),
         ),
