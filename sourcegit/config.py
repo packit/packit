@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 import click
 from jsonschema import Draft4Validator
@@ -44,7 +44,7 @@ def get_context_settings() -> dict:
 class TriggerType(Enum):
     release = 1
     pull_request = 2
-    branch_commit = 3
+    git_tag = 3
 
 
 @dataclass(unsafe_hash=True, frozen=True)
@@ -103,7 +103,7 @@ class PackageConfig:
 JOB_CONFIG_SCHEMA = {
     "type": "object",
     "properties": {
-        "trigger": {"enum": ["release", "pull_request", "branch_commit"]},
+        "trigger": {"enum": ["release", "pull_request", "git_tag"]},
         "release_to": {"type": "array", "items": {"type": "string"}},
     },
     "required": ["trigger", "release_to"],

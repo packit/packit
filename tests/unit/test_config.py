@@ -23,15 +23,7 @@ def test_job_config_not_equal():
         ({"release_to": ["f28"]}, False),
         ({"trigger": "release", "release_to": ["f28"]}, True),
         ({"trigger": "pull_request", "release_to": ["f28"]}, True),
-        ({"trigger": "branch_commit", "release_to": ["f28"]}, True),
-        (
-                {
-                    "trigger": "branch_commit",
-                    "release_to": ["f28"],
-                    "branch_name": "master",
-                },
-                True,
-        ),
+        ({"trigger": "git_tag", "release_to": ["f28"]}, True),
         ({"trigger": "release", "release_to": ["f28", "rawhide", "f29"]}, True),
         (
                 {
@@ -68,22 +60,8 @@ def test_job_config_parse_error(raw):
                 ),
         ),
         (
-                {"trigger": "branch_commit", "release_to": ["f28"]},
-                JobConfig(
-                    trigger=TriggerType.branch_commit, release_to=["f28"], metadata={}
-                ),
-        ),
-        (
-                {
-                    "trigger": "branch_commit",
-                    "release_to": ["f28"],
-                    "branch_name": "master",
-                },
-                JobConfig(
-                    trigger=TriggerType.branch_commit,
-                    release_to=["f28"],
-                    metadata={"branch_name": "master"},
-                ),
+                {"trigger": "git_tag", "release_to": ["f28"]},
+                JobConfig(trigger=TriggerType.git_tag, release_to=["f28"], metadata={}),
         ),
         (
                 {"trigger": "release", "release_to": ["f28", "rawhide", "f29"]},
@@ -231,27 +209,7 @@ def test_package_config_not_equal(not_equal_package_config):
                     "jobs": [
                         {"trigger": "release", "release_to": ["f28"]},
                         {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                        {
-                            "trigger": "branch_commit",
-                            "release_to": ["f29", "f30", "master"],
-                            "branch": "master",
-                        },
-                    ],
-                },
-                True,
-        ),
-        (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [],
-                    "jobs": [
-                        {"trigger": "release", "release_to": ["f28"]},
-                        {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                        {
-                            "trigger": "branch_commit",
-                            "release_to": ["f29", "f30", "master"],
-                            "branch": "master",
-                        },
+                        {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
                     ],
                 },
                 True,
