@@ -3,6 +3,9 @@ import logging
 import os
 import shlex
 import subprocess
+import tempfile
+
+import git
 
 logger = logging.getLogger("source_git")
 
@@ -40,7 +43,8 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         stderr=subprocess.PIPE,
         shell=False,
         cwd=cwd,
-        universal_newlines=True)
+        universal_newlines=True,
+    )
 
     logger.debug(f"{shell.args}\n{shell.stdout}")
 
@@ -75,10 +79,12 @@ class FedPKG:
         if not os.path.isdir(self.directory):
             raise Exception("Cannot access fedpkg repository:")
 
-        return run_command(cmd=f"fedpkg{'-stage' if self.stage else ''} new-sources {sources}",
-                           cwd=self.directory,
-                           error_message=f"Adding new sources failed:",
-                           fail=fail)
+        return run_command(
+            cmd=f"fedpkg{'-stage' if self.stage else ''} new-sources {sources}",
+            cwd=self.directory,
+            error_message=f"Adding new sources failed:",
+            fail=fail,
+        )
 
     def init_ticket(self, keytab):
 
@@ -87,9 +93,9 @@ class FedPKG:
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
             cmd = f"kinit -R {self.fas_username}@FEDORAPROJECT.ORG"
-        return run_command(cmd=cmd,
-                           error_message="Failed to init kerberos ticket:",
-                           fail=True)
+        return run_command(
+            cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
+        )
 
 
 def set_logging(
@@ -97,8 +103,9 @@ def set_logging(
         level=logging.INFO,
         handler_class=logging.StreamHandler,
         handler_kwargs=None,
-        format='%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s',
-        date_format='%H:%M:%S'):
+        format="%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s",
+        date_format="%H:%M:%S",
+):
     """
     Set personal logger for this library.
 
@@ -143,3 +150,40 @@ def exclude_from_dict(raw_dict: dict, *args: str):
             result.append(None)
     result.append(raw_dict)
     return result
+
+
+def is_git_repo(directory: str) -> bool:
+    """
+    Test, if the directory is a git repo.
+    (Has .git subdirectory?)
+    """
+    return os.path.isdir(os.path.join(directory, ".git"))
+
+
+def checkout_pr(repo: git.Repo, pr_id: int):
+    """
+    Checkout the branch for the pr.
+
+    TODO: Move this to ogr and make it compatible with other git forges.
+    """
+    repo.remote().fetch(refspec=f"pull/{pr_id}/head:pull/{pr_id}")
+    repo.refs[f"pull/{pr_id}"].checkout()
+
+
+def get_repo(url: str, directory: str = None) -> git.Repo:
+    """
+    Use directory as a git repo or clone repo to the tempdir.
+    """
+    if not directory:
+        tempdir = tempfile.mkdtemp()
+        directory = tempdir
+
+    # TODO: optimize cloning: single branch and last n commits?
+    if is_git_repo(directory=directory):
+        logger.debug("Source git repo exists.")
+        repo = git.repo.Repo(directory)
+    else:
+        logger.info(f"Cloning source-git repo: {url} -> {directory}")
+        repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
+
+    return repo
