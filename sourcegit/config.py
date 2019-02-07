@@ -1,16 +1,22 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
 from typing import Optional, List
 
+import anymarkup
 import click
 from jsonschema import Draft4Validator
 
+from ogr.abstract import GitProject
+from sourcegit.constants import CONFIG_FILE_NAMES
 from sourcegit.utils import exclude_from_dict
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -98,6 +104,65 @@ class PackageConfig:
     @classmethod
     def is_dict_valid(cls, raw_dict: dict) -> bool:
         return Draft4Validator(PACKAGE_CONFIG_SCHEMA).is_valid(raw_dict)
+
+
+def get_local_package_config() -> Optional[PackageConfig]:
+    """
+    :return: local PackageConfig if present
+    """
+    for config_file_name in CONFIG_FILE_NAMES:
+
+        if os.path.isfile(config_file_name):
+            logger.debug(f"Local package config found: {config_file_name}")
+            try:
+                loaded_config = anymarkup.parse_file(config_file_name)
+            except Exception as ex:
+                logger.error(f"Cannot load package config '{config_file_name}'.")
+                raise Exception("Cannot load package config.", ex)
+
+            try:
+                package_config = PackageConfig.get_from_dict(
+                    raw_dict=loaded_config, validate=True
+                )
+                return package_config
+            except Exception as ex:
+                logger.error(
+                    f"Cannot parse package config:\n{json.dumps(loaded_config, indent=4)}"
+                )
+                raise Exception("Package config is not valid.", ex)
+
+    return None
+
+
+def get_packit_config_from_repo(
+        sourcegit_project: GitProject, branch: str
+) -> PackageConfig:
+    for config_file_name in CONFIG_FILE_NAMES:
+        try:
+            config_file = sourcegit_project.get_file_content(
+                path=config_file_name, ref=branch
+            )
+        except FileNotFoundError:
+            continue
+
+        try:
+            loaded_config = anymarkup.parse(config_file)
+        except Exception as ex:
+            logger.error(f"Cannot load package config '{config_file_name}'.")
+            raise Exception("Cannot load package config.", ex)
+
+        try:
+            package_config = PackageConfig.get_from_dict(
+                raw_dict=loaded_config, validate=True
+            )
+            return package_config
+        except Exception as ex:
+            logger.error(
+                f"Cannot parse package config:\n{json.dumps(loaded_config, indent=4)}"
+            )
+            raise Exception("Package config is not valid.", ex)
+
+    raise Exception("Package config not found")
 
 
 JOB_CONFIG_SCHEMA = {
