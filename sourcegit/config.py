@@ -118,51 +118,59 @@ def get_local_package_config() -> Optional[PackageConfig]:
                 loaded_config = anymarkup.parse_file(config_file_name)
             except Exception as ex:
                 logger.error(f"Cannot load package config '{config_file_name}'.")
-                raise Exception("Cannot load package config.", ex)
+                raise Exception(f"Cannot load package config: {ex}.")
 
-            try:
-                package_config = PackageConfig.get_from_dict(
-                    raw_dict=loaded_config, validate=True
-                )
-                return package_config
-            except Exception as ex:
-                logger.error(
-                    f"Cannot parse package config:\n{json.dumps(loaded_config, indent=4)}"
-                )
-                raise Exception("Package config is not valid.", ex)
+            return parse_loaded_config(loaded_config=loaded_config)
+
+        logger.debug(f"The local config file '{config_file_name}' not found.")
 
     return None
 
 
 def get_packit_config_from_repo(
         sourcegit_project: GitProject, branch: str
-) -> PackageConfig:
+) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
             config_file = sourcegit_project.get_file_content(
                 path=config_file_name, ref=branch
             )
+            logger.debug(
+                f"Found a config file '{config_file_name}' "
+                f"on branch '{branch}' "
+                f"of the {sourcegit_project.full_repo_name} repository."
+            )
         except FileNotFoundError:
+            logger.debug(
+                f"The config file '{config_file_name}' "
+                f"not found on branch '{branch}' "
+                f"of the {sourcegit_project.full_repo_name} repository."
+            )
             continue
 
         try:
             loaded_config = anymarkup.parse(config_file)
         except Exception as ex:
             logger.error(f"Cannot load package config '{config_file_name}'.")
-            raise Exception("Cannot load package config.", ex)
+            raise Exception(f"Cannot load package config: {ex}.")
 
-        try:
-            package_config = PackageConfig.get_from_dict(
-                raw_dict=loaded_config, validate=True
-            )
-            return package_config
-        except Exception as ex:
-            logger.error(
-                f"Cannot parse package config:\n{json.dumps(loaded_config, indent=4)}"
-            )
-            raise Exception("Package config is not valid.", ex)
+        return parse_loaded_config(loaded_config=loaded_config)
 
-    raise Exception("Package config not found")
+    return None
+
+
+def parse_loaded_config(loaded_config: dict) -> PackageConfig:
+    """Tries to parse the config to PackageConfig."""
+    logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
+
+    try:
+        package_config = PackageConfig.get_from_dict(
+            raw_dict=loaded_config, validate=True
+        )
+        return package_config
+    except Exception as ex:
+        logger.error(f"Cannot parse package config. {ex}.")
+        raise Exception(f"Cannot parse package config: {ex}.")
 
 
 JOB_CONFIG_SCHEMA = {
