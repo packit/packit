@@ -1,4 +1,5 @@
-import json
+from __future__ import annotations
+
 import logging
 import os
 import shutil
@@ -12,14 +13,6 @@ import git
 from sourcegit.utils import get_rev_list_kwargs, FedPKG, run_command
 
 logger = logging.getLogger(__name__)
-
-
-def get_package_mapping():
-    mapping_file = "sourcegit-mapping.json"
-    if os.path.exists(mapping_file):
-        with open(file=mapping_file) as fp:
-            return json.load(fp)
-    return {}
 
 
 class Transformator:
@@ -304,12 +297,17 @@ class Transformator:
 
         logger.info(f"Patches ({len(patch_list)}) added to the specfile ({specfile_path})")
 
-    def copy_redhat_content_to_dest_dir(self):
+    def copy_synced_content_to_dest_dir(self, synced_files: List[str]) -> None:
         """
-        Copy content of the redhat dir in source-git to destination directory.
+        Copy files from source-git to destination directory.
         """
-        copy_tree(src=self.redhat_source_git_dir,
-                  dst=self.dest_dir)
+        for file in synced_files:
+            file_in_working_dir = os.path.join(self.repo.working_tree_dir, file)
+            logger.debug(f"Copying '{file_in_working_dir}' to distgit.")
+            if os.path.isdir(file_in_working_dir):
+                copy_tree(src=file_in_working_dir, dst=self.dest_dir)
+            elif os.path.isfile(file_in_working_dir):
+                shutil.copy2(file_in_working_dir, os.path.join(self.dest_dir, file))
 
     def upload_archive_to_lookaside_cache(self, keytab):
         """
