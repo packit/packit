@@ -5,8 +5,8 @@ import logging
 
 import click
 
-from sourcegit.api import SourceGitAPI
-from sourcegit.config import get_context_settings
+from packit.api import SourceGitAPI
+from packit.config import get_context_settings
 
 
 logger = logging.getLogger(__name__)

@@ -1,28 +1,27 @@
 BASE_IMAGE := registry.fedoraproject.org/fedora:29
 TEST_TARGET := ./tests/
-PY_PACKAGE := sourcegit
-SOURCE_GIT_IMAGE := sourcegit
+PY_PACKAGE := packit
+SOURCE_GIT_IMAGE := packit
 
 build: recipe.yaml
-	sudo ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
+	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
 
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
 
 shell:
-	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash
 
 check-pypi-packaging:
-	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash -c '\
+	podman run --rm -ti -v $(CURDIR):/src -w /src $(SOURCE_GIT_IMAGE) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
 		&& pip3 install dist/*.tar.gz \
-		&& sourcegit --help \
+		&& packit --help \
 		&& pip3 show $(PY_PACKAGE) \
 		&& twine check ./dist/* \
-		&& python3 -c "import sourcegit; assert sourcegit.__version__" \
-		&& python3 -c "import onegittorulethemall" \
+		&& python3 -c "import packit; assert packit.__version__" \
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
 		'
 
@@ -31,10 +30,10 @@ secrets.yaml:
 
 run-local: secrets.yaml
 	ansible-playbook -K -e source_git_image=$(SOURCE_GIT_IMAGE) -e @secrets.yaml -i inventory-local -c local ./deploy.yaml
-	sudo podman logs -f watcher & sudo podman logs -f syncer & sleep 999999
+	podman logs -f watcher & podman logs -f syncer & sleep 999999
 
 stop-local:
-	sudo podman stop syncer watcher
+	podman stop syncer watcher
 
 rm-local:
-	sudo podman rm syncer watcher
+	podman rm syncer watcher

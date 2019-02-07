@@ -99,7 +99,7 @@ class FedPKG:
 
 
 def set_logging(
-        logger_name="sourcegit",
+        logger_name="packit",
         level=logging.INFO,
         handler_class=logging.StreamHandler,
         handler_kwargs=None,

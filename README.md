@@ -1,4 +1,4 @@
-# source-git
+# Packit
 
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
@@ -11,10 +11,9 @@ projects into Fedora operating system.
    your newest release doesn't work in Fedora rawhide, it breaks \<Z>, here is
    a link to logs."*)
 
- * We expect that stability will increases: only merge, build and compose
-   components which integrate well with the rest of the operating system. The
-   biggest impact of such behavior will be on Fedora rawhide and when working
-   on a new release.
+ * We want to only merge, build and compose components which integrate well
+   with the rest of the operating system. The biggest impact of such behavior
+   will be on Fedora rawhide and when working on a new release.
 
  * Automatically pull and validate new upstream releases. This can be a trivial
    thing to do, why should maintainers waste their times on work which can be
@@ -47,7 +46,7 @@ projects into Fedora operating system.
 
 ## Current status
 
-Right now we are aiming for a proof of concept.
+Work has begun on the MVP.
 
 
 ## Usage

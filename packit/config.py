@@ -13,8 +13,8 @@ import click
 from jsonschema import Draft4Validator
 
 from ogr.abstract import GitProject
-from sourcegit.constants import CONFIG_FILE_NAMES
-from sourcegit.utils import exclude_from_dict
+from packit.constants import CONFIG_FILE_NAMES
+from packit.utils import exclude_from_dict
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ pass_config = click.make_pass_decorator(Config)
 
 
 def get_default_map_from_file() -> Optional[dict]:
-    config_path = ".sourcegit"
+    config_path = ".packit"
     if os.path.isfile(config_path):
         with open(config_path) as config_data:
             return json.load(config_data)

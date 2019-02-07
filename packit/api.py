@@ -9,9 +9,9 @@ from typing import Any, Dict
 
 import requests
 
-from sourcegit.fed_mes_consume import Consumerino
-from sourcegit.sync import Synchronizer
-from sourcegit.watcher import SourceGitCheckHelper
+from packit.fed_mes_consume import Consumerino
+from packit.sync import Synchronizer
+from packit.watcher import SourceGitCheckHelper
 
 logger = logging.getLogger(__name__)
 
