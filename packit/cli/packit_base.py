@@ -2,18 +2,18 @@ import logging
 
 import click
 
-import sourcegit
-from sourcegit.cli.sourcegit_to_dist_git import sg2dg
-from sourcegit.cli.sourcegit_to_srpm import sg2srpm
-from sourcegit.cli.watch_fedora_ci import watcher
-from sourcegit.cli.watch_sg_pr import watch_pr
-from sourcegit.config import Config, get_context_settings
-from sourcegit.utils import set_logging
+import packit
+from packit.cli.sourcegit_to_dist_git import sg2dg
+from packit.cli.sourcegit_to_srpm import sg2srpm
+from packit.cli.watch_fedora_ci import watcher
+from packit.cli.watch_sg_pr import watch_pr
+from packit.config import Config, get_context_settings
+from packit.utils import set_logging
 
 logger = logging.getLogger(__name__)
 
 
-@click.group("sourcegit", context_settings=get_context_settings())
+@click.group("packit", context_settings=get_context_settings())
 @click.option("-d", "--debug", is_flag=True)
 @click.option("--fas-user")
 @click.option("-k", "--keytab")
@@ -34,7 +34,7 @@ def sourcegit_base(ctx, **kwargs):
 @click.command("version")
 def version():
     """Display the version."""
-    click.echo(sourcegit.__version__)
+    click.echo(packit.__version__)
 
 
 sourcegit_base.add_command(sg2dg)

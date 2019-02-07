@@ -2,8 +2,8 @@ import logging
 
 import click
 
-from sourcegit.config import pass_config, get_context_settings, get_local_package_config
-from sourcegit.transformator import Transformator
+from packit.config import pass_config, get_context_settings, get_local_package_config
+from packit.transformator import Transformator
 
 logger = logging.getLogger("source_git")
 
@@ -21,7 +21,7 @@ logger = logging.getLogger("source_git")
 @pass_config
 def sg2dg(config, dest_dir, no_new_sources, upstream_ref, repo, version):
     """
-    Convert sourcegit to distgit.
+    Convert source-git repo to dist-git repo.
 
     1. Create tarball from the source git repo.
 
