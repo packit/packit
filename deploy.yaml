@@ -8,7 +8,7 @@
 #   $ packit -d watch-pr --updated 2019-e693608f-d77c-41ab-8b2b-99825b6170f4
 # Good luck!
 ---
-- name: Deploy source-git
+- name: Deploy packit
   hosts: all
   become: true
   tasks:
