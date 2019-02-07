@@ -7,13 +7,13 @@ import shutil
 from ogr.abstract import GitService
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
-from sourcegit.config import (
+from packit.config import (
     PackageConfig,
     get_packit_config_from_repo,
     get_local_package_config,
 )
-from sourcegit.transformator import Transformator
-from sourcegit.utils import commits_to_nice_str, checkout_pr, get_repo
+from packit.transformator import Transformator
+from packit.utils import commits_to_nice_str, checkout_pr, get_repo
 
 logger = logging.getLogger(__name__)
 

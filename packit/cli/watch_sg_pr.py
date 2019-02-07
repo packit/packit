@@ -6,7 +6,7 @@ import logging
 
 import click
 
-from sourcegit.api import SourceGitAPI
+from packit.api import SourceGitAPI
 
 
 logger = logging.getLogger(__name__)

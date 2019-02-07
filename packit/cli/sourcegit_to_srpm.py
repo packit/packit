@@ -2,8 +2,8 @@ import logging
 
 import click
 
-from sourcegit.config import pass_config, get_context_settings, get_local_package_config
-from sourcegit.transformator import Transformator
+from packit.config import pass_config, get_context_settings, get_local_package_config
+from packit.transformator import Transformator
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @pass_config
 def sg2srpm(config, dest_dir, upstream_ref, repo, version):
     """
-    Generate a srpm from sourcegit.
+    Generate a srpm from packit.
 
     This script is meant to accept a source git repo with a branch as an input and produce a SRPM.
 
