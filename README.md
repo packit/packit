@@ -46,7 +46,7 @@ projects into Fedora operating system.
 
 ## Current status
 
-Work has bagun on the MVP.
+Work has begun on the MVP.
 
 
 ## Usage
