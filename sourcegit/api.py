@@ -37,12 +37,11 @@ class SourceGitAPI:
         msg_dict = response.json()
         return msg_dict
 
-    def sync_upstream_pr_to_distgit(self, fedmsg_dict: Dict[str, Any]) -> str:
+    def sync_upstream_pr_to_distgit(self, fedmsg_dict: Dict[str, Any]) -> None:
         """
         Take the input fedmsg (github push or pr create) and sync the content into dist-git
 
         :param fedmsg_dict: dict, code change on github
-        :return: path to working dir
         """
         logger.info("syncing the upstream code to downstream")
         with Synchronizer(
@@ -51,20 +50,24 @@ class SourceGitAPI:
                 self.pagure_package_token,
                 self.pagure_fork_token,
         ) as sync:
-            return sync.sync_using_fedmsg_dict(fedmsg_dict)
+            sync.sync_using_fedmsg_dict(fedmsg_dict)
 
     def keep_syncing_upstream_pulls(self) -> None:
         """
         Watch Fedora messages and keep syncing upstream PRs downstream. This runs forever.
-
-        :return: None
         """
-        for topic, action, msg in self.consumerino.iterate_gh_pulls():
-            # TODO:
-            #   handle edited (what's that?)
-            #   handle closed (merged & not merged)
-            if action in ["opened", "synchronize", "reopened"]:
-                self.sync_upstream_pr_to_distgit(msg)
+        with Synchronizer(
+                self.github_token,
+                self.pagure_user_token,
+                self.pagure_package_token,
+                self.pagure_fork_token,
+        ) as sync:
+            for topic, action, msg in self.consumerino.iterate_gh_pulls():
+                # TODO:
+                #   handle edited (what's that?)
+                #   handle closed (merged & not merged)
+                if action in ["opened", "synchronize", "reopened"]:
+                    sync.sync_using_fedmsg_dict(msg)
 
     def process_ci_result(self, fedmsg_dict: Dict[str, Any]) -> None:
         """

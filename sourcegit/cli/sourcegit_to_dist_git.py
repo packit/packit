@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from sourcegit.config import pass_config, get_context_settings
+from sourcegit.config import pass_config, get_context_settings, get_local_package_config
 from sourcegit.transformator import Transformator
 
 logger = logging.getLogger("source_git")
@@ -19,16 +19,7 @@ logger = logging.getLogger("source_git")
 @click.argument("name")
 @click.argument("version")
 @pass_config
-def sg2dg(config,
-          dest_dir,
-          no_new_sources,
-          package_name,
-          rev_list_option,
-          upstream_ref,
-          repo,
-          dist_git,
-          name,
-          version):
+def sg2dg(config, dest_dir, no_new_sources, upstream_ref, repo, version):
     """
     Convert sourcegit to distgit.
 
@@ -43,17 +34,17 @@ def sg2dg(config,
     5. The output is the directory (= dirty git repo)
     """
 
-    with Transformator(url=repo,
-                       upstream_name=name,
-                       package_name=package_name,
-                       version=version,
-                       dest_dir=dest_dir,
-                       dist_git_url=dist_git,
-                       fas_username=config.fas_user,
-                       rev_list_option=rev_list_option) as t:
+    package_config = get_local_package_config()
+    with Transformator(
+            url=repo,
+            version=version,
+            dest_dir=dest_dir,
+            fas_username=config.fas_user,
+            package_config=package_config,
+    ) as t:
         t.clone_dist_git_repo()
         t.create_archive()
-        t.copy_redhat_content_to_dest_dir()
+        t.copy_synced_content_to_dest_dir(synced_files=package_config.synced_files)
         patches = t.create_patches(upstream=upstream_ref)
         t.add_patches_to_specfile(patch_list=patches)
         if not no_new_sources:
