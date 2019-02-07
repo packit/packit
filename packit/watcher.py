@@ -6,7 +6,7 @@ import logging
 import github
 
 from ogr.services.pagure import PagureService
-from sourcegit.downstream_checks import DownstreamCheck
+from packit.downstream_checks import DownstreamCheck
 
 logger = logging.getLogger(__name__)
 

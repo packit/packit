@@ -12,20 +12,20 @@ from typing import Optional, List, Tuple
 import git
 
 from ogr.abstract import GitProject
-from sourcegit.config import PackageConfig
-from sourcegit.constants import DG_PR_COMMENT_KEY_SG_PR, DG_PR_COMMENT_KEY_SG_COMMIT
-from sourcegit.downstream_checks import get_check_by_name
-from sourcegit.utils import get_rev_list_kwargs, FedPKG, run_command
-from sourcegit.watcher import SourceGitCheckHelper
+from packit.config import PackageConfig
+from packit.constants import DG_PR_COMMENT_KEY_SG_PR, DG_PR_COMMENT_KEY_SG_COMMIT
+from packit.downstream_checks import get_check_by_name
+from packit.utils import get_rev_list_kwargs, FedPKG, run_command
+from packit.watcher import SourceGitCheckHelper
 
 logger = logging.getLogger(__name__)
 
 
 class Transformator:
     """
-    Describes relation between sourcegit and distgit repository.
+    Describes a relation between a source-git and a dist-git repository.
 
-    Allows multiple actions and transformation of the repos.
+    Allows multiple actions and transformation operations of the repos.
     """
 
     def __init__(

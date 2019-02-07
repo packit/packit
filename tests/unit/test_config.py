@@ -1,6 +1,6 @@
 import pytest
 
-from sourcegit.config import JobConfig, PackageConfig, TriggerType
+from packit.config import JobConfig, PackageConfig, TriggerType
 
 
 def test_job_config_equal():
