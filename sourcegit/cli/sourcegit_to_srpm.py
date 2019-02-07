@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from sourcegit.config import pass_config, get_context_settings
+from sourcegit.config import pass_config, get_context_settings, get_local_package_config
 from sourcegit.transformator import Transformator
 
 logger = logging.getLogger(__name__)
@@ -19,15 +19,7 @@ logger = logging.getLogger(__name__)
 @click.argument("name")
 @click.argument("version")
 @pass_config
-def sg2srpm(config,
-            dest_dir,
-            package_name,
-            rev_list_option,
-            upstream_ref,
-            repo,
-            dist_git,
-            name,
-            version):
+def sg2srpm(config, dest_dir, upstream_ref, repo, version):
     """
     Generate a srpm from sourcegit.
 
@@ -42,20 +34,19 @@ def sg2srpm(config,
     3. create SRPM
     """
 
-    with Transformator(url=repo,
-                       upstream_name=name,
-                       package_name=package_name,
-                       version=version,
-                       dest_dir=dest_dir,
-                       dist_git_url=dist_git,
-                       branch=upstream_ref,
-                       fas_username=config.fas_user) as t:
+    package_config = get_local_package_config()
+    with Transformator(
+        url=repo,
+        version=version,
+        dest_dir=dest_dir,
+        branch=upstream_ref,
+        fas_username=config.fas_user,
+        package_config=package_config,
+    ) as t:
         t.clone_dist_git_repo()
         t.create_archive()
-        """
-        t.copy_redhat_content_to_dest_dir()
-        patches = t.create_patches(upstream=upstream_ref, rev_list_option=rev_list_option)
+        t.copy_synced_content_to_dest_dir(synced_files=package_config.synced_files)
+        patches = t.create_patches(upstream=upstream_ref)
         t.add_patches_to_specfile(patch_list=patches)
-        """
         t.create_srpm()
         click.echo(f"{t.archive}")
