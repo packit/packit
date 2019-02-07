@@ -7,7 +7,6 @@ import github
 
 from ogr.services.pagure import PagureService
 from sourcegit.downstream_checks import DownstreamCheck
-from sourcegit.transformator import get_package_mapping
 
 logger = logging.getLogger(__name__)
 
