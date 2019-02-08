@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import json
 import logging
-import shutil
 
 from ogr.abstract import GitService
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
+from packit.cloned_project import ClonedProject
 from packit.config import (
     PackageConfig,
     get_packit_config_from_repo,
     get_local_package_config,
 )
 from packit.transformator import Transformator
-from packit.utils import commits_to_nice_str, checkout_pr, get_repo
+from packit.utils import commits_to_nice_str, checkout_pr
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +99,11 @@ class Synchronizer:
                 title=fedmsg_dict["msg"]["pull_request"]["title"],
                 package_config=package_config,
             )
+        except ConnectionError as ex:
+            # TODO: Retry on connection error
+            logger.warning(f"Connection error on processing a msg {msg_id}")
+            logger.debug(str(ex))
+            return
         except Exception as ex:
             logger.warning(f"Error on processing a msg {msg_id}")
             logger.debug(str(ex))
@@ -131,69 +136,64 @@ class Synchronizer:
         :return:
         """
         logger.info("starting sync for project %s", target_url)
-        repo = get_repo(url=target_url, directory=repo_directory)
-        try:
-            checkout_pr(repo=repo, pr_id=pr_id)
 
-            with Transformator(
-                    url=target_url,
-                    repo=repo,
-                    branch=repo.active_branch,
-                    package_config=package_config,
-            ) as transformator:
-                dist_git_branch_name = f"source-git-{pr_id}"
-                transformator.clone_dist_git_repo(
-                    new_branch_to_checkout=dist_git_branch_name
-                )
+        sourcegit = ClonedProject(
+            git_url=target_url, working_dir=repo_directory, full_name=full_name
+        )
 
-                transformator.create_archive()
-                transformator.copy_synced_content_to_dest_dir(
-                    synced_files=package_config.synced_files
-                )
-                transformator.add_patches_to_specfile()
+        distgit = ClonedProject(
+            git_url=package_config.metadata["dist_git_url"],
+            branch=f"source-git-{pr_id}",
+            git_service=PagureService(token=self.pagure_fork_token),
+            namespace="rpms",
+            repo_name=package_config.metadata["package_name"],
+        )
 
-                commits = transformator.get_commits_to_upstream(upstream=target_ref)
-                commits_nice_str = commits_to_nice_str(commits)
+        checkout_pr(repo=sourcegit.git_repo, pr_id=pr_id)
 
-                logger.debug(f"Commits in source-git PR:\n{commits_nice_str}")
+        with Transformator(
+                sourcegit=sourcegit, distgit=distgit, package_config=package_config
+        ) as transformator:
+            transformator.create_archive()
+            transformator.copy_synced_content_to_distgit_directory(
+                synced_files=package_config.synced_files
+            )
+            transformator.add_patches_to_specfile()
 
-                msg = f"upstream commit: {top_commit}\n\nupstream repo: {target_url}"
-                transformator.commit_distgit(title=title, msg=msg)
+            commits = transformator.get_commits_to_upstream(upstream=target_ref)
+            commits_nice_str = commits_to_nice_str(commits)
 
-                package_name = package_config.metadata["package_name"]
-                pagure = PagureService(token=self.pagure_fork_token)
+            logger.debug(f"Commits in source-git PR:\n{commits_nice_str}")
 
-                project = pagure.get_project(repo=package_name, namespace="rpms")
+            msg = f"upstream commit: {top_commit}\n\nupstream repo: {target_url}"
+            transformator.commit_distgit(title=title, msg=msg)
 
-                project_fork = project.get_fork()
-                if not project_fork:
-                    logger.info("Creating a fork.")
-                    project.fork_create()
-                    project_fork = project.get_fork()
+            project_fork = distgit.git_project.get_fork()
+            if not project_fork:
+                logger.info("Creating a fork.")
+                distgit.git_project.fork_create()
+                project_fork = distgit.git_project.get_fork()
 
-                transformator.push_to_distgit_fork(
-                    project_fork=project_fork, branch_name=dist_git_branch_name
-                )
+            transformator.push_to_distgit_fork(
+                project_fork=project_fork, branch_name=distgit.branch
+            )
 
-                transformator.reset_checks(
-                    full_name,
-                    pr_id,
-                    github_token=self.github_token,
-                    pagure_user_token=self.pagure_user_token,
-                )
-                transformator.update_or_create_dist_git_pr(
-                    project,
-                    pr_id,
-                    pr_url,
-                    top_commit,
-                    title,
-                    source_ref=dist_git_branch_name,
-                    pagure_fork_token=self.pagure_fork_token,
-                    pagure_package_token=self.pagure_package_token,
-                )
-        finally:
-            if not repo_directory:
-                shutil.rmtree(repo.working_dir)
+            transformator.reset_checks(
+                full_name,
+                pr_id,
+                github_token=self.github_token,
+                pagure_user_token=self.pagure_user_token,
+            )
+            transformator.update_or_create_dist_git_pr(
+                distgit.git_project,
+                pr_id,
+                pr_url,
+                top_commit,
+                title,
+                source_ref=distgit.branch,
+                pagure_fork_token=self.pagure_fork_token,
+                pagure_package_token=self.pagure_package_token,
+            )
 
     def __enter__(self) -> Synchronizer:
         return self

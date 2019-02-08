@@ -12,6 +12,7 @@ from typing import Optional, List, Tuple
 import git
 
 from ogr.abstract import GitProject
+from packit.cloned_project import ClonedProject
 from packit.config import PackageConfig
 from packit.constants import DG_PR_COMMENT_KEY_SG_PR, DG_PR_COMMENT_KEY_SG_COMMIT
 from packit.downstream_checks import get_check_by_name
@@ -31,25 +32,17 @@ class Transformator:
     def __init__(
             self,
             package_config: PackageConfig,
-            branch: str = None,
+            sourcegit: ClonedProject,
+            distgit: ClonedProject,
             version: str = None,
-            dest_dir: str = None,
             fas_username: str = None,
-            url: str = None,
-            repo: git.Repo = None,
     ) -> None:
 
         self.package_config = package_config
-        self._repo = repo
-        if repo:
-            self._branch = branch or repo.active_branch
-            self.repo_url = url or list(repo.remote().urls)[0]
-        else:
-            self._branch = branch
-            self.repo_url = url
+        self.sourcegit = sourcegit
+        self.distgit = distgit
 
         self._version = version
-        self._temp_dir: Optional[str] = None
         self.rev_list_option_args = get_rev_list_kwargs(
             self.package_config.metadata.get("rev_list_option", ["first_parent"])
         )
@@ -60,58 +53,12 @@ class Transformator:
         self.package_name = (
                 self.package_config.metadata["package_name"] or self.upstream_name
         )
-        self.dest_dir = dest_dir or tempfile.mkdtemp()
-        self.dist_git_url = self.package_config.metadata["dist_git_url"]
-
-    @property
-    def branch(self) -> str:
-        """
-        Source branch in the source-git repo.
-        """
-        if not self._branch:
-            self._branch = f"upstream-{self.version}"
-        return self._branch
-
-    @property
-    def repo(self) -> git.Repo:
-        """
-        Repository used as a source.
-        """
-        if not self._repo:
-            repo_path = os.path.join(self.temp_dir, self.upstream_name)
-            logger.info(
-                f"Cloning source-git repo: {self.repo_url} ({self.branch})-> {repo_path}"
-            )
-            self._repo = git.repo.Repo.clone_from(
-                url=self.repo_url, to_path=repo_path, branch=self.branch, tags=True
-            )
-        return self._repo
-
-    @property
-    @lru_cache()
-    def dist_git_repo(self) -> git.Repo:
-        """
-        Clone the dist_git repository to the destination dir and return git.Repo instance
-
-        :return: git.Repo instance
-        """
-        return self.clone_dist_git_repo()
-
-    @property
-    def temp_dir(self) -> str:
-        """
-        Dir used for storing temp. content. e.g. source-git repo.
-        """
-        if not self._temp_dir:
-            self._temp_dir = tempfile.mkdtemp()
-            logger.debug(f"Creating temp dir: {self._temp_dir}")
-        return self._temp_dir
 
     @property
     @lru_cache()
     def specfile_path(self) -> str:
         return os.path.join(
-            self.repo.working_tree_dir, self.package_config.specfile_path
+            self.sourcegit.working_dir, self.package_config.specfile_path
         )
 
     @property
@@ -158,17 +105,15 @@ class Transformator:
         """
         return FedPKG(
             fas_username=self.fas_username,
-            repo_path=self.dist_git_url,
-            directory=self.dest_dir,
+            repo_path=self.distgit.git_url,
+            directory=self.distgit.working_dir,
         )
 
     def clean(self) -> None:
         """
         Clean te temporary dir.
         """
-        logger.debug(f"Cleaning: {self.temp_dir}")
-        shutil.rmtree(self.temp_dir)
-        self._temp_dir = None
+        pass
 
     def create_archive(
             self, path: str = None, name="{project}-{version}.tar.gz"
@@ -181,12 +126,12 @@ class Transformator:
         :return: str, path to the archive
         """
         archive_name = name.format(project=self.upstream_name, version=self.version)
-        archive_path = path or os.path.join(self.dest_dir, archive_name)
+        archive_path = path or os.path.join(self.distgit.working_dir, archive_name)
 
         self.add_exclude_redhat_to_gitattributes()
 
         with open(archive_path, "wb") as fp:
-            self.repo.archive(
+            self.sourcegit.git_repo.archive(
                 fp, prefix=f"./{self.upstream_name}/", worktree_attributes=True
             )
 
@@ -199,10 +144,10 @@ class Transformator:
         TODO: We need to use upstream release archive directly
         """
         logger.debug("Adding 'redhat/ export-ignore' to .gitattributes")
-        gitattributes_path = os.path.join(self.repo.working_tree_dir, ".gitattributes")
+        gitattributes_path = os.path.join(self.sourcegit.working_dir, ".gitattributes")
         with open(gitattributes_path, "a") as gitattributes_file:
             for file in self.package_config.synced_files:
-                file_in_working_dir = os.path.join(self.repo.working_tree_dir, file)
+                file_in_working_dir = os.path.join(self.sourcegit.working_dir, file)
                 if os.path.isdir(file_in_working_dir):
                     gitattributes_file.writelines([f"{file}/ export-ignore\n"])
                 elif os.path.isfile(file_in_working_dir):
@@ -227,7 +172,7 @@ class Transformator:
                 "--define",
                 f"_buildir {spec_dir}",
                 "--define",
-                f"_srcrpmdir {self.dest_dir}",
+                f"_srcrpmdir {self.distgit.working_dir}",
                 "--define",
                 f"_rpmdir {spec_dir}",
             ],
@@ -245,49 +190,27 @@ class Transformator:
         :return: list of commits (last commit on the current branch.).
         """
 
-        if upstream in self.repo.tags:
+        if upstream in self.sourcegit.git_repo.tags:
             upstream_ref = upstream
         else:
             upstream_ref = f"origin/{upstream}"
-            if upstream_ref not in self.repo.refs:
+            if upstream_ref not in self.sourcegit.git_repo.refs:
                 raise Exception(
                     f"Upstream {upstream_ref} branch nor {upstream} tag not found."
                 )
 
         commits = list(
-            self.repo.iter_commits(
-                rev=f"{upstream_ref}..{self.branch}",
+            self.sourcegit.git_repo.iter_commits(
+                rev=f"{upstream_ref}..{self.sourcegit._branch}",
                 reverse=True,
                 **self.rev_list_option_args,
             )
         )
         if add_usptream_head_commit:
-            commits.insert(0, self.repo.refs[f"{upstream_ref}"].commit)
+            commits.insert(0, self.sourcegit.git_repo.refs[f"{upstream_ref}"].commit)
 
-        logger.debug(f"Delta ({upstream_ref}..{self.branch}): {len(commits)}")
+        logger.debug(f"Delta ({upstream_ref}..{self.sourcegit._branch}): {len(commits)}")
         return commits
-
-    @lru_cache()
-    def clone_dist_git_repo(self, new_branch_to_checkout: str = None) -> git.Repo:
-        """
-        Clone the dist_git repository to the destination dir and return git.Repo instance
-
-        :return: git.Repo instance
-        """
-        # TODO: optimize cloning: single branch and last 3 commits?
-        if os.path.isdir(os.path.join(self.dest_dir, ".git")):
-            logger.info(f"Dist-git already present: {self.dest_dir}")
-            return git.repo.Repo(self.dest_dir)
-
-        logger.info(f"Cloning dist-git repo: {self.dist_git_url} -> {self.dest_dir}")
-        repo = git.repo.Repo.clone_from(
-            url=self.dist_git_url, to_path=self.dest_dir, tags=True
-        )
-
-        if new_branch_to_checkout:
-            new_branch = repo.create_head(new_branch_to_checkout)
-            new_branch.checkout()
-        return repo
 
     def create_patches(self, upstream: str = None) -> List[Tuple[str, str]]:
         """
@@ -304,7 +227,7 @@ class Transformator:
             parent = commits[i]
 
             patch_name = f"{i + 1:04d}-{commit.hexsha}.patch"
-            patch_path = os.path.join(self.dest_dir, patch_name)
+            patch_path = os.path.join(self.distgit.working_dir, patch_name)
             patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
 
             logger.debug(f"PATCH: {patch_name}\n{patch_msg}")
@@ -319,7 +242,7 @@ class Transformator:
                     ".",
                     '":(exclude)redhat"',
                 ],
-                cwd=self.repo.working_tree_dir,
+                cwd=self.sourcegit.working_dir,
                 output=True,
             )
 
@@ -338,7 +261,7 @@ class Transformator:
         if patch_list is None:
             patch_list = self.create_patches()
 
-        specfile_path = os.path.join(self.dest_dir, f"{self.package_name}.spec")
+        specfile_path = os.path.join(self.distgit.working_dir, f"{self.package_name}.spec")
 
         with open(file=specfile_path, mode="r+") as spec_file:
             last_source_position = None
@@ -367,19 +290,19 @@ class Transformator:
         logger.info(
             f"Patches ({len(patch_list)}) added to the specfile ({specfile_path})"
         )
-        self.repo.index.write()
+        self.sourcegit.git_repo.index.write()
 
-    def copy_synced_content_to_dest_dir(self, synced_files: List[str]) -> None:
+    def copy_synced_content_to_distgit_directory(self, synced_files: List[str]) -> None:
         """
         Copy files from source-git to destination directory.
         """
         for file in synced_files:
-            file_in_working_dir = os.path.join(self.repo.working_tree_dir, file)
+            file_in_working_dir = os.path.join(self.sourcegit.working_dir, file)
             logger.debug(f"Copying '{file_in_working_dir}' to distgit.")
             if os.path.isdir(file_in_working_dir):
-                copy_tree(src=file_in_working_dir, dst=self.dest_dir)
+                copy_tree(src=file_in_working_dir, dst=self.distgit.working_dir)
             elif os.path.isfile(file_in_working_dir):
-                shutil.copy2(file_in_working_dir, os.path.join(self.dest_dir, file))
+                shutil.copy2(file_in_working_dir, os.path.join(self.distgit.working_dir, file))
 
     def upload_archive_to_lookaside_cache(self, keytab: str) -> None:
         """
@@ -392,12 +315,12 @@ class Transformator:
 
     def commit_distgit(self, title: str, msg: str) -> None:
         main_msg = f"[source-git] {title}"
-        self.dist_git_repo.git.add("-A")
-        self.dist_git_repo.index.write()
+        self.distgit.git_repo.git.add("-A")
+        self.distgit.git_repo.index.write()
         # TODO: implement signing properly: we need to create a cert for the bot, distribute it to the container,
         #       prepare git config and then we can start signing
         # TODO: make -s configurable
-        self.dist_git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
+        self.distgit.git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
 
     def reset_checks(
             self, full_name: str, pr_id: int, github_token: str, pagure_user_token: str
@@ -468,7 +391,7 @@ class Transformator:
             # FIXME: consider storing the data above as a git note of the top commit
             project.change_token(pagure_package_token)
             project.pr_comment(pr.id, msg)
-            logger.info("new comment added on PR %s", sg_pr_id)
+            logger.info(f"new comment added on PR {pr.id} ({pr.url})")
             break
         else:
             logger.debug(f"Matching dist-git PR not found => creating a new one.")
@@ -490,13 +413,13 @@ class Transformator:
             logger.info(f"PR created: {dist_git_pr_id}")
 
     def push_to_distgit_fork(self, project_fork, branch_name):
-        if "origin-fork" not in [remote.name for remote in self.dist_git_repo.remotes]:
-            self.dist_git_repo.create_remote(
+        if "origin-fork" not in [remote.name for remote in self.distgit.git_repo.remotes]:
+            self.distgit.git_repo.create_remote(
                 name="origin-fork", url=project_fork.get_git_urls()["ssh"]
             )
 
         # I suggest to comment this one while testing when the push is not needed
-        self.dist_git_repo.remote("origin-fork").push(
+        self.distgit.git_repo.remote("origin-fork").push(
             refspec=branch_name, force=branch_name in project_fork.get_branches()
         )
 
