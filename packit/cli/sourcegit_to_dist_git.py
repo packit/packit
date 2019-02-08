@@ -44,7 +44,7 @@ def sg2dg(config, dest_dir, no_new_sources, upstream_ref, repo, version):
     ) as t:
         t.clone_dist_git_repo()
         t.create_archive()
-        t.copy_synced_content_to_dest_dir(synced_files=package_config.synced_files)
+        t.copy_synced_content_to_distgit_directory(synced_files=package_config.synced_files)
         patches = t.create_patches(upstream=upstream_ref)
         t.add_patches_to_specfile(patch_list=patches)
         if not no_new_sources:
