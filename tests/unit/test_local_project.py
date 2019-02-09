@@ -133,11 +133,11 @@ def test_clone_project_service_repo_namespace():
 
 @mock.patch(
     "packit.local_project.get_repo",
-    return_value=flexmock(working_dir="some-dir", active_branch="branch"),
+    return_value=flexmock(working_dir="some/example/path", active_branch="branch"),
 )
 def test_local_project_clone(mock_get_repo):
-    project = LocalProject(git_url="some-url")
-    mock_get_repo.assert_called_once_with(url="some-url")
+    project = LocalProject(git_url="http://some.example/url")
+    mock_get_repo.assert_called_once_with(url="http://some.example/url")
 
     assert project.git_url
     assert project.git_repo
@@ -155,11 +155,31 @@ def test_local_project_clone(mock_get_repo):
     ),
 )
 def test_local_project_repo_from_working_dir(_MockRepo, mock_is_git_directory):
-    project = LocalProject(working_dir="some/directory")
-    mock_is_git_directory.assert_called_once_with(directory="some/directory")
+    project = LocalProject(working_dir="some/example/path")
+    mock_is_git_directory.assert_called_once_with(directory="some/example/path")
 
     assert project.git_url == "git/url"
     assert project.git_repo
     assert project.git_repo.active_branch == "branch"
     assert project.branch == "branch"
+    assert not project.working_dir_created
+
+
+@mock.patch(
+    "packit.local_project.get_repo",
+    return_value=flexmock(working_dir="some/example/path", active_branch="branch"),
+)
+def test_local_project_dir_url(mock_get_repo):
+    project = LocalProject(
+        git_url="http://some.example/url", working_dir="some/example/path"
+    )
+    mock_get_repo.assert_called_once_with(
+        url="http://some.example/url", directory="some/example/path"
+    )
+
+    assert project.git_url == "http://some.example/url"
+    assert project.git_repo
+    assert project.branch == "branch"
+    assert project.git_repo.active_branch == "branch"
+    assert project.git_repo.working_dir == "some/example/path"
     assert not project.working_dir_created
