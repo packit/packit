@@ -3,6 +3,7 @@ import logging
 import click
 
 from packit.config import pass_config, get_context_settings, get_local_package_config
+from packit.local_project import LocalProject
 from packit.transformator import Transformator
 
 logger = logging.getLogger("source_git")

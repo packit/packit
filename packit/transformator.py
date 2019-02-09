@@ -3,19 +3,18 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-import tempfile
 # decorator for cached properties, in python >=3.8 use cached_property
 from distutils.dir_util import copy_tree
 from functools import lru_cache
-from typing import Optional, List, Tuple
+from typing import List, Tuple
 
 import git
 
 from ogr.abstract import GitProject
-from packit.cloned_project import ClonedProject
 from packit.config import PackageConfig
 from packit.constants import DG_PR_COMMENT_KEY_SG_PR, DG_PR_COMMENT_KEY_SG_COMMIT
 from packit.downstream_checks import get_check_by_name
+from packit.local_project import LocalProject
 from packit.utils import get_rev_list_kwargs, FedPKG, run_command
 from packit.watcher import SourceGitCheckHelper
 
@@ -32,8 +31,8 @@ class Transformator:
     def __init__(
             self,
             package_config: PackageConfig,
-            sourcegit: ClonedProject,
-            distgit: ClonedProject,
+            sourcegit: LocalProject,
+            distgit: LocalProject,
             version: str = None,
             fas_username: str = None,
     ) -> None:
