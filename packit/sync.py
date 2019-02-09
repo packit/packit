@@ -6,12 +6,12 @@ import logging
 from ogr.abstract import GitService
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
-from packit.cloned_project import ClonedProject
 from packit.config import (
     PackageConfig,
     get_packit_config_from_repo,
     get_local_package_config,
 )
+from packit.local_project import LocalProject
 from packit.transformator import Transformator
 from packit.utils import commits_to_nice_str, checkout_pr
 
@@ -137,11 +137,11 @@ class Synchronizer:
         """
         logger.info("starting sync for project %s", target_url)
 
-        sourcegit = ClonedProject(
+        sourcegit = LocalProject(
             git_url=target_url, working_dir=repo_directory, full_name=full_name
         )
 
-        distgit = ClonedProject(
+        distgit = LocalProject(
             git_url=package_config.metadata["dist_git_url"],
             branch=f"source-git-{pr_id}",
             git_service=PagureService(token=self.pagure_fork_token),

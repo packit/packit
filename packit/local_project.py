@@ -9,18 +9,18 @@ from packit.utils import is_git_repo, get_repo
 logger = logging.getLogger(__name__)
 
 
-class ClonedProject:
+class LocalProject:
     def __init__(
-            self,
-            git_repo: git.Repo = None,
-            working_dir: str = None,
-            branch: str = None,
-            git_project: GitProject = None,
-            git_service: GitService = None,
-            git_url: str = None,
-            full_name: str = None,
-            namespace: str = None,
-            repo_name: str = None,
+        self,
+        git_repo: git.Repo = None,
+        working_dir: str = None,
+        branch: str = None,
+        git_project: GitProject = None,
+        git_service: GitService = None,
+        git_url: str = None,
+        full_name: str = None,
+        namespace: str = None,
+        repo_name: str = None,
     ) -> None:
 
         self.git_repo = git_repo
@@ -51,10 +51,10 @@ class ClonedProject:
                 change = True
 
             if (
-                    self.repo_name
-                    and self.namespace
-                    and self.git_service
-                    and not self.git_project
+                self.repo_name
+                and self.namespace
+                and self.git_service
+                and not self.git_project
             ):
                 self.git_project = self.git_service.get_project(
                     repo=self.repo_name, namespace=self.namespace
@@ -74,7 +74,7 @@ class ClonedProject:
                 change = True
 
             if self.working_dir and not self.git_repo:
-                if is_git_repo(self.working_dir):
+                if is_git_repo(directory=self.working_dir):
                     self.git_repo = git.Repo(path=self.working_dir)
                     change = True
                 elif self.git_url:
