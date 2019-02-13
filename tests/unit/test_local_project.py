@@ -1,7 +1,7 @@
-from unittest import mock
-
+import git
 from flexmock import flexmock
 
+from packit import local_project
 from packit.local_project import LocalProject
 
 
@@ -131,13 +131,12 @@ def test_clone_project_service_repo_namespace():
     assert project.git_project
 
 
-@mock.patch(
-    "packit.local_project.get_repo",
-    return_value=flexmock(working_dir="some/example/path", active_branch="branch"),
-)
-def test_local_project_clone(mock_get_repo):
+def test_local_project_clone():
+    flexmock(local_project).should_receive("get_repo").with_args(
+        "http://some.example/url"
+    ).and_return(flexmock(working_dir="some/example/path", active_branch="branch"))
+
     project = LocalProject(git_url="http://some.example/url")
-    mock_get_repo.assert_called_once_with(url="http://some.example/url")
 
     assert project.git_url
     assert project.git_repo
@@ -147,16 +146,17 @@ def test_local_project_clone(mock_get_repo):
     project.working_dir_temporary = False
 
 
-@mock.patch("packit.local_project.is_git_repo", return_value=True)
-@mock.patch(
-    "packit.local_project.git.Repo",
-    new_callable=flexmock(
-        active_branch="branch", remote=lambda: flexmock(urls=["git/url"])
-    ),
-)
-def test_local_project_repo_from_working_dir(_MockRepo, mock_is_git_directory):
+def test_local_project_repo_from_working_dir():
+    flexmock(local_project).should_receive("is_git_repo").with_args(
+        "some/example/path"
+    ).and_return(True)
+    flexmock(
+        git,
+        Repo=flexmock(
+            active_branch="branch", remote=lambda: flexmock(urls=["git/url"])
+        ),
+    )
     project = LocalProject(working_dir="some/example/path")
-    mock_is_git_directory.assert_called_once_with(directory="some/example/path")
 
     assert project.git_url == "git/url"
     assert project.git_repo
@@ -165,16 +165,14 @@ def test_local_project_repo_from_working_dir(_MockRepo, mock_is_git_directory):
     assert not project.working_dir_temporary
 
 
-@mock.patch(
-    "packit.local_project.get_repo",
-    return_value=flexmock(working_dir="some/example/path", active_branch="branch"),
-)
-def test_local_project_dir_url(mock_get_repo):
+def test_local_project_dir_url():
+
+    flexmock(local_project).should_receive("get_repo").with_args(
+        "http://some.example/url", "some/example/path"
+    ).and_return(flexmock(working_dir="some/example/path", active_branch="branch"))
+
     project = LocalProject(
         git_url="http://some.example/url", working_dir="some/example/path"
-    )
-    mock_get_repo.assert_called_once_with(
-        url="http://some.example/url", directory="some/example/path"
     )
 
     assert project.git_url == "http://some.example/url"
