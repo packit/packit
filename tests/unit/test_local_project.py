@@ -142,9 +142,9 @@ def test_local_project_clone(mock_get_repo):
     assert project.git_url
     assert project.git_repo
     assert project.branch == "branch"
-    assert project.working_dir_created
+    assert project.working_dir_temporary
 
-    project.working_dir_created = False
+    project.working_dir_temporary = False
 
 
 @mock.patch("packit.local_project.is_git_repo", return_value=True)
@@ -162,7 +162,7 @@ def test_local_project_repo_from_working_dir(_MockRepo, mock_is_git_directory):
     assert project.git_repo
     assert project.git_repo.active_branch == "branch"
     assert project.branch == "branch"
-    assert not project.working_dir_created
+    assert not project.working_dir_temporary
 
 
 @mock.patch(
@@ -182,4 +182,4 @@ def test_local_project_dir_url(mock_get_repo):
     assert project.branch == "branch"
     assert project.git_repo.active_branch == "branch"
     assert project.git_repo.working_dir == "some/example/path"
-    assert not project.working_dir_created
+    assert not project.working_dir_temporary
