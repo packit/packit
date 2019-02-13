@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-# decorator for cached properties, in python >=3.8 use cached_property
 from distutils.dir_util import copy_tree
 from functools import lru_cache
 from typing import List, Tuple
@@ -29,12 +28,12 @@ class Transformator:
     """
 
     def __init__(
-            self,
-            package_config: PackageConfig,
-            sourcegit: LocalProject,
-            distgit: LocalProject,
-            version: str = None,
-            fas_username: str = None,
+        self,
+        package_config: PackageConfig,
+        sourcegit: LocalProject,
+        distgit: LocalProject,
+        version: str = None,
+        fas_username: str = None,
     ) -> None:
 
         self.package_config = package_config
@@ -50,7 +49,7 @@ class Transformator:
 
         self.upstream_name = self.package_config.metadata["upstream_name"]
         self.package_name = (
-                self.package_config.metadata["package_name"] or self.upstream_name
+            self.package_config.metadata["package_name"] or self.upstream_name
         )
 
     @property
@@ -115,7 +114,7 @@ class Transformator:
         pass
 
     def create_archive(
-            self, path: str = None, name="{project}-{version}.tar.gz"
+        self, path: str = None, name="{project}-{version}.tar.gz"
     ) -> str:
         """
         Create archive from the provided git repo. The archive needs to be able to be used to build
@@ -154,7 +153,7 @@ class Transformator:
 
     @lru_cache()
     def create_srpm(self) -> None:
-        logger.debug("Start creating og the SRPM.")
+        logger.debug("Start creating of the SRPM.")
         archive = self.create_archive()
         logger.debug(f"Using archive: {archive}")
 
@@ -165,7 +164,7 @@ class Transformator:
                 "-bs",
                 f"{self.specfile_path}",
                 "--define",
-                f"_sourcedir {spec_dir}",
+                f"_sourcedir {self.distgit.working_dir}",
                 "--define",
                 f"_specdir {spec_dir}",
                 "--define",
@@ -180,7 +179,7 @@ class Transformator:
 
     @lru_cache()
     def get_commits_to_upstream(
-            self, upstream: str, add_usptream_head_commit=False
+        self, upstream: str, add_usptream_head_commit=False
     ) -> List[git.Commit]:
         """
         Return the list of commits from current branch to upstream rev/tag.
@@ -208,7 +207,9 @@ class Transformator:
         if add_usptream_head_commit:
             commits.insert(0, self.sourcegit.git_repo.refs[f"{upstream_ref}"].commit)
 
-        logger.debug(f"Delta ({upstream_ref}..{self.sourcegit._branch}): {len(commits)}")
+        logger.debug(
+            f"Delta ({upstream_ref}..{self.sourcegit._branch}): {len(commits)}"
+        )
         return commits
 
     def create_patches(self, upstream: str = None) -> List[Tuple[str, str]]:
@@ -260,7 +261,9 @@ class Transformator:
         if patch_list is None:
             patch_list = self.create_patches()
 
-        specfile_path = os.path.join(self.distgit.working_dir, f"{self.package_name}.spec")
+        specfile_path = os.path.join(
+            self.distgit.working_dir, f"{self.package_name}.spec"
+        )
 
         with open(file=specfile_path, mode="r+") as spec_file:
             last_source_position = None
@@ -301,7 +304,9 @@ class Transformator:
             if os.path.isdir(file_in_working_dir):
                 copy_tree(src=file_in_working_dir, dst=self.distgit.working_dir)
             elif os.path.isfile(file_in_working_dir):
-                shutil.copy2(file_in_working_dir, os.path.join(self.distgit.working_dir, file))
+                shutil.copy2(
+                    file_in_working_dir, os.path.join(self.distgit.working_dir, file)
+                )
 
     def upload_archive_to_lookaside_cache(self, keytab: str) -> None:
         """
@@ -322,7 +327,7 @@ class Transformator:
         self.distgit.git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
 
     def reset_checks(
-            self, full_name: str, pr_id: int, github_token: str, pagure_user_token: str
+        self, full_name: str, pr_id: int, github_token: str, pagure_user_token: str
     ) -> None:
         """
         Before syncing a new change downstream, we need to reset status of checks
@@ -335,15 +340,15 @@ class Transformator:
             sg.set_init_check(full_name, pr_id, check)
 
     def update_or_create_dist_git_pr(
-            self,
-            project: GitProject,
-            pr_id: int,
-            pr_url: str,
-            top_commit: str,
-            title: str,
-            source_ref: str,
-            pagure_fork_token: str,
-            pagure_package_token: str,
+        self,
+        project: GitProject,
+        pr_id: int,
+        pr_url: str,
+        top_commit: str,
+        title: str,
+        source_ref: str,
+        pagure_fork_token: str,
+        pagure_package_token: str,
     ) -> None:
         # Sadly, pagure does not support editing initial comments of a PR via the API
         # https://pagure.io/pagure/issue/4111
@@ -412,7 +417,9 @@ class Transformator:
             logger.info(f"PR created: {dist_git_pr_id}")
 
     def push_to_distgit_fork(self, project_fork, branch_name):
-        if "origin-fork" not in [remote.name for remote in self.distgit.git_repo.remotes]:
+        if "origin-fork" not in [
+            remote.name for remote in self.distgit.git_repo.remotes
+        ]:
             self.distgit.git_repo.create_remote(
                 name="origin-fork", url=project_fork.get_git_urls()["ssh"]
             )

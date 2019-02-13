@@ -32,7 +32,7 @@ class LocalProject:
         self.full_name = full_name
         self.repo_name = repo_name
         self.namespace = namespace
-        self.working_dir_created = False
+        self.working_dir_temporary = False
 
         change = True
         while change:
@@ -85,7 +85,7 @@ class LocalProject:
 
             if self.git_url and not self.working_dir and not self.git_repo:
                 self.git_repo = get_repo(url=self.git_url)
-                self.working_dir_created = True
+                self.working_dir_temporary = True
                 change = True
 
             if self.git_project and not self.git_url:
@@ -112,10 +112,10 @@ class LocalProject:
             self.git_repo.branches[self._branch].checkout()
 
     def clean(self):
-        if self.working_dir_created:
+        if self.working_dir_temporary:
             logger.debug(f"Cleaning: {self.working_dir}")
             shutil.rmtree(self.working_dir)
-            self.working_dir_created = False
+            self.working_dir_temporary = False
 
     @property
     def branch(self):
