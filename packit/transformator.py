@@ -54,9 +54,16 @@ class Transformator:
 
     @property
     @lru_cache()
-    def specfile_path(self) -> str:
+    def source_specfile_path(self) -> str:
         return os.path.join(
             self.sourcegit.working_dir, self.package_config.specfile_path
+        )
+
+    @property
+    @lru_cache()
+    def dist_specfile_path(self) -> str:
+        return os.path.join(
+            self.distgit.working_dir, f"{self.package_name}.spec"
         )
 
     @property
@@ -87,7 +94,7 @@ class Transformator:
                 "--qf",
                 "'%{version}\\n'",
                 "--srpm",
-                self.specfile_path,
+                self.source_specfile_path,
             ],
             output=True,
             fail=True,
@@ -130,7 +137,7 @@ class Transformator:
 
         with open(archive_path, "wb") as fp:
             self.sourcegit.git_repo.archive(
-                fp, prefix=f"./{self.upstream_name}/", worktree_attributes=True
+                fp, prefix=f"./{self.upstream_name}-{self.version}/", worktree_attributes=True
             )
 
         logger.info(f"Archive created: {archive_path}")
@@ -152,30 +159,33 @@ class Transformator:
                     gitattributes_file.writelines([f"{file} export-ignore\n"])
 
     @lru_cache()
-    def create_srpm(self) -> None:
+    def create_srpm(self) -> str:
         logger.debug("Start creating of the SRPM.")
         archive = self.create_archive()
         logger.debug(f"Using archive: {archive}")
 
-        spec_dir = os.path.dirname(self.specfile_path)
-        run_command(
+        output = run_command(
             cmd=[
                 "rpmbuild",
                 "-bs",
-                f"{self.specfile_path}",
+                f"{self.dist_specfile_path}",
                 "--define",
                 f"_sourcedir {self.distgit.working_dir}",
                 "--define",
-                f"_specdir {spec_dir}",
+                f"_specdir {self.distgit.working_dir}",
                 "--define",
-                f"_buildir {spec_dir}",
+                f"_buildir {self.distgit.working_dir}",
                 "--define",
                 f"_srcrpmdir {self.distgit.working_dir}",
                 "--define",
-                f"_rpmdir {spec_dir}",
+                f"_rpmdir {self.distgit.working_dir}",
             ],
             fail=True,
+            output=True,
         )
+        specfile_name = output.split(':')[1].rstrip()
+        logger.info(f"Specfile created: {specfile_name}")
+        return specfile_name
 
     @lru_cache()
     def get_commits_to_upstream(
@@ -260,6 +270,9 @@ class Transformator:
         """
         if patch_list is None:
             patch_list = self.create_patches()
+
+        if not patch_list:
+            return
 
         specfile_path = os.path.join(
             self.distgit.working_dir, f"{self.package_name}.spec"

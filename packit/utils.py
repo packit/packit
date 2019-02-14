@@ -7,7 +7,7 @@ import tempfile
 
 import git
 
-logger = logging.getLogger("source_git")
+logger = logging.getLogger(__file__)
 
 
 def get_rev_list_kwargs(opt_list):
