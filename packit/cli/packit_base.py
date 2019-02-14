@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @click.option("-k", "--keytab")
 @click.option("-v", "--verbose", is_flag=True)
 @click.pass_context
-def sourcegit_base(ctx, **kwargs):
+def packit_base(ctx, **kwargs):
     ctx.obj = Config(**kwargs)
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
@@ -37,11 +37,11 @@ def version():
     click.echo(packit.__version__)
 
 
-sourcegit_base.add_command(sg2dg)
-sourcegit_base.add_command(sg2srpm)
-sourcegit_base.add_command(watcher)
-sourcegit_base.add_command(version)
-sourcegit_base.add_command(watch_pr)
+packit_base.add_command(sg2dg)
+packit_base.add_command(sg2srpm)
+packit_base.add_command(watcher)
+packit_base.add_command(version)
+packit_base.add_command(watch_pr)
 
 if __name__ == '__main__':
-    sourcegit_base()
+    packit_base()
