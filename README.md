@@ -131,6 +131,56 @@ $ make build
 $ make run-local
 ```
 
+## Local CLI installation
+
+You can install our CLI tool with the `pip`:
+
+```
+$ pip3 install --user git+https://github.com/packit-service/packit.git
+```
+
+```
+$ packit --help
+Usage: packit [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -d, --debug
+  --fas-user TEXT
+  -k, --keytab TEXT
+  -v, --verbose
+  -h, --help         Show this message and exit.
+
+Commands:
+  sg2dg            Convert source-git repo to dist-git repo.
+  srpm             Generate a srpm from packit.
+  version          Display the version.
+  watch-fedora-ci  watch for flags on PRs: try to process those...
+  watch-pr         watch for activity on github and...
+```
+
+```
+$ packit sg2dg --help
+Usage: packit sg2dg [OPTIONS] REPO VERSION
+
+  Convert source-git repo to dist-git repo.
+
+  1. Create tarball from the source git repo.
+
+  2. Create patches from the downstream commits.
+
+  3. Copy the redhat/ dir to the dist-git.
+
+  4. Take the tarball and upload it to lookaside cache.
+
+  5. The output is the directory (= dirty git repo)
+
+Options:
+  --dest-dir TEXT
+  --no-new-sources
+  --upstream-ref TEXT
+  -h, --help           Show this message and exit.
+```
+
 
 ## Candidates for early adoption
 
