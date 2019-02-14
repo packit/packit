@@ -34,24 +34,27 @@ def sg2srpm(config, dest_dir, upstream_ref, repo, version):
     sourcegit = LocalProject(git_url=repo)
     if not package_config:
         package_config = get_local_package_config(directory=sourcegit.working_dir)
+
     distgit = LocalProject(
         git_url=package_config.metadata["dist_git_url"],
         namespace="rpms",
         repo_name=package_config.metadata["package_name"],
         working_dir=dest_dir,
     )
+
     distgit.working_dir_temporary = False
     with Transformator(
-            sourcegit=sourcegit,
-            distgit=distgit,
-            version=version,
-            fas_username=config.fas_user,
-            package_config=package_config,
+        sourcegit=sourcegit,
+        distgit=distgit,
+        version=version,
+        fas_username=config.fas_user,
+        package_config=package_config,
     ) as t:
         t.create_archive()
-        t.copy_synced_content_to_distgit_directory(synced_files=package_config.synced_files)
+        t.copy_synced_content_to_distgit_directory(
+            synced_files=package_config.synced_files
+        )
         patches = t.create_patches(upstream=upstream_ref)
         t.add_patches_to_specfile(patch_list=patches)
-        t.create_srpm()
-        click.echo(f"{t.archive}")
-
+        specfile = t.create_srpm()
+        click.echo(specfile)
