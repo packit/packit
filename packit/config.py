@@ -106,23 +106,24 @@ class PackageConfig:
         return Draft4Validator(PACKAGE_CONFIG_SCHEMA).is_valid(raw_dict)
 
 
-def get_local_package_config() -> Optional[PackageConfig]:
+def get_local_package_config(directory=None) -> Optional[PackageConfig]:
     """
     :return: local PackageConfig if present
     """
+    directory = directory or os.path.curdir
     for config_file_name in CONFIG_FILE_NAMES:
-
-        if os.path.isfile(config_file_name):
-            logger.debug(f"Local package config found: {config_file_name}")
+        config_file_name_full =os.path.join(directory, config_file_name)
+        if os.path.isfile(config_file_name_full):
+            logger.debug(f"Local package config found: {config_file_name_full}")
             try:
-                loaded_config = anymarkup.parse_file(config_file_name)
+                loaded_config = anymarkup.parse_file(config_file_name_full)
             except Exception as ex:
-                logger.error(f"Cannot load package config '{config_file_name}'.")
+                logger.error(f"Cannot load package config '{config_file_name_full}'.")
                 raise Exception(f"Cannot load package config: {ex}.")
 
             return parse_loaded_config(loaded_config=loaded_config)
 
-        logger.debug(f"The local config file '{config_file_name}' not found.")
+        logger.debug(f"The local config file '{config_file_name_full}' not found.")
 
     return None
 
