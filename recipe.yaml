@@ -65,6 +65,9 @@
     assert:
       that:
       - 'src_path.stat.isdir'
+  - name: Install ogr from master
+    pip:
+      name: git+http://github.com/packit-service/ogr.git
   # this requires to have sources mounted inside at /src
   - name: Install packit from the current working directory
     pip:
