@@ -14,18 +14,9 @@
       - python3-ipdb  # for easy debugging
       - python3-fedmsg
       - python3-anymarkup
-      # - python3-fedora-messaging
-      # - fedora-messaging
-  - name: Install dependencies for CI watcher
-    dnf:
-      name:
       - python3-requests
       - python3-pygithub
       - python3-libpagure
-      state: present
-  - name: Install dependencies for syncer
-    dnf:
-      name:
       - rpm-build
       state: present
   - name: Install latest twine for sake of check command
