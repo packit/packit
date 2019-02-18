@@ -34,6 +34,9 @@ projects into Fedora operating system.
    be the modern, better alternative.
 
 
+DevConf.cz ["Auto-maintain your package" talk](https://www.youtube.com/watch?v=KpF27v6K4Oc).
+
+
 ## Plan
 
 * Automatically release to Fedora Rawhide (by the end of February 2019).
