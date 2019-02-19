@@ -33,15 +33,36 @@ projects into Fedora operating system.
    dist-git the same way. We are not taking that away. Source git is meant to
    be the modern, better alternative.
 
-
 DevConf.cz ["Auto-maintain your package" talk](https://www.youtube.com/watch?v=KpF27v6K4Oc).
+
+
+## Ehm, what's source-git?
+
+Content of source-git repository is equivalent to dist-git, but uses upstream
+format: source files instead of tarballs, git commits instead of patches.
+
+You can host this repository, or the specific git branch, anywhere you want. If
+you open a pull request, you will receive feedback on the changes:
+* Does the package build with the changes?
+* Do all the package tests pass?
+* How about tests of the dependant packages?
+* Are the changes good to be included in Fedora?
+
+The goal of packit is to provide automation and tooling to interact with
+source-git repositories so you don't have to touch dist-git ever again. Our
+plan is to center development experience around upstream repositories and
+source-git.
+
+Upstream repositories and source-git repositories are pretty much the same
+thing. Creating source-git only makes sense when the upstream does not accept
+our spec file or adding spec file to such a project doesn't make sense.
 
 
 ## Plan
 
 * Automatically release to Fedora Rawhide (by the end of February 2019).
   * Once there is a new upstream release, create a PR in downstream pagure.
-  * Send new downstream changes back to upstream. (so the spec files are in sync)
+* Send new downstream changes back to upstream. (so the spec files are in sync)
 
 * Provide feedback on upstream pull requests.
   * Run RPM builds in COPR and integrate the results into Github.
