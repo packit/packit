@@ -122,6 +122,19 @@ $ make run-local
 ```
 
 
+## Candidates for early adoption
+
+Please, open a PR if you want to be on the list, or just let us know.
+
+* Indetity team (@pvoborni)
+* Plumbers & shells (@msekletar @lnykryn @siteshwar)
+* pykickstart (@dcantrell @larskarlitski)
+* python-operator-courier (Ralph Bean)
+* @thrix
+* youtube-dl (Till Mass)
+* anaconda (@jkonecny12)
+
+
 ## Resources
 
  * An excellent document by Colin Walters which describes a modern way of
