@@ -127,7 +127,7 @@ $ make run-local
 
 Please, open a PR if you want to be on the list, or just let us know.
 
-* Indetity team (@pvoborni)
+* Identity team (@pvoborni)
 * Plumbers & shells (@msekletar @lnykryn @siteshwar)
 * pykickstart (@dcantrell @larskarlitski)
 * python-operator-courier (Ralph Bean)
