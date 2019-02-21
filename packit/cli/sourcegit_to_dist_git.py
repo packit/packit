@@ -1,4 +1,5 @@
 import logging
+import os
 
 import click
 
@@ -13,10 +14,10 @@ logger = logging.getLogger(__file__)
 @click.option("--dest-dir")
 @click.option("--no-new-sources", is_flag=True)
 @click.option("--upstream-ref")
-@click.argument("repo")
-@click.argument("version")
+@click.option("--version")
+@click.argument("repo", default=os.path.abspath(os.path.curdir))
 @pass_config
-def sg2dg(config, dest_dir, no_new_sources, upstream_ref, repo, version):
+def sg2dg(config, dest_dir, no_new_sources, upstream_ref, version, repo):
     """
     Convert source-git repo to dist-git repo.
 
@@ -49,7 +50,7 @@ def sg2dg(config, dest_dir, no_new_sources, upstream_ref, repo, version):
         fas_username=config.fas_user,
         package_config=package_config,
     ) as t:
-        t.create_archive()
+        t.download_upstream_archive()
         t.copy_synced_content_to_distgit_directory(
             synced_files=package_config.synced_files
         )
