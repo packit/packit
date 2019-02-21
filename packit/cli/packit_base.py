@@ -3,6 +3,7 @@ import logging
 import click
 
 import packit
+from packit.cli.update import update
 from packit.cli.sourcegit_to_dist_git import sg2dg
 from packit.cli.sourcegit_to_srpm import sg2srpm
 from packit.cli.watch_fedora_ci import watcher
@@ -42,6 +43,7 @@ packit_base.add_command(sg2srpm)
 packit_base.add_command(watcher)
 packit_base.add_command(version)
 packit_base.add_command(watch_pr)
+packit_base.add_command(update)
 
 if __name__ == '__main__':
     packit_base()
