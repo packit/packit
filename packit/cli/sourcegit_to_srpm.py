@@ -1,4 +1,5 @@
 import logging
+import os
 
 import click
 
@@ -12,10 +13,10 @@ logger = logging.getLogger(__file__)
 @click.command("srpm", context_settings=get_context_settings())
 @click.option("--dest-dir")
 @click.option("--upstream-ref")
-@click.argument("repo")
-@click.argument("version")
+@click.option("--version")
+@click.argument("repo", default=os.path.abspath(os.path.curdir))
 @pass_config
-def sg2srpm(config, dest_dir, upstream_ref, repo, version):
+def sg2srpm(config, dest_dir, upstream_ref, version, repo):
     """
     Generate a srpm from packit.
 
