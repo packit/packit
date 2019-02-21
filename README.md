@@ -73,6 +73,15 @@ For more info on source-git, please read [the detailed design doc](docs/source-g
 
 Work has begun on the MVP.
 
+* [ ] You can release to rawhide using packit
+  * [ ] Implement update command (in progress by @lachmanfrantisek and @TomasTomecek)
+* [ ] source-git
+  * [ ] You can release to rawhide from source-git using packit
+* [ ] Packit as a service
+  * [ ] Packit reacts to Github webhooks
+  * [ ] Have a github app for packit
+  * [ ] Deployment
+
 
 ## Usage
 
