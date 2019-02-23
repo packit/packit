@@ -104,7 +104,11 @@ class LocalProject:
                 change = True
 
             if self.git_repo and not self.git_url:
-                self.git_url = self.git_repo.remote().urls[0]
+                # this is prone to errors
+                # also if we want url to upstream, we may want to ask for it explicitly
+                # since this can point to a fork
+                # .urls returns generator
+                self.git_url = list(self.git_repo.remote().urls)[0]
                 logger.debug("remote url of the repo is %s", self.git_url)
                 change = True
 
