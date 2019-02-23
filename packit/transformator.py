@@ -22,6 +22,7 @@ from packit.watcher import SourceGitCheckHelper
 logger = logging.getLogger(__name__)
 
 
+# TODO: refactor this class, it's too complex
 class Transformator:
     """
     Describes a relation between a source-git and a dist-git repository.

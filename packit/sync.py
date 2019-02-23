@@ -6,6 +6,7 @@ import logging
 from ogr.abstract import GitService
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
+
 from packit.config import (
     PackageConfig,
     get_packit_config_from_repo,
@@ -18,6 +19,7 @@ from packit.utils import commits_to_nice_str, checkout_pr
 logger = logging.getLogger(__name__)
 
 
+# TODO: refactor this class, it's too complex
 class Synchronizer:
     """
     One instance can be used for multiple sync actions.
