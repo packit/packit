@@ -15,7 +15,7 @@ from packit.watcher import SourceGitCheckHelper
 logger = logging.getLogger(__name__)
 
 
-class SourceGitAPI:
+class PackitAPI:
     def __init__(self, config):
         # TODO: the url template should be configurable
         self.datagrepper_url = (

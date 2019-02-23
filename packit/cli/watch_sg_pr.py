@@ -6,7 +6,7 @@ import logging
 
 import click
 
-from packit.api import SourceGitAPI
+from packit.api import PackitAPI
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def watch_pr(message_id):
 
     :return: int, retcode
     """
-    api = SourceGitAPI()
+    api = PackitAPI()
     if message_id:
         for msg_id in message_id:
             fedmsg_dict = api.fetch_fedmsg_dict(msg_id)
