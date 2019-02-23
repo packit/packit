@@ -5,7 +5,7 @@ import logging
 
 import click
 
-from packit.api import SourceGitAPI
+from packit.api import PackitAPI
 from packit.config import get_context_settings
 
 
@@ -20,7 +20,7 @@ def watcher(message_id):
 
     :return: int, retcode
     """
-    api = SourceGitAPI()
+    api = PackitAPI()
 
     if message_id:
         for msg_id in message_id:
