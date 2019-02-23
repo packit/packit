@@ -3,12 +3,11 @@ This is the official python interface for source-git. This is used exclusively i
 """
 
 import logging
-import os
-from functools import lru_cache
 from typing import Any, Dict
 
 import requests
 
+from packit.dg_robot import PackitDistGitRobot
 from packit.fed_mes_consume import Consumerino
 from packit.sync import Synchronizer
 from packit.watcher import SourceGitCheckHelper
@@ -17,12 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class SourceGitAPI:
-    def __init__(self):
+    def __init__(self, config):
         # TODO: the url template should be configurable
         self.datagrepper_url = (
             "https://apps.fedoraproject.org/datagrepper/id?id={msg_id}&is_raw=true"
         )
         self.consumerino = Consumerino()
+        self.config = config
 
     def fetch_fedmsg_dict(self, msg_id: str) -> Dict[str, Any]:
         """
@@ -85,26 +85,26 @@ class SourceGitAPI:
         for topic, msg in self.consumerino.iterate_dg_pr_flags():
             self.process_ci_result(msg)
 
-    @property
-    @lru_cache()
-    def github_token(self) -> str:
-        return os.environ["GITHUB_TOKEN"]
+    def update(self, dist_git_branch, dist_git_path: str = None):
+        """
+        Update given package in Fedora
+        """
+        with PackitDistGitRobot(self.config, dist_git_path=dist_git_path) as robot:
+            full_version = robot.upstream_specfile.get_full_version()
+            local_pr_branch = f"{full_version}-update"
+            robot.checkout_branch_distgit(dist_git_branch)
+            robot.create_branch_distgit(local_pr_branch)
+            robot.checkout_branch_distgit(local_pr_branch)
 
-    @property
-    @lru_cache()
-    def pagure_user_token(self) -> str:
-        return os.environ["PAGURE_USER_TOKEN"]
+            robot.sync_files()
+            archive = robot.download_upstream_archive()
 
-    @property
-    @lru_cache()
-    def pagure_package_token(self) -> str:
-        """ this token is used to comment on pull requests """
-        # FIXME: make this more easier to be used -- no need for a dedicated token
-        return os.environ["PAGURE_PACKAGE_TOKEN"]
+            robot.upload_to_lookaside_cache(archive)
 
-    @property
-    @lru_cache()
-    def pagure_fork_token(self) -> str:
-        """ this is needed to create pull requests """
-        # FIXME: make this more easier to be used -- no need for a dedicated token
-        return os.environ["PAGURE_FORK_TOKEN"]
+            robot.commit_distgit(f"{full_version} upstream release", "more info")
+            robot.create_pull(
+                "title",
+                "description",
+                local_pr_branch,
+                dist_git_branch
+            )

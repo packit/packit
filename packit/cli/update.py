@@ -1,9 +1,13 @@
+"""
+Update selected component from upstream in Fedora
+"""
+
 import logging
-import os
 
 import click
 
-from packit.config import get_context_settings, pass_config, get_local_package_config
+from packit.api import PackitAPI
+from packit.config import pass_config, get_context_settings, get_local_package_config
 from packit.local_project import LocalProject
 from packit.transformator import Transformator
 
@@ -11,42 +15,28 @@ logger = logging.getLogger(__file__)
 
 
 @click.command("update", context_settings=get_context_settings())
-@click.option("--dest-dir")
-@click.option("--version")
-@click.argument("repo", default=os.path.abspath(os.path.curdir))
+@click.option("--no-new-sources", is_flag=True)
+@click.option("--upstream-ref")
+@click.option("--dist-git-branch",
+              help="Target branch in dist-git to release into.",
+              default="master"
+              )
+@click.option("--dist-git-path",
+              help="Path to dist-git repo to work in.")
+@click.argument("version", required=False)
+@click.argument("repo", required=False)
 @pass_config
-def update(config, dest_dir, version, repo):
+def update(config, dist_git_path, dist_git_branch, no_new_sources, upstream_ref, repo, version):
     """
-    1. Take the release
+    Release current upstream release into Fedora
 
-    2. Update the distgit content
-
-    3. Create a PR on distgit
+    :param config:
+    :param dest_dir:
+    :param no_new_sources:
+    :param upstream_ref:
+    :param repo:
+    :param version:
+    :return:
     """
-    package_config = get_local_package_config()
-    sourcegit = LocalProject(git_url=repo)
-    if not package_config:
-        package_config = get_local_package_config(directory=sourcegit.working_dir)
-
-    if not package_config:
-        raise Exception("No package config found.")
-
-    distgit = LocalProject(
-        git_url=package_config.metadata["dist_git_url"],
-        namespace="rpms",
-        repo_name=package_config.metadata["package_name"],
-        working_dir=dest_dir,
-    )
-    distgit.working_dir_temporary = False
-    with Transformator(
-        sourcegit=sourcegit,
-        distgit=distgit,
-        version=version,
-        fas_username=config.fas_user,
-        package_config=package_config,
-    ) as t:
-        upstream_version = version or t.get_latest_upstream_version()
-        t.distgit_spec.set_version(version=upstream_version)
-        t.download_upstream_archive()
-
-        # TODO: @TomasTomecek will add the missing code here...
+    api = PackitAPI(config)
+    api.update(dist_git_branch, dist_git_path=dist_git_path)
