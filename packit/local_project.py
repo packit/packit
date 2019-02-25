@@ -74,13 +74,16 @@ class LocalProject:
                 change = True
 
             if self.working_dir and not self.git_repo:
+                logger.debug("working_dir is set and git_repo is not: let's discover...")
                 if is_git_repo(directory=self.working_dir):
                     self.git_repo = git.Repo(path=self.working_dir)
+                    logger.debug("it's a git repo!")
                     change = True
                 elif self.git_url:
                     self.git_repo = get_repo(
                         url=self.git_url, directory=self.working_dir
                     )
+                    logger.debug("we just cloned git repo %s to %s", self.git_url, self.working_dir)
                     change = True
 
             if self.git_url and not self.working_dir and not self.git_repo:
@@ -101,7 +104,12 @@ class LocalProject:
                 change = True
 
             if self.git_repo and not self.git_url:
-                self.git_url = self.git_repo.remote().urls[0]
+                # this is prone to errors
+                # also if we want url to upstream, we may want to ask for it explicitly
+                # since this can point to a fork
+                # .urls returns generator
+                self.git_url = list(self.git_repo.remote().urls)[0]
+                logger.debug("remote url of the repo is %s", self.git_url)
                 change = True
 
         if branch:

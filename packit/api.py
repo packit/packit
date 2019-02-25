@@ -3,12 +3,11 @@ This is the official python interface for source-git. This is used exclusively i
 """
 
 import logging
-import os
-from functools import lru_cache
 from typing import Any, Dict
 
 import requests
 
+from packit.dg_robot import PackitDistGitRobot
 from packit.fed_mes_consume import Consumerino
 from packit.sync import Synchronizer
 from packit.watcher import SourceGitCheckHelper
@@ -16,13 +15,14 @@ from packit.watcher import SourceGitCheckHelper
 logger = logging.getLogger(__name__)
 
 
-class SourceGitAPI:
-    def __init__(self):
+class PackitAPI:
+    def __init__(self, config):
         # TODO: the url template should be configurable
         self.datagrepper_url = (
             "https://apps.fedoraproject.org/datagrepper/id?id={msg_id}&is_raw=true"
         )
         self.consumerino = Consumerino()
+        self.config = config
 
     def fetch_fedmsg_dict(self, msg_id: str) -> Dict[str, Any]:
         """
@@ -44,24 +44,14 @@ class SourceGitAPI:
         :param fedmsg_dict: dict, code change on github
         """
         logger.info("syncing the upstream code to downstream")
-        with Synchronizer(
-                self.github_token,
-                self.pagure_user_token,
-                self.pagure_package_token,
-                self.pagure_fork_token,
-        ) as sync:
+        with Synchronizer(self.config) as sync:
             sync.sync_using_fedmsg_dict(fedmsg_dict)
 
     def keep_syncing_upstream_pulls(self) -> None:
         """
         Watch Fedora messages and keep syncing upstream PRs downstream. This runs forever.
         """
-        with Synchronizer(
-                self.github_token,
-                self.pagure_user_token,
-                self.pagure_package_token,
-                self.pagure_fork_token,
-        ) as sync:
+        with Synchronizer(self.config) as sync:
             for topic, action, msg in self.consumerino.iterate_gh_pulls():
                 # TODO:
                 #   handle edited (what's that?)
@@ -75,7 +65,7 @@ class SourceGitAPI:
 
         :param fedmsg_dict: dict, flag added in pagure
         """
-        sg = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
+        sg = SourceGitCheckHelper(self.config)
         sg.process_new_dg_flag(fedmsg_dict)
 
     def keep_fwding_ci_results(self) -> None:
@@ -85,26 +75,26 @@ class SourceGitAPI:
         for topic, msg in self.consumerino.iterate_dg_pr_flags():
             self.process_ci_result(msg)
 
-    @property
-    @lru_cache()
-    def github_token(self) -> str:
-        return os.environ["GITHUB_TOKEN"]
+    def update(self, dist_git_branch, dist_git_path: str = None):
+        """
+        Update given package in Fedora
+        """
+        robot = PackitDistGitRobot(self.config, dist_git_path=dist_git_path)
+        full_version = robot.upstream_specfile.get_full_version()
+        local_pr_branch = f"{full_version}-update"
+        robot.checkout_branch_distgit(dist_git_branch)
+        robot.create_branch_distgit(local_pr_branch)
+        robot.checkout_branch_distgit(local_pr_branch)
 
-    @property
-    @lru_cache()
-    def pagure_user_token(self) -> str:
-        return os.environ["PAGURE_USER_TOKEN"]
+        robot.sync_files()
+        archive = robot.download_upstream_archive()
 
-    @property
-    @lru_cache()
-    def pagure_package_token(self) -> str:
-        """ this token is used to comment on pull requests """
-        # FIXME: make this more easier to be used -- no need for a dedicated token
-        return os.environ["PAGURE_PACKAGE_TOKEN"]
+        robot.upload_to_lookaside_cache(archive)
 
-    @property
-    @lru_cache()
-    def pagure_fork_token(self) -> str:
-        """ this is needed to create pull requests """
-        # FIXME: make this more easier to be used -- no need for a dedicated token
-        return os.environ["PAGURE_FORK_TOKEN"]
+        robot.commit_distgit(f"{full_version} upstream release", "more info")
+        robot.create_pull(
+            "title",
+            "description",
+            local_pr_branch,
+            dist_git_branch
+        )
