@@ -139,6 +139,8 @@ You can install packit using `pip`:
 $ pip3 install --user git+https://github.com/packit-service/packit.git
 ```
 
+Please bear in mind that packit works only with python 3.6.
+
 ```
 $ packit --help
 Usage: packit [OPTIONS] COMMAND [ARGS]...
