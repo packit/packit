@@ -19,12 +19,49 @@ from packit.utils import exclude_from_dict
 logger = logging.getLogger(__name__)
 
 
-@dataclass
 class Config:
-    verbose: bool
-    debug: bool
-    fas_user: str
-    keytab: str
+    def __init__(self):
+        self.verbose = False
+        self.debug = False
+        self.fas_user = None
+        self.keytab_path = None
+        self._package_config = None
+        self._github_token = None
+        self._pagure_user_token = None
+        self._pagure_package_token = None
+        self._pagure_fork_token = None
+
+    @property
+    def package_config(self) -> PackageConfig:
+        if self._package_config is None:
+            self._package_config = get_local_package_config()
+        return self._package_config
+
+    @property
+    def github_token(self) -> str:
+        if self._github_token is None:
+            self._github_token = os.environ["GITHUB_TOKEN"]
+        return self._github_token
+
+    @property
+    def pagure_user_token(self) -> str:
+        if self._pagure_user_token is None:
+            self._pagure_user_token = os.environ["PAGURE_USER_TOKEN"]
+        return self._pagure_user_token
+
+    @property
+    def pagure_package_token(self) -> str:
+        """ this token is used to comment on pull requests """
+        if self._pagure_package_token is None:
+            self._pagure_package_token = os.environ["PAGURE_PACKAGE_TOKEN"]
+        return self._pagure_package_token
+
+    @property
+    def pagure_fork_token(self) -> str:
+        """ this is needed to create pull requests """
+        if self._pagure_fork_token is None:
+            self._pagure_fork_token = os.environ["PAGURE_FORK_TOKEN"]
+        return self._pagure_fork_token
 
 
 pass_config = click.make_pass_decorator(Config)
@@ -112,7 +149,7 @@ def get_local_package_config(directory=None) -> Optional[PackageConfig]:
     """
     directory = directory or os.path.curdir
     for config_file_name in CONFIG_FILE_NAMES:
-        config_file_name_full =os.path.join(directory, config_file_name)
+        config_file_name_full = os.path.join(directory, config_file_name)
         if os.path.isfile(config_file_name_full):
             logger.debug(f"Local package config found: {config_file_name_full}")
             try:

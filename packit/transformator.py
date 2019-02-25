@@ -8,6 +8,8 @@ from functools import lru_cache
 from typing import List, Tuple
 
 import git
+from rebasehelper.specfile import SpecFile
+from rebasehelper.versioneer import versioneers_runner
 
 from ogr.abstract import GitProject
 from packit.config import PackageConfig
@@ -20,6 +22,7 @@ from packit.watcher import SourceGitCheckHelper
 logger = logging.getLogger(__name__)
 
 
+# TODO: refactor this class, it's too complex
 class Transformator:
     """
     Describes a relation between a source-git and a dist-git repository.
@@ -52,6 +55,8 @@ class Transformator:
             self.package_config.metadata["package_name"] or self.upstream_name
         )
 
+        self._archive = None
+
     @property
     @lru_cache()
     def source_specfile_path(self) -> str:
@@ -62,9 +67,7 @@ class Transformator:
     @property
     @lru_cache()
     def dist_specfile_path(self) -> str:
-        return os.path.join(
-            self.distgit.working_dir, f"{self.package_name}.spec"
-        )
+        return os.path.join(self.distgit.working_dir, f"{self.package_name}.spec")
 
     @property
     @lru_cache()
@@ -73,8 +76,9 @@ class Transformator:
         Path of the archive generated from the source-git.
         If not exists, the archive will be created in the destination directory.
         """
-        archive = self.create_archive()
-        return archive
+        if not self._archive:
+            self._archive = self.download_upstream_archive()
+        return self._archive
 
     @property
     @lru_cache()
@@ -114,11 +118,41 @@ class Transformator:
             directory=self.distgit.working_dir,
         )
 
+    @property
+    def distgit_spec(self) -> SpecFile:
+        return SpecFile(
+            path=self.dist_specfile_path,
+            sources_location=self.distgit.working_dir,
+            changelog_entry=None,
+        )
+
     def clean(self) -> None:
         """
         Clean te temporary dir.
         """
         pass
+
+    def save_archive(
+        self, path: str = None, release: str = None, name="{project}-{version}.tar.gz"
+    ):
+        """
+        Saves the release archive.
+        """
+
+        if release:
+            release = self.sourcegit.git_project.get_release(release)
+        else:
+            release = self.sourcegit.git_project.get_releases()[-1]
+
+        archive_name = name.format(project=self.upstream_name, version=self.version)
+        archive_path = path or os.path.join(self.distgit.working_dir, archive_name)
+        release.save_archive(path=archive_path)
+
+    def download_upstream_archive(self):
+        self.distgit_spec.download_remote_sources()
+        archive_name = self.distgit_spec.get_archive()
+        self._archive = os.path.join(self.distgit.working_dir, archive_name)
+        logger.info(f"Downloaded archive: {self._archive}")
 
     def create_archive(
         self, path: str = None, name="{project}-{version}.tar.gz"
@@ -137,7 +171,9 @@ class Transformator:
 
         with open(archive_path, "wb") as fp:
             self.sourcegit.git_repo.archive(
-                fp, prefix=f"./{self.upstream_name}-{self.version}/", worktree_attributes=True
+                fp,
+                prefix=f"./{self.upstream_name}-{self.version}/",
+                worktree_attributes=True,
             )
 
         logger.info(f"Archive created: {archive_path}")
@@ -161,8 +197,10 @@ class Transformator:
     @lru_cache()
     def create_srpm(self) -> str:
         logger.debug("Start creating of the SRPM.")
-        archive = self.create_archive()
-        logger.debug(f"Using archive: {archive}")
+        if not self.archive:
+            logger.error("No source archive found.")
+            raise Exception("No source archive found.")
+        logger.debug(f"Using archive: {self.archive}")
 
         output = run_command(
             cmd=[
@@ -447,3 +485,8 @@ class Transformator:
 
     def __exit__(self, *args) -> None:
         self.clean()
+
+    def get_latest_upstream_version(self):
+        return versioneers_runner.run(
+            versioneer=None, package_name=self.package_name, category=None
+        )

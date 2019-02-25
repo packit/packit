@@ -1,4 +1,5 @@
 import logging
+import os
 
 import click
 
@@ -12,10 +13,10 @@ logger = logging.getLogger(__file__)
 @click.command("srpm", context_settings=get_context_settings())
 @click.option("--dest-dir")
 @click.option("--upstream-ref")
-@click.argument("repo")
-@click.argument("version")
+@click.option("--version")
+@click.argument("repo", default=os.path.abspath(os.path.curdir))
 @pass_config
-def sg2srpm(config, dest_dir, upstream_ref, repo, version):
+def sg2srpm(config, dest_dir, upstream_ref, version, repo):
     """
     Generate a srpm from packit.
 
@@ -50,11 +51,11 @@ def sg2srpm(config, dest_dir, upstream_ref, repo, version):
         fas_username=config.fas_user,
         package_config=package_config,
     ) as t:
-        t.create_archive()
+        t.download_upstream_archive()
         t.copy_synced_content_to_distgit_directory(
             synced_files=package_config.synced_files
         )
         patches = t.create_patches(upstream=upstream_ref)
         t.add_patches_to_specfile(patch_list=patches)
-        specfile = t.create_srpm()
-        click.echo(specfile)
+        srpm = t.create_srpm()
+        click.echo(srpm)
