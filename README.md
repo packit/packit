@@ -131,6 +131,71 @@ $ make build
 $ make run-local
 ```
 
+## Local CLI installation
+
+You can install packit using `pip`:
+
+```
+$ pip3 install --user git+https://github.com/packit-service/packit.git
+```
+
+Please bear in mind that packit works only with python 3.6.
+
+```
+$ packit --help
+Usage: packit [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -d, --debug
+  --fas-user TEXT
+  -k, --keytab TEXT
+  -v, --verbose
+  -h, --help         Show this message and exit.
+
+Commands:
+  propose-update   Release current upstream release into Fedora
+  sg2dg            Convert source-git repo to dist-git repo.
+  srpm             Generate a srpm from packit.
+  version          Display the version.
+  watch-fedora-ci  watch for flags on PRs: try to process those...
+  watch-pr         watch for activity on github and...
+```
+
+```
+$ packit sg2dg --help
+Usage: packit sg2dg [OPTIONS] [REPO]
+
+  Convert source-git repo to dist-git repo.
+
+  1. Create tarball from the source git repo.
+
+  2. Create patches from the downstream commits.
+
+  3. Copy the redhat/ dir to the dist-git.
+
+  4. Take the tarball and upload it to lookaside cache.
+
+  5. The output is the directory (= dirty git repo)
+
+Options:
+  --dest-dir TEXT
+  --no-new-sources
+  --upstream-ref TEXT
+  --version TEXT
+  -h, --help           Show this message and exit.
+```
+
+```
+$ packit propose-update --help
+Usage: packit propose-update [OPTIONS]
+
+  Release current upstream release into Fedora
+
+Options:
+  --dist-git-branch TEXT  Target branch in dist-git to release into.
+  --dist-git-path TEXT    Path to dist-git repo to work in.
+  -h, --help              Show this message and exit.
+```
 
 ## Candidates for early adoption
 
