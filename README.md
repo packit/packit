@@ -153,6 +153,7 @@ Options:
   -h, --help         Show this message and exit.
 
 Commands:
+  propose-update   Release current upstream release into Fedora
   sg2dg            Convert source-git repo to dist-git repo.
   srpm             Generate a srpm from packit.
   version          Display the version.
@@ -162,7 +163,7 @@ Commands:
 
 ```
 $ packit sg2dg --help
-Usage: packit sg2dg [OPTIONS] REPO VERSION
+Usage: packit sg2dg [OPTIONS] [REPO]
 
   Convert source-git repo to dist-git repo.
 
@@ -180,6 +181,7 @@ Options:
   --dest-dir TEXT
   --no-new-sources
   --upstream-ref TEXT
+  --version TEXT
   -h, --help           Show this message and exit.
 ```
 
