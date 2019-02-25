@@ -185,6 +185,17 @@ Options:
   -h, --help           Show this message and exit.
 ```
 
+```
+$ packit propose-update --help
+Usage: packit propose-update [OPTIONS]
+
+  Release current upstream release into Fedora
+
+Options:
+  --dist-git-branch TEXT  Target branch in dist-git to release into.
+  --dist-git-path TEXT    Path to dist-git repo to work in.
+  -h, --help              Show this message and exit.
+```
 
 ## Candidates for early adoption
 
