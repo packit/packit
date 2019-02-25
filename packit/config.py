@@ -11,8 +11,8 @@ from typing import Optional, List
 import anymarkup
 import click
 from jsonschema import Draft4Validator
-
 from ogr.abstract import GitProject
+
 from packit.constants import CONFIG_FILE_NAMES
 from packit.utils import exclude_from_dict
 
@@ -30,6 +30,8 @@ class Config:
         self._pagure_user_token = None
         self._pagure_package_token = None
         self._pagure_fork_token = None
+
+        self.dist_git_path = None
 
     @property
     def package_config(self) -> PackageConfig:
@@ -113,12 +115,15 @@ class JobConfig:
         return Draft4Validator(JOB_CONFIG_SCHEMA).is_valid(raw_dict)
 
 
-@dataclass(unsafe_hash=True, frozen=True)
 class PackageConfig:
-    specfile_path: str
-    synced_files: List[str]
-    jobs: List[JobConfig]
-    metadata: dict
+    def __init__(self):
+        self.specfile_path: Optional[str] = None
+        self.synced_files: Optional[List[str]] = None
+        self.jobs: Optional[List[JobConfig]] = None
+        # TODO: the metadata should have a proper definition and validation
+        self.metadata: Optional[dict] = None
+        self.dist_git_namespace: str = "rpms"
+        self.upstream_project_url: str = "."  # can be URL or path
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> PackageConfig:
@@ -129,17 +134,17 @@ class PackageConfig:
             raw_dict, "specfile_path", "synced_files", "jobs"
         )
 
-        return PackageConfig(
-            specfile_path=specfile_path,
-            synced_files=synced_files,
-            jobs=[
-                JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
-            ],
-            metadata=metadata,
-        )
+        pc = PackageConfig()
+        pc.specfile_path = specfile_path
+        pc.synced_files = synced_files
+        pc.jobs = [JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs]
+        pc.metadata = metadata
+
+        return pc
 
     @classmethod
     def is_dict_valid(cls, raw_dict: dict) -> bool:
+        # TODO: we need to log what the error is
         return Draft4Validator(PACKAGE_CONFIG_SCHEMA).is_valid(raw_dict)
 
 
