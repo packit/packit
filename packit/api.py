@@ -79,22 +79,22 @@ class PackitAPI:
         """
         Update given package in Fedora
         """
-        with PackitDistGitRobot(self.config, dist_git_path=dist_git_path) as robot:
-            full_version = robot.upstream_specfile.get_full_version()
-            local_pr_branch = f"{full_version}-update"
-            robot.checkout_branch_distgit(dist_git_branch)
-            robot.create_branch_distgit(local_pr_branch)
-            robot.checkout_branch_distgit(local_pr_branch)
+        robot = PackitDistGitRobot(self.config, dist_git_path=dist_git_path)
+        full_version = robot.upstream_specfile.get_full_version()
+        local_pr_branch = f"{full_version}-update"
+        robot.checkout_branch_distgit(dist_git_branch)
+        robot.create_branch_distgit(local_pr_branch)
+        robot.checkout_branch_distgit(local_pr_branch)
 
-            robot.sync_files()
-            archive = robot.download_upstream_archive()
+        robot.sync_files()
+        archive = robot.download_upstream_archive()
 
-            robot.upload_to_lookaside_cache(archive)
+        robot.upload_to_lookaside_cache(archive)
 
-            robot.commit_distgit(f"{full_version} upstream release", "more info")
-            robot.create_pull(
-                "title",
-                "description",
-                local_pr_branch,
-                dist_git_branch
-            )
+        robot.commit_distgit(f"{full_version} upstream release", "more info")
+        robot.create_pull(
+            "title",
+            "description",
+            local_pr_branch,
+            dist_git_branch
+        )
