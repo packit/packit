@@ -53,15 +53,8 @@ class DistGitRobot:
         self._distgit = None
         self._upstream_project = None
         self._package_config = None
-        self._tmpdir = None
         self._distgit_spec = None
         self._upstream_spec = None
-
-    @property
-    def tmpdir(self):
-        if self._tmpdir is None:
-            self._tmpdir = tempfile.mkdtemp(prefix="packit-")
-        return self._tmpdir
 
     @property
     def distgit_spec_path(self):
@@ -110,13 +103,13 @@ class DistGitRobot:
     def distgit(self):
         """  """
         if self._distgit is None:
-            working_dir = self.dist_git_path if self.dist_git_path else self.tmpdir
             self._distgit = LocalProject(
                 git_url=self.dist_git_url,
                 namespace=self.dist_git_namespace,
                 repo_name=self.package_name,
-                working_dir=working_dir,
+                working_dir=self.dist_git_path,
                 git_service=PagureService(token=self.pagure_user_token),
+
             )
         return self._distgit
 
@@ -224,13 +217,6 @@ class DistGitRobot:
     def purge_unused_git_branches(self):
         # TODO: remove branches from merged PRs
         raise NotImplementedError("not implemented yet")
-
-    def __enter__(self) -> "DistGitRobot":
-        return self
-
-    def __exit__(self, *args) -> None:
-        if self._tmpdir:
-            shutil.rmtree(self._tmpdir)
 
 
 class PackitDistGitRobot(DistGitRobot):
