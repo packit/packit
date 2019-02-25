@@ -43,6 +43,51 @@ projects into Fedora operating system.
 * Provide feedback on upstream pull requests.
   * Run RPM builds in COPR and integrate the results into Github.
 
+## Requirements for upstream projects
+
+If your project would like to use `packit`, there are some requirements which
+needs to be full field.
+
+* place in your upstream project directory `.packit.json`
+
+Format of `.packit.json` file is:
+```json
+{
+  "specfile_path": "redhat/<SPEC_NAME>.spec",
+  "synced_files": [
+    "redhat",
+    ".packit.json"
+  ],
+  "jobs": [
+    {
+      "trigger": "release",
+      "release_to": [
+        "master"
+      ]
+    },
+    {
+      "trigger": "pull_request",
+      "release_to": [
+        "master"
+      ]
+    }
+  ],
+  "upstream_name": "<your_name>",
+  "package_name": "<Fedora package name>",
+  "dist_git_url": "https://src.fedoraproject.org/rpms/<your_package_name>.git",
+  "checks": [
+    {
+      "name": "simple-koji-ci"
+    },
+    {
+      "name": "Fedora CI"
+    }
+  ]
+}
+```
+
+* Spec should be a in upstream directory `redhat`. E.g: `redhat/<SPEC_NAME>.spec`.
+It can be identical with Fedora SPEC file.
 
 ## Current status
 
