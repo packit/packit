@@ -11,7 +11,7 @@ from packit.config import (
     PackageConfig,
     get_packit_config_from_repo,
     get_local_package_config,
-)
+    Config)
 from packit.local_project import LocalProject
 from packit.transformator import Transformator
 from packit.utils import commits_to_nice_str, checkout_pr
@@ -27,17 +27,12 @@ class Synchronizer:
     Contains api tokens.
     """
 
-    def __init__(
-            self,
-            github_token: str,
-            pagure_user_token: str,
-            pagure_package_token: str,
-            pagure_fork_token: str,
-    ) -> None:
-        self.github_token = github_token
-        self.pagure_user_token = pagure_user_token
-        self.pagure_package_token = pagure_package_token
-        self.pagure_fork_token = pagure_fork_token
+    def __init__(self, config: Config):
+        self.config = config
+        self.github_token = config.github_token
+        self.pagure_user_token = config.pagure_user_token
+        self.pagure_package_token = config.pagure_package_token
+        self.pagure_fork_token = config.pagure_fork_token
 
     @property
     def sourcegit_service(self) -> GitService:

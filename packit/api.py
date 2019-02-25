@@ -44,24 +44,14 @@ class PackitAPI:
         :param fedmsg_dict: dict, code change on github
         """
         logger.info("syncing the upstream code to downstream")
-        with Synchronizer(
-                self.github_token,
-                self.pagure_user_token,
-                self.pagure_package_token,
-                self.pagure_fork_token,
-        ) as sync:
+        with Synchronizer(self.config) as sync:
             sync.sync_using_fedmsg_dict(fedmsg_dict)
 
     def keep_syncing_upstream_pulls(self) -> None:
         """
         Watch Fedora messages and keep syncing upstream PRs downstream. This runs forever.
         """
-        with Synchronizer(
-                self.github_token,
-                self.pagure_user_token,
-                self.pagure_package_token,
-                self.pagure_fork_token,
-        ) as sync:
+        with Synchronizer(self.config) as sync:
             for topic, action, msg in self.consumerino.iterate_gh_pulls():
                 # TODO:
                 #   handle edited (what's that?)
@@ -75,7 +65,7 @@ class PackitAPI:
 
         :param fedmsg_dict: dict, flag added in pagure
         """
-        sg = SourceGitCheckHelper(self.github_token, self.pagure_user_token)
+        sg = SourceGitCheckHelper(self.config)
         sg.process_new_dg_flag(fedmsg_dict)
 
     def keep_fwding_ci_results(self) -> None:

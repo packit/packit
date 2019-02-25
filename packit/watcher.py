@@ -6,6 +6,8 @@ import logging
 import github
 
 from ogr.services.pagure import PagureService
+
+from packit.config import Config
 from packit.downstream_checks import DownstreamCheck
 
 logger = logging.getLogger(__name__)
@@ -16,9 +18,10 @@ class SourceGitCheckHelper:
     This class provides functionality to operate on github pull request checks
     """
 
-    def __init__(self, github_token, pagure_user_token):
-        self.pagure_token = pagure_user_token
-        self.github_token = github_token
+    def __init__(self, config: Config):
+        self.config = config
+        self.pagure_token = config.pagure_user_token
+        self.github_token = config.github_token
         self.gh = github.Github(login_or_token=self.github_token)
 
     def set_init_check(self, full_name: str, pr_id: int, check: DownstreamCheck):
