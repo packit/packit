@@ -133,7 +133,7 @@ $ make run-local
 
 ## Local CLI installation
 
-You can install our CLI tool with the `pip`:
+You can install packit using `pip`:
 
 ```
 $ pip3 install --user git+https://github.com/packit-service/packit.git
