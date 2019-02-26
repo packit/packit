@@ -20,9 +20,11 @@ This is a detailed documentation for the update functionality of packit.
       colin project.
 
 2. Place a spec file into your upstream project (and make sure that
-   `specfile_path` in the config has a correct value)
+   `specfile_path` in the config has a correct value).
     * This spec file will be then used to perform the update.
-    * Once you create a new release, please make sure that it's up to date!
+    * When you create a new upstream release, you should also update the spec file.
+    * Once your upstream release is out (and the spec file is really up to
+      date), you can use packit to release it into Fedora.
 
 3. Pagure dist-git is configured in a way that it requires 2 API tokens in
    order to perform a pull request using the API (which packit is using).
