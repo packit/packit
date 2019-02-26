@@ -102,7 +102,7 @@ class DistGit:
 
     def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork"):
         """
-        push changes to a for of the dist-git repo; they need to be committed!
+        push changes to a fork of the dist-git repo; they need to be committed!
 
         :param branch_name: the branch where we push
         :param fork_remote_name: local name of the remote where we push to
@@ -142,13 +142,18 @@ class DistGit:
             project_fork = project.get_fork()
         project_fork.change_token(self.pagure_fork_token)
 
-        dist_git_pr_id = project_fork.pr_create(
-            title=pr_title,
-            body=pr_description,
-            source_branch=source_branch,
-            target_branch=target_branch,
-        ).id
-        logger.info(f"PR created: {dist_git_pr_id}")
+        try:
+            dist_git_pr = project_fork.pr_create(
+                title=pr_title,
+                body=pr_description,
+                source_branch=source_branch,
+                target_branch=target_branch,
+            )
+        except Exception as ex:
+            logger.error("there was an error while create a PR: %r", ex)
+            raise
+        else:
+            logger.info(f"PR created: {dist_git_pr.url}")
 
     def download_upstream_archive(self) -> str:
         """
@@ -166,6 +171,7 @@ class DistGit:
         """
         upload files (archive) to the lookaside cache
         """
+        logger.info("uploading to the lookaside cache")
         f = FedPKG(self.fas_user, self.local_project.working_dir)
         f.init_ticket()
         f.new_sources(sources=archive_path)
@@ -178,9 +184,9 @@ class DistGit:
         """
         sync required files from upstream to downstream
         """
-        logger.info("about to sync files %s", self.files_to_sync)
+        logger.debug("about to sync files %s", self.files_to_sync)
         for fi in self.files_to_sync:
             fi = fi[1:] if fi.startswith("/") else fi
             src = os.path.join(upstream_project.working_dir, fi)
-            logger.debug("syncing %s", src)
+            logger.info("syncing %s", src)
             shutil.copy2(src, self.local_project.working_dir)
