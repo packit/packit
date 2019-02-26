@@ -85,6 +85,7 @@ class PackitAPI:
         full_version = up.specfile.get_full_version()
         local_pr_branch = f"{full_version}-update"
         # fetch and reset --hard upstream/$branch?
+        logger.info(f"using \"{dist_git_branch}\" dist-git branch")
         dg.checkout_branch(dist_git_branch)
         dg.create_branch(local_pr_branch)
         dg.checkout_branch(local_pr_branch)
