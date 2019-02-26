@@ -98,7 +98,10 @@ class PackitAPI:
         dg.push_to_fork(local_pr_branch)
         dg.create_pull(
             f"Update to upstream release {full_version}",
-            "description",
+            (
+                f"Upstream branch: {up.local_project.git_repo.active_branch}\n"
+                f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+            ),
             local_pr_branch,
             dist_git_branch
         )
