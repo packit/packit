@@ -28,7 +28,7 @@ class DistGit:
     def __init__(self, config: Config):
         self.config = config
 
-        self._lp = None
+        self._local_project = None
 
         self.github_token = self.config.github_token
         self.pagure_user_token = self.config.pagure_user_token
@@ -43,10 +43,10 @@ class DistGit:
         self._specfile = None
 
     @property
-    def lp(self):
+    def local_project(self):
         """ return an instance of LocalProject """
-        if self._lp is None:
-            self._lp = LocalProject(
+        if self._local_project is None:
+            self._local_project = LocalProject(
                 git_url=self.dist_git_url,
                 namespace=self.dist_git_namespace,
                 repo_name=self.package_name,
@@ -54,19 +54,19 @@ class DistGit:
                 git_service=PagureService(token=self.pagure_user_token),
 
             )
-        return self._lp
+        return self._local_project
 
     @property
     def specfile_path(self) -> Optional[str]:
         if self.package_name:
-            return os.path.join(self.lp.working_dir, f"{self.package_name}.spec")
+            return os.path.join(self.local_project.working_dir, f"{self.package_name}.spec")
 
     @property
     def specfile(self):
         if self._specfile is None:
             self._specfile = SpecFile(
                 path=self.specfile_path,
-                sources_location=self.lp.working_dir,
+                sources_location=self.local_project.working_dir,
                 changelog_entry=None,
             )
         return self._specfile
@@ -76,21 +76,21 @@ class DistGit:
         Create a new git branch in dist-git
         """
         # what if the branch already exists?
-        self.lp.git_repo.create_head(branch_nane, commit=base)
+        self.local_project.git_repo.create_head(branch_nane, commit=base)
 
     def checkout_branch(self, git_ref: str):
         """
         Perform a `git checkout`
         """
-        self.lp.git_repo.heads[git_ref].checkout()
+        self.local_project.git_repo.heads[git_ref].checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
         """
         Perform `git add -A` and `git commit`
         """
         main_msg = f"{prefix}{title}"
-        self.lp.git_repo.git.add("-A")
-        self.lp.git_repo.index.write()
+        self.local_project.git_repo.git.add("-A")
+        self.local_project.git_repo.index.write()
         # TODO: attach git note to every commit created
         # TODO: implement cleaning policy: once the PR is closed (merged/refused), remove the branch
         #       make this configurable so that people know this would happen, don't clean by default
@@ -98,7 +98,7 @@ class DistGit:
         # TODO: implement signing properly: we need to create a cert for the bot, distribute it to the container,
         #       prepare git config and then we can start signing
         # TODO: make -s configurable
-        self.lp.git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
+        self.local_project.git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
 
     def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork"):
         """
@@ -108,17 +108,17 @@ class DistGit:
         :param fork_remote_name: local name of the remote where we push to
         """
         if fork_remote_name not in [
-            remote.name for remote in self.lp.git_repo.remotes
+            remote.name for remote in self.local_project.git_repo.remotes
         ]:
-            fork_urls = self.lp.git_project.get_fork().get_git_urls()
-            self.lp.git_repo.create_remote(
+            fork_urls = self.local_project.git_project.get_fork().get_git_urls()
+            self.local_project.git_repo.create_remote(
                 name=fork_remote_name, url=fork_urls["ssh"]
             )
 
         # I suggest to comment this one while testing when the push is not needed
         # TODO: create dry-run ^
-        fork_branches = self.lp.git_project.get_fork().get_branches()
-        self.lp.git_repo.remote(fork_remote_name).push(
+        fork_branches = self.local_project.git_project.get_fork().get_branches()
+        self.local_project.git_repo.remote(fork_remote_name).push(
             refspec=branch_name, force=branch_name in fork_branches
         )
 
@@ -132,7 +132,7 @@ class DistGit:
         """
         Create dist-git pull request using the requested branches
         """
-        project = self.lp.git_project
+        project = self.local_project.git_project
 
         project.change_token(self.pagure_user_token)
         # This pagure call requires token from the package's FORK
@@ -158,7 +158,7 @@ class DistGit:
         """
         self.specfile.download_remote_sources()
         archive_name = self.specfile.get_archive()
-        archive = os.path.join(self.lp.working_dir, archive_name)
+        archive = os.path.join(self.local_project.working_dir, archive_name)
         logger.info("downloaded archive: %s", archive)
         return archive
 
@@ -166,7 +166,7 @@ class DistGit:
         """
         upload files (archive) to the lookaside cache
         """
-        f = FedPKG(self.fas_user, self.lp.working_dir)
+        f = FedPKG(self.fas_user, self.local_project.working_dir)
         f.init_ticket()
         f.new_sources(sources=archive_path)
 
@@ -183,4 +183,4 @@ class DistGit:
             fi = fi[1:] if fi.startswith("/") else fi
             src = os.path.join(upstream_project.working_dir, fi)
             logger.debug("syncing %s", src)
-            shutil.copy2(src, self.lp.working_dir)
+            shutil.copy2(src, self.local_project.working_dir)

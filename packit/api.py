@@ -89,7 +89,7 @@ class PackitAPI:
         dg.create_branch(local_pr_branch)
         dg.checkout_branch(local_pr_branch)
 
-        dg.sync_files(up.lp)
+        dg.sync_files(up.local_project)
         archive = dg.download_upstream_archive()
 
         dg.upload_to_lookaside_cache(archive)

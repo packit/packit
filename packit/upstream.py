@@ -12,7 +12,7 @@ class Upstream:
     def __init__(self, config: Config):
         self.config = config
 
-        self._lp = None
+        self._local_project = None
         self._specfile = None
 
         self.package_name: Optional[str] = self.config.package_config.metadata.get('package_name', None)
@@ -21,23 +21,23 @@ class Upstream:
     @property
     def specfile_path(self) -> Optional[str]:
         if self.package_name:
-            return os.path.join(self.lp.working_dir, f"{self.package_name}.spec")
+            return os.path.join(self.local_project.working_dir, f"{self.package_name}.spec")
 
     @property
-    def lp(self):
+    def local_project(self):
         """ return an instance of LocalProject """
-        if self._lp is None:
-            self._lp = LocalProject(
+        if self._local_project is None:
+            self._local_project = LocalProject(
                 working_dir=self.upstream_project_url
             )
-        return self._lp
+        return self._local_project
 
     @property
     def specfile(self):
         if self._specfile is None:
             self._specfile = SpecFile(
                 path=self.specfile_path,
-                sources_location=self.lp.working_dir,
+                sources_location=self.local_project.working_dir,
                 changelog_entry=None,
             )
         return self._specfile
