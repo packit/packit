@@ -4,6 +4,7 @@ This is the official python interface for packit.
 
 import logging
 
+from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.upstream import Upstream
 
@@ -11,8 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class PackitAPI:
-    def __init__(self, config):
+    def __init__(self, config: Config, package_config: PackageConfig):
         self.config = config
+        self.package_config = package_config
 
     def update(self, dist_git_branch: str):
         """
