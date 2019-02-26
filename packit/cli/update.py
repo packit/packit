@@ -18,7 +18,9 @@ logger = logging.getLogger(__file__)
     help="Target branch in dist-git to release into.",
     default="master",
 )
-@click.option("--dist-git-path", help="Path to dist-git repo to work in.")
+@click.option("--dist-git-path",
+              help="Path to dist-git repo to work in. "
+                   "Otherwise clone the repo in a temporary directory.")
 @pass_config
 def update(config, dist_git_path, dist_git_branch):
     """
