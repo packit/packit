@@ -86,6 +86,9 @@ class FedPKG:
         )
 
     def init_ticket(self, keytab: str = None):
+        if not keytab:
+            logger.info("won't be doing kinit, no credentials provided")
+            return
         if keytab and os.path.isfile(keytab):
             cmd = f"kinit {self.fas_username}@FEDORAPROJECT.ORG -k -t {keytab}"
         else:
