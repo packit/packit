@@ -99,12 +99,22 @@ class FedPKG:
         )
 
 
+class PackitFormatter(logging.Formatter):
+    def format(self, record):
+        if record.levelno == logging.INFO:
+            self._fmt = "%(message)s"
+        elif record.levelno > logging.INFO:
+            self._fmt = "%(levelname)-8s %(message)s"
+        else:  # debug
+            self._fmt = "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
+        return logging.Formatter.format(self, record)
+
+
 def set_logging(
         logger_name="packit",
         level=logging.INFO,
         handler_class=logging.StreamHandler,
         handler_kwargs=None,
-        format="%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s",
         date_format="%H:%M:%S",
 ):
     """
@@ -114,7 +124,6 @@ def set_logging(
     :param level: int, see logging.{DEBUG,INFO,ERROR,...}: level of logger and handler
     :param handler_class: logging.Handler instance, default is StreamHandler (/dev/stderr)
     :param handler_kwargs: dict, keyword arguments to handler's constructor
-    :param format: str, formatting style
     :param date_format: str, date style in the logs
     """
     if level != logging.NOTSET:
@@ -127,7 +136,7 @@ def set_logging(
             handler = handler_class(**handler_kwargs)
             handler.setLevel(level)
 
-            formatter = logging.Formatter(format, date_format)
+            formatter = PackitFormatter(None, date_format)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
