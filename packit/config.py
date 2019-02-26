@@ -116,14 +116,22 @@ class JobConfig:
 
 
 class PackageConfig:
-    def __init__(self):
-        self.specfile_path: Optional[str] = None
-        self.synced_files: Optional[List[str]] = None
-        self.jobs: Optional[List[JobConfig]] = None
+    def __init__(
+            self,
+            specfile_path: Optional[str] = None,
+            synced_files: Optional[List[str]] = None,
+            jobs: Optional[List[JobConfig]] = None,
+            metadata: Optional[dict] = None,
+            dist_git_namespace: str = "rpms",
+            upstream_project_url: str = ".",  # can be URL or path
+    ):
+        self.specfile_path: Optional[str] = specfile_path
+        self.synced_files: Optional[List[str]] = synced_files
+        self.jobs: Optional[List[JobConfig]] = jobs
         # TODO: the metadata should have a proper definition and validation
-        self.metadata: Optional[dict] = None
-        self.dist_git_namespace: str = "rpms"
-        self.upstream_project_url: str = "."  # can be URL or path
+        self.metadata: Optional[dict] = metadata
+        self.dist_git_namespace: str = dist_git_namespace
+        self.upstream_project_url: str = upstream_project_url
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> PackageConfig:
@@ -134,11 +142,12 @@ class PackageConfig:
             raw_dict, "specfile_path", "synced_files", "jobs"
         )
 
-        pc = PackageConfig()
-        pc.specfile_path = specfile_path
-        pc.synced_files = synced_files
-        pc.jobs = [JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs]
-        pc.metadata = metadata
+        pc = PackageConfig(
+            specfile_path=specfile_path,
+            synced_files=synced_files,
+            jobs=[JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs],
+            metadata=metadata,
+        )
 
         return pc
 
