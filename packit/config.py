@@ -1,18 +1,16 @@
-from __future__ import annotations
-
 import json
 import logging
 import os
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import anymarkup
 import click
 from jsonschema import Draft4Validator
-from ogr.abstract import GitProject
 
+from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
 from packit.utils import exclude_from_dict
 
@@ -29,14 +27,6 @@ class Config:
         self._pagure_user_token = None
         self._pagure_package_token = None
         self._pagure_fork_token = None
-
-        self.dist_git_path = None
-
-    @property
-    def package_config(self) -> PackageConfig:
-        if self._package_config is None:
-            self._package_config = get_local_package_config()
-        return self._package_config
 
     @property
     def github_token(self) -> str:
@@ -98,7 +88,7 @@ class JobConfig:
     metadata: dict
 
     @classmethod
-    def get_from_dict(cls, raw_dict: dict, validate=True) -> JobConfig:
+    def get_from_dict(cls, raw_dict: dict, validate=True) -> "JobConfig":
         if validate and not JobConfig.is_dict_valid(raw_dict):
             raise Exception(f"Job config not valid.")
 
@@ -116,13 +106,13 @@ class JobConfig:
 
 class PackageConfig:
     def __init__(
-            self,
-            specfile_path: Optional[str] = None,
-            synced_files: Optional[List[str]] = None,
-            jobs: Optional[List[JobConfig]] = None,
-            metadata: Optional[dict] = None,
-            dist_git_namespace: str = "rpms",
-            upstream_project_url: str = ".",  # can be URL or path
+        self,
+        specfile_path: Optional[str] = None,
+        synced_files: Optional[List[str]] = None,
+        jobs: Optional[List[JobConfig]] = None,
+        metadata: Optional[dict] = None,
+        dist_git_namespace: str = "rpms",
+        upstream_project_url: str = ".",  # can be URL or path
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: Optional[List[str]] = synced_files
@@ -143,7 +133,7 @@ class PackageConfig:
         )
 
     @classmethod
-    def get_from_dict(cls, raw_dict: dict, validate=True) -> PackageConfig:
+    def get_from_dict(cls, raw_dict: dict, validate=True) -> "PackageConfig":
         if validate and not PackageConfig.is_dict_valid(raw_dict):
             raise Exception("Package config not valid.")
 
@@ -154,7 +144,9 @@ class PackageConfig:
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=synced_files,
-            jobs=[JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs],
+            jobs=[
+                JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
+            ],
             metadata=metadata,
         )
 
