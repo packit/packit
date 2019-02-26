@@ -9,6 +9,7 @@ from ogr.abstract import PullRequest, PRStatus
 from ogr.services.pagure import PagureProject, PagureService
 from rebasehelper.specfile import SpecFile
 
+from packit.distgit import DistGit
 from packit.utils import FedPKG
 
 THIS_DIR = os.path.dirname(__file__)
@@ -73,6 +74,8 @@ def mock_update_workflow(beer):
         subprocess.check_call(["tar", "-cf", path, hops_filename], cwd=d)
         return path
     flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
+
+    flexmock(DistGit, push_to_fork=lambda branch_name: None)
 
     def mocked_new_sources(sources=None):
         if not os.path.isfile(sources):

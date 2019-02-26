@@ -95,6 +95,7 @@ class PackitAPI:
         dg.upload_to_lookaside_cache(archive)
 
         dg.commit(f"{full_version} upstream release", "more info")
+        dg.push_to_fork(local_pr_branch)
         dg.create_pull(
             f"Update to upstream release {full_version}",
             "description",
