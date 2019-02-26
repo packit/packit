@@ -4,11 +4,13 @@ The code here handles receiving messages about events and has wrappers to proces
 This module is meant to be imported in API and should be independent.
 """
 import logging
+
 # not yet: https://github.com/fedora-infra/fedora-messaging/issues/111
 # from fedora_messaging import api
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Dict, Any
 
 import fedmsg
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +20,11 @@ class Consumerino:
     A class which provides an interface to consume messages via a callback
     """
 
-    def __init__(self) -> None:
-        """
-
-        """
-        pass
+    def __init__(self, url: str = None) -> None:
+        # TODO: the url template should be configurable
+        self.datagrepper_url = url or (
+            "https://apps.fedoraproject.org/datagrepper/id?id={msg_id}&is_raw=true"
+        )
         # timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         # self.binding = {
         #     'exchange': 'amq.topic',  # The AMQP exchange to bind our queue to
@@ -36,7 +38,7 @@ class Consumerino:
     #     api.consume(callback, self.binding)
 
     @staticmethod
-    def iterate_gh_pulls() -> Iterable[Tuple[str, str, dict]]:
+    def iterate_pull_requests() -> Iterable[Tuple[str, str, dict]]:
         """
         Provide messages for all github pull-request-related events
 
@@ -56,6 +58,23 @@ class Consumerino:
                 yield topic, action, msg
 
     @staticmethod
+    def iterate_releases() -> Iterable[Tuple[str, dict]]:
+        """
+        Provide messages for all github pull-request-related events
+
+        Actions:
+            https://developer.github.com/v3/activity/events/types/#events-api-payload-28
+
+        :return: tuple, (full topic name, dict with the message)
+        """
+        # https://github.com/fedora-infra/github2fedmsg/blob/a9c178b93aa6890e6b050e5f1c5e3297ceca463c/github2fedmsg/views/webhooks.py#L120
+        topic = "org.fedoraproject.prod.github.release."
+
+        logger.info("listening on fedmsg, topic=%s", topic)
+        for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
+            yield topic, msg
+
+    @staticmethod
     def iterate_dg_pr_flags() -> Iterable[Tuple[str, dict]]:
         """
         Provide messages when a flag is added to a pull request in dist-git
@@ -69,3 +88,16 @@ class Consumerino:
         logger.info("listening on fedmsg, topic=%s", topic)
         for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
             yield topic, msg
+
+    def fetch_fedmsg_dict(self, msg_id: str) -> Dict[str, Any]:
+        """
+        Fetch selected message from datagrepper
+
+        :param msg_id: str
+        :return: dict, the fedmsg
+        """
+        logger.debug(f"Proccessing message: {msg_id}")
+        url = self.datagrepper_url.format(msg_id=msg_id)
+        response = requests.get(url)
+        msg_dict = response.json()
+        return msg_dict
