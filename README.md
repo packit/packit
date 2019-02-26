@@ -102,6 +102,12 @@ You can install packit using `pip`:
 $ pip3 install --user git+https://github.com/packit-service/packit.git
 ```
 
+Packit depends on multiple libraries and tools. We suggest to install
+`rebase-helper` from Fedora repositories, since the tool is not on PyPI:
+```
+$ dnf install rebase-helper
+```
+
 
 ## Candidates for early adoption
 
