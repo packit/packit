@@ -1,0 +1,31 @@
+{
+  "specfile_path": "beer.spec",
+  "synced_files": [
+    "beer.spec"
+  ],
+  "jobs": [
+    {
+      "trigger": "release",
+      "release_to": [
+        "master"
+      ]
+    },
+    {
+      "trigger": "pull_request",
+      "release_to": [
+        "master"
+      ]
+    }
+  ],
+  "upstream_name": "beer",
+  "package_name": "beer",
+  "dist_git_url": "",
+  "checks": [
+    {
+      "name": "simple-koji-ci"
+    },
+    {
+      "name": "Fedora CI"
+    }
+  ]
+}
