@@ -18,22 +18,18 @@ logger = logging.getLogger(__name__)
 @click.option("-d", "--debug", is_flag=True)
 @click.option("--fas-user")
 @click.option("-k", "--keytab")
-@click.option("-v", "--verbose", is_flag=True)
 @click.pass_context
-def packit_base(ctx, debug, verbose, fas_user, keytab):
+def packit_base(ctx, debug, fas_user, keytab):
     c = Config()
     c.debug = debug
-    c.verbose = verbose
     c.fas_user = fas_user
     c.keytab_path = keytab
     ctx.obj = c
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
         logger.debug("logging set to DEBUG")
-
-    elif ctx.obj.verbose:
-        set_logging(level=logging.INFO,
-                    format="%(message)s")
+    else:
+        set_logging(level=logging.INFO)
         logger.debug("logging set to INFO")
 
 

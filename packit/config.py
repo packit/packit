@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 
 class Config:
     def __init__(self):
-        self.verbose = False
         self.debug = False
         self.fas_user = None
         self.keytab_path = None
