@@ -17,13 +17,13 @@ class DistGit:
     """
     A class which interacts with dist-git and pagure-over-dist-git API.
 
-    The logic covers git and pagure interaction, manipulation with content, spec files, patches and archives
+    The logic covers git and pagure interaction, manipulation with content, spec files, patches and archives.
 
     The expectation is that this class interacts with low level APIs (ogr) and doesn't hold any workflow; the
-    workflow and feeding input should be done up the stack
+    workflow and feeding input should be done up the stack.
 
     The class works with a single instance of dist-git, that's the state, and methods of this class
-    interact with the local copy
+    interact with the local copy.
     """
     def __init__(self, config: Config):
         self.config = config
@@ -52,7 +52,6 @@ class DistGit:
                 repo_name=self.package_name,
                 working_dir=self.dist_git_path,
                 git_service=PagureService(token=self.pagure_user_token),
-
             )
         return self._local_project
 
