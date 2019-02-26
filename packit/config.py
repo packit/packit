@@ -133,6 +133,16 @@ class PackageConfig:
         self.dist_git_namespace: str = dist_git_namespace
         self.upstream_project_url: str = upstream_project_url
 
+    def __eq__(self, other: PackageConfig):
+        return (
+            self.specfile_path == other.specfile_path
+            and self.synced_files == other.synced_files
+            and self.jobs == other.jobs
+            and self.metadata == other.metadata
+            and self.dist_git_namespace == other.dist_git_namespace
+            and self.upstream_project_url == other.upstream_project_url
+        )
+
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> PackageConfig:
         if validate and not PackageConfig.is_dict_valid(raw_dict):
