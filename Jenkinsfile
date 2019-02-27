@@ -29,20 +29,20 @@ node('userspace-containerization'){
                 env.DUFFY_SSID=duffy_rtn[1]
             }
 
-            stage ("setup"){
-                // onmyduffynode "yum -y install epel-release 
+            stage ("Setup"){
+                onmyduffynode "yum -y install epel-release"
                 onmyduffynode "yum -y install ansible buildah podman make python36-pip"
                 onmyduffynode "pip3.6 install ansible-bender"
                 synctoduffynode "*" // copy all source files
             }
 
-            stage("build test image"){
+            stage("Build test image"){
                 onmyduffynode "make build"
                 onmyduffynode "make build-tests"
             }
 
             stage("Run tests") {
-                onmyduffynode "make test-in-container"
+                onmyduffynode "make check-in-container"
             }
         } catch (e) {
             currentBuild.result = "FAILURE"
