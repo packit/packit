@@ -3,7 +3,7 @@
 # If you need a debugger, I suggest to:
 # 1. Change the command to bash
 # 2. Run this playbook
-# 3. sudo podman attach {syncer,watcher} bash
+# 3. podman attach {syncer,watcher} bash
 # 4. Insert ipdb probes in the code and run packit:
 #   $ packit -d watch-pr --updated 2019-e693608f-d77c-41ab-8b2b-99825b6170f4
 # Good luck!
