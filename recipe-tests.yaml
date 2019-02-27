@@ -1,5 +1,5 @@
 ---
-- name: This is a recipe for how to tests packit
+- name: This is a recipe for a container image where packit tests will run
   hosts: all
   tasks:
   - name: Install all packages needed to run tests
