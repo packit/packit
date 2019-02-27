@@ -1,0 +1,11 @@
+---
+- name: This is a recipe for how to tests packit
+  hosts: all
+  tasks:
+  - name: Install all packages needed to run tests
+    dnf:
+      name:
+      - python3-pytest
+      - python3-flexmock
+      - make
+      state: present
