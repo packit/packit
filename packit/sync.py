@@ -140,7 +140,7 @@ class Synchronizer:
 
         distgit = LocalProject(
             git_url=package_config.metadata["dist_git_url"],
-            branch=f"source-git-{pr_id}",
+            ref=f"source-git-{pr_id}",
             git_service=PagureService(token=self.pagure_fork_token),
             namespace="rpms",
             repo_name=package_config.metadata["package_name"],
@@ -187,7 +187,7 @@ class Synchronizer:
                 pr_url,
                 top_commit,
                 title,
-                source_ref=distgit.branch,
+                source_ref=distgit.ref,
                 pagure_fork_token=self.pagure_fork_token,
                 pagure_package_token=self.pagure_package_token,
             )
