@@ -1,4 +1,4 @@
-# Packit
+# Packit [![Build Status](https://ci.centos.org/job/packit-master/badge/icon)](https://ci.centos.org/job/packit-master)
 
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
