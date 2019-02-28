@@ -48,7 +48,7 @@ def test_local_project_repo_url():
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "branch"
+    assert project._ref == "branch"
 
 
 def test_local_project_repo():
@@ -62,7 +62,7 @@ def test_local_project_repo():
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "branch"
+    assert project._ref == "branch"
     assert project.git_url == "git/url"
 
 
@@ -79,12 +79,12 @@ def test_clone_project_checkout_branch():
                 .mock()
             },
         ),
-        branch="other",
+        ref="other",
         git_url=flexmock(),
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "other"
+    assert project._ref == "other"
 
 
 def test_clone_project_checkout_new_branch():
@@ -103,12 +103,12 @@ def test_clone_project_checkout_new_branch():
         )
         .once()
         .mock(),
-        branch="other",
+        ref="other",
         git_url=flexmock(),
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "other"
+    assert project._ref == "other"
 
 
 def test_clone_project_service_repo_namespace():
@@ -140,7 +140,7 @@ def test_local_project_clone():
 
     assert project.git_url
     assert project.git_repo
-    assert project.branch == "branch"
+    assert project.ref == "branch"
     assert project.working_dir_temporary
 
     project.working_dir_temporary = False
@@ -161,7 +161,7 @@ def test_local_project_repo_from_working_dir():
     assert project.git_url == "git/url"
     assert project.git_repo
     assert project.git_repo.active_branch == "branch"
-    assert project.branch == "branch"
+    assert project.ref == "branch"
     assert not project.working_dir_temporary
 
 
@@ -177,7 +177,7 @@ def test_local_project_dir_url():
 
     assert project.git_url == "http://some.example/url"
     assert project.git_repo
-    assert project.branch == "branch"
+    assert project.ref == "branch"
     assert project.git_repo.active_branch == "branch"
     assert project.git_repo.working_dir == "some/example/path"
     assert not project.working_dir_temporary

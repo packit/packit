@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 import anymarkup
 import click
@@ -181,22 +181,22 @@ def get_local_package_config(directory=None) -> Optional[PackageConfig]:
 
 
 def get_packit_config_from_repo(
-        sourcegit_project: GitProject, branch: str
+    sourcegit_project: GitProject, ref: str
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
             config_file = sourcegit_project.get_file_content(
-                path=config_file_name, ref=branch
+                path=config_file_name, ref=ref
             )
             logger.debug(
                 f"Found a config file '{config_file_name}' "
-                f"on branch '{branch}' "
+                f"on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
             )
         except FileNotFoundError:
             logger.debug(
                 f"The config file '{config_file_name}' "
-                f"not found on branch '{branch}' "
+                f"not found on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
             )
             continue

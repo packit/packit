@@ -247,7 +247,7 @@ class Transformator:
 
         commits = list(
             self.sourcegit.git_repo.iter_commits(
-                rev=f"{upstream_ref}..{self.sourcegit._branch}",
+                rev=f"{upstream_ref}..{self.sourcegit._ref}",
                 reverse=True,
                 **self.rev_list_option_args,
             )
@@ -256,7 +256,7 @@ class Transformator:
             commits.insert(0, self.sourcegit.git_repo.refs[f"{upstream_ref}"].commit)
 
         logger.debug(
-            f"Delta ({upstream_ref}..{self.sourcegit._branch}): {len(commits)}"
+            f"Delta ({upstream_ref}..{self.sourcegit._ref}): {len(commits)}"
         )
         return commits
 
