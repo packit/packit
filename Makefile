@@ -8,7 +8,7 @@ build: recipe.yaml
 	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
 
 prepare-check:
-	sudo ansible-playbook -i inventory-local -c local ./recipe-tests.yaml
+	ansible-playbook -b -K -i inventory-local -c local ./recipe-tests.yaml
 
 check:
 	tox
