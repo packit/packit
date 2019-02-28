@@ -8,6 +8,8 @@ import logging
 from functools import lru_cache
 from typing import Dict, Optional
 
+from ogr.services.pagure import PagureService
+
 from ogr.services.github import GithubService
 from packit.api import PackitAPI
 from packit.config import Config, PackageConfig, get_packit_config_from_repo
@@ -26,6 +28,11 @@ class PackitBotAPI:
     @lru_cache()
     def _github_service(self):
         return GithubService(token=self.config.github_token)
+
+    @property
+    @lru_cache()
+    def _pagure_service(self):
+        return PagureService(token=self.config.pagure_user_token)
 
     def watch_upstream_pull_request(self):
         for topic, action, msg in self.consumerino.iterate_pull_requests():
@@ -119,9 +126,28 @@ class PackitBotAPI:
             self.sync_fedora_ci_with_fedmsg(fedmsg=msg)
 
     def sync_fedora_ci_with_fedmsg(self, fedmsg: Dict):
-        # package_config = PackageConfig.get_config_from_fedmsg(fedmsg)
-        self.sync_fedora_ci(package_config=None)
+        raise NotImplementedError(
+            "The watching of the Fedora CI is not implemented yet."
+        )
+
+        repo_name = fedmsg["msg"]["pull_request"]["project"]["name"]
+        namespace = fedmsg["msg"]["pull_request"]["project"]["namespace"]
+        pr_id = fedmsg["msg"]["pull_request"]["id"]
+
+        pagure_repo = self._pagure_service.get_project(
+            repo=repo_name, namespace=namespace
+        )
+
+        pull_request = pagure_repo.get_pr_info(pr_id=pr_id)
+
+        # TODO: Finish parsing fedmsg and call sync_fedora_ci
 
     def sync_fedora_ci(self, package_config: PackageConfig):
+        raise NotImplementedError(
+            "The watching of the Fedora CI is not implemented yet."
+        )
+
+        # TODO: Rework the SourceGitCheckHelper and use it
+
         sg = SourceGitCheckHelper(config=self.config, package_config=package_config)
         sg.process_new_dg_flag(None)

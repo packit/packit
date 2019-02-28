@@ -21,6 +21,7 @@ class SourceGitCheckHelper:
     def __init__(self, config: Config, package_config: PackageConfig):
         self.config = config
         self.package_config = package_config
+        # TODO: Use OGR instead of the PyGitHub directly
         self.gh = github.Github(login_or_token=self.config.github_token)
 
     def set_init_check(self, full_name: str, pr_id: int, check: DownstreamCheck):
@@ -51,6 +52,10 @@ class SourceGitCheckHelper:
         :param msg:
         :return:
         """
+        raise NotImplementedError(
+            "The watching of the Fedora CI is not implemented yet."
+        )
+
         project_name = msg["msg"]["pullrequest"]["project"]["name"]
         logger.info("new flag for PR for %s", project_name)
 
