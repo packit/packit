@@ -93,6 +93,11 @@ Work has begun on the MVP.
 
 Packit is written in python 3 and is supported only on 3.6 and later.
 
+When packit interacts with dist-git, it uses `fedpkg`, we suggest installing it:
+
+```bash
+sudo dnf install -y fedpkg
+```
 
 ## Installation
 
