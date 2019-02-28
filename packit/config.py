@@ -140,6 +140,8 @@ class PackageConfig:
             raw_dict, "specfile_path", "synced_files", "jobs"
         )
 
+        raw_jobs = raw_jobs or []
+
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=synced_files,
@@ -240,5 +242,5 @@ PACKAGE_CONFIG_SCHEMA = {
         "synced_files": {"type": "array", "items": {"type": "string"}},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
     },
-    "required": ["specfile_path", "synced_files", "jobs"],
+    "required": ["specfile_path", "synced_files"],
 }
