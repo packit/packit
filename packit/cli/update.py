@@ -18,11 +18,14 @@ logger = logging.getLogger(__file__)
     help="Target branch in dist-git to release into.",
     default="master",
 )
-@click.option("--dist-git-path", help="Path to dist-git repo to work in.")
+@click.option("--dist-git-path",
+              help="Path to dist-git repo to work in. "
+                   "Otherwise clone the repo in a temporary directory.")
 @pass_config
 def update(config, dist_git_path, dist_git_branch):
     """
     Release current upstream release into Fedora
     """
+    config.dist_git_path = dist_git_path
     api = PackitAPI(config)
-    api.update(dist_git_branch, dist_git_path=dist_git_path)
+    api.update(dist_git_branch)

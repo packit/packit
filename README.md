@@ -68,58 +68,19 @@ For more info on source-git, please read [the detailed design doc](docs/source-g
 * Provide feedback on upstream pull requests.
   * Run RPM builds in COPR and integrate the results into Github.
 
-## Requirements for upstream projects
 
-If your project would like to use `packit`, there are some requirements which
-needs to be full field.
+## Workflows covered by packit
 
-* place in your upstream project directory `.packit.json`
+* Update to latest upstream release in rawhide. [For more info please read the
+  documentation](/docs/update.md)
 
-Format of `.packit.json` file is:
-```json
-{
-  "specfile_path": "redhat/<SPEC_NAME>.spec",
-  "synced_files": [
-    "redhat",
-    ".packit.json"
-  ],
-  "jobs": [
-    {
-      "trigger": "release",
-      "release_to": [
-        "master"
-      ]
-    },
-    {
-      "trigger": "pull_request",
-      "release_to": [
-        "master"
-      ]
-    }
-  ],
-  "upstream_name": "<your_name>",
-  "package_name": "<Fedora package name>",
-  "dist_git_url": "https://src.fedoraproject.org/rpms/<your_package_name>.git",
-  "checks": [
-    {
-      "name": "simple-koji-ci"
-    },
-    {
-      "name": "Fedora CI"
-    }
-  ]
-}
-```
-
-* Spec should be a in upstream directory `redhat`. E.g: `redhat/<SPEC_NAME>.spec`.
-It can be identical with Fedora SPEC file.
 
 ## Current status
 
 Work has begun on the MVP.
 
-* [ ] You can release to rawhide using packit
-  * [ ] Implement update command (in progress by @lachmanfrantisek and @TomasTomecek)
+* [x] You can release to rawhide using packit
+  * [x] Implement `propose-update` command (in master now)
 * [ ] source-git
   * [ ] You can release to rawhide from source-git using packit
 * [ ] Packit as a service
@@ -128,55 +89,12 @@ Work has begun on the MVP.
   * [ ] Deployment
 
 
-## Usage
+## Requirements
 
-The software is far from being even an alpha quality. Most of the values and
-configuration is hard-coded inside the scripts. Once we prove this project,
-we'll start working on configuration and user experience. You've been warned.
-
-There is a makefile in this repository which can be used to build the container
-images and run them locally with podman.
-
-Before that, you should create a file secrets.yaml and store your github and
-[pagure API tokens](https://src.fedoraproject.org/settings#nav-api-tab) in
-there. This file is then used during deployment as a source for ansible
-variables which are utilized by the containers:
-```yaml
-$ cat ./secrets.yaml
-github_token: 123456
-
-# This token is needed to access data in pagure.
-# This is meant to be an API token of your user
-# https://src.fedoraproject.org/settings#nav-api-tab
-pagure_user_token: 456789
-
-# We need this token to be able to comment on a pagure pull request.
-# If you don't have commit access to the package, you should ask maintainer of
-# the package to generate a token for the specific dist-git repository.
-# https://src.fedoraproject.org/rpms/<package>/settings#apikeys-tab
-pagure_package_token: ABCDEF
-
-# This token is needed to create a pull request
-# https://src.fedoraproject.org/fork/<user>/rpms/<package>/settings#apikeys-tab
-pagure_fork_token: QWERTY
-```
-
-The next thing you need, in order for the tooling to be able to push to your fork in Fedora dist-git, SSH keys.
-
-Please place two files to the root of this repo:
- * bigger-secret — public key
- * biggest-secret — private key
-
-Both of them are in .gitignore so they will not land in git.
+Packit is written in python 3 and is supported only on 3.6 and later.
 
 
-Let's build and run now:
-```
-$ make build
-$ make run-local
-```
-
-## Local CLI installation
+## Installation
 
 You can install packit using `pip`:
 
@@ -184,63 +102,6 @@ You can install packit using `pip`:
 $ pip3 install --user git+https://github.com/packit-service/packit.git
 ```
 
-Please bear in mind that packit works only with python 3.6.
-
-```
-$ packit --help
-Usage: packit [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  -d, --debug
-  --fas-user TEXT
-  -k, --keytab TEXT
-  -v, --verbose
-  -h, --help         Show this message and exit.
-
-Commands:
-  propose-update   Release current upstream release into Fedora
-  sg2dg            Convert source-git repo to dist-git repo.
-  srpm             Generate a srpm from packit.
-  version          Display the version.
-  watch-fedora-ci  watch for flags on PRs: try to process those...
-  watch-pr         watch for activity on github and...
-```
-
-```
-$ packit sg2dg --help
-Usage: packit sg2dg [OPTIONS] [REPO]
-
-  Convert source-git repo to dist-git repo.
-
-  1. Create tarball from the source git repo.
-
-  2. Create patches from the downstream commits.
-
-  3. Copy the redhat/ dir to the dist-git.
-
-  4. Take the tarball and upload it to lookaside cache.
-
-  5. The output is the directory (= dirty git repo)
-
-Options:
-  --dest-dir TEXT
-  --no-new-sources
-  --upstream-ref TEXT
-  --version TEXT
-  -h, --help           Show this message and exit.
-```
-
-```
-$ packit propose-update --help
-Usage: packit propose-update [OPTIONS]
-
-  Release current upstream release into Fedora
-
-Options:
-  --dist-git-branch TEXT  Target branch in dist-git to release into.
-  --dist-git-path TEXT    Path to dist-git repo to work in.
-  -h, --help              Show this message and exit.
-```
 
 ## Candidates for early adoption
 
