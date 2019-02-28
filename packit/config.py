@@ -158,7 +158,7 @@ class PackageConfig:
         jsonschema.validate(raw_dict, PACKAGE_CONFIG_SCHEMA)
 
 
-def get_local_package_config(directory=None) -> Optional[PackageConfig]:
+def get_local_package_config(directory=None) -> PackageConfig:
     """
     :return: local PackageConfig if present
     """
@@ -176,8 +176,7 @@ def get_local_package_config(directory=None) -> Optional[PackageConfig]:
             return parse_loaded_config(loaded_config=loaded_config)
 
         logger.debug(f"The local config file '{config_file_name_full}' not found.")
-
-    return None
+    raise RuntimeError("No packit config found.")
 
 
 def get_packit_config_from_repo(
