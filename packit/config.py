@@ -122,7 +122,7 @@ class PackageConfig:
         self.dist_git_namespace: str = dist_git_namespace
         self.upstream_project_url: str = upstream_project_url
 
-    def __eq__(self, other: PackageConfig):
+    def __eq__(self, other: "PackageConfig"):
         return (
             self.specfile_path == other.specfile_path
             and self.synced_files == other.synced_files
