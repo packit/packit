@@ -35,6 +35,9 @@ This is a detailed documentation for the update functionality of packit.
     2. `export PAGURE_FORK_TOKEN=<token>` — packit needs this token to create a
        pull request:
        https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
+    3. `export PAGURE_PACKAGE_TOKEN=<token>` - packit needs this token to access
+       and update comments in PRs for your package:
+       https://src.fedoraproject.org/rpms/PACKAGE/settings#apikeys-tab
 
 4. Once you have performed the upstream release (and the new archive is up),
    run `packit propose-update` in a working directory of your upstream
