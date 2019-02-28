@@ -7,6 +7,7 @@ from typing import Optional, List, NamedTuple
 
 import anymarkup
 import click
+import jsonschema
 from jsonschema import Draft4Validator
 
 from ogr.abstract import GitProject
@@ -132,8 +133,8 @@ class PackageConfig:
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "PackageConfig":
-        if validate and not PackageConfig.is_dict_valid(raw_dict):
-            raise Exception("Package config not valid.")
+        if validate:
+            PackageConfig.validate_dict(raw_dict)
 
         specfile_path, synced_files, raw_jobs, metadata = exclude_from_dict(
             raw_dict, "specfile_path", "synced_files", "jobs"
@@ -151,9 +152,8 @@ class PackageConfig:
         return pc
 
     @classmethod
-    def is_dict_valid(cls, raw_dict: dict) -> bool:
-        # TODO: we need to log what the error is
-        return Draft4Validator(PACKAGE_CONFIG_SCHEMA).is_valid(raw_dict)
+    def validate_dict(cls, raw_dict: dict) -> None:
+        jsonschema.validate(raw_dict, PACKAGE_CONFIG_SCHEMA)
 
 
 def get_local_package_config(directory=None) -> Optional[PackageConfig]:
