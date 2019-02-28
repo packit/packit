@@ -193,5 +193,8 @@ class DistGit:
         for fi in self.files_to_sync:
             fi = fi[1:] if fi.startswith("/") else fi
             src = os.path.join(upstream_project.working_dir, fi)
-            logger.info("syncing %s", src)
-            shutil.copy2(src, self.local_project.working_dir)
+            if os.path.exists(src):
+                logger.info("syncing %s", src)
+                shutil.copy2(src, self.local_project.working_dir)
+            else:
+                logger.debug("not found %s (no sync)", src)
