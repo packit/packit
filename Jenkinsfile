@@ -32,13 +32,12 @@ node('userspace-containerization'){
             stage ("Setup"){
                 onmyduffynode "yum -y install epel-release"
                 onmyduffynode "yum -y install git rpm-build python36-pip krb5-devel gcc python36-devel"
-                onmyduffynode "pip3.6 install pytest flexmock rpm"
-                synctoduffynode "./." // copy all source files (even hidden, we need .git/)
-                onmyduffynode "pip3.6 install ."
+                onmyduffynode "pip3.6 install tox"
+                synctoduffynode "./." // copy all source files (hidden too, we need .git/)
             }
 
             stage("Run tests") {
-                onmyduffynode "pytest --color=yes --verbose --showlocals"
+                onmyduffynode "tox -e py36"
             }
         } catch (e) {
             currentBuild.result = "FAILURE"
