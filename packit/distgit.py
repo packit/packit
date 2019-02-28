@@ -3,10 +3,10 @@ import os
 import shutil
 from typing import Optional, List
 
-from ogr.services.pagure import PagureService
 from rebasehelper.specfile import SpecFile
 
-from packit.config import Config
+from ogr.services.pagure import PagureService
+from packit.config import Config, PackageConfig
 from packit.local_project import LocalProject
 from packit.utils import FedPKG
 
@@ -25,8 +25,12 @@ class DistGit:
     The class works with a single instance of dist-git, that's the state, and methods of this class
     interact with the local copy.
     """
-    def __init__(self, config: Config):
+
+    def __init__(
+        self, config: Config, package_config: PackageConfig, dist_git_path: str = None
+    ):
         self.config = config
+        self.package_config = package_config
 
         self._local_project = None
 
@@ -34,12 +38,16 @@ class DistGit:
         self.pagure_user_token = self.config.pagure_user_token
         self.pagure_package_token = self.config.pagure_package_token
         self.pagure_fork_token = self.config.pagure_fork_token
-        self.package_name: Optional[str] = self.config.package_config.metadata.get('package_name', None)
+        self.package_name: Optional[str] = self.package_config.metadata.get(
+            "package_name", None
+        )
         self.fas_user = self.config.fas_user
-        self.dist_git_url: Optional[str] = self.config.package_config.metadata.get('dist_git_url', None)
-        self.files_to_sync: Optional[List[str]] = self.config.package_config.synced_files
-        self.dist_git_path = self.config.dist_git_path
-        self.dist_git_namespace: str = self.config.package_config.dist_git_namespace
+        self.dist_git_url: Optional[str] = self.package_config.metadata.get(
+            "dist_git_url", None
+        )
+        self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
+        self.dist_git_path = dist_git_path
+        self.dist_git_namespace: str = self.package_config.dist_git_namespace
         self._specfile = None
 
     @property
@@ -58,7 +66,9 @@ class DistGit:
     @property
     def specfile_path(self) -> Optional[str]:
         if self.package_name:
-            return os.path.join(self.local_project.working_dir, f"{self.package_name}.spec")
+            return os.path.join(
+                self.local_project.working_dir, f"{self.package_name}.spec"
+            )
 
     @property
     def specfile(self):
@@ -122,11 +132,7 @@ class DistGit:
         )
 
     def create_pull(
-            self,
-            pr_title: str,
-            pr_description: str,
-            source_branch: str,
-            target_branch: str,
+        self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
     ) -> None:
         """
         Create dist-git pull request using the requested branches
