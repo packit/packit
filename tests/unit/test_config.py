@@ -217,7 +217,7 @@ def test_package_config_not_equal(not_equal_package_config):
     ],
 )
 def test_package_config_validate(raw, is_valid):
-    assert PackageConfig.is_dict_valid(raw) == is_valid
+    assert PackageConfig.validate_dict(raw) == is_valid
 
 
 @pytest.mark.parametrize(
