@@ -11,8 +11,8 @@ from typing import Optional, List
 import anymarkup
 import click
 from jsonschema import Draft4Validator
-
 from ogr.abstract import GitProject
+
 from packit.constants import CONFIG_FILE_NAMES
 from packit.utils import exclude_from_dict
 
@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 
 class Config:
     def __init__(self):
-        self.verbose = False
         self.debug = False
         self.fas_user = None
         self.keytab_path = None
@@ -30,6 +29,8 @@ class Config:
         self._pagure_user_token = None
         self._pagure_package_token = None
         self._pagure_fork_token = None
+
+        self.dist_git_path = None
 
     @property
     def package_config(self) -> PackageConfig:
@@ -113,12 +114,33 @@ class JobConfig:
         return Draft4Validator(JOB_CONFIG_SCHEMA).is_valid(raw_dict)
 
 
-@dataclass(unsafe_hash=True, frozen=True)
 class PackageConfig:
-    specfile_path: str
-    synced_files: List[str]
-    jobs: List[JobConfig]
-    metadata: dict
+    def __init__(
+            self,
+            specfile_path: Optional[str] = None,
+            synced_files: Optional[List[str]] = None,
+            jobs: Optional[List[JobConfig]] = None,
+            metadata: Optional[dict] = None,
+            dist_git_namespace: str = "rpms",
+            upstream_project_url: str = ".",  # can be URL or path
+    ):
+        self.specfile_path: Optional[str] = specfile_path
+        self.synced_files: Optional[List[str]] = synced_files
+        self.jobs: Optional[List[JobConfig]] = jobs
+        # TODO: the metadata should have a proper definition and validation
+        self.metadata: Optional[dict] = metadata
+        self.dist_git_namespace: str = dist_git_namespace
+        self.upstream_project_url: str = upstream_project_url
+
+    def __eq__(self, other: PackageConfig):
+        return (
+            self.specfile_path == other.specfile_path
+            and self.synced_files == other.synced_files
+            and self.jobs == other.jobs
+            and self.metadata == other.metadata
+            and self.dist_git_namespace == other.dist_git_namespace
+            and self.upstream_project_url == other.upstream_project_url
+        )
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> PackageConfig:
@@ -129,17 +151,18 @@ class PackageConfig:
             raw_dict, "specfile_path", "synced_files", "jobs"
         )
 
-        return PackageConfig(
+        pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=synced_files,
-            jobs=[
-                JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
-            ],
+            jobs=[JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs],
             metadata=metadata,
         )
 
+        return pc
+
     @classmethod
     def is_dict_valid(cls, raw_dict: dict) -> bool:
+        # TODO: we need to log what the error is
         return Draft4Validator(PACKAGE_CONFIG_SCHEMA).is_valid(raw_dict)
 
 

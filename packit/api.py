@@ -7,9 +7,10 @@ from typing import Any, Dict
 
 import requests
 
-from packit.dg_robot import PackitDistGitRobot
+from packit.distgit import DistGit
 from packit.fed_mes_consume import Consumerino
 from packit.sync import Synchronizer
+from packit.upstream import Upstream
 from packit.watcher import SourceGitCheckHelper
 
 logger = logging.getLogger(__name__)
@@ -75,26 +76,33 @@ class PackitAPI:
         for topic, msg in self.consumerino.iterate_dg_pr_flags():
             self.process_ci_result(msg)
 
-    def update(self, dist_git_branch, dist_git_path: str = None):
+    def update(self, dist_git_branch: str):
         """
         Update given package in Fedora
         """
-        robot = PackitDistGitRobot(self.config, dist_git_path=dist_git_path)
-        full_version = robot.upstream_specfile.get_full_version()
+        dg = DistGit(self.config)
+        up = Upstream(self.config)
+        full_version = up.specfile.get_full_version()
         local_pr_branch = f"{full_version}-update"
-        robot.checkout_branch_distgit(dist_git_branch)
-        robot.create_branch_distgit(local_pr_branch)
-        robot.checkout_branch_distgit(local_pr_branch)
+        # fetch and reset --hard upstream/$branch?
+        logger.info(f"using \"{dist_git_branch}\" dist-git branch")
+        dg.checkout_branch(dist_git_branch)
+        dg.create_branch(local_pr_branch)
+        dg.checkout_branch(local_pr_branch)
 
-        robot.sync_files()
-        archive = robot.download_upstream_archive()
+        dg.sync_files(up.local_project)
+        archive = dg.download_upstream_archive()
 
-        robot.upload_to_lookaside_cache(archive)
+        dg.upload_to_lookaside_cache(archive)
 
-        robot.commit_distgit(f"{full_version} upstream release", "more info")
-        robot.create_pull(
-            "title",
-            "description",
+        dg.commit(f"{full_version} upstream release", "more info")
+        dg.push_to_fork(local_pr_branch)
+        dg.create_pull(
+            f"Update to upstream release {full_version}",
+            (
+                f"Upstream branch: {up.local_project.git_repo.active_branch}\n"
+                f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+            ),
             local_pr_branch,
             dist_git_branch
         )
