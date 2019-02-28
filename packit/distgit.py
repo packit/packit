@@ -119,7 +119,14 @@ class DistGit:
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
         ]:
-            fork_urls = self.local_project.git_project.get_fork().get_git_urls()
+            fork = self.local_project.git_project.get_fork()
+            if not fork:
+                self.local_project.git_project.fork_create()
+                fork = self.local_project.git_project.get_fork()
+            if not fork:
+                raise RuntimeError(
+                    f"Unable to create a fork of repository {self.local_project.git_project.full_repo_name}")
+            fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name, url=fork_urls["ssh"]
             )
