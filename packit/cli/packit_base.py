@@ -8,6 +8,7 @@ from packit.cli.sourcegit_to_dist_git import sg2dg
 from packit.cli.sourcegit_to_srpm import sg2srpm
 from packit.cli.watch_fedora_ci import watcher
 from packit.cli.watch_sg_pr import watch_pr
+from packit.cli.watch_upstream_release import watch_releases
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
 
@@ -44,7 +45,8 @@ packit_base.add_command(sg2srpm)
 packit_base.add_command(watcher)
 packit_base.add_command(version)
 packit_base.add_command(watch_pr)
+packit_base.add_command(watch_releases)
 packit_base.add_command(update)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     packit_base()
