@@ -65,6 +65,10 @@ class PackitAPI:
             )
             or up.specfile.get_full_version()
         )
+        # TODO: this is problematic, since we may overwrite stuff in the repo
+        #       but the thing is that we need to do it
+        #       and we also need to check out the original branch once we're done
+        #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
         up.checkout_release(full_version)
 
         local_pr_branch = f"{full_version}-update"
