@@ -85,7 +85,7 @@ class PackitAPI:
             pr_title=f"Update to upstream release {full_version}",
             pr_description=(
                 f"Upstream tag: {full_version}\n"
-                f"Upstream commit: {up.local_project.git_repo.ref}\n"
+                f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
             ),
             dist_git_branch=dist_git_branch,
         )
