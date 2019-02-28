@@ -37,21 +37,21 @@ class Config:
     @property
     def pagure_user_token(self) -> str:
         if self._pagure_user_token is None:
-            self._pagure_user_token = os.environ["PAGURE_USER_TOKEN"]
+            self._pagure_user_token = os.environ.get("PAGURE_USER_TOKEN", "")
         return self._pagure_user_token
 
     @property
     def pagure_package_token(self) -> str:
         """ this token is used to comment on pull requests """
         if self._pagure_package_token is None:
-            self._pagure_package_token = os.environ["PAGURE_PACKAGE_TOKEN"]
+            self._pagure_package_token = os.environ.get("PAGURE_PACKAGE_TOKEN", "")
         return self._pagure_package_token
 
     @property
     def pagure_fork_token(self) -> str:
         """ this is needed to create pull requests """
         if self._pagure_fork_token is None:
-            self._pagure_fork_token = os.environ["PAGURE_FORK_TOKEN"]
+            self._pagure_fork_token = os.environ.get("PAGURE_FORK_TOKEN", "")
         return self._pagure_fork_token
 
 
