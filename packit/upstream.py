@@ -47,6 +47,23 @@ class Upstream:
             )
         return self._specfile
 
+    def checkout_pr(self, pr_id: int) -> None:
+        """
+        Checkout the branch for the pr.
+
+        TODO: Move this to ogr and make it compatible with other git forges.
+        """
+        self.local_project.git_repo.remote().fetch(
+            refspec=f"pull/{pr_id}/head:pull/{pr_id}"
+        )
+        self.local_project.git_repo.refs[f"pull/{pr_id}"].checkout()
+
+    def checkout_release(self, version: str) -> None:
+        try:
+            self.local_project.git_repo.git.checkout(version)
+        except Exception as ex:
+            raise PackitException("Cannot checkout release tag.", ex)
+
 
 class SourceGit(Upstream):
     pass
