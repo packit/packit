@@ -73,10 +73,8 @@ We can start layering downstream content on top.
 
 ### Layering downstream content on top of upstream
 
-To not clutter the root directory in the repo, let's create a new directory
-"fedora/" and just copy in there everything from the f29 fedora branch:
+Let's get files from the `fedora/f29` branch.
 ```
-$ mkdir fedora
 $ git checkout fedora/f29 -- .
 $ git status
 On branch 239-sg
@@ -102,12 +100,14 @@ Changes to be committed:
         new file:   yum-protect-systemd.conf
 ```
 
-We have a bunch of new files from f29 branch in the root. We'll move them now to the `fedora/` directory:
+We have a bunch of new files from f29 branch in the root. We'll move them now
+to the `fedora/` directory:
 ```
+$ mkdir fedora
 $ mv $(git diff --name-only --cached) fedora/
 ```
 
-Let's clean up our working tree:
+and we should also clean our working tree:
 ```
 $ git reset HEAD .
 Unstaged changes after reset:
