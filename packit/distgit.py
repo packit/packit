@@ -91,7 +91,11 @@ class DistGit:
         """
         Perform a `git checkout`
         """
-        self.local_project.git_repo.heads[git_ref].checkout()
+        try:
+            head = self.local_project.git_repo.heads[git_ref]
+        except IndexError:
+            head = self.local_project.git_repo.create_head(git_ref, commit=f"remotes/origin/{git_ref}")
+        head.checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
         """
