@@ -100,6 +100,9 @@ class DistGit:
         main_msg = f"{prefix}{title}"
         self.local_project.git_repo.git.add("-A")
         self.local_project.git_repo.index.write()
+        commit_args = ["-s", "-m", main_msg]
+        if msg:
+            commit_args += ["-m", msg]
         # TODO: attach git note to every commit created
         # TODO: implement cleaning policy: once the PR is closed (merged/refused), remove the branch
         #       make this configurable so that people know this would happen, don't clean by default
@@ -107,7 +110,7 @@ class DistGit:
         # TODO: implement signing properly: we need to create a cert for the bot, distribute it to the container,
         #       prepare git config and then we can start signing
         # TODO: make -s configurable
-        self.local_project.git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
+        self.local_project.git_repo.git.commit(*commit_args)
 
     def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork"):
         """
