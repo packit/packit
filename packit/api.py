@@ -1,88 +1,72 @@
 """
-This is the official python interface for source-git. This is used exclusively in the CLI.
+This is the official python interface for packit.
 """
 
 import logging
-from typing import Any, Dict
 
-import requests
+from rebasehelper.versioneer import versioneers_runner
 
+from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
-from packit.fed_mes_consume import Consumerino
-from packit.sync import Synchronizer
 from packit.upstream import Upstream
-from packit.watcher import SourceGitCheckHelper
 
 logger = logging.getLogger(__name__)
 
 
 class PackitAPI:
-    def __init__(self, config):
-        # TODO: the url template should be configurable
-        self.datagrepper_url = (
-            "https://apps.fedoraproject.org/datagrepper/id?id={msg_id}&is_raw=true"
-        )
-        self.consumerino = Consumerino()
+    def __init__(self, config: Config, package_config: PackageConfig) -> None:
         self.config = config
+        self.package_config = package_config
 
-    def fetch_fedmsg_dict(self, msg_id: str) -> Dict[str, Any]:
-        """
-        Fetch selected message from datagrepper
+    def sync_pr(self, pr_id, dist_git_branch: str, dist_git_path: str = None):
+        up = Upstream(config=self.config, package_config=self.package_config)
 
-        :param msg_id: str
-        :return: dict, the fedmsg
-        """
-        logger.debug(f"Proccessing message: {msg_id}")
-        url = self.datagrepper_url.format(msg_id=msg_id)
-        response = requests.get(url)
-        msg_dict = response.json()
-        return msg_dict
+        dg = DistGit(
+            config=self.config,
+            package_config=self.package_config,
+            dist_git_path=dist_git_path,
+        )
 
-    def sync_upstream_pr_to_distgit(self, fedmsg_dict: Dict[str, Any]) -> None:
-        """
-        Take the input fedmsg (github push or pr create) and sync the content into dist-git
+        up.checkout_pr(pr_id=pr_id)
+        local_pr_branch = f"pull-request-{pr_id}-sync"
+        # fetch and reset --hard upstream/$branch?
+        dg.checkout_branch(dist_git_branch)
+        dg.create_branch(local_pr_branch)
+        dg.checkout_branch(local_pr_branch)
 
-        :param fedmsg_dict: dict, code change on github
-        """
-        logger.info("syncing the upstream code to downstream")
-        with Synchronizer(self.config) as sync:
-            sync.sync_using_fedmsg_dict(fedmsg_dict)
+        self.sync(
+            upstream=up,
+            distgit=dg,
+            commit_msg=[f"Sync upstream pr: {pr_id}", "more info"],
+            pr_title=f"Upstream pr: {pr_id}",
+            pr_description="description",
+        )
 
-    def keep_syncing_upstream_pulls(self) -> None:
-        """
-        Watch Fedora messages and keep syncing upstream PRs downstream. This runs forever.
-        """
-        with Synchronizer(self.config) as sync:
-            for topic, action, msg in self.consumerino.iterate_gh_pulls():
-                # TODO:
-                #   handle edited (what's that?)
-                #   handle closed (merged & not merged)
-                if action in ["opened", "synchronize", "reopened"]:
-                    sync.sync_using_fedmsg_dict(msg)
-
-    def process_ci_result(self, fedmsg_dict: Dict[str, Any]) -> None:
-        """
-        Take the CI result, figure out if it's related to source-git and if it is, report back to upstream
-
-        :param fedmsg_dict: dict, flag added in pagure
-        """
-        sg = SourceGitCheckHelper(self.config)
-        sg.process_new_dg_flag(fedmsg_dict)
-
-    def keep_fwding_ci_results(self) -> None:
-        """
-        Watch Fedora messages and keep reporting CI results back to upstream PRs. This runs forever.
-        """
-        for topic, msg in self.consumerino.iterate_dg_pr_flags():
-            self.process_ci_result(msg)
-
-    def update(self, dist_git_branch: str):
+    def sync_release(
+        self, dist_git_branch: str, dist_git_path: str = None, version: str = None
+    ):
         """
         Update given package in Fedora
         """
-        dg = DistGit(self.config)
-        up = Upstream(self.config)
-        full_version = up.specfile.get_full_version()
+        up = Upstream(config=self.config, package_config=self.package_config)
+
+        dg = DistGit(
+            config=self.config,
+            package_config=self.package_config,
+            dist_git_path=dist_git_path,
+        )
+
+        full_version = (
+            version
+            or versioneers_runner.run(
+                versioneer=None,
+                package_name=self.package_config.metadata["package_name"],
+                category=None,
+            )
+            or up.specfile.get_full_version()
+        )
+        up.checkout_release(full_version)
+
         local_pr_branch = f"{full_version}-update"
         # fetch and reset --hard upstream/$branch?
         logger.info(f"using \"{dist_git_branch}\" dist-git branch")
@@ -90,19 +74,31 @@ class PackitAPI:
         dg.create_branch(local_pr_branch)
         dg.checkout_branch(local_pr_branch)
 
-        dg.sync_files(up.local_project)
-        archive = dg.download_upstream_archive()
-
-        dg.upload_to_lookaside_cache(archive)
-
-        dg.commit(f"{full_version} upstream release", "more info")
-        dg.push_to_fork(local_pr_branch)
-        dg.create_pull(
-            f"Update to upstream release {full_version}",
-            (
-                f"Upstream branch: {up.local_project.git_repo.active_branch}\n"
-                f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+        self.sync(
+            upstream=up,
+            distgit=dg,
+            commit_msg=[f"{full_version} upstream release", "more info"],
+            pr_title=f"Update to upstream release {full_version}",
+            pr_description=(
+                f"Upstream tag: {full_version}\n"
+                f"Upstream commit: {up.local_project.git_repo.ref}\n"
             ),
-            local_pr_branch,
-            dist_git_branch
+            dist_git_branch=dist_git_branch,
+        )
+
+    def sync(
+        self, upstream, distgit, commit_msg, pr_title, pr_description, dist_git_branch
+    ):
+        distgit.sync_files(upstream.local_project)
+        archive = distgit.download_upstream_archive()
+
+        distgit.upload_to_lookaside_cache(archive)
+
+        distgit.commit(*commit_msg)
+        distgit.push_to_fork(distgit.local_project.ref)
+        distgit.create_pull(
+            pr_title,
+            pr_description,
+            source_branch=distgit.local_project.ref,
+            target_branch=dist_git_branch,
         )
