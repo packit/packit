@@ -75,7 +75,7 @@ class PackitAPI:
             #       release = 232, tag = v232
             up.checkout_release(full_version)
 
-            local_pr_branch = f"{full_version}-update"
+            local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
             logger.info(f"using \"{dist_git_branch}\" dist-git branch")
             dg.checkout_branch(dist_git_branch)
