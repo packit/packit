@@ -195,6 +195,7 @@ class DistGit:
         """
         upload files (archive) to the lookaside cache
         """
+        # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("uploading to the lookaside cache")
         f = FedPKG(self.fas_user, self.local_project.working_dir)
         f.init_ticket()
