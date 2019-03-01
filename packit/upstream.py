@@ -62,7 +62,7 @@ class Upstream:
         try:
             self.local_project.git_repo.git.checkout(version)
         except Exception as ex:
-            raise PackitException("Cannot checkout release tag.", ex)
+            raise PackitException(f"Cannot checkout release tag: {ex}.")
 
 
 class SourceGit(Upstream):
