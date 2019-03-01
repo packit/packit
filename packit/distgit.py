@@ -112,12 +112,13 @@ class DistGit:
         # TODO: make -s configurable
         self.local_project.git_repo.git.commit(*commit_args)
 
-    def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork"):
+    def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork", force: bool = False):
         """
         push changes to a fork of the dist-git repo; they need to be committed!
 
         :param branch_name: the branch where we push
         :param fork_remote_name: local name of the remote where we push to
+        :param force: push forcefully?
         """
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
@@ -136,9 +137,8 @@ class DistGit:
 
         # I suggest to comment this one while testing when the push is not needed
         # TODO: create dry-run ^
-        fork_branches = self.local_project.git_project.get_fork().get_branches()
         self.local_project.git_repo.remote(fork_remote_name).push(
-            refspec=branch_name, force=branch_name in fork_branches
+            refspec=branch_name, force=force
         )
 
     def create_pull(
