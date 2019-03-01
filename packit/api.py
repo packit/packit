@@ -70,6 +70,8 @@ class PackitAPI:
         #       but the thing is that we need to do it
         #       and we also need to check out the original branch once we're done
         #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
+        # TODO: this is also naive, upstream may use different tagging scheme, e.g.
+        #       release = 232, tag = v232
         up.checkout_release(full_version)
 
         local_pr_branch = f"{full_version}-update"
