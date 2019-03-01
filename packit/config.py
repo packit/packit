@@ -1,10 +1,9 @@
 import json
 import logging
 import os
-from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 from functools import lru_cache
-from typing import Optional, List
+from typing import Optional, List, NamedTuple
 
 import anymarkup
 import click
@@ -75,14 +74,13 @@ def get_context_settings() -> dict:
     )
 
 
-class TriggerType(Enum):
+class TriggerType(IntEnum):
     release = 1
     pull_request = 2
     git_tag = 3
 
 
-@dataclass(unsafe_hash=True, frozen=True)
-class JobConfig:
+class JobConfig(NamedTuple):
     trigger: TriggerType
     release_to: List[str]
     metadata: dict
