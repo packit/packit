@@ -31,7 +31,7 @@ def test_local_project_working_dir_project():
     project = LocalProject(
         git_project=project_mock,
         working_dir=flexmock(),
-        git_repo=flexmock(active_branch="branch"),
+        git_repo=flexmock(active_branch="branch", head=flexmock(is_detached=False)),
     )
     assert project.git_service
     assert project.git_project
@@ -43,18 +43,26 @@ def test_local_project_working_dir_project():
 def test_local_project_repo_url():
     """Get working_dir from git_repo"""
     project = LocalProject(
-        git_repo=flexmock(active_branch="branch", working_dir="something"),
+        git_repo=flexmock(
+            active_branch="branch",
+            working_dir="something",
+            head=flexmock(is_detached=False),
+        ),
         git_url=flexmock(),
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "branch"
+    assert project._ref == "branch"
 
 
 def test_local_project_repo():
     """Get git_url from git_repo"""
     project = LocalProject(
-        git_repo=flexmock(active_branch="branch", working_dir="something")
+        git_repo=flexmock(
+            active_branch="branch",
+            working_dir="something",
+            head=flexmock(is_detached=False),
+        )
         .should_receive("remote")
         .replace_with(lambda: flexmock(urls=["git/url"]))
         .once()
@@ -62,7 +70,7 @@ def test_local_project_repo():
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "branch"
+    assert project._ref == "branch"
     assert project.git_url == "git/url"
 
 
@@ -79,12 +87,12 @@ def test_clone_project_checkout_branch():
                 .mock()
             },
         ),
-        branch="other",
+        ref="other",
         git_url=flexmock(),
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "other"
+    assert project._ref == "other"
 
 
 def test_clone_project_checkout_new_branch():
@@ -92,7 +100,10 @@ def test_clone_project_checkout_new_branch():
     branches = {}
     project = LocalProject(
         git_repo=flexmock(
-            active_branch="branch", working_dir="something", branches=branches
+            active_branch="branch",
+            working_dir="something",
+            branches=branches,
+            head=flexmock(is_detached=False),
         )
         .should_receive("create_head")
         .with_args("other")
@@ -103,12 +114,12 @@ def test_clone_project_checkout_new_branch():
         )
         .once()
         .mock(),
-        branch="other",
+        ref="other",
         git_url=flexmock(),
     )
     assert project.git_repo
     assert project.working_dir == "something"
-    assert project._branch == "other"
+    assert project._ref == "other"
 
 
 def test_clone_project_service_repo_namespace():
@@ -123,7 +134,7 @@ def test_clone_project_service_repo_namespace():
         .mock(),
         git_url=flexmock(),
         working_dir=flexmock(),
-        git_repo=flexmock(active_branch=flexmock()),
+        git_repo=flexmock(active_branch=flexmock(), head=flexmock(is_detached=False)),
     )
     assert project.repo_name
     assert project.namespace
@@ -134,13 +145,19 @@ def test_clone_project_service_repo_namespace():
 def test_local_project_clone():
     flexmock(local_project).should_receive("get_repo").with_args(
         "http://some.example/url"
-    ).and_return(flexmock(working_dir="some/example/path", active_branch="branch"))
+    ).and_return(
+        flexmock(
+            working_dir="some/example/path",
+            active_branch="branch",
+            head=flexmock(is_detached=False),
+        )
+    )
 
     project = LocalProject(git_url="http://some.example/url")
 
     assert project.git_url
     assert project.git_repo
-    assert project.branch == "branch"
+    assert project.ref == "branch"
     assert project.working_dir_temporary
 
     project.working_dir_temporary = False
@@ -153,7 +170,9 @@ def test_local_project_repo_from_working_dir():
     flexmock(
         git,
         Repo=flexmock(
-            active_branch="branch", remote=lambda: flexmock(urls=["git/url"])
+            active_branch="branch",
+            remote=lambda: flexmock(urls=["git/url"]),
+            head=flexmock(is_detached=False),
         ),
     )
     project = LocalProject(working_dir="some/example/path")
@@ -161,7 +180,7 @@ def test_local_project_repo_from_working_dir():
     assert project.git_url == "git/url"
     assert project.git_repo
     assert project.git_repo.active_branch == "branch"
-    assert project.branch == "branch"
+    assert project.ref == "branch"
     assert not project.working_dir_temporary
 
 
@@ -169,7 +188,13 @@ def test_local_project_dir_url():
 
     flexmock(local_project).should_receive("get_repo").with_args(
         "http://some.example/url", "some/example/path"
-    ).and_return(flexmock(working_dir="some/example/path", active_branch="branch"))
+    ).and_return(
+        flexmock(
+            working_dir="some/example/path",
+            active_branch="branch",
+            head=flexmock(is_detached=False),
+        )
+    )
 
     project = LocalProject(
         git_url="http://some.example/url", working_dir="some/example/path"
@@ -177,7 +202,7 @@ def test_local_project_dir_url():
 
     assert project.git_url == "http://some.example/url"
     assert project.git_repo
-    assert project.branch == "branch"
+    assert project.ref == "branch"
     assert project.git_repo.active_branch == "branch"
     assert project.git_repo.working_dir == "some/example/path"
     assert not project.working_dir_temporary
