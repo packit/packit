@@ -116,7 +116,6 @@ Please, open a PR if you want to be on the list, or just let us know.
 * anaconda (@jkonecny12)
 * [greenboot](https://github.com/LorbusChris/greenboot/) (@LorbusChris)
 
-
 ## Resources
 
  * An excellent document by Colin Walters which describes a modern way of
