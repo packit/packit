@@ -4,13 +4,14 @@ Update selected component from upstream in Fedora
 
 import logging
 import os
+import sys
 
 import click
 
 from packit.api import PackitAPI
 from packit.cli.types import LocalProjectParameter
 from packit.config import pass_config, get_context_settings, get_local_package_config
-
+from packit.exceptions import PackitException
 logger = logging.getLogger(__file__)
 
 
@@ -31,4 +32,9 @@ def update(config, dist_git_path, dist_git_branch, repo):
     """
     package_config = get_local_package_config(directory=repo.working_dir)
     api = PackitAPI(config=config, package_config=package_config)
-    api.sync_release(dist_git_branch, dist_git_path=dist_git_path)
+    try:
+        api.sync_release(dist_git_branch, dist_git_path=dist_git_path)
+    except PackitException:
+        if config.debug:
+            raise
+        sys.exit(1)
