@@ -96,7 +96,19 @@ Packit is written in python 3 and is supported only on 3.6 and later.
 
 ## Installation
 
-You can install packit using `pip`:
+On Fedora:
+
+```
+$ dnf install --enablerepo=updates-testing packit
+```
+
+Or
+
+```
+$ pip3 install --user packitos
+```
+
+You can also install it from master branch:
 
 ```
 $ pip3 install --user git+https://github.com/packit-service/packit.git

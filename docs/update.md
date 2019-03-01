@@ -1,10 +1,15 @@
 # `packit propose-update`
 
-This is a detailed documentation for the update functionality of packit.
+This is a detailed documentation for the update functionality of packit. The
+command creates a new pull request in Fedora using a selected or latest
+upstream release.
 
 
 ## Requirements
 
+* Upstream git repository (specific forge is not required)
+* Upstream release (read, git tag) where version in spec file is equivalent to
+  the name of the git tag.
 * Packit config file placed in the upstream repository.
 * Spec file present in the upstream repository.
 * Pagure API tokens for Fedora Dist-git.
