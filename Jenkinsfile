@@ -31,18 +31,13 @@ node('userspace-containerization'){
 
             stage ("Setup"){
                 onmyduffynode "yum -y install epel-release"
-                onmyduffynode "yum -y install ansible buildah podman make python36-pip"
-                onmyduffynode "pip3.6 install ansible-bender"
-                synctoduffynode "*" // copy all source files
-            }
-
-            stage("Build test image"){
-                onmyduffynode "make build"
-                onmyduffynode "make build-tests"
+                onmyduffynode "yum -y install git rpm-build python36-pip krb5-devel gcc python36-devel"
+                onmyduffynode "pip3.6 install tox"
+                synctoduffynode "./." // copy all source files (hidden too, we need .git/)
             }
 
             stage("Run tests") {
-                onmyduffynode "make check-in-container"
+                onmyduffynode "tox -e py36"
             }
         } catch (e) {
             currentBuild.result = "FAILURE"

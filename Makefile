@@ -7,14 +7,11 @@ PACKIT_TESTS_IMAGE := packit-tests
 build: recipe.yaml
 	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
 
-build-tests: recipe-tests.yaml
-	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
+prepare-check:
+	ansible-playbook -b -K -i inventory-local -c local ./recipe-tests.yaml
 
 check:
-	PYTHONPATH=$(CURDIR) pytest-3 --color=yes --verbose --showlocals $(TEST_TARGET)
-
-test-in-container:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(PACKIT_TESTS_IMAGE) make check
+	tox
 
 shell:
 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash
@@ -44,3 +41,10 @@ stop-local:
 
 rm-local:
 	podman rm syncer watcher
+
+build-tests: recipe-tests.yaml
+	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
+
+# FIXME: is not working ATM
+test-in-container:
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(PACKIT_TESTS_IMAGE) make check

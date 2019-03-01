@@ -5,7 +5,7 @@
   - name: Install all packages needed to run tests
     dnf:
       name:
-      - python3-pytest
-      - python3-flexmock
-      - make
+      - python3-tox
+      - python36
+      - krb5-devel
       state: present
