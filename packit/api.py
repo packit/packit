@@ -114,7 +114,8 @@ class PackitAPI:
         distgit.upload_to_lookaside_cache(archive)
 
         distgit.commit(title=commit_msg, msg=commit_msg_description)
-        distgit.push_to_fork(distgit.local_project.ref)
+        # the branch may already be up, let's push forcefully
+        distgit.push_to_fork(distgit.local_project.ref, force=True)
         distgit.create_pull(
             pr_title,
             pr_description,
