@@ -10,6 +10,7 @@ from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.upstream import Upstream
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,27 +79,36 @@ class PackitAPI:
         dg.create_branch(local_pr_branch)
         dg.checkout_branch(local_pr_branch)
 
+        description = (
+            f"Upstream tag: {full_version}\n"
+            f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+        )
         self.sync(
             upstream=up,
             distgit=dg,
-            commit_msg=[f"{full_version} upstream release", "more info"],
+            commit_msg=f"{full_version} upstream release",
             pr_title=f"Update to upstream release {full_version}",
-            pr_description=(
-                f"Upstream tag: {full_version}\n"
-                f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
-            ),
+            pr_description=description,
             dist_git_branch=dist_git_branch,
+            commit_msg_description=description
         )
 
     def sync(
-        self, upstream, distgit, commit_msg, pr_title, pr_description, dist_git_branch
+        self,
+        upstream: Upstream,
+        distgit: DistGit,
+        commit_msg: str,
+        pr_title: str,
+        pr_description: str,
+        dist_git_branch: str,
+        commit_msg_description: str = None,
     ):
         distgit.sync_files(upstream.local_project)
         archive = distgit.download_upstream_archive()
 
         distgit.upload_to_lookaside_cache(archive)
 
-        distgit.commit(*commit_msg)
+        distgit.commit(title=commit_msg, msg=commit_msg_description)
         distgit.push_to_fork(distgit.local_project.ref)
         distgit.create_pull(
             pr_title,
