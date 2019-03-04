@@ -73,7 +73,7 @@ class PackitAPI:
         )
 
         full_version = version or up.get_upstream_version()
-        current_up_branch = up.local_project.git_repo.active_branch
+        current_up_branch = up.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
             #       but the thing is that we need to do it
