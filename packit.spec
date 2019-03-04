@@ -1,5 +1,5 @@
 # Created by pyp2rpm-3.3.2
-%global pypi_name we-dont-know-yet
+%global pypi_name packitos
 %global real_name packit
 
 Name:           %{real_name}
