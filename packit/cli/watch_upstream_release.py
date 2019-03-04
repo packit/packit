@@ -9,6 +9,7 @@ import click
 from packit.bot_api import PackitBotAPI
 from packit.config import pass_config
 
+
 logger = logging.getLogger(__name__)
 
 

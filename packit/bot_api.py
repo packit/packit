@@ -8,9 +8,9 @@ import logging
 from functools import lru_cache
 from typing import Dict, Optional
 
+from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
 
-from ogr.services.github import GithubService
 from packit.api import PackitAPI
 from packit.config import Config, PackageConfig, get_packit_config_from_repo
 from packit.fed_mes_consume import Consumerino
@@ -85,6 +85,7 @@ class PackitBotAPI:
         repo_name = fedmsg["msg"]["repository"]["name"]
         namespace = fedmsg["msg"]["repository"]["owner"]["login"]
         version = fedmsg["msg"]["release"]["tag_name"]
+        https_url = fedmsg["msg"]["repository"]["html_url"]
 
         github_repo = self._github_service.get_project(
             repo=repo_name, namespace=namespace
@@ -100,8 +101,12 @@ class PackitBotAPI:
             )
             return
 
+        if not package_config.upstream_project_url:
+            package_config.upstream_project_url = https_url
+
+        # TODO: https://github.com/packit-service/packit/issues/103
         self.sync_upstream_release(
-            package_config=package_config, version=version, dist_git_branch=""
+            package_config=package_config, version=version, dist_git_branch="master"
         )
 
     def sync_upstream_release(

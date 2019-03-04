@@ -28,7 +28,7 @@ class DistGit:
     """
 
     def __init__(
-        self, config: Config, package_config: PackageConfig, dist_git_path: str = None
+        self, config: Config, package_config: PackageConfig
     ):
         self.config = config
         self.package_config = package_config
@@ -47,7 +47,6 @@ class DistGit:
             "dist_git_url", None
         )
         self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
-        self.dist_git_path = dist_git_path
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
         self._specfile = None
 
@@ -59,7 +58,7 @@ class DistGit:
                 git_url=self.dist_git_url,
                 namespace=self.dist_git_namespace,
                 repo_name=self.package_name,
-                working_dir=self.dist_git_path,
+                working_dir=self.package_config.downstream_project_url,
                 git_service=PagureService(token=self.pagure_user_token),
             )
         return self._local_project
