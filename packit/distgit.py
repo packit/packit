@@ -7,6 +7,7 @@ from rebasehelper.specfile import SpecFile
 
 from ogr.services.pagure import PagureService
 from packit.config import Config, PackageConfig
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import FedPKG
 
@@ -154,9 +155,9 @@ class DistGit:
         project = self.local_project.git_project
 
         if not self.pagure_user_token:
-            raise RuntimeError("Please provide PAGURE_USER_TOKEN as an environment variable.")
+            raise PackitException("Please provide PAGURE_USER_TOKEN as an environment variable.")
         if not self.pagure_fork_token:
-            raise RuntimeError("Please provide PAGURE_FORK_TOKEN as an environment variable.")
+            raise PackitException("Please provide PAGURE_FORK_TOKEN as an environment variable.")
 
         project.change_token(self.pagure_user_token)
         # This pagure call requires token from the package's FORK
