@@ -1,4 +1,5 @@
 import pytest
+from jsonschema.exceptions import ValidationError
 
 from packit.config import JobConfig, PackageConfig, TriggerType
 
@@ -217,7 +218,11 @@ def test_package_config_not_equal(not_equal_package_config):
     ],
 )
 def test_package_config_validate(raw, is_valid):
-    assert PackageConfig.validate_dict(raw) == is_valid
+    if not is_valid:
+        with pytest.raises(ValidationError):
+            PackageConfig.validate_dict(raw)
+    else:
+        PackageConfig.validate_dict(raw)
 
 
 @pytest.mark.parametrize(
