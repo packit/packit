@@ -7,6 +7,7 @@ from rebasehelper.specfile import SpecFile
 
 from ogr.services.pagure import PagureService
 from packit.config import Config, PackageConfig
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import FedPKG
 
@@ -91,7 +92,11 @@ class DistGit:
         """
         Perform a `git checkout`
         """
-        self.local_project.git_repo.heads[git_ref].checkout()
+       if git_ref in self.local_project.git_repo.heads:
+            head = self.local_project.git_repo.heads[git_ref]
+        else:
+            head = self.local_project.git_repo.create_head(git_ref, commit=f"remotes/origin/{git_ref}")
+        head.checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
         """
@@ -100,6 +105,9 @@ class DistGit:
         main_msg = f"{prefix}{title}"
         self.local_project.git_repo.git.add("-A")
         self.local_project.git_repo.index.write()
+        commit_args = ["-s", "-m", main_msg]
+        if msg:
+            commit_args += ["-m", msg]
         # TODO: attach git note to every commit created
         # TODO: implement cleaning policy: once the PR is closed (merged/refused), remove the branch
         #       make this configurable so that people know this would happen, don't clean by default
@@ -107,28 +115,35 @@ class DistGit:
         # TODO: implement signing properly: we need to create a cert for the bot, distribute it to the container,
         #       prepare git config and then we can start signing
         # TODO: make -s configurable
-        self.local_project.git_repo.git.commit("-s", "-m", main_msg, "-m", msg)
+        self.local_project.git_repo.git.commit(*commit_args)
 
-    def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork"):
+    def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork", force: bool = False):
         """
         push changes to a fork of the dist-git repo; they need to be committed!
 
         :param branch_name: the branch where we push
         :param fork_remote_name: local name of the remote where we push to
+        :param force: push forcefully?
         """
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
         ]:
-            fork_urls = self.local_project.git_project.get_fork().get_git_urls()
+            fork = self.local_project.git_project.get_fork()
+            if not fork:
+                self.local_project.git_project.fork_create()
+                fork = self.local_project.git_project.get_fork()
+            if not fork:
+                raise RuntimeError(
+                    f"Unable to create a fork of repository {self.local_project.git_project.full_repo_name}")
+            fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name, url=fork_urls["ssh"]
             )
 
         # I suggest to comment this one while testing when the push is not needed
         # TODO: create dry-run ^
-        fork_branches = self.local_project.git_project.get_fork().get_branches()
         self.local_project.git_repo.remote(fork_remote_name).push(
-            refspec=branch_name, force=branch_name in fork_branches
+            refspec=branch_name, force=force
         )
 
     def create_pull(
@@ -138,6 +153,11 @@ class DistGit:
         Create dist-git pull request using the requested branches
         """
         project = self.local_project.git_project
+
+        if not self.pagure_user_token:
+            raise PackitException("Please provide PAGURE_USER_TOKEN as an environment variable.")
+        if not self.pagure_fork_token:
+            raise PackitException("Please provide PAGURE_FORK_TOKEN as an environment variable.")
 
         project.change_token(self.pagure_user_token)
         # This pagure call requires token from the package's FORK
@@ -176,6 +196,7 @@ class DistGit:
         """
         upload files (archive) to the lookaside cache
         """
+        # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("uploading to the lookaside cache")
         f = FedPKG(self.fas_user, self.local_project.working_dir)
         f.init_ticket()
@@ -191,10 +212,12 @@ class DistGit:
         """
         logger.debug("about to sync files %s", self.files_to_sync)
         for fi in self.files_to_sync:
+            # TODO: fi can be dir
             fi = fi[1:] if fi.startswith("/") else fi
             src = os.path.join(upstream_project.working_dir, fi)
             if os.path.exists(src):
                 logger.info("syncing %s", src)
                 shutil.copy2(src, self.local_project.working_dir)
             else:
-                logger.debug("not found %s (no sync)", src)
+                # TODO: is this enough?
+                logger.warning("not found %s (no sync)", src)
