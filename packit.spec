@@ -48,6 +48,7 @@ rm -rf %{pypi_name}.egg-info
 
 %files
 %{_bindir}/packit
+%license LICENSE
 
 %files -n python3-%{pypi_name}
 %license LICENSE
