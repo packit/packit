@@ -12,6 +12,7 @@ from jsonschema import Draft4Validator
 
 from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
+from packit.exceptions import PackitConfigException
 from packit.utils import exclude_from_dict
 
 logger = logging.getLogger(__name__)
@@ -176,7 +177,7 @@ def get_local_package_config(directory=None) -> PackageConfig:
             return parse_loaded_config(loaded_config=loaded_config)
 
         logger.debug(f"The local config file '{config_file_name_full}' not found.")
-    raise RuntimeError("No packit config found.")
+    raise PackitConfigException("No packit config found.")
 
 
 def get_packit_config_from_repo(
