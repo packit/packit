@@ -7,10 +7,12 @@ from typing import Optional, List, NamedTuple
 
 import anymarkup
 import click
+import jsonschema
 from jsonschema import Draft4Validator
 
 from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
+from packit.exceptions import PackitConfigException
 from packit.utils import exclude_from_dict
 
 logger = logging.getLogger(__name__)
@@ -36,21 +38,21 @@ class Config:
     @property
     def pagure_user_token(self) -> str:
         if self._pagure_user_token is None:
-            self._pagure_user_token = os.environ["PAGURE_USER_TOKEN"]
+            self._pagure_user_token = os.environ.get("PAGURE_USER_TOKEN", "")
         return self._pagure_user_token
 
     @property
     def pagure_package_token(self) -> str:
         """ this token is used to comment on pull requests """
         if self._pagure_package_token is None:
-            self._pagure_package_token = os.environ["PAGURE_PACKAGE_TOKEN"]
+            self._pagure_package_token = os.environ.get("PAGURE_PACKAGE_TOKEN", "")
         return self._pagure_package_token
 
     @property
     def pagure_fork_token(self) -> str:
         """ this is needed to create pull requests """
         if self._pagure_fork_token is None:
-            self._pagure_fork_token = os.environ["PAGURE_FORK_TOKEN"]
+            self._pagure_fork_token = os.environ.get("PAGURE_FORK_TOKEN", "")
         return self._pagure_fork_token
 
 
@@ -132,12 +134,14 @@ class PackageConfig:
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "PackageConfig":
-        if validate and not PackageConfig.is_dict_valid(raw_dict):
-            raise Exception("Package config not valid.")
+        if validate:
+            PackageConfig.validate_dict(raw_dict)
 
         specfile_path, synced_files, raw_jobs, metadata = exclude_from_dict(
             raw_dict, "specfile_path", "synced_files", "jobs"
         )
+
+        raw_jobs = raw_jobs or []
 
         pc = PackageConfig(
             specfile_path=specfile_path,
@@ -151,12 +155,11 @@ class PackageConfig:
         return pc
 
     @classmethod
-    def is_dict_valid(cls, raw_dict: dict) -> bool:
-        # TODO: we need to log what the error is
-        return Draft4Validator(PACKAGE_CONFIG_SCHEMA).is_valid(raw_dict)
+    def validate_dict(cls, raw_dict: dict) -> None:
+        jsonschema.validate(raw_dict, PACKAGE_CONFIG_SCHEMA)
 
 
-def get_local_package_config(directory=None) -> Optional[PackageConfig]:
+def get_local_package_config(directory=None) -> PackageConfig:
     """
     :return: local PackageConfig if present
     """
@@ -174,8 +177,7 @@ def get_local_package_config(directory=None) -> Optional[PackageConfig]:
             return parse_loaded_config(loaded_config=loaded_config)
 
         logger.debug(f"The local config file '{config_file_name_full}' not found.")
-
-    return None
+    raise PackitConfigException("No packit config found.")
 
 
 def get_packit_config_from_repo(
@@ -240,5 +242,5 @@ PACKAGE_CONFIG_SCHEMA = {
         "synced_files": {"type": "array", "items": {"type": "string"}},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
     },
-    "required": ["specfile_path", "synced_files", "jobs"],
+    "required": ["specfile_path", "synced_files"],
 }
