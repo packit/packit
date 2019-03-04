@@ -1,8 +1,9 @@
 import json
 import logging
-import os
 from enum import IntEnum
 from functools import lru_cache
+from os import getenv, environ
+from pathlib import Path
 from typing import Optional, List, NamedTuple
 
 import anymarkup
@@ -32,27 +33,27 @@ class Config:
     @property
     def github_token(self) -> str:
         if self._github_token is None:
-            self._github_token = os.environ["GITHUB_TOKEN"]
+            self._github_token = environ["GITHUB_TOKEN"]
         return self._github_token
 
     @property
     def pagure_user_token(self) -> str:
         if self._pagure_user_token is None:
-            self._pagure_user_token = os.environ.get("PAGURE_USER_TOKEN", "")
+            self._pagure_user_token = getenv("PAGURE_USER_TOKEN", "")
         return self._pagure_user_token
 
     @property
     def pagure_package_token(self) -> str:
         """ this token is used to comment on pull requests """
         if self._pagure_package_token is None:
-            self._pagure_package_token = os.environ.get("PAGURE_PACKAGE_TOKEN", "")
+            self._pagure_package_token = getenv("PAGURE_PACKAGE_TOKEN", "")
         return self._pagure_package_token
 
     @property
     def pagure_fork_token(self) -> str:
         """ this is needed to create pull requests """
         if self._pagure_fork_token is None:
-            self._pagure_fork_token = os.environ.get("PAGURE_FORK_TOKEN", "")
+            self._pagure_fork_token = getenv("PAGURE_FORK_TOKEN", "")
         return self._pagure_fork_token
 
 
@@ -60,10 +61,9 @@ pass_config = click.make_pass_decorator(Config)
 
 
 def get_default_map_from_file() -> Optional[dict]:
-    config_path = ".packit"
-    if os.path.isfile(config_path):
-        with open(config_path) as config_data:
-            return json.load(config_data)
+    config_path = Path(".packit")
+    if config_path.is_file():
+        return json.loads(config_path.read_text())
     return None
 
 
@@ -163,10 +163,10 @@ def get_local_package_config(directory=None) -> PackageConfig:
     """
     :return: local PackageConfig if present
     """
-    directory = directory or os.path.curdir
+    directory = Path(directory) or Path.cwd()
     for config_file_name in CONFIG_FILE_NAMES:
-        config_file_name_full = os.path.join(directory, config_file_name)
-        if os.path.isfile(config_file_name_full):
+        config_file_name_full = directory / config_file_name
+        if config_file_name_full.is_file():
             logger.debug(f"Local package config found: {config_file_name_full}")
             try:
                 loaded_config = anymarkup.parse_file(config_file_name_full)
