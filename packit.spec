@@ -50,7 +50,7 @@ rm -rf %{pypi_name}.egg-info
 %{_bindir}/packit
 %license LICENSE
 
-%files -n python3-%{pypi_name}
+%files -n python3-%{real_name}
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/%{pypi_name}
