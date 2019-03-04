@@ -38,9 +38,10 @@ class PackitAPI:
         self.sync(
             upstream=up,
             distgit=dg,
-            commit_msg=[f"Sync upstream pr: {pr_id}", "more info"],
+            commit_msg=f"Sync upstream pr: {pr_id}",
             pr_title=f"Upstream pr: {pr_id}",
             pr_description="description",
+            dist_git_branch=dist_git_branch
         )
 
     def sync_release(
