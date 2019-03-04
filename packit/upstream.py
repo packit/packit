@@ -30,6 +30,10 @@ class Upstream:
         self.upstream_project_url: str = self.package_config.upstream_project_url
 
     @property
+    def active_branch(self):
+        return self.local_project.git_repo.active_branch
+
+    @property
     def specfile_path(self) -> Optional[str]:
         if self.package_name:
             return os.path.join(
