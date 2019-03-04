@@ -95,7 +95,8 @@ class DistGit:
         if git_ref in self.local_project.git_repo.heads:
             head = self.local_project.git_repo.heads[git_ref]
         else:
-            head = self.local_project.git_repo.create_head(git_ref, commit=f"remotes/origin/{git_ref}")
+            head = self.local_project.git_repo.create_head(git_ref,
+                                                           commit=f"remotes/origin/{git_ref}")
         head.checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
@@ -112,8 +113,8 @@ class DistGit:
         # TODO: implement cleaning policy: once the PR is closed (merged/refused), remove the branch
         #       make this configurable so that people know this would happen, don't clean by default
         #       we should likely clean only merged PRs by default
-        # TODO: implement signing properly: we need to create a cert for the bot, distribute it to the container,
-        #       prepare git config and then we can start signing
+        # TODO: implement signing properly: we need to create a cert for the bot,
+        #       distribute it to the container, prepare git config and then we can start signing
         # TODO: make -s configurable
         self.local_project.git_repo.git.commit(*commit_args)
 
