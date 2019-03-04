@@ -92,7 +92,7 @@ class DistGit:
         """
         Perform a `git checkout`
         """
-       if git_ref in self.local_project.git_repo.heads:
+        if git_ref in self.local_project.git_repo.heads:
             head = self.local_project.git_repo.heads[git_ref]
         else:
             head = self.local_project.git_repo.create_head(git_ref, commit=f"remotes/origin/{git_ref}")
