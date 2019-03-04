@@ -88,6 +88,7 @@ def mock_update_workflow(upstream_n_distgit):
     flexmock(FedPKG, init_ticket=lambda x=None: None, new_sources=mocked_new_sources)
 
 
+@pytest.mark.xfail
 def test_basic_local_update(upstream_n_distgit, mock_update_workflow):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d = upstream_n_distgit
