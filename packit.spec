@@ -21,7 +21,7 @@ BuildRequires:  python3dist(setuptools-scm-git-archive)
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
 
-%package -n     python3-%{pypi_name}
+%package -n     python3-%{real_name}
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 
