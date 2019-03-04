@@ -4,13 +4,12 @@ The code here handles receiving messages about events and has wrappers to proces
 This module is meant to be imported in API and should be independent.
 """
 import logging
-
-# not yet: https://github.com/fedora-infra/fedora-messaging/issues/111
-# from fedora_messaging import api
 from typing import Iterable, Tuple, Dict, Any
 
 import fedmsg
 import requests
+
+from packit.constants import GH2FED_RELEASE_TOPIC
 
 logger = logging.getLogger(__name__)
 
@@ -58,9 +57,15 @@ class Consumerino:
                 yield topic, action, msg
 
     @staticmethod
+    def _yield_messages(topic: str) -> Iterable[Tuple[str, dict]]:
+        logger.info("listening on fedmsg, topic=%s", topic)
+        for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
+            yield topic, msg
+
+    @staticmethod
     def iterate_releases() -> Iterable[Tuple[str, dict]]:
         """
-        Provide messages for all github pull-request-related events
+        Provide messages for changes to github releases
 
         Actions:
             https://developer.github.com/v3/activity/events/types/#events-api-payload-28
@@ -68,11 +73,7 @@ class Consumerino:
         :return: tuple, (full topic name, dict with the message)
         """
         # https://github.com/fedora-infra/github2fedmsg/blob/a9c178b93aa6890e6b050e5f1c5e3297ceca463c/github2fedmsg/views/webhooks.py#L120
-        topic = "org.fedoraproject.prod.github.release."
-
-        logger.info("listening on fedmsg, topic=%s", topic)
-        for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
-            yield topic, msg
+        return Consumerino._yield_messages(GH2FED_RELEASE_TOPIC)
 
     @staticmethod
     def iterate_dg_pr_flags() -> Iterable[Tuple[str, dict]]:
@@ -84,10 +85,7 @@ class Consumerino:
         # we can watch for runs directly:
         # "org.centos.prod.ci.pipeline.allpackages.complete"
         topic = "org.fedoraproject.prod.pagure.pull-request.flag.added"
-
-        logger.info("listening on fedmsg, topic=%s", topic)
-        for name, endpoint, topic, msg in fedmsg.tail_messages(topic=topic):
-            yield topic, msg
+        return Consumerino._yield_messages(topic)
 
     def fetch_fedmsg_dict(self, msg_id: str) -> Dict[str, Any]:
         """

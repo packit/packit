@@ -60,7 +60,7 @@ class PackitAPI:
         )
 
     def sync_release(
-        self, dist_git_branch: str, dist_git_path: str = None, version: str = None
+        self, dist_git_branch: str, version: str = None
     ):
         """
         Update given package in Fedora
@@ -70,7 +70,6 @@ class PackitAPI:
         dg = DistGit(
             config=self.config,
             package_config=self.package_config,
-            dist_git_path=dist_git_path,
         )
 
         full_version = version or up.get_upstream_version()

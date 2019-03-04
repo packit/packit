@@ -2,7 +2,7 @@ import json
 import logging
 from enum import IntEnum
 from functools import lru_cache
-from os import getenv, environ
+from os import getenv
 from pathlib import Path
 from typing import Optional, List, NamedTuple
 
@@ -10,8 +10,8 @@ import anymarkup
 import click
 import jsonschema
 from jsonschema import Draft4Validator
-
 from ogr.abstract import GitProject
+
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 from packit.utils import exclude_from_dict
@@ -33,7 +33,7 @@ class Config:
     @property
     def github_token(self) -> str:
         if self._github_token is None:
-            self._github_token = environ["GITHUB_TOKEN"]
+            self._github_token = getenv("GITHUB_TOKEN", "")
         return self._github_token
 
     @property
@@ -112,7 +112,8 @@ class PackageConfig:
         jobs: Optional[List[JobConfig]] = None,
         metadata: Optional[dict] = None,
         dist_git_namespace: str = "rpms",
-        upstream_project_url: str = ".",  # can be URL or path
+        upstream_project_url: str = None,  # can be URL or path
+        downstream_project_url: str = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: Optional[List[str]] = synced_files
@@ -121,6 +122,7 @@ class PackageConfig:
         self.metadata: Optional[dict] = metadata
         self.dist_git_namespace: str = dist_git_namespace
         self.upstream_project_url: str = upstream_project_url
+        self.downstream_project_url: Optional[str] = downstream_project_url
 
     def __eq__(self, other: "PackageConfig"):
         return (
