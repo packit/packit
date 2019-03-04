@@ -46,7 +46,7 @@ rm -rf %{pypi_name}.egg-info
 %install
 %py3_install
 
-%files -n %{real_name}
+%files
 %{_bindir}/packit
 
 %files -n python3-%{pypi_name}
