@@ -1,6 +1,7 @@
 import logging
 
 import click
+from pkg_resources import get_distribution
 
 import packit
 from packit.cli.update import update
@@ -17,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 @click.group("packit", context_settings=get_context_settings())
 @click.option("-d", "--debug", is_flag=True)
-@click.option("--fas-user")
-@click.option("-k", "--keytab")
+@click.option("--fas-user", help="Fedora Account System username.")
+@click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab):
     c = Config()
@@ -37,7 +38,7 @@ def packit_base(ctx, debug, fas_user, keytab):
 @click.command("version")
 def version():
     """Display the version."""
-    click.echo(packit.__version__)
+    click.echo(get_distribution('packitos').version)
 
 
 packit_base.add_command(sg2dg)
