@@ -29,7 +29,9 @@ Requires:       git-core
 Requires:       rebase-helper
 %description -n python3-%{pypi_name}
 This project provides tooling and automation to integrate upstream open source
-projects into Fedora operating system. This package contains the python code,
+projects into Fedora operating system.
+
+This package contains the python code,
 check out packit package for the executable.
 
 
