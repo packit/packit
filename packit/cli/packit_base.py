@@ -1,6 +1,7 @@
 import logging
 
 import click
+from pkg_resources import get_distribution
 
 import packit
 from packit.cli.update import update
@@ -37,7 +38,7 @@ def packit_base(ctx, debug, fas_user, keytab):
 @click.command("version")
 def version():
     """Display the version."""
-    click.echo(packit.__version__)
+    click.echo(get_distribution('packit').version)
 
 
 packit_base.add_command(sg2dg)
