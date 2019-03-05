@@ -26,7 +26,11 @@ This is a detailed documentation for the update functionality of packit.
     * Once your upstream release is out (and the spec file is really up to
       date), you can use packit to release it into Fedora.
 
-3. Pagure dist-git is configured in a way that it requires 2 API tokens in
+3. Create a new upstream release. The spec file needs to be included in the ref
+   for upstream release, because packit checks out the tag for the upstream
+   release before copying files downstream.
+
+4. Pagure dist-git is configured in a way that it requires 2 API tokens in
    order to perform a pull request using the API (which packit is using).
    Please set these three environment variables using the appropriate tokens:
     1. `export PAGURE_USER_TOKEN=<token>` — this token is needed to access data
@@ -35,8 +39,9 @@ This is a detailed documentation for the update functionality of packit.
     2. `export PAGURE_FORK_TOKEN=<token>` — packit needs this token to create a
        pull request:
        https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
+       If the fork does not exist, you have to create it.
 
-4. Once you have performed the upstream release (and the new archive is up),
+5. Once you have performed the upstream release (and the new archive is up),
    run `packit propose-update` in a working directory of your upstream
    repository:
     ```bash

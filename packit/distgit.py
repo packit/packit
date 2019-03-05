@@ -233,8 +233,10 @@ class DistGit:
                 logger.info("syncing %s", src)
                 shutil.copy2(src, self.local_project.working_dir)
             else:
-                # TODO: is this enough?
-                logger.warning("not found %s (no sync)", src)
+                raise PackitException(
+                    "File %s is not present in the upstream repository. "
+                    f"Upstream ref {upstream_project.git_repo.active_branch} is checked out"
+                )
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
         """

@@ -65,6 +65,7 @@ class Upstream:
         self.local_project.git_repo.refs[f"pull/{pr_id}"].checkout()
 
     def checkout_release(self, version: str) -> None:
+        logger.info("Checking out upstream version %s", version)
         try:
             self.local_project.git_repo.git.checkout(version)
         except Exception as ex:
