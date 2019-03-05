@@ -6,7 +6,7 @@ import logging
 
 import click
 
-from packit.api import PackitAPI
+from packit.bot_api import PackitBotAPI
 from packit.config import pass_config
 
 logger = logging.getLogger(__name__)
@@ -21,10 +21,10 @@ def watch_pr(config, message_id):
 
     :return: int, retcode
     """
-    api = PackitAPI(config)
+    api = PackitBotAPI(config)
     if message_id:
         for msg_id in message_id:
-            fedmsg_dict = api.fetch_fedmsg_dict(msg_id)
-            api.sync_upstream_pr_to_distgit(fedmsg_dict)
+            fedmsg_dict = api.consumerino.fetch_fedmsg_dict(msg_id)
+            api.sync_upstream_pull_request_with_fedmsg(fedmsg_dict)
     else:
-        api.keep_syncing_upstream_pulls()
+        api.watch_upstream_pull_request()
