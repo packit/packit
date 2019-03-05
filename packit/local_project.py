@@ -31,7 +31,7 @@ class LocalProject:
                 working_dir = working_dir or path_or_url
             else:
                 try:
-                    res = requests.get(path_or_url)
+                    res = requests.head(path_or_url)
                     if res.ok:
                         git_url = git_url or path_or_url
                     else:
