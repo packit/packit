@@ -246,7 +246,6 @@ class DistGit:
             while line:
                 if line.startswith("Source"):
                     last_source_position = spec_file.tell()
-
                 line = spec_file.readline()
 
             if not last_source_position:
