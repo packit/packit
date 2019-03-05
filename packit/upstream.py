@@ -74,7 +74,11 @@ class Upstream:
         self, upstream: str, add_usptream_head_commit=False
     ) -> List[git.Commit]:
         """
-        Return the list of commits from current branch to upstream rev/tag.
+        Return the list of different commits between current branch and upstream rev/tag.
+
+        Always choosing the first-parent, so we have a line/path of the commits.
+        It contains merge-commits from the master and commits on top of the master.
+        (e.g. commits from PR)
 
         :param add_usptream_head_commit: bool
         :param upstream: str -- git branch or tag
