@@ -1,7 +1,7 @@
 import logging
 import os
 import shutil
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from rebasehelper.specfile import SpecFile
 
@@ -95,8 +95,9 @@ class DistGit:
         if git_ref in self.local_project.git_repo.heads:
             head = self.local_project.git_repo.heads[git_ref]
         else:
-            head = self.local_project.git_repo.create_head(git_ref,
-                                                           commit=f"remotes/origin/{git_ref}")
+            head = self.local_project.git_repo.create_head(
+                git_ref, commit=f"remotes/origin/{git_ref}"
+            )
         head.checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
@@ -118,7 +119,9 @@ class DistGit:
         # TODO: make -s configurable
         self.local_project.git_repo.git.commit(*commit_args)
 
-    def push_to_fork(self, branch_name: str, fork_remote_name: str = "fork", force: bool = False):
+    def push_to_fork(
+        self, branch_name: str, fork_remote_name: str = "fork", force: bool = False
+    ):
         """
         push changes to a fork of the dist-git repo; they need to be committed!
 
@@ -135,7 +138,8 @@ class DistGit:
                 fork = self.local_project.git_project.get_fork()
             if not fork:
                 raise RuntimeError(
-                    f"Unable to create a fork of repository {self.local_project.git_project.full_repo_name}")
+                    f"Unable to create a fork of repository {self.local_project.git_project.full_repo_name}"
+                )
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name, url=fork_urls["ssh"]
@@ -156,9 +160,13 @@ class DistGit:
         project = self.local_project.git_project
 
         if not self.pagure_user_token:
-            raise PackitException("Please provide PAGURE_USER_TOKEN as an environment variable.")
+            raise PackitException(
+                "Please provide PAGURE_USER_TOKEN as an environment variable."
+            )
         if not self.pagure_fork_token:
-            raise PackitException("Please provide PAGURE_FORK_TOKEN as an environment variable.")
+            raise PackitException(
+                "Please provide PAGURE_FORK_TOKEN as an environment variable."
+            )
 
         project.change_token(self.pagure_user_token)
         # This pagure call requires token from the package's FORK
@@ -222,3 +230,41 @@ class DistGit:
             else:
                 # TODO: is this enough?
                 logger.warning("not found %s (no sync)", src)
+
+    def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
+        """
+        Add the given list of (patch_name, msg) to the specfile.
+
+        :param patch_list: [(patch_name, msg)] if None, the patches will be generated
+        """
+        if not patch_list:
+            return
+
+        with open(file=self.specfile_path, mode="r+") as spec_file:
+            last_source_position = None
+            line = spec_file.readline()
+            while line:
+                if line.startswith("Source"):
+                    last_source_position = spec_file.tell()
+
+                line = spec_file.readline()
+
+            if not last_source_position:
+                raise Exception("Cannot found place for patches in specfile.")
+
+            spec_file.seek(last_source_position)
+            rest_of_the_file = spec_file.read()
+            spec_file.seek(last_source_position)
+
+            spec_file.write("\n\n# PATCHES FROM SOURCE GIT:\n")
+            for i, (patch, msg) in enumerate(patch_list):
+                commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
+                spec_file.write(commented_msg)
+                spec_file.write(f"Patch{i + 1:04d}: {patch}\n")
+
+            spec_file.write(rest_of_the_file)
+
+        logger.info(
+            f"Patches ({len(patch_list)}) added to the specfile ({self.specfile_path})"
+        )
+        self.local_project.git_repo.index.write()
