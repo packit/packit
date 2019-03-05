@@ -1,7 +1,9 @@
 import logging
+import os
 import shutil
 
 import git
+import requests
 
 from ogr.abstract import GitProject, GitService
 from packit.utils import is_git_repo, get_repo
@@ -21,7 +23,21 @@ class LocalProject:
         full_name: str = None,
         namespace: str = None,
         repo_name: str = None,
+        path_or_url: str = None,
     ) -> None:
+
+        if path_or_url:
+            if os.path.isdir(path_or_url):
+                working_dir = working_dir or path_or_url
+
+            try:
+                res = requests.get(path_or_url)
+                if res.ok:
+                    git_url = git_url or path_or_url
+                else:
+                    logger.warning("path_or_url is nor directory nor url")
+            except requests.exceptions.BaseHTTPError as ex:
+                logger.warning("path_or_url is nor directory nor url")
 
         self.git_repo = git_repo
         self.working_dir = working_dir
