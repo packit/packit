@@ -75,6 +75,22 @@ For more info on source-git, please read [the detailed design doc](docs/source-g
   documentation](/docs/update.md)
 
 
+## Configuration
+
+Configuration file for packit is described in a separate document: [docs/configuration.md](/docs/configuration.md).
+
+TL;DR
+
+```yaml
+specfile_path: packit.spec
+synced_files:
+  - packit.spec
+upstream_name: packit
+package_name: packit
+dist_git_url: https://src.fedoraproject.org/rpms/packit.git
+```
+
+
 ## Current status
 
 Work has begun on the MVP.
