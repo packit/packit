@@ -10,6 +10,10 @@ License:        MIT
 URL:            https://github.com/packit-service/packit
 Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires:  python3dist(setuptools)
+BuildRequires:  python3dist(setuptools-scm)
+BuildRequires:  python3dist(setuptools-scm-git-archive)
 
 %?python_enable_dependency_generator
 
@@ -47,7 +51,7 @@ rm -rf %{pypi_name}.egg-info
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/%{real_name}
-%{python3_sitelib}/%{real_name}-%{version}-py?.?.egg-info
+%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
 
 %changelog
 * Mon Mar 04 2019 Frantisek Lachman <flachman@redhat.com> - 0.1.0-1
