@@ -4,12 +4,9 @@ This is the official python interface for packit.
 
 import logging
 
-from rebasehelper.versioneer import versioneers_runner
-
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.upstream import Upstream
-
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +51,6 @@ class PackitAPI:
         )
 
         self.sync(
-            upstream=up,
             distgit=dg,
             commit_msg=f"Sync upstream pr: {pr_id}",
             pr_title=f"Upstream pr: {pr_id}",
@@ -102,7 +98,6 @@ class PackitAPI:
             dg.sync_files(up.local_project)
 
             self.sync(
-                upstream=up,
                 distgit=dg,
                 commit_msg=f"{full_version} upstream release",
                 pr_title=f"Update to upstream release {full_version}",
@@ -124,8 +119,6 @@ class PackitAPI:
         commit_msg_description: str = None,
         add_new_sources=False,
     ):
-        distgit.sync_files(upstream.local_project)
-        archive = distgit.download_upstream_archive()
 
         if add_new_sources:
             archive = distgit.download_upstream_archive()
