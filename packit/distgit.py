@@ -10,7 +10,7 @@ from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import FedPKG
-
+from packit.exceptions import PackitException
 logger = logging.getLogger(__name__)
 
 
@@ -209,7 +209,12 @@ class DistGit:
         logger.info("uploading to the lookaside cache")
         f = FedPKG(self.fas_user, self.local_project.working_dir)
         f.init_ticket()
-        f.new_sources(sources=archive_path)
+        try:
+            f.new_sources(sources=archive_path)
+        except Exception as ex:
+            logger.error(f"`fedpkg new-sources` failed for some reason. "
+                         f"Either Fedora kerberos is invalid or there could be network outage.")
+            raise PackitException(ex)
 
     def purge_unused_git_branches(self):
         # TODO: remove branches from merged PRs
