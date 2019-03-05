@@ -19,7 +19,13 @@ class PackitAPI:
         self.config = config
         self.package_config = package_config
 
-    def sync_pr(self, pr_id, dist_git_branch: str, dist_git_path: str = None):
+    def sync_pr(
+        self,
+        pr_id,
+        dist_git_branch: str,
+        dist_git_path: str = None,
+        upstream_version: str = None,
+    ):
         up = Upstream(config=self.config, package_config=self.package_config)
 
         dg = DistGit(
@@ -35,13 +41,26 @@ class PackitAPI:
         dg.create_branch(local_pr_branch)
         dg.checkout_branch(local_pr_branch)
 
+        dg.sync_files(up.local_project)
+
+        patches = up.create_patches(
+            upstream=upstream_version, destination=dg.local_project.working_dir
+        )
+        dg.add_patches_to_specfile(patches)
+
+        description = (
+            f"Upstream pr: {pr_id}\n"
+            f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+        )
+
         self.sync(
             upstream=up,
             distgit=dg,
             commit_msg=f"Sync upstream pr: {pr_id}",
             pr_title=f"Upstream pr: {pr_id}",
-            pr_description="description",
-            dist_git_branch=dist_git_branch
+            pr_description=description,
+            dist_git_branch="master",
+            add_new_sources=False,
         )
 
     def sync_release(
@@ -58,15 +77,7 @@ class PackitAPI:
             dist_git_path=dist_git_path,
         )
 
-        full_version = (
-            version
-            or versioneers_runner.run(
-                versioneer=None,
-                package_name=self.package_config.metadata["package_name"],
-                category=None,
-            )
-            or up.specfile.get_full_version()
-        )
+        full_version = version or up.get_upstream_version()
         current_up_branch = up.local_project.git_repo.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
@@ -78,7 +89,7 @@ class PackitAPI:
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
-            logger.info(f"using \"{dist_git_branch}\" dist-git branch")
+            logger.info(f'using "{dist_git_branch}" dist-git branch')
             dg.checkout_branch(dist_git_branch)
             dg.create_branch(local_pr_branch)
             dg.checkout_branch(local_pr_branch)
@@ -87,6 +98,9 @@ class PackitAPI:
                 f"Upstream tag: {full_version}\n"
                 f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
             )
+
+            dg.sync_files(up.local_project)
+
             self.sync(
                 upstream=up,
                 distgit=dg,
@@ -94,25 +108,28 @@ class PackitAPI:
                 pr_title=f"Update to upstream release {full_version}",
                 pr_description=description,
                 dist_git_branch=dist_git_branch,
-                commit_msg_description=description
+                commit_msg_description=description,
+                add_new_sources=True,
             )
         finally:
             current_up_branch.checkout()
 
     def sync(
         self,
-        upstream: Upstream,
         distgit: DistGit,
         commit_msg: str,
         pr_title: str,
         pr_description: str,
         dist_git_branch: str,
         commit_msg_description: str = None,
+        add_new_sources=False,
     ):
         distgit.sync_files(upstream.local_project)
         archive = distgit.download_upstream_archive()
 
-        distgit.upload_to_lookaside_cache(archive)
+        if add_new_sources:
+            archive = distgit.download_upstream_archive()
+            distgit.upload_to_lookaside_cache(archive)
 
         distgit.commit(title=commit_msg, msg=commit_msg_description)
         # the branch may already be up, let's push forcefully

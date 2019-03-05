@@ -43,7 +43,7 @@ class PackitBotAPI:
         repo_name = fedmsg["msg"]["pull_request"]["head"]["repo"]["name"]
         namespace = fedmsg["msg"]["pull_request"]["head"]["repo"]["owner"]["login"]
         ref = fedmsg["msg"]["pull_request"]["head"]["ref"]
-        pr_id = fedmsg["msg"]["pull_request"]["id"]
+        pr_id = fedmsg["msg"]["pull_request"]["number"]
 
         github_repo = self._github_service.get_project(
             repo=repo_name, namespace=namespace
@@ -59,7 +59,7 @@ class PackitBotAPI:
             )
             return
         self.sync_upstream_pull_request(
-            package_config=package_config, pr_id=0, dist_git_branch=""
+            package_config=package_config, pr_id=pr_id, dist_git_branch="master"
         )
 
     def sync_upstream_pull_request(
