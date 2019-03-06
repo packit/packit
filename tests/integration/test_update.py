@@ -1,3 +1,4 @@
+import copy
 import datetime
 import shutil
 import subprocess
@@ -177,9 +178,9 @@ def test_single_message(github_release_fedmsg, mock_update_workflow):
     assert spec.get_full_version() == "0.1.0"
 
 
-def test_loop(mock_update_workflow):
+def test_loop(mock_update_workflow, github_release_fedmsg):
     def mocked_iter_releases():
-        msg = github_release_fedmsg()
+        msg = copy.deepcopy(github_release_fedmsg)
         yield msg["topic"], msg
         return
     flexmock(Consumerino, iterate_releases=mocked_iter_releases)
