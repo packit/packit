@@ -40,9 +40,9 @@ def version():
     click.echo(get_distribution('packitos').version)
 
 
-packit_base.add_command(sg2dg)
-packit_base.add_command(sg2srpm)
-packit_base.add_command(watcher)
+# packit_base.add_command(sg2dg)
+# packit_base.add_command(sg2srpm)
+# packit_base.add_command(watcher)
 packit_base.add_command(version)
 # packit_base.add_command(watch_pr)
 packit_base.add_command(watch_releases)
