@@ -27,7 +27,7 @@ logger = logging.getLogger(__file__)
          "Otherwise clone the repo in a temporary directory.")
 @click.option(
     "--upstream-git-path",
-    help="Path to the upstrem git repository.",
+    help="Path to the upstream git repository.",
     defult=".")
 @click.argument("repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir))
 @pass_config
@@ -41,7 +41,6 @@ def update(config, dist_git_path, upstream_git_path, dist_git_branch, repo):
     api = PackitAPI(config=config, package_config=package_config)
     try:
         api.sync_release(dist_git_branch)
-    except PackitException:
-        if config.debug:
-            raise
+    except PackitException as exc:
+        logger.exception(exc)
         sys.exit(1)
