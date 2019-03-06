@@ -182,7 +182,6 @@ def test_loop(mock_update_workflow, github_release_fedmsg):
     def mocked_iter_releases():
         msg = copy.deepcopy(github_release_fedmsg)
         yield msg["topic"], msg
-        return
     flexmock(Consumerino, iterate_releases=mocked_iter_releases)
     conf = get_test_config()
     api = PackitBotAPI(conf)
