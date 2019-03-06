@@ -31,7 +31,6 @@ TARBALL_NAME = "beerware-0.1.0.tar.gz"
 def get_test_config():
     conf = Config()
     conf._pagure_user_token = "test"
-    conf._pagure_fork_token = "test"
     conf._github_token = "test"
     return conf
 

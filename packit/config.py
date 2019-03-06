@@ -27,8 +27,6 @@ class Config:
         self._package_config = None
         self._github_token = None
         self._pagure_user_token = None
-        self._pagure_package_token = None
-        self._pagure_fork_token = None
 
     @property
     def github_token(self) -> str:
@@ -41,20 +39,6 @@ class Config:
         if self._pagure_user_token is None:
             self._pagure_user_token = getenv("PAGURE_USER_TOKEN", "")
         return self._pagure_user_token
-
-    @property
-    def pagure_package_token(self) -> str:
-        """ this token is used to comment on pull requests """
-        if self._pagure_package_token is None:
-            self._pagure_package_token = getenv("PAGURE_PACKAGE_TOKEN", "")
-        return self._pagure_package_token
-
-    @property
-    def pagure_fork_token(self) -> str:
-        """ this is needed to create pull requests """
-        if self._pagure_fork_token is None:
-            self._pagure_fork_token = getenv("PAGURE_FORK_TOKEN", "")
-        return self._pagure_fork_token
 
 
 pass_config = click.make_pass_decorator(Config)

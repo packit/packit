@@ -37,8 +37,6 @@ class DistGit:
 
         self.github_token = self.config.github_token
         self.pagure_user_token = self.config.pagure_user_token
-        self.pagure_package_token = self.config.pagure_package_token
-        self.pagure_fork_token = self.config.pagure_fork_token
         self.package_name: Optional[str] = self.package_config.metadata.get(
             "package_name", None
         )
@@ -162,10 +160,6 @@ class DistGit:
             raise PackitException(
                 "Please provide PAGURE_USER_TOKEN as an environment variable."
             )
-        if not self.pagure_fork_token:
-            raise PackitException(
-                "Please provide PAGURE_FORK_TOKEN as an environment variable."
-            )
 
         project.change_token(self.pagure_user_token)
         # This pagure call requires token from the package's FORK
@@ -173,7 +167,6 @@ class DistGit:
         if not project_fork:
             project.fork_create()
             project_fork = project.get_fork()
-        project_fork.change_token(self.pagure_fork_token)
 
         try:
             dist_git_pr = project_fork.pr_create(

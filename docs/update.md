@@ -36,10 +36,6 @@ This is a detailed documentation for the update functionality of packit.
     1. `export PAGURE_USER_TOKEN=<token>` — this token is needed to access data
        in pagure. This is meant to be an API token of your user:
        https://src.fedoraproject.org/settings#nav-api-tab
-    2. `export PAGURE_FORK_TOKEN=<token>` — packit needs this token to create a
-       pull request:
-       https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
-       If the fork does not exist, you have to create it.
 
 5. Once you have performed the upstream release (and the new archive is up),
    run `packit propose-update` in a working directory of your upstream
