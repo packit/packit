@@ -14,6 +14,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
+Requires:       fedpkg
 
 %?python_enable_dependency_generator
 
