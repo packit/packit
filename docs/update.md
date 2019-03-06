@@ -13,7 +13,7 @@ This is a detailed documentation for the update functionality of packit.
 
 ## Tutorial
 
-1. Place a file called `.packit.yaml` in the root of your upstream repository.
+1. Place a file called `.packit.yaml` or `packit.yaml` in the root of your upstream repository.
     * The configuration is described [in this document](/docs/configuration.md). TBD: write it!
     * Please get inspired from [an existing
       config](https://github.com/user-cont/colin/blob/master/.packit.yaml) in
