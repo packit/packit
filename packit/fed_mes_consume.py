@@ -70,7 +70,7 @@ class Consumerino:
         Actions:
             https://developer.github.com/v3/activity/events/types/#events-api-payload-28
 
-        :return: tuple, (full topic name, dict with the message)
+        :return: full topic name, dict with the message
         """
         # https://github.com/fedora-infra/github2fedmsg/blob/a9c178b93aa6890e6b050e5f1c5e3297ceca463c/github2fedmsg/views/webhooks.py#L120
         return Consumerino._yield_messages(GH2FED_RELEASE_TOPIC)
