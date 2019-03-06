@@ -31,7 +31,7 @@ node('userspace-containerization'){
 
             stage ("Setup"){
                 onmyduffynode "yum -y install epel-release"
-                onmyduffynode "yum -y install git rpm-build python36-pip krb5-devel gcc python36-devel"
+                onmyduffynode "yum -y install python36-pip python36-devel git krb5-devel gcc rpm-build rpm-libs redhat-rpm-config"
                 onmyduffynode "yum -y remove git"
                 onmyduffynode "curl -o /etc/yum.repos.d/git-epel-7.repo https://copr.fedorainfracloud.org/coprs/g/git-maint/git/repo/epel-7/group_git-maint-git-epel-7.repo"
                 onmyduffynode "yum -y install git-core"
