@@ -19,6 +19,7 @@
       - python3-libpagure
       - rpm-build
       - rebase-helper
+      - fedpkg
       state: present
   - name: Install latest twine for sake of check command
     pip:
