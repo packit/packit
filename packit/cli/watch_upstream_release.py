@@ -14,13 +14,15 @@ logger = logging.getLogger(__name__)
 
 
 @click.command("watch-releases")
-@click.argument("message-id", nargs=-1)
+@click.argument(
+    "message-id", nargs=-1,
+    help="if this is specified, process only the selected fedmsg"
+)
 @pass_config
 def watch_releases(config, message_id):
     """
-    watch for activity on github and create a downstream PR
-
-    :return: int, retcode
+    watch for activity on github and for every new upstream release, create a
+    downstream pull request
     """
     api = PackitBotAPI(config)
     if message_id:
