@@ -1,8 +1,8 @@
-# `.packit.yaml` configuration file
+# Packit configuration file
 
 Packit uses a configuration file in the upstream repository. The config file is written in YAML language.
 
-You should place the file in the root of your upstream repo and name it `.packit.yaml`.
+You should place the file in the root of your upstream repo and name it `.packit.yaml` or `packit.yaml`.
 
 
 ## Values
