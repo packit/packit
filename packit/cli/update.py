@@ -9,6 +9,7 @@ import click
 
 from packit.api import PackitAPI
 from packit.cli.types import LocalProjectParameter
+from packit.cli.utils import cover_packit_exception
 from packit.config import pass_config, get_context_settings, get_local_package_config
 
 logger = logging.getLogger(__file__)
