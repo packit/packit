@@ -3,9 +3,9 @@ import os
 
 import click
 
+from packit.cli.utils import cover_packit_exception
 from packit.config import pass_config, get_context_settings, get_local_package_config
 from packit.local_project import LocalProject
-
 
 logger = logging.getLogger(__file__)
 
@@ -16,6 +16,7 @@ logger = logging.getLogger(__file__)
 @click.option("--version")
 @click.argument("repo", default=os.path.abspath(os.path.curdir))
 @pass_config
+@cover_packit_exception
 def sg2srpm(config, dest_dir, upstream_ref, version, repo):
     """
     Generate a srpm from packit.
