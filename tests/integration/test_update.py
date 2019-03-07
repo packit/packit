@@ -19,6 +19,7 @@ from packit.config import Config, get_local_package_config
 from packit.distgit import DistGit
 from packit.fed_mes_consume import Consumerino
 from packit.utils import FedPKG
+from tests.spellbook import git_set_user_email
 
 THIS_DIR = Path(__file__).parent
 TESTS_DIR = THIS_DIR.parent
@@ -34,11 +35,6 @@ def get_test_config():
     conf._pagure_fork_token = "test"
     conf._github_token = "test"
     return conf
-
-
-def git_set_user_email(directory):
-    subprocess.check_call(["git", "config", "user.email", "test@example.com"], cwd=directory)
-    subprocess.check_call(["git", "config", "user.name", "Packit Test Suite"], cwd=directory)
 
 
 def git_add_n_commit(directory, tag=None):
