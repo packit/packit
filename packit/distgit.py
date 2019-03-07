@@ -46,6 +46,7 @@ class DistGit:
         self.dist_git_url: Optional[str] = self.package_config.metadata.get(
             "dist_git_url", None
         )
+        logger.debug("using dist-git repo %s", self.dist_git_url)
         self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
         self._specfile = None
