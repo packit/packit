@@ -7,6 +7,7 @@ import logging
 import click
 
 from packit.bot_api import PackitBotAPI
+from packit.cli.utils import cover_packit_exception
 from packit.config import pass_config
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 @click.command("watch-pr")
 @click.argument("message-id", nargs=-1)
 @pass_config
+@cover_packit_exception
 def watch_pr(config, message_id):
     """
     watch for activity on github and create/update a downstream PR

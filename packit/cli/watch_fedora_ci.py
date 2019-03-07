@@ -6,6 +6,7 @@ import logging
 import click
 
 from packit.api import PackitAPI
+from packit.cli.utils import cover_packit_exception
 from packit.config import get_context_settings, pass_config
 
 logger = logging.getLogger(__name__)
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 @click.command("watch-fedora-ci", context_settings=get_context_settings())
 @click.argument("message_id", nargs=-1, required=False)
 @pass_config
+@cover_packit_exception
 def watcher(config, message_id):
     """
     watch for flags on PRs: try to process those which we know mapping for
