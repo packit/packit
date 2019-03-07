@@ -24,12 +24,14 @@ logger = logging.getLogger(__file__)
 @click.option(
     "--dist-git-path",
     help="Path to dist-git repo to work in. "
-         "Otherwise clone the repo in a temporary directory.")
+    "Otherwise clone the repo in a temporary directory.",
+)
 @click.option(
-    "--upstream-git-path",
-    help="Path to the upstream git repository.",
-    default=".")
-@click.argument("repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir))
+    "--upstream-git-path", help="Path to the upstream git repository.", default="."
+)
+@click.argument(
+    "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
+)
 @pass_config
 @cover_packit_exception
 def update(config, dist_git_path, upstream_git_path, dist_git_branch, repo):
@@ -40,4 +42,4 @@ def update(config, dist_git_path, upstream_git_path, dist_git_branch, repo):
     package_config.downstream_project_url = dist_git_path
     package_config.upstream_project_url = upstream_git_path
     api = PackitAPI(config=config, package_config=package_config)
-    api.sync_release(dist_git_branch, dist_git_path=dist_git_path)
+    api.sync_release(dist_git_branch)
