@@ -10,7 +10,7 @@ from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import FedPKG
-from packit.exceptions import PackitException
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,9 +27,7 @@ class DistGit:
     interact with the local copy.
     """
 
-    def __init__(
-        self, config: Config, package_config: PackageConfig
-    ):
+    def __init__(self, config: Config, package_config: PackageConfig):
         self.config = config
         self.package_config = package_config
 
@@ -59,7 +57,7 @@ class DistGit:
                 git_url=self.dist_git_url,
                 namespace=self.dist_git_namespace,
                 repo_name=self.package_name,
-                working_dir=self.package_config.downstream_project_url,
+                path_or_url=self.package_config.downstream_project_url,
                 git_service=PagureService(token=self.pagure_user_token),
             )
         return self._local_project
@@ -212,8 +210,10 @@ class DistGit:
         try:
             f.new_sources(sources=archive_path)
         except Exception as ex:
-            logger.error(f"`fedpkg new-sources` failed for some reason. "
-                         f"Either Fedora kerberos is invalid or there could be network outage.")
+            logger.error(
+                f"`fedpkg new-sources` failed for some reason. "
+                f"Either Fedora kerberos is invalid or there could be network outage."
+            )
             raise PackitException(ex)
 
     def purge_unused_git_branches(self):

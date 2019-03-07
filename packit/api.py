@@ -16,20 +16,10 @@ class PackitAPI:
         self.config = config
         self.package_config = package_config
 
-    def sync_pr(
-        self,
-        pr_id,
-        dist_git_branch: str,
-        dist_git_path: str = None,
-        upstream_version: str = None,
-    ):
+    def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
         up = Upstream(config=self.config, package_config=self.package_config)
 
-        dg = DistGit(
-            config=self.config,
-            package_config=self.package_config,
-            dist_git_path=dist_git_path,
-        )
+        dg = DistGit(config=self.config, package_config=self.package_config)
 
         up.checkout_pr(pr_id=pr_id)
         local_pr_branch = f"pull-request-{pr_id}-sync"
@@ -59,18 +49,13 @@ class PackitAPI:
             add_new_sources=False,
         )
 
-    def sync_release(
-        self, dist_git_branch: str, version: str = None
-    ):
+    def sync_release(self, dist_git_branch: str, version: str = None):
         """
         Update given package in Fedora
         """
         up = Upstream(config=self.config, package_config=self.package_config)
 
-        dg = DistGit(
-            config=self.config,
-            package_config=self.package_config,
-        )
+        dg = DistGit(config=self.config, package_config=self.package_config)
 
         full_version = version or up.get_upstream_version()
         current_up_branch = up.active_branch
