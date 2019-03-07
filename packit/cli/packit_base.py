@@ -12,7 +12,7 @@ from packit.cli.watch_upstream_release import watch_releases
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("packit")
 
 
 @click.group("packit", context_settings=get_context_settings())

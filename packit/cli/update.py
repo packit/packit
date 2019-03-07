@@ -28,7 +28,7 @@ logger = logging.getLogger(__file__)
 @click.option(
     "--upstream-git-path",
     help="Path to the upstream git repository.",
-    defult=".")
+    default=".")
 @click.argument("repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir))
 @pass_config
 def update(config, dist_git_path, upstream_git_path, dist_git_branch, repo):

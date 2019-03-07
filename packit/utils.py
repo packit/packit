@@ -102,11 +102,11 @@ class FedPKG:
 class PackitFormatter(logging.Formatter):
     def format(self, record):
         if record.levelno == logging.INFO:
-            self._fmt = "%(message)s"
+            self._style._fmt = "%(message)s"
         elif record.levelno > logging.INFO:
-            self._fmt = "%(levelname)-8s %(message)s"
+            self._style._fmt = "%(levelname)-8s %(message)s"
         else:  # debug
-            self._fmt = "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
+            self._style._fmt = "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
         return logging.Formatter.format(self, record)
 
 
