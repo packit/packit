@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 """
 Watch for new upstream releases.
 """
