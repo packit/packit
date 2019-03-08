@@ -7,12 +7,14 @@ upstream release.
 
 ## Requirements
 
-* Upstream git repository (specific forge is not required)
+* Upstream git repository on Github.
 * Upstream release (read, git tag) where version in spec file is equivalent to
   the name of the git tag.
 * Packit config file placed in the upstream repository.
-* Spec file present in the upstream repository.
+* Spec file present in the upstream repository and is correct in a given
+  release.
 * Pagure API tokens for Fedora Dist-git.
+* Github API token.
 * Valid Fedora Kerberos ticket.
 
 
@@ -26,7 +28,7 @@ upstream release.
 
 2. Place a spec file into your upstream project (and make sure that
    `specfile_path` in the config has a correct value).
-    * This spec file will be then used to perform the update.
+    * This spec file will be then used to perform the update in Fedora.
     * When you create a new upstream release, you should also update the spec file.
     * Once your upstream release is out (and the spec file is really up to
       date), you can use packit to release it into Fedora.
@@ -44,7 +46,10 @@ upstream release.
     2. `export PAGURE_FORK_TOKEN=<token>` — packit needs this token to create a
        pull request:
        https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
-       If the fork does not exist, you have to create it.
+       If the fork does not exist, you have to create it in Pagure's web
+       interface. We are working with Fedora team to relax this requirement.
+    3. `export GITHUB_TOKEN=<token>` — you can obtain the token over here:
+       https://github.com/settings/tokens
 
 5. Once you have performed the upstream release (and the new archive is up),
    run `packit propose-update` in a working directory of your upstream
@@ -68,13 +73,17 @@ upstream release.
 ## `packit propose-update --help`
 
 ```
-Usage: packit_base.py propose-update [OPTIONS]
+Usage: packit propose-update [OPTIONS] [REPO]
 
   Release current upstream release into Fedora
 
+  REPO argument is a local path to the upstream git repository, it defaults
+  to the current working directory
+
 Options:
   --dist-git-branch TEXT  Target branch in dist-git to release into.
-  --dist-git-path TEXT    Path to dist-git repo to work in.
+  --dist-git-path TEXT    Path to dist-git repo to work in. Otherwise clone
+                          the repo in a temporary directory.
   -h, --help              Show this message and exit.
 ```
 
