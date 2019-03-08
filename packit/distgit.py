@@ -221,7 +221,7 @@ class DistGit:
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
-                f"https://src.fedoraproject.org/lookaside/pkgs/{self.package_name}/{archive_name}"
+                f"https://src.fedoraproject.org/lookaside/pkgs/{self.package_name}/{archive_name}/"
             )
             if res.ok:
                 logger.info(
