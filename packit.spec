@@ -4,7 +4,7 @@
 Name:           %{real_name}
 Version:        0.0.1
 Release:        1%{?dist}
-Summary:        A set of tools to integrate upstream open source projects into Fedora operating system
+Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
 URL:            https://github.com/packit-service/packit
@@ -15,7 +15,7 @@ BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
 Requires:       fedpkg
-Requires:       python3-%{real_name}
+Requires:       python3-%{real_name} = %{version}-%{release}
 
 %?python_enable_dependency_generator
 
@@ -28,10 +28,7 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{real_name}}
 
 %description -n python3-%{real_name}
-This project provides tooling and automation to integrate upstream open source
-projects into Fedora operating system.
-
-This package contains the python code,
+Python library for Packit,
 check out packit package for the executable.
 
 
@@ -46,7 +43,8 @@ rm -rf %{pypi_name}.egg-info
 %install
 %py3_install
 
-%files -n %{real_name}
+%files
+%license LICENSE
 %{_bindir}/packit
 
 %files -n python3-%{real_name}
@@ -56,5 +54,5 @@ rm -rf %{pypi_name}.egg-info
 %{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
 
 %changelog
-* Mon Mar 04 2019 Frantisek Lachman <flachman@redhat.com> - 0.1.0-1
+* Mon Mar 04 2019 Frantisek Lachman <flachman@redhat.com> - 0.0.1-1
 - Initial package.
