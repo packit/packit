@@ -3,6 +3,7 @@ import os
 import shutil
 from typing import Optional, List, Tuple
 
+import requests
 from rebasehelper.specfile import SpecFile
 
 from ogr.services.pagure import PagureService
@@ -10,7 +11,7 @@ from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import FedPKG
-from packit.exceptions import PackitException
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,9 +28,7 @@ class DistGit:
     interact with the local copy.
     """
 
-    def __init__(
-        self, config: Config, package_config: PackageConfig
-    ):
+    def __init__(self, config: Config, package_config: PackageConfig):
         self.config = config
         self.package_config = package_config
 
@@ -212,9 +211,29 @@ class DistGit:
         try:
             f.new_sources(sources=archive_path)
         except Exception as ex:
-            logger.error(f"`fedpkg new-sources` failed for some reason. "
-                         f"Either Fedora kerberos is invalid or there could be network outage.")
+            logger.error(
+                f"`fedpkg new-sources` failed for some reason. "
+                f"Either Fedora kerberos is invalid or there could be network outage."
+            )
             raise PackitException(ex)
+
+    def is_archive_on_lookaside_cache(self, archive_path: str) -> bool:
+        archive_name = os.path.basename(archive_path)
+        try:
+            res = requests.head(
+                f"https://src.fedoraproject.org/lookaside/pkgs/{self.package_name}/{archive_name}"
+            )
+            if res.ok:
+                logger.info(
+                    f"Archive {archive_name} found on lookaside cache (skipping upload)."
+                )
+                return True
+            logger.debug(f"Archive {archive_name} not found on the lookaside cache.")
+        except requests.exceptions.BaseHTTPError as ex:
+            logger.warning(
+                f"Error trying to find {archive_name} on the lookaside cache."
+            )
+        return False
 
     def purge_unused_git_branches(self):
         # TODO: remove branches from merged PRs
