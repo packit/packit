@@ -188,6 +188,14 @@ class DistGit:
         else:
             logger.info(f"PR created: {dist_git_pr.url}")
 
+    def get_upstream_archive_name(self) -> str:
+        """
+        :return: name of the archive, e.g. sen-0.6.1.tar.gz
+        """
+        archive_name = self.specfile.get_archive()
+        logger.debug("upstream archive name is %s", archive_name)
+        return archive_name
+
     def download_upstream_archive(self) -> str:
         """
         Fetch archive for the current upstream release defined in dist-git's spec
@@ -195,7 +203,7 @@ class DistGit:
         :return: str, path to the archive
         """
         self.specfile.download_remote_sources()
-        archive_name = self.specfile.get_archive()
+        archive_name = self.get_upstream_archive_name()
         archive = os.path.join(self.local_project.working_dir, archive_name)
         logger.info("downloaded archive: %s", archive)
         return archive
