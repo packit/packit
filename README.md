@@ -1,4 +1,4 @@
-# Packit [![Build Status](https://ci.centos.org/job/packit-master/badge/icon)](https://ci.centos.org/job/packit-master)
+# Pack It! [![Build Status](https://ci.centos.org/job/packit-master/badge/icon)](https://ci.centos.org/job/packit-master)
 
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
@@ -59,14 +59,28 @@ downstream spec file or adding spec file to such a project doesn't make sense.
 
 For more info on source-git, please read [the detailed design doc](docs/source-git.md).
 
-## Plan
 
-* Automatically release to Fedora Rawhide (by the end of February 2019).
-  * Once there is a new upstream release, create a PR in downstream pagure.
-* Send new downstream changes back to upstream. (so the spec files are in sync)
+## Plan and current status
 
-* Provide feedback on upstream pull requests.
-  * Run RPM builds in COPR and integrate the results into Github.
+Work has begun on the MVP.
+
+* [x] E2E workflow for getting upstream releases into Fedora
+  * [x] Bring new upstream releases into Fedora rawhide as dist-git pull
+        requests. (`propose-update` command included in in 0.1.0 release)
+  * [ ] Build the change once it's merged.
+  * [ ] Send new downstream changes back to upstream. (so the spec files are in sync)
+  * [ ] Packit can create bodhi updates.
+  * [x] Ability to propose updates also to stable releases of Fedora.
+  * [ ] Build RPMs in COPR and integrate the results into Github.
+* [ ] source-git
+  * [ ] Packit can create a SRPM from a source-git repo.
+  * [ ] You can release to rawhide from source-git using packit.
+  * [ ] Packit can create a source-git repository.
+  * [ ] Packit helps developers with their source-git repositories.
+* [ ] Packit as a service
+  * [ ] Packit reacts to Github webhooks.
+  * [ ] Have a github app for packit.
+  * [ ] Deployment.
 
 
 ## Workflows covered by packit
@@ -91,20 +105,6 @@ dist_git_url: https://src.fedoraproject.org/rpms/packit.git
 ```
 
 
-## Current status
-
-Work has begun on the MVP.
-
-* [x] You can release to rawhide using packit
-  * [x] Implement `propose-update` command (in master now)
-* [ ] source-git
-  * [ ] You can release to rawhide from source-git using packit
-* [ ] Packit as a service
-  * [ ] Packit reacts to Github webhooks
-  * [ ] Have a github app for packit
-  * [ ] Deployment
-
-
 ## Requirements
 
 Packit is written in python 3 and is supported only on 3.6 and later.
@@ -117,7 +117,21 @@ sudo dnf install -y fedpkg
 
 ## Installation
 
-You can install packit using `pip`:
+On Fedora:
+
+```
+$ dnf install --enablerepo=updates-testing packit
+```
+
+Or
+
+```
+$ pip3 install --user packitos
+```
+
+(packit project on PyPI is NOT this packit project)
+
+You can also install packit from master branch, if you are brave enough:
 
 ```
 $ pip3 install --user git+https://github.com/packit-service/packit.git
@@ -137,6 +151,8 @@ Please, open a PR if you want to be on the list, or just let us know.
 * anaconda (@jkonecny12)
 * [greenboot](https://github.com/LorbusChris/greenboot/) (@LorbusChris)
 * rebase-helper (@nforro)
+* ABRT
+
 
 ## Resources
 
