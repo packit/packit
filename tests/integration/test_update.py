@@ -130,7 +130,12 @@ def mock_update_workflow(upstream_n_distgit):
 
     flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
 
-    flexmock(DistGit, push_to_fork=lambda *args, **kwargs: None)
+    flexmock(
+        DistGit,
+        push_to_fork=lambda *args, **kwargs: None,
+        # let's not hammer the production lookaside cache webserver
+        is_archive_on_lookaside_cache=lambda archive_path: False,
+    )
 
     def mocked_new_sources(sources=None):
         if not Path(sources).is_file():

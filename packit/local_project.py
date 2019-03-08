@@ -26,6 +26,7 @@ class LocalProject:
         path_or_url: str = None,
     ) -> None:
 
+        self.working_dir_temporary = False
         if path_or_url:
             if os.path.isdir(path_or_url):
                 working_dir = working_dir or path_or_url
@@ -48,7 +49,6 @@ class LocalProject:
         self.full_name = full_name
         self.repo_name = repo_name
         self.namespace = namespace
-        self.working_dir_temporary = False
 
         change = True
         while change:

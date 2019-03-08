@@ -26,20 +26,20 @@ logger = logging.getLogger(__file__)
     help="Path to dist-git repo to work in. "
     "Otherwise clone the repo in a temporary directory.",
 )
-@click.option(
-    "--upstream-git-path", help="Path to the upstream git repository.", default="."
-)
 @click.argument(
     "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @pass_config
 @cover_packit_exception
-def update(config, dist_git_path, upstream_git_path, dist_git_branch, repo):
+def update(config, dist_git_path, dist_git_branch, repo):
     """
     Release current upstream release into Fedora
+
+    REPO argument is a local path to the upstream git repository,
+    it defaults to the current working directory
     """
     package_config = get_local_package_config(directory=repo.working_dir)
     package_config.downstream_project_url = dist_git_path
-    package_config.upstream_project_url = upstream_git_path
+    package_config.upstream_project_url = repo.working_dir
     api = PackitAPI(config=config, package_config=package_config)
     api.sync_release(dist_git_branch)
