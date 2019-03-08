@@ -40,6 +40,6 @@ def update(config, dist_git_path, dist_git_branch, repo):
     """
     package_config = get_local_package_config(directory=repo.working_dir)
     package_config.downstream_project_url = dist_git_path
-    package_config.upstream_project_url = repo
+    package_config.upstream_project_url = repo.working_dir
     api = PackitAPI(config=config, package_config=package_config)
     api.sync_release(dist_git_branch)
