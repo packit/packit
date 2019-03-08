@@ -106,7 +106,8 @@ class PackitAPI:
 
         if add_new_sources:
             archive = distgit.download_upstream_archive()
-            distgit.upload_to_lookaside_cache(archive)
+            if not distgit.is_archive_on_lookaside_cache(archive):
+                distgit.upload_to_lookaside_cache(archive)
 
         distgit.commit(title=commit_msg, msg=commit_msg_description)
         # the branch may already be up, let's push forcefully
