@@ -70,7 +70,7 @@ class PackitAPI:
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
             logger.info(f'using "{dist_git_branch}" dist-git branch')
-            dg.checkout_branch(dist_git_branch)
+            dg.checkout_branch(dist_git_branch, fetch_latest=True)
             dg.create_branch(local_pr_branch)
             dg.checkout_branch(local_pr_branch)
 
@@ -122,3 +122,17 @@ class PackitAPI:
             source_branch=distgit.local_project.ref,
             target_branch=dist_git_branch,
         )
+
+    def build(self, dist_git_branch: str, scratch: bool = False):
+        """
+        Build component in koji
+
+        :param dist_git_branch: ref in dist-git
+        :param scratch: should the build be a scratch build?
+        """
+        dg = DistGit(config=self.config, package_config=self.package_config)
+
+        logger.info(f'using "{dist_git_branch}" dist-git branch')
+        dg.checkout_branch(dist_git_branch, fetch_latest=True)
+
+        dg.build(scratch=scratch)

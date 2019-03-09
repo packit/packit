@@ -32,6 +32,7 @@ def get_rev_list_kwargs(opt_list):
     return result
 
 
+# TODO: we should use run_cmd from conu
 def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
     logger.debug("cmd = %s", cmd)
     if not isinstance(cmd, list):
@@ -50,12 +51,14 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         universal_newlines=True,
     )
 
-    logger.debug("%s", shell.stdout)
+    if not output:
+        # output is returned, let the caller process it
+        logger.debug("%s", shell.stdout)
     logger.error("%s", shell.stderr)
 
     if shell.returncode != 0:
         logger.error("Command %s failed", shell.args)
-        logger.info("%s", error_message)
+        logger.error("%s", error_message)
         if fail:
             raise PackitException(f"Command {shell.args!r} failed.")
         success = False
@@ -95,7 +98,21 @@ class FedPKG:
             fail=fail,
         )
 
+    def build(self, scratch: bool = False):
+        cmd = [self.fedpkg_exec, "build", "--nowait"]
+        if scratch:
+            cmd.append("--scratch")
+        out = run_command(
+            cmd=cmd,
+            cwd=self.directory,
+            error_message="Submission of build to koji failed.",
+            fail=True,
+            output=True
+        )
+        logger.info("%s", out)
+
     def init_ticket(self, keytab: str = None):
+        # TODO: this method has nothing to do with fedpkg, pull it out
         if not keytab:
             logger.info("won't be doing kinit, no credentials provided")
             return

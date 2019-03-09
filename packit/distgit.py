@@ -87,16 +87,26 @@ class DistGit:
         # what if the branch already exists?
         self.local_project.git_repo.create_head(branch_nane, commit=base)
 
-    def checkout_branch(self, git_ref: str):
+    def checkout_branch(self, git_ref: str, fetch_latest: bool = False):
         """
         Perform a `git checkout`
+
+        :param git_ref: ref to check out
+        :param fetch_latest: fetch latest content from the remote and check it out
         """
+        full_ref = f"remotes/origin/{git_ref}"
+        if fetch_latest:
+            # this is very suboptimal since we fetch every ref from every remote
+            for remote in self.local_project.git_repo.remotes:
+                remote.fetch()
         if git_ref in self.local_project.git_repo.heads:
             head = self.local_project.git_repo.heads[git_ref]
         else:
             head = self.local_project.git_repo.create_head(
-                git_ref, commit=f"remotes/origin/{git_ref}"
+                git_ref, commit=full_ref
             )
+        if fetch_latest:
+            head.set_commit(full_ref)
         head.checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
@@ -301,3 +311,12 @@ class DistGit:
             f"Patches ({len(patch_list)}) added to the specfile ({self.specfile_path})"
         )
         self.local_project.git_repo.index.write()
+
+    def build(self, scratch: bool = False):
+        """
+        Perform a `fedpkg build` in the repository
+
+        :param scratch: should the build be a scratch build?
+        """
+        fpkg = FedPKG(directory=self.local_project.working_dir)
+        fpkg.build(scratch=scratch)
