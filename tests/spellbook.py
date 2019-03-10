@@ -48,3 +48,8 @@ def git_add_n_commit(directory, tag=None, upstream_remote="https://lol.wat", pus
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
         subprocess.check_call(["git", "push", "-u", "origin", "master:master"], cwd=directory)
+
+
+def prepare_dist_git_repo(directory):
+    subprocess.check_call(["git", "branch", "f30"], cwd=directory)
+    subprocess.check_call(["git", "push", "-u", "origin", "f30:f30"], cwd=directory)
