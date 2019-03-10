@@ -14,6 +14,7 @@ from rebasehelper.specfile import SpecFile
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.utils import FedPKG
+from tests.spellbook import prepare_dist_git_repo
 from .spellbook import TARBALL_NAME, UPSTREAM, git_add_n_commit, DISTGIT
 
 
@@ -62,7 +63,7 @@ def mock_remote_functionality(upstream_n_distgit):
         push_to_fork=lambda *args, **kwargs: None,
         # let's not hammer the production lookaside cache webserver
         is_archive_on_lookaside_cache=lambda archive_path: False,
-        build=lambda: None,
+        build=lambda scratch: None,
     )
 
     def mocked_new_sources(sources=None):
@@ -93,5 +94,6 @@ def upstream_n_distgit(tmpdir):
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
     git_add_n_commit(d, push=True, upstream_remote=str(u_remote))
+    prepare_dist_git_repo(d)
 
     return u, d
