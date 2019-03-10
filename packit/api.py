@@ -3,6 +3,7 @@ This is the official python interface for packit.
 """
 
 import logging
+from typing import Sequence
 
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
@@ -145,3 +146,19 @@ class PackitAPI:
         dg.checkout_branch(dist_git_branch)
 
         dg.build(scratch=scratch)
+
+    def create_update(self, dist_git_branch: str, update_type: str,
+                      update_notes: str, koji_builds: Sequence[str] = None):
+        """
+        Create bodhi update
+
+        :param dist_git_branch: git ref
+        :param update_type: type of the update, check CLI
+        :param update_notes: documentation about the update
+        :param koji_builds: list of koji builds or None (and pick latest)
+        """
+        logger.debug("create bodhi update, builds=%s, dg_branch=%s, type=%s",
+                     koji_builds, dist_git_branch, update_type)
+        dg = DistGit(config=self.config, package_config=self.package_config)
+        dg.create_bodhi_update(koji_builds=koji_builds, dist_git_branch=dist_git_branch,
+                               update_notes=update_notes, update_type=update_type)
