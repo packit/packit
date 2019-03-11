@@ -5,6 +5,7 @@ from pkg_resources import get_distribution
 
 from packit.cli.sourcegit_to_dist_git import sg2dg
 from packit.cli.sourcegit_to_srpm import sg2srpm
+from packit.cli.build import build
 from packit.cli.update import update
 from packit.cli.watch_fedora_ci import watcher
 from packit.cli.watch_sg_pr import watch_pr
@@ -47,6 +48,7 @@ packit_base.add_command(version)
 # packit_base.add_command(watch_pr)
 packit_base.add_command(watch_releases)
 packit_base.add_command(update)
+packit_base.add_command(build)
 
 if __name__ == "__main__":
     packit_base()

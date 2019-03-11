@@ -7,7 +7,9 @@ import tempfile
 
 import git
 
-logger = logging.getLogger(__file__)
+from packit.exceptions import PackitException
+
+logger = logging.getLogger(__name__)
 
 
 def get_rev_list_kwargs(opt_list):
@@ -30,8 +32,11 @@ def get_rev_list_kwargs(opt_list):
     return result
 
 
+# TODO: we should use run_cmd from conu
 def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
+    logger.debug("cmd = %s", cmd)
     if not isinstance(cmd, list):
+        logger.debug("cmd = '%s'", " ".join(cmd))
         cmd = shlex.split(cmd)
 
     cwd = cwd or os.getcwd()
@@ -46,12 +51,16 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         universal_newlines=True,
     )
 
-    logger.debug(f"{shell.args}\n{shell.stdout}")
+    if not output:
+        # output is returned, let the caller process it
+        logger.debug("%s", shell.stdout)
+    logger.error("%s", shell.stderr)
 
     if shell.returncode != 0:
-        logger.error(f"{error_message}\n{shell.stderr}")
+        logger.error("Command %s failed", shell.args)
+        logger.error("%s", error_message)
         if fail:
-            raise Exception(f"{shell.args!r} failed with {error_message!r}")
+            raise PackitException(f"Command {shell.args!r} failed.")
         success = False
     else:
         success = True
@@ -69,31 +78,49 @@ class FedPKG:
     https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
     """
 
-    def __init__(self, fas_username, directory, stage=False):
+    def __init__(self, fas_username:str = None, directory: str = None, stage: bool = False):
         self.fas_username = fas_username
         self.directory = directory
         self.stage = stage
+        if stage:
+            self.fedpkg_exec = "fedpkg-stage"
+        else:
+            self.fedpkg_exec = "fedpkg"
 
     def new_sources(self, sources="", fail=True):
         if not os.path.isdir(self.directory):
             raise Exception("Cannot access fedpkg repository:")
 
         return run_command(
-            cmd=f"fedpkg{'-stage' if self.stage else ''} new-sources {sources}",
+            cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
             error_message=f"Adding new sources failed:",
             fail=fail,
         )
 
+    def build(self, scratch: bool = False):
+        cmd = [self.fedpkg_exec, "build", "--nowait"]
+        if scratch:
+            cmd.append("--scratch")
+        out = run_command(
+            cmd=cmd,
+            cwd=self.directory,
+            error_message="Submission of build to koji failed.",
+            fail=True,
+            output=True
+        )
+        logger.info("%s", out)
+
     def init_ticket(self, keytab: str = None):
+        # TODO: this method has nothing to do with fedpkg, pull it out
         if not keytab:
             logger.info("won't be doing kinit, no credentials provided")
             return
         if keytab and os.path.isfile(keytab):
-            cmd = f"kinit {self.fas_username}@FEDORAPROJECT.ORG -k -t {keytab}"
+            cmd = ["kinit", f"{self.fas_username}@FEDORAPROJECT.ORG", "-k", "-t", keytab]
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
-            cmd = f"kinit -R {self.fas_username}@FEDORAPROJECT.ORG"
+            cmd = ["kinit", "-R", f"{self.fas_username}@FEDORAPROJECT.ORG"]
         return run_command(
             cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
         )

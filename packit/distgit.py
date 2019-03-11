@@ -3,6 +3,7 @@ import os
 import shutil
 from typing import Optional, List, Tuple
 
+import git
 import requests
 from rebasehelper.specfile import SpecFile
 
@@ -80,23 +81,57 @@ class DistGit:
             )
         return self._specfile
 
-    def create_branch(self, branch_nane: str, base: str = "HEAD"):
+    def create_branch(self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False) -> git.Head:
         """
         Create a new git branch in dist-git
+
+        :param branch_name: name of the branch to check out and fetch
+        :param base: we base our new branch on this one
+        :param setup_tracking: set up remote tracking (exc will be raised if the branch is not in the remote)
+        :return the branch which was just created
         """
-        # what if the branch already exists?
-        self.local_project.git_repo.create_head(branch_nane, commit=base)
+        # it's not an error if the branch already exists
+        origin = self.local_project.git_repo.remote("origin")
+        head = self.local_project.git_repo.create_head(branch_name, commit=base)
+
+        if setup_tracking:
+            try:
+                remote_ref = origin.refs[branch_name]
+            except IndexError:
+                raise PackitException("Remote origin doesn't have ref %s" % branch_name)
+            # this is important to fedpkg: build can't find the tracking branch otherwise
+            head.set_tracking_branch(remote_ref)
+
+        return head
+
+    def update_branch(self, branch_name: str):
+        """
+        Fetch latest commits to the selected branch; tracking needs to be set up
+
+        :param branch_name: name of the branch to check out and fetch
+        """
+        origin = self.local_project.git_repo.remote("origin")
+        origin.fetch()
+        try:
+            head = self.local_project.git_repo.heads[branch_name]
+        except IndexError:
+            raise PackitException(f"Branch {branch_name} does not exist")
+        try:
+            remote_ref = origin.refs[branch_name]
+        except IndexError:
+            raise PackitException(f"Branch {branch_name} does not exist in the origin remote.")
+        head.set_commit(remote_ref)
 
     def checkout_branch(self, git_ref: str):
         """
         Perform a `git checkout`
+
+        :param git_ref: ref to check out
         """
-        if git_ref in self.local_project.git_repo.heads:
+        try:
             head = self.local_project.git_repo.heads[git_ref]
-        else:
-            head = self.local_project.git_repo.create_head(
-                git_ref, commit=f"remotes/origin/{git_ref}"
-            )
+        except IndexError:
+            raise PackitException(f"Branch {git_ref} does not exist")
         head.checkout()
 
     def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
@@ -301,3 +336,12 @@ class DistGit:
             f"Patches ({len(patch_list)}) added to the specfile ({self.specfile_path})"
         )
         self.local_project.git_repo.index.write()
+
+    def build(self, scratch: bool = False):
+        """
+        Perform a `fedpkg build` in the repository
+
+        :param scratch: should the build be a scratch build?
+        """
+        fpkg = FedPKG(directory=self.local_project.working_dir)
+        fpkg.build(scratch=scratch)
