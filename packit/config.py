@@ -71,7 +71,7 @@ def get_default_map_from_file() -> Optional[dict]:
 def get_context_settings() -> dict:
     return dict(
         help_option_names=["-h", "--help"],
-        auto_envvar_prefix="SOURCE_GIT",
+        auto_envvar_prefix="PACKIT",
         default_map=get_default_map_from_file(),
     )
 
