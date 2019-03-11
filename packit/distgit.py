@@ -296,8 +296,8 @@ class DistGit:
                 shutil.copy2(src, self.local_project.working_dir)
             else:
                 raise PackitException(
-                    "File %s is not present in the upstream repository. "
-                    f"Upstream ref {upstream_project.git_repo.active_branch} is checked out"
+                    f"File {fi} is not present in the upstream repository. "
+                    f"Upstream ref {upstream_project.git_repo.head} is checked out"
                 )
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
