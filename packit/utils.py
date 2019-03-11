@@ -73,13 +73,17 @@ class FedPKG:
         self.fas_username = fas_username
         self.directory = directory
         self.stage = stage
+        if stage:
+            self.fedpkg_exec = "fedpkg-stage"
+        else:
+            self.fedpkg_exec = "fedpkg"
 
     def new_sources(self, sources="", fail=True):
         if not os.path.isdir(self.directory):
             raise Exception("Cannot access fedpkg repository:")
 
         return run_command(
-            cmd=f"fedpkg{'-stage' if self.stage else ''} new-sources {sources}",
+            cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
             error_message=f"Adding new sources failed:",
             fail=fail,
@@ -90,10 +94,10 @@ class FedPKG:
             logger.info("won't be doing kinit, no credentials provided")
             return
         if keytab and os.path.isfile(keytab):
-            cmd = f"kinit {self.fas_username}@FEDORAPROJECT.ORG -k -t {keytab}"
+            cmd = ["kinit", f"{self.fas_username}@FEDORAPROJECT.ORG", "-k", "-t", keytab]
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
-            cmd = f"kinit -R {self.fas_username}@FEDORAPROJECT.ORG"
+            cmd = ["kinit", "-R", f"{self.fas_username}@FEDORAPROJECT.ORG"]
         return run_command(
             cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
         )
