@@ -5,7 +5,6 @@ from typing import Optional, List, Tuple, Sequence
 
 import git
 import requests
-from bodhi.client.bindings import BodhiClient
 from ogr.services.pagure import PagureService
 from rebasehelper.specfile import SpecFile
 
@@ -351,6 +350,9 @@ class DistGit:
             self, dist_git_branch: str, update_type: str,
             update_notes: str, koji_builds: Sequence[str] = None
     ):
+        # https://github.com/fedora-infra/bodhi/issues/3058
+        from bodhi.client.bindings import BodhiClient
+
         if not self.package_name:
             raise PackitException("Package name is not set.")
         # bodhi will likely prompt for username and password if kerb ticket is not up

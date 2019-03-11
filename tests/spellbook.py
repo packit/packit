@@ -53,3 +53,12 @@ def git_add_n_commit(directory, tag=None, upstream_remote="https://lol.wat", pus
 def prepare_dist_git_repo(directory):
     subprocess.check_call(["git", "branch", "f30"], cwd=directory)
     subprocess.check_call(["git", "push", "-u", "origin", "f30:f30"], cwd=directory)
+
+
+def can_a_module_be_imported(module_name):
+    """ can a module be imported? """
+    try:
+        __import__(module_name)
+        return True
+    except ImportError:
+        return False
