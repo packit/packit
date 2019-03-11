@@ -126,7 +126,7 @@ class PackitAPI:
         distgit.create_pull(
             pr_title,
             pr_description,
-            source_branch=distgit.local_project.ref,
+            source_branch=str(distgit.local_project.ref),
             target_branch=dist_git_branch,
         )
 
