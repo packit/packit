@@ -24,13 +24,14 @@ class LocalProject:
         namespace: str = None,
         repo_name: str = None,
         path_or_url: str = None,
+        offline: bool = False,
     ) -> None:
 
         self.working_dir_temporary = False
         if path_or_url:
             if os.path.isdir(path_or_url):
                 working_dir = working_dir or path_or_url
-            else:
+            elif not offline:
                 try:
                     res = requests.head(path_or_url)
                     if res.ok:
@@ -71,13 +72,14 @@ class LocalProject:
                 and self.namespace
                 and self.git_service
                 and not self.git_project
+                and not offline
             ):
                 self.git_project = self.git_service.get_project(
                     repo=self.repo_name, namespace=self.namespace
                 )
                 change = True
 
-            if self.git_project and not self.git_service:
+            if self.git_project and not self.git_service and not offline:
                 self.git_service = self.git_project.service
                 change = True
 
@@ -100,7 +102,7 @@ class LocalProject:
                     self.git_repo = git.Repo(path=self.working_dir)
                     logger.debug("it's a git repo!")
                     change = True
-                elif self.git_url:
+                elif self.git_url and not offline:
                     self.git_repo = get_repo(
                         url=self.git_url, directory=self.working_dir
                     )
@@ -111,7 +113,12 @@ class LocalProject:
                     )
                     change = True
 
-            if self.git_url and not self.working_dir and not self.git_repo:
+            if (
+                self.git_url
+                and not self.working_dir
+                and not self.git_repo
+                and not offline
+            ):
                 self.git_repo = get_repo(url=self.git_url)
                 self.working_dir_temporary = True
                 change = True
