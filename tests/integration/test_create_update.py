@@ -1,14 +1,18 @@
 from os import chdir
 
 import pytest
-from bodhi.client.bindings import BodhiClient
 from flexmock import flexmock
 
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
-from tests.spellbook import get_test_config
+from tests.spellbook import get_test_config, can_a_module_be_imported
 
 
+# FIXME: https://github.com/fedora-infra/bodhi/issues/3058
+@pytest.mark.skipif(
+    not can_a_module_be_imported("bodhi"),
+    reason="bodhi not present, skipping"
+)
 @pytest.mark.parametrize(
     "branch,update_type,update_notes,koji_builds",
     ((
@@ -25,6 +29,8 @@ from tests.spellbook import get_test_config
 )
 def test_basic_bodhi_update(
         upstream_n_distgit, mock_remote_functionality, branch, update_type, update_notes, koji_builds):
+    # https://github.com/fedora-infra/bodhi/issues/3058
+    from bodhi.client.bindings import BodhiClient
     u, d = upstream_n_distgit
     chdir(u)
     c = get_test_config()
