@@ -7,6 +7,8 @@ import tempfile
 
 import git
 
+from packit.exceptions import PackitException
+
 logger = logging.getLogger(__file__)
 
 
@@ -31,7 +33,9 @@ def get_rev_list_kwargs(opt_list):
 
 
 def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
+    logger.debug("cmd = %s", cmd)
     if not isinstance(cmd, list):
+        logger.debug("cmd = '%s'", " ".join(cmd))
         cmd = shlex.split(cmd)
 
     cwd = cwd or os.getcwd()
@@ -46,12 +50,14 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         universal_newlines=True,
     )
 
-    logger.debug(f"{shell.args}\n{shell.stdout}")
+    logger.debug("%s", shell.stdout)
+    logger.error("%s", shell.stderr)
 
     if shell.returncode != 0:
-        logger.error(f"{error_message}\n{shell.stderr}")
+        logger.error("Command %s failed", shell.args)
+        logger.info("%s", error_message)
         if fail:
-            raise Exception(f"{shell.args!r} failed with {error_message!r}")
+            raise PackitException(f"Command {shell.args!r} failed.")
         success = False
     else:
         success = True
