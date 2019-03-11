@@ -9,7 +9,7 @@ import git
 
 from packit.exceptions import PackitException
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 def get_rev_list_kwargs(opt_list):
