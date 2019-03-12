@@ -1,6 +1,8 @@
 import tempfile
+from os import path
 
 import git
+import requests
 from flexmock import flexmock
 
 from packit import local_project, utils
@@ -267,3 +269,79 @@ def test_local_project_offline_no_clone_no_temp_dir():
     assert project.git_url == "http://some.example/url"
     assert not project.git_repo
     assert not project.working_dir
+
+
+def test_local_project_path_or_url_path():
+    """isdir=True"""
+    flexmock(path).should_receive("isdir").and_return(True).once()
+    project = LocalProject(
+        path_or_url="some/example/path",
+        git_repo=flexmock(branches={"other": flexmock(checkout=lambda: None)}),
+        git_url="nothing",
+        ref="other",
+    )
+
+    assert project.working_dir == "some/example/path"
+    assert project.git_repo
+    assert project.git_url == "nothing"
+
+
+def test_local_project_path_or_url_overwrite():
+    """overwrite the path_or_url with working_dir"""
+    flexmock(path).should_receive("isdir").and_return(True).once()
+    project = LocalProject(
+        path_or_url="some/example/path",
+        working_dir="new/dir",
+        git_repo=flexmock(branches={"other": flexmock(checkout=lambda: None)}),
+        git_url="nothing",
+        ref="other",
+    )
+
+    assert project.working_dir == "new/dir"
+    assert project.git_repo
+    assert project.git_url == "nothing"
+
+
+def test_local_project_path_or_url_url():
+    """isdir=False requests.head => ok=True"""
+    flexmock(path).should_receive("isdir").and_return(False).once()
+    flexmock(requests).should_receive("head").and_return(flexmock(ok=True)).once()
+
+    project = LocalProject(
+        path_or_url="http://some.example/url",
+        git_repo=flexmock(branches={"other": flexmock(checkout=lambda: None)}),
+        working_dir="nothing",
+        ref="other",
+    )
+
+    assert project.git_url == "http://some.example/url"
+    assert project.git_repo
+    assert project.working_dir == "nothing"
+
+
+def test_local_project_path_or_url_url_overwrite():
+    """overwrite the path_or_url with git_url"""
+    flexmock(path).should_receive("isdir").and_return(False).once()
+    flexmock(requests).should_receive("head").and_return(flexmock(ok=True)).once()
+
+    project = LocalProject(
+        path_or_url="http://some.example/url",
+        git_repo=flexmock(branches={"other": flexmock(checkout=lambda: None)}),
+        working_dir="nothing",
+        git_url="http://some.new/url",
+        ref="other",
+    )
+
+    assert project.git_url == "http://some.new/url"
+    assert project.git_repo
+    assert project.working_dir == "nothing"
+
+
+def test_local_project_path_or_url_nok():
+    """isdir=False requests.head => ok=False"""
+    flexmock(path).should_receive("isdir").and_return(False).once()
+    flexmock(requests).should_receive("head").and_return(flexmock(ok=False)).once()
+
+    project = LocalProject(path_or_url="http://some.example/url")
+
+    assert not project.git_url
