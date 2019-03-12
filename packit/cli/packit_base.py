@@ -3,12 +3,9 @@ import logging
 import click
 from pkg_resources import get_distribution
 
-from packit.cli.sourcegit_to_dist_git import sg2dg
-from packit.cli.sourcegit_to_srpm import sg2srpm
+from packit.cli.create_update import create_update
 from packit.cli.build import build
 from packit.cli.update import update
-from packit.cli.watch_fedora_ci import watcher
-from packit.cli.watch_sg_pr import watch_pr
 from packit.cli.watch_upstream_release import watch_releases
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
@@ -49,6 +46,7 @@ packit_base.add_command(version)
 packit_base.add_command(watch_releases)
 packit_base.add_command(update)
 packit_base.add_command(build)
+packit_base.add_command(create_update)
 
 if __name__ == "__main__":
     packit_base()
