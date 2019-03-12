@@ -38,7 +38,7 @@ def github_release_fedmsg():
     }
 
 
-def test_basic_local_update(upstream_n_distgit, mock_remote_functionality):
+def test_basic_local_update(upstream_n_distgit, mock_upstream_remote_functionality):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d = upstream_n_distgit
 
@@ -56,8 +56,27 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality):
     assert spec.get_full_version() == "0.1.0"
 
 
-def test_single_message(github_release_fedmsg, mock_remote_functionality):
-    u, d = mock_remote_functionality
+def test_basic_local_update_from_downstream(
+    downstream_n_distgit, mock_downstream_remote_functionality
+):
+    """ basic propose-update test: mock remote API, use local upstream and dist-git """
+    u, d = downstream_n_distgit
+
+    chdir(u)
+    c = get_test_config()
+    pc = get_local_package_config(str(u))
+    pc.upstream_project_url = str(u)
+    pc.downstream_project_url = str(d)
+    api = PackitAPI(c, pc)
+    api.sync_from_downstream("master", "master", True)
+
+    assert (u / "beer.spec").is_file()
+    spec = SpecFile(str(u / "beer.spec"), None)
+    assert spec.get_version() == "0.0.0"
+
+
+def test_single_message(github_release_fedmsg, mock_upstream_remote_functionality):
+    u, d = mock_upstream_remote_functionality
 
     conf = get_test_config()
     api = PackitBotAPI(conf)
@@ -67,7 +86,7 @@ def test_single_message(github_release_fedmsg, mock_remote_functionality):
     assert spec.get_full_version() == "0.1.0"
 
 
-def test_loop(mock_remote_functionality, github_release_fedmsg):
+def test_loop(mock_upstream_remote_functionality, github_release_fedmsg):
     def mocked_iter_releases():
         msg = copy.deepcopy(github_release_fedmsg)
         yield msg["topic"], msg
