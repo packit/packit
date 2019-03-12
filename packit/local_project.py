@@ -123,7 +123,7 @@ class LocalProject:
                 self.working_dir_temporary = True
                 change = True
 
-            if self.git_project and not self.git_url:
+            if self.git_project and not self.git_url and not offline:
                 self.git_url = self.git_project.get_git_urls()["git"]
                 change = True
 

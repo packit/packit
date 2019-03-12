@@ -1,7 +1,9 @@
+import tempfile
+
 import git
 from flexmock import flexmock
 
-from packit import local_project
+from packit import local_project, utils
 from packit.local_project import LocalProject
 
 
@@ -185,7 +187,6 @@ def test_local_project_repo_from_working_dir():
 
 
 def test_local_project_dir_url():
-
     flexmock(local_project).should_receive("get_repo").with_args(
         "http://some.example/url", "some/example/path"
     ).and_return(
@@ -206,3 +207,63 @@ def test_local_project_dir_url():
     assert project.git_repo.active_branch == "branch"
     assert project.git_repo.working_dir == "some/example/path"
     assert not project.working_dir_temporary
+
+
+def test_local_project_offline_git_project():
+    """No get_project on offline"""
+
+    project = LocalProject(
+        repo_name="repo_name",
+        namespace="namespace",
+        git_service=flexmock().should_receive("get_project").times(0).mock(),
+        offline=True,
+    )
+    assert project.repo_name == "repo_name"
+    assert project.namespace == "namespace"
+    assert project.git_service
+    assert not project.git_project
+
+
+def test_local_project_offline_git_service():
+    """No git service on on offline"""
+
+    project = LocalProject(
+        repo_name="repo_name",
+        namespace="namespace",
+        git_project=flexmock(service="something")
+        .should_receive("get_git_urls")
+        .times(0)
+        .mock(),
+        offline=True,
+    )
+    assert project.repo_name == "repo_name"
+    assert project.namespace == "namespace"
+    assert project.git_project
+    assert not project.git_service
+    assert not project.git_url
+
+
+def test_local_project_offline_no_clone():
+    """No clone on offline"""
+    flexmock(utils).should_receive("get_repo").times(0)
+    flexmock(tempfile).should_receive("mkdtemp").times(0)
+    flexmock(git.Repo).should_receive("clone_from").times(0)
+
+    project = LocalProject(
+        working_dir="some/example/path", git_url="http://some.example/url", offline=True
+    )
+    assert project.working_dir == "some/example/path"
+    assert project.git_url == "http://some.example/url"
+    assert not project.git_repo
+
+
+def test_local_project_offline_no_clone_no_temp_dir():
+    """No clone on offline, no temp dir"""
+    flexmock(utils).should_receive("get_repo").times(0)
+    flexmock(tempfile).should_receive("mkdtemp").times(0)
+    flexmock(git.Repo).should_receive("clone_from").times(0)
+    project = LocalProject(git_url="http://some.example/url", offline=True)
+
+    assert project.git_url == "http://some.example/url"
+    assert not project.git_repo
+    assert not project.working_dir
