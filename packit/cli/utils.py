@@ -29,7 +29,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         def covered_func(config=None, *args, **kwargs):
             try:
                 if config:
-                    func(config, *args, **kwargs)
+                    func(config=config, *args, **kwargs)
                 else:
                     func(*args, **kwargs)
             except KeyboardInterrupt:
