@@ -1,5 +1,4 @@
 import pytest
-from click.testing import CliRunner
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
@@ -7,35 +6,26 @@ from packit.cli.packit_base import packit_base
 from packit.cli.packit_base import version as cli_version
 from packit.cli.update import update
 from packit.cli.watch_upstream_release import watch_releases
-
-
-def _call_packit(fnc=None, parameters=None, envs=None):
-    fnc = fnc or packit_base
-    runner = CliRunner()
-    envs = envs or {}
-    if not parameters:
-        return runner.invoke(fnc, env=envs)
-    else:
-        return runner.invoke(fnc, parameters, env=envs)
+from tests.spellbook import call_packit
 
 
 def test_base_help():
-    result = _call_packit(parameters=["--help"])
+    result = call_packit(parameters=["--help"])
     assert result.exit_code == 0
     assert "Usage: packit [OPTIONS] COMMAND [ARGS]..." in result.output
 
 
 def test_base_version_direct():
     # This test requires packit on pythonpath
-    result = _call_packit(cli_version)
+    result = call_packit(cli_version)
     assert result.exit_code == 0
 
 
 def test_base_version():
     # This test requires packit on pythonpath
-    result = _call_packit(parameters=["version"])
+    result = call_packit(parameters=["version"])
     assert result.exit_code == 0
-    # TODO: figurate the correct version getter:
+    # TODO: figure out the correct version getter:
     # version = get_version(root="../..", relative_to=__file__)
     # name_ver = get_distribution(__name__).version
     # packit_ver = get_distribution("packit").version
@@ -45,7 +35,7 @@ def test_base_version():
 
 @pytest.mark.parametrize("cmd_function", [update, watch_releases, build, create_update])
 def test_base_subcommand_direct(cmd_function):
-    result = _call_packit(cmd_function, parameters=["--help"])
+    result = call_packit(cmd_function, parameters=["--help"])
     assert result.exit_code == 0
 
 
@@ -53,6 +43,6 @@ def test_base_subcommand_direct(cmd_function):
     "subcommand", ["propose-update", "watch-releases", "build", "create-update"]
 )
 def test_base_subcommand_help(subcommand):
-    result = _call_packit(packit_base, parameters=[subcommand, "--help"])
+    result = call_packit(packit_base, parameters=[subcommand, "--help"])
     assert result.exit_code == 0
     assert f"Usage: packit {subcommand} [OPTIONS]" in result.output
