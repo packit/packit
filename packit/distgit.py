@@ -1,13 +1,13 @@
 import logging
 import os
 import shutil
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Sequence
 
 import git
 import requests
+from ogr.services.pagure import PagureService
 from rebasehelper.specfile import SpecFile
 
-from ogr.services.pagure import PagureService
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -296,8 +296,8 @@ class DistGit:
                 shutil.copy2(src, self.local_project.working_dir)
             else:
                 raise PackitException(
-                    "File %s is not present in the upstream repository. "
-                    f"Upstream ref {upstream_project.git_repo.active_branch} is checked out"
+                    f"File {fi} is not present in the upstream repository. "
+                    f"Upstream ref {upstream_project.git_repo.head} is checked out"
                 )
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
@@ -345,3 +345,33 @@ class DistGit:
         """
         fpkg = FedPKG(directory=self.local_project.working_dir)
         fpkg.build(scratch=scratch)
+
+    def create_bodhi_update(
+            self, dist_git_branch: str, update_type: str,
+            update_notes: str, koji_builds: Sequence[str] = None
+    ):
+        # https://github.com/fedora-infra/bodhi/issues/3058
+        from bodhi.client.bindings import BodhiClient
+
+        if not self.package_name:
+            raise PackitException("Package name is not set.")
+        # bodhi will likely prompt for username and password if kerb ticket is not up
+        b = BodhiClient()
+        if not koji_builds:
+            # alternatively we can call something like `koji latest-build rawhide sen`
+            builds_d = b.latest_builds(self.package_name)
+            koji_tag = f"{dist_git_branch}-updates-candidate"
+            try:
+                koji_builds = [builds_d[koji_tag]]
+            except KeyError:
+                raise PackitException(
+                    f"There is no build for {self.package_name} in koji tag {koji_tag}")
+        # I was thinking of verifying that the build is valid for a new bodhi update
+        # but in the end it's likely a waste of resources since bodhi will tell us
+
+        rendered_note = update_notes.format(version=self.specfile.get_full_version())
+        b.save(
+            builds=koji_builds,
+            notes=rendered_note,
+            type=update_type
+        )
