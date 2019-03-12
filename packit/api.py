@@ -63,7 +63,7 @@ class PackitAPI:
 
         dg = DistGit(config=self.config, package_config=self.package_config)
 
-        full_version = version or up.get_upstream_version()
+        full_version = version or up.get_specfile_version()
         current_up_branch = up.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
