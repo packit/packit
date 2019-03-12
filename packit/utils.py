@@ -54,13 +54,15 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
     if not output:
         # output is returned, let the caller process it
         logger.debug("%s", shell.stdout)
-    logger.error("%s", shell.stderr)
+    stderr = shell.stderr.strip()
+    if stderr:
+        logger.error("%s", shell.stderr)
 
     if shell.returncode != 0:
         logger.error("Command %s failed", shell.args)
         logger.error("%s", error_message)
         if fail:
-            raise PackitException(f"Command {shell.args!r} failed.")
+            raise PackitException(f"Command {shell.args!r} failed: {error_message}")
         success = False
     else:
         success = True
