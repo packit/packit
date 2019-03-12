@@ -128,7 +128,7 @@ class Upstream:
         :return: [(patch_name, msg)] list of created patches (tuple of the file name and commit msg)
         """
 
-        upstream = upstream or self.get_upstream_version()
+        upstream = upstream or self.get_specfile_version()
         commits = self.get_commits_to_upstream(upstream, add_usptream_head_commit=True)
         patch_list = []
 
@@ -163,16 +163,21 @@ class Upstream:
 
         return patch_list
 
-    def get_upstream_version(self):
-        return (
-            versioneers_runner.run(
-                versioneer=None,
-                package_name=self.package_config.metadata["package_name"],
-                category=None,
-            )
-            or self.specfile.get_full_version()
+    def get_latest_released_version(self) -> str:
+        """
+        Return version of the upstream project for the latest official release
+
+        :return: the version string (e.g. "1.0.0")
+        """
+        return versioneers_runner.run(
+            versioneer=None,
+            package_name=self.package_config.metadata["package_name"],
+            category=None,
         )
 
+    def get_specfile_version(self) -> str:
+        """ provide version from specfile """
+        return self.specfile.get_full_version()
 
 class SourceGit(Upstream):
     pass
