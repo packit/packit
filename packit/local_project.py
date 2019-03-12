@@ -6,7 +6,7 @@ import git
 import requests
 
 from ogr.abstract import GitProject, GitService
-from packit.utils import is_git_repo, get_repo
+from packit.utils import is_git_repo, get_repo, get_namespace
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +141,8 @@ class LocalProject:
                 # since this can point to a fork
                 # .urls returns generator
                 self.git_url = list(self.git_repo.remote().urls)[0]
-                logger.debug("remote url of the repo is %s", self.git_url)
+                logger.debug(f"remote url of the repo is {self.git_url}")
+                self.namespace = get_namespace(self.git_url)
                 change = True
 
         if ref:

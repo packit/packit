@@ -5,7 +5,7 @@ from packit.config import get_local_package_config
 from tests.spellbook import get_test_config
 
 
-def test_basic_build(upstream_n_distgit, mock_remote_functionality):
+def test_basic_build(upstream_n_distgit, mock_upstream_remote_functionality):
     u, d = upstream_n_distgit
     chdir(u)
     c = get_test_config()
