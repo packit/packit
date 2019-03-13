@@ -24,11 +24,13 @@ def test_base_help():
 
 
 def test_base_version_direct():
+    # This test requires packit on pythonpath
     result = _call_packit(cli_version)
     assert result.exit_code == 0
 
 
 def test_base_version():
+    # This test requires packit on pythonpath
     result = _call_packit(parameters=["version"])
     assert result.exit_code == 0
     # TODO: figurate the correct version getter:
