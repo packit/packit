@@ -73,7 +73,7 @@ class PackitAPI:
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
-            logger.info(f'using "{dist_git_branch}" dist-git branch')
+            logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
             dg.create_branch(dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True)
             dg.update_branch(dist_git_branch)
