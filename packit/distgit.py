@@ -5,9 +5,9 @@ from typing import Optional, List, Tuple, Sequence
 
 import git
 import requests
-from ogr.services.pagure import PagureService
 from rebasehelper.specfile import SpecFile
 
+from ogr.services.pagure import PagureService
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject

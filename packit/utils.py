@@ -78,7 +78,7 @@ class FedPKG:
     https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
     """
 
-    def __init__(self, fas_username:str = None, directory: str = None, stage: bool = False):
+    def __init__(self, fas_username: str = None, directory: str = None, stage: bool = False):
         self.fas_username = fas_username
         self.directory = directory
         self.stage = stage
