@@ -50,8 +50,7 @@ rm -rf %{pypi_name}.egg-info
 %files -n python3-%{real_name}
 %license LICENSE
 %doc README.md
-%{python3_sitelib}/%{real_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%{python3_sitelib}/*
 
 %changelog
 * Mon Mar 04 2019 Frantisek Lachman <flachman@redhat.com> - 0.0.1-1
