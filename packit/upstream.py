@@ -39,6 +39,7 @@ class Upstream:
             return os.path.join(
                 self.local_project.working_dir, f"{self.package_name}.spec"
             )
+        return None
 
     @property
     def local_project(self):
