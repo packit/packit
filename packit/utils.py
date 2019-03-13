@@ -217,10 +217,10 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
 
     # TODO: optimize cloning: single branch and last n commits?
     if is_git_repo(directory=directory):
-        logger.debug("Source git repo exists.")
+        logger.debug(f"Repo already exists in {directory}")
         repo = git.repo.Repo(directory)
     else:
-        logger.info(f"Cloning source-git repo: {url} -> {directory}")
+        logger.info(f"Cloning repo: {url} -> {directory}")
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
