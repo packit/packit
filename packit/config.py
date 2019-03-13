@@ -116,15 +116,17 @@ class PackageConfig:
         downstream_project_url: str = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
-        self.synced_files: Optional[List[str]] = synced_files
-        self.jobs: Optional[List[JobConfig]] = jobs
+        self.synced_files: List[str] = synced_files or []
+        self.jobs: List[JobConfig] = jobs or []
         # TODO: the metadata should have a proper definition and validation
         self.metadata: Optional[dict] = metadata
         self.dist_git_namespace: str = dist_git_namespace
-        self.upstream_project_url: str = upstream_project_url
+        self.upstream_project_url: Optional[str] = upstream_project_url
         self.downstream_project_url: Optional[str] = downstream_project_url
 
-    def __eq__(self, other: "PackageConfig"):
+    def __eq__(self, other: object):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
             self.specfile_path == other.specfile_path
             and self.synced_files == other.synced_files

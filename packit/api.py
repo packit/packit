@@ -25,7 +25,9 @@ class PackitAPI:
         up.checkout_pr(pr_id=pr_id)
         local_pr_branch = f"pull-request-{pr_id}-sync"
         # fetch and reset --hard upstream/$branch?
-        dg.create_branch(dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True)
+        dg.create_branch(
+            dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True
+        )
         dg.update_branch(dist_git_branch)
         dg.checkout_branch(dist_git_branch)
 
@@ -73,9 +75,11 @@ class PackitAPI:
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
-            logger.info(f'using "{dist_git_branch}" dist-git branch')
+            logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
-            dg.create_branch(dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True)
+            dg.create_branch(
+                dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True
+            )
             dg.update_branch(dist_git_branch)
             dg.checkout_branch(dist_git_branch)
 
@@ -113,11 +117,9 @@ class PackitAPI:
     ):
 
         if add_new_sources:
-            archive_name = distgit.get_upstream_archive_name()
             # btw this is really naive: the name could be the same but the hash can be different
-            # we should do something when such situation happens
-            iz_archive_in_lookaside = distgit.is_archive_on_lookaside_cache(archive_name)
-            if not iz_archive_in_lookaside:
+            # TODO: we should do something when such situation happens
+            if not distgit.is_archive_in_lookaside_cache(distgit.upstream_archive_name):
                 archive = distgit.download_upstream_archive()
                 distgit.upload_to_lookaside_cache(archive)
 
@@ -140,8 +142,10 @@ class PackitAPI:
         """
         dg = DistGit(config=self.config, package_config=self.package_config)
 
-        logger.info(f'using "{dist_git_branch}" dist-git branch')
-        dg.create_branch(dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True)
+        logger.info(f"Using {dist_git_branch!r} dist-git branch")
+        dg.create_branch(
+            dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True
+        )
         dg.update_branch(dist_git_branch)
         dg.checkout_branch(dist_git_branch)
 
