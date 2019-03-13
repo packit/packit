@@ -169,12 +169,27 @@ class Upstream:
 
         :return: the version string (e.g. "1.0.0")
         """
-        return versioneers_runner.run(
+        version = versioneers_runner.run(
             versioneer=None,
             package_name=self.package_config.metadata["package_name"],
             category=None,
         )
+        logger.info(f"Version in upstream registries is \"f{version}\".")
+        return version
 
     def get_specfile_version(self) -> str:
         """ provide version from specfile """
-        return self.specfile.get_full_version()
+        version = self.specfile.get_full_version()
+        logger.info(f"Version in spec file is \"f{version}\".")
+        return version
+
+    def get_version(self) -> str:
+        """
+        Return version of latest release: prioritize upstream
+        package repositories over the version in spec
+        """
+        ups_ver = self.get_latest_released_version()
+        spec_ver = self.get_specfile_version()
+        if ups_ver:
+            return ups_ver
+        return spec_ver
