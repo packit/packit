@@ -7,6 +7,7 @@ from typing import Sequence
 
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
+from packit.exceptions import PackitException
 from packit.upstream import Upstream
 
 logger = logging.getLogger(__name__)
@@ -63,7 +64,9 @@ class PackitAPI:
 
         dg = DistGit(config=self.config, package_config=self.package_config)
 
-        full_version = version or up.get_specfile_version()
+        full_version = version or up.get_version()
+        if not full_version:
+            raise PackitException("Could not figure out version of latest upstream release.")
         current_up_branch = up.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
