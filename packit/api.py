@@ -113,11 +113,9 @@ class PackitAPI:
     ):
 
         if add_new_sources:
-            archive_name = distgit.get_upstream_archive_name()
             # btw this is really naive: the name could be the same but the hash can be different
-            # we should do something when such situation happens
-            iz_archive_in_lookaside = distgit.is_archive_on_lookaside_cache(archive_name)
-            if not iz_archive_in_lookaside:
+            # TODO: we should do something when such situation happens
+            if not distgit.is_archive_in_lookaside_cache(distgit.upstream_archive_name):
                 archive = distgit.download_upstream_archive()
                 distgit.upload_to_lookaside_cache(archive)
 
