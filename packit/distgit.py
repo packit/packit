@@ -230,7 +230,8 @@ class DistGit:
         else:
             logger.info(f"PR created: {dist_git_pr.url}")
 
-    def get_upstream_archive_name(self) -> str:
+    @property
+    def upstream_archive_name(self) -> str:
         """
         :return: name of the archive, e.g. sen-0.6.1.tar.gz
         """
@@ -245,9 +246,8 @@ class DistGit:
         :return: str, path to the archive
         """
         self.specfile.download_remote_sources()
-        archive_name = self.get_upstream_archive_name()
-        archive = os.path.join(self.local_project.working_dir, archive_name)
-        logger.info("downloaded archive: %s", archive)
+        archive = os.path.join(self.local_project.working_dir, self.upstream_archive_name)
+        logger.info(f"Downloaded archive: {archive!r}")
         return archive
 
     def upload_to_lookaside_cache(self, archive_path: str) -> None:
@@ -267,7 +267,7 @@ class DistGit:
             )
             raise PackitException(ex)
 
-    def is_archive_on_lookaside_cache(self, archive_path: str) -> bool:
+    def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
@@ -275,13 +275,13 @@ class DistGit:
             )
             if res.ok:
                 logger.info(
-                    f"Archive {archive_name} found on lookaside cache (skipping upload)."
+                    f"Archive {archive_name} found in lookaside cache (skipping upload)."
                 )
                 return True
-            logger.debug(f"Archive {archive_name} not found on the lookaside cache.")
-        except requests.exceptions.BaseHTTPError as ex:
+            logger.debug(f"Archive {archive_name} not found in the lookaside cache.")
+        except requests.exceptions.BaseHTTPError:
             logger.warning(
-                f"Error trying to find {archive_name} on the lookaside cache."
+                f"Error trying to find {archive_name} in the lookaside cache."
             )
         return False
 
