@@ -178,6 +178,3 @@ class Upstream:
     def get_specfile_version(self) -> str:
         """ provide version from specfile """
         return self.specfile.get_full_version()
-
-class SourceGit(Upstream):
-    pass
