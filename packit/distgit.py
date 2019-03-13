@@ -5,9 +5,9 @@ from typing import Optional, List, Tuple, Sequence
 
 import git
 import requests
-from ogr.services.pagure import PagureService
 from rebasehelper.specfile import SpecFile
 
+from ogr.services.pagure import PagureService
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -46,8 +46,8 @@ class DistGit:
         self.dist_git_url: Optional[str] = self.package_config.metadata.get(
             "dist_git_url", None
         )
-        logger.debug("using dist-git repo %s", self.dist_git_url)
-        self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
+        logger.debug(f"Using dist-git repo {self.dist_git_url}")
+        self.files_to_sync: List[str] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
         self._specfile = None
 
@@ -70,6 +70,7 @@ class DistGit:
             return os.path.join(
                 self.local_project.working_dir, f"{self.package_name}.spec"
             )
+        return None
 
     @property
     def specfile(self):
@@ -90,6 +91,7 @@ class DistGit:
         :param setup_tracking: set up remote tracking (exc will be raised if the branch is not in the remote)
         :return the branch which was just created
         """
+        logger.debug(f"About to create a new git branch {branch_name!r} in dist-git")
         # it's not an error if the branch already exists
         origin = self.local_project.git_repo.remote("origin")
         head = self.local_project.git_repo.create_head(branch_name, commit=base)
@@ -110,6 +112,7 @@ class DistGit:
 
         :param branch_name: name of the branch to check out and fetch
         """
+        logger.debug(f"About to update branch {branch_name!r}")
         origin = self.local_project.git_repo.remote("origin")
         origin.fetch()
         try:
@@ -128,6 +131,7 @@ class DistGit:
 
         :param git_ref: ref to check out
         """
+        logger.debug(f"About to checkout {git_ref!r}")
         try:
             head = self.local_project.git_repo.heads[git_ref]
         except IndexError:
@@ -138,6 +142,7 @@ class DistGit:
         """
         Perform `git add -A` and `git commit`
         """
+        logger.debug("About to add all & commit")
         main_msg = f"{prefix}{title}"
         self.local_project.git_repo.git.add("-A")
         self.local_project.git_repo.index.write()
@@ -163,6 +168,8 @@ class DistGit:
         :param fork_remote_name: local name of the remote where we push to
         :param force: push forcefully?
         """
+        logger.debug(f"About to {'force ' if force else ''}push changes to branch {branch_name} "
+                     f"of a fork {fork_remote_name} of the dist-git repo")
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
         ]:
@@ -171,9 +178,8 @@ class DistGit:
                 self.local_project.git_project.fork_create()
                 fork = self.local_project.git_project.get_fork()
             if not fork:
-                raise RuntimeError(
-                    f"Unable to create a fork of repository {self.local_project.git_project.full_repo_name}"
-                )
+                raise RuntimeError("Unable to create a fork of repository "
+                                   f"{self.local_project.git_project.full_repo_name}")
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name, url=fork_urls["ssh"]
@@ -191,6 +197,8 @@ class DistGit:
         """
         Create dist-git pull request using the requested branches
         """
+        logger.debug("About to create dist-git pull request "
+                     f"from {source_branch} to {target_branch}")
         project = self.local_project.git_project
 
         if not self.pagure_user_token:
@@ -218,17 +226,18 @@ class DistGit:
                 target_branch=target_branch,
             )
         except Exception as ex:
-            logger.error("there was an error while create a PR: %r", ex)
+            logger.error(f"There was an error while creating the PR: {ex!r}")
             raise
         else:
             logger.info(f"PR created: {dist_git_pr.url}")
 
-    def get_upstream_archive_name(self) -> str:
+    @property
+    def upstream_archive_name(self) -> str:
         """
         :return: name of the archive, e.g. sen-0.6.1.tar.gz
         """
         archive_name = self.specfile.get_archive()
-        logger.debug("upstream archive name is %s", archive_name)
+        logger.debug(f"Upstream archive name is {archive_name!r}")
         return archive_name
 
     def download_upstream_archive(self) -> str:
@@ -238,17 +247,16 @@ class DistGit:
         :return: str, path to the archive
         """
         self.specfile.download_remote_sources()
-        archive_name = self.get_upstream_archive_name()
-        archive = os.path.join(self.local_project.working_dir, archive_name)
-        logger.info("downloaded archive: %s", archive)
+        archive = os.path.join(self.local_project.working_dir, self.upstream_archive_name)
+        logger.info(f"Downloaded archive: {archive!r}")
         return archive
 
     def upload_to_lookaside_cache(self, archive_path: str) -> None:
         """
-        upload files (archive) to the lookaside cache
+        Upload files (archive) to the lookaside cache.
         """
         # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
-        logger.info("uploading to the lookaside cache")
+        logger.info("About to upload to lookaside cache")
         f = FedPKG(self.fas_user, self.local_project.working_dir)
         f.init_ticket()
         try:
@@ -260,7 +268,7 @@ class DistGit:
             )
             raise PackitException(ex)
 
-    def is_archive_on_lookaside_cache(self, archive_path: str) -> bool:
+    def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
@@ -268,13 +276,13 @@ class DistGit:
             )
             if res.ok:
                 logger.info(
-                    f"Archive {archive_name} found on lookaside cache (skipping upload)."
+                    f"Archive {archive_name} found in lookaside cache (skipping upload)."
                 )
                 return True
-            logger.debug(f"Archive {archive_name} not found on the lookaside cache.")
-        except requests.exceptions.BaseHTTPError as ex:
+            logger.debug(f"Archive {archive_name} not found in the lookaside cache.")
+        except requests.exceptions.BaseHTTPError:
             logger.warning(
-                f"Error trying to find {archive_name} on the lookaside cache."
+                f"Error trying to find {archive_name} in the lookaside cache."
             )
         return False
 
@@ -284,15 +292,15 @@ class DistGit:
 
     def sync_files(self, upstream_project: LocalProject) -> None:
         """
-        sync required files from upstream to downstream
+        Sync required files from upstream to downstream.
         """
-        logger.debug("about to sync files %s", self.files_to_sync)
+        logger.debug(f"About to sync files {self.files_to_sync}")
         for fi in self.files_to_sync:
             # TODO: fi can be dir
             fi = fi[1:] if fi.startswith("/") else fi
             src = os.path.join(upstream_project.working_dir, fi)
             if os.path.exists(src):
-                logger.info("syncing %s", src)
+                logger.info(f"Syncing {src}")
                 shutil.copy2(src, self.local_project.working_dir)
             else:
                 raise PackitException(
@@ -306,8 +314,11 @@ class DistGit:
 
         :param patch_list: [(patch_name, msg)] if None, the patches will be generated
         """
+        logger.debug(f"About to add patches {patch_list} to specfile")
         if not patch_list:
             return
+        if not self.specfile_path:
+            raise Exception("No specfile")
 
         with open(file=self.specfile_path, mode="r+") as spec_file:
             last_source_position = None
@@ -350,6 +361,7 @@ class DistGit:
             self, dist_git_branch: str, update_type: str,
             update_notes: str, koji_builds: Sequence[str] = None
     ):
+        logger.debug(f"About to create a Bodhi update of type {update_type} from {dist_git_branch}")
         # https://github.com/fedora-infra/bodhi/issues/3058
         from bodhi.client.bindings import BodhiClient
 

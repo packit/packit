@@ -1,9 +1,9 @@
 import json
 import logging
-import os
 import shlex
 import subprocess
 import tempfile
+from pathlib import Path
 
 import git
 
@@ -39,7 +39,7 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         logger.debug("cmd = '%s'", " ".join(cmd))
         cmd = shlex.split(cmd)
 
-    cwd = cwd or os.getcwd()
+    cwd = cwd or str(Path.cwd())
     error_message = error_message or cmd[0]
 
     shell = subprocess.run(
@@ -78,7 +78,7 @@ class FedPKG:
     https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
     """
 
-    def __init__(self, fas_username:str = None, directory: str = None, stage: bool = False):
+    def __init__(self, fas_username: str = None, directory: str = None, stage: bool = False):
         self.fas_username = fas_username
         self.directory = directory
         self.stage = stage
@@ -88,7 +88,7 @@ class FedPKG:
             self.fedpkg_exec = "fedpkg"
 
     def new_sources(self, sources="", fail=True):
-        if not os.path.isdir(self.directory):
+        if not Path(self.directory).is_dir():
             raise Exception("Cannot access fedpkg repository:")
 
         return run_command(
@@ -116,7 +116,7 @@ class FedPKG:
         if not keytab:
             logger.info("won't be doing kinit, no credentials provided")
             return
-        if keytab and os.path.isfile(keytab):
+        if keytab and Path(keytab).is_file():
             cmd = ["kinit", f"{self.fas_username}@FEDORAPROJECT.ORG", "-k", "-t", keytab]
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
@@ -194,7 +194,7 @@ def is_git_repo(directory: str) -> bool:
     Test, if the directory is a git repo.
     (Has .git subdirectory?)
     """
-    return os.path.isdir(os.path.join(directory, ".git"))
+    return Path(directory).joinpath(".git").is_dir()
 
 
 def checkout_pr(repo: git.Repo, pr_id: int):
@@ -217,10 +217,10 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
 
     # TODO: optimize cloning: single branch and last n commits?
     if is_git_repo(directory=directory):
-        logger.debug("Source git repo exists.")
+        logger.debug(f"Repo already exists in {directory}")
         repo = git.repo.Repo(directory)
     else:
-        logger.info(f"Cloning source-git repo: {url} -> {directory}")
+        logger.info(f"Cloning repo: {url} -> {directory}")
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
