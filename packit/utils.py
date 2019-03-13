@@ -1,9 +1,9 @@
 import json
 import logging
-import os
 import shlex
 import subprocess
 import tempfile
+from pathlib import Path
 
 import git
 
@@ -39,7 +39,7 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         logger.debug("cmd = '%s'", " ".join(cmd))
         cmd = shlex.split(cmd)
 
-    cwd = cwd or os.getcwd()
+    cwd = cwd or str(Path.cwd())
     error_message = error_message or cmd[0]
 
     shell = subprocess.run(
@@ -88,7 +88,7 @@ class FedPKG:
             self.fedpkg_exec = "fedpkg"
 
     def new_sources(self, sources="", fail=True):
-        if not os.path.isdir(self.directory):
+        if not Path(self.directory).is_dir():
             raise Exception("Cannot access fedpkg repository:")
 
         return run_command(
@@ -116,7 +116,7 @@ class FedPKG:
         if not keytab:
             logger.info("won't be doing kinit, no credentials provided")
             return
-        if keytab and os.path.isfile(keytab):
+        if keytab and Path(keytab).is_file():
             cmd = ["kinit", f"{self.fas_username}@FEDORAPROJECT.ORG", "-k", "-t", keytab]
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
@@ -194,7 +194,7 @@ def is_git_repo(directory: str) -> bool:
     Test, if the directory is a git repo.
     (Has .git subdirectory?)
     """
-    return os.path.isdir(os.path.join(directory, ".git"))
+    return Path(directory).joinpath(".git").is_dir()
 
 
 def checkout_pr(repo: git.Repo, pr_id: int):
