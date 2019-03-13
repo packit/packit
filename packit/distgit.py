@@ -47,7 +47,7 @@ class DistGit:
             "dist_git_url", None
         )
         logger.debug(f"Using dist-git repo {self.dist_git_url}")
-        self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
+        self.files_to_sync: List[str] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
         self._specfile = None
 
@@ -70,6 +70,7 @@ class DistGit:
             return os.path.join(
                 self.local_project.working_dir, f"{self.package_name}.spec"
             )
+        return None
 
     @property
     def specfile(self):
@@ -313,8 +314,11 @@ class DistGit:
 
         :param patch_list: [(patch_name, msg)] if None, the patches will be generated
         """
+        logger.debug(f"About to add patches {patch_list} to specfile")
         if not patch_list:
             return
+        if not self.specfile_path:
+            raise Exception("No specfile")
 
         with open(file=self.specfile_path, mode="r+") as spec_file:
             last_source_position = None
