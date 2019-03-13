@@ -2,7 +2,7 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.0.1
+Version:        0.0.2
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -53,5 +53,8 @@ rm -rf %{pypi_name}.egg-info
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 13 2019 Frantisek Lachman <flachman@redhat.com> 0.0.2-1
+- new package built with tito
+
 * Mon Mar 04 2019 Frantisek Lachman <flachman@redhat.com> - 0.0.1-1
 - Initial package.
