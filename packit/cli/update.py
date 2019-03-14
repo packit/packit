@@ -38,6 +38,9 @@ def update(config, dist_git_path, dist_git_branch, repo, version):
 
     REPO argument is a local path to the upstream git repository,
     it defaults to the current working directory
+
+    VERSION argument is optional, the latest upstream version
+    will be used by default
     """
     package_config = get_local_package_config(directory=repo.working_dir)
     package_config.downstream_project_url = dist_git_path
