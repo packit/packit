@@ -33,10 +33,10 @@ def sg2dg(config, dest_dir, no_new_sources, upstream_ref, version, repo):
     5. The output is the directory (= dirty git repo)
     """
 
-    package_config = get_local_package_config()
+    package_config = get_local_package_config(try_local_dir_first=True)
     sourcegit = LocalProject(git_url=repo)
     if not package_config:
-        package_config = get_local_package_config(directory=sourcegit.working_dir)
+        package_config = get_local_package_config(sourcegit.working_dir)
     distgit = LocalProject(
         git_url=package_config.metadata["dist_git_url"],
         namespace="rpms",
