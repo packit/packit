@@ -1,10 +1,14 @@
 import functools
 import logging
+import os
 import sys
 
 import click
 
+from packit.api import PackitAPI
+from packit.config import get_local_package_config, Config
 from packit.exceptions import PackitException
+from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +64,23 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         return decorator_cover
     else:
         return decorator_cover(_func)
+
+
+def get_packit_api(config: Config, repo: LocalProject, dist_git_path: str = None):
+    """
+    Load the package config, set other options and return the PackitAPI
+    """
+    package_config = get_local_package_config()
+    if (
+        not package_config
+        and repo.working_dir
+        and repo.working_dir != os.path.abspath(os.path.curdir)
+    ):
+        package_config = get_local_package_config(directory=repo.working_dir)
+
+    if dist_git_path:
+        package_config.downstream_project_url = dist_git_path
+    package_config.upstream_project_url = repo.working_dir
+
+    api = PackitAPI(config=config, package_config=package_config)
+    return api
