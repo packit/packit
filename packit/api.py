@@ -147,13 +147,9 @@ class PackitAPI:
             ):
                 make_new_sources = True
             else:
-                sources_file = Path(distgit.local_project.working_dir) / Path("sources")
-                with open(str(sources_file), mode="r") as sources_file_obj:
-                    if (
-                        distgit.upstream_archive_name not
-                        in sources_file_obj.read()
-                    ):
-                        make_new_sources = True
+                sources_file = Path(distgit.local_project.working_dir) / "sources"
+                if distgit.upstream_archive_name not in sources_file.read_text():
+                    make_new_sources = True
 
             if make_new_sources:
                 archive = distgit.download_upstream_archive()
