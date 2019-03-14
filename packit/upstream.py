@@ -128,7 +128,7 @@ class Upstream:
         :return: [(patch_name, msg)] list of created patches (tuple of the file name and commit msg)
         """
 
-        upstream = upstream or self.get_upstream_version()
+        upstream = upstream or self.get_specfile_version()
         commits = self.get_commits_to_upstream(upstream, add_usptream_head_commit=True)
         patch_list = []
 
@@ -163,16 +163,35 @@ class Upstream:
 
         return patch_list
 
-    def get_upstream_version(self):
-        return (
-            versioneers_runner.run(
-                versioneer=None,
-                package_name=self.package_config.metadata["package_name"],
-                category=None,
-            )
-            or self.specfile.get_full_version()
+    def get_latest_released_version(self) -> str:
+        """
+        Return version of the upstream project for the latest official release
+
+        :return: the version string (e.g. "1.0.0")
+        """
+        version = versioneers_runner.run(
+            versioneer=None,
+            package_name=self.package_config.metadata["package_name"],
+            category=None,
         )
+        logger.info(f"Version in upstream registries is \"f{version}\".")
+        return version
 
+    def get_specfile_version(self) -> str:
+        """ provide version from specfile """
+        version = self.specfile.get_full_version()
+        logger.info(f"Version in spec file is \"f{version}\".")
+        return version
 
-class SourceGit(Upstream):
-    pass
+    def get_version(self) -> str:
+        """
+        Return version of latest release: prioritize upstream
+        package repositories over the version in spec
+        """
+        ups_ver = self.get_latest_released_version()
+        spec_ver = self.get_specfile_version()
+        # we're running both so that results of each function are logged and user is aware
+        if ups_ver:
+            logger.info("Picking version of the latest release from the upstream registry over spec file.")
+            return ups_ver
+        return spec_ver
