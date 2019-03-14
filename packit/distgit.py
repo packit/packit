@@ -82,7 +82,9 @@ class DistGit:
             )
         return self._specfile
 
-    def create_branch(self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False) -> git.Head:
+    def create_branch(
+        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+    ) -> git.Head:
         """
         Create a new git branch in dist-git
 
@@ -122,7 +124,9 @@ class DistGit:
         try:
             remote_ref = origin.refs[branch_name]
         except IndexError:
-            raise PackitException(f"Branch {branch_name} does not exist in the origin remote.")
+            raise PackitException(
+                f"Branch {branch_name} does not exist in the origin remote."
+            )
         head.set_commit(remote_ref)
 
     def checkout_branch(self, git_ref: str):
@@ -168,8 +172,10 @@ class DistGit:
         :param fork_remote_name: local name of the remote where we push to
         :param force: push forcefully?
         """
-        logger.debug(f"About to {'force ' if force else ''}push changes to branch {branch_name} "
-                     f"of a fork {fork_remote_name} of the dist-git repo")
+        logger.debug(
+            f"About to {'force ' if force else ''}push changes to branch {branch_name} "
+            f"of a fork {fork_remote_name} of the dist-git repo"
+        )
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
         ]:
@@ -178,8 +184,10 @@ class DistGit:
                 self.local_project.git_project.fork_create()
                 fork = self.local_project.git_project.get_fork()
             if not fork:
-                raise RuntimeError("Unable to create a fork of repository "
-                                   f"{self.local_project.git_project.full_repo_name}")
+                raise PackitException(
+                    "Unable to create a fork of repository "
+                    f"{self.local_project.git_project.full_repo_name}"
+                )
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name, url=fork_urls["ssh"]
@@ -197,8 +205,10 @@ class DistGit:
         """
         Create dist-git pull request using the requested branches
         """
-        logger.debug("About to create dist-git pull request "
-                     f"from {source_branch} to {target_branch}")
+        logger.debug(
+            "About to create dist-git pull request "
+            f"from {source_branch} to {target_branch}"
+        )
         project = self.local_project.git_project
 
         if not self.pagure_user_token:
@@ -247,7 +257,9 @@ class DistGit:
         :return: str, path to the archive
         """
         self.specfile.download_remote_sources()
-        archive = os.path.join(self.local_project.working_dir, self.upstream_archive_name)
+        archive = os.path.join(
+            self.local_project.working_dir, self.upstream_archive_name
+        )
         logger.info(f"Downloaded archive: {archive!r}")
         return archive
 
@@ -358,12 +370,17 @@ class DistGit:
         fpkg.build(scratch=scratch)
 
     def create_bodhi_update(
-            self, dist_git_branch: str, update_type: str,
-            update_notes: str, koji_builds: Sequence[str] = None
+        self,
+        dist_git_branch: str,
+        update_type: str,
+        update_notes: str,
+        koji_builds: Sequence[str] = None,
     ):
-        logger.debug(f"About to create a Bodhi update of type {update_type} from {dist_git_branch}")
+        logger.debug(
+            f"About to create a Bodhi update of type {update_type} from {dist_git_branch}"
+        )
         # https://github.com/fedora-infra/bodhi/issues/3058
-        from bodhi.client.bindings import BodhiClient
+        from bodhi.client.bindings import BodhiClient, BodhiClientException
 
         if not self.package_name:
             raise PackitException("Package name is not set.")
@@ -372,18 +389,31 @@ class DistGit:
         if not koji_builds:
             # alternatively we can call something like `koji latest-build rawhide sen`
             builds_d = b.latest_builds(self.package_name)
+
+            builds_str = "\n".join(f" - {b}" for b in builds_d)
+            logger.debug(f"Koji builds for package {self.package_name}: \n{builds_str}")
+
             koji_tag = f"{dist_git_branch}-updates-candidate"
             try:
                 koji_builds = [builds_d[koji_tag]]
+                koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
+                logger.info(
+                    f"Koji builds for package {self.package_name} and koji tag {koji_tag}:"
+                    f"\n{koji_builds_str}"
+                )
             except KeyError:
                 raise PackitException(
-                    f"There is no build for {self.package_name} in koji tag {koji_tag}")
+                    f"There is no build for {self.package_name} in koji tag {koji_tag}"
+                )
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
-
         rendered_note = update_notes.format(version=self.specfile.get_full_version())
-        b.save(
-            builds=koji_builds,
-            notes=rendered_note,
-            type=update_type
-        )
+        try:
+            result = b.save(builds=koji_builds, notes=rendered_note, type=update_type)
+            logger.info(f"Bodhi response:\n{result}")
+        except BodhiClientException as ex:
+            logger.error(ex)
+            raise PackitException(
+                f"There is a problem with creating the bodhi update:\n{ex}"
+            )
+        return result
