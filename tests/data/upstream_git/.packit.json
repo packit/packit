@@ -17,9 +17,8 @@
       ]
     }
   ],
-  "upstream_name": "beer",
-  "package_name": "beer",
-  "dist_git_url": "",
+  "upstream_project_name": "beer",
+  "downstream_package_name": "beer",
   "checks": [
     {
       "name": "simple-koji-ci"

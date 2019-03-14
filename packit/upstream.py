@@ -24,9 +24,7 @@ class Upstream:
         self._local_project = None
         self._specfile = None
 
-        self.package_name: Optional[str] = self.package_config.metadata.get(
-            "package_name", None
-        )
+        self.package_name: Optional[str] = self.package_config.downstream_package_name
         self.upstream_project_url: str = self.package_config.upstream_project_url
 
     @property
@@ -171,7 +169,7 @@ class Upstream:
         """
         version = versioneers_runner.run(
             versioneer=None,
-            package_name=self.package_config.metadata["package_name"],
+            package_name=self.package_config.downstream_package_name,
             category=None,
         )
         logger.info(f"Version in upstream registries is \"f{version}\".")
