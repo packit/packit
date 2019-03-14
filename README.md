@@ -62,7 +62,16 @@ For more info on source-git, please read [the detailed design doc](docs/source-g
 
 ## Plan and current status
 
-Work has begun on the MVP.
+We are working on two things now:
+ 1. Packit as a tool - a standalone CLI tool which you can install from Fedora
+    repositories and use easily.
+ 2. Packit service - A service offering built on top of packit tool. Our
+    expectation is that you would add packit service into your Github
+    repository and it would start handling things automatically: opening pull
+    requests on dist-git, building packages, creating updates, ...
+
+For the run-down of the planned work, please see the task-list below.
+
 
 * [x] E2E workflow for getting upstream releases into Fedora
   * [x] Bring new upstream releases into Fedora rawhide as dist-git pull
