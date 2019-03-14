@@ -190,6 +190,8 @@ class Upstream:
         """
         ups_ver = self.get_latest_released_version()
         spec_ver = self.get_specfile_version()
+        # we're running both so that results of each function are logged and user is aware
         if ups_ver:
+            logger.info("Picking version of the latest release from the upstream registry over spec file.")
             return ups_ver
         return spec_ver
