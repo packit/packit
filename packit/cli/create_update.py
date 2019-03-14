@@ -39,7 +39,9 @@ logger = logging.getLogger(__file__)
 )
 @pass_config
 @cover_packit_exception
-def create_update(config, dist_git_branch, koji_build, update_notes, update_type, path_or_url):
+def create_update(
+    config, dist_git_branch, koji_build, update_notes, update_type, path_or_url
+):
     """
     Create a bodhi update for the selected upstream project
 

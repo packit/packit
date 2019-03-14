@@ -28,11 +28,7 @@ def test_basic_local_update(upstream_n_distgit):
 
 
 @pytest.mark.parametrize(
-    "m_v,exp",
-    (
-        ("1.1000.1000000", "1.1000.1000000"),
-        (None, "0.1.0"),
-    )
+    "m_v,exp", (("1.1000.1000000", "1.1000.1000000"), (None, "0.1.0"))
 )
 def test_get_version(upstream_n_distgit, m_v, exp):
     u, d = upstream_n_distgit
