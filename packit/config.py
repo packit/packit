@@ -132,7 +132,7 @@ class PackageConfig:
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        logger.debug(f"our configuraion:\n{self.__dict__}")
+        logger.debug(f"our configuration:\n{self.__dict__}")
         logger.debug(f"the other configuration:\n{other.__dict__}")
         return (
             self.specfile_path == other.specfile_path
@@ -190,12 +190,12 @@ class PackageConfig:
         return pc
 
     @staticmethod
-    def get_deprecated_key(raw_dict: dict, new_key_name, old_key_name):
+    def get_deprecated_key(raw_dict: dict, new_key_name: str, old_key_name: str):
         old = raw_dict.get(old_key_name, None)
         if old:
             logger.warning(
-                f"'{old_key_name}' configuration key was renamed to '{new_key_name}',"
-                f" please update your configuration file, vole"
+                f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
+                f" please update your configuration file"
             )
         r = raw_dict.get(new_key_name, None)
         if not r:
