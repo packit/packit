@@ -70,13 +70,7 @@ def get_packit_api(config: Config, repo: LocalProject, dist_git_path: str = None
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config = get_local_package_config()
-    if (
-        not package_config
-        and repo.working_dir
-        and repo.working_dir != os.path.abspath(os.path.curdir)
-    ):
-        package_config = get_local_package_config(directory=repo.working_dir)
+    package_config = get_local_package_config(repo.working_dir, try_local_dir_first=True)
 
     if dist_git_path:
         package_config.downstream_project_url = dist_git_path
