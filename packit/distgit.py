@@ -390,7 +390,7 @@ class DistGit:
             # alternatively we can call something like `koji latest-build rawhide sen`
             builds_d = b.latest_builds(self.package_name)
 
-            builds_str = "\n".join([f" - {b}" for b in builds_d])
+            builds_str = "\n".join(f" - {b}" for b in builds_d)
             logger.debug(f"Koji builds for package {self.package_name}: \n{builds_str}")
 
             koji_tag = f"{dist_git_branch}-updates-candidate"
