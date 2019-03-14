@@ -24,12 +24,12 @@ class PackitBotAPI:
         self.config = config
         self.consumerino = Consumerino()
 
-    @property
+    @property  # type: ignore
     @lru_cache()
     def _github_service(self):
         return GithubService(token=self.config.github_token)
 
-    @property
+    @property  # type: ignore
     @lru_cache()
     def _pagure_service(self):
         return PagureService(token=self.config.pagure_user_token)
@@ -45,7 +45,7 @@ class PackitBotAPI:
         ref = fedmsg["msg"]["pull_request"]["head"]["ref"]
         pr_id = fedmsg["msg"]["pull_request"]["number"]
 
-        github_repo = self._github_service.get_project(
+        github_repo = self._github_service.get_project(  # type: ignore
             repo=repo_name, namespace=namespace
         )
 
@@ -87,7 +87,7 @@ class PackitBotAPI:
         version = fedmsg["msg"]["release"]["tag_name"]
         https_url = fedmsg["msg"]["repository"]["html_url"]
 
-        github_repo = self._github_service.get_project(
+        github_repo = self._github_service.get_project(  # type: ignore
             repo=repo_name, namespace=namespace
         )
 
@@ -139,7 +139,7 @@ class PackitBotAPI:
         namespace = fedmsg["msg"]["pull_request"]["project"]["namespace"]
         pr_id = fedmsg["msg"]["pull_request"]["id"]
 
-        pagure_repo = self._pagure_service.get_project(
+        pagure_repo = self._pagure_service.get_project(  # type: ignore
             repo=repo_name, namespace=namespace
         )
 
