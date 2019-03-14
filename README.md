@@ -73,13 +73,15 @@ We are working on two things now:
 For the run-down of the planned work, please see the task-list below.
 
 
-* [x] E2E workflow for getting upstream releases into Fedora
+* [ ] E2E workflow for getting upstream releases into Fedora using packit CLI.
   * [x] Bring new upstream releases into Fedora rawhide as dist-git pull
         requests. (`propose-update` command included in in 0.1.0 release)
-  * [ ] Build the change once it's merged.
-  * [ ] Send new downstream changes back to upstream. (so the spec files are in sync)
-  * [ ] Packit can create bodhi updates.
+  * [x] Build the change once it's merged. #137
+  * [ ] Send new downstream changes back to upstream. (so the spec files are in
+        sync) #145
+  * [x] Packit can create bodhi updates. #139
   * [x] Ability to propose updates also to stable releases of Fedora.
+  * [ ] Create SRPMs from the upstream repository
   * [ ] Build RPMs in COPR and integrate the results into Github.
 * [ ] source-git
   * [ ] Packit can create a SRPM from a source-git repo.
@@ -89,7 +91,7 @@ For the run-down of the planned work, please see the task-list below.
 * [ ] Packit as a service
   * [ ] Packit reacts to Github webhooks.
   * [ ] Have a github app for packit.
-  * [ ] Deployment.
+  * [ ] Packit service is deployed and usable by anyone.
 
 
 ## Workflows covered by packit
