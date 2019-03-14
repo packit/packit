@@ -15,7 +15,7 @@ logger = logging.getLogger(__file__)
 @click.option("--dist-git-branch", help="Target branch in dist-git to release into.")
 @click.option(
     "--koji-build",
-    help="Koji build to add to the bodhi update (can be specified multiple times)",
+    help="Koji build (NVR) to add to the bodhi update (can be specified multiple times)",
     required=False,
     multiple=True,
 )
