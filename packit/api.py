@@ -3,6 +3,7 @@ This is the official python interface for packit.
 """
 
 import logging
+from pathlib import Path
 from typing import Sequence
 
 from packit.config import Config, PackageConfig
@@ -59,7 +60,11 @@ class PackitAPI:
         )
 
     def sync_release(
-        self, dist_git_branch: str, use_local_content=False, version: str = None
+        self,
+        dist_git_branch: str,
+        use_local_content=False,
+        version: str = None,
+        force_new_sources=False,
     ):
         """
         Update given package in Fedora
@@ -113,6 +118,7 @@ class PackitAPI:
                 dist_git_branch=dist_git_branch,
                 commit_msg_description=description,
                 add_new_sources=True,
+                force_new_sources=force_new_sources,
             )
         finally:
             if not use_local_content:
@@ -127,12 +133,25 @@ class PackitAPI:
         dist_git_branch: str,
         commit_msg_description: str = None,
         add_new_sources=False,
+        force_new_sources=False,
     ):
 
-        if add_new_sources:
+        if add_new_sources or force_new_sources:
+
+            make_new_sources = False
+
             # btw this is really naive: the name could be the same but the hash can be different
             # TODO: we should do something when such situation happens
-            if not distgit.is_archive_in_lookaside_cache(distgit.upstream_archive_name):
+            if force_new_sources or not distgit.is_archive_in_lookaside_cache(
+                distgit.upstream_archive_name
+            ):
+                make_new_sources = True
+            else:
+                sources_file = Path(distgit.local_project.working_dir) / "sources"
+                if distgit.upstream_archive_name not in sources_file.read_text():
+                    make_new_sources = True
+
+            if make_new_sources:
                 archive = distgit.download_upstream_archive()
                 distgit.upload_to_lookaside_cache(archive)
 
