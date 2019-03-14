@@ -31,7 +31,7 @@ class Upstream:
 
     @property
     def active_branch(self):
-        return self.local_project.git_repo.active_branch
+        return self.local_project.ref
 
     @property
     def specfile_path(self) -> Optional[str]:
