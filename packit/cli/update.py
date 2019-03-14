@@ -31,13 +31,27 @@ logger = logging.getLogger(__file__)
     default=False,
     help="Do not checkout release tag. Use the current state of the repo.",
 )
+@click.option(
+    "--force-new-sources",
+    is_flag=True,
+    default=False,
+    help="Upload the new sources also when the archive is already in the lookaside cache.",
+)
 @click.argument(
     "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @click.argument("version", required=False)
 @pass_config
 @cover_packit_exception
-def update(config, dist_git_path, dist_git_branch, local_content, repo, version):
+def update(
+    config,
+    dist_git_path,
+    dist_git_branch,
+    force_new_sources,
+    local_content,
+    repo,
+    version,
+):
     """
     Release current upstream release into Fedora
 
@@ -48,4 +62,9 @@ def update(config, dist_git_path, dist_git_branch, local_content, repo, version)
     will be used by default
     """
     api = get_packit_api(config=config, dist_git_path=dist_git_path, repo=repo)
-    api.sync_release(dist_git_branch, use_local_content=local_content, version=version)
+    api.sync_release(
+        dist_git_branch,
+        use_local_content=local_content,
+        version=version,
+        force_new_sources=force_new_sources,
+    )
