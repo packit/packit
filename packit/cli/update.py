@@ -25,13 +25,19 @@ logger = logging.getLogger(__file__)
     help="Path to dist-git repo to work in. "
     "Otherwise clone the repo in a temporary directory.",
 )
+@click.option(
+    "--local-content",
+    is_flag=True,
+    default=False,
+    help="Do not checkout release tag. Use the current state of the repo.",
+)
 @click.argument(
     "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @click.argument("version", required=False)
 @pass_config
 @cover_packit_exception
-def update(config, dist_git_path, dist_git_branch, repo, version):
+def update(config, dist_git_path, dist_git_branch, local_content, repo, version):
     """
     Release current upstream release into Fedora
 
@@ -42,4 +48,4 @@ def update(config, dist_git_path, dist_git_branch, repo, version):
     will be used by default
     """
     api = get_packit_api(config=config, dist_git_path=dist_git_path, repo=repo)
-    api.sync_release(dist_git_branch, version=version)
+    api.sync_release(dist_git_branch, use_local_content=local_content, version=version)
