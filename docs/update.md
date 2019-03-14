@@ -86,4 +86,3 @@ Options:
                           the repo in a temporary directory.
   -h, --help              Show this message and exit.
 ```
-

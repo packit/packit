@@ -38,5 +38,7 @@ def build(config, dist_git_path, dist_git_branch, scratch, path_or_url):
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    api = get_packit_api(config=config, dist_git_path=dist_git_path, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+    )
     api.build(dist_git_branch, scratch=scratch)

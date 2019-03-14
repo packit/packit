@@ -15,8 +15,12 @@ TARBALL_NAME = "beerware-0.1.0.tar.gz"
 
 
 def git_set_user_email(directory):
-    subprocess.check_call(["git", "config", "user.email", "test@example.com"], cwd=directory)
-    subprocess.check_call(["git", "config", "user.name", "Packit Test Suite"], cwd=directory)
+    subprocess.check_call(
+        ["git", "config", "user.email", "test@example.com"], cwd=directory
+    )
+    subprocess.check_call(
+        ["git", "config", "user.name", "Packit Test Suite"], cwd=directory
+    )
 
 
 def get_test_config():
@@ -27,7 +31,9 @@ def get_test_config():
     return conf
 
 
-def git_add_n_commit(directory, tag=None, upstream_remote="https://lol.wat", push=False):
+def git_add_n_commit(
+    directory, tag=None, upstream_remote="https://lol.wat", push=False
+):
     """
     Initiate a git repo for testing.
 
@@ -42,12 +48,16 @@ def git_add_n_commit(directory, tag=None, upstream_remote="https://lol.wat", pus
     subprocess.check_call(["git", "commit", "-m", "initial commit"], cwd=directory)
     if tag:
         subprocess.check_call(["git", "tag", tag], cwd=directory)
-    subprocess.check_call(["git", "remote", "add", "origin", upstream_remote], cwd=directory)
+    subprocess.check_call(
+        ["git", "remote", "add", "origin", upstream_remote], cwd=directory
+    )
     if push:
         subprocess.check_call(["git", "fetch", "origin"], cwd=directory)
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
-        subprocess.check_call(["git", "push", "-u", "origin", "master:master"], cwd=directory)
+        subprocess.check_call(
+            ["git", "push", "-u", "origin", "master:master"], cwd=directory
+        )
 
 
 def prepare_dist_git_repo(directory):

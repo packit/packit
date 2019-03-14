@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.command("watch-releases")
-@click.argument(
-    "message-id", nargs=-1,
-)
+@click.argument("message-id", nargs=-1)
 @pass_config
 @cover_packit_exception
 def watch_releases(config, message_id):

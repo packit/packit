@@ -80,7 +80,9 @@ class FedPKG:
     https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
     """
 
-    def __init__(self, fas_username: str = None, directory: str = None, stage: bool = False):
+    def __init__(
+        self, fas_username: str = None, directory: str = None, stage: bool = False
+    ):
         self.fas_username = fas_username
         self.directory = directory
         self.stage = stage
@@ -109,7 +111,7 @@ class FedPKG:
             cwd=self.directory,
             error_message="Submission of build to koji failed.",
             fail=True,
-            output=True
+            output=True,
         )
         logger.info("%s", out)
 
@@ -119,7 +121,13 @@ class FedPKG:
             logger.info("won't be doing kinit, no credentials provided")
             return
         if keytab and Path(keytab).is_file():
-            cmd = ["kinit", f"{self.fas_username}@FEDORAPROJECT.ORG", "-k", "-t", keytab]
+            cmd = [
+                "kinit",
+                f"{self.fas_username}@FEDORAPROJECT.ORG",
+                "-k",
+                "-t",
+                keytab,
+            ]
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
             cmd = ["kinit", "-R", f"{self.fas_username}@FEDORAPROJECT.ORG"]
@@ -135,16 +143,18 @@ class PackitFormatter(logging.Formatter):
         elif record.levelno > logging.INFO:
             self._style._fmt = "%(levelname)-8s %(message)s"
         else:  # debug
-            self._style._fmt = "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
+            self._style._fmt = (
+                "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
+            )
         return logging.Formatter.format(self, record)
 
 
 def set_logging(
-        logger_name="packit",
-        level=logging.INFO,
-        handler_class=logging.StreamHandler,
-        handler_kwargs=None,
-        date_format="%H:%M:%S",
+    logger_name="packit",
+    level=logging.INFO,
+    handler_class=logging.StreamHandler,
+    handler_kwargs=None,
+    date_format="%H:%M:%S",
 ):
     """
     Set personal logger for this library.

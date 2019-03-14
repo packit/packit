@@ -20,9 +20,7 @@ def github_release_fedmsg():
         "msg": {
             "repository": {
                 "full_name": "brewery/beer",
-                "owner": {
-                    "login": "brewery",
-                },
+                "owner": {"login": "brewery"},
                 "name": "beer",
                 "html_url": "https://github.com/brewery/beer",
             },
@@ -33,10 +31,10 @@ def github_release_fedmsg():
                 "published_at": "2019-02-28T18:51:10Z",
                 "draft": False,
                 "prerelease": False,
-                "name": "Beer 0.1.0 is gooooood"
+                "name": "Beer 0.1.0 is gooooood",
             },
             "action": "published",
-        }
+        },
     }
 
 
@@ -73,6 +71,7 @@ def test_loop(mock_remote_functionality, github_release_fedmsg):
     def mocked_iter_releases():
         msg = copy.deepcopy(github_release_fedmsg)
         yield msg["topic"], msg
+
     flexmock(Consumerino, iterate_releases=mocked_iter_releases)
     conf = get_test_config()
     api = PackitBotAPI(conf)

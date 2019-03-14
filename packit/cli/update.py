@@ -61,7 +61,9 @@ def update(
     VERSION argument is optional, the latest upstream version
     will be used by default
     """
-    api = get_packit_api(config=config, dist_git_path=dist_git_path, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+    )
     api.sync_release(
         dist_git_branch,
         use_local_content=local_content,
