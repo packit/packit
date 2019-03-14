@@ -1,0 +1,8 @@
+---
+specfile_path: packit.spec
+synced_files:
+  - packit.spec
+  - .packit.yaml
+upstream_name: packit
+package_name: packit
+dist_git_url: https://src.fedoraproject.org/rpms/packit.git
