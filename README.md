@@ -110,9 +110,8 @@ TL;DR
 specfile_path: packit.spec
 synced_files:
   - packit.spec
-upstream_name: packit
-package_name: packit
-dist_git_url: https://src.fedoraproject.org/rpms/packit.git
+upstream_project_name: packit
+downstream_package_name: packit
 ```
 
 

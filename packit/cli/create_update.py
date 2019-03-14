@@ -35,18 +35,18 @@ logger = logging.getLogger(__file__)
     default="enhancement",
 )
 @click.argument(
-    "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
+    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @pass_config
 @cover_packit_exception
-def create_update(config, dist_git_branch, koji_build, update_notes, update_type, repo):
+def create_update(config, dist_git_branch, koji_build, update_notes, update_type, path_or_url):
     """
     Create a bodhi update for the selected upstream project
 
-    REPO argument is a local path to the upstream git repository,
+    PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    api = get_packit_api(config=config, repo=repo)
+    api = get_packit_api(config=config, local_project=path_or_url)
     api.create_update(
         koji_builds=koji_build,
         dist_git_branch=dist_git_branch,

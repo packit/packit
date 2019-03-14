@@ -97,12 +97,10 @@ def test_package_config_equal():
         specfile_path="fedora/package.spec",
         synced_files=["a", "b"],
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
-        metadata={"c": "d"},
     ) == PackageConfig(
         specfile_path="fedora/package.spec",
         synced_files=["a", "b"],
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
-        metadata={"c": "d"},
     )
 
 
@@ -115,7 +113,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            metadata={"c": "d"},
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -123,7 +120,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            metadata={"c": "d"},
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -133,7 +129,6 @@ def test_package_config_equal():
                     trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
                 )
             ],
-            metadata={"c": "d"},
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -141,7 +136,6 @@ def test_package_config_equal():
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f29"], metadata={})
             ],
-            metadata={"c": "d"},
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -151,15 +145,6 @@ def test_package_config_equal():
                     trigger=TriggerType.release, release_to=["f28"], metadata={"a": "b"}
                 )
             ],
-            metadata={"c": "d"},
-        ),
-        PackageConfig(
-            specfile_path="fedora/package.spec",
-            synced_files=["a", "b"],
-            jobs=[
-                JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
-            ],
-            metadata={"c": "dddd"},
         ),
     ],
 )
@@ -171,7 +156,6 @@ def test_package_config_not_equal(not_equal_package_config):
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
-            metadata={"c": "d"},
         )
         == not_equal_package_config
     )
@@ -256,7 +240,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    metadata={},
                 ),
         ),
         (
@@ -283,7 +266,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    metadata={},
                 ),
         ),
         (
@@ -310,35 +292,6 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    metadata={},
-                ),
-        ),
-        (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                    "something": "stupid",
-                },
-                PackageConfig(
-                    specfile_path="fedora/package.spec",
-                    synced_files=[
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    jobs=[
-                        JobConfig(
-                            trigger=TriggerType.release, release_to=["f28"], metadata={}
-                        )
-                    ],
-                    metadata={"something": "stupid"},
                 ),
         ),
         (
@@ -366,7 +319,39 @@ def test_package_config_parse_error(raw):
                             trigger=TriggerType.release, release_to=["f28"], metadata={}
                         )
                     ],
-                    metadata={"something": "stupid"},
+                ),
+        ),
+        (
+                {
+                    "specfile_path": "fedora/package.spec",
+                    "synced_files": [
+                        "fedora/package.spec",
+                        "some",
+                        "other",
+                        "directory/files",
+                    ],
+                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                    "something": "stupid",
+                    "upstream_project_url": "https://github.com/asd/qwe",
+                    "upstream_project_name": "qwe",
+                    "dist_git_base_url": "https://something.wicked"
+                },
+                PackageConfig(
+                    specfile_path="fedora/package.spec",
+                    synced_files=[
+                        "fedora/package.spec",
+                        "some",
+                        "other",
+                        "directory/files",
+                    ],
+                    jobs=[
+                        JobConfig(
+                            trigger=TriggerType.release, release_to=["f28"], metadata={}
+                        )
+                    ],
+                    upstream_project_url="https://github.com/asd/qwe",
+                    upstream_project_name="qwe",
+                    dist_git_base_url="https://something.wicked",
                 ),
         ),
     ],
@@ -375,3 +360,24 @@ def test_package_config_parse(raw, expected):
     package_config = PackageConfig.get_from_dict(raw_dict=raw)
     assert package_config
     assert package_config == expected
+
+
+def test_dist_git_package_url():
+    di = {
+        "dist_git_base_url": "https://packit.dev/",
+        "downstream_package_name": "packit",
+        "dist_git_namespace": "awesome",
+        "specfile_path": "fedora/package.spec",
+        "synced_files": [],
+    }
+    new_pc = PackageConfig.get_from_dict(di)
+    pc = PackageConfig(
+        dist_git_base_url="https://packit.dev/",
+        downstream_package_name="packit",
+        dist_git_namespace="awesome",
+        specfile_path="fedora/package.spec",
+        synced_files=[],
+    )
+    assert pc == new_pc
+    assert pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
+    assert new_pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
