@@ -405,6 +405,7 @@ class DistGit:
         rendered_note = update_notes.format(version=self.specfile.get_full_version())
         try:
             result = b.save(builds=koji_builds, notes=rendered_note, type=update_type)
+            logger.info(f"Bodhi response:\n{result}")
         except BodhiClientException as ex:
             logger.error(ex)
             raise PackitException(
