@@ -10,8 +10,8 @@ import anymarkup
 import click
 import jsonschema
 from jsonschema import Draft4Validator
-from ogr.abstract import GitProject
 
+from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 from packit.utils import exclude_from_dict
@@ -163,24 +163,36 @@ class PackageConfig:
         jsonschema.validate(raw_dict, PACKAGE_CONFIG_SCHEMA)
 
 
-def get_local_package_config(directory=None) -> PackageConfig:
+def get_local_package_config(
+    *directory, try_local_dir_first=False, try_local_dir_last=False
+) -> PackageConfig:
     """
     :return: local PackageConfig if present
     """
-    directory = Path(directory) if directory else Path.cwd()
-    for config_file_name in CONFIG_FILE_NAMES:
-        config_file_name_full = directory / config_file_name
-        if config_file_name_full.is_file():
-            logger.debug(f"Local package config found: {config_file_name_full}")
-            try:
-                loaded_config = anymarkup.parse_file(config_file_name_full)
-            except Exception as ex:
-                logger.error(f"Cannot load package config '{config_file_name_full}'.")
-                raise Exception(f"Cannot load package config: {ex}.")
+    directories = [Path(config_dir) for config_dir in directory]
 
-            return parse_loaded_config(loaded_config=loaded_config)
+    if try_local_dir_first:
+        directories.insert(0, Path.cwd())
 
-        logger.debug(f"The local config file '{config_file_name_full}' not found.")
+    if try_local_dir_last:
+        directories.append(Path.cwd())
+
+    for config_dir in directories:
+        for config_file_name in CONFIG_FILE_NAMES:
+            config_file_name_full = config_dir / config_file_name
+            if config_file_name_full.is_file():
+                logger.debug(f"Local package config found: {config_file_name_full}")
+                try:
+                    loaded_config = anymarkup.parse_file(config_file_name_full)
+                except Exception as ex:
+                    logger.error(
+                        f"Cannot load package config '{config_file_name_full}'."
+                    )
+                    raise Exception(f"Cannot load package config: {ex}.")
+
+                return parse_loaded_config(loaded_config=loaded_config)
+
+            logger.debug(f"The local config file '{config_file_name_full}' not found.")
     raise PackitConfigException("No packit config found.")
 
 
