@@ -62,15 +62,26 @@ For more info on source-git, please read [the detailed design doc](docs/source-g
 
 ## Plan and current status
 
-Work has begun on the MVP.
+We are working on two things now:
+ 1. Packit as a tool - a standalone CLI tool which you can install from Fedora
+    repositories and use easily.
+ 2. Packit service - A service offering built on top of packit tool. Our
+    expectation is that you would add packit service into your Github
+    repository and it would start handling things automatically: opening pull
+    requests on dist-git, building packages, creating updates, ...
 
-* [x] E2E workflow for getting upstream releases into Fedora
+For the run-down of the planned work, please see the task-list below.
+
+
+* [ ] E2E workflow for getting upstream releases into Fedora using packit CLI.
   * [x] Bring new upstream releases into Fedora rawhide as dist-git pull
         requests. (`propose-update` command included in in 0.1.0 release)
-  * [ ] Build the change once it's merged.
-  * [ ] Send new downstream changes back to upstream. (so the spec files are in sync)
-  * [ ] Packit can create bodhi updates.
+  * [x] Build the change once it's merged. #137
+  * [ ] Send new downstream changes back to upstream. (so the spec files are in
+        sync) #145
+  * [x] Packit can create bodhi updates. #139
   * [x] Ability to propose updates also to stable releases of Fedora.
+  * [ ] Create SRPMs from the upstream repository
   * [ ] Build RPMs in COPR and integrate the results into Github.
 * [ ] source-git
   * [ ] Packit can create a SRPM from a source-git repo.
@@ -80,7 +91,7 @@ Work has begun on the MVP.
 * [ ] Packit as a service
   * [ ] Packit reacts to Github webhooks.
   * [ ] Have a github app for packit.
-  * [ ] Deployment.
+  * [ ] Packit service is deployed and usable by anyone.
 
 
 ## Workflows covered by packit
