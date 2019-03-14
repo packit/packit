@@ -29,9 +29,10 @@ logger = logging.getLogger(__file__)
 @click.argument(
     "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
+@click.argument("version", required=False)
 @pass_config
 @cover_packit_exception
-def update(config, dist_git_path, dist_git_branch, repo):
+def update(config, dist_git_path, dist_git_branch, repo, version):
     """
     Release current upstream release into Fedora
 
@@ -42,4 +43,4 @@ def update(config, dist_git_path, dist_git_branch, repo):
     package_config.downstream_project_url = dist_git_path
     package_config.upstream_project_url = repo.working_dir
     api = PackitAPI(config=config, package_config=package_config)
-    api.sync_release(dist_git_branch)
+    api.sync_release(dist_git_branch, version=version)

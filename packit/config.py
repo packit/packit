@@ -167,7 +167,7 @@ def get_local_package_config(directory=None) -> PackageConfig:
     """
     :return: local PackageConfig if present
     """
-    directory = Path(directory) or Path.cwd()
+    directory = Path(directory) if directory else Path.cwd()
     for config_file_name in CONFIG_FILE_NAMES:
         config_file_name_full = directory / config_file_name
         if config_file_name_full.is_file():
