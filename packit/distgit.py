@@ -396,7 +396,7 @@ class DistGit:
             koji_tag = f"{dist_git_branch}-updates-candidate"
             try:
                 koji_builds = [builds_d[koji_tag]]
-                koji_builds_str = "\n".join([f" - {b}" for b in koji_builds])
+                koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
                 logger.info(
                     f"Koji builds for package {self.package_name} and koji tag {koji_tag}:"
                     f"\n{koji_builds_str}"
