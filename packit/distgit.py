@@ -184,7 +184,7 @@ class DistGit:
                 self.local_project.git_project.fork_create()
                 fork = self.local_project.git_project.get_fork()
             if not fork:
-                raise RuntimeError(
+                raise PackitException(
                     "Unable to create a fork of repository "
                     f"{self.local_project.git_project.full_repo_name}"
                 )
@@ -391,11 +391,16 @@ class DistGit:
             builds_d = b.latest_builds(self.package_name)
 
             builds_str = "\n".join([f" - {b}" for b in builds_d])
-            logger.info(f"Koji builds found: \n{builds_str}")
+            logger.debug(f"Koji builds for package {self.package_name}: \n{builds_str}")
 
             koji_tag = f"{dist_git_branch}-updates-candidate"
             try:
                 koji_builds = [builds_d[koji_tag]]
+                koji_builds_str = "\n".join([f" - {b}" for b in koji_builds])
+                logger.info(
+                    f"Koji builds for package {self.package_name} and koji tag {koji_tag}:"
+                    f"\n{koji_builds_str}"
+                )
             except KeyError:
                 raise PackitException(
                     f"There is no build for {self.package_name} in koji tag {koji_tag}"
