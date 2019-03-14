@@ -27,7 +27,9 @@ class PackitAPI:
         local_pr_branch = f"pull-request-{pr_id}-sync"
         # fetch and reset --hard upstream/$branch?
         dg.create_branch(
-            dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True
+            dist_git_branch,
+            base=f"remotes/origin/{dist_git_branch}",
+            setup_tracking=True,
         )
         dg.update_branch(dist_git_branch)
         dg.checkout_branch(dist_git_branch)
@@ -56,7 +58,9 @@ class PackitAPI:
             add_new_sources=False,
         )
 
-    def sync_release(self, dist_git_branch: str, version: str = None):
+    def sync_release(
+        self, dist_git_branch: str, use_local_content=False, version: str = None
+    ):
         """
         Update given package in Fedora
         """
@@ -66,7 +70,9 @@ class PackitAPI:
 
         full_version = version or up.get_version()
         if not full_version:
-            raise PackitException("Could not figure out version of latest upstream release.")
+            raise PackitException(
+                "Could not figure out version of latest upstream release."
+            )
         current_up_branch = up.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
@@ -74,14 +80,17 @@ class PackitAPI:
             #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
             # TODO: this is also naive, upstream may use different tagging scheme, e.g.
             #       release = 232, tag = v232
-            up.checkout_release(full_version)
+            if not use_local_content:
+                up.checkout_release(full_version)
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
             logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
             dg.create_branch(
-                dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True
+                dist_git_branch,
+                base=f"remotes/origin/{dist_git_branch}",
+                setup_tracking=True,
             )
             dg.update_branch(dist_git_branch)
             dg.checkout_branch(dist_git_branch)
@@ -106,7 +115,8 @@ class PackitAPI:
                 add_new_sources=True,
             )
         finally:
-            current_up_branch.checkout()
+            if not use_local_content:
+                up.local_project.git_repo.git.checkout(current_up_branch.checkout())
 
     def sync(
         self,
@@ -147,15 +157,22 @@ class PackitAPI:
 
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
         dg.create_branch(
-            dist_git_branch, base=f"remotes/origin/{dist_git_branch}", setup_tracking=True
+            dist_git_branch,
+            base=f"remotes/origin/{dist_git_branch}",
+            setup_tracking=True,
         )
         dg.update_branch(dist_git_branch)
         dg.checkout_branch(dist_git_branch)
 
         dg.build(scratch=scratch)
 
-    def create_update(self, dist_git_branch: str, update_type: str,
-                      update_notes: str, koji_builds: Sequence[str] = None):
+    def create_update(
+        self,
+        dist_git_branch: str,
+        update_type: str,
+        update_notes: str,
+        koji_builds: Sequence[str] = None,
+    ):
         """
         Create bodhi update
 
@@ -164,8 +181,16 @@ class PackitAPI:
         :param update_notes: documentation about the update
         :param koji_builds: list of koji builds or None (and pick latest)
         """
-        logger.debug("create bodhi update, builds=%s, dg_branch=%s, type=%s",
-                     koji_builds, dist_git_branch, update_type)
+        logger.debug(
+            "create bodhi update, builds=%s, dg_branch=%s, type=%s",
+            koji_builds,
+            dist_git_branch,
+            update_type,
+        )
         dg = DistGit(config=self.config, package_config=self.package_config)
-        dg.create_bodhi_update(koji_builds=koji_builds, dist_git_branch=dist_git_branch,
-                               update_notes=update_notes, update_type=update_type)
+        dg.create_bodhi_update(
+            koji_builds=koji_builds,
+            dist_git_branch=dist_git_branch,
+            update_notes=update_notes,
+            update_type=update_type,
+        )
