@@ -25,18 +25,18 @@ logger = logging.getLogger(__file__)
     "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
 )
 @click.argument(
-    "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
+    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @pass_config
 @cover_packit_exception
-def build(config, dist_git_path, dist_git_branch, scratch, repo):
+def build(config, dist_git_path, dist_git_branch, scratch, path_or_url):
     """
     Build selected upstream project in Fedora.
 
     Packit goes to dist-git and performs `fedpkg build` for the selected branch.
 
-    REPO argument is a local path to the upstream git repository,
+    PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    api = get_packit_api(config=config, dist_git_path=dist_git_path, repo=repo)
+    api = get_packit_api(config=config, dist_git_path=dist_git_path, local_project=path_or_url)
     api.build(dist_git_branch, scratch=scratch)

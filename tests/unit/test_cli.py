@@ -1,6 +1,8 @@
 import pytest
 from click.testing import CliRunner
 
+from packit.cli.build import build
+from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
 from packit.cli.packit_base import version as cli_version
 from packit.cli.update import update
@@ -41,13 +43,16 @@ def test_base_version():
     # assert version in result.output
 
 
-@pytest.mark.parametrize("cmd_function", [update, watch_releases])
+@pytest.mark.parametrize("cmd_function", [update, watch_releases, build, create_update])
 def test_base_subcommand_direct(cmd_function):
     result = _call_packit(cmd_function, parameters=["--help"])
     assert result.exit_code == 0
 
 
-@pytest.mark.parametrize("subcommand", ["propose-update", "watch-releases"])
+@pytest.mark.parametrize(
+    "subcommand",
+    ["propose-update", "watch-releases", "build", "create-update"]
+)
 def test_base_subcommand_help(subcommand):
     result = _call_packit(packit_base, parameters=[subcommand, "--help"])
     assert result.exit_code == 0
