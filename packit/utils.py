@@ -27,7 +27,7 @@ def get_rev_list_kwargs(opt_list):
             try:
                 val = json.loads(raw_val.lower())
                 result[key] = val
-            except json.JSONDecodeError as ex:
+            except json.JSONDecodeError:
                 result[key] = raw_val
     return result
 

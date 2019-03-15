@@ -147,7 +147,10 @@ class PackageConfig:
 
     @property
     def dist_git_package_url(self):
-        return f"{self.dist_git_base_url}{self.dist_git_namespace}/{self.downstream_package_name}.git"
+        return (
+            f"{self.dist_git_base_url}{self.dist_git_namespace}/"
+            f"{self.downstream_package_name}.git"
+        )
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "PackageConfig":
