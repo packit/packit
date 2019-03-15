@@ -1,8 +1,6 @@
 import logging
 import os
 import re
-import shutil
-import tempfile
 from pathlib import Path
 from typing import Optional, List, Tuple
 
@@ -248,8 +246,8 @@ class Upstream:
             self.specfile.changelog_entry = changelog_entry
             # https://github.com/rebase-helper/rebase-helper/blob/643dab4a864288327289f34e023124d5a499e04b/rebasehelper/application.py#L446-L448
             new_log = self.specfile.get_new_log()
-            new_log.extend(self.specfile.spec_content.sections['%changelog'])
-            self.specfile.spec_content.sections['%changelog'] = new_log
+            new_log.extend(self.specfile.spec_content.sections["%changelog"])
+            self.specfile.spec_content.sections["%changelog"] = new_log
             self.specfile.save()
         except RebaseHelperError as ex:
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
