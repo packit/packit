@@ -303,6 +303,13 @@ class Upstream:
             # no idea about this one, but tests were failing in tox w/o it
             "--define",
             f"_topdir {cwd}",
+            # we also need these 3 so that rpmbuild won't create them
+            "--define",
+            f"_builddir {cwd}",
+            "--define",
+            f"_rpmdir {cwd}",
+            "--define",
+            f"_buildrootdir {cwd}",
             self.specfile_path,
         ]
         present_srpms = set(Path.cwd().glob("*.src.rpm"))
