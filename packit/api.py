@@ -227,7 +227,9 @@ class PackitAPI:
         up.create_archive()
         if version != spec_version:
             try:
-                up.set_spec_version(version=version, changelog_entry="- Development snapshot")
+                up.set_spec_version(
+                    version=version, changelog_entry="- Development snapshot"
+                )
             except PackitException:
                 up.bump_spec(version=version, changelog_entry="Development snapshot")
         srpm_path = up.create_srpm(srpm_path=output_file)
