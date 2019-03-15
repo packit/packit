@@ -66,15 +66,15 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         return decorator_cover(_func)
 
 
-def get_packit_api(config: Config, repo: LocalProject, dist_git_path: str = None):
+def get_packit_api(config: Config, local_project: LocalProject, dist_git_path: str = None):
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config = get_local_package_config(repo.working_dir, try_local_dir_first=True)
+    package_config = get_local_package_config(local_project.working_dir, try_local_dir_first=True)
 
     if dist_git_path:
         package_config.downstream_project_url = dist_git_path
-    package_config.upstream_project_url = repo.working_dir
+    package_config.upstream_project_url = local_project.working_dir
 
     api = PackitAPI(config=config, package_config=package_config)
     return api

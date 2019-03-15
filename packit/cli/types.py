@@ -8,7 +8,7 @@ class LocalProjectParameter(click.ParamType):
     Path or url.
     """
 
-    name = "repo"
+    name = "path_or_url"
 
     def __init__(self, branch_param_name: str = None) -> None:
         """

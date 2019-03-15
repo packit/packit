@@ -38,7 +38,7 @@ logger = logging.getLogger(__file__)
     help="Upload the new sources also when the archive is already in the lookaside cache.",
 )
 @click.argument(
-    "repo", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
+    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @click.argument("version", required=False)
 @pass_config
@@ -49,19 +49,19 @@ def update(
     dist_git_branch,
     force_new_sources,
     local_content,
-    repo,
+    path_or_url,
     version,
 ):
     """
     Release current upstream release into Fedora
 
-    REPO argument is a local path to the upstream git repository,
+    PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
 
     VERSION argument is optional, the latest upstream version
     will be used by default
     """
-    api = get_packit_api(config=config, dist_git_path=dist_git_path, repo=repo)
+    api = get_packit_api(config=config, dist_git_path=dist_git_path, local_project=path_or_url)
     api.sync_release(
         dist_git_branch,
         use_local_content=local_content,
