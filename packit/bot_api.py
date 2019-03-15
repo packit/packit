@@ -10,11 +10,9 @@ from typing import Dict, Optional
 
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
-
 from packit.api import PackitAPI
 from packit.config import Config, PackageConfig, get_packit_config_from_repo
 from packit.fed_mes_consume import Consumerino
-from packit.watcher import SourceGitCheckHelper
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +132,7 @@ class PackitBotAPI:
         raise NotImplementedError(
             "The watching of the Fedora CI is not implemented yet."
         )
-
+        """
         repo_name = fedmsg["msg"]["pull_request"]["project"]["name"]
         namespace = fedmsg["msg"]["pull_request"]["project"]["namespace"]
         pr_id = fedmsg["msg"]["pull_request"]["id"]
@@ -146,13 +144,15 @@ class PackitBotAPI:
         pull_request = pagure_repo.get_pr_info(pr_id=pr_id)
 
         # TODO: Finish parsing fedmsg and call sync_fedora_ci
+        """
 
     def sync_fedora_ci(self, package_config: PackageConfig):
         raise NotImplementedError(
             "The watching of the Fedora CI is not implemented yet."
         )
-
+        """
         # TODO: Rework the SourceGitCheckHelper and use it
 
         sg = SourceGitCheckHelper(config=self.config, package_config=package_config)
         sg.process_new_dg_flag(None)
+        """
