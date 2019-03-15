@@ -105,6 +105,11 @@ class JobConfig(NamedTuple):
 
 
 class PackageConfig:
+    """
+    Config class for upstream/downstream packages;
+    this is the config people put in their repos
+    """
+
     def __init__(
         self,
         specfile_path: Optional[str] = None,
@@ -116,6 +121,8 @@ class PackageConfig:
         downstream_project_url: str = None,
         downstream_package_name: str = None,
         dist_git_base_url: str = None,
+        create_tarball_command: List[str] = None,
+        current_version_command: List[str] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: List[str] = synced_files or []
@@ -127,6 +134,21 @@ class PackageConfig:
         self.downstream_project_url: Optional[str] = downstream_project_url
         self.downstream_package_name: Optional[str] = downstream_package_name
         self.dist_git_base_url: str = dist_git_base_url or "https://src.fedoraproject.org/"
+
+        # command to generate a tarball from the upstream repo
+        # uncommitted changes will not be present in the archive
+        self.create_tarball_command: List[str] = create_tarball_command
+        # command to get current version of the project
+        if current_version_command:
+            self.current_version_command: List[str] = current_version_command
+        else:
+            self.current_version_command: List[str] = [
+                "git",
+                "describe",
+                "--tags",
+                "--match",
+                "*.*",
+            ]
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -143,6 +165,8 @@ class PackageConfig:
             and self.downstream_project_url == other.downstream_project_url
             and self.downstream_package_name == other.downstream_package_name
             and self.dist_git_base_url == other.dist_git_base_url
+            and self.current_version_command == other.current_version_command
+            and self.create_tarball_command == other.create_tarball_command
         )
 
     @property
@@ -160,6 +184,8 @@ class PackageConfig:
         specfile_path = raw_dict.get("specfile_path", None)
         synced_files = raw_dict.get("synced_files", None)
         raw_jobs = raw_dict.get("jobs", [])
+        create_tarball_command = raw_dict.get("create_tarball_command", None)
+        current_version_command = raw_dict.get("current_version_command", None)
 
         upstream_project_name = cls.get_deprecated_key(
             raw_dict, "upstream_project_name", "upstream_name"
@@ -189,6 +215,8 @@ class PackageConfig:
             upstream_project_url=upstream_project_url,
             dist_git_base_url=dist_git_base_url,
             dist_git_namespace=dist_git_namespace,
+            create_tarball_command=create_tarball_command,
+            current_version_command=current_version_command,
         )
 
         return pc
@@ -306,6 +334,8 @@ PACKAGE_CONFIG_SCHEMA = {
         "specfile_path": {"type": "string"},
         "downstream_package_name": {"type": "string"},
         "upstream_project_name": {"type": "string"},
+        "create_tarball_command": {"type": "array", "items": {"type": "string"}},
+        "current_version_command": {"type": "array", "items": {"type": "string"}},
         "synced_files": {"type": "array", "items": {"type": "string"}},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
     },

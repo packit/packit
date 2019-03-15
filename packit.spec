@@ -14,7 +14,10 @@ BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
+# new-sources
 Requires:       fedpkg
+# bumpspec
+Requires:       rpmdevtools
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %?python_enable_dependency_generator

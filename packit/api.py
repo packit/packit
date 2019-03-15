@@ -213,3 +213,22 @@ class PackitAPI:
             update_notes=update_notes,
             update_type=update_type,
         )
+
+    def create_srpm(self, output_file: str = None) -> Path:
+        """
+        Create srpm from the upstream repo
+
+        :param output_file: path + filename where the srpm should be written, defaults to cwd
+        :return: a path to the srpm
+        """
+        up = Upstream(config=self.config, package_config=self.package_config)
+        version = up.get_current_version()
+        spec_version = up.get_specfile_version()
+        up.create_archive()
+        if version != spec_version:
+            try:
+                up.set_spec_version(version=version, changelog_entry="- Development snapshot")
+            except PackitException:
+                up.bump_spec(version=version, changelog_entry="Development snapshot")
+        srpm_path = up.create_srpm(srpm_path=output_file)
+        return srpm_path
