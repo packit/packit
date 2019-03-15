@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, List, Tuple
 
 import git
+from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
@@ -240,22 +241,19 @@ class Upstream:
         :param version: new version
         :param changelog_entry: accompanying changelog entry
         """
-        # We can't change the version in-place:
-        # https://github.com/rebase-helper/rebase-helper/pull/596
-        # also this code adds 3 rpmbuild dirs into the upstream repo,
-        # we should ask rebase-helper not to do that
-        tmpdir = Path(tempfile.mkdtemp())
         try:
-            new_path = tmpdir / "spec"
-            shutil.copy2(self.specfile_path, new_path)
-            tmpspec = SpecFile(
-                new_path, changelog_entry=changelog_entry, download=False
-            )
-            tmpspec.set_version(version=version)
-            tmpspec.save()
-            self._specfile = tmpspec.copy(self.specfile_path)
-        finally:
-            shutil.rmtree(tmpdir)
+            # also this code adds 3 rpmbuild dirs into the upstream repo,
+            # we should ask rebase-helper not to do that
+            self.specfile.set_version(version=version)
+            self.specfile.changelog_entry = changelog_entry
+            # https://github.com/rebase-helper/rebase-helper/blob/643dab4a864288327289f34e023124d5a499e04b/rebasehelper/application.py#L446-L448
+            new_log = self.specfile.get_new_log()
+            new_log.extend(self.specfile.spec_content.sections['%changelog'])
+            self.specfile.spec_content.sections['%changelog'] = new_log
+            self.specfile.save()
+        except RebaseHelperError as ex:
+            logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
+            raise PackitException("rebase-helper didn't do the job")
 
     def create_archive(self):
         """
