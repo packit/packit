@@ -172,13 +172,13 @@ class Upstream:
             package_name=self.package_config.downstream_package_name,
             category=None,
         )
-        logger.info(f"Version in upstream registries is \"f{version}\".")
+        logger.info(f'Version in upstream registries is "f{version}".')
         return version
 
     def get_specfile_version(self) -> str:
         """ provide version from specfile """
         version = self.specfile.get_full_version()
-        logger.info(f"Version in spec file is \"f{version}\".")
+        logger.info(f'Version in spec file is "f{version}".')
         return version
 
     def get_version(self) -> str:
@@ -190,6 +190,8 @@ class Upstream:
         spec_ver = self.get_specfile_version()
         # we're running both so that results of each function are logged and user is aware
         if ups_ver:
-            logger.info("Picking version of the latest release from the upstream registry over spec file.")
+            logger.info(
+                "Picking version of the latest release from the upstream registry over spec file."
+            )
             return ups_ver
         return spec_ver

@@ -50,8 +50,7 @@ def test_base_subcommand_direct(cmd_function):
 
 
 @pytest.mark.parametrize(
-    "subcommand",
-    ["propose-update", "watch-releases", "build", "create-update"]
+    "subcommand", ["propose-update", "watch-releases", "build", "create-update"]
 )
 def test_base_subcommand_help(subcommand):
     result = _call_packit(packit_base, parameters=[subcommand, "--help"])

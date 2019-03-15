@@ -264,4 +264,3 @@ Summary: all commits in dist-git, which are curated by a bot, are signed with
 bot’s key. The commit message then references the commits in source git. All
 the mentioned commits need to be signed so it’s possible to figure out who
 authored and approved the work.
-

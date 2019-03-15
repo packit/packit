@@ -16,4 +16,3 @@ true
 %changelog
 * Mon Feb 25 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.1.0-1
 - Initial brewing
-

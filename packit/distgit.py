@@ -20,13 +20,14 @@ class DistGit:
     """
     A class which interacts with dist-git and pagure-over-dist-git API.
 
-    The logic covers git and pagure interaction, manipulation with content, spec files, patches and archives.
+    The logic covers git and pagure interaction, manipulation with content,
+    spec files, patches and archives.
 
-    The expectation is that this class interacts with low level APIs (ogr) and doesn't hold any workflow; the
-    workflow and feeding input should be done up the stack.
+    The expectation is that this class interacts with low level APIs (ogr) and
+    doesn't hold any workflow; the workflow and feeding input should be done up the stack.
 
-    The class works with a single instance of dist-git, that's the state, and methods of this class
-    interact with the local copy.
+    The class works with a single instance of dist-git, that's the state,
+    and methods of this class interact with the local copy.
     """
 
     def __init__(self, config: Config, package_config: PackageConfig):
@@ -86,7 +87,7 @@ class DistGit:
 
         :param branch_name: name of the branch to check out and fetch
         :param base: we base our new branch on this one
-        :param setup_tracking: set up remote tracking (exc will be raised if the branch is not in the remote)
+        :param setup_tracking: set up remote tracking (exc raised if branch not in remote)
         :return the branch which was just created
         """
         logger.debug(f"About to create a new git branch {branch_name!r} in dist-git")

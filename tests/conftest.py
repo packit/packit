@@ -32,21 +32,17 @@ def mock_remote_functionality(upstream_n_distgit):
             author="",
             source_branch="",
             target_branch="",
-            created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11)
+            created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
         )
+
     flexmock(
         PagureProject,
         get_git_urls=lambda: {"git": str(d)},
         fork_create=lambda: None,
-        get_fork=lambda: PagureProject(
-            "", "", PagureService()
-        ),
-        pr_create=mocked_pr_create
+        get_fork=lambda: PagureProject("", "", PagureService()),
+        pr_create=mocked_pr_create,
     )
-    flexmock(
-        GithubService,
-        get_project=None
-    )
+    flexmock(GithubService, get_project=None)
 
     def mock_download_remote_sources():
         """ mock download of the remote archive and place it into dist-git repo """
@@ -69,13 +65,16 @@ def mock_remote_functionality(upstream_n_distgit):
     def mocked_new_sources(sources=None):
         if not Path(sources).is_file():
             raise RuntimeError("archive does not exist")
+
     flexmock(FedPKG, init_ticket=lambda x=None: None, new_sources=mocked_new_sources)
 
     pc = get_local_package_config(str(u))
     pc.downstream_project_url = str(d)
     pc.upstream_project_url = str(u)
     # https://stackoverflow.com/questions/45580215/using-flexmock-on-python-modules
-    flexmock(sys.modules["packit.bot_api"]).should_receive("get_packit_config_from_repo").and_return(pc)
+    flexmock(sys.modules["packit.bot_api"]).should_receive(
+        "get_packit_config_from_repo"
+    ).and_return(pc)
     return u, d
 
 
