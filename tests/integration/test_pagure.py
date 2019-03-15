@@ -9,8 +9,7 @@ from tests.spellbook import git_set_user_email
 
 
 @pytest.mark.skipif(
-    condition=True,
-    reason="Don't interact with a real pagure instance by default"
+    condition=True, reason="Don't interact with a real pagure instance by default"
 )
 def test_basic_distgit_workflow(tmpdir):
     pagure_token = os.getenv("PAGURE_TOKEN")
@@ -19,7 +18,7 @@ def test_basic_distgit_workflow(tmpdir):
         token=pagure_token,
         repo="tmux-top",
         namespace="rpms",
-        instance_url="https://src.stg.fedoraproject.org/"
+        instance_url="https://src.stg.fedoraproject.org/",
     )
 
     print(pag.pagure.whoami())
@@ -43,7 +42,9 @@ def test_basic_distgit_workflow(tmpdir):
 
     subprocess.check_call(["git", "add", "README"], cwd=repo)
     subprocess.check_call(["git", "commit", "-m", "test commit"], cwd=repo)
-    subprocess.check_call(["git", "push", "origin", f"{branch_name}:{branch_name}"], cwd=repo)
+    subprocess.check_call(
+        ["git", "push", "origin", f"{branch_name}:{branch_name}"], cwd=repo
+    )
 
     pr = fork.pr_create("testing PR", "serious description", "master", branch_name)
 

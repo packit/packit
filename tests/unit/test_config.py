@@ -27,13 +27,13 @@ def test_job_config_not_equal():
         ({"trigger": "git_tag", "release_to": ["f28"]}, True),
         ({"trigger": "release", "release_to": ["f28", "rawhide", "f29"]}, True),
         (
-                {
-                    "trigger": "release",
-                    "release_to": ["f28"],
-                    "some": "other",
-                    "metadata": "info",
-                },
-                True,
+            {
+                "trigger": "release",
+                "release_to": ["f28"],
+                "some": "other",
+                "metadata": "info",
+            },
+            True,
         ),
     ],
 )
@@ -51,39 +51,39 @@ def test_job_config_parse_error(raw):
     "raw,expected_config",
     [
         (
-                {"trigger": "release", "release_to": ["f28"]},
-                JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={}),
+            {"trigger": "release", "release_to": ["f28"]},
+            JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={}),
         ),
         (
-                {"trigger": "pull_request", "release_to": ["f28"]},
-                JobConfig(
-                    trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
-                ),
+            {"trigger": "pull_request", "release_to": ["f28"]},
+            JobConfig(
+                trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
+            ),
         ),
         (
-                {"trigger": "git_tag", "release_to": ["f28"]},
-                JobConfig(trigger=TriggerType.git_tag, release_to=["f28"], metadata={}),
+            {"trigger": "git_tag", "release_to": ["f28"]},
+            JobConfig(trigger=TriggerType.git_tag, release_to=["f28"], metadata={}),
         ),
         (
-                {"trigger": "release", "release_to": ["f28", "rawhide", "f29"]},
-                JobConfig(
-                    trigger=TriggerType.release,
-                    release_to=["f28", "rawhide", "f29"],
-                    metadata={},
-                ),
+            {"trigger": "release", "release_to": ["f28", "rawhide", "f29"]},
+            JobConfig(
+                trigger=TriggerType.release,
+                release_to=["f28", "rawhide", "f29"],
+                metadata={},
+            ),
         ),
         (
-                {
-                    "trigger": "release",
-                    "release_to": ["f28"],
-                    "some": "other",
-                    "metadata": "info",
-                },
-                JobConfig(
-                    trigger=TriggerType.release,
-                    release_to=["f28"],
-                    metadata={"some": "other", "metadata": "info"},
-                ),
+            {
+                "trigger": "release",
+                "release_to": ["f28"],
+                "some": "other",
+                "metadata": "info",
+            },
+            JobConfig(
+                trigger=TriggerType.release,
+                release_to=["f28"],
+                metadata={"some": "other", "metadata": "info"},
+            ),
         ),
     ],
 )
@@ -169,35 +169,35 @@ def test_package_config_not_equal(not_equal_package_config):
         ({"synced_files": ["fedora/package.spec"]}, False),
         ({"jobs": [{"trigger": "release", "release_to": ["f28"]}]}, False),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": ["fedora/package.spec"],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                },
-                True,
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/package.spec"],
+                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+            },
+            True,
         ),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": ["fedora/package.spec", "other", "directory"],
-                    "jobs": [
-                        {"trigger": "release", "release_to": ["f28"]},
-                        {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                    ],
-                },
-                True,
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/package.spec", "other", "directory"],
+                "jobs": [
+                    {"trigger": "release", "release_to": ["f28"]},
+                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
+                ],
+            },
+            True,
         ),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [],
-                    "jobs": [
-                        {"trigger": "release", "release_to": ["f28"]},
-                        {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                        {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
-                    ],
-                },
-                True,
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": [],
+                "jobs": [
+                    {"trigger": "release", "release_to": ["f28"]},
+                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
+                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
+                ],
+            },
+            True,
         ),
     ],
 )
@@ -227,132 +227,132 @@ def test_package_config_parse_error(raw):
     "raw,expected",
     [
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": ["fedora/package.spec"],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                },
-                PackageConfig(
-                    specfile_path="fedora/package.spec",
-                    synced_files=["fedora/package.spec"],
-                    jobs=[
-                        JobConfig(
-                            trigger=TriggerType.release, release_to=["f28"], metadata={}
-                        )
-                    ],
-                ),
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/package.spec"],
+                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=["fedora/package.spec"],
+                jobs=[
+                    JobConfig(
+                        trigger=TriggerType.release, release_to=["f28"], metadata={}
+                    )
+                ],
+            ),
         ),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                },
-                PackageConfig(
-                    specfile_path="fedora/package.spec",
-                    synced_files=[
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    jobs=[
-                        JobConfig(
-                            trigger=TriggerType.release, release_to=["f28"], metadata={}
-                        )
-                    ],
-                ),
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": [
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=[
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                jobs=[
+                    JobConfig(
+                        trigger=TriggerType.release, release_to=["f28"], metadata={}
+                    )
+                ],
+            ),
         ),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                },
-                PackageConfig(
-                    specfile_path="fedora/package.spec",
-                    synced_files=[
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    jobs=[
-                        JobConfig(
-                            trigger=TriggerType.release, release_to=["f28"], metadata={}
-                        )
-                    ],
-                ),
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": [
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=[
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                jobs=[
+                    JobConfig(
+                        trigger=TriggerType.release, release_to=["f28"], metadata={}
+                    )
+                ],
+            ),
         ),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                    "something": "stupid",
-                },
-                PackageConfig(
-                    specfile_path="fedora/package.spec",
-                    synced_files=[
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    jobs=[
-                        JobConfig(
-                            trigger=TriggerType.release, release_to=["f28"], metadata={}
-                        )
-                    ],
-                ),
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": [
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "something": "stupid",
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=[
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                jobs=[
+                    JobConfig(
+                        trigger=TriggerType.release, release_to=["f28"], metadata={}
+                    )
+                ],
+            ),
         ),
         (
-                {
-                    "specfile_path": "fedora/package.spec",
-                    "synced_files": [
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-                    "something": "stupid",
-                    "upstream_project_url": "https://github.com/asd/qwe",
-                    "upstream_project_name": "qwe",
-                    "dist_git_base_url": "https://something.wicked"
-                },
-                PackageConfig(
-                    specfile_path="fedora/package.spec",
-                    synced_files=[
-                        "fedora/package.spec",
-                        "some",
-                        "other",
-                        "directory/files",
-                    ],
-                    jobs=[
-                        JobConfig(
-                            trigger=TriggerType.release, release_to=["f28"], metadata={}
-                        )
-                    ],
-                    upstream_project_url="https://github.com/asd/qwe",
-                    upstream_project_name="qwe",
-                    dist_git_base_url="https://something.wicked",
-                ),
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": [
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "something": "stupid",
+                "upstream_project_url": "https://github.com/asd/qwe",
+                "upstream_project_name": "qwe",
+                "dist_git_base_url": "https://something.wicked",
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=[
+                    "fedora/package.spec",
+                    "some",
+                    "other",
+                    "directory/files",
+                ],
+                jobs=[
+                    JobConfig(
+                        trigger=TriggerType.release, release_to=["f28"], metadata={}
+                    )
+                ],
+                upstream_project_url="https://github.com/asd/qwe",
+                upstream_project_name="qwe",
+                dist_git_base_url="https://something.wicked",
+            ),
         ),
     ],
 )

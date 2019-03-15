@@ -38,7 +38,7 @@ class LocalProject:
                         git_url = git_url or path_or_url
                     else:
                         logger.warning("path_or_url is nor directory nor url")
-                except requests.exceptions.BaseHTTPError as ex:
+                except requests.exceptions.BaseHTTPError:
                     logger.warning("path_or_url is nor directory nor url")
 
         self.git_repo = git_repo

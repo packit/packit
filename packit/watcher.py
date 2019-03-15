@@ -5,8 +5,6 @@ import logging
 
 import github
 
-from ogr.services.pagure import PagureService
-
 from packit.config import Config, PackageConfig
 from packit.downstream_checks import DownstreamCheck
 
@@ -55,7 +53,7 @@ class SourceGitCheckHelper:
         raise NotImplementedError(
             "The watching of the Fedora CI is not implemented yet."
         )
-
+        """
         project_name = msg["msg"]["pullrequest"]["project"]["name"]
         logger.info("new flag for PR for %s", project_name)
 
@@ -97,3 +95,4 @@ class SourceGitCheckHelper:
             description=msg["msg"]["flag"]["comment"],
             context=msg["msg"]["flag"]["username"],  # simple-koji-ci or Fedora CI
         )
+        """

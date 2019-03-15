@@ -38,8 +38,10 @@ class SimpleKojiBuild(DownstreamCheck):
 @downstream_check
 class AllPackagesCI(DownstreamCheck):
     # this is actually for rawhide
-    url = ("https://jenkins-continuous-infra.apps.ci.centos.org/view/"
-           "Fedora%20All%20Packages%20Pipeline/job/fedora-rawhide-build-pipeline/")
+    url = (
+        "https://jenkins-continuous-infra.apps.ci.centos.org/view/"
+        "Fedora%20All%20Packages%20Pipeline/job/fedora-rawhide-build-pipeline/"
+    )
     description = "Fedora test run"
     name = "Fedora CI"
 

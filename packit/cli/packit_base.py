@@ -35,7 +35,7 @@ def packit_base(ctx, debug, fas_user, keytab):
 @click.command("version")
 def version():
     """Display the version."""
-    click.echo(get_distribution('packitos').version)
+    click.echo(get_distribution("packitos").version)
 
 
 # packit_base.add_command(sg2dg)
