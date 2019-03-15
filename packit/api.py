@@ -226,11 +226,11 @@ class PackitAPI:
         spec_version = up.get_specfile_version()
         up.create_archive()
         if version != spec_version:
-            up.bump_spec(version=version, changelog_entry="Development snapshot")
-            # sadly rebase-helper can't do the job easily now:
-            # * it creates a bunch of dirs we don't need: BUILD, BUILDROOT, RPMS
-            # * the API is complicated to be used
-            # * I can't make it to add a changelog comment
-            # up.set_spec_version(version=version, changelog_entry="Development snapshot")
+            try:
+                # sadly rebase-helper can't do the job easily now:
+                # * it creates a bunch of dirs we don't need: BUILD, BUILDROOT, RPMS
+                up.set_spec_version(version=version, changelog_entry="- Development snapshot")
+            except PackitException:
+                up.bump_spec(version=version, changelog_entry="Development snapshot")
         srpm_path = up.create_srpm(srpm_path=output_file)
         return srpm_path

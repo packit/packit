@@ -54,8 +54,17 @@ def test_bumpspec(upstream_instance):
     assert ups.get_specfile_version() == new_ver
 
 
+def test_set_spec_ver(upstream_instance):
+    u, ups = upstream_instance
+
+    new_ver = "1.2.3"
+    ups.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+
+    assert ups.get_specfile_version() == new_ver
+    assert "- asdqwe" in u.joinpath("beer.spec").read_text()
+
+
 def test_create_archive(upstream_instance):
-    """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, ups = upstream_instance
 
     ups.create_archive()
