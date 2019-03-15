@@ -3,8 +3,9 @@ import logging
 import click
 from pkg_resources import get_distribution
 
-from packit.cli.create_update import create_update
 from packit.cli.build import build
+from packit.cli.create_update import create_update
+from packit.cli.srpm import srpm
 from packit.cli.update import update
 from packit.cli.watch_upstream_release import watch_releases
 from packit.config import Config, get_context_settings
@@ -47,6 +48,7 @@ packit_base.add_command(watch_releases)
 packit_base.add_command(update)
 packit_base.add_command(build)
 packit_base.add_command(create_update)
+packit_base.add_command(srpm)
 
 if __name__ == "__main__":
     packit_base()

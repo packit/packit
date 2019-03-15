@@ -17,7 +17,7 @@
       ]
     }
   ],
-  "upstream_project_name": "beer",
+  "upstream_project_name": "beerware",
   "downstream_package_name": "beer",
   "checks": [
     {

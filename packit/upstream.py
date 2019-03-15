@@ -1,8 +1,13 @@
 import logging
 import os
+import re
+import shutil
+import tempfile
+from pathlib import Path
 from typing import Optional, List, Tuple
 
 import git
+from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
@@ -178,12 +183,12 @@ class Upstream:
     def get_specfile_version(self) -> str:
         """ provide version from specfile """
         version = self.specfile.get_full_version()
-        logger.info(f'Version in spec file is "f{version}".')
+        logger.info(f'Version in spec file is "{version}".')
         return version
 
     def get_version(self) -> str:
         """
-        Return version of latest release: prioritize upstream
+        Return version of the latest release available: prioritize upstream
         package repositories over the version in spec
         """
         ups_ver = self.get_latest_released_version()
@@ -195,3 +200,131 @@ class Upstream:
             )
             return ups_ver
         return spec_ver
+
+    def get_current_version(self) -> str:
+        """
+        Get version of the project in current state (hint `git describe`)
+
+        :return: e.g. 0.1.1.dev86+ga17a559.d20190315 or 0.6.1.1.gce4d84e
+        """
+        ver = run_command(
+            self.package_config.current_version_command, output=True
+        ).strip()
+        logger.debug("version = %s", ver)
+        # FIXME: this might not work when users expect the dashes
+        #  but! RPM refuses dashes in version/release
+        ver = ver.replace("-", ".")
+        logger.debug("sanitized version = %s", ver)
+        return ver
+
+    def bump_spec(self, version: str = None, changelog_entry: str = None):
+        """
+        Run rpmdev-bumpspec on the upstream spec file: it enables
+        changing version and adding a changelog entry
+
+        :param version: new version which should be present in the spec
+        :param changelog_entry: new changelog entry (just the comment)
+        """
+        cmd = ["rpmdev-bumpspec"]
+        if version:
+            # 1.2.3-4 means, version = 1.2.3, release = 4
+            cmd += ["--new", version]
+        if changelog_entry:
+            cmd += ["--comment", changelog_entry]
+        cmd.append(self.specfile_path)
+        run_command(cmd)
+
+    def set_spec_version(self, version: str, changelog_entry: str):
+        """
+        Set version in spec and add a changelog_entry.
+
+        :param version: new version
+        :param changelog_entry: accompanying changelog entry
+        """
+        try:
+            # also this code adds 3 rpmbuild dirs into the upstream repo,
+            # we should ask rebase-helper not to do that
+            self.specfile.set_version(version=version)
+            self.specfile.changelog_entry = changelog_entry
+            # https://github.com/rebase-helper/rebase-helper/blob/643dab4a864288327289f34e023124d5a499e04b/rebasehelper/application.py#L446-L448
+            new_log = self.specfile.get_new_log()
+            new_log.extend(self.specfile.spec_content.sections['%changelog'])
+            self.specfile.spec_content.sections['%changelog'] = new_log
+            self.specfile.save()
+        except RebaseHelperError as ex:
+            logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
+            raise PackitException("rebase-helper didn't do the job")
+
+    def create_archive(self):
+        """
+        Create archive, using `git archive` by default, from the content of the upstream
+        repository, only committed changes are present in the archive
+        """
+        if self.package_config.upstream_project_name:
+            dir_name = f"{self.package_config.upstream_project_name}-{self.get_current_version()}"
+        else:
+            dir_name = f"{self.package_name}-{self.get_current_version()}"
+        logger.debug("name + version = %s", dir_name)
+        # We don't care about the name of the archive, really
+        # we just require for the archive to be placed in the cwd
+        if self.package_config.create_tarball_command:
+            archive_cmd = self.package_config.create_tarball_command
+        else:
+            # FIXME: .tar.gz is naive
+            archive_name = f"{dir_name}.tar.gz"
+            archive_cmd = [
+                "git",
+                "archive",
+                "-o",
+                archive_name,
+                "--prefix",
+                f"{dir_name}/",
+                "HEAD",
+            ]
+        run_command(archive_cmd)
+
+    def create_srpm(self, srpm_path: str = None) -> Path:
+        """
+        Create SRPM from the actual content of the repo
+
+        :param srpm_path: path to the srpm
+        :return: path to the srpm
+        """
+        cwd = os.getcwd()
+        cmd = [
+            "rpmbuild",
+            "-bs",
+            "--define",
+            f"_sourcedir {cwd}",
+            "--define",
+            f"_specdir {cwd}",
+            "--define",
+            f"_srcrpmdir {cwd}",
+            # no idea about this one, but tests were failing in tox w/o it
+            "--define",
+            f"_topdir {cwd}",
+            # we also need these 3 so that rpmbuild won't create them
+            "--define",
+            f"_builddir {cwd}",
+            "--define",
+            f"_rpmdir {cwd}",
+            "--define",
+            f"_buildrootdir {cwd}",
+            self.specfile_path,
+        ]
+        present_srpms = set(Path.cwd().glob("*.src.rpm"))
+        logger.debug("present srpms = %s", present_srpms)
+        out = run_command(
+            cmd,
+            output=True,
+            error_message="SRPM could not be created. Is the archive present?",
+        ).strip()
+        reg = r"Wrote: (.+)$"
+        try:
+            the_srpm = re.findall(reg, out)[0]
+        except IndexError:
+            raise PackitException("SRPM cannot be found, something is wrong.")
+        if srpm_path:
+            Path(the_srpm).rename(srpm_path)
+            return Path(srpm_path)
+        return Path(the_srpm)

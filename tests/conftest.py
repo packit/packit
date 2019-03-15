@@ -2,6 +2,7 @@ import datetime
 import shutil
 import subprocess
 import sys
+from os import chdir
 from pathlib import Path
 
 import pytest
@@ -11,10 +12,12 @@ from ogr.services.github import GithubService
 from ogr.services.pagure import PagureProject, PagureService
 from rebasehelper.specfile import SpecFile
 
+from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
+from packit.upstream import Upstream
 from packit.utils import FedPKG
-from tests.spellbook import prepare_dist_git_repo
+from tests.spellbook import prepare_dist_git_repo, get_test_config
 from .spellbook import TARBALL_NAME, UPSTREAM, git_add_n_commit, DISTGIT
 
 
@@ -96,3 +99,31 @@ def upstream_n_distgit(tmpdir):
     prepare_dist_git_repo(d)
 
     return u, d
+
+
+@pytest.fixture()
+def upstream_instance(upstream_n_distgit):
+    u, d = upstream_n_distgit
+
+    chdir(u)
+    c = get_test_config()
+
+    pc = get_local_package_config(str(u))
+    pc.upstream_project_url = str(u)
+
+    ups = Upstream(c, pc)
+    return u, ups
+
+
+@pytest.fixture()
+def api_instance(upstream_n_distgit):
+    u, d = upstream_n_distgit
+
+    chdir(u)
+    c = get_test_config()
+
+    pc = get_local_package_config(str(u))
+    pc.upstream_project_url = str(u)
+
+    api = PackitAPI(c, pc)
+    return u, d, api
