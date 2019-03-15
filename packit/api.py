@@ -227,8 +227,6 @@ class PackitAPI:
         up.create_archive()
         if version != spec_version:
             try:
-                # sadly rebase-helper can't do the job easily now:
-                # * it creates a bunch of dirs we don't need: BUILD, BUILDROOT, RPMS
                 up.set_spec_version(version=version, changelog_entry="- Development snapshot")
             except PackitException:
                 up.bump_spec(version=version, changelog_entry="Development snapshot")
