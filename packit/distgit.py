@@ -407,10 +407,20 @@ class DistGit:
         rendered_note = update_notes.format(version=self.specfile.get_full_version())
         try:
             result = b.save(builds=koji_builds, notes=rendered_note, type=update_type)
-            logger.info(f"Bodhi response:\n{result}")
+            logger.debug(f"Bodhi response:\n{result}")
+            logger.info(
+                f"Bodhi update {result['alias']}:\n"
+                f"- {result['url']}\n"
+                f"- autokarma: {result['autokarma']}\n"
+                f"- stable_karma: {result['stable_karma']}\n"
+                f"- unstable_karma: {result['unstable_karma']}"
+            )
+            for cav in result["caveats"]:
+                logger.info(f"- {cav['name']}: {cav['description']}\n")
+
         except BodhiClientException as ex:
             logger.error(ex)
             raise PackitException(
                 f"There is a problem with creating the bodhi update:\n{ex}"
             )
-        return result
+        return result["alias"]
