@@ -411,9 +411,9 @@ class DistGit:
             logger.info(
                 f"Bodhi update {result['alias']}:\n"
                 f"- {result['url']}\n"
-                f"- autokarma: {result['autokarma']}\n"
                 f"- stable_karma: {result['stable_karma']}\n"
                 f"- unstable_karma: {result['unstable_karma']}"
+                f"- notes:\n{result['notes']}\n"
             )
             for cav in result["caveats"]:
                 logger.info(f"- {cav['name']}: {cav['description']}\n")
