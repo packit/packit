@@ -73,16 +73,23 @@ upstream release.
 ## `packit propose-update --help`
 
 ```
-Usage: packit propose-update [OPTIONS] [REPO]
+Usage: packit propose-update [OPTIONS] [PATH_OR_URL] [VERSION]
 
   Release current upstream release into Fedora
 
-  REPO argument is a local path to the upstream git repository, it defaults
-  to the current working directory
+  PATH_OR_URL argument is a local path or a URL to the upstream git
+  repository, it defaults to the current working directory
+
+  VERSION argument is optional, the latest upstream version will be used by
+  default
 
 Options:
   --dist-git-branch TEXT  Target branch in dist-git to release into.
   --dist-git-path TEXT    Path to dist-git repo to work in. Otherwise clone
                           the repo in a temporary directory.
+  --local-content         Do not checkout release tag. Use the current state
+                          of the repo.
+  --force-new-sources     Upload the new sources also when the archive is
+                          already in the lookaside cache.
   -h, --help              Show this message and exit.
 ```
