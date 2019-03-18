@@ -96,8 +96,12 @@ For the run-down of the planned work, please see the task-list below.
 
 ## Workflows covered by packit
 
-* Update to latest upstream release in rawhide. [For more info please read the
-  documentation](/docs/update.md)
+This list contains workflows covered by packit tool and links to the documentation.
+
+* [Update Fedora dist-git with an upstream release.](/docs/propose_update.md)
+* [Build content of a Fedora dist-git branch in koji.](/docs/build.md)
+* [Create a bodhi update.](/docs/create_bodhi_update.md)
+* [Create a SRPM from the current content in the upstream repository](/docs/srpm.md)
 
 
 ## Configuration
