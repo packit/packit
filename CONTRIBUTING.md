@@ -13,7 +13,7 @@ if the problem has already been reported (or fixed in a master branch).
 If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/packit-service/packit/issues/new).
 Be sure to include a **descriptive title and a clear description**. Ideally, please provide:
  * version of packit you are using (`rpm -q packit` or `pip3 freeze | grep packitos`)
- * the command you executed and output
+ * the command you executed and a debug output (using option `--debug`)
 
 If possible, add a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
 
