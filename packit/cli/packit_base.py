@@ -9,6 +9,7 @@ from packit.cli.srpm import srpm
 from packit.cli.update import update
 from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.watch_upstream_release import watch_releases
+from packit.cli.status import status
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
 
@@ -51,6 +52,7 @@ packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
 packit_base.add_command(create_update)
 packit_base.add_command(srpm)
+packit_base.add_command(status)
 
 if __name__ == "__main__":
     packit_base()
