@@ -5,10 +5,32 @@ This document serves as a detailed description of source-git. Please bear in
 mind that some things are a subject to change — the overall design is pretty
 solid, but details may be tinkered over time.
 
-
-
 **Authors**: Stef Walter, Tomas Tomecek
 
+
+### TL;DR
+
+Content of source-git repository is equivalent to dist-git, but uses upstream
+format: source files instead of tarballs, git commits instead of patches.
+
+You can host this repository, or the specific git branch, anywhere you want. If
+you open a pull request, you will receive feedback on the changes:
+* Does the package build with the changes?
+* Do all the package tests pass?
+* How about tests of the dependant packages?
+* Are the changes good to be included in Fedora?
+
+The goal of packit is to provide automation and tooling to interact with
+source-git repositories so you don't have to touch dist-git ever again. Our
+plan is to center development experience around upstream repositories and
+source-git.
+
+Upstream repositories and source-git repositories are pretty much the same
+thing. Creating source-git only makes sense when the upstream does not accept
+downstream spec file or adding spec file to such a project doesn't make sense.
+
+
+### Full description
 
 Source git becomes the place for creative and interesting work, including
 aspects of packaging requiring human effort. We allow dist-git to become an

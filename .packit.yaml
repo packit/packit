@@ -3,6 +3,7 @@ specfile_path: packit.spec
 synced_files:
   - packit.spec
   - .packit.yaml
+# packit was already taken on PyPI
 upstream_project_name: packitos
 downstream_package_name: packit
 current_version_command: ["python3", "setup.py", "--version"]

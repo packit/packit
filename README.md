@@ -38,26 +38,7 @@ DevConf.cz ["Auto-maintain your package" talk](https://www.youtube.com/watch?v=K
 
 ## Ehm, what's source-git?
 
-Content of source-git repository is equivalent to dist-git, but uses upstream
-format: source files instead of tarballs, git commits instead of patches.
-
-You can host this repository, or the specific git branch, anywhere you want. If
-you open a pull request, you will receive feedback on the changes:
-* Does the package build with the changes?
-* Do all the package tests pass?
-* How about tests of the dependant packages?
-* Are the changes good to be included in Fedora?
-
-The goal of packit is to provide automation and tooling to interact with
-source-git repositories so you don't have to touch dist-git ever again. Our
-plan is to center development experience around upstream repositories and
-source-git.
-
-Upstream repositories and source-git repositories are pretty much the same
-thing. Creating source-git only makes sense when the upstream does not accept
-downstream spec file or adding spec file to such a project doesn't make sense.
-
-For more info on source-git, please read [the detailed design doc](docs/source-git.md).
+Please read about source-git [in a dedicated document](docs/source-git.md).
 
 
 ## Plan and current status
@@ -96,8 +77,12 @@ For the run-down of the planned work, please see the task-list below.
 
 ## Workflows covered by packit
 
-* Update to latest upstream release in rawhide. [For more info please read the
-  documentation](/docs/update.md)
+This list contains workflows covered by packit tool and links to the documentation.
+
+* [Update Fedora dist-git with an upstream release.](/docs/propose_update.md)
+* [Build content of a Fedora dist-git branch in koji.](/docs/build.md)
+* [Create a bodhi update.](/docs/create_bodhi_update.md)
+* [Create a SRPM from the current content in the upstream repository](/docs/srpm.md)
 
 
 ## Configuration
@@ -162,6 +147,7 @@ Please, open a PR if you want to be on the list, or just let us know.
 * [greenboot](https://github.com/LorbusChris/greenboot/) (@LorbusChris)
 * rebase-helper (@nforro)
 * ABRT
+* [standard-test-roles](https://pagure.io/standard-test-roles)
 
 
 ## Resources
