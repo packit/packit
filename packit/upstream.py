@@ -317,7 +317,9 @@ class Upstream:
             output=True,
             error_message="SRPM could not be created. Is the archive present?",
         ).strip()
-        reg = r"Wrote: (.+)$"
+        logger.debug(f"{out}")
+        # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
+        reg = r": (.+\.src\.rpm)$"
         try:
             the_srpm = re.findall(reg, out)[0]
         except IndexError:
