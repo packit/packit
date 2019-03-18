@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @cover_packit_exception
 def watch_pr(config, message_id):
     """
-    watch for activity on github and create/update a downstream PR
+    Watch for activity on github and create/update a downstream PR
 
     :return: int, retcode
     """

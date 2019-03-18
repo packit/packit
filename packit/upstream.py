@@ -175,13 +175,13 @@ class Upstream:
             package_name=self.package_config.downstream_package_name,
             category=None,
         )
-        logger.info(f'Version in upstream registries is "f{version}".')
+        logger.info(f"Version in upstream registries is {version!r}.")
         return version
 
     def get_specfile_version(self) -> str:
         """ provide version from specfile """
         version = self.specfile.get_full_version()
-        logger.info(f'Version in spec file is "{version}".')
+        logger.info(f"Version in spec file is {version!r}.")
         return version
 
     def get_version(self) -> str:
