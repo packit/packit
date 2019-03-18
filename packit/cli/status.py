@@ -43,7 +43,7 @@ def status(config):
     click.echo("Latest builds:")
 
     # https://github.com/fedora-infra/bodhi/issues/3058
-    from bodhi.client.bindings import BodhiClient, BodhiClientException
+    from bodhi.client.bindings import BodhiClient
 
     b = BodhiClient()
 
@@ -63,4 +63,6 @@ def status(config):
                 f"\n{koji_builds_str}"
             )
         except KeyError:
-            click.echo(f"No koji builds for package {dg.package_name} and koji tag {koji_tag}")
+            click.echo(
+                f"No koji builds for package {dg.package_name} and koji tag {koji_tag}"
+            )
