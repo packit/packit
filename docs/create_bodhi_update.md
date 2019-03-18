@@ -14,7 +14,7 @@ Create a new bodhi update for the latest Fedora build of the upstream project.
 
 1. [Place a config file for packit in the root of your upstream repository.](/docs/configuration.md).
 
-2. Once the builds are already done, you can run the `create-update` command.
+2. Once the [builds are done](build.md), you can run the `create-update` command.
    If you don't specify the koji builds packit takes latest build.
    ```bash
    $ packit create-update --dist-git-branch f29 https://github.com/packit-service/packit.git

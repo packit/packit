@@ -7,8 +7,8 @@ version of the snapshot and `git archive -o "{package_name}-{version}.tar.gz"
 --prefix "{package_name}-{version}/" HEAD` to create a tarball with upstream
 sources.
 
-You can override the archive and version commands in packit.yaml, e.g. this is
-what we use in ogr, a library which packit is using:
+You can override the archive and version commands in [packit.yaml](configuration.md), e.g. this is
+what we use in [ogr](https://github.com/packit-service/ogr/blob/master/.packit.yaml), a library which packit is using:
 ```yaml
 create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
 current_version_command: ["python3", "setup.py", "--version"]
