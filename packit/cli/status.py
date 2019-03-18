@@ -21,7 +21,6 @@ def status(config):
     """
     Display status
     """
-
     package_config = get_local_package_config()
 
     up = Upstream(config=config, package_config=package_config)
@@ -29,17 +28,17 @@ def status(config):
 
     click.echo("Downstream PRs:")
     for pr in dg.local_project.git_project.get_pr_list():
-        print(f"#{pr.id} {pr.title} {pr.url}")
+        click.echo(f"#{pr.id} {pr.title} {pr.url}")
 
     click.echo("Dist-git versions:")
     branches = ["master", "f30", "f29"]
     for branch in branches:
         dg.checkout_branch(git_ref=branch)
-        print(f"{branch}: {dg.specfile.get_full_version()}")
+        click.echo(f"{branch}: {dg.specfile.get_full_version()}")
 
     click.echo("GitHub upstream releases:")
     for release in up.local_project.git_project.get_releases():
-        print(f"#{release.tag_name}")
+        click.echo(f"#{release.tag_name}")
 
     click.echo("Latest builds:")
 
@@ -59,9 +58,9 @@ def status(config):
         try:
             koji_builds = [builds_d[koji_tag]]
             koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
-            logger.info(
+            click.echo(
                 f"Koji builds for package {dg.package_name} and koji tag {koji_tag}:"
                 f"\n{koji_builds_str}"
             )
         except KeyError:
-            logger.info(f"No koji builds for package {dg.package_name} and koji tag {koji_tag}")
+            click.echo(f"No koji builds for package {dg.package_name} and koji tag {koji_tag}")
