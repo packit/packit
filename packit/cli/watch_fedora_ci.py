@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @cover_packit_exception
 def watcher(config, message_id):
     """
-    watch for flags on PRs: try to process those which we know mapping for
+    Watch for flags on PRs: try to process those which we know mapping for
 
     :return: int, retcode
     """
