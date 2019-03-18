@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @cover_packit_exception
 def watch_releases(config, message_id):
     """
-    watch for activity on github and for every new upstream release, create a
+    Watch for activity on github and for every new upstream release, create a
     downstream pull request
 
     if MESSAGE-ID is specified, process only the selected fedmsg
