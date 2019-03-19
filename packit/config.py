@@ -6,10 +6,10 @@ from os import getenv
 from pathlib import Path
 from typing import Optional, List, NamedTuple
 
-import anymarkup
 import click
 import jsonschema
 from jsonschema import Draft4Validator
+from yaml import safe_load
 
 from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
@@ -260,7 +260,7 @@ def get_local_package_config(
             if config_file_name_full.is_file():
                 logger.debug(f"Local package config found: {config_file_name_full}")
                 try:
-                    loaded_config = anymarkup.parse_file(config_file_name_full)
+                    loaded_config = safe_load(open(config_file_name_full))
                 except Exception as ex:
                     logger.error(
                         f"Cannot load package config '{config_file_name_full}'."
@@ -278,7 +278,7 @@ def get_packit_config_from_repo(
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
-            config_file = sourcegit_project.get_file_content(
+            config_file_content = sourcegit_project.get_file_content(
                 path=config_file_name, ref=ref
             )
             logger.debug(
@@ -295,7 +295,7 @@ def get_packit_config_from_repo(
             continue
 
         try:
-            loaded_config = anymarkup.parse(config_file)
+            loaded_config = safe_load(config_file_content)
         except Exception as ex:
             logger.error(f"Cannot load package config '{config_file_name}'.")
             raise Exception(f"Cannot load package config: {ex}.")

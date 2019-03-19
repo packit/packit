@@ -1,7 +1,14 @@
 import pytest
+from flexmock import flexmock
 from jsonschema.exceptions import ValidationError
 
-from packit.config import JobConfig, PackageConfig, TriggerType
+from ogr.abstract import GitProject, GitService
+from packit.config import (
+    JobConfig,
+    PackageConfig,
+    TriggerType,
+    get_packit_config_from_repo,
+)
 
 
 def test_job_config_equal():
@@ -381,3 +388,19 @@ def test_dist_git_package_url():
     assert pc == new_pc
     assert pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
     assert new_pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "---\nspecfile_path: packit.spec\nsynced_files:\n  - packit.spec\n  - .packit.yaml\n",
+        '{"specfile_path": "packit.spec", "synced_files": ["packit.spec", ".packit.yaml"]}',
+    ],
+)
+def test_get_packit_config_from_repo(content):
+    flexmock(GitProject).should_receive("get_file_content").and_return(content)
+    git_project = GitProject(repo="", service=GitService(), namespace="")
+    config = get_packit_config_from_repo(sourcegit_project=git_project, ref="")
+    assert isinstance(config, PackageConfig)
+    assert config.specfile_path == "packit.spec"
+    assert set(config.synced_files) == {"packit.spec", ".packit.yaml"}
