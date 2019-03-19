@@ -98,7 +98,7 @@ def test_clone_project_checkout_branch():
             },
         ),
         ref="other",
-        git_url=flexmock(),
+        git_url="git@github.com:org/name",
     )
     assert project.git_repo
     assert project.working_dir == "something"
@@ -125,7 +125,7 @@ def test_clone_project_checkout_new_branch():
         .once()
         .mock(),
         ref="other",
-        git_url=flexmock(),
+        git_url="git@github.com:org/name",
     )
     assert project.git_repo
     assert project.working_dir == "something"
@@ -142,7 +142,7 @@ def test_clone_project_service_repo_namespace():
         .with_args(repo="repo", namespace="namespace")
         .replace_with(lambda repo, namespace: flexmock())
         .mock(),
-        git_url=flexmock(),
+        git_url="git@github.com:org/name",
         working_dir=flexmock(),
         git_repo=flexmock(active_branch=flexmock(), head=flexmock(is_detached=False)),
     )
