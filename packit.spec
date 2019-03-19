@@ -18,6 +18,7 @@ BuildRequires:  python3dist(setuptools-scm-git-archive)
 Requires:       fedpkg
 # bumpspec
 Requires:       rpmdevtools
+Requires:       python3-bodhi-client
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %?python_enable_dependency_generator
