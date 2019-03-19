@@ -2,7 +2,7 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -57,6 +57,9 @@ rm -rf %{pypi_name}.egg-info
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 19 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.2.0-1
+- New upstream release 0.2.0
+
 * Thu Mar 14 2019 Frantisek Lachman <flachman@redhat.com> - 0.1.0-1
 - New upstream release 0.1.0
 
