@@ -29,19 +29,6 @@ check-pypi-packaging:
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
 		'
 
-secrets.yaml:
-	stat secrets.yaml || echo "Please create a file secrets.yaml according to instructions in README.md"
-
-run-local: secrets.yaml
-	ansible-playbook -e source_git_image=$(SOURCE_GIT_IMAGE) -e @secrets.yaml -i inventory-local -c local ./deploy.yaml
-	podman logs -f watcher & podman logs -f syncer & sleep 999999
-
-stop-local:
-	podman stop syncer watcher
-
-rm-local:
-	podman rm syncer watcher
-
 build-tests: recipe-tests.yaml
 	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
 
