@@ -82,7 +82,8 @@ This list contains workflows covered by packit tool and links to the documentati
 * [Update Fedora dist-git with an upstream release.](/docs/propose_update.md)
 * [Build content of a Fedora dist-git branch in koji.](/docs/build.md)
 * [Create a bodhi update.](/docs/create_bodhi_update.md)
-* [Create a SRPM from the current content in the upstream repository](/docs/srpm.md)
+* [Create a SRPM from the current content in the upstream repository.](/docs/srpm.md)
+* [Sync content of the Fedora dist-git repo into the upstream repository.](/docs/sync-from-downstream.md)
 
 
 ## Configuration

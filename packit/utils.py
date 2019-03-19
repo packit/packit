@@ -236,3 +236,17 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
+
+
+def get_namespace(url: str) -> str:
+    try:
+        if url.startswith("http"):
+            # if git_url is in format http{s}://github.com/org/repo_name
+            namespace = url.split("/")[3]
+        else:
+            # If git_url is in format git@github.com:org/repo_name
+            org_repo = url.split(":")[1]
+            namespace = org_repo.split("/")[0]
+        return namespace
+    except IndexError:
+        return None

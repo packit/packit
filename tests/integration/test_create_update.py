@@ -260,7 +260,7 @@ def bodhi_response():
 )
 def test_basic_bodhi_update(
     upstream_n_distgit,
-    mock_remote_functionality,
+    mock_upstream_remote_functionality,
     branch,
     update_type,
     update_notes,

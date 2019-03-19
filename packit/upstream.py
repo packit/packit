@@ -3,12 +3,13 @@ import os
 import re
 from pathlib import Path
 from typing import Optional, List, Tuple
-
+import shutil
 import git
 from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
+from ogr.services.github import GithubService
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -28,7 +29,9 @@ class Upstream:
         self._specfile = None
 
         self.package_name: Optional[str] = self.package_config.downstream_package_name
+        self.github_token = self.config.github_token
         self.upstream_project_url: str = self.package_config.upstream_project_url
+        self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
 
     @property
     def active_branch(self):
@@ -46,7 +49,11 @@ class Upstream:
     def local_project(self):
         """ return an instance of LocalProject """
         if self._local_project is None:
-            self._local_project = LocalProject(path_or_url=self.upstream_project_url)
+            self._local_project = LocalProject(
+                path_or_url=self.upstream_project_url,
+                repo_name=self.package_name,
+                git_service=GithubService(token=self.github_token),
+            )
         return self._local_project
 
     @property
@@ -69,6 +76,48 @@ class Upstream:
             refspec=f"pull/{pr_id}/head:pull/{pr_id}"
         )
         self.local_project.git_repo.refs[f"pull/{pr_id}"].checkout()
+
+    def create_branch(
+        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+    ) -> git.Head:
+        """
+        Create a new git branch in dist-git
+
+        :param branch_name: name of the branch to check out and fetch
+        :param base: we base our new branch on this one
+        :param setup_tracking: set up remote tracking
+                              (exc will be raised if the branch is not in the remote)
+        :return the branch which was just created
+        """
+        # it's not an error if the branch already exists
+        origin = self.local_project.git_repo.remote("origin")
+        heads = self.local_project.git_repo.heads
+        if branch_name in heads:
+            logger.debug(f"Branch '{branch_name}' already exists.")
+            return heads[branch_name]
+        head = self.local_project.git_repo.create_head(branch_name, commit=base)
+
+        if setup_tracking:
+            try:
+                remote_ref = origin.refs[branch_name]
+            except IndexError:
+                raise PackitException("Remote origin doesn't have ref %s" % branch_name)
+            # this is important to fedpkg: build can't find the tracking branch otherwise
+            head.set_tracking_branch(remote_ref)
+
+        return head
+
+    def checkout_branch(self, git_ref: str):
+        """
+        Perform a `git checkout`
+
+        :param git_ref: ref to check out
+        """
+        try:
+            head = self.local_project.git_repo.heads[git_ref]
+        except IndexError:
+            raise PackitException(f"Branch {git_ref} does not exist")
+        head.checkout()
 
     def checkout_release(self, version: str) -> None:
         logger.info("Checking out upstream version %s", version)
@@ -117,6 +166,60 @@ class Upstream:
             f"Delta ({upstream_ref}..{self.local_project.ref}): {len(commits)}"
         )
         return commits
+
+    def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
+        """
+        Perform `git add -A` and `git commit`
+        """
+        main_msg = f"{prefix}{title}"
+        self.local_project.git_repo.git.add("-A")
+        self.local_project.git_repo.index.write()
+        commit_args = ["-s", "-m", main_msg]
+        if msg:
+            commit_args += ["-m", msg]
+        self.local_project.git_repo.git.commit(*commit_args)
+
+    def push_to_branch(
+        self, branch_name: str, remote_name: str = "origin", force: bool = False
+    ):
+        """
+        push changes to a fork of the dist-git repo; they need to be committed!
+
+        :param branch_name: the branch where we push
+        :param fork_remote_name: local name of the remote where we push to
+        :param force: push forcefully?
+        """
+        # I suggest to comment this one while testing when the push is not needed
+        # TODO: create dry-run ^
+        self.local_project.git_repo.remote(remote_name).push(
+            refspec=branch_name, force=force
+        )
+
+    def create_pull(
+        self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
+    ) -> None:
+        """
+        Create upstream pull request using the requested branches
+        """
+        project = self.local_project.git_project
+
+        if not self.github_token:
+            raise PackitException(
+                "Please provide GITHUB_TOKEN as an environment variable."
+            )
+
+        try:
+            upstream_pr = project.pr_create(
+                title=pr_title,
+                body=pr_description,
+                source_branch=source_branch,
+                target_branch=target_branch,
+            )
+        except Exception as ex:
+            logger.error("there was an error while create a PR: %r", ex)
+            raise
+        else:
+            logger.info(f"PR created: {upstream_pr.url}")
 
     def create_patches(
         self, upstream: str = None, destination: str = None
@@ -183,6 +286,24 @@ class Upstream:
         version = self.specfile.get_full_version()
         logger.info(f"Version in spec file is {version!r}.")
         return version
+
+    def sync_files(self, downstream_project: LocalProject) -> None:
+        """
+        sync required files from upstream to downstream
+        """
+        logger.debug("about to sync files %s", self.files_to_sync)
+        for fi in self.files_to_sync:
+            # TODO: fi can be dir
+            fi = fi[1:] if fi.startswith("/") else fi
+            src = os.path.join(downstream_project.working_dir, fi)
+            if os.path.exists(src):
+                logger.info("syncing %s", src)
+                shutil.copy2(src, self.local_project.working_dir)
+            else:
+                raise PackitException(
+                    f"File {src} is not present in the downstream repository. "
+                    f"Upstream ref {downstream_project.git_repo.active_branch} is checked out"
+                )
 
     def get_version(self) -> str:
         """
