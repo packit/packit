@@ -415,8 +415,9 @@ class DistGit:
                 f"- unstable_karma: {result['unstable_karma']}"
                 f"- notes:\n{result['notes']}\n"
             )
-            for cav in result["caveats"]:
-                logger.info(f"- {cav['name']}: {cav['description']}\n")
+            if "caveats" in result:
+                for cav in result["caveats"]:
+                    logger.info(f"- {cav['name']}: {cav['description']}\n")
 
         except BodhiClientException as ex:
             logger.error(ex)
