@@ -71,7 +71,6 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
         get_fork=lambda: PagureProject("", "", PagureService()),
         pr_create=mocked_pr_create,
     )
-    flexmock(GithubService, get_project=None)
 
     def mock_download_remote_sources():
         """ mock download of the remote archive and place it into dist-git repo """
@@ -82,6 +81,8 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
         subprocess.check_call(["tar", "-cf", str(tarball_path), hops_filename], cwd=d)
 
     flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
+
+    flexmock(GithubService, get_project=lambda repo, namespace: flexmock())
 
     flexmock(
         DistGit,
@@ -161,7 +162,7 @@ def upstream_instance(upstream_n_distgit):
 
 
 @pytest.fixture()
-def distgit_instance(upstream_n_distgit, mock_remote_functionality):
+def distgit_instance(upstream_n_distgit, mock_upstream_remote_functionality):
     u, d = upstream_n_distgit
     c = get_test_config()
     pc = get_local_package_config(str(u))

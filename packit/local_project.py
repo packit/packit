@@ -142,8 +142,13 @@ class LocalProject:
                 # .urls returns generator
                 self.git_url = list(self.git_repo.remote().urls)[0]
                 logger.debug(f"remote url of the repo is {self.git_url}")
-                self.namespace = get_namespace(self.git_url)
                 change = True
+
+            if self.git_repo and not self.namespace:
+                self.namespace = get_namespace(self.git_url)
+                logger.debug(f"namespace from url is {self.namespace}")
+                if self.namespace:
+                    change = True
 
         if ref:
 
