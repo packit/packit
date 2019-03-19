@@ -116,6 +116,16 @@ def upstream_instance(upstream_n_distgit):
 
 
 @pytest.fixture()
+def distgit_instance(upstream_n_distgit, mock_remote_functionality):
+    u, d = upstream_n_distgit
+    c = get_test_config()
+    pc = get_local_package_config(str(u))
+    pc.upstream_project_url = str(u)
+    dg = DistGit(c, pc)
+    return d, dg
+
+
+@pytest.fixture()
 def api_instance(upstream_n_distgit):
     u, d = upstream_n_distgit
 
