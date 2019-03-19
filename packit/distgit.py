@@ -190,11 +190,16 @@ class DistGit:
                 name=fork_remote_name, url=fork_urls["ssh"]
             )
 
-        # I suggest to comment this one while testing when the push is not needed
-        # TODO: create dry-run ^
-        self.local_project.git_repo.remote(fork_remote_name).push(
-            refspec=branch_name, force=force
-        )
+        try:
+            self.local_project.git_repo.remote(fork_remote_name).push(
+                refspec=branch_name, force=force
+            )
+        except git.GitError as ex:
+            msg = (
+                f"Unable to push to remote {fork_remote_name} using branch {branch_name}, "
+                f"the error is:\n{ex}"
+            )
+            raise PackitException(msg)
 
     def create_pull(
         self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
