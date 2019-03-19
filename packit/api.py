@@ -124,6 +124,64 @@ class PackitAPI:
             if not use_local_content:
                 up.local_project.git_repo.git.checkout(current_up_branch.checkout())
 
+    def sync_from_downstream(
+        self, dist_git_branch: str, upstream_branch: str, no_pr: bool = None
+    ):
+        """
+        Update upstream package from Fedora
+        """
+        up = Upstream(config=self.config, package_config=self.package_config)
+
+        dg = DistGit(config=self.config, package_config=self.package_config)
+
+        logger.info(f"upstream active branch {up.active_branch}")
+        try:
+            dg.update_branch(dist_git_branch)
+            dg.checkout_branch(dist_git_branch)
+
+            local_pr_branch = f"{dist_git_branch}-downstream-sync"
+            logger.info(f'using "{dist_git_branch}" dist-git branch')
+
+            up.create_branch(local_pr_branch)
+            up.checkout_branch(local_pr_branch)
+
+            up.sync_files(dg.local_project)
+
+            if not no_pr:
+                description = (
+                    f"Downstream commit: {dg.local_project.git_repo.head.commit}\n"
+                )
+
+                self.sync_upstream(
+                    upstream=up,
+                    commit_msg=f"{dist_git_branch} downstream sync",
+                    pr_title=f"Update from downstream branch {dist_git_branch}",
+                    pr_description=description,
+                    upstream_branch=upstream_branch,
+                    commit_msg_description=description,
+                )
+        finally:
+            pass
+
+    def sync_upstream(
+        self,
+        upstream: Upstream,
+        commit_msg: str,
+        pr_title: str,
+        pr_description: str,
+        upstream_branch: str,
+        commit_msg_description: str = None,
+    ):
+        upstream.commit(title=commit_msg, msg=commit_msg_description)
+        # the branch may already be up, let's push forcefully
+        upstream.push_to_branch(upstream.local_project.ref, force=True)
+        upstream.create_pull(
+            pr_title,
+            pr_description,
+            source_branch=str(upstream.local_project.ref),
+            target_branch=upstream_branch,
+        )
+
     def sync(
         self,
         distgit: DistGit,
