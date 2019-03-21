@@ -71,12 +71,12 @@ class LocalProject:
             change = (
                 self._parse_repo_name_full_name_and_namespace()
                 or self._parse_git_repo_from_working_dir(offline=offline)
-                or self._parse_git_project(offline)
-                or self._parse_git_service(offline)
+                or self._parse_git_project_from_repo_namespace_and_git_project(offline)
+                or self._parse_git_service_from_git_project(offline)
                 or self._parse_ref_from_git_repo()
-                or self._parse_working_dir()
+                or self._parse_working_dir_from_git_repo()
                 or self._parse_git_repo_from_git_url(offline)
-                or self._parse_git_url(offline)
+                or self._parse_git_url_from_git_project(offline)
                 or self._parse_repo_name_from_git_project()
                 or self._parse_namespace_from_git_project()
                 or self._parse_git_url_from_git_repo()
@@ -142,7 +142,7 @@ class LocalProject:
             return True
         return False
 
-    def _parse_git_url(self, offline):
+    def _parse_git_url_from_git_project(self, offline):
         if self.git_project and not self.git_url and not offline:
             self.git_url = self.git_project.get_git_urls()["git"]
             return True
@@ -155,7 +155,7 @@ class LocalProject:
             return True
         return False
 
-    def _parse_working_dir(self):
+    def _parse_working_dir_from_git_repo(self):
         if self.git_repo and not self.working_dir:
             self.working_dir = self.git_repo.working_dir
             return True
@@ -167,13 +167,15 @@ class LocalProject:
             return self._ref is not None
         return False
 
-    def _parse_git_service(self, offline):
+    def _parse_git_service_from_git_project(self, offline):
         if self.git_project and not self.git_service and not offline:
             self.git_service = self.git_project.service
             return True
         return False
 
-    def _parse_git_project(self, offline: bool) -> bool:
+    def _parse_git_project_from_repo_namespace_and_git_project(
+        self, offline: bool
+    ) -> bool:
 
         if (
             self.repo_name
