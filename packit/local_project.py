@@ -50,15 +50,8 @@ class LocalProject:
         if path_or_url:
             if os.path.isdir(path_or_url):
                 working_dir = working_dir or path_or_url
-            elif not offline:
-                try:
-                    res = requests.head(path_or_url)
-                    if res.ok:
-                        git_url = git_url or path_or_url
-                    else:
-                        logger.warning("path_or_url is nor directory nor url")
-                except requests.exceptions.BaseHTTPError:
-                    logger.warning("path_or_url is nor directory nor url")
+            elif not offline and self._is_url(path_or_url):
+                git_url = git_url or path_or_url
 
         self.git_repo = git_repo
         self.working_dir = working_dir
@@ -107,6 +100,17 @@ class LocalProject:
         if self.git_repo:
             return self._get_ref_from_git_repo()
         return None
+
+    def _is_url(self, path_or_url):
+        try:
+            res = requests.head(path_or_url)
+            if res.ok:
+                return True
+            else:
+                logger.warning("path_or_url is nor directory nor url")
+        except requests.exceptions.BaseHTTPError:
+            logger.warning("path_or_url is nor directory nor url")
+        return False
 
     def _parse_namespace_from_git_repo(self):
         if self.git_repo and not self.namespace:
