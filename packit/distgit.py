@@ -57,7 +57,10 @@ class DistGit:
                 namespace=self.dist_git_namespace,
                 repo_name=self.package_name,
                 path_or_url=self.package_config.downstream_project_url,
-                git_service=PagureService(token=self.pagure_user_token),
+                git_service=PagureService(
+                    token=self.pagure_user_token,
+                    instance_url=self.package_config.dist_git_base_url
+                ),
             )
         return self._local_project
 
