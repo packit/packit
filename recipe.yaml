@@ -1,6 +1,14 @@
 ---
 - name: This is a recipe for how to cook with packit
   hosts: all
+  vars:
+    ansible_bender:
+      target_image:
+        name: packit
+      working_container:
+        volumes:
+        - '{{ playbook_dir }}:/src:Z'
+      base_image: fedora:29
   tasks:
   - name: Install all packages needed to hack on packit.
     dnf:
