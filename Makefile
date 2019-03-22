@@ -1,11 +1,10 @@
-BASE_IMAGE := registry.fedoraproject.org/fedora:29
 TEST_TARGET := ./tests/
 PY_PACKAGE := packit
 SOURCE_GIT_IMAGE := packit
 PACKIT_TESTS_IMAGE := packit-tests
 
 build: recipe.yaml
-	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yaml $(BASE_IMAGE) $(SOURCE_GIT_IMAGE)
+	ansible-bender build -- ./recipe.yaml
 
 prepare-check:
 	ansible-playbook -b -K -i inventory-local -c local ./recipe-tests.yaml
