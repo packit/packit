@@ -416,7 +416,7 @@ class DistGit:
                 )
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
-        rendered_note = update_notes.format(version=self.specfile.get_full_version())
+        rendered_note = update_notes.format(version=self.specfile.get_version())
         try:
             result = b.save(builds=koji_builds, notes=rendered_note, type=update_type)
             logger.debug(f"Bodhi response:\n{result}")
