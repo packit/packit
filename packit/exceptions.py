@@ -27,3 +27,7 @@ class PackitException(Exception):
 
 class PackitConfigException(PackitException):
     pass
+
+
+class PackitInvalidConfigException(PackitConfigException):
+    """ provided configuration file is not valid """
