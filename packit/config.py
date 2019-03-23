@@ -24,7 +24,6 @@ class Config:
         self.debug = False
         self.fas_user = None
         self.keytab_path = None
-        self._package_config = None
         self._github_token = None
         self._pagure_user_token = None
         self._pagure_package_token = None
