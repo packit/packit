@@ -21,10 +21,10 @@ logger = logging.getLogger("packit")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab):
-    c = Config()
-    c.debug = debug
-    c.fas_user = fas_user
-    c.keytab_path = keytab
+    c = Config.get_user_config()
+    c.debug = debug or c.debug
+    c.fas_user = fas_user or c.fas_user
+    c.keytab_path = keytab or c.keytab_path
     ctx.obj = c
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
