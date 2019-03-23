@@ -25,31 +25,83 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from jsonschema.exceptions import ValidationError
-
 from ogr.abstract import GitProject, GitService
+
 from packit.actions import ActionName
 from packit.config import (
     JobConfig,
     PackageConfig,
-    TriggerType,
+    JobTriggerType,
     SyncFilesConfig,
     SyncFilesItem,
     get_packit_config_from_repo,
     Config,
+    JobType,
+    JobNotifyType,
 )
+from packit.exceptions import PackitInvalidConfigException
 
 
-def test_job_config_equal():
-    assert JobConfig(
-        trigger=TriggerType.release, release_to=["f28"], metadata={}
-    ) == JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
+def get_job_config_dict_simple():
+    return {"job": "build", "trigger": "release", "notify": []}
 
 
-def test_job_config_not_equal():
-    assert not JobConfig(
-        trigger=TriggerType.release, release_to=["f28"], metadata={}
-    ) == JobConfig(trigger=TriggerType.release, release_to=["f29"], metadata={})
+def get_job_config_dict_full():
+    return {
+        "job": "propose_downstream",
+        "trigger": "pull_request",
+        "notify": ["pull_request_status"],
+        "metadata": {"a": "b"},
+    }
+
+
+@pytest.fixture()
+def job_config_dict_simple():
+    return get_job_config_dict_simple()
+
+
+@pytest.fixture()
+def job_config_dict_full():
+    return get_job_config_dict_full()
+
+
+def get_job_config_simple():
+    return JobConfig(
+        job=JobType.build, trigger=JobTriggerType.release, notify=[], metadata={}
+    )
+
+
+def get_job_config_full():
+    return JobConfig(
+        job=JobType.propose_downstream,
+        trigger=JobTriggerType.pull_request,
+        notify=[JobNotifyType.pull_request_status],
+        metadata={"a": "b"},
+    )
+
+
+@pytest.fixture()
+def job_config_simple():
+    return get_job_config_simple()
+
+
+@pytest.fixture()
+def job_config_full():
+    return get_job_config_full()
+
+
+def test_job_config_equal(job_config_simple):
+    assert job_config_simple == job_config_simple
+
+
+def test_job_config_not_equal(job_config_simple, job_config_full):
+    assert job_config_simple != job_config_full
+
+
+def test_job_config_blah():
+    with pytest.raises(PackitInvalidConfigException) as ex:
+        JobConfig.get_from_dict({"job": "asdqwe", "trigger": "salt", "notify": []})
+    assert "'asdqwe' is not one of " in str(ex.value)
 
 
 @pytest.mark.parametrize(
@@ -58,69 +110,25 @@ def test_job_config_not_equal():
         ({}, False),
         ({"trigger": "release"}, False),
         ({"release_to": ["f28"]}, False),
-        ({"trigger": "release", "release_to": ["f28"]}, True),
-        ({"trigger": "pull_request", "release_to": ["f28"]}, True),
-        ({"trigger": "git_tag", "release_to": ["f28"]}, True),
-        ({"trigger": "release", "release_to": ["f28", "rawhide", "f29"]}, True),
-        (
-            {
-                "trigger": "release",
-                "release_to": ["f28"],
-                "some": "other",
-                "metadata": "info",
-            },
-            True,
-        ),
+        ([], False),
+        ({"asd"}, False),
+        (get_job_config_dict_simple(), True),
+        (get_job_config_dict_full(), True),
     ],
 )
 def test_job_config_validate(raw, is_valid):
-    assert JobConfig.is_dict_valid(raw) == is_valid
-
-
-@pytest.mark.parametrize("raw", [{}, {"trigger": "release"}, {"release_to": ["f28"]}])
-def test_job_config_parse_error(raw):
-    with pytest.raises(Exception):
-        JobConfig.get_from_dict(raw_dict=raw)
+    if is_valid:
+        JobConfig.validate(raw)
+    else:
+        with pytest.raises(PackitInvalidConfigException):
+            JobConfig.validate(raw)
 
 
 @pytest.mark.parametrize(
     "raw,expected_config",
     [
-        (
-            {"trigger": "release", "release_to": ["f28"]},
-            JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={}),
-        ),
-        (
-            {"trigger": "pull_request", "release_to": ["f28"]},
-            JobConfig(
-                trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
-            ),
-        ),
-        (
-            {"trigger": "git_tag", "release_to": ["f28"]},
-            JobConfig(trigger=TriggerType.git_tag, release_to=["f28"], metadata={}),
-        ),
-        (
-            {"trigger": "release", "release_to": ["f28", "rawhide", "f29"]},
-            JobConfig(
-                trigger=TriggerType.release,
-                release_to=["f28", "rawhide", "f29"],
-                metadata={},
-            ),
-        ),
-        (
-            {
-                "trigger": "release",
-                "release_to": ["f28"],
-                "some": "other",
-                "metadata": "info",
-            },
-            JobConfig(
-                trigger=TriggerType.release,
-                release_to=["f28"],
-                metadata={"some": "other", "metadata": "info"},
-            ),
-        ),
+        (get_job_config_dict_simple(), get_job_config_simple()),
+        (get_job_config_dict_full(), get_job_config_full()),
     ],
 )
 def test_job_config_parse(raw, expected_config):
@@ -128,19 +136,19 @@ def test_job_config_parse(raw, expected_config):
     assert job_config == expected_config
 
 
-def test_package_config_equal():
+def test_package_config_equal(job_config_simple):
     assert PackageConfig(
         specfile_path="fedora/package.spec",
         synced_files=SyncFilesConfig(
             files_to_sync=[SyncFilesItem(src="packit.yaml", dest="packit.yaml")]
         ),
-        jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
+        jobs=[job_config_simple],
     ) == PackageConfig(
         specfile_path="fedora/package.spec",
         synced_files=SyncFilesConfig(
             files_to_sync=[SyncFilesItem(src="packit.yaml", dest="packit.yaml")]
         ),
-        jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
+        jobs=[job_config_simple],
     )
 
 
@@ -155,18 +163,14 @@ def test_package_config_equal():
                     SyncFilesItem(src="b", dest="b"),
                 ]
             ),
-            jobs=[
-                JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
-            ],
+            jobs=[get_job_config_simple()],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
             synced_files=SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="c", dest="c")]
             ),
-            jobs=[
-                JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
-            ],
+            jobs=[get_job_config_simple()],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -176,11 +180,7 @@ def test_package_config_equal():
                     SyncFilesItem(src="b", dest="b"),
                 ]
             ),
-            jobs=[
-                JobConfig(
-                    trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
-                )
-            ],
+            jobs=[get_job_config_full()],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -190,9 +190,7 @@ def test_package_config_equal():
                     SyncFilesItem(src="d", dest="d"),
                 ]
             ),
-            jobs=[
-                JobConfig(trigger=TriggerType.release, release_to=["f29"], metadata={})
-            ],
+            jobs=[get_job_config_full()],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
@@ -202,15 +200,13 @@ def test_package_config_equal():
                     SyncFilesItem(src="d", dest="d"),
                 ]
             ),
-            jobs=[
-                JobConfig(
-                    trigger=TriggerType.release, release_to=["f28"], metadata={"a": "b"}
-                )
-            ],
+            jobs=[get_job_config_full()],
         ),
     ],
 )
 def test_package_config_not_equal(not_equal_package_config):
+    j = get_job_config_full()
+    j.metadata["b"] = "c"
     assert (
         not PackageConfig(
             specfile_path="fedora/package.spec",
@@ -220,9 +216,7 @@ def test_package_config_not_equal(not_equal_package_config):
                     SyncFilesItem(src="d", dest="d"),
                 ]
             ),
-            jobs=[
-                JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
-            ],
+            jobs=[j],
         )
         == not_equal_package_config
     )
@@ -239,12 +233,11 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             False,
         ),
-        ({"jobs": [{"trigger": "release", "release_to": ["f28"]}]}, False),
+        ({"jobs": [{"trigger": "release", "job": "propose_downstream"}]}, False),
         (
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/foobar.spec"],
-                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
             },
             True,
         ),
@@ -252,22 +245,7 @@ def test_package_config_not_equal(not_equal_package_config):
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/foobar.spec", "somefile", "somedirectory"],
-                "jobs": [
-                    {"trigger": "release", "release_to": ["f28"]},
-                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                ],
-            },
-            True,
-        ),
-        (
-            {
-                "specfile_path": "fedora/package.spec",
-                "synced_files": ["fedora/foobar.spec"],
-                "jobs": [
-                    {"trigger": "release", "release_to": ["f28"]},
-                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
-                ],
+                "jobs": [],
             },
             True,
         ),
@@ -279,11 +257,6 @@ def test_package_config_not_equal(not_equal_package_config):
                     "pre-sync": "some/pre-sync/command --option",
                     "get-current-version": "get-me-version",
                 },
-                "jobs": [
-                    {"trigger": "release", "release_to": ["f28"]},
-                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
-                ],
             },
             True,
         ),
@@ -295,11 +268,6 @@ def test_package_config_not_equal(not_equal_package_config):
                     "pre-sync": "some/pre-sync/command --option",
                     "unknown-action": "nothing",
                 },
-                "jobs": [
-                    {"trigger": "release", "release_to": ["f28"]},
-                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
-                ],
             },
             False,
         ),
@@ -307,11 +275,7 @@ def test_package_config_not_equal(not_equal_package_config):
             {
                 "specfile_path": "fedora/package.spec",
                 "actions": ["actions" "has", "to", "be", "key", "value"],
-                "jobs": [
-                    {"trigger": "release", "release_to": ["f28"]},
-                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
-                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
-                ],
+                "jobs": [{"job": "asd", "trigger": "qwe"}],
             },
             False,
         ),
@@ -319,10 +283,10 @@ def test_package_config_not_equal(not_equal_package_config):
 )
 def test_package_config_validate(raw, is_valid):
     if not is_valid:
-        with pytest.raises(ValidationError):
-            PackageConfig.validate_dict(raw)
+        with pytest.raises(PackitInvalidConfigException):
+            PackageConfig.validate(raw)
     else:
-        PackageConfig.validate_dict(raw)
+        PackageConfig.validate(raw)
 
 
 @pytest.mark.parametrize(
@@ -346,7 +310,7 @@ def test_package_config_parse_error(raw):
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
-                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "jobs": [get_job_config_dict_full()],
             },
             PackageConfig(
                 specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
@@ -357,11 +321,7 @@ def test_package_config_parse_error(raw):
                         )
                     ]
                 ),
-                jobs=[
-                    JobConfig(
-                        trigger=TriggerType.release, release_to=["f28"], metadata={}
-                    )
-                ],
+                jobs=[get_job_config_full()],
             ),
         ),
         (
@@ -373,7 +333,7 @@ def test_package_config_parse_error(raw):
                     "other",
                     "directory/files",
                 ],
-                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "jobs": [get_job_config_dict_simple()],
             },
             PackageConfig(
                 specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
@@ -387,18 +347,14 @@ def test_package_config_parse_error(raw):
                         SyncFilesItem(src="directory/files", dest="directory/files"),
                     ]
                 ),
-                jobs=[
-                    JobConfig(
-                        trigger=TriggerType.release, release_to=["f28"], metadata={}
-                    )
-                ],
+                jobs=[get_job_config_simple()],
             ),
         ),
         (
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
-                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "jobs": [get_job_config_dict_full()],
             },
             PackageConfig(
                 specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
@@ -409,18 +365,14 @@ def test_package_config_parse_error(raw):
                         )
                     ]
                 ),
-                jobs=[
-                    JobConfig(
-                        trigger=TriggerType.release, release_to=["f28"], metadata={}
-                    )
-                ],
+                jobs=[get_job_config_full()],
             ),
         ),
         (
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec", "somefile"],
-                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "jobs": [get_job_config_dict_full()],
                 "something": "stupid",
             },
             PackageConfig(
@@ -433,18 +385,14 @@ def test_package_config_parse_error(raw):
                         SyncFilesItem(src="somefile", dest="somefile"),
                     ]
                 ),
-                jobs=[
-                    JobConfig(
-                        trigger=TriggerType.release, release_to=["f28"], metadata={}
-                    )
-                ],
+                jobs=[get_job_config_full()],
             ),
         ),
         (
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
-                "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+                "jobs": [get_job_config_dict_full()],
                 "something": "stupid",
                 "upstream_project_url": "https://github.com/asd/qwe",
                 "upstream_project_name": "qwe",
@@ -459,11 +407,7 @@ def test_package_config_parse_error(raw):
                         )
                     ]
                 ),
-                jobs=[
-                    JobConfig(
-                        trigger=TriggerType.release, release_to=["f28"], metadata={}
-                    )
-                ],
+                jobs=[get_job_config_full()],
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
                 dist_git_base_url="https://something.wicked",
