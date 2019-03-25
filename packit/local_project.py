@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 class LocalProject:
     """
-    Class representing the cloned repository and the remote API
+    Class representing a cloned repository
+    and its API to the remote git-forge (e.g. GitHub/GitLab/Pagure)
 
     - git_repo: instance of git.Repo
     - working_dir: working directory for the project
@@ -46,6 +47,22 @@ class LocalProject:
         offline: bool = False,
         refresh=True,
     ) -> None:
+        """
+
+        :param git_repo: git.Repo
+        :param working_dir: str (working directory for the project)
+        :param ref: str (git ref (branch/tag/commit) if set, then checkouted)
+        :param git_project: ogr.GitProject (remote API for project)
+        :param git_service: ogr.GitService (tokens for remote API)
+        :param git_url: str (remote url used for cloning)
+        :param full_name: str ("$namespace/$repo")
+        :param namespace: str (namespace of the remote project)
+        :param repo_name: str (name of the remote project)
+        :param path_or_url: str (used as working_dir if it is an existing directory,
+                                used as git_url if the it is a request-able url)
+        :param offline: bool (do not use any network action, defaults to False)
+        :param refresh: bool (calculate the missing attributes, defaults to True)
+        """
 
         self.working_dir_temporary = False
         if path_or_url:
