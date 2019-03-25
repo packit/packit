@@ -53,7 +53,7 @@ def test_basic_local_update(upstream_n_distgit, mock_upstream_remote_functionali
 
     assert (d / TARBALL_NAME).is_file()
     spec = SpecFile(str(d / "beer.spec"), None)
-    assert spec.get_full_version() == "0.1.0"
+    assert spec.get_version() == "0.1.0"
 
 
 def test_basic_local_update_from_downstream(
@@ -83,7 +83,7 @@ def test_single_message(github_release_fedmsg, mock_upstream_remote_functionalit
     api.sync_upstream_release_with_fedmsg(github_release_fedmsg)
     assert (d / TARBALL_NAME).is_file()
     spec = SpecFile(str(d / "beer.spec"), None)
-    assert spec.get_full_version() == "0.1.0"
+    assert spec.get_version() == "0.1.0"
 
 
 def test_loop(mock_upstream_remote_functionality, github_release_fedmsg):

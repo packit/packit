@@ -283,7 +283,7 @@ class Upstream:
 
     def get_specfile_version(self) -> str:
         """ provide version from specfile """
-        version = self.specfile.get_full_version()
+        version = self.specfile.get_version()
         logger.info(f"Version in spec file is {version!r}.")
         return version
 
