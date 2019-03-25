@@ -320,19 +320,19 @@ class PackitAPI:
             except PackitException:
                 logger.info(f"Branch {branch} doesn't exists.")
 
-        logger.info("\nGitHub upstream releases:")
-        if up.local_project.git_project is None:
-            logger.info("Failed to obtain latest releases from upstream!")
-        else:
-            latest_releases = up.local_project.git_project.get_releases()
+        latest_releases = up.local_project.git_project.get_releases()
+        if len(latest_releases) > 0:
+            logger.info("\nGitHub upstream releases:")
             # take last five releases
             latest_releases = (
                 latest_releases[:5] if len(latest_releases) > 5 else latest_releases
             )
             upstream_releases_str = "\n".join(
-                f"#{release.tag_name}" for release in latest_releases
+                f"{release.tag_name}" for release in latest_releases
             )
             logger.info(upstream_releases_str)
+        else:
+            logger.info("\nGitHub upstream releases: No releases found.")
 
         logger.info("\nLatest builds:")
         # https://github.com/fedora-infra/bodhi/issues/3058
