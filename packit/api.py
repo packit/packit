@@ -25,20 +25,13 @@ class PackitAPI:
     @property
     def up(self):
         if self._up is None:
-            self._up = Upstream(
-                config=self.config,
-                package_config=self.package_config,
-                local_project=self.upstream_local_project,
-            )
+            self._up = Upstream(config=self.config, package_config=self.package_config)
         return self._up
 
     @property
     def dg(self):
         if self._dg is None:
-            self._dg = DistGit(
-                config=self.config,
-                package_config=self.package_config,
-            )
+            self._dg = DistGit(config=self.config, package_config=self.package_config)
         return self._dg
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
@@ -141,12 +134,22 @@ class PackitAPI:
                 )
 
     def sync_from_downstream(
-        self, dist_git_branch: str, upstream_branch: str, no_pr: bool = False
+        self,
+        dist_git_branch: str,
+        upstream_branch: str,
+        no_pr: bool = False,
+        fork: bool = True,
+        remote_name: str = None,
     ):
         """
-        Update self.upstream package from Fedora
+        Sync content of Fedora dist-git repo back to upstream
+
+        :param dist_git_branch: branch in dist-git
+        :param upstream_branch: upstream branch
+        :param no_pr: won't create a pull request if set to True
+        :param fork: forks the project if set to True
+        :param remote_name: name of remote where we should push; if None, try to find a ssh_url
         """
-        import ipdb; ipdb.set_trace()
         logger.info(f"upstream active branch {self.up.active_branch}")
 
         self.dg.update_branch(dist_git_branch)
@@ -170,12 +173,17 @@ class PackitAPI:
 
             self.up.commit(title=commit_msg, msg=description)
 
-            # the branch may already be self.up, let's push forcefully
-            self.up.push_to_branch(self.up.local_project.ref, force=True)
+            # the branch may already be up, let's push forcefully
+            source_branch = self.up.push(
+                self.up.local_project.ref,
+                fork=fork,
+                force=True,
+                remote_name=remote_name,
+            )
             self.up.create_pull(
                 pr_title,
                 description,
-                source_branch=str(self.up.local_project.ref),
+                source_branch=source_branch,
                 target_branch=upstream_branch,
             )
 
