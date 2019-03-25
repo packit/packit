@@ -6,7 +6,7 @@ import git
 import requests
 
 from ogr.abstract import GitProject, GitService
-from packit.utils import is_git_repo, get_repo, get_namespace
+from packit.utils import is_git_repo, get_repo, get_namespace_and_repo_name
 
 logger = logging.getLogger(__name__)
 
@@ -249,10 +249,12 @@ class LocalProject:
         return False
 
     def _parse_namespace_from_git_url(self):
-        if self.git_url and not self.namespace:
-            self.namespace = get_namespace(self.git_url)
-            if self.namespace:
-                return True
+        if self.git_repo and (not self.namespace or not self.repo_name):
+            self.namespace, self.repo_name = get_namespace_and_repo_name(self.git_url)
+            logger.debug(
+                f"Parsed namespace and repo name from url: {self.namespace}/{self.repo_name}"
+            )
+            return True
         return False
 
     def _get_ref_from_git_repo(self):
