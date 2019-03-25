@@ -59,7 +59,7 @@ class DistGit:
                 path_or_url=self.package_config.downstream_project_url,
                 git_service=PagureService(
                     token=self.pagure_user_token,
-                    instance_url=self.package_config.dist_git_base_url
+                    instance_url=self.package_config.dist_git_base_url,
                 ),
             )
         return self._local_project
@@ -424,7 +424,7 @@ class DistGit:
                 f"Bodhi update {result['alias']}:\n"
                 f"- {result['url']}\n"
                 f"- stable_karma: {result['stable_karma']}\n"
-                f"- unstable_karma: {result['unstable_karma']}"
+                f"- unstable_karma: {result['unstable_karma']}\n"
                 f"- notes:\n{result['notes']}\n"
             )
             if "caveats" in result:
