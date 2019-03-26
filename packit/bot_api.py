@@ -94,7 +94,7 @@ class PackitBotAPI:
         )
 
         if not package_config:
-            logger.debug(
+            logger.info(
                 f"No packit config: skipping release {version} for {namespace}/{repo_name}."
             )
             return
