@@ -35,13 +35,22 @@ node('userspace-containerization'){
                 onmyduffynode "yum -y remove git"
                 onmyduffynode "curl -o /etc/yum.repos.d/git-epel-7.repo https://copr.fedorainfracloud.org/coprs/g/git-maint/git/repo/epel-7/group_git-maint-git-epel-7.repo"
                 onmyduffynode "yum -y install git-core"
-                onmyduffynode "pip3.6 install tox"
+                onmyduffynode "pip3.6 install tox pre-commit"
                 synctoduffynode "./." // copy all source files (hidden too, we need .git/)
             }
 
-            stage("Run tests") {
-                onmyduffynode "tox -e py36"
+            def tasks = [:]
+            tasks["Tests"] = {
+                stage ("Tests"){
+                    onmyduffynode "tox -e py36"
+                }
             }
+            tasks["Linters"] = {
+                stage ("Linters"){
+                    onmyduffynode "pre-commit run --all-files"
+                }
+            }
+            parallel tasks
         } catch (e) {
             currentBuild.result = "FAILURE"
             throw e
