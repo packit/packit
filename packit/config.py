@@ -352,6 +352,10 @@ class PackageConfig:
         return True
 
     def get_output_from_action(self, action_name: str):
+        """
+        Run action if specified in the self.actions and return output
+        else return None
+        """
         if action_name in self.actions:
             command = self.actions[action_name]
             logger.info(f"Using user-defined script for {action_name}: {command}")
