@@ -4,8 +4,7 @@ import os
 import click
 
 from packit.cli.utils import cover_packit_exception
-from packit.config import pass_config, get_context_settings, get_local_package_config
-from packit.local_project import LocalProject
+from packit.config import pass_config, get_context_settings
 
 logger = logging.getLogger(__file__)
 
@@ -32,7 +31,7 @@ def sg2dg(config, dest_dir, no_new_sources, upstream_ref, version, repo):
 
     5. The output is the directory (= dirty git repo)
     """
-
+    """
     package_config = get_local_package_config(try_local_dir_first=True)
     sourcegit = LocalProject(git_url=repo)
     if not package_config:
@@ -62,3 +61,4 @@ def sg2dg(config, dest_dir, no_new_sources, upstream_ref, version, repo):
         else:
             logger.debug("Skipping fedpkg new-sources.")
         click.echo(f"{distgit.working_dir}")
+    """

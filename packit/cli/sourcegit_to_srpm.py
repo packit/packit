@@ -4,8 +4,7 @@ import os
 import click
 
 from packit.cli.utils import cover_packit_exception
-from packit.config import pass_config, get_context_settings, get_local_package_config
-from packit.local_project import LocalProject
+from packit.config import pass_config, get_context_settings
 
 logger = logging.getLogger(__file__)
 
@@ -31,7 +30,7 @@ def sg2srpm(config, dest_dir, upstream_ref, version, repo):
 
     3. create SRPM
     """
-
+    """
     package_config = get_local_package_config(try_local_dir_first=True)
     sourcegit = LocalProject(git_url=repo)
     if not package_config:
@@ -60,3 +59,4 @@ def sg2srpm(config, dest_dir, upstream_ref, version, repo):
         t.add_patches_to_specfile(patch_list=patches)
         srpm = t.create_srpm()
         click.echo(srpm)
+    """
