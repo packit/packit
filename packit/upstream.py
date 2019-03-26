@@ -17,21 +17,22 @@ from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import run_command
+from packit.base_git import PackitRepositoryBase
 
 logger = logging.getLogger(__name__)
 
 
-class Upstream:
+class Upstream(PackitRepositoryBase):
     """ interact with upstream project """
 
     def __init__(self, config: Config, package_config: PackageConfig):
-        self.config = config
-        self.package_config = package_config
+        super().__init__(config=config, package_config=package_config)
 
         self._local_project = None
         self._specfile = None
 
         self.package_name: Optional[str] = self.package_config.downstream_package_name
+
         self.github_token = self.config.github_token
         self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
@@ -105,48 +106,6 @@ class Upstream:
         )
         self.local_project.git_repo.refs[f"pull/{pr_id}"].checkout()
 
-    def create_branch(
-        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
-    ) -> git.Head:
-        """
-        Create a new git branch in dist-git
-
-        :param branch_name: name of the branch to check out and fetch
-        :param base: we base our new branch on this one
-        :param setup_tracking: set up remote tracking
-                              (exc will be raised if the branch is not in the remote)
-        :return the branch which was just created
-        """
-        # it's not an error if the branch already exists
-        origin = self.local_project.git_repo.remote("origin")
-        heads = self.local_project.git_repo.heads
-        if branch_name in heads:
-            logger.debug(f"Branch '{branch_name}' already exists.")
-            return heads[branch_name]
-        head = self.local_project.git_repo.create_head(branch_name, commit=base)
-
-        if setup_tracking:
-            try:
-                remote_ref = origin.refs[branch_name]
-            except IndexError:
-                raise PackitException("Remote origin doesn't have ref %s" % branch_name)
-            # this is important to fedpkg: build can't find the tracking branch otherwise
-            head.set_tracking_branch(remote_ref)
-
-        return head
-
-    def checkout_branch(self, git_ref: str):
-        """
-        Perform a `git checkout`
-
-        :param git_ref: ref to check out
-        """
-        try:
-            head = self.local_project.git_repo.heads[git_ref]
-        except IndexError:
-            raise PackitException(f"Branch {git_ref} does not exist")
-        head.checkout()
-
     def checkout_release(self, version: str) -> None:
         logger.info("Checking out upstream version %s", version)
         try:
@@ -194,18 +153,6 @@ class Upstream:
             f"Delta ({upstream_ref}..{self.local_project.ref}): {len(commits)}"
         )
         return commits
-
-    def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
-        """
-        Perform `git add -A` and `git commit`
-        """
-        main_msg = f"{prefix}{title}"
-        self.local_project.git_repo.git.add("-A")
-        self.local_project.git_repo.index.write()
-        commit_args = ["-s", "-m", main_msg]
-        if msg:
-            commit_args += ["-m", msg]
-        self.local_project.git_repo.git.commit(*commit_args)
 
     def push(
         self,

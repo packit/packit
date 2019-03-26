@@ -47,6 +47,7 @@ class PackitAPI:
             base=f"remotes/origin/{dist_git_branch}",
             setup_tracking=True,
         )
+
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
@@ -115,6 +116,7 @@ class PackitAPI:
                 base=f"remotes/origin/{dist_git_branch}",
                 setup_tracking=True,
             )
+
             self.dg.update_branch(dist_git_branch)
             self.dg.checkout_branch(dist_git_branch)
 
@@ -247,11 +249,13 @@ class PackitAPI:
         :param scratch: should the build be a scratch build?
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
+
         self.dg.create_branch(
             dist_git_branch,
             base=f"remotes/origin/{dist_git_branch}",
             setup_tracking=True,
         )
+
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
