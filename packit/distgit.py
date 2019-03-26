@@ -11,7 +11,7 @@ from ogr.services.pagure import PagureService
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
-from packit.utils import FedPKG
+from packit.fedpkg import FedPKG
 
 logger = logging.getLogger(__name__)
 
