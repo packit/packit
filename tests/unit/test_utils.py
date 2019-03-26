@@ -21,7 +21,5 @@ def test_get_ns_repo_exc():
     url = "git@github.com"
     with pytest.raises(PackitException) as ex:
         get_namespace_and_repo_name(url)
-    assert str(ex.value) == (
-        "Invalid URL format, can't obtain namespace and repository name:"
-        f" {url}: IndexError('list index out of range')"
-    )
+    msg = f"Invalid URL format, can't obtain namespace and repository name: {url}"
+    assert msg in str(ex.value)

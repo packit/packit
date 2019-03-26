@@ -179,14 +179,15 @@ def test_parse_git_url_from_git_repo():
 
 def test_parse_namespace_from_git_url():
     project = LocalProject(
-        git_url="http://some.example/namespace/reponame", refresh=False
+        git_url="https://github.com/namespace/reponame", refresh=False
     )
     changed = project._parse_namespace_from_git_url()
 
     assert changed
     assert project.namespace
     assert project.namespace == "namespace"
-    assert project.git_url == "http://some.example/namespace/reponame"
+    assert project.repo_name == "reponame"
+    assert project.git_url == "https://github.com/namespace/reponame"
 
 
 # CHECKOUT BRANCH
