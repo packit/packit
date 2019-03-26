@@ -249,8 +249,11 @@ class LocalProject:
         return False
 
     def _parse_namespace_from_git_url(self):
-        if self.git_repo and (not self.namespace or not self.repo_name):
-            self.namespace, self.repo_name = get_namespace_and_repo_name(self.git_url)
+        if self.git_url and (not self.namespace or not self.repo_name):
+            namespace, repo_name = get_namespace_and_repo_name(self.git_url)
+            if namespace == self.namespace and repo_name == self.repo_name:
+                return False
+            self.namespace, self.repo_name = namespace, repo_name
             logger.debug(
                 f"Parsed namespace and repo name from url: {self.namespace}/{self.repo_name}"
             )
