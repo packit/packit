@@ -42,7 +42,7 @@ class DistGit:
         self.pagure_fork_token = self.config.pagure_fork_token
         self.package_name: Optional[str] = self.package_config.downstream_package_name
         self.fas_user = self.config.fas_user
-        self.dist_git_url: Optional[str] = self.package_config.downstream_project_url
+        self.dist_git_url: str = self.package_config.downstream_project_url
         logger.debug(f"Using dist-git repo {self.dist_git_url}")
         self.files_to_sync: List[str] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
