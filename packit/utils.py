@@ -147,16 +147,6 @@ def is_git_repo(directory: str) -> bool:
     return Path(directory).joinpath(".git").is_dir()
 
 
-def checkout_pr(repo: git.Repo, pr_id: int):
-    """
-    Checkout the branch for the pr.
-
-    TODO: Move this to ogr and make it compatible with other git forges.
-    """
-    repo.remote().fetch(refspec=f"pull/{pr_id}/head:pull/{pr_id}")
-    repo.refs[f"pull/{pr_id}"].checkout()
-
-
 def get_repo(url: str, directory: str = None) -> git.Repo:
     """
     Use directory as a git repo or clone repo to the tempdir.
