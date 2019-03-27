@@ -73,14 +73,6 @@
       state: directory
       path: /root/.ssh
       mode: 0700
-  - name: Copy keys in there
-    copy:
-      src: '{{ item.source }}'
-      dest: /root/.ssh/{{ item.dest }}
-      mode: 0400
-    with_items:
-    - {source: "bigger-secret", dest: "id_rsa.pub"}
-    - {source: "biggest-secret", dest: "id_rsa"}
   - name: Copy ssh_config
     copy:
       src: files/ssh_config
