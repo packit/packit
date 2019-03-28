@@ -1,4 +1,6 @@
-# Packit configuration file
+# Configuration for packit
+
+## Project's configuration file
 
 Packit uses a configuration file in the upstream repository. The config file is written in YAML language.
 
@@ -11,9 +13,9 @@ You should place the file in the root of your upstream repo. Packit accepts thes
 * `packit.json`
 
 
-## Values
+### Values
 
- Key name                  | type            | description
+ Key name                  | Type            | Description
 ---------------------------|-----------------|----------------------------------------------------------------------
  `specfile_path`           | string          | relative path to a spec file within the upstream repository (mandatory)
  `synced_files`            | list of strings | a list of relative paths to files in the upstream repo which are meant to be copied to dist-git during an update
@@ -25,7 +27,7 @@ You should place the file in the root of your upstream repo. Packit accepts thes
  `current_version_command` | list of strings | a command which prints current upstream version (hint: `git describe`) (defaults to `git describe --tags --match '*.*'`)
 
 
-## Minimal sample config
+### Minimal sample config
 
 This is a sample config which is meant for packit itself.
 
@@ -38,7 +40,7 @@ upstream_project_name: packitos
 downstream_package_name: packit
 ```
 
-## Real examples
+### Real examples
 
 The list of projects which already have packit config in their upstream repositories:
 * [packit-service/packit](https://github.com/packit-service/packit/blob/master/.packit.yaml)
@@ -49,7 +51,45 @@ The list of projects which already have packit config in their upstream reposito
 * [rebase-helper/rebase-helper](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yaml)
 
 
-## In-progress work
+### In-progress work
 
 You may see packit configs with much more values, such as jobs and checks
 keys. Packit is not using those values right now.
+
+
+## User configuration file
+
+When running packit as a tool locally, it is convenient to use a configuration
+file to provide data such as API tokens. Packit respects `XDG_CONFIG_HOME`
+environment variable. If not set, it looks inside `~/.config/` directory.
+
+The acceptable names are the same as for the package config:
+* `.packit.yaml`
+* `.packit.yml`
+* `.packit.json`
+* `packit.yaml`
+* `packit.yml`
+* `packit.json`
+
+
+### Values
+
+ Key name                  | Type            | Description
+---------------------------|-----------------|----------------------------------------------------------------------
+ `debug`                   | bool            | enable debug logs
+ `fas_user`                | string          | username in Fedora account system (to perform kinit if needed)
+ `keytab_path`             | string          | path to a Kerberos keytab file (requires `fas_user` to be set)
+ `github_token`            | string          | Github API token: this is needed when packit interacts with Github API
+ `pagure_user_token`       | string          | Pagure token needed to access REST API, get it at: https://src.fedoraproject.org/settings#nav-api-tab
+ `pagure_fork_token`       | string          | a token so packit can create a pull request: https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
+
+You can also specify the tokens as environment variables: `GITHUB_TOKEN`, `PAGURE_USER_TOKEN`, `PAGURE_FORK_TOKEN`.
+
+
+### Minimal sample config
+
+```
+debug: true
+github_token: mnbvcxz123456
+pagure_user_token: qwertyuiop098765
+```
