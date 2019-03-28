@@ -320,6 +320,12 @@ class PackageConfig:
             if method:
                 method(*args, **kwargs)
 
+    def has_action(self, action_name: str) -> bool:
+        """
+        Is the action defined in the config?
+        """
+        return action_name in self.actions
+
     def with_action(self, action_name: str) -> bool:
         """
         If the action is defined in the self.package_config.actions,
