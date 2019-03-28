@@ -62,13 +62,15 @@ class PackitAPI:
             f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
         )
 
-        self.sync(
-            distgit=self.dg,
-            commit_msg=f"Sync self.upstream pr: {pr_id}",
+        self._handle_sources(add_new_sources=True, force_new_sources=False)
+
+        self.dg.sync_files(upstream_project=self.up.local_project)
+        self.dg.commit(title=f"Sync upstream pr: {pr_id}", msg=description)
+
+        self.push_and_create_pr(
             pr_title=f"Upstream pr: {pr_id}",
             pr_description=description,
             dist_git_branch="master",
-            add_new_sources=False,
         )
 
     def sync_release(
@@ -117,16 +119,12 @@ class PackitAPI:
             )
 
             self.dg.sync_files(self.up.local_project)
+            self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
-            self.sync(
-                distgit=self.dg,
-                commit_msg=f"{full_version} self.upstream release",
-                pr_title=f"Update to self.upstream release {full_version}",
+            self.push_and_create_pr(
+                pr_title=f"Update to upstream release {full_version}",
                 pr_description=description,
                 dist_git_branch=dist_git_branch,
-                commit_msg_description=description,
-                add_new_sources=True,
-                force_new_sources=force_new_sources,
             )
         finally:
             if not use_local_content:
@@ -188,46 +186,34 @@ class PackitAPI:
                 target_branch=upstream_branch,
             )
 
-    def sync(
-        self,
-        distgit: DistGit,
-        commit_msg: str,
-        pr_title: str,
-        pr_description: str,
-        dist_git_branch: str,
-        commit_msg_description: str = None,
-        add_new_sources=False,
-        force_new_sources=False,
+    def push_and_create_pr(
+        self, pr_title: str, pr_description: str, dist_git_branch: str
     ):
+        # the branch may already be up, let's push forcefully
+        self.dg.push_to_fork(self.dg.local_project.ref, force=True)
+        self.dg.create_pull(
+            pr_title,
+            pr_description,
+            source_branch=str(self.dg.local_project.ref),
+            target_branch=dist_git_branch,
+        )
 
+    def _handle_sources(self, add_new_sources, force_new_sources):
         if add_new_sources or force_new_sources:
-
             make_new_sources = False
-
             # btw this is really naive: the name could be the same but the hash can be different
             # TODO: we should do something when such situation happens
-            if force_new_sources or not distgit.is_archive_in_lookaside_cache(
-                distgit.upstream_archive_name
+            if force_new_sources or not self.dg.is_archive_in_lookaside_cache(
+                self.dg.upstream_archive_name
             ):
                 make_new_sources = True
             else:
-                sources_file = Path(distgit.local_project.working_dir) / "sources"
-                if distgit.upstream_archive_name not in sources_file.read_text():
+                sources_file = Path(self.dg.local_project.working_dir) / "sources"
+                if self.dg.upstream_archive_name not in sources_file.read_text():
                     make_new_sources = True
-
             if make_new_sources:
-                archive = distgit.download_upstream_archive()
-                distgit.upload_to_lookaside_cache(archive)
-
-        distgit.commit(title=commit_msg, msg=commit_msg_description)
-        # the branch may already be self.up, let's push forcefully
-        distgit.push_to_fork(distgit.local_project.ref, force=True)
-        distgit.create_pull(
-            pr_title,
-            pr_description,
-            source_branch=str(distgit.local_project.ref),
-            target_branch=dist_git_branch,
-        )
+                archive = self.dg.download_upstream_archive()
+                self.dg.upload_to_lookaside_cache(archive)
 
     def build(self, dist_git_branch: str, scratch: bool = False):
         """
