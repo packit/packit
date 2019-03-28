@@ -84,20 +84,20 @@ class PackitAPI:
         full_version = version or self.up.get_version()
         if not full_version:
             raise PackitException(
-                "Could not figure out version of latest self.upstream release."
+                "Could not figure out version of latest upstream release."
             )
         current_up_branch = self.up.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
             #       but the thing is that we need to do it
             #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
-            # TODO: this is also naive, self.upstream may use different tagging scheme, e.g.
+            # TODO: this is also naive, upstream may use different tagging scheme, e.g.
             #       release = 232, tag = v232
             if not use_local_content:
                 self.up.checkout_release(full_version)
 
-            local_pr_branch = f"{full_version}-{dist_git_branch}-self.update"
-            # fetch and reset --hard self.upstream/$branch?
+            local_pr_branch = f"{full_version}-{dist_git_branch}-update"
+            # fetch and reset --hard upstream/$branch?
             logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
             self.dg.create_branch(
@@ -255,15 +255,15 @@ class PackitAPI:
         koji_builds: Sequence[str] = None,
     ):
         """
-        Create bodhi self.update
+        Create bodhi update
 
         :param dist_git_branch: git ref
-        :param update_type: type of the self.update, check CLI
-        :param update_notes: documentation about the self.update
+        :param update_type: type of the update, check CLI
+        :param update_notes: documentation about the update
         :param koji_builds: list of koji builds or None (and pick latest)
         """
         logger.debug(
-            "create bodhi self.update, builds=%s, self.dg_branch=%s, type=%s",
+            "create bodhi update, builds=%s, dg_branch=%s, type=%s",
             koji_builds,
             dist_git_branch,
             update_type,
@@ -277,7 +277,7 @@ class PackitAPI:
 
     def create_srpm(self, output_file: str = None) -> Path:
         """
-        Create srpm from the self.upstream repo
+        Create srpm from the upstream repo
 
         :param output_file: path + filename where the srpm should be written, defaults to cwd
         :return: a path to the srpm
