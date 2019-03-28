@@ -9,11 +9,11 @@ from typing import Optional, List, NamedTuple
 import click
 import jsonschema
 from jsonschema import Draft4Validator
+from ogr.abstract import GitProject
 from yaml import safe_load
 
-from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
-from packit.exceptions import PackitConfigException
+from packit.exceptions import PackitConfigException, PackitException
 from packit.utils import exclude_from_dict
 
 logger = logging.getLogger(__name__)
@@ -21,33 +21,35 @@ logger = logging.getLogger(__name__)
 
 class Config:
     def __init__(self):
-        self.debug = False
-        self.fas_user = None
-        self.keytab_path = None
-        self._github_token = None
-        self._pagure_user_token = None
-        self._pagure_fork_token = None
+        self.debug: bool = False
+        self.fas_user: Optional[str] = None
+        self.keytab_path: Optional[str] = None
+        self._github_token: str = ""
+        self._pagure_user_token: str = ""
+        self._pagure_fork_token: str = ""
 
     @classmethod
     def get_user_config(cls) -> "Config":
-        directory = getenv("XDG_CONFIG_HOME")
-        if directory:
-            directory = Path(directory)
+        xdg_config_home = getenv("XDG_CONFIG_HOME")
+        if xdg_config_home:
+            directory = Path(xdg_config_home)
         else:
             directory = Path.home() / ".config"
 
+        logger.debug(f"Loading user config from directory: {directory}")
+
+        loaded_config: dict = {}
         for config_file_name in CONFIG_FILE_NAMES:
             config_file_name_full = directory / config_file_name
+            logger.debug(f"Trying to load user config from: {config_file_name_full}")
             if config_file_name_full.is_file():
                 try:
                     loaded_config = safe_load(open(config_file_name_full))
                 except Exception as ex:
-                    logger.error(
-                        f"Cannot load user config '{config_file_name_full}'."
-                    )
-                    raise Exception(f"Cannot load user config: {ex}.")
+                    logger.error(f"Cannot load user config '{config_file_name_full}'.")
+                    raise PackitException(f"Cannot load user config: {ex}.")
 
-                return Config.get_from_dict(raw_dict=loaded_config)
+        return Config.get_from_dict(raw_dict=loaded_config)
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "Config":
@@ -59,9 +61,9 @@ class Config:
         config.debug = raw_dict.get("debug", False)
         config.fas_user = raw_dict.get("fas_user", None)
         config.keytab_path = raw_dict.get("keytab_path", None)
-        config._github_token = raw_dict.get("github_token", None)
-        config._pagure_user_token = raw_dict.get("pagure_user_token", None)
-        config._pagure_fork_token = raw_dict.get("pagure_fork_token", None)
+        config._github_token = raw_dict.get("github_token", "")
+        config._pagure_user_token = raw_dict.get("pagure_user_token", "")
+        config._pagure_fork_token = raw_dict.get("pagure_fork_token", "")
 
         return config
 
