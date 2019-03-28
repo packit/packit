@@ -156,6 +156,7 @@ def upstream_instance(upstream_n_distgit):
 
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
+    pc.downstream_project_url = str(d)
 
     ups = Upstream(c, pc)
     return u, ups
@@ -166,6 +167,7 @@ def distgit_instance(upstream_n_distgit, mock_upstream_remote_functionality):
     u, d = upstream_n_distgit
     c = get_test_config()
     pc = get_local_package_config(str(u))
+    pc.downstream_project_url = str(d)
     pc.upstream_project_url = str(u)
     dg = DistGit(c, pc)
     return d, dg

@@ -1,22 +1,25 @@
 import pytest
+from packit.exceptions import PackitException
 
-from packit.utils import get_namespace
+from packit.utils import get_namespace_and_repo_name
 
 
 @pytest.mark.parametrize(
-    "url,namespace",
+    "url,namespace,repo_name",
     [
-        ("https://github.com/org/name", "org"),
-        ("git@github.com:org/name", "org"),
-        ("https://git/foo/bar/2", "foo"),
-        ("git@github.com:nothing/else/matters", "nothing"),
-        ("http://git/org/name", "org"),
-        ("https://some/org", "org"),
-        ("https://some", None),
-        ("git@github.com", None),
-        ("git@github.com/foo/bar", None),
-        ("git@github.com:foo", "foo"),
+        ("https://github.com/org/name", "org", "name"),
+        ("https://github.com/org/name.git", "org", "name"),
+        ("git@github.com:org/name", "org", "name"),
+        ("git@github.com:org/name.git", "org", "name"),
     ],
 )
-def test_job_config_validate(url, namespace):
-    assert get_namespace(url) == namespace
+def test_get_ns_repo(url, namespace, repo_name):
+    assert get_namespace_and_repo_name(url) == (namespace, repo_name)
+
+
+def test_get_ns_repo_exc():
+    url = "git@github.com"
+    with pytest.raises(PackitException) as ex:
+        get_namespace_and_repo_name(url)
+    msg = f"Invalid URL format, can't obtain namespace and repository name: {url}"
+    assert msg in str(ex.value)

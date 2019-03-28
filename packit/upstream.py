@@ -1,15 +1,16 @@
 import logging
 import os
 import re
+import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
-import shutil
+
 import git
+from ogr.services.github import GithubService
 from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
-from ogr.services.github import GithubService
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -179,21 +180,65 @@ class Upstream:
             commit_args += ["-m", msg]
         self.local_project.git_repo.git.commit(*commit_args)
 
-    def push_to_branch(
-        self, branch_name: str, remote_name: str = "origin", force: bool = False
-    ):
+    def push(
+        self,
+        branch_name: str,
+        force: bool = False,
+        fork: bool = True,
+        remote_name: str = None,
+    ) -> str:
         """
-        push changes to a fork of the dist-git repo; they need to be committed!
+        push current branch to fork if fork=True, else to origin
 
         :param branch_name: the branch where we push
-        :param fork_remote_name: local name of the remote where we push to
         :param force: push forcefully?
+        :param fork: push to fork?
+        :param remote_name: name of remote where we should push
+               if None, try to find a ssh_url
+        :return: name of the branch where we pushed
         """
-        # I suggest to comment this one while testing when the push is not needed
-        # TODO: create dry-run ^
-        self.local_project.git_repo.remote(remote_name).push(
-            refspec=branch_name, force=force
+        logger.debug(
+            f"About to {'force ' if force else ''}push changes to branch {branch_name}."
         )
+
+        if not remote_name:
+            if fork:
+                if self.local_project.git_project.is_fork:
+                    project = self.local_project.git_project
+                else:
+                    # ogr is awesome! if you want to fork your own repo, you'll get it!
+                    project = self.local_project.git_project.get_fork(create=True)
+                fork_urls = project.get_git_urls()
+
+                ssh_url = fork_urls["ssh"]
+
+                remote_name = "fork-ssh"
+                for remote in self.local_project.git_repo.remotes:
+                    pushurl = next(remote.urls)  # afaik this is what git does as well
+                    if ssh_url.startswith(pushurl):
+                        logger.info(f"Will use remote {remote} using URL {pushurl}.")
+                        remote_name = str(remote)
+                        break
+                else:
+                    logger.info(f"Creating remote fork-ssh with URL {ssh_url}.")
+                    self.local_project.git_repo.create_remote(
+                        name="fork-ssh", url=ssh_url
+                    )
+            else:
+                # push to origin and hope for the best
+                remote_name = "origin"
+        logger.info(f"Pushing to remote {remote_name} using branch {branch_name}.")
+        try:
+            self.local_project.git_repo.remote(remote_name).push(
+                refspec=branch_name, force=force
+            )
+        except git.GitError as ex:
+            msg = (
+                f"Unable to push to remote {remote_name} using branch {branch_name}, "
+                f"the error is:\n{ex}"
+            )
+            raise PackitException(msg)
+        return str(branch_name)
 
     def create_pull(
         self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
@@ -207,6 +252,10 @@ class Upstream:
             raise PackitException(
                 "Please provide GITHUB_TOKEN as an environment variable."
             )
+
+        if project:
+            source_branch = f"{project.namespace}:{source_branch}"
+            project = self.local_project.git_project.parent
 
         try:
             upstream_pr = project.pr_create(

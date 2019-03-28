@@ -63,6 +63,9 @@ Options:
   --dist-git-branch TEXT  Source branch in dist-git for sync.
   --upstream-branch TEXT  Target branch in upstream to sync to.
   --no-pr                 Pull request is not create.
+  --fork / --no-fork      Push to a fork.
+  --remote-name TEXT      Name of the remote where packit should push. if this
+                          is not specified, it pushes to a fork if the repo
+                          can be forked.
   -h, --help              Show this message and exit.
-
 ```

@@ -19,40 +19,51 @@ class PackitAPI:
         self.config = config
         self.package_config = package_config
 
+        self._up = None
+        self._dg = None
+
+    @property
+    def up(self):
+        if self._up is None:
+            self._up = Upstream(config=self.config, package_config=self.package_config)
+        return self._up
+
+    @property
+    def dg(self):
+        if self._dg is None:
+            self._dg = DistGit(config=self.config, package_config=self.package_config)
+        return self._dg
+
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
-        up = Upstream(config=self.config, package_config=self.package_config)
-
-        dg = DistGit(config=self.config, package_config=self.package_config)
-
-        up.checkout_pr(pr_id=pr_id)
+        self.up.checkout_pr(pr_id=pr_id)
         local_pr_branch = f"pull-request-{pr_id}-sync"
         # fetch and reset --hard upstream/$branch?
-        dg.create_branch(
+        self.dg.create_branch(
             dist_git_branch,
             base=f"remotes/origin/{dist_git_branch}",
             setup_tracking=True,
         )
-        dg.update_branch(dist_git_branch)
-        dg.checkout_branch(dist_git_branch)
+        self.dg.update_branch(dist_git_branch)
+        self.dg.checkout_branch(dist_git_branch)
 
-        dg.create_branch(local_pr_branch)
-        dg.checkout_branch(local_pr_branch)
+        self.dg.create_branch(local_pr_branch)
+        self.dg.checkout_branch(local_pr_branch)
 
-        dg.sync_files(up.local_project)
+        self.dg.sync_files(self.up.local_project)
 
-        patches = up.create_patches(
-            upstream=upstream_version, destination=dg.local_project.working_dir
+        patches = self.up.create_patches(
+            upstream=upstream_version, destination=self.dg.local_project.working_dir
         )
-        dg.add_patches_to_specfile(patches)
+        self.dg.add_patches_to_specfile(patches)
 
         description = (
             f"Upstream pr: {pr_id}\n"
-            f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+            f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
         )
 
         self.sync(
-            distgit=dg,
-            commit_msg=f"Sync upstream pr: {pr_id}",
+            distgit=self.dg,
+            commit_msg=f"Sync self.upstream pr: {pr_id}",
             pr_title=f"Upstream pr: {pr_id}",
             pr_description=description,
             dist_git_branch="master",
@@ -69,51 +80,47 @@ class PackitAPI:
         """
         Update given package in Fedora
         """
-        up = Upstream(config=self.config, package_config=self.package_config)
-
-        dg = DistGit(config=self.config, package_config=self.package_config)
-
-        full_version = version or up.get_version()
+        full_version = version or self.up.get_version()
         if not full_version:
             raise PackitException(
-                "Could not figure out version of latest upstream release."
+                "Could not figure out version of latest self.upstream release."
             )
-        current_up_branch = up.active_branch
+        current_up_branch = self.up.active_branch
         try:
             # TODO: this is problematic, since we may overwrite stuff in the repo
             #       but the thing is that we need to do it
             #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
-            # TODO: this is also naive, upstream may use different tagging scheme, e.g.
+            # TODO: this is also naive, self.upstream may use different tagging scheme, e.g.
             #       release = 232, tag = v232
             if not use_local_content:
-                up.checkout_release(full_version)
+                self.up.checkout_release(full_version)
 
-            local_pr_branch = f"{full_version}-{dist_git_branch}-update"
-            # fetch and reset --hard upstream/$branch?
+            local_pr_branch = f"{full_version}-{dist_git_branch}-self.update"
+            # fetch and reset --hard self.upstream/$branch?
             logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
-            dg.create_branch(
+            self.dg.create_branch(
                 dist_git_branch,
                 base=f"remotes/origin/{dist_git_branch}",
                 setup_tracking=True,
             )
-            dg.update_branch(dist_git_branch)
-            dg.checkout_branch(dist_git_branch)
+            self.dg.update_branch(dist_git_branch)
+            self.dg.checkout_branch(dist_git_branch)
 
-            dg.create_branch(local_pr_branch)
-            dg.checkout_branch(local_pr_branch)
+            self.dg.create_branch(local_pr_branch)
+            self.dg.checkout_branch(local_pr_branch)
 
             description = (
                 f"Upstream tag: {full_version}\n"
-                f"Upstream commit: {up.local_project.git_repo.head.commit}\n"
+                f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
 
-            dg.sync_files(up.local_project)
+            self.dg.sync_files(self.up.local_project)
 
             self.sync(
-                distgit=dg,
-                commit_msg=f"{full_version} upstream release",
-                pr_title=f"Update to upstream release {full_version}",
+                distgit=self.dg,
+                commit_msg=f"{full_version} self.upstream release",
+                pr_title=f"Update to self.upstream release {full_version}",
                 pr_description=description,
                 dist_git_branch=dist_git_branch,
                 commit_msg_description=description,
@@ -122,65 +129,63 @@ class PackitAPI:
             )
         finally:
             if not use_local_content:
-                up.local_project.git_repo.git.checkout(current_up_branch.checkout())
+                self.up.local_project.git_repo.git.checkout(
+                    current_up_branch.checkout()
+                )
 
     def sync_from_downstream(
-        self, dist_git_branch: str, upstream_branch: str, no_pr: bool = None
-    ):
-        """
-        Update upstream package from Fedora
-        """
-        up = Upstream(config=self.config, package_config=self.package_config)
-
-        dg = DistGit(config=self.config, package_config=self.package_config)
-
-        logger.info(f"upstream active branch {up.active_branch}")
-        try:
-            dg.update_branch(dist_git_branch)
-            dg.checkout_branch(dist_git_branch)
-
-            local_pr_branch = f"{dist_git_branch}-downstream-sync"
-            logger.info(f'using "{dist_git_branch}" dist-git branch')
-
-            up.create_branch(local_pr_branch)
-            up.checkout_branch(local_pr_branch)
-
-            up.sync_files(dg.local_project)
-
-            if not no_pr:
-                description = (
-                    f"Downstream commit: {dg.local_project.git_repo.head.commit}\n"
-                )
-
-                self.sync_upstream(
-                    upstream=up,
-                    commit_msg=f"{dist_git_branch} downstream sync",
-                    pr_title=f"Update from downstream branch {dist_git_branch}",
-                    pr_description=description,
-                    upstream_branch=upstream_branch,
-                    commit_msg_description=description,
-                )
-        finally:
-            pass
-
-    def sync_upstream(
         self,
-        upstream: Upstream,
-        commit_msg: str,
-        pr_title: str,
-        pr_description: str,
+        dist_git_branch: str,
         upstream_branch: str,
-        commit_msg_description: str = None,
+        no_pr: bool = False,
+        fork: bool = True,
+        remote_name: str = None,
     ):
-        upstream.commit(title=commit_msg, msg=commit_msg_description)
-        # the branch may already be up, let's push forcefully
-        upstream.push_to_branch(upstream.local_project.ref, force=True)
-        upstream.create_pull(
-            pr_title,
-            pr_description,
-            source_branch=str(upstream.local_project.ref),
-            target_branch=upstream_branch,
-        )
+        """
+        Sync content of Fedora dist-git repo back to upstream
+
+        :param dist_git_branch: branch in dist-git
+        :param upstream_branch: upstream branch
+        :param no_pr: won't create a pull request if set to True
+        :param fork: forks the project if set to True
+        :param remote_name: name of remote where we should push; if None, try to find a ssh_url
+        """
+        logger.info(f"upstream active branch {self.up.active_branch}")
+
+        self.dg.update_branch(dist_git_branch)
+        self.dg.checkout_branch(dist_git_branch)
+
+        local_pr_branch = f"{dist_git_branch}-downstream-sync"
+        logger.info(f'using "{dist_git_branch}" dist-git branch')
+
+        self.up.create_branch(local_pr_branch)
+        self.up.checkout_branch(local_pr_branch)
+
+        self.up.sync_files(self.dg.local_project)
+
+        if not no_pr:
+            description = (
+                f"Downstream commit: {self.dg.local_project.git_repo.head.commit}\n"
+            )
+
+            commit_msg = f"sync from downstream branch {dist_git_branch!r}"
+            pr_title = f"Update from downstream branch {dist_git_branch!r}"
+
+            self.up.commit(title=commit_msg, msg=description)
+
+            # the branch may already be up, let's push forcefully
+            source_branch = self.up.push(
+                self.up.local_project.ref,
+                fork=fork,
+                force=True,
+                remote_name=remote_name,
+            )
+            self.up.create_pull(
+                pr_title,
+                description,
+                source_branch=source_branch,
+                target_branch=upstream_branch,
+            )
 
     def sync(
         self,
@@ -214,7 +219,7 @@ class PackitAPI:
                 distgit.upload_to_lookaside_cache(archive)
 
         distgit.commit(title=commit_msg, msg=commit_msg_description)
-        # the branch may already be up, let's push forcefully
+        # the branch may already be self.up, let's push forcefully
         distgit.push_to_fork(distgit.local_project.ref, force=True)
         distgit.create_pull(
             pr_title,
@@ -230,18 +235,16 @@ class PackitAPI:
         :param dist_git_branch: ref in dist-git
         :param scratch: should the build be a scratch build?
         """
-        dg = DistGit(config=self.config, package_config=self.package_config)
-
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
-        dg.create_branch(
+        self.dg.create_branch(
             dist_git_branch,
             base=f"remotes/origin/{dist_git_branch}",
             setup_tracking=True,
         )
-        dg.update_branch(dist_git_branch)
-        dg.checkout_branch(dist_git_branch)
+        self.dg.update_branch(dist_git_branch)
+        self.dg.checkout_branch(dist_git_branch)
 
-        dg.build(scratch=scratch)
+        self.dg.build(scratch=scratch)
 
     def create_update(
         self,
@@ -251,21 +254,20 @@ class PackitAPI:
         koji_builds: Sequence[str] = None,
     ):
         """
-        Create bodhi update
+        Create bodhi self.update
 
         :param dist_git_branch: git ref
-        :param update_type: type of the update, check CLI
-        :param update_notes: documentation about the update
+        :param update_type: type of the self.update, check CLI
+        :param update_notes: documentation about the self.update
         :param koji_builds: list of koji builds or None (and pick latest)
         """
         logger.debug(
-            "create bodhi update, builds=%s, dg_branch=%s, type=%s",
+            "create bodhi self.update, builds=%s, self.dg_branch=%s, type=%s",
             koji_builds,
             dist_git_branch,
             update_type,
         )
-        dg = DistGit(config=self.config, package_config=self.package_config)
-        dg.create_bodhi_update(
+        self.dg.create_bodhi_update(
             koji_builds=koji_builds,
             dist_git_branch=dist_git_branch,
             update_notes=update_notes,
@@ -274,21 +276,22 @@ class PackitAPI:
 
     def create_srpm(self, output_file: str = None) -> Path:
         """
-        Create srpm from the upstream repo
+        Create srpm from the self.upstream repo
 
         :param output_file: path + filename where the srpm should be written, defaults to cwd
         :return: a path to the srpm
         """
-        up = Upstream(config=self.config, package_config=self.package_config)
-        version = up.get_current_version()
-        spec_version = up.get_specfile_version()
-        up.create_archive()
+        version = self.up.get_current_version()
+        spec_version = self.up.get_specfile_version()
+        self.up.create_archive()
         if version != spec_version:
             try:
-                up.set_spec_version(
+                self.up.set_spec_version(
                     version=version, changelog_entry="- Development snapshot"
                 )
             except PackitException:
-                up.bump_spec(version=version, changelog_entry="Development snapshot")
-        srpm_path = up.create_srpm(srpm_path=output_file)
+                self.up.bump_spec(
+                    version=version, changelog_entry="Development snapshot"
+                )
+        srpm_path = self.up.create_srpm(srpm_path=output_file)
         return srpm_path

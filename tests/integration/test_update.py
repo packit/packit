@@ -3,6 +3,7 @@ from os import chdir
 
 import pytest
 from flexmock import flexmock
+from packit.local_project import LocalProject
 from rebasehelper.specfile import SpecFile
 
 from packit.api import PackitAPI
@@ -59,7 +60,7 @@ def test_basic_local_update(upstream_n_distgit, mock_upstream_remote_functionali
 def test_basic_local_update_from_downstream(
     downstream_n_distgit, mock_downstream_remote_functionality
 ):
-    """ basic propose-update test: mock remote API, use local upstream and dist-git """
+    flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
     u, d = downstream_n_distgit
 
     chdir(u)

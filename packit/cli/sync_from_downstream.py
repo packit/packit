@@ -22,12 +22,23 @@ logger = logging.getLogger(__file__)
     "--upstream-branch", help="Target branch in upstream to sync to.", default="master"
 )
 @click.option("--no-pr", is_flag=True, help="Pull request is not create.")
+@click.option("--fork/--no-fork", is_flag=True, default=True, help="Push to a fork.")
+@click.option(
+    "--remote-name",
+    default=None,
+    help=(
+        "Name of the remote where packit should push. "
+        "if this is not specified, it pushes to a fork if the repo can be forked."
+    ),
+)
 @click.argument(
     "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
 )
 @pass_config
 @cover_packit_exception
-def sync_from_downstream(config, dist_git_branch, upstream_branch, no_pr, path_or_url):
+def sync_from_downstream(
+    config, dist_git_branch, upstream_branch, no_pr, path_or_url, fork, remote_name
+):
     """
     Copy synced files from Fedora dist-git into upstream by opening a pull request.
 
@@ -35,4 +46,10 @@ def sync_from_downstream(config, dist_git_branch, upstream_branch, no_pr, path_o
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    api.sync_from_downstream(dist_git_branch, upstream_branch, no_pr)
+    api.sync_from_downstream(
+        dist_git_branch,
+        upstream_branch,
+        no_pr=no_pr,
+        fork=fork,
+        remote_name=remote_name,
+    )

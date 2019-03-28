@@ -4,6 +4,7 @@ import shlex
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import Tuple
 
 import git
 
@@ -238,15 +239,19 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
     return repo
 
 
-def get_namespace(url: str) -> str:
+def get_namespace_and_repo_name(url: str) -> Tuple[str, str]:
     try:
+        if url.endswith(".git"):
+            url = url[:-4]
         if url.startswith("http"):
             # if git_url is in format http{s}://github.com/org/repo_name
-            namespace = url.split("/")[3]
+            _, namespace, repo_name = url.rsplit("/", 2)
         else:
             # If git_url is in format git@github.com:org/repo_name
-            org_repo = url.split(":")[1]
-            namespace = org_repo.split("/")[0]
-        return namespace
-    except IndexError:
-        return None
+            org_repo = url.split(":", 2)[1]
+            namespace, repo_name = org_repo.split("/", 2)
+    except (IndexError, ValueError) as ex:
+        raise PackitException(
+            f"Invalid URL format, can't obtain namespace and repository name: {url}: {ex!r}"
+        )
+    return namespace, repo_name
