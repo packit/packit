@@ -26,7 +26,6 @@ class Config:
         self.keytab_path = None
         self._github_token = None
         self._pagure_user_token = None
-        self._pagure_package_token = None
         self._pagure_fork_token = None
 
     @classmethod
@@ -62,7 +61,6 @@ class Config:
         config.keytab_path = raw_dict.get("keytab_path", None)
         config._github_token = raw_dict.get("github_token", None)
         config._pagure_user_token = raw_dict.get("pagure_user_token", None)
-        config._pagure_package_token = raw_dict.get("pagure_package_token", None)
         config._pagure_fork_token = raw_dict.get("pagure_fork_token", None)
 
         return config
@@ -84,14 +82,6 @@ class Config:
         if token:
             return token
         return self._pagure_user_token
-
-    @property
-    def pagure_package_token(self) -> str:
-        """ this token is used to comment on pull requests """
-        token = getenv("PAGURE_PACKAGE_TOKEN", "")
-        if token:
-            return token
-        return self._pagure_package_token
 
     @property
     def pagure_fork_token(self) -> str:
@@ -398,7 +388,6 @@ USER_CONFIG_SCHEMA = {
         "keytab_path": {"type": "string"},
         "github_token": {"type": "string"},
         "pagure_user_token": {"type": "string"},
-        "pagure_package_token": {"type": "string"},
         "pagure_fork_token": {"type": "string"},
     },
 }
