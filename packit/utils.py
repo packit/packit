@@ -182,3 +182,11 @@ def get_namespace_and_repo_name(url: str) -> Tuple[str, str]:
             f"Invalid URL format, can't obtain namespace and repository name: {url}: {ex!r}"
         )
     return namespace, repo_name
+
+
+def assert_existence(obj):
+    """
+    Force the lazy object to be evaluated.
+    """
+    if obj is None:
+        raise PackitException("Object needs to have a value.")
