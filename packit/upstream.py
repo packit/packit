@@ -365,21 +365,22 @@ class Upstream:
 
     def sync_files(self, downstream_project: LocalProject) -> None:
         """
-        sync required files from upstream to downstream
+        sync required files from downstream to upstream
         """
         logger.debug("about to sync files %s", self.files_to_sync)
-        for fi in self.files_to_sync:
-            # TODO: fi can be dir
-            fi = fi[1:] if fi.startswith("/") else fi
-            src = os.path.join(downstream_project.working_dir, fi)
-            if os.path.exists(src):
-                logger.info("syncing %s", src)
-                shutil.copy2(src, self.local_project.working_dir)
-            else:
-                raise PackitException(
-                    f"File {src} is not present in the downstream repository. "
-                    f"Upstream ref {downstream_project.git_repo.active_branch} is checked out"
-                )
+        if self.package_config.with_action(action_name="sync-down-to-up"):
+            for fi in self.files_to_sync:
+                # TODO: fi can be dir
+                fi = fi[1:] if fi.startswith("/") else fi
+                src = os.path.join(downstream_project.working_dir, fi)
+                if os.path.exists(src):
+                    logger.info("syncing %s", src)
+                    shutil.copy2(src, self.local_project.working_dir)
+                else:
+                    raise PackitException(
+                        f"File {src} is not present in the downstream repository. "
+                        f"Upstream ref {downstream_project.git_repo.active_branch} is checked out"
+                    )
 
     def get_version(self) -> str:
         """
@@ -406,6 +407,12 @@ class Upstream:
 
         :return: e.g. 0.1.1.dev86+ga17a559.d20190315 or 0.6.1.1.gce4d84e
         """
+        action_output = self.package_config.get_output_from_action(
+            action_name="get-current-version"
+        )
+        if action_output:
+            return action_output
+
         ver = run_command(
             self.package_config.current_version_command, output=True
         ).strip()
@@ -459,28 +466,34 @@ class Upstream:
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
-        if self.package_config.upstream_project_name:
-            dir_name = f"{self.package_config.upstream_project_name}-{self.get_current_version()}"
-        else:
-            dir_name = f"{self.package_name}-{self.get_current_version()}"
-        logger.debug("name + version = %s", dir_name)
-        # We don't care about the name of the archive, really
-        # we just require for the archive to be placed in the cwd
-        if self.package_config.create_tarball_command:
-            archive_cmd = self.package_config.create_tarball_command
-        else:
-            # FIXME: .tar.gz is naive
-            archive_name = f"{dir_name}.tar.gz"
-            archive_cmd = [
-                "git",
-                "archive",
-                "-o",
-                archive_name,
-                "--prefix",
-                f"{dir_name}/",
-                "HEAD",
-            ]
-        run_command(archive_cmd)
+
+        if self.package_config.with_action(action_name="create-archive"):
+
+            if self.package_config.upstream_project_name:
+                dir_name = (
+                    f"{self.package_config.upstream_project_name}"
+                    f"-{self.get_current_version()}"
+                )
+            else:
+                dir_name = f"{self.package_name}-{self.get_current_version()}"
+            logger.debug("name + version = %s", dir_name)
+            # We don't care about the name of the archive, really
+            # we just require for the archive to be placed in the cwd
+            if self.package_config.create_tarball_command:
+                archive_cmd = self.package_config.create_tarball_command
+            else:
+                # FIXME: .tar.gz is naive
+                archive_name = f"{dir_name}.tar.gz"
+                archive_cmd = [
+                    "git",
+                    "archive",
+                    "-o",
+                    archive_name,
+                    "--prefix",
+                    f"{dir_name}/",
+                    "HEAD",
+                ]
+            run_command(archive_cmd)
 
     def create_srpm(self, srpm_path: str = None) -> Path:
         """
