@@ -4,7 +4,7 @@ from enum import IntEnum
 from functools import lru_cache
 import os
 from pathlib import Path
-from typing import Optional, List, NamedTuple
+from typing import Optional, List, NamedTuple, Dict, Callable
 
 import click
 import jsonschema
