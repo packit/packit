@@ -9,8 +9,8 @@ from typing import Sequence
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
+from packit.status import Status
 from packit.upstream import Upstream
-from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
 
@@ -299,77 +299,10 @@ class PackitAPI:
 
     def status(self):
 
-        up = Upstream(config=self.config, package_config=self.package_config)
-        dg = DistGit(config=self.config, package_config=self.package_config)
+        status = Status(self.config, self.package_config)
 
-        pr_list = dg.local_project.git_project.get_pr_list()
-        if len(pr_list) > 0:
-            pr_list = pr_list[:3] if len(pr_list) > 3 else pr_list  # take last 3 PRs
-            logger.info("Downstream PRs:")
-            table = [[pr.id, pr.title, pr.url] for pr in pr_list]
-            logger.info(tabulate(table, headers=["ID", "Title", "URL"]))
-        else:
-            logger.info("Downstream PRs: No open PRs.")
-
-        logger.info("\nDist-git versions:")
-        branches = dg.local_project.git_project.get_branches()
-        for branch in branches:
-            try:
-                dg.checkout_branch(branch)
-                logger.info(f"{branch}: {dg.specfile.get_version()}")
-            except PackitException:
-                logger.info(f"Branch {branch} doesn't exists.")
-
-        latest_releases = up.local_project.git_project.get_releases()
-        if len(latest_releases) > 0:
-            logger.info("\nGitHub upstream releases:")
-            # take last five releases
-            latest_releases = (
-                latest_releases[:5] if len(latest_releases) > 5 else latest_releases
-            )
-            upstream_releases_str = "\n".join(
-                f"{release.tag_name}" for release in latest_releases
-            )
-            logger.info(upstream_releases_str)
-        else:
-            logger.info("\nGitHub upstream releases: No releases found.")
-
-        logger.info("\nLatest builds:")
-        # https://github.com/fedora-infra/bodhi/issues/3058
-        from bodhi.client.bindings import BodhiClient
-
-        b = BodhiClient()
-        builds_d = b.latest_builds(dg.package_name)
-
-        # there is no master tag in koji
-        branches.remove("master")
-        for branch in branches:
-            koji_tag = f"{branch}-updates-candidate"
-            try:
-                koji_builds = [builds_d[koji_tag]]
-                # take last three builds
-                koji_builds = koji_builds[:3] if len(koji_builds) > 5 else koji_builds
-                koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
-                logger.info(f"{branch}:\n{koji_builds_str}")
-            except KeyError:
-                logger.info(f"{branch}: No builds.")
-
-        logger.info("\nLatest bodhi updates:")
-        results = b.query(packages=dg.package_name)["updates"]
-        if len(results) > 3:
-            results = results[:3]
-
-        table = [
-            [
-                result["title"],
-                result["stable_karma"],
-                result["unstable_karma"],
-                result["status"],
-            ]
-            for result in results
-        ]
-        logger.info(
-            tabulate(
-                table, headers=["Update", "Stable karma", "Unstable karma", "status"]
-            )
-        )
+        status.get_downstream_prs()
+        status.get_dg_versions()
+        status.get_up_releases()
+        status.get_builds()
+        status.get_updates()
