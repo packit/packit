@@ -11,6 +11,7 @@ from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.status import Status
 from packit.upstream import Upstream
+from packit.utils import assert_existence
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ class PackitAPI:
         return self._dg
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
+        self.package_config.run_action(action_name="pre-sync")
+
         self.up.checkout_pr(pr_id=pr_id)
         local_pr_branch = f"pull-request-{pr_id}-sync"
         # fetch and reset --hard upstream/$branch?
@@ -50,12 +53,11 @@ class PackitAPI:
         self.dg.create_branch(local_pr_branch)
         self.dg.checkout_branch(local_pr_branch)
 
-        self.dg.sync_files(self.up.local_project)
-
-        patches = self.up.create_patches(
-            upstream=upstream_version, destination=self.dg.local_project.working_dir
-        )
-        self.dg.add_patches_to_specfile(patches)
+        if self.package_config.with_action(action_name="patch"):
+            patches = self.up.create_patches(
+                upstream=upstream_version, destination=self.dg.local_project.working_dir
+            )
+            self.dg.add_patches_to_specfile(patches)
 
         description = (
             f"Upstream pr: {pr_id}\n"
@@ -79,10 +81,16 @@ class PackitAPI:
         use_local_content=False,
         version: str = None,
         force_new_sources=False,
+        upstream_ref: str = None,
     ):
         """
         Update given package in Fedora
         """
+        assert_existence(self.up.local_project)
+        assert_existence(self.dg.local_project)
+
+        self.package_config.run_action(action_name="pre-sync")
+
         full_version = version or self.up.get_version()
         if not full_version:
             raise PackitException(
@@ -118,7 +126,23 @@ class PackitAPI:
                 f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
 
-            self.dg.sync_files(self.up.local_project)
+            if self.package_config.with_action(action_name="prepare-files"):
+                self.dg.sync_files(self.up.local_project)
+                if upstream_ref:
+                    if self.package_config.with_action(action_name="patch"):
+                        patches = self.up.create_patches(
+                            upstream=upstream_ref,
+                            destination=self.dg.local_project.working_dir,
+                        )
+                        self.dg.add_patches_to_specfile(patches)
+
+                self._handle_sources(
+                    add_new_sources=True, force_new_sources=force_new_sources
+                )
+
+            if self.package_config.has_action("prepare-files"):
+                self.dg.sync_files(self.up.local_project)
+
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
             self.push_and_create_pr(
