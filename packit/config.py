@@ -24,36 +24,81 @@ class Config:
         self.debug = False
         self.fas_user = None
         self.keytab_path = None
-        self._package_config = None
         self._github_token = None
         self._pagure_user_token = None
         self._pagure_package_token = None
         self._pagure_fork_token = None
 
+    @classmethod
+    def get_user_config(cls) -> "Config":
+        directory = getenv("XDG_CONFIG_HOME")
+        if directory:
+            directory = Path(directory)
+        else:
+            directory = Path.home() / ".config"
+
+        for config_file_name in CONFIG_FILE_NAMES:
+            config_file_name_full = directory / config_file_name
+            if config_file_name_full.is_file():
+                try:
+                    loaded_config = safe_load(open(config_file_name_full))
+                except Exception as ex:
+                    logger.error(
+                        f"Cannot load user config '{config_file_name_full}'."
+                    )
+                    raise Exception(f"Cannot load user config: {ex}.")
+
+                return Config.get_from_dict(raw_dict=loaded_config)
+
+    @classmethod
+    def get_from_dict(cls, raw_dict: dict, validate=True) -> "Config":
+        if validate and not Config.is_dict_valid(raw_dict):
+            raise Exception(f"User config not valid.")
+
+        config = Config()
+
+        config.debug = raw_dict.get("debug", False)
+        config.fas_user = raw_dict.get("fas_user", None)
+        config.keytab_path = raw_dict.get("keytab_path", None)
+        config._github_token = raw_dict.get("github_token", None)
+        config._pagure_user_token = raw_dict.get("pagure_user_token", None)
+        config._pagure_package_token = raw_dict.get("pagure_package_token", None)
+        config._pagure_fork_token = raw_dict.get("pagure_fork_token", None)
+
+        return config
+
+    @classmethod
+    def is_dict_valid(cls, raw_dict: dict) -> bool:
+        return Draft4Validator(USER_CONFIG_SCHEMA).is_valid(raw_dict)
+
     @property
     def github_token(self) -> str:
-        if self._github_token is None:
-            self._github_token = getenv("GITHUB_TOKEN", "")
+        token = getenv("GITHUB_TOKEN", "")
+        if token:
+            return token
         return self._github_token
 
     @property
     def pagure_user_token(self) -> str:
-        if self._pagure_user_token is None:
-            self._pagure_user_token = getenv("PAGURE_USER_TOKEN", "")
+        token = getenv("PAGURE_USER_TOKEN", "")
+        if token:
+            return token
         return self._pagure_user_token
 
     @property
     def pagure_package_token(self) -> str:
         """ this token is used to comment on pull requests """
-        if self._pagure_package_token is None:
-            self._pagure_package_token = getenv("PAGURE_PACKAGE_TOKEN", "")
+        token = getenv("PAGURE_PACKAGE_TOKEN", "")
+        if token:
+            return token
         return self._pagure_package_token
 
     @property
     def pagure_fork_token(self) -> str:
         """ this is needed to create pull requests """
-        if self._pagure_fork_token is None:
-            self._pagure_fork_token = getenv("PAGURE_FORK_TOKEN", "")
+        token = getenv("PAGURE_FORK_TOKEN", "")
+        if token:
+            return token
         return self._pagure_fork_token
 
 
@@ -343,4 +388,17 @@ PACKAGE_CONFIG_SCHEMA = {
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
     },
     "required": ["specfile_path", "synced_files"],
+}
+
+USER_CONFIG_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "debug": {"type": "boolean"},
+        "fas_user": {"type": "string"},
+        "keytab_path": {"type": "string"},
+        "github_token": {"type": "string"},
+        "pagure_user_token": {"type": "string"},
+        "pagure_package_token": {"type": "string"},
+        "pagure_fork_token": {"type": "string"},
+    },
 }
