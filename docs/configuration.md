@@ -15,10 +15,10 @@ You should place the file in the root of your upstream repo. Packit accepts thes
 
  Key name                  | type            | description
 ---------------------------|-----------------|----------------------------------------------------------------------
- `specfile_path`           | string          | relative path to a spec file within the upstream repository
+ `specfile_path`           | string          | relative path to a spec file within the upstream repository (mandatory)
  `synced_files`            | list of strings | a list of relative paths to files in the upstream repo which are meant to be copied to dist-git during an update
  `upstream_project_name`   | string          | name of the upstream repository (e.g. in PyPI); this is used in `%prep` section
- `downstream_package_name` | string          | name of package in Fedora
+ `downstream_package_name` | string          | name of package in Fedora (mandatory)
  `dist_git_namespace`      | string          | namespace in dist-git URL (defaults to "rpms")
  `dist_git_base_url`       | string          | URL of dist-git server, defaults to "https://src.fedoraproject.org/" (has to end with a slash)
  `create_tarball_command`  | list of strings | a command which generates upstream tarball in the root of the upstream directory (defaults to `git archive -o "{package_name}-{version}.tar.gz" --prefix "{package_name}-{version}/" HEAD`)
