@@ -235,6 +235,7 @@ class PackageConfig:
 
         specfile_path = raw_dict.get("specfile_path", None)
         synced_files = raw_dict.get("synced_files", None)
+        actions = raw_dict.get("actions", None)
         raw_jobs = raw_dict.get("jobs", [])
         create_tarball_command = raw_dict.get("create_tarball_command", None)
         current_version_command = raw_dict.get("current_version_command", None)
@@ -259,6 +260,7 @@ class PackageConfig:
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=synced_files,
+            actions=actions,
             jobs=[
                 JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
             ],
@@ -467,6 +469,7 @@ PACKAGE_CONFIG_SCHEMA = {
         "current_version_command": {"type": "array", "items": {"type": "string"}},
         "synced_files": {"type": "array", "items": {"type": "string"}},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
+        "actions": {"type": "object", "additionalProperties": {"type": "string"}},
     },
     "required": ["specfile_path", "synced_files"],
 }
