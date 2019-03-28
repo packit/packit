@@ -315,18 +315,19 @@ class DistGit:
         Sync required files from upstream to downstream.
         """
         logger.debug(f"About to sync files {self.files_to_sync}")
-        for fi in self.files_to_sync:
-            # TODO: fi can be dir
-            fi = fi[1:] if fi.startswith("/") else fi
-            src = os.path.join(upstream_project.working_dir, fi)
-            if os.path.exists(src):
-                logger.info(f"Syncing {src}")
-                shutil.copy2(src, self.local_project.working_dir)
-            else:
-                raise PackitException(
-                    f"File {fi} is not present in the upstream repository. "
-                    f"Upstream ref {upstream_project.git_repo.head} is checked out"
-                )
+        if self.package_config.with_action(action_name="sync-up-to-down"):
+            for fi in self.files_to_sync:
+                # TODO: fi can be dir
+                fi = fi[1:] if fi.startswith("/") else fi
+                src = os.path.join(upstream_project.working_dir, fi)
+                if os.path.exists(src):
+                    logger.info(f"Syncing {src}")
+                    shutil.copy2(src, self.local_project.working_dir)
+                else:
+                    raise PackitException(
+                        f"File {fi} is not present in the upstream repository. "
+                        f"Upstream ref {upstream_project.git_repo.head} is checked out"
+                    )
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
         """
