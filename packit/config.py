@@ -2,7 +2,7 @@ import json
 import logging
 from enum import IntEnum
 from functools import lru_cache
-from os import getenv
+import os
 from pathlib import Path
 from typing import Optional, List, NamedTuple
 
@@ -30,7 +30,7 @@ class Config:
 
     @classmethod
     def get_user_config(cls) -> "Config":
-        xdg_config_home = getenv("XDG_CONFIG_HOME")
+        xdg_config_home = os.getenv("XDG_CONFIG_HOME")
         if xdg_config_home:
             directory = Path(xdg_config_home)
         else:
@@ -73,14 +73,14 @@ class Config:
 
     @property
     def github_token(self) -> str:
-        token = getenv("GITHUB_TOKEN", "")
+        token = os.getenv("GITHUB_TOKEN", "")
         if token:
             return token
         return self._github_token
 
     @property
     def pagure_user_token(self) -> str:
-        token = getenv("PAGURE_USER_TOKEN", "")
+        token = os.getenv("PAGURE_USER_TOKEN", "")
         if token:
             return token
         return self._pagure_user_token
@@ -88,7 +88,7 @@ class Config:
     @property
     def pagure_fork_token(self) -> str:
         """ this is needed to create pull requests """
-        token = getenv("PAGURE_FORK_TOKEN", "")
+        token = os.getenv("PAGURE_FORK_TOKEN", "")
         if token:
             return token
         return self._pagure_fork_token

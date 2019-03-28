@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import pytest
 from flexmock import flexmock
 from jsonschema.exceptions import ValidationError
@@ -8,6 +11,7 @@ from packit.config import (
     PackageConfig,
     TriggerType,
     get_packit_config_from_repo,
+    Config,
 )
 
 
@@ -404,3 +408,33 @@ def test_get_packit_config_from_repo(content):
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == "packit.spec"
     assert set(config.synced_files) == {"packit.spec", ".packit.yaml"}
+
+
+def test_get_user_config(tmpdir):
+    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+    user_config_file_path.write_text(
+        "---\n"
+        "debug: true\n"
+        "fas_user: rambo\n"
+        "keytab_path: './rambo.keytab'\n"
+        "github_token: ra\n"
+        "pagure_user_token: mb\n"
+        "pagure_fork_token: o\n"
+    )
+    flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
+        str(tmpdir)
+    )
+    config = Config.get_user_config()
+    assert config.debug and isinstance(config.debug, bool)
+    assert config.fas_user == "rambo"
+    assert config.keytab_path == "./rambo.keytab"
+    flexmock(os).should_receive("getenv").with_args("GITHUB_TOKEN", "").and_return(None)
+    assert config.github_token == "ra"
+    flexmock(os).should_receive("getenv").with_args("PAGURE_USER_TOKEN", "").and_return(
+        None
+    )
+    assert config.pagure_user_token == "mb"
+    flexmock(os).should_receive("getenv").with_args("PAGURE_FORK_TOKEN", "").and_return(
+        None
+    )
+    assert config.pagure_fork_token == "o"
