@@ -235,7 +235,7 @@ class PackageConfig:
 
         specfile_path = raw_dict.get("specfile_path", None)
         synced_files = raw_dict.get("synced_files", None)
-        actions = raw_dict.get("actions", None)
+        actions = raw_dict.get("actions", {})
         raw_jobs = raw_dict.get("jobs", [])
         create_tarball_command = raw_dict.get("create_tarball_command", None)
         current_version_command = raw_dict.get("current_version_command", None)
