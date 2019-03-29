@@ -9,6 +9,7 @@ from typing import Sequence
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
+from packit.status import Status
 from packit.upstream import Upstream
 
 logger = logging.getLogger(__name__)
@@ -295,3 +296,13 @@ class PackitAPI:
                 )
         srpm_path = self.up.create_srpm(srpm_path=output_file)
         return srpm_path
+
+    def status(self):
+
+        status = Status(self.config, self.package_config)
+
+        status.get_downstream_prs()
+        status.get_dg_versions()
+        status.get_up_releases()
+        status.get_builds()
+        status.get_updates()
