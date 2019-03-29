@@ -38,7 +38,6 @@ class DistGit:
 
         self.github_token = self.config.github_token
         self.pagure_user_token = self.config.pagure_user_token
-        self.pagure_package_token = self.config.pagure_package_token
         self.pagure_fork_token = self.config.pagure_fork_token
         self.package_name: Optional[str] = self.package_config.downstream_package_name
         self.fas_user = self.config.fas_user
