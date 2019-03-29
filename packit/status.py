@@ -47,10 +47,18 @@ class Status:
         branches = self.dg.local_project.git_project.get_branches()
         for branch in branches:
             try:
+                self.dg.create_branch(
+                    branch, base=f"remotes/origin/{branch}", setup_tracking=False
+                )
                 self.dg.checkout_branch(branch)
+            except Exception as ex:
+                logger.debug(f"Branch {branch} is not present: {ex}")
+                continue
+            try:
                 logger.info(f"{branch}: {self.dg.specfile.get_version()}")
             except PackitException:
                 logger.debug(f"Can't figure out the version of branch: {branch}")
+        self.dg.checkout_branch("master")
 
     def get_up_releases(self, number_of_releases: int = 5) -> None:
         """
