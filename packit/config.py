@@ -24,7 +24,12 @@ class Config:
         self.debug: bool = False
         self.fas_user: Optional[str] = None
         self.keytab_path: Optional[str] = None
+
+        self.github_app_installation_id: Optional[str] = None
+        self.github_app_id: Optional[str] = None
+        self.github_app_cert_path: Optional[str] = None
         self._github_token: str = ""
+
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
 
@@ -64,6 +69,11 @@ class Config:
         config._github_token = raw_dict.get("github_token", "")
         config._pagure_user_token = raw_dict.get("pagure_user_token", "")
         config._pagure_fork_token = raw_dict.get("pagure_fork_token", "")
+        config.github_app_installation_id = raw_dict.get(
+            "github_app_installation_id", ""
+        )
+        config.github_app_id = raw_dict.get("github_app_id", "")
+        config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
 
         return config
 
@@ -391,5 +401,8 @@ USER_CONFIG_SCHEMA = {
         "github_token": {"type": "string"},
         "pagure_user_token": {"type": "string"},
         "pagure_fork_token": {"type": "string"},
+        "github_app_installation_id": {"type": "string"},
+        "github_app_id": {"type": "string"},
+        "github_app_cert_path": {"type": "string"},
     },
 }
