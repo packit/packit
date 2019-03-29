@@ -4,6 +4,7 @@ import re
 import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
+from packaging import version
 
 import git
 from ogr.services.github import GithubService
@@ -356,18 +357,22 @@ class Upstream:
 
     def get_version(self) -> str:
         """
-        Return version of the latest release available: prioritize upstream
-        package repositories over the version in spec
+        Return version of the latest release available: prioritize bigger from upstream
+        package repositories or the version in spec
         """
-        ups_ver = self.get_latest_released_version()
-        spec_ver = self.get_specfile_version()
-        # we're running both so that results of each function are logged and user is aware
-        if ups_ver:
+        ups_ver = version.parse(self.get_latest_released_version() or "")
+        logger.debug(f"Version in upstream package repositories: {ups_ver}")
+        spec_ver = version.parse(self.get_specfile_version())
+        logger.debug(f"Version in spec file: {spec_ver}")
+
+        if ups_ver > spec_ver:
+            logger.warning("Version in spec file is outdated")
             logger.info(
-                "Picking version of the latest release from the upstream registry over spec file."
+                "Picking version of the latest release from the upstream registry."
             )
-            return ups_ver
-        return spec_ver
+            return str(ups_ver)
+        logger.info("Picking version found in spec file.")
+        return str(spec_ver)
 
     def get_current_version(self) -> str:
         """

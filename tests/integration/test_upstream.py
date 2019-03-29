@@ -25,7 +25,13 @@ def test_get_current_version(upstream_instance):
 
 
 @pytest.mark.parametrize(
-    "m_v,exp", (("1.1000.1000000", "1.1000.1000000"), (None, "0.1.0"))
+    "m_v,exp",
+    (
+        ("1.1000.1000000", "1.1000.1000000"),
+        (None, "0.1.0"),
+        ("0.0.3", "0.1.0"),
+        ("176", "176"),
+    ),
 )
 def test_get_version(upstream_instance, m_v, exp):
     u, ups = upstream_instance
