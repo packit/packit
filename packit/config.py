@@ -53,7 +53,7 @@ class Config:
                 except Exception as ex:
                     logger.error(f"Cannot load user config '{config_file_name_full}'.")
                     raise PackitException(f"Cannot load user config: {ex}.")
-
+                break
         return Config.get_from_dict(raw_dict=loaded_config)
 
     @classmethod
