@@ -88,7 +88,7 @@ You can also specify the tokens as environment variables: `GITHUB_TOKEN`, `PAGUR
 
 ### Minimal sample config
 
-```
+```yaml
 debug: true
 github_token: mnbvcxz123456
 pagure_user_token: qwertyuiop098765
