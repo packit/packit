@@ -99,11 +99,13 @@ class PackitRepositoryBase:
         """
         logger.debug("About to add all & commit")
         main_msg = f"{prefix}{title}"
+        # add files to index in case some are untracked
+        # untracked files don't make a git repo dirty, unless they are staged
+        self.local_project.git_repo.git.add("-A")
         if not self.local_project.git_repo.is_dirty():
             raise PackitException(
                 "No changes are present in the dist-git repo: nothing to commit."
             )
-        self.local_project.git_repo.git.add("-A")
         self.local_project.git_repo.index.write()
         commit_args = ["-s", "-m", main_msg]
         if msg:
