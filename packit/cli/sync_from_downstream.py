@@ -38,13 +38,22 @@ logger = logging.getLogger(__file__)
 
 @click.command("sync-from-downstream", context_settings=get_context_settings())
 @click.option(
-    "--dist-git-branch", help="Source branch in dist-git for sync.", default="master"
+    "--dist-git-branch",
+    help="Source branch in dist-git to sync from.",
+    default="master",
 )
 @click.option(
     "--upstream-branch", help="Target branch in upstream to sync to.", default="master"
 )
-@click.option("--no-pr", is_flag=True, help="Pull request is not create.")
-@click.option("--fork/--no-fork", is_flag=True, default=True, help="Push to a fork.")
+@click.option(
+    "--no-pr", is_flag=True, help="Do not create a pull request to upstream repository."
+)
+@click.option(
+    "--fork/--no-fork",
+    is_flag=True,
+    default=True,
+    help="Push to a fork before creating a pull request.",
+)
 @click.option(
     "--remote",
     default=None,
