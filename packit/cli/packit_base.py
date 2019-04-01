@@ -22,6 +22,7 @@ logger = logging.getLogger("packit")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab):
+    """Integrate upstream open source projects into Fedora operating system."""
     c = Config.get_user_config()
     c.debug = debug or c.debug
     c.fas_user = fas_user or c.fas_user
