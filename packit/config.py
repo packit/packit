@@ -1,17 +1,17 @@
 import json
 import logging
+import os
 from enum import IntEnum
 from functools import lru_cache
-import os
 from pathlib import Path
 from typing import Optional, List, NamedTuple, Dict, Callable
 
 import click
 import jsonschema
 from jsonschema import Draft4Validator
-from ogr.abstract import GitProject
 from yaml import safe_load
 
+from ogr.abstract import GitProject
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException, PackitException
 from packit.utils import exclude_from_dict, run_command
@@ -185,7 +185,7 @@ class PackageConfig:
             self.downstream_project_url: str = downstream_project_url
         else:
             self.downstream_project_url: str = self.dist_git_package_url
-	self.actions = actions
+        self.actions = actions
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
