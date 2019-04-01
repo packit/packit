@@ -1,12 +1,15 @@
 """
 Tests for Upstream class
 """
+import os
 import re
 import subprocess
 from pathlib import Path
 
+import github
 import pytest
 from flexmock import flexmock
+from packit.config import Config
 from rebasehelper.versioneer import versioneers_runner
 
 from packit.exceptions import PackitException
@@ -101,3 +104,39 @@ def test_create_srpm(upstream_instance, tmpdir):
     srpm_path = Path(tmpdir).joinpath("custom.src.rpm")
     srpm = ups.create_srpm(srpm_path=srpm_path)
     assert srpm.exists()
+
+
+def test_github_app(upstream_instance, tmpdir):
+    u, ups = upstream_instance
+    t = Path(tmpdir)
+
+    fake_cert_path = t / "fake-cert.pem"
+    fake_cert_path.write_text("hello!")
+
+    user_config_file_path = t / ".packit.yaml"
+    user_config_file_path.write_text(
+        "---\n"
+        f"github_app_cert_path: {fake_cert_path}\n"
+        "github_app_id: qwe\n"
+        "github_app_installation_id: asd\n"
+    )
+    flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
+        str(tmpdir)
+    )
+    ups.config = Config.get_user_config()
+
+    def fake_init(github_app_id, private_key):
+        assert github_app_id == "qwe"
+        assert private_key == "hello!"
+
+    def fake_get_access_token(inst_id):
+        assert inst_id == "asd"
+        return "good"
+
+    flexmock(
+        github.GithubIntegration,
+        __init__=fake_init,
+        get_access_token=fake_get_access_token,
+    )
+
+    assert ups.local_project.git_service._token == "good"
