@@ -33,17 +33,13 @@ logger = logging.getLogger(__name__)
 
 
 class PackitRepositoryBase:
+    # mypy complains when this is a property
+    local_project: LocalProject
+
     def __init__(self, config: Config, package_config: PackageConfig) -> None:
         self.config = config
         self.package_config = package_config
         self._specfile = None
-
-    @property
-    def local_project(self) -> LocalProject:
-        """
-        :return: an instance of LocalProject
-        """
-        raise NotImplementedError
 
     @property
     def specfile(self) -> SpecFile:

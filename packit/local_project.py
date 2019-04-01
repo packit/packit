@@ -26,8 +26,9 @@ import shutil
 
 import git
 import requests
-
 from ogr.abstract import GitProject, GitService
+from packit.exceptions import PackitException
+
 from packit.utils import is_git_repo, get_repo, get_namespace_and_repo_name
 
 logger = logging.getLogger(__name__)
@@ -54,20 +55,22 @@ class LocalProject:
     Local project can compute other attributes if it is possible.
     """
 
+    # setting defaults to str because `None == ""` results into TypeError is not true-true
     def __init__(
         self,
         git_repo: git.Repo = None,
-        working_dir: str = None,
-        ref: str = None,
+        working_dir: str = "",
+        ref: str = "",
         git_project: GitProject = None,
         git_service: GitService = None,
-        git_url: str = None,
-        full_name: str = None,
-        namespace: str = None,
-        repo_name: str = None,
-        path_or_url: str = None,
+        git_url: str = "",
+        full_name: str = "",
+        namespace: str = "",
+        repo_name: str = "",
+        path_or_url: str = "",
         offline: bool = False,
-        refresh=True,
+        refresh: bool = True,
+        remote: str = "",
     ) -> None:
         """
 
@@ -84,8 +87,8 @@ class LocalProject:
                                 used as git_url if the it is a request-able url)
         :param offline: bool (do not use any network action, defaults to False)
         :param refresh: bool (calculate the missing attributes, defaults to True)
+        :param remote: name of the git remote to use
         """
-
         self.working_dir_temporary = False
         if path_or_url:
             if os.path.isdir(path_or_url):
@@ -93,7 +96,7 @@ class LocalProject:
             elif not offline and self._is_url(path_or_url):
                 git_url = git_url or path_or_url
 
-        self.git_repo = git_repo
+        self.git_repo: git.Repo = git_repo
         self.working_dir = working_dir
         self._ref = ref
         self.git_project = git_project
@@ -103,6 +106,7 @@ class LocalProject:
         self.repo_name = repo_name
         self.namespace = namespace
         self.offline = offline
+        self.remote = remote
 
         if refresh:
             self.refresh_the_arguments()
@@ -220,7 +224,7 @@ class LocalProject:
     def _parse_ref_from_git_repo(self):
         if self.git_repo and not self._ref:
             self._ref = self._get_ref_from_git_repo()
-            return self._ref is not None
+            return bool(self._ref)
         return False
 
     def _parse_working_dir_from_git_repo(self):
@@ -250,6 +254,10 @@ class LocalProject:
     def _parse_repo_name_from_git_project(self):
         if self.git_project and not self.repo_name:
             self.repo_name = self.git_project.repo
+            if not self.repo_name:
+                raise PackitException(
+                    "Repo name should have been set but isn't, this is bug!"
+                )
             return True
         return False
 
@@ -261,13 +269,16 @@ class LocalProject:
 
     def _parse_git_url_from_git_repo(self):
         if self.git_repo and not self.git_url:
-            # this is prone to errors
-            # also if we want url to upstream, we may want to ask for it explicitly
-            # since this can point to a fork
-            # .urls returns generator
-            self.git_url = list(self.git_repo.remote().urls)[0]
+            old_git_url = self.git_url
+            if self.remote:
+                self.git_url = list(self.git_repo.remote(self.remote).urls)[0]
+            else:
+                # TODO: let's just default to origin
+                # .urls returns generator
+                self.git_url = list(self.git_repo.remote().urls)[0]
             logger.debug(f"remote url of the repo is {self.git_url}")
-            return True
+            # trigger refresh if they are different
+            return not (bool(old_git_url) == bool(self.git_url))
         return False
 
     def _parse_namespace_from_git_url(self):

@@ -30,17 +30,21 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 from ogr.abstract import PullRequest, PRStatus
-from ogr.services.github import GithubService
+from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService
 from rebasehelper.specfile import SpecFile
 
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
-from packit.upstream import Upstream
 from packit.fedpkg import FedPKG
+from packit.local_project import LocalProject
+from packit.upstream import Upstream
 from tests.spellbook import prepare_dist_git_repo, get_test_config
 from .spellbook import TARBALL_NAME, UPSTREAM, git_add_n_commit, DISTGIT
+
+DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
+UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
 
 
 @pytest.fixture()
@@ -86,12 +90,27 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
             created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
         )
 
+    flexmock(GithubService)
+    github_service = GithubService()
+    flexmock(
+        GithubService,
+        get_project=lambda repo, namespace: GithubProject(
+            "also-not", github_service, "set", github_repo=flexmock()
+        ),
+    )
+
     flexmock(
         PagureProject,
-        get_git_urls=lambda: {"git": str(d)},
+        get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
         fork_create=lambda: None,
         get_fork=lambda: PagureProject("", "", PagureService()),
         pr_create=mocked_pr_create,
+    )
+    flexmock(
+        GithubProject,
+        get_git_urls=lambda: {"git": UPSTREAM_PROJECT_URL},
+        fork_create=lambda: None,
+        pr_create=lambda: None,
     )
 
     def mock_download_remote_sources():
@@ -103,8 +122,6 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
         subprocess.check_call(["tar", "-cf", str(tarball_path), hops_filename], cwd=d)
 
     flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
-
-    flexmock(GithubService, get_project=lambda repo, namespace: flexmock())
 
     flexmock(
         DistGit,
@@ -179,8 +196,9 @@ def upstream_instance(upstream_n_distgit):
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
     pc.downstream_project_url = str(d)
+    lp = LocalProject(path_or_url=str(u))
 
-    ups = Upstream(c, pc)
+    ups = Upstream(c, pc, lp)
     return u, ups
 
 
@@ -204,6 +222,7 @@ def api_instance(upstream_n_distgit):
 
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
+    up_lp = LocalProject(path_or_url=str(u))
 
-    api = PackitAPI(c, pc)
+    api = PackitAPI(c, pc, up_lp)
     return u, d, api

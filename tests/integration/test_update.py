@@ -23,15 +23,17 @@
 import copy
 from os import chdir
 
+import git
 import pytest
 from flexmock import flexmock
-from packit.local_project import LocalProject
+from git import Repo
 from rebasehelper.specfile import SpecFile
 
 from packit.api import PackitAPI
 from packit.bot_api import PackitBotAPI
 from packit.config import get_local_package_config
 from packit.fed_mes_consume import Consumerino
+from packit.local_project import LocalProject
 from tests.spellbook import TARBALL_NAME, get_test_config
 
 
@@ -71,7 +73,8 @@ def test_basic_local_update(upstream_n_distgit, mock_upstream_remote_functionali
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
     pc.downstream_project_url = str(d)
-    api = PackitAPI(c, pc)
+    up_lp = LocalProject(path_or_url=str(u))
+    api = PackitAPI(c, pc, up_lp)
     api.sync_release("master", "0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
@@ -90,7 +93,8 @@ def test_basic_local_update_from_downstream(
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
     pc.downstream_project_url = str(d)
-    api = PackitAPI(c, pc)
+    up_lp = LocalProject(path_or_url=str(u))
+    api = PackitAPI(c, pc, up_lp)
     api.sync_from_downstream("master", "master", True)
 
     assert (u / "beer.spec").is_file()
@@ -103,6 +107,9 @@ def test_single_message(github_release_fedmsg, mock_upstream_remote_functionalit
 
     conf = get_test_config()
     api = PackitBotAPI(conf)
+
+    flexmock(Repo).should_receive("clone_from").and_return(git.Repo(str(u)))
+
     api.sync_upstream_release_with_fedmsg(github_release_fedmsg)
     assert (d / TARBALL_NAME).is_file()
     spec = SpecFile(str(d / "beer.spec"), None)
@@ -110,10 +117,13 @@ def test_single_message(github_release_fedmsg, mock_upstream_remote_functionalit
 
 
 def test_loop(mock_upstream_remote_functionality, github_release_fedmsg):
+    u, d = mock_upstream_remote_functionality
+
     def mocked_iter_releases():
         msg = copy.deepcopy(github_release_fedmsg)
         yield msg["topic"], msg
 
+    flexmock(Repo).should_receive("clone_from").and_return(git.Repo(str(u)))
     flexmock(Consumerino, iterate_releases=mocked_iter_releases)
     conf = get_test_config()
     api = PackitBotAPI(conf)

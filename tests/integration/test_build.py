@@ -24,6 +24,7 @@ from os import chdir
 
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
+from packit.local_project import LocalProject
 from tests.spellbook import get_test_config
 
 
@@ -35,6 +36,7 @@ def test_basic_build(upstream_n_distgit, mock_upstream_remote_functionality):
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
     pc.downstream_project_url = str(d)
+    up_lp = LocalProject(path_or_url=u)
 
-    api = PackitAPI(c, pc)
+    api = PackitAPI(c, pc, up_lp)
     api.build("master")
