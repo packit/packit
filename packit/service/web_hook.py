@@ -20,14 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from flask import Flask, request
 import logging
 from io import StringIO
 
-from packit.utils import set_logging
+from flask import Flask, request, jsonify
 
-from packit.config import Config
 from packit.bot_api import PackitBotAPI
+from packit.config import Config
+from packit.utils import set_logging
 
 
 class PackitWebhookReceiver(Flask):
@@ -38,6 +38,12 @@ class PackitWebhookReceiver(Flask):
 
 app = PackitWebhookReceiver(__name__)
 logger = logging.getLogger("packit")
+
+
+@app.route("/healthz", methods=["GET", "HEAD", "POST"])
+def get_health():
+    # TODO: add some interesting stats here
+    return jsonify({"msg": "We are healthy!"})
 
 
 @app.route("/webhooks/github/release", methods=["POST"])
