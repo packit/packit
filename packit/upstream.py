@@ -1,10 +1,9 @@
 import logging
 import os
 import re
-import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
-from packaging import _version
+from packaging import version
 
 import git
 import github
@@ -13,8 +12,6 @@ from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
-from packit.config import Config, PackageConfig
-from ogr.services.github import GithubService
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject

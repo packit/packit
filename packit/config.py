@@ -183,6 +183,23 @@ class SyncFilesConfig:
     def is_dict_valid(cls, raw_dict: dict) -> bool:
         return Draft4Validator(SYNCED_FILES_SCHEMA).is_valid(raw_dict)
 
+    def __eq__(self, other: object):
+        if not isinstance(other, SyncFilesConfig):
+            return NotImplemented
+
+        if not self.files_to_sync and not other.files_to_sync:
+            return True
+
+        if len(self.files_to_sync) != len(other.files_to_sync):
+            return False
+        compare = False
+        for f in self.files_to_sync:
+            for o in other.files_to_sync:
+                if f.src == o.src and f.dest == o.dest:
+                    compare = True
+
+        return compare
+
 
 class PackageConfig:
     """
@@ -206,7 +223,7 @@ class PackageConfig:
         actions: Dict[str, str] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
-        self.synced_files: Optional[SyncFilesConfig] = synced_files or []
+        self.synced_files: Optional[SyncFilesConfig] = synced_files or None
         self.jobs: List[JobConfig] = jobs or []
         self.dist_git_namespace: str = dist_git_namespace or "rpms"
         self.upstream_project_url: Optional[str] = upstream_project_url
