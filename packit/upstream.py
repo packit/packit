@@ -7,6 +7,7 @@ from typing import Optional, List, Tuple
 from packaging import version
 
 import git
+import github
 from ogr.services.github import GithubService
 from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
@@ -51,10 +52,35 @@ class Upstream:
     def local_project(self):
         """ return an instance of LocalProject """
         if self._local_project is None:
+            # TODO: ogr should have a method, something like this:
+            #       get_github_service(token, app_id, inst_id, cert_path) -> GithubService
+            #       the logic below should be the function
+            #       I want to leave this code here up the end of this sprint
+            # TODO: in order to support any git forge here, ogr should also have a method like this:
+            #       get_github_service_from_url(url, **kwargs):
+            #       ogr should guess the forge based on the url; kwargs should be passed to the
+            #       constructor in order to support the above
+            if (
+                self.config.github_app_id
+                and self.config.github_app_cert_path
+                and self.config.github_app_installation_id
+            ):
+                logger.info("Authenticating with Github using a Githab app.")
+                private_key = Path(self.config.github_app_cert_path).read_text()
+                integration = github.GithubIntegration(
+                    self.config.github_app_id, private_key
+                )
+                token = integration.get_access_token(
+                    self.config.github_app_installation_id
+                )
+                gh_service = GithubService(token=token)
+            else:
+                logger.debug("Authenticating with Github using a token.")
+                gh_service = GithubService(token=self.github_token)
             self._local_project = LocalProject(
                 path_or_url=self.upstream_project_url,
                 repo_name=self.package_name,
-                git_service=GithubService(token=self.github_token),
+                git_service=gh_service,
             )
         return self._local_project
 
