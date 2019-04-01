@@ -101,5 +101,9 @@ def get_packit_api(
         package_config.downstream_project_url = dist_git_path
     package_config.upstream_project_url = local_project.working_dir
 
-    api = PackitAPI(config=config, package_config=package_config)
+    api = PackitAPI(
+        config=config,
+        package_config=package_config,
+        upstream_local_project=local_project,
+    )
     return api

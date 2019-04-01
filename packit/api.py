@@ -28,6 +28,8 @@ import logging
 from pathlib import Path
 from typing import Sequence
 
+from packit.local_project import LocalProject
+
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -40,9 +42,15 @@ logger = logging.getLogger(__name__)
 
 
 class PackitAPI:
-    def __init__(self, config: Config, package_config: PackageConfig) -> None:
+    def __init__(
+        self,
+        config: Config,
+        package_config: PackageConfig,
+        upstream_local_project: LocalProject,
+    ) -> None:
         self.config = config
         self.package_config = package_config
+        self.upstream_local_project = upstream_local_project
 
         self._up = None
         self._dg = None
@@ -50,7 +58,11 @@ class PackitAPI:
     @property
     def up(self):
         if self._up is None:
-            self._up = Upstream(config=self.config, package_config=self.package_config)
+            self._up = Upstream(
+                config=self.config,
+                package_config=self.package_config,
+                local_project=self.upstream_local_project,
+            )
         return self._up
 
     @property
@@ -352,7 +364,7 @@ class PackitAPI:
 
     def status(self):
 
-        status = Status(self.config, self.package_config)
+        status = Status(self.config, self.package_config, self.up, self.dg)
 
         status.get_downstream_prs()
         status.get_dg_versions()

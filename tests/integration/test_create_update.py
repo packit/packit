@@ -28,6 +28,7 @@ from munch import Munch
 
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
+from packit.local_project import LocalProject
 from tests.spellbook import get_test_config, can_a_module_be_imported
 
 
@@ -299,8 +300,9 @@ def test_basic_bodhi_update(
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
     pc.downstream_project_url = str(d)
+    up_lp = LocalProject(path_or_url=u)
 
-    api = PackitAPI(c, pc)
+    api = PackitAPI(c, pc, up_lp)
 
     flexmock(
         BodhiClient,

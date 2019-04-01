@@ -32,12 +32,16 @@ class LocalProjectParameter(click.ParamType):
 
     name = "path_or_url"
 
-    def __init__(self, branch_param_name: str = None) -> None:
+    def __init__(
+        self, branch_param_name: str = None, remote_param_name: str = None
+    ) -> None:
         """
         :param branch_param_name: name of the cli function parameter (not the option name)
+        :param remote_param_name: name of the remote cli function parameter (not the option name)
         """
         super().__init__()
         self.branch_param_name = branch_param_name
+        self.remote_param_name = remote_param_name
 
     def convert(self, value, param, ctx):
         try:
@@ -49,8 +53,11 @@ class LocalProjectParameter(click.ParamType):
                     for param in ctx.command.params:
                         if param.name == self.branch_param_name:
                             branch_name = param.default
+            remote_name = ctx.params.get(self.remote_param_name, None)
 
-            local_project = LocalProject(path_or_url=value, ref=branch_name)
+            local_project = LocalProject(
+                path_or_url=value, ref=branch_name, remote=remote_name
+            )
             if not local_project.working_dir and not local_project.git_url:
                 self.fail(
                     "Parameter is not an existing directory nor correct git url.",
