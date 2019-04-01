@@ -16,7 +16,7 @@ from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.upstream import Upstream
-from packit.utils import FedPKG
+from packit.fedpkg import FedPKG
 from tests.spellbook import prepare_dist_git_repo, get_test_config
 from .spellbook import TARBALL_NAME, UPSTREAM, git_add_n_commit, DISTGIT
 

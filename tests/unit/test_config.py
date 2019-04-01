@@ -210,6 +210,35 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             True,
         ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "actions": {
+                    "pre-sync": "some/pre-sync/command --option",
+                    "upstream-version": "get-me-upstream-version",
+                },
+                "synced_files": [],
+                "jobs": [
+                    {"trigger": "release", "release_to": ["f28"]},
+                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
+                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
+                ],
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "actions": ["actions" "has", "to", "be", "key", "value"],
+                "synced_files": [],
+                "jobs": [
+                    {"trigger": "release", "release_to": ["f28"]},
+                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
+                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
+                ],
+            },
+            False,
+        ),
     ],
 )
 def test_package_config_validate(raw, is_valid):
@@ -360,6 +389,33 @@ def test_package_config_parse_error(raw):
                         trigger=TriggerType.release, release_to=["f28"], metadata={}
                     )
                 ],
+                upstream_project_url="https://github.com/asd/qwe",
+                upstream_project_name="qwe",
+                dist_git_base_url="https://something.wicked",
+            ),
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": [],
+                "actions": {
+                    "pre-sync": "some/pre-sync/command --option",
+                    "upstream-version": "get-me-upstream-version",
+                },
+                "jobs": [],
+                "something": "stupid",
+                "upstream_project_url": "https://github.com/asd/qwe",
+                "upstream_project_name": "qwe",
+                "dist_git_base_url": "https://something.wicked",
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=[],
+                actions={
+                    "pre-sync": "some/pre-sync/command --option",
+                    "upstream-version": "get-me-upstream-version",
+                },
+                jobs=[],
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
                 dist_git_base_url="https://something.wicked",
