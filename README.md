@@ -134,6 +134,22 @@ $ pip3 install --user git+https://github.com/packit-service/packit.git
 ```
 
 
+### Run from git directly:
+
+You don't need need to install packit to try it out. You can run it directly
+from git (if you have all the dependencies installed):
+
+```
+$ python3 -m packit.cli.packit_base --help
+Usage: packit_base.py [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -d, --debug
+  -h, --help         Show this message and exit.
+...
+```
+
+
 ## Candidates for early adoption
 
 Please, open a PR if you want to be on the list, or just let us know.
