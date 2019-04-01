@@ -39,9 +39,19 @@ class PackitWebhookReceiver(Flask):
 app = PackitWebhookReceiver(__name__)
 logger = logging.getLogger("packit")
 
-@app.route("/github_release", methods=["POST"])
+
+@app.route("/webhooks/github/release", methods=["POST"])
 def github_release():
     msg = request.get_json()
+
+    if not msg:
+        logger.debug("/webhooks/github/release: We haven't received any JSON data.")
+        return "We haven't received any JSON data."
+
+    if not (msg.get("action") == "published" and "release" in msg):
+        logger.debug("/webhooks/github/release: Not a new release event.")
+        logger.debug(f"Action={msg['action']}, keys={msg.keys()}")
+        return "We only accept events for new Github releases."
 
     buffer = StringIO()
     logHandler = logging.StreamHandler(buffer)

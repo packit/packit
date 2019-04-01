@@ -6,10 +6,8 @@ import requests
 
 
 @pytest.mark.skip
-def test_prop_update_on_colin():
-    # f"{msg['repository']['owner']}/{msg['repository']['name']} - {msg['release']['tag_name']}")
-
-    url = "http://localhost:5000/github_release"
+def test_prop_update_on_packit_020():
+    url = "http://localhost:5000/webhooks/github/release"
     payload = {
         "repository": {
             "name": "packit",
