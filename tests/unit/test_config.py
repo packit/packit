@@ -213,7 +213,6 @@ def test_package_config_not_equal(not_equal_package_config):
     "raw,is_valid",
     [
         ({}, False),
-        ({"specfile_path": "fedora/package.spec"}, False),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -244,7 +243,7 @@ def test_package_config_not_equal(not_equal_package_config):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": [""],
+                "synced_files": ["fedora/foobar.spec"],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -256,11 +255,11 @@ def test_package_config_not_equal(not_equal_package_config):
         (
             {
                 "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/foobar.spec"],
                 "actions": {
                     "pre-sync": "some/pre-sync/command --option",
                     "upstream-version": "get-me-upstream-version",
                 },
-                "synced_files": [],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -273,7 +272,6 @@ def test_package_config_not_equal(not_equal_package_config):
             {
                 "specfile_path": "fedora/package.spec",
                 "actions": ["actions" "has", "to", "be", "key", "value"],
-                "synced_files": [],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -452,11 +450,11 @@ def test_package_config_parse_error(raw):
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[],
                 actions={
                     "pre-sync": "some/pre-sync/command --option",
                     "upstream-version": "get-me-upstream-version",
                 },
+                synced_files=SyncFilesConfig(files_to_sync=None),
                 jobs=[],
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
@@ -476,6 +474,7 @@ def test_dist_git_package_url():
         "dist_git_base_url": "https://packit.dev/",
         "downstream_package_name": "packit",
         "dist_git_namespace": "awesome",
+        "synced_files": ["fedora/foobar.spec"],
         "specfile_path": "fedora/package.spec",
     }
     new_pc = PackageConfig.get_from_dict(di)
@@ -483,6 +482,11 @@ def test_dist_git_package_url():
         dist_git_base_url="https://packit.dev/",
         downstream_package_name="packit",
         dist_git_namespace="awesome",
+        synced_files=SyncFilesConfig(
+            files_to_sync=[
+                SyncFilesItem(src="fedora/foobar.spec", dest="fedora/foobar.spec")
+            ]
+        ),
         specfile_path="fedora/package.spec",
     )
     assert pc == new_pc

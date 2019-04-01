@@ -52,9 +52,7 @@ upstream_project_name: packitos
 downstream_package_name: packit
 ```
 
-
 ### Real examples
-
 
 The list of projects which already have packit config in their upstream repositories:
 * [packit-service/packit](https://github.com/packit-service/packit/blob/master/.packit.yaml)
