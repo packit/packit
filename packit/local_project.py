@@ -26,10 +26,16 @@ import shutil
 
 import git
 import requests
+<<<<<<< HEAD
+=======
+import re
+
+>>>>>>> giturlparse replaced by regex
 from ogr.abstract import GitProject, GitService
 from packit.exceptions import PackitException
 
 from packit.utils import is_git_repo, get_repo, get_namespace_and_repo_name
+
 
 logger = logging.getLogger(__name__)
 
@@ -161,11 +167,11 @@ class LocalProject:
             res = requests.head(path_or_url)
             if res.ok:
                 return True
-            else:
-                logger.warning("path_or_url is nor directory nor url")
+            logger.warning("path_or_url is nor directory nor url")
         except requests.exceptions.BaseHTTPError:
             logger.warning("path_or_url is nor directory nor url")
         return False
+
 
     def _parse_repo_name_full_name_and_namespace(self):
         change = False
