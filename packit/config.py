@@ -32,6 +32,7 @@ class Config:
 
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
+        self.dry_run: bool = False
 
     @classmethod
     def get_user_config(cls) -> "Config":

@@ -18,13 +18,15 @@ logger = logging.getLogger("packit")
 
 @click.group("packit", context_settings=get_context_settings())
 @click.option("-d", "--debug", is_flag=True)
+@click.option("--dry-run", is_flag=True, help="do not create PR, comments or similar")
 @click.option("--fas-user", help="Fedora Account System username.")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.pass_context
-def packit_base(ctx, debug, fas_user, keytab):
+def packit_base(ctx, debug, fas_user, keytab, dry_run):
     """Integrate upstream open source projects into Fedora operating system."""
     c = Config.get_user_config()
     c.debug = debug or c.debug
+    c.dry_run = dry_run or c.dry_run
     c.fas_user = fas_user or c.fas_user
     c.keytab_path = keytab or c.keytab_path
     ctx.obj = c
