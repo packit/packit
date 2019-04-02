@@ -65,6 +65,7 @@ class Config:
         config = Config()
 
         config.debug = raw_dict.get("debug", False)
+        config.dry_run = raw_dict.get("dry_run", False)
         config.fas_user = raw_dict.get("fas_user", None)
         config.keytab_path = raw_dict.get("keytab_path", None)
         config._github_token = raw_dict.get("github_token", "")
@@ -479,6 +480,7 @@ USER_CONFIG_SCHEMA = {
     "type": "object",
     "properties": {
         "debug": {"type": "boolean"},
+        "dry_run": {"type": "boolean"},
         "fas_user": {"type": "string"},
         "keytab_path": {"type": "string"},
         "github_token": {"type": "string"},

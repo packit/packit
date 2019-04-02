@@ -18,7 +18,11 @@ logger = logging.getLogger("packit")
 
 @click.group("packit", context_settings=get_context_settings())
 @click.option("-d", "--debug", is_flag=True)
-@click.option("--dry-run", is_flag=True, help="do not create PR, comments or similar")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Do not perform any remote changes (pull requests or comments).",
+)
 @click.option("--fas-user", help="Fedora Account System username.")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.pass_context
