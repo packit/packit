@@ -25,12 +25,16 @@ class PackitBotAPI:
     @property  # type: ignore
     @lru_cache()
     def _github_service(self):
-        return GithubService(token=self.config.github_token, read_only=self.config.dry_run)
+        return GithubService(
+            token=self.config.github_token, read_only=self.config.dry_run
+        )
 
     @property  # type: ignore
     @lru_cache()
     def _pagure_service(self):
-        return PagureService(token=self.config.pagure_user_token, read_only=self.config.dry_run)
+        return PagureService(
+            token=self.config.pagure_user_token, read_only=self.config.dry_run
+        )
 
     def watch_upstream_pull_request(self):
         for topic, action, msg in self.consumerino.iterate_pull_requests():

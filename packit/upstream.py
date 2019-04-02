@@ -76,7 +76,9 @@ class Upstream:
                 gh_service = GithubService(token=token, read_only=self.config.dry_run)
             else:
                 logger.debug("Authenticating with Github using a token.")
-                gh_service = GithubService(token=self.github_token, read_only=self.config.dry_run)
+                gh_service = GithubService(
+                    token=self.github_token, read_only=self.config.dry_run
+                )
             self._local_project = LocalProject(
                 path_or_url=self.upstream_project_url,
                 repo_name=self.package_name,
