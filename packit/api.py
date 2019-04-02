@@ -73,7 +73,7 @@ class PackitAPI:
         return self._dg
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
-        self.package_config.run_action(action_name="pre-sync")
+        self.up.run_action(action_name="pre-sync")
 
         self.up.checkout_pr(pr_id=pr_id)
         local_pr_branch = f"pull-request-{pr_id}-sync"
@@ -90,7 +90,7 @@ class PackitAPI:
         self.dg.create_branch(local_pr_branch)
         self.dg.checkout_branch(local_pr_branch)
 
-        if self.package_config.with_action(action_name="patch"):
+        if self.up.with_action(action_name="patch"):
             patches = self.up.create_patches(
                 upstream=upstream_version, destination=self.dg.local_project.working_dir
             )
@@ -130,7 +130,7 @@ class PackitAPI:
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
 
-        self.package_config.run_action(action_name="pre-sync")
+        self.up.run_action(action_name="pre-sync")
 
         full_version = version or self.up.get_version()
         if not full_version:
@@ -168,14 +168,14 @@ class PackitAPI:
                 f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
 
-            if self.package_config.with_action(action_name="prepare-files"):
+            if self.up.with_action(action_name="prepare-files"):
                 sync_files(
                     self.package_config,
                     self.up.local_project.working_dir,
                     self.dg.local_project.working_dir,
                 )
                 if upstream_ref:
-                    if self.package_config.with_action(action_name="patch"):
+                    if self.up.with_action(action_name="patch"):
                         patches = self.up.create_patches(
                             upstream=upstream_ref,
                             destination=self.dg.local_project.working_dir,
@@ -186,7 +186,7 @@ class PackitAPI:
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
 
-            if self.package_config.has_action("prepare-files"):
+           if self.up.has_action("prepare-files"):
                 sync_files(
                     self.package_config,
                     self.up.local_project.working_dir,

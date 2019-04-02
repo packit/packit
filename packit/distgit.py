@@ -22,6 +22,7 @@
 
 import logging
 import os
+import shutil
 from typing import Optional, List, Tuple, Sequence
 
 import git
