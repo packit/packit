@@ -247,7 +247,6 @@ class DistGit(PackitRepositoryBase):
         # TODO: remove branches from merged PRs
         raise NotImplementedError("not implemented yet")
 
-
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
