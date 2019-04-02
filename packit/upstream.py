@@ -23,6 +23,7 @@
 import logging
 import os
 import re
+import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
 from packaging import version
@@ -355,9 +356,7 @@ class Upstream(PackitRepositoryBase):
 
         :return: e.g. 0.1.1.dev86+ga17a559.d20190315 or 0.6.1.1.gce4d84e
         """
-        action_output = self.package_config.get_output_from_action(
-            action_name="get-current-version"
-        )
+        action_output = self.get_output_from_action(action_name="get-current-version")
         if action_output:
             return action_output
 
@@ -415,7 +414,7 @@ class Upstream(PackitRepositoryBase):
         repository, only committed changes are present in the archive
         """
 
-        if self.package_config.with_action(action_name="create-archive"):
+        if self.with_action(action_name="create-archive"):
 
             if self.package_config.upstream_project_name:
                 dir_name = (
