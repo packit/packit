@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
 from packaging import version
@@ -13,7 +12,7 @@ from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
-from packit.config import Config, PackageConfig
+from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import run_command
@@ -35,7 +34,7 @@ class Upstream(PackitRepositoryBase):
 
         self.github_token = self.config.github_token
         self.upstream_project_url: str = self.package_config.upstream_project_url
-        self.files_to_sync: Optional[List[str]] = self.package_config.synced_files
+        self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
 
     @property
     def active_branch(self):
@@ -309,25 +308,6 @@ class Upstream(PackitRepositoryBase):
         version = self.specfile.get_version()
         logger.info(f"Version in spec file is {version!r}.")
         return version
-
-    def sync_files(self, downstream_project: LocalProject) -> None:
-        """
-        sync required files from downstream to upstream
-        """
-        logger.debug("about to sync files %s", self.files_to_sync)
-        if self.package_config.with_action(action_name="sync-down-to-up"):
-            for fi in self.files_to_sync:
-                # TODO: fi can be dir
-                fi = fi[1:] if fi.startswith("/") else fi
-                src = os.path.join(downstream_project.working_dir, fi)
-                if os.path.exists(src):
-                    logger.info("syncing %s", src)
-                    shutil.copy2(src, self.local_project.working_dir)
-                else:
-                    raise PackitException(
-                        f"File {src} is not present in the downstream repository. "
-                        f"Upstream ref {downstream_project.git_repo.active_branch} is checked out"
-                    )
 
     def get_version(self) -> str:
         """

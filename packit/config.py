@@ -4,6 +4,7 @@ import os
 from enum import IntEnum
 from functools import lru_cache
 from pathlib import Path
+
 from typing import Optional, List, NamedTuple, Dict, Callable
 
 import click
@@ -151,6 +152,60 @@ class JobConfig(NamedTuple):
         return Draft4Validator(JOB_CONFIG_SCHEMA).is_valid(raw_dict)
 
 
+class SyncFilesItem(NamedTuple):
+    src: str
+    dest: str
+
+    def __eq__(self, other: object):
+        if not isinstance(other, SyncFilesItem):
+            return NotImplemented
+
+        if self.src == other.src and self.dest == other.dest:
+            return True
+        return False
+
+
+class SyncFilesConfig:
+    def __init__(self, files_to_sync: List[SyncFilesItem]):
+        self.files_to_sync = files_to_sync
+
+    @classmethod
+    def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":
+        if validate and not SyncFilesConfig.is_dict_valid(raw_dict):
+            raise Exception(f"Sync files config not valid.")
+
+        files_to_sync = []
+        if isinstance(raw_dict, list):
+            for f in raw_dict:
+                if isinstance(f, dict):
+                    files_to_sync.append(SyncFilesItem(src=f["src"], dest=f["dest"]))
+                else:
+                    files_to_sync.append(SyncFilesItem(src=f, dest=f))
+        if isinstance(raw_dict, dict):
+            for f in raw_dict:
+                files_to_sync.append(SyncFilesItem(src=f["src"], dest=f["dest"]))
+
+        return SyncFilesConfig(files_to_sync=files_to_sync)
+
+    @classmethod
+    def is_dict_valid(cls, raw_dict: dict) -> bool:
+        return Draft4Validator(SYNCED_FILES_SCHEMA).is_valid(raw_dict)
+
+    def __eq__(self, other: object):
+        if not isinstance(other, SyncFilesConfig):
+            return NotImplemented
+
+        if not self.files_to_sync and not other.files_to_sync:
+            return True
+
+        if len(self.files_to_sync) != len(other.files_to_sync):
+            return False
+
+        if self.files_to_sync == other.files_to_sync:
+            return True
+        return False
+
+
 class PackageConfig:
     """
     Config class for upstream/downstream packages;
@@ -160,7 +215,7 @@ class PackageConfig:
     def __init__(
         self,
         specfile_path: Optional[str] = None,
-        synced_files: Optional[List[str]] = None,
+        synced_files: Optional[SyncFilesConfig] = None,
         jobs: Optional[List[JobConfig]] = None,
         dist_git_namespace: str = None,
         upstream_project_url: str = None,  # can be URL or path
@@ -173,7 +228,7 @@ class PackageConfig:
         actions: Dict[str, str] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
-        self.synced_files: List[str] = synced_files or []
+        self.synced_files: Optional[SyncFilesConfig] = synced_files or None
         self.jobs: List[JobConfig] = jobs or []
         self.dist_git_namespace: str = dist_git_namespace or "rpms"
         self.upstream_project_url: Optional[str] = upstream_project_url
@@ -256,10 +311,9 @@ class PackageConfig:
 
         dist_git_base_url = raw_dict.get("dist_git_base_url", None)
         dist_git_namespace = raw_dict.get("dist_git_namespace", None)
-
         pc = PackageConfig(
             specfile_path=specfile_path,
-            synced_files=synced_files,
+            synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
             actions=actions,
             jobs=[
                 JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
@@ -272,7 +326,6 @@ class PackageConfig:
             create_tarball_command=create_tarball_command,
             current_version_command=current_version_command,
         )
-
         return pc
 
     @staticmethod
@@ -459,6 +512,16 @@ JOB_CONFIG_SCHEMA = {
     "required": ["trigger", "release_to"],
 }
 
+SYNCED_FILES_SCHEMA = {
+    "anyOf": [
+        {"type": "string"},
+        {
+            "type": "object",
+            "properties": {"src": {"type": "string"}, "dest": {"type": "string"}},
+        },
+    ]
+}
+
 PACKAGE_CONFIG_SCHEMA = {
     "type": "object",
     "properties": {
@@ -467,7 +530,7 @@ PACKAGE_CONFIG_SCHEMA = {
         "upstream_project_name": {"type": "string"},
         "create_tarball_command": {"type": "array", "items": {"type": "string"}},
         "current_version_command": {"type": "array", "items": {"type": "string"}},
-        "synced_files": {"type": "array", "items": {"type": "string"}},
+        "synced_files": {"type": "array", "items": SYNCED_FILES_SCHEMA},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
         "actions": {"type": "object", "additionalProperties": {"type": "string"}},
     },

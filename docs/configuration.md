@@ -34,7 +34,19 @@ This is a sample config which is meant for packit itself.
 ```yaml
 specfile_path: packit.spec
 synced_files:
+# possible styles how to write a file to sync
+  # Copy the file in an upstream directory into the same downstream directory.
+  # File name is not changed
   - packit.spec
+  # src means a source file in root from the upstream directory.
+  # dest means a directory and filename into the downstream directory.
+  # in this case the name is the same
+  - src: packit.spec
+    dest: redhat/packit.spec
+  # src means all md files in a root from the upstream directory
+  # dest means all md files are copied into the downstream docs directory.
+  - src: *.md
+    dest: docs/
 # packit was already taken on PyPI
 upstream_project_name: packitos
 downstream_package_name: packit
