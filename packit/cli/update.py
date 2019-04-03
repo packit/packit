@@ -59,8 +59,18 @@ logger = logging.getLogger(__file__)
     default=False,
     help="Upload the new sources also when the archive is already in the lookaside cache.",
 )
+@click.option(
+    "--remote",
+    default=None,
+    help=(
+        "Name of the remote to discover upstream project URL, "
+        "If this is not specified, default to origin."
+    ),
+)
 @click.argument(
-    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
+    "path_or_url",
+    type=LocalProjectParameter(remote_param_name="remote"),
+    default=os.path.abspath(os.path.curdir),
 )
 @click.argument("version", required=False)
 @pass_config
@@ -73,6 +83,7 @@ def update(
     local_content,
     path_or_url,
     version,
+    remote,  # click introspects this in LocalProjectParameter
 ):
     """
     Release current upstream release into Fedora

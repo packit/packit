@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import logging
+
 from tabulate import tabulate
 
 from packit.config import Config, PackageConfig
@@ -36,12 +37,18 @@ class Status:
     This class provides methods to obtain status of the package
     """
 
-    def __init__(self, config: Config, package_config: PackageConfig):
+    def __init__(
+        self,
+        config: Config,
+        package_config: PackageConfig,
+        upstream: Upstream,
+        distgit: DistGit,
+    ):
         self.config = config
         self.package_config = package_config
 
-        self.up = Upstream(config=self.config, package_config=self.package_config)
-        self.dg = DistGit(config=self.config, package_config=self.package_config)
+        self.up = upstream
+        self.dg = distgit
 
     def get_downstream_prs(self, number_of_prs: int = 5) -> None:
         """

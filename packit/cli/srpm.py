@@ -36,12 +36,22 @@ logger = logging.getLogger("packit")
 @click.option(
     "--output", metavar="FILE", help="Write the SRPM to FILE instead of current dir."
 )
+@click.option(
+    "--remote",
+    default=None,
+    help=(
+        "Name of the remote to discover upstream project URL, "
+        "If this is not specified, default to origin."
+    ),
+)
 @click.argument(
-    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
+    "path_or_url",
+    type=LocalProjectParameter(remote_param_name="remote"),
+    default=os.path.abspath(os.path.curdir),
 )
 @pass_config
 @cover_packit_exception
-def srpm(config, output, path_or_url):
+def srpm(config, output, path_or_url, remote):
     """
     Create new SRPM (.src.rpm file) using content of the upstream repository.
 

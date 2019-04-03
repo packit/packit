@@ -573,13 +573,13 @@ def test_get_user_config(tmpdir):
 
 
 @pytest.mark.parametrize(
-    "packit_files,real_files",
+    "packit_files,expected",
     [
         (
             SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="conftest.py", dest="conftest.py")]
             ),
-            [{"src": "conftest.py", "dest": "conftest.py"}],
+            [SyncFilesItem(src="conftest.py", dest="conftest.py")],
         ),
         (
             SyncFilesConfig(
@@ -590,9 +590,9 @@ def test_get_user_config(tmpdir):
                 ]
             ),
             [
-                {"src": "__init__.py", "dest": "__init__.py"},
-                {"src": "conftest.py", "dest": "conftest.py"},
-                {"src": "spellbook.py", "dest": "spellbook.py"},
+                SyncFilesItem(src="__init__.py", dest="__init__.py"),
+                SyncFilesItem(src="conftest.py", dest="conftest.py"),
+                SyncFilesItem(src="spellbook.py", dest="spellbook.py"),
             ],
         ),
         (
@@ -600,23 +600,23 @@ def test_get_user_config(tmpdir):
                 files_to_sync=[SyncFilesItem(src="functional/", dest="tests")]
             ),
             [
-                {"src": "functional/__init__.py", "dest": "tests"},
-                {"src": "functional/test_srpm.py", "dest": "tests"},
+                SyncFilesItem(src="functional/__init__.py", dest="tests"),
+                SyncFilesItem(src="functional/test_srpm.py", dest="tests"),
             ],
         ),
         (
             SyncFilesConfig(files_to_sync=[SyncFilesItem(src="*.py", dest="tests")]),
             [
-                {"src": "__init__.py", "dest": "tests"},
-                {"src": "conftest.py", "dest": "tests"},
-                {"src": "spellbook.py", "dest": "tests"},
+                SyncFilesItem(src="__init__.py", dest="tests"),
+                SyncFilesItem(src="conftest.py", dest="tests"),
+                SyncFilesItem(src="spellbook.py", dest="tests"),
             ],
         ),
         (
             SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="unit/test_u*.py", dest="units")]
             ),
-            [{"src": "unit/test_utils.py", "dest": "units"}],
+            [SyncFilesItem(src="unit/test_utils.py", dest="units")],
         ),
         (
             SyncFilesConfig(
@@ -625,13 +625,13 @@ def test_get_user_config(tmpdir):
                 ]
             ),
             [
-                {"src": "integration/test_upstream.py", "dest": "units"},
-                {"src": "integration/test_update.py", "dest": "units"},
+                SyncFilesItem(src="integration/test_upstream.py", dest="units"),
+                SyncFilesItem(src="integration/test_update.py", dest="units"),
             ],
         ),
     ],
 )
-def test_sync_files(packit_files, real_files):
+def test_sync_files(packit_files, expected):
     chdir(TESTS_DIR)
     pc = PackageConfig(
         dist_git_base_url="https://packit.dev/",
@@ -642,6 +642,4 @@ def test_sync_files(packit_files, real_files):
     )
     get_wildcard_resolved_sync_files(pc)
     assert pc.synced_files
-    for files in pc.synced_files.files_to_sync:
-        assert [real for real in real_files if files.src == real.get("src")]
-        assert [real for real in real_files if files.dest == real["dest"]]
+    assert set(expected).issubset(set(pc.synced_files.files_to_sync))

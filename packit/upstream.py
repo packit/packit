@@ -46,10 +46,14 @@ logger = logging.getLogger(__name__)
 class Upstream(PackitRepositoryBase):
     """ interact with upstream project """
 
-    def __init__(self, config: Config, package_config: PackageConfig):
+    def __init__(
+        self, config: Config, package_config: PackageConfig, local_project: LocalProject
+    ):
         super().__init__(config=config, package_config=package_config)
+        self.config = config
+        self.package_config = package_config
+        self.local_project = local_project
 
-        self._local_project = None
         self._specfile = None
 
         self.package_name: Optional[str] = self.package_config.downstream_package_name
@@ -57,6 +61,7 @@ class Upstream(PackitRepositoryBase):
         self.github_token = self.config.github_token
         self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
+        self.set_local_project()
 
     @property
     def active_branch(self):
@@ -70,41 +75,35 @@ class Upstream(PackitRepositoryBase):
             )
         return None
 
-    @property
-    def local_project(self):
-        """ return an instance of LocalProject """
-        if self._local_project is None:
-            # TODO: ogr should have a method, something like this:
-            #       get_github_service(token, app_id, inst_id, cert_path) -> GithubService
-            #       the logic below should be the function
-            #       I want to leave this code here up the end of this sprint
-            # TODO: in order to support any git forge here, ogr should also have a method like this:
-            #       get_github_service_from_url(url, **kwargs):
-            #       ogr should guess the forge based on the url; kwargs should be passed to the
-            #       constructor in order to support the above
-            if (
-                self.config.github_app_id
-                and self.config.github_app_cert_path
-                and self.config.github_app_installation_id
-            ):
-                logger.info("Authenticating with Github using a Githab app.")
-                private_key = Path(self.config.github_app_cert_path).read_text()
-                integration = github.GithubIntegration(
-                    self.config.github_app_id, private_key
-                )
-                token = integration.get_access_token(
-                    self.config.github_app_installation_id
-                )
-                gh_service = GithubService(token=token)
-            else:
-                logger.debug("Authenticating with Github using a token.")
-                gh_service = GithubService(token=self.github_token)
-            self._local_project = LocalProject(
-                path_or_url=self.upstream_project_url,
-                repo_name=self.package_name,
-                git_service=gh_service,
+    def set_local_project(self):
+        """ update self.local_project """
+        # TODO: ogr should have a method, something like this:
+        #       get_github_service(token, app_id, inst_id, cert_path) -> GithubService
+        #       the logic below should be the function
+        #       I want to leave this code here up the end of this sprint
+        # TODO: in order to support any git forge here, ogr should also have a method like this:
+        #       get_github_service_from_url(url, **kwargs):
+        #       ogr should guess the forge based on the url; kwargs should be passed to the
+        #       constructor in order to support the above
+        if (
+            self.config.github_app_id
+            and self.config.github_app_cert_path
+            and self.config.github_app_installation_id
+        ):
+            logger.info("Authenticating with Github using a Githab app.")
+            private_key = Path(self.config.github_app_cert_path).read_text()
+            integration = github.GithubIntegration(
+                self.config.github_app_id, private_key
             )
-        return self._local_project
+            token = integration.get_access_token(self.config.github_app_installation_id)
+            gh_service = GithubService(token=token)
+        else:
+            logger.debug("Authenticating with Github using a token.")
+            gh_service = GithubService(token=self.config.github_token)
+        self.local_project.git_service = gh_service
+        if not self.local_project.repo_name:
+            # will this ever happen?
+            self.local_project.repo_name = self.package_name
 
     @property
     def specfile(self):

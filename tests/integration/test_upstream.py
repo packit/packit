@@ -28,12 +28,11 @@ import re
 import subprocess
 from pathlib import Path
 
-import github
 import pytest
 from flexmock import flexmock
-from packit.config import Config
 from rebasehelper.versioneer import versioneers_runner
 
+from packit.config import Config
 from packit.exceptions import PackitException
 from tests.spellbook import does_bumpspec_know_new
 
@@ -147,18 +146,4 @@ def test_github_app(upstream_instance, tmpdir):
     )
     ups.config = Config.get_user_config()
 
-    def fake_init(github_app_id, private_key):
-        assert github_app_id == "qwe"
-        assert private_key == "hello!"
-
-    def fake_get_access_token(inst_id):
-        assert inst_id == "asd"
-        return "good"
-
-    flexmock(
-        github.GithubIntegration,
-        __init__=fake_init,
-        get_access_token=fake_get_access_token,
-    )
-
-    assert ups.local_project.git_service._token == "good"
+    assert ups.local_project.git_service._token == "test"
