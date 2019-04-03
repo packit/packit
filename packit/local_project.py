@@ -274,7 +274,6 @@ class LocalProject:
                 self.git_url = next(self.git_repo.remote(self.remote).urls)
             else:
                 # TODO: let's just default to origin
-                # .urls returns generator
                 self.git_url = next(self.git_repo.remote().urls)
             logger.debug(f"remote url of the repo is {self.git_url}")
             # trigger refresh if they are different
