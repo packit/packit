@@ -40,8 +40,8 @@ logger = logging.getLogger("packit")
     "--remote",
     default=None,
     help=(
-        "Name of the remote where packit should push. "
-        "if this is not specified, it pushes to a fork if the repo can be forked."
+        "Name of the remote to discover upstream project URL, "
+        "If this is not specified, default to origin."
     ),
 )
 @click.argument(

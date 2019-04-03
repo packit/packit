@@ -59,7 +59,7 @@ logger = logging.getLogger(__file__)
     default=None,
     help=(
         "Name of the remote where packit should push. "
-        "if this is not specified, it pushes to a fork if the repo can be forked."
+        "If this is not specified, push to a fork if the repo can be forked."
     ),
 )
 @click.argument(
