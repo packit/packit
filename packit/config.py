@@ -178,18 +178,22 @@ class SyncFilesItem(NamedTuple):
     src: str
     dest: str
 
-    def __eq__(self, other: object):
-        if not isinstance(other, SyncFilesItem):
-            return NotImplemented
+    def __repr__(self):
+        return f"[src={self.src}, dest={self.dest}]"
 
-        if self.src == other.src and self.dest == other.dest:
-            return True
-        return False
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SyncFilesItem):
+            raise NotImplementedError()
+
+        return self.src == other.src and self.dest == other.dest
 
 
 class SyncFilesConfig:
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync = files_to_sync
+
+    def __repr__(self):
+        return f"{self.files_to_sync!r}"
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":

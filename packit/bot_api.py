@@ -32,6 +32,8 @@ from typing import Dict, Optional
 
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
+from packit.local_project import LocalProject
+
 from packit.api import PackitAPI
 from packit.config import Config, PackageConfig, get_packit_config_from_repo
 from packit.fed_mes_consume import Consumerino
@@ -68,6 +70,7 @@ class PackitBotAPI:
         github_repo = self._github_service.get_project(  # type: ignore
             repo=repo_name, namespace=namespace
         )
+        local_project = LocalProject(git_project=github_repo)
 
         package_config = get_packit_config_from_repo(
             sourcegit_project=github_repo, ref=ref
@@ -79,14 +82,25 @@ class PackitBotAPI:
             )
             return
         self.sync_upstream_pull_request(
-            package_config=package_config, pr_id=pr_id, dist_git_branch="master"
+            package_config=package_config,
+            pr_id=pr_id,
+            dist_git_branch="master",
+            upstream_local_project=local_project,
         )
 
     def sync_upstream_pull_request(
-        self, package_config: PackageConfig, pr_id: int, dist_git_branch: str
+        self,
+        package_config: PackageConfig,
+        pr_id: int,
+        dist_git_branch: str,
+        upstream_local_project: LocalProject,
     ):
         logger.info("syncing the upstream code to downstream")
-        packit_api = PackitAPI(config=self.config, package_config=package_config)
+        packit_api = PackitAPI(
+            config=self.config,
+            package_config=package_config,
+            upstream_local_project=upstream_local_project,
+        )
         packit_api.sync_pr(pr_id=pr_id, dist_git_branch=dist_git_branch)
 
     def watch_upstream_release(self):
@@ -110,6 +124,7 @@ class PackitBotAPI:
         github_repo = self._github_service.get_project(  # type: ignore
             repo=repo_name, namespace=namespace
         )
+        local_project = LocalProject(git_project=github_repo)
 
         package_config = get_packit_config_from_repo(
             sourcegit_project=github_repo, ref=version
@@ -126,7 +141,10 @@ class PackitBotAPI:
 
         # TODO: https://github.com/packit-service/packit/issues/103
         self.sync_upstream_release(
-            package_config=package_config, version=version, dist_git_branch="master"
+            package_config=package_config,
+            version=version,
+            dist_git_branch="master",
+            upstream_local_project=local_project,
         )
 
     def sync_upstream_release(
@@ -134,6 +152,7 @@ class PackitBotAPI:
         package_config: PackageConfig,
         version: Optional[str],
         dist_git_branch: str,
+        upstream_local_project: LocalProject,
     ):
         """
         Sync the upstream release to the distgit pull-request.
@@ -141,9 +160,14 @@ class PackitBotAPI:
         :param package_config: PackageConfig
         :param version: not used now, str
         :param dist_git_branch: str
+        :param upstream_local_project: LocalProject instance
         """
         logger.info("syncing the upstream code to downstream")
-        packit_api = PackitAPI(config=self.config, package_config=package_config)
+        packit_api = PackitAPI(
+            config=self.config,
+            package_config=package_config,
+            upstream_local_project=upstream_local_project,
+        )
         packit_api.sync_release(dist_git_branch=dist_git_branch, version=version)
 
     def watch_fedora_ci(self):
