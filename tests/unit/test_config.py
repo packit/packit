@@ -574,6 +574,15 @@ def test_get_user_config(tmpdir):
             ],
         ),
         (
+            SyncFilesConfig(
+                files_to_sync=[SyncFilesItem(src="functional/", dest="tests")]
+            ),
+            [
+                {"src": "functional/__init__.py", "dest": "tests"},
+                {"src": "functional/test_srpm.py", "dest": "tests"},
+            ],
+        ),
+        (
             SyncFilesConfig(files_to_sync=[SyncFilesItem(src="*.py", dest="tests")]),
             [
                 {"src": "__init__.py", "dest": "tests"},

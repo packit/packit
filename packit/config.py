@@ -156,6 +156,14 @@ class SyncFilesItem(NamedTuple):
     src: str
     dest: str
 
+    def __eq__(self, other: object):
+        if not isinstance(other, SyncFilesItem):
+            return NotImplemented
+
+        if self.src == other.src and self.dest == other.dest:
+            return True
+        return False
+
 
 class SyncFilesConfig:
     def __init__(self, files_to_sync: List[SyncFilesItem]):
@@ -192,13 +200,10 @@ class SyncFilesConfig:
 
         if len(self.files_to_sync) != len(other.files_to_sync):
             return False
-        compare = False
-        for f in self.files_to_sync:
-            for o in other.files_to_sync:
-                if f.src == o.src and f.dest == o.dest:
-                    compare = True
 
-        return compare
+        if self.files_to_sync == other.files_to_sync:
+            return True
+        return False
 
 
 class PackageConfig:
