@@ -13,10 +13,15 @@ def get_wildcard_resolved_sync_files(pc: PackageConfig) -> None:
     logger.debug("Packit synced files %s", pc.synced_files.files_to_sync)
     files_to_sync = []
     for sync in pc.synced_files.files_to_sync:
-        if isinstance(sync, str):
-            files_to_sync.append(SyncFilesItem(src=sync, dest=sync))
-            continue
-        src = glob.glob(sync.src)
+        source = sync.src
+        if isinstance(source, str):
+            if "*" not in source:
+                if source.endswith("/"):
+                    source = f"{source}*"
+                else:
+                    files_to_sync.append(SyncFilesItem(src=source, dest=sync.dest))
+                    continue
+        src = glob.glob(source)
         if src:
             for s in src:
                 files_to_sync.append(SyncFilesItem(src=s, dest=sync.dest))
