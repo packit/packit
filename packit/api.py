@@ -12,6 +12,7 @@ from packit.exceptions import PackitException
 from packit.status import Status
 from packit.upstream import Upstream
 from packit.utils import assert_existence
+from packit.sync import sync_files
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,11 @@ class PackitAPI:
 
         self._handle_sources(add_new_sources=True, force_new_sources=False)
 
-        self.dg.sync_files(upstream_project=self.up.local_project)
+        sync_files(
+            self.package_config,
+            self.up.local_project.working_dir,
+            self.dg.local_project.working_dir,
+        )
         self.dg.commit(title=f"Sync upstream pr: {pr_id}", msg=description)
 
         self.push_and_create_pr(
@@ -129,7 +134,11 @@ class PackitAPI:
             )
 
             if self.package_config.with_action(action_name="prepare-files"):
-                self.dg.sync_files(self.up.local_project)
+                sync_files(
+                    self.package_config,
+                    self.up.local_project.working_dir,
+                    self.dg.local_project.working_dir,
+                )
                 if upstream_ref:
                     if self.package_config.with_action(action_name="patch"):
                         patches = self.up.create_patches(
@@ -143,7 +152,11 @@ class PackitAPI:
                 )
 
             if self.package_config.has_action("prepare-files"):
-                self.dg.sync_files(self.up.local_project)
+                sync_files(
+                    self.package_config,
+                    self.up.local_project.working_dir,
+                    self.dg.local_project.working_dir,
+                )
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
@@ -186,7 +199,11 @@ class PackitAPI:
         self.up.create_branch(local_pr_branch)
         self.up.checkout_branch(local_pr_branch)
 
-        self.up.sync_files(self.dg.local_project)
+        sync_files(
+            self.package_config,
+            self.dg.local_project.working_dir,
+            self.up.local_project.working_dir,
+        )
 
         if not no_pr:
             description = (

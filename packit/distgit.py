@@ -1,6 +1,5 @@
 import logging
 import os
-import shutil
 from typing import Optional, List, Tuple, Sequence
 
 import git
@@ -8,7 +7,7 @@ import requests
 from rebasehelper.specfile import SpecFile
 
 from ogr.services.pagure import PagureService
-from packit.config import Config, PackageConfig
+from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
@@ -44,7 +43,7 @@ class DistGit(PackitRepositoryBase):
         self.fas_user = self.config.fas_user
         self.dist_git_url: str = self.package_config.downstream_project_url
         logger.debug(f"Using dist-git repo {self.dist_git_url}")
-        self.files_to_sync: List[str] = self.package_config.synced_files
+        self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
         self._specfile = None
 
@@ -247,25 +246,6 @@ class DistGit(PackitRepositoryBase):
     def purge_unused_git_branches(self):
         # TODO: remove branches from merged PRs
         raise NotImplementedError("not implemented yet")
-
-    def sync_files(self, upstream_project: LocalProject) -> None:
-        """
-        Sync required files from upstream to downstream.
-        """
-        logger.debug(f"About to sync files {self.files_to_sync}")
-        if self.package_config.with_action(action_name="sync-up-to-down"):
-            for fi in self.files_to_sync:
-                # TODO: fi can be dir
-                fi = fi[1:] if fi.startswith("/") else fi
-                src = os.path.join(upstream_project.working_dir, fi)
-                if os.path.exists(src):
-                    logger.info(f"Syncing {src}")
-                    shutil.copy2(src, self.local_project.working_dir)
-                else:
-                    raise PackitException(
-                        f"File {fi} is not present in the upstream repository. "
-                        f"Upstream ref {upstream_project.git_repo.head} is checked out"
-                    )
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
         """

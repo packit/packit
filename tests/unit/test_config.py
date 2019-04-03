@@ -4,15 +4,21 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 from jsonschema.exceptions import ValidationError
+from os import chdir
 
+from tests.spellbook import TESTS_DIR
 from ogr.abstract import GitProject, GitService
 from packit.config import (
     JobConfig,
     PackageConfig,
     TriggerType,
+    SyncFilesConfig,
+    SyncFilesItem,
     get_packit_config_from_repo,
     Config,
 )
+
+from packit.sync import get_wildcard_resolved_sync_files
 
 
 def test_job_config_equal():
@@ -106,11 +112,15 @@ def test_job_config_parse(raw, expected_config):
 def test_package_config_equal():
     assert PackageConfig(
         specfile_path="fedora/package.spec",
-        synced_files=["a", "b"],
+        synced_files=SyncFilesConfig(
+            files_to_sync=[SyncFilesItem(src="packit.yaml", dest="packit.yaml")]
+        ),
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
     ) == PackageConfig(
         specfile_path="fedora/package.spec",
-        synced_files=["a", "b"],
+        synced_files=SyncFilesConfig(
+            files_to_sync=[SyncFilesItem(src="packit.yaml", dest="packit.yaml")]
+        ),
         jobs=[JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})],
     )
 
@@ -120,21 +130,33 @@ def test_package_config_equal():
     [
         PackageConfig(
             specfile_path="fedora/other-package.spec",
-            synced_files=["a", "b"],
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="a", dest="a"),
+                    SyncFilesItem(src="b", dest="b"),
+                ]
+            ),
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
-            synced_files=["b"],
+            synced_files=SyncFilesConfig(
+                files_to_sync=[SyncFilesItem(src="c", dest="c")]
+            ),
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
-            synced_files=["a", "b"],
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="a", dest="a"),
+                    SyncFilesItem(src="b", dest="b"),
+                ]
+            ),
             jobs=[
                 JobConfig(
                     trigger=TriggerType.pull_request, release_to=["f28"], metadata={}
@@ -143,14 +165,24 @@ def test_package_config_equal():
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
-            synced_files=["a", "b"],
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="c", dest="c"),
+                    SyncFilesItem(src="d", dest="d"),
+                ]
+            ),
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f29"], metadata={})
             ],
         ),
         PackageConfig(
             specfile_path="fedora/package.spec",
-            synced_files=["a", "b"],
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="c", dest="c"),
+                    SyncFilesItem(src="d", dest="d"),
+                ]
+            ),
             jobs=[
                 JobConfig(
                     trigger=TriggerType.release, release_to=["f28"], metadata={"a": "b"}
@@ -163,7 +195,12 @@ def test_package_config_not_equal(not_equal_package_config):
     assert (
         not PackageConfig(
             specfile_path="fedora/package.spec",
-            synced_files=["a", "b"],
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="c", dest="c"),
+                    SyncFilesItem(src="d", dest="d"),
+                ]
+            ),
             jobs=[
                 JobConfig(trigger=TriggerType.release, release_to=["f28"], metadata={})
             ],
@@ -176,13 +213,18 @@ def test_package_config_not_equal(not_equal_package_config):
     "raw,is_valid",
     [
         ({}, False),
-        ({"specfile_path": "fedora/package.spec"}, False),
-        ({"synced_files": ["fedora/package.spec"]}, False),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": "fedora/foobar.spec",
+            },
+            False,
+        ),
         ({"jobs": [{"trigger": "release", "release_to": ["f28"]}]}, False),
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": ["fedora/package.spec"],
+                "synced_files": ["fedora/foobar.spec"],
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
             },
             True,
@@ -190,7 +232,7 @@ def test_package_config_not_equal(not_equal_package_config):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": ["fedora/package.spec", "other", "directory"],
+                "synced_files": ["fedora/foobar.spec", "somefile", "somedirectory"],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -201,7 +243,7 @@ def test_package_config_not_equal(not_equal_package_config):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": [],
+                "synced_files": ["fedora/foobar.spec"],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -213,11 +255,11 @@ def test_package_config_not_equal(not_equal_package_config):
         (
             {
                 "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/foobar.spec"],
                 "actions": {
                     "pre-sync": "some/pre-sync/command --option",
                     "upstream-version": "get-me-upstream-version",
                 },
-                "synced_files": [],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -230,7 +272,6 @@ def test_package_config_not_equal(not_equal_package_config):
             {
                 "specfile_path": "fedora/package.spec",
                 "actions": ["actions" "has", "to", "be", "key", "value"],
-                "synced_files": [],
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
                     {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
@@ -254,7 +295,7 @@ def test_package_config_validate(raw, is_valid):
     [
         {},
         {"something": "different"},
-        {"synced_files": ["fedora/package.spec"]},
+        {"synced_files": ["fedora/package.spec", "somefile"]},
         {"jobs": [{"trigger": "release", "release_to": ["f28"]}]},
     ],
 )
@@ -274,7 +315,13 @@ def test_package_config_parse_error(raw):
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=["fedora/package.spec"],
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        )
+                    ]
+                ),
                 jobs=[
                     JobConfig(
                         trigger=TriggerType.release, release_to=["f28"], metadata={}
@@ -287,7 +334,7 @@ def test_package_config_parse_error(raw):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": [
                     "fedora/package.spec",
-                    "some",
+                    "somefile",
                     "other",
                     "directory/files",
                 ],
@@ -295,12 +342,16 @@ def test_package_config_parse_error(raw):
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        ),
+                        SyncFilesItem(src="somefile", dest="somefile"),
+                        SyncFilesItem(src="other", dest="other"),
+                        SyncFilesItem(src="directory/files", dest="directory/files"),
+                    ]
+                ),
                 jobs=[
                     JobConfig(
                         trigger=TriggerType.release, release_to=["f28"], metadata={}
@@ -311,22 +362,18 @@ def test_package_config_parse_error(raw):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": [
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                "synced_files": ["fedora/package.spec"],
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        )
+                    ]
+                ),
                 jobs=[
                     JobConfig(
                         trigger=TriggerType.release, release_to=["f28"], metadata={}
@@ -337,23 +384,20 @@ def test_package_config_parse_error(raw):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": [
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                "synced_files": ["fedora/package.spec", "somefile"],
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
                 "something": "stupid",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        ),
+                        SyncFilesItem(src="somefile", dest="somefile"),
+                    ]
+                ),
                 jobs=[
                     JobConfig(
                         trigger=TriggerType.release, release_to=["f28"], metadata={}
@@ -364,12 +408,7 @@ def test_package_config_parse_error(raw):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": [
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                "synced_files": ["fedora/package.spec"],
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
                 "something": "stupid",
                 "upstream_project_url": "https://github.com/asd/qwe",
@@ -378,12 +417,13 @@ def test_package_config_parse_error(raw):
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[
-                    "fedora/package.spec",
-                    "some",
-                    "other",
-                    "directory/files",
-                ],
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        )
+                    ]
+                ),
                 jobs=[
                     JobConfig(
                         trigger=TriggerType.release, release_to=["f28"], metadata={}
@@ -410,11 +450,11 @@ def test_package_config_parse_error(raw):
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[],
                 actions={
                     "pre-sync": "some/pre-sync/command --option",
                     "upstream-version": "get-me-upstream-version",
                 },
+                synced_files=SyncFilesConfig(files_to_sync=None),
                 jobs=[],
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
@@ -434,16 +474,20 @@ def test_dist_git_package_url():
         "dist_git_base_url": "https://packit.dev/",
         "downstream_package_name": "packit",
         "dist_git_namespace": "awesome",
+        "synced_files": ["fedora/foobar.spec"],
         "specfile_path": "fedora/package.spec",
-        "synced_files": [],
     }
     new_pc = PackageConfig.get_from_dict(di)
     pc = PackageConfig(
         dist_git_base_url="https://packit.dev/",
         downstream_package_name="packit",
         dist_git_namespace="awesome",
+        synced_files=SyncFilesConfig(
+            files_to_sync=[
+                SyncFilesItem(src="fedora/foobar.spec", dest="fedora/foobar.spec")
+            ]
+        ),
         specfile_path="fedora/package.spec",
-        synced_files=[],
     )
     assert pc == new_pc
     assert pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
@@ -453,8 +497,13 @@ def test_dist_git_package_url():
 @pytest.mark.parametrize(
     "content",
     [
-        "---\nspecfile_path: packit.spec\nsynced_files:\n  - packit.spec\n  - .packit.yaml\n",
-        '{"specfile_path": "packit.spec", "synced_files": ["packit.spec", ".packit.yaml"]}',
+        "---\nspecfile_path: packit.spec\n"
+        "synced_files:\n"
+        "  - packit.spec\n"
+        "  - src: .packit.yaml\n"
+        "    dest: .packit2.yaml",
+        '{"specfile_path": "packit.spec", "synced_files": ["packit.spec", '
+        '{"src": ".packit.yaml", "dest": ".packit2.yaml"}]}',
     ],
 )
 def test_get_packit_config_from_repo(content):
@@ -463,7 +512,12 @@ def test_get_packit_config_from_repo(content):
     config = get_packit_config_from_repo(sourcegit_project=git_project, ref="")
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == "packit.spec"
-    assert set(config.synced_files) == {"packit.spec", ".packit.yaml"}
+    assert config.synced_files == SyncFilesConfig(
+        files_to_sync=[
+            SyncFilesItem(src="packit.spec", dest="packit.spec"),
+            SyncFilesItem(src=".packit.yaml", dest=".packit2.yaml"),
+        ]
+    )
 
 
 def test_get_user_config(tmpdir):
@@ -494,3 +548,78 @@ def test_get_user_config(tmpdir):
         None
     )
     assert config.pagure_fork_token == "o"
+
+
+@pytest.mark.parametrize(
+    "packit_files,real_files",
+    [
+        (
+            SyncFilesConfig(
+                files_to_sync=[SyncFilesItem(src="conftest.py", dest="conftest.py")]
+            ),
+            [{"src": "conftest.py", "dest": "conftest.py"}],
+        ),
+        (
+            SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="__init__.py", dest="__init__.py"),
+                    SyncFilesItem(src="conftest.py", dest="conftest.py"),
+                    SyncFilesItem(src="spellbook.py", dest="spellbook.py"),
+                ]
+            ),
+            [
+                {"src": "__init__.py", "dest": "__init__.py"},
+                {"src": "conftest.py", "dest": "conftest.py"},
+                {"src": "spellbook.py", "dest": "spellbook.py"},
+            ],
+        ),
+        (
+            SyncFilesConfig(
+                files_to_sync=[SyncFilesItem(src="functional/", dest="tests")]
+            ),
+            [
+                {"src": "functional/__init__.py", "dest": "tests"},
+                {"src": "functional/test_srpm.py", "dest": "tests"},
+            ],
+        ),
+        (
+            SyncFilesConfig(files_to_sync=[SyncFilesItem(src="*.py", dest="tests")]),
+            [
+                {"src": "__init__.py", "dest": "tests"},
+                {"src": "conftest.py", "dest": "tests"},
+                {"src": "spellbook.py", "dest": "tests"},
+            ],
+        ),
+        (
+            SyncFilesConfig(
+                files_to_sync=[SyncFilesItem(src="unit/test_u*.py", dest="units")]
+            ),
+            [{"src": "unit/test_utils.py", "dest": "units"}],
+        ),
+        (
+            SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="integration/test_u*.py", dest="units")
+                ]
+            ),
+            [
+                {"src": "integration/test_upstream.py", "dest": "units"},
+                {"src": "integration/test_update.py", "dest": "units"},
+            ],
+        ),
+    ],
+)
+def test_sync_files(packit_files, real_files):
+    chdir(TESTS_DIR)
+    pc = PackageConfig(
+        dist_git_base_url="https://packit.dev/",
+        downstream_package_name="packit",
+        dist_git_namespace="awesome",
+        specfile_path="fedora/package.spec",
+        synced_files=packit_files,
+    )
+    get_wildcard_resolved_sync_files(pc)
+    assert pc.synced_files
+    for files in pc.synced_files.files_to_sync:
+        assert [real for real in real_files if files.src == real.get("src")]
+        assert [real for real in real_files if files.dest == real["dest"]]
