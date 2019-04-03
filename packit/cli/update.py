@@ -64,7 +64,7 @@ logger = logging.getLogger(__file__)
     default=None,
     help=(
         "Name of the remote to discover upstream project URL, "
-        "if this is not specified, origin is assumed."
+        "If this is not specified, default to origin."
     ),
 )
 @click.argument(
