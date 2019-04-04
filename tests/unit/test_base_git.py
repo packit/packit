@@ -5,6 +5,7 @@ from packit import utils
 from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig, Config
 from packit.distgit import DistGit
+from packit.upstream import Upstream
 
 
 @pytest.fixture()
@@ -21,13 +22,14 @@ def distgit_with_actions():
 
 @pytest.fixture()
 def upstream_with_actions():
-    return DistGit(
+    return Upstream(
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
                 actions={"action-a": "command --a", "action-b": "command --b"}
             )
         ),
+        local_project=flexmock(repo_name=flexmock()),
     )
 
 
