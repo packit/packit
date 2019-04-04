@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 import logging
+from typing import List, Tuple
 
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -49,23 +49,20 @@ class Status:
         self.up = upstream
         self.dg = distgit
 
-    def get_downstream_prs(self, number_of_prs: int = 5) -> List:
+    def get_downstream_prs(self, number_of_prs: int = 5) -> List[Tuple[int, str, str]]:
         """
         Get specific number of latest downstream PRs
         :param number_of_prs: int
         :return: List of downstream PRs
         """
-        table = None
+        table: List[Tuple[int, str, str]] = []
         pr_list = self.dg.local_project.git_project.get_pr_list()
         if len(pr_list) > 0:
             # take last `number_of_prs` PRs
             pr_list = (
                 pr_list[:number_of_prs] if len(pr_list) > number_of_prs else pr_list
             )
-            for pr in pr_list:
-                print(pr)
-                print(f"{pr.id}, {type(pr.id)}")
-            table = [[pr.id, pr.title, pr.url] for pr in pr_list]
+            table = [(pr.id, pr.title, pr.url) for pr in pr_list]
         return table
 
     def get_dg_versions(self) -> None:
