@@ -22,7 +22,6 @@
 
 import logging
 import os
-import shutil
 from typing import Optional, List, Tuple, Sequence
 
 import git
@@ -30,12 +29,11 @@ import requests
 from rebasehelper.specfile import SpecFile
 
 from ogr.services.pagure import PagureService
+from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
-from packit.local_project import LocalProject
-
 from packit.fedpkg import FedPKG
-from packit.base_git import PackitRepositoryBase
+from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
 
