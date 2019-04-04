@@ -45,7 +45,14 @@ logger = logging.getLogger(__file__)
 @cover_packit_exception
 def status(config, path_or_url):
     """
-    Display status
+    Display status.
+
+    \b
+    - latest downstream pull requests
+    - versions from all downstream branches
+    - latest upstream releases
+    - latest builds in Koji
+    - latest updates in Bodhi
     """
 
     api = get_packit_api(config=config, local_project=path_or_url)
