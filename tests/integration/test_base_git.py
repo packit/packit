@@ -1,18 +1,18 @@
-import pytest
 from flexmock import flexmock
 
-from tests.unit.test_base_git import distgit_with_actions, upstream_with_actions
+from packit.base_git import PackitRepositoryBase
+from packit.config import PackageConfig
 
 
-@pytest.mark.parametrize(
-    "base_git_fixture", [distgit_with_actions, upstream_with_actions]
-)
-def test_get_output_from_action_defined(base_git_fixture):
+def test_get_output_from_action_defined():
     echo_cmd = "echo 'hello world'"
 
-    base_git = base_git_fixture()
-    base_git._local_project = flexmock(working_dir=".")
-    base_git.package_config.actions = {"action-a": echo_cmd}
+    packit_repository_base = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(PackageConfig(actions={"action-a": echo_cmd})),
+    )
 
-    result = base_git.get_output_from_action("action-a")
+    packit_repository_base.local_project = flexmock(working_dir=".")
+
+    result = packit_repository_base.get_output_from_action("action-a")
     assert result == "hello world\n"
