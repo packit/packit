@@ -130,7 +130,7 @@ class PackitAPI:
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
 
-        self.up.run_action(action_name="pre-sync")
+        self.up.run_action(action_name="init")
 
         full_version = version or self.up.get_version()
         if not full_version:
@@ -146,6 +146,8 @@ class PackitAPI:
             #       release = 232, tag = v232
             if not use_local_content:
                 self.up.checkout_release(full_version)
+
+            self.up.run_action(action_name="pre-sync")
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
