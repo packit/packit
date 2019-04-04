@@ -33,6 +33,8 @@
       - python3-ipdb  # for easy debugging
       - python3-fedmsg
       - python3-pyyaml
+      - python3-rpm
+      - python3-GitPython
       - python3-requests
       - python3-pygithub
       - python3-libpagure
