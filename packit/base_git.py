@@ -20,11 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import git
 import logging
 from typing import Optional, Callable
 
+import git
 from rebasehelper.specfile import SpecFile
+
+from packit import utils
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -181,7 +183,7 @@ class PackitRepositoryBase:
         if action_name in self.package_config.actions:
             command = self.package_config.actions[action_name]
             logger.info(f"Using user-defined script for {action_name}: {command}")
-            run_command(cmd=command)
+            utils.run_command(cmd=command, cwd=self.local_project.working_dir)
             return False
         logger.debug(f"Running default implementation for {action_name}.")
         return True
