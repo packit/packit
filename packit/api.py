@@ -186,7 +186,7 @@ class PackitAPI:
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
 
-           if self.up.has_action("prepare-files"):
+            if self.up.has_action("prepare-files"):
                 sync_files(
                     self.package_config,
                     self.up.local_project.working_dir,

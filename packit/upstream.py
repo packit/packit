@@ -23,23 +23,22 @@
 import logging
 import os
 import re
-import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
-from packaging import version
 
 import git
 import github
-from ogr.services.github import GithubService
+from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
+from ogr.services.github import GithubService
+from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import run_command
-from packit.base_git import PackitRepositoryBase
 
 logger = logging.getLogger(__name__)
 
