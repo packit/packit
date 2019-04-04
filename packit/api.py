@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import logging
 from pathlib import Path
 from typing import Sequence
+from tabulate import tabulate
 
 from packit.local_project import LocalProject
 
@@ -363,8 +364,6 @@ class PackitAPI:
         return srpm_path
 
     def status(self):
-        from tabulate import tabulate
-
         status = Status(self.config, self.package_config, self.up, self.dg)
 
         ds_prs = status.get_downstream_prs()
