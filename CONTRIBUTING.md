@@ -79,8 +79,9 @@ As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configur
 #### Requirements
 
 - [podman](https://github.com/containers/libpod)
-- [ansible-bender](https://pypi.org/project/ansible-bender)
-  - until [ansible](https://github.com/ansible/ansible/releases) 2.8 is released, it requires [buildah](https://github.com/containers/buildah)
+- [ansible-bender](https://pypi.org/project/ansible-bender) >= 0.5.1
+  - it requires [buildah](https://github.com/containers/buildah)
+- ansible
 
 #### Targets
 

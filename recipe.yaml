@@ -2,13 +2,24 @@
 - name: This is a recipe for how to cook with packit
   hosts: all
   vars:
+    user_name: packit
+    home_path: /home/{{ user_name }}
+
     ansible_bender:
+      base_image: fedora:29
       target_image:
-        name: packit
+        name: docker.io/usercont/packit-service
+        environment:
+          FLASK_APP: packit.service.web_hook
+          LD_PRELOAD: libnss_wrapper.so
+          NSS_WRAPPER_PASSWD: '{{ home_path }}/passwd'
+          NSS_WRAPPER_GROUP: /etc/group
+          USER: '{{ user_name }}'
+          HOME: '{{ home_path }}'
+        cmd: flask-3 run -h 0.0.0.0
       working_container:
         volumes:
         - '{{ playbook_dir }}:/src:Z'
-      base_image: fedora:29
   tasks:
   - name: Install all packages needed to hack on packit.
     dnf:
@@ -28,13 +39,31 @@
       - rpm-build
       - rebase-helper
       - fedpkg
+      - python3-flask
+      - nss_wrapper
       state: present
+
+  - user:
+      name: '{{ user_name }}'
+      create_home: yes
+      home: '{{ home_path }}'
+  - file:
+      state: directory
+      path: /home
+      mode: 0777
+      recurse: yes
+  - copy:
+      src: ./files/passwd
+      dest: '{{ home_path }}/passwd'
+      mode: 0777
+
   - name: Install latest twine for sake of check command
     pip:
       name:
       - twine  # we need newest twine, b/c of the check command
       - readme_renderer[md]
       state: latest
+  # TODO: we should do a git config instead
   - name: "Set up git: user.email"
     command: git config --global user.email "user-cont-team@redhat.com"
   - name: "Set up git: user.name"
@@ -44,18 +73,10 @@
       state: directory
       path: /root/.ssh
       mode: 0700
-  - name: Copy keys in there
-    copy:
-      src: '{{ item.source }}'
-      dest: /root/.ssh/{{ item.dest }}
-      mode: 0400
-    with_items:
-    - {source: "bigger-secret", dest: "id_rsa.pub"}
-    - {source: "biggest-secret", dest: "id_rsa"}
   - name: Copy ssh_config
     copy:
       src: files/ssh_config
-      dest: /root/.ssh/config
+      dest: /etc/ssh/ssh_config.d/01-packit.conf
   - name: stat /src
     stat:
       path: /src
