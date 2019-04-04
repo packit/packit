@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import logging
 from pathlib import Path
 from typing import Sequence
+from tabulate import tabulate
 
 from packit.local_project import LocalProject
 
@@ -363,11 +364,18 @@ class PackitAPI:
         return srpm_path
 
     def status(self):
-
         status = Status(self.config, self.package_config, self.up, self.dg)
 
-        status.get_downstream_prs()
+        ds_prs = status.get_downstream_prs()
+        if ds_prs:
+            logger.info("Downstream PRs:")
+            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+        else:
+            logger.info("Downstream PRs: No open PRs.")
         status.get_dg_versions()
         status.get_up_releases()
         status.get_builds()
-        status.get_updates()
+        updates = status.get_updates()
+        if updates:
+            logger.info("\nLatest bodhi updates:")
+            logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
