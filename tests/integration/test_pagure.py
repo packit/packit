@@ -47,9 +47,8 @@ def test_basic_distgit_workflow(tmpdir):
 
     proj = pag.get_project()
 
-    proj.fork_create()
-    fork = proj.get_fork()
-    clone_url = fork.get_git_urls()
+    fork = proj.get_fork(create=True)
+    clone_url = fork.get_git_urls()["ssh"]
 
     t = Path(tmpdir)
     repo = t.joinpath("repo")
