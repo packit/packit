@@ -20,21 +20,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from flask import Flask, request
 import logging
 from io import StringIO
 
-from packit.config import Config
+from flask import Flask, request, jsonify
+
 from packit.bot_api import PackitBotAPI
-
-app = Flask(__name__)
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+from packit.config import Config
+from packit.utils import set_logging
 
 
-@app.route("/github_release", methods=["POST"])
+class PackitWebhookReceiver(Flask):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        set_logging(level=logging.DEBUG)
+
+
+app = PackitWebhookReceiver(__name__)
+logger = logging.getLogger("packit")
+
+
+@app.route("/healthz", methods=["GET", "HEAD", "POST"])
+def get_health():
+    # TODO: add some interesting stats here
+    return jsonify({"msg": "We are healthy!"})
+
+
+@app.route("/webhooks/github/release", methods=["POST"])
 def github_release():
     msg = request.get_json()
+
+    if not msg:
+        logger.debug("/webhooks/github/release: We haven't received any JSON data.")
+        return "We haven't received any JSON data."
+
+    if not (msg.get("action") == "published" and "release" in msg):
+        logger.debug("/webhooks/github/release: Not a new release event.")
+        logger.debug(f"Action={msg['action']}, keys={msg.keys()}")
+        return "We only accept events for new Github releases."
 
     buffer = StringIO()
     logHandler = logging.StreamHandler(buffer)
@@ -47,9 +70,9 @@ def github_release():
 
     logger.debug(
         f"Received release event: "
-        f"{msg['repository']['owner']}/{msg['repository']['name']} - {msg['release']['tag_name']}"
+        f"{msg['repository']['owner']['login']}/{msg['repository']['name']}"
+        f" - {msg['release']['tag_name']}"
     )
-
     config = Config()
     api = PackitBotAPI(config)
     # Using fedmsg since the fields are the same
