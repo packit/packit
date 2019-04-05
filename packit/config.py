@@ -280,7 +280,7 @@ class PackageConfig:
                 "describe",
                 "--tags",
                 "--match",
-                "*.*",
+                "*",
             ]
 
     def __eq__(self, other: object):
