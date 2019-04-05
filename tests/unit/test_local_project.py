@@ -30,7 +30,7 @@ from flexmock import flexmock
 from packit import local_project, utils
 from packit.local_project import LocalProject
 
-
+ 
 def test_parse_repo_name_and_namespace_from_namespace():
     project = LocalProject(full_name="namespace/repository_name", refresh=False)
     changed = project._parse_repo_name_full_name_and_namespace()
@@ -503,7 +503,13 @@ def test_path_or_url_url_overwrite():
     assert project.working_dir == "nothing"
 
 
-# URL
+def test_is_url():
+    project = LocalProject()
+    project.path_or_url = 'https://github.com/packit-service/packit'
+    assert project._is_url(project.path_or_url) == True
+
+    project.path_or_url = 'git@github.com:packit-service/ogr'
+    assert project._is_url(project.path_or_url) == True
 
 
 def test_path_or_url_nok():
