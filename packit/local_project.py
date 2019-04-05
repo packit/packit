@@ -26,11 +26,8 @@ import shutil
 
 import git
 import requests
-<<<<<<< HEAD
-=======
-import re
 
->>>>>>> giturlparse replaced by regex
+from urllib.parse import urlparse
 from ogr.abstract import GitProject, GitService
 from packit.exceptions import PackitException
 
@@ -163,15 +160,15 @@ class LocalProject:
             )
 
     def _is_url(self, path_or_url):
-        try:
-            res = requests.head(path_or_url)
-            if res.ok:
+        if urlparse(path_or_url).scheme:
+            return True
+        elif path_or_url.startswith("git@"):
+            if urlparse(path_or_url.replace(":", "/", 1).replace("git@", "git+ssh://", 1)).scheme:
                 return True
             logger.warning("path_or_url is nor directory nor url")
-        except requests.exceptions.BaseHTTPError:
-            logger.warning("path_or_url is nor directory nor url")
+        else:
+           logger.warning("path_or_url is nor directory nor url")
         return False
-
 
     def _parse_repo_name_full_name_and_namespace(self):
         change = False
