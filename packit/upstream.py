@@ -69,12 +69,8 @@ class Upstream(PackitRepositoryBase):
         return self.local_project.ref
 
     @property
-    def specfile_path(self) -> Optional[str]:
-        if self.package_name:
-            return os.path.join(
-                self.local_project.working_dir, f"{self.package_name}.spec"
-            )
-        return None
+    def specfile_path(self) -> str:
+        return self.package_config.specfile_path
 
     def set_local_project(self):
         """ update self.local_project """
