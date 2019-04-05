@@ -165,7 +165,8 @@ bcc2c8a292 resolved: create /etc/resolv.conf symlink at runtime
 1d39b39df9 Revert "journald: periodically drop cache for all dead PIDs"
 ```
 
-And that's it, this is our source-git repo!
+And that's it, this is our source-git repo! You can check it out over
+[here](https://github.com/packit-service/systemd-source-git).
 
 Once we finish source-git related code in packit, you'd be able then to work
 exclusively in source-git, getting results from tests and other testing systems
