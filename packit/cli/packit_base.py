@@ -32,6 +32,7 @@ from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.update import update
+from packit.cli.generate import generate
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
 
@@ -78,7 +79,7 @@ packit_base.add_command(create_update)
 packit_base.add_command(srpm)
 packit_base.add_command(status)
 packit_base.add_command(listen_to_fedmsg)
-
+packit_base.add_command(generate)
 
 if __name__ == "__main__":
     packit_base()
