@@ -25,7 +25,6 @@ import os
 import shutil
 
 import git
-import requests
 
 from urllib.parse import urlparse
 from ogr.abstract import GitProject, GitService
@@ -161,13 +160,19 @@ class LocalProject:
 
     def _is_url(self, path_or_url):
         if urlparse(path_or_url).scheme:
+            url = urlparse(path_or_url)
+            logger.debug(f"Url {path_or_url} parsed. Resulting scheme: {url.scheme}")
             return True
         elif path_or_url.startswith("git@"):
-            if urlparse(path_or_url.replace(":", "/", 1).replace("git@", "git+ssh://", 1)).scheme:
-                return True
-            logger.warning("path_or_url is nor directory nor url")
-        else:
-           logger.warning("path_or_url is nor directory nor url")
+            url = urlparse(
+                path_or_url.replace(":", "/", 1).replace("git@", "git+ssh://", 1)
+            )
+            logger.debug(f"SSH style url {path_or_url} found.")
+            logger.debug(
+                f"Url parsed after replacing with {url.geturl()}. Resulting scheme: {url.scheme}"
+            )
+            return True
+        logger.warning("path_or_url is nor directory nor url")
         return False
 
     def _parse_repo_name_full_name_and_namespace(self):
