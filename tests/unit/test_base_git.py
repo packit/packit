@@ -2,6 +2,7 @@ import pytest
 from flexmock import flexmock
 
 from packit import utils
+from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig, Config
 from packit.distgit import DistGit
@@ -14,7 +15,10 @@ def distgit_with_actions():
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
-                actions={"action-a": "command --a", "action-b": "command --b"}
+                actions={
+                    ActionName.pre_sync: "command --a",
+                    ActionName.get_current_version: "command --b",
+                }
             )
         ),
     )
@@ -26,7 +30,10 @@ def upstream_with_actions():
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
-                actions={"action-a": "command --a", "action-b": "command --b"}
+                actions={
+                    ActionName.pre_sync: "command --a",
+                    ActionName.get_current_version: "command --b",
+                }
             )
         ),
         local_project=flexmock(repo_name=flexmock()),
@@ -39,24 +46,27 @@ def packit_repository_base():
         config=flexmock(),
         package_config=flexmock(
             PackageConfig(
-                actions={"action-a": "command --a", "action-b": "command --b"}
+                actions={
+                    ActionName.pre_sync: "command --a",
+                    ActionName.get_current_version: "command --b",
+                }
             )
         ),
     )
 
 
 def test_has_action_upstream(upstream_with_actions):
-    assert upstream_with_actions.has_action("action-a")
-    assert not upstream_with_actions.has_action("action-c")
+    assert upstream_with_actions.has_action(ActionName.pre_sync)
+    assert not upstream_with_actions.has_action(ActionName.create_patches)
 
 
 def test_has_action_distgit(distgit_with_actions):
-    assert distgit_with_actions.has_action("action-a")
-    assert not distgit_with_actions.has_action("action-c")
+    assert distgit_with_actions.has_action(ActionName.pre_sync)
+    assert not distgit_with_actions.has_action(ActionName.create_patches)
 
 
 def test_with_action_non_defined(packit_repository_base):
-    if packit_repository_base.with_action(action_name="unknown-action"):
+    if packit_repository_base.with_action(action=ActionName.create_patches):
         # this is the style we are using that function
         return
 
@@ -68,7 +78,7 @@ def test_with_action_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    if packit_repository_base.with_action(action_name="action-a"):
+    if packit_repository_base.with_action(action=ActionName.pre_sync):
         # this is the style we are using that function
         assert False
 
@@ -80,7 +90,7 @@ def test_with_action_working_dir(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    assert not packit_repository_base.with_action(action_name="action-a")
+    assert not packit_repository_base.with_action(action=ActionName.pre_sync)
 
 
 def test_run_action_hook_not_defined(packit_repository_base):
@@ -88,7 +98,7 @@ def test_run_action_hook_not_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    packit_repository_base.run_action(action_name="not-defined")
+    packit_repository_base.run_action(action=ActionName.create_patches)
 
 
 def test_run_action_not_defined(packit_repository_base):
@@ -106,7 +116,7 @@ def test_run_action_not_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        "not-defined", action_method, "arg", kwarg="kwarg"
+        ActionName.create_patches, action_method, "arg", kwarg="kwarg"
     )
 
 
@@ -126,7 +136,9 @@ def test_run_action_defined(packit_repository_base):
         .action_function
     )
 
-    packit_repository_base.run_action("action-a", action_method, "arg", kwarg="kwarg")
+    packit_repository_base.run_action(
+        ActionName.pre_sync, action_method, "arg", kwarg="kwarg"
+    )
 
 
 def test_get_output_from_action_not_defined(packit_repository_base):
@@ -134,5 +146,5 @@ def test_get_output_from_action_not_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    result = packit_repository_base.get_output_from_action("not-defined")
+    result = packit_repository_base.get_output_from_action(ActionName.create_patches)
     assert result is None
