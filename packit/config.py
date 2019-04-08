@@ -179,7 +179,7 @@ class SyncFilesItem(NamedTuple):
     dest: str
 
     def __repr__(self):
-        return f"[src={self.src}, dest={self.dest}]"
+        return f"SyncFilesItem(src={self.src}, dest={self.dest})"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SyncFilesItem):
@@ -193,7 +193,7 @@ class SyncFilesConfig:
         self.files_to_sync = files_to_sync
 
     def __repr__(self):
-        return f"{self.files_to_sync!r}"
+        return f"SyncFilesConfig({self.files_to_sync!r})"
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":
@@ -254,7 +254,7 @@ class PackageConfig:
         actions: Dict[ActionName, str] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
-        self.synced_files: Optional[SyncFilesConfig] = synced_files or None
+        self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
         self.jobs: List[JobConfig] = jobs or []
         self.dist_git_namespace: str = dist_git_namespace or "rpms"
         self.upstream_project_url: Optional[str] = upstream_project_url
@@ -280,7 +280,7 @@ class PackageConfig:
                 "describe",
                 "--tags",
                 "--match",
-                "*.*",
+                "*",
             ]
 
     def __eq__(self, other: object):
@@ -315,7 +315,6 @@ class PackageConfig:
         if validate:
             PackageConfig.validate_dict(raw_dict)
 
-        specfile_path = raw_dict.get("specfile_path", None)
         synced_files = raw_dict.get("synced_files", None)
         actions = raw_dict.get("actions", {})
         raw_jobs = raw_dict.get("jobs", [])
@@ -335,6 +334,18 @@ class PackageConfig:
         downstream_package_name = cls.get_deprecated_key(
             raw_dict, "downstream_package_name", "package_name"
         )
+        specfile_path = raw_dict.get("specfile_path", None)
+        if specfile_path:
+            specfile_path = str(Path(specfile_path).resolve())
+        else:
+            if downstream_package_name:
+                specfile_path = str(
+                    Path.cwd().joinpath(f"{downstream_package_name}.spec")
+                )
+                logger.info(f"We guess that spec file is at {specfile_path}")
+            else:
+                # guess it?
+                logger.warning("Path to spec file is not set.")
 
         dist_git_base_url = raw_dict.get("dist_git_base_url", None)
         dist_git_namespace = raw_dict.get("dist_git_namespace", None)
@@ -490,7 +501,7 @@ PACKAGE_CONFIG_SCHEMA = {
             "additionalProperties": False,
         },
     },
-    "required": ["specfile_path", "synced_files"],
+    "required": ["specfile_path"],
 }
 
 USER_CONFIG_SCHEMA = {

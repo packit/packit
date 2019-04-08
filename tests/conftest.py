@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import datetime
+import os
 import shutil
 import subprocess
 import sys
@@ -197,6 +198,9 @@ def downstream_n_distgit(tmpdir):
 def upstream_instance(upstream_n_distgit):
     u, d = upstream_n_distgit
 
+    # we need to chdir(u) because when PackageConfig is created,
+    # it already expects it's in the correct directory
+    old_cwd = os.getcwd()
     chdir(u)
     c = get_test_config()
 
@@ -206,7 +210,8 @@ def upstream_instance(upstream_n_distgit):
     lp = LocalProject(path_or_url=str(u))
 
     ups = Upstream(c, pc, lp)
-    return u, ups
+    yield u, ups
+    chdir(old_cwd)
 
 
 @pytest.fixture()
@@ -224,6 +229,9 @@ def distgit_instance(upstream_n_distgit, mock_upstream_remote_functionality):
 def api_instance(upstream_n_distgit):
     u, d = upstream_n_distgit
 
+    # we need to chdir(u) because when PackageConfig is created,
+    # it already expects it's in the correct directory
+    old_cwd = os.getcwd()
     chdir(u)
     c = get_test_config()
 
@@ -232,4 +240,5 @@ def api_instance(upstream_n_distgit):
     up_lp = LocalProject(path_or_url=str(u))
 
     api = PackitAPI(c, pc, up_lp)
-    return u, d, api
+    yield u, d, api
+    chdir(old_cwd)

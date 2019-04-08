@@ -26,7 +26,6 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 from jsonschema.exceptions import ValidationError
-from os import chdir
 
 from packit.actions import ActionName
 from tests.spellbook import TESTS_DIR
@@ -42,6 +41,7 @@ from packit.config import (
 )
 
 from packit.sync import get_wildcard_resolved_sync_files
+from tests.utils import cwd
 
 
 def test_job_config_equal():
@@ -353,7 +353,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
             },
             PackageConfig(
-                specfile_path="fedora/package.spec",
+                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -380,7 +380,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
             },
             PackageConfig(
-                specfile_path="fedora/package.spec",
+                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -405,7 +405,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [{"trigger": "release", "release_to": ["f28"]}],
             },
             PackageConfig(
-                specfile_path="fedora/package.spec",
+                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -428,7 +428,7 @@ def test_package_config_parse_error(raw):
                 "something": "stupid",
             },
             PackageConfig(
-                specfile_path="fedora/package.spec",
+                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -455,7 +455,7 @@ def test_package_config_parse_error(raw):
                 "dist_git_base_url": "https://something.wicked",
             },
             PackageConfig(
-                specfile_path="fedora/package.spec",
+                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -476,7 +476,6 @@ def test_package_config_parse_error(raw):
         (
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": [],
                 "actions": {
                     "pre-sync": "some/pre-sync/command --option",
                     "get-current-version": "get-me-version",
@@ -488,12 +487,11 @@ def test_package_config_parse_error(raw):
                 "dist_git_base_url": "https://something.wicked",
             },
             PackageConfig(
-                specfile_path="fedora/package.spec",
+                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
                 actions={
                     ActionName.pre_sync: "some/pre-sync/command --option",
                     ActionName.get_current_version: "get-me-version",
                 },
-                synced_files=SyncFilesConfig(files_to_sync=None),
                 jobs=[],
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
@@ -526,8 +524,10 @@ def test_dist_git_package_url():
                 SyncFilesItem(src="fedora/foobar.spec", dest="fedora/foobar.spec")
             ]
         ),
-        specfile_path="fedora/package.spec",
+        specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
     )
+    assert new_pc.specfile_path.endswith("fedora/package.spec")
+    assert pc.specfile_path.endswith("fedora/package.spec")
     assert pc == new_pc
     assert pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
     assert new_pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
@@ -550,7 +550,7 @@ def test_get_packit_config_from_repo(content):
     git_project = GitProject(repo="", service=GitService(), namespace="")
     config = get_packit_config_from_repo(sourcegit_project=git_project, ref="")
     assert isinstance(config, PackageConfig)
-    assert config.specfile_path == "packit.spec"
+    assert Path(config.specfile_path).name == "packit.spec"
     assert config.synced_files == SyncFilesConfig(
         files_to_sync=[
             SyncFilesItem(src="packit.spec", dest="packit.spec"),
@@ -649,14 +649,14 @@ def test_get_user_config(tmpdir):
     ],
 )
 def test_sync_files(packit_files, expected):
-    chdir(TESTS_DIR)
-    pc = PackageConfig(
-        dist_git_base_url="https://packit.dev/",
-        downstream_package_name="packit",
-        dist_git_namespace="awesome",
-        specfile_path="fedora/package.spec",
-        synced_files=packit_files,
-    )
-    get_wildcard_resolved_sync_files(pc)
-    assert pc.synced_files
-    assert set(expected).issubset(set(pc.synced_files.files_to_sync))
+    with cwd(TESTS_DIR):
+        pc = PackageConfig(
+            dist_git_base_url="https://packit.dev/",
+            downstream_package_name="packit",
+            dist_git_namespace="awesome",
+            specfile_path="fedora/package.spec",
+            synced_files=packit_files,
+        )
+        get_wildcard_resolved_sync_files(pc)
+        assert pc.synced_files
+        assert set(expected).issubset(set(pc.synced_files.files_to_sync))
