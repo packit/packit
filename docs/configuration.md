@@ -25,7 +25,7 @@ You should place the file in the root of your upstream repo. Packit accepts thes
  `dist_git_base_url`       | string          | URL of dist-git server, defaults to "https://src.fedoraproject.org/" (has to end with a slash)
  `create_tarball_command`  | list of strings | a command which generates upstream tarball in the root of the upstream directory (defaults to `git archive -o "{package_name}-{version}.tar.gz" --prefix "{package_name}-{version}/" HEAD`)
  `current_version_command` | list of strings | a command which prints current upstream version (hint: `git describe`) (defaults to `git describe --tags --match '*.*'`)
-
+ `actions`                 | string:string   | custom actions/hooks overwriting the default behavior of the workflow (more in [Actions](./actions.md))
 
 ### Minimal sample config
 
