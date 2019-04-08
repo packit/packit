@@ -25,20 +25,21 @@ import os
 import re
 from pathlib import Path
 from typing import Optional, List, Tuple
-from packaging import version
 
 import git
 import github
-from ogr.services.github import GithubService
+from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
+from ogr.services.github import GithubService
+from packit.actions import ActionName
+from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils import run_command
-from packit.base_git import PackitRepositoryBase
 
 logger = logging.getLogger(__name__)
 
@@ -355,8 +356,8 @@ class Upstream(PackitRepositoryBase):
 
         :return: e.g. 0.1.1.dev86+ga17a559.d20190315 or 0.6.1.1.gce4d84e
         """
-        action_output = self.package_config.get_output_from_action(
-            action_name="get-current-version"
+        action_output = self.get_output_from_action(
+            action=ActionName.get_current_version
         )
         if action_output:
             return action_output
@@ -415,7 +416,7 @@ class Upstream(PackitRepositoryBase):
         repository, only committed changes are present in the archive
         """
 
-        if self.package_config.with_action(action_name="create-archive"):
+        if self.with_action(action=ActionName.create_archive):
 
             if self.package_config.upstream_project_name:
                 dir_name = (
