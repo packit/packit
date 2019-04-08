@@ -24,7 +24,6 @@ import tempfile
 from os import path
 
 import git
-import requests
 from flexmock import flexmock
 
 from packit import local_project, utils
@@ -303,7 +302,6 @@ def test_from_git_url_path_or_url_repo_name_git_service():
 
 def test_from_path_or_ulr_repo_name_git_service():
     flexmock(path).should_receive("isdir").and_return(False).once()
-    flexmock(requests).should_receive("head").and_return(flexmock(ok=True)).once()
 
     flexmock(git.Repo).should_receive("clone_from").and_return(
         flexmock(
@@ -469,9 +467,8 @@ def test_path_or_url_overwrite():
 
 
 def test_path_or_url_url():
-    """isdir=False requests.head => ok=True"""
+    """isdir=False"""
     flexmock(path).should_receive("isdir").and_return(False).once()
-    flexmock(requests).should_receive("head").and_return(flexmock(ok=True)).once()
 
     project = LocalProject(
         path_or_url="http://some.example/url/reponame",
@@ -488,7 +485,6 @@ def test_path_or_url_url():
 def test_path_or_url_url_overwrite():
     """overwrite the path_or_url with git_url"""
     flexmock(path).should_receive("isdir").and_return(False).once()
-    flexmock(requests).should_receive("head").and_return(flexmock(ok=True)).once()
 
     project = LocalProject(
         path_or_url="http://some.example/url/reponame",
@@ -510,14 +506,3 @@ def test_is_url():
 
     project.path_or_url = "git@github.com:packit-service/ogr"
     assert project._is_url(project.path_or_url)
-
-
-def test_path_or_url_nok():
-    """isdir=False requests.head => ok=False"""
-    flexmock(path).should_receive("isdir").and_return(False).once()
-    flexmock(requests).should_receive("head").and_return(flexmock(ok=False)).once()
-
-    project = LocalProject(path_or_url="http://some.example/url/reponame")
-
-    assert not project.git_url
-    assert not project.working_dir
