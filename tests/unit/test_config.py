@@ -28,6 +28,7 @@ from flexmock import flexmock
 from jsonschema.exceptions import ValidationError
 from os import chdir
 
+from packit.actions import ActionName
 from tests.spellbook import TESTS_DIR
 from ogr.abstract import GitProject, GitService
 from packit.config import (
@@ -280,7 +281,7 @@ def test_package_config_not_equal(not_equal_package_config):
                 "synced_files": ["fedora/foobar.spec"],
                 "actions": {
                     "pre-sync": "some/pre-sync/command --option",
-                    "upstream-version": "get-me-upstream-version",
+                    "get-current-version": "get-me-version",
                 },
                 "jobs": [
                     {"trigger": "release", "release_to": ["f28"]},
@@ -289,6 +290,22 @@ def test_package_config_not_equal(not_equal_package_config):
                 ],
             },
             True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/foobar.spec"],
+                "actions": {
+                    "pre-sync": "some/pre-sync/command --option",
+                    "unknown-action": "nothing",
+                },
+                "jobs": [
+                    {"trigger": "release", "release_to": ["f28"]},
+                    {"trigger": "pull_request", "release_to": ["f29", "f30", "master"]},
+                    {"trigger": "git_tag", "release_to": ["f29", "f30", "master"]},
+                ],
+            },
+            False,
         ),
         (
             {
@@ -462,7 +479,7 @@ def test_package_config_parse_error(raw):
                 "synced_files": [],
                 "actions": {
                     "pre-sync": "some/pre-sync/command --option",
-                    "upstream-version": "get-me-upstream-version",
+                    "get-current-version": "get-me-version",
                 },
                 "jobs": [],
                 "something": "stupid",
@@ -473,8 +490,8 @@ def test_package_config_parse_error(raw):
             PackageConfig(
                 specfile_path="fedora/package.spec",
                 actions={
-                    "pre-sync": "some/pre-sync/command --option",
-                    "upstream-version": "get-me-upstream-version",
+                    ActionName.pre_sync: "some/pre-sync/command --option",
+                    ActionName.get_current_version: "get-me-version",
                 },
                 synced_files=SyncFilesConfig(files_to_sync=None),
                 jobs=[],
