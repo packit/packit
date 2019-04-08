@@ -34,6 +34,7 @@ from jsonschema import Draft4Validator
 from yaml import safe_load
 
 from ogr.abstract import GitProject
+from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException, PackitException
 from packit.utils import exclude_from_dict
@@ -250,7 +251,7 @@ class PackageConfig:
         dist_git_base_url: str = None,
         create_tarball_command: List[str] = None,
         current_version_command: List[str] = None,
-        actions: Dict[str, str] = None,
+        actions: Dict[ActionName, str] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: Optional[SyncFilesConfig] = synced_files or None
@@ -265,7 +266,7 @@ class PackageConfig:
             self.downstream_project_url: str = downstream_project_url
         else:
             self.downstream_project_url: str = self.dist_git_package_url
-        self.actions = actions
+        self.actions = actions or {}
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
@@ -299,6 +300,7 @@ class PackageConfig:
             and self.dist_git_base_url == other.dist_git_base_url
             and self.current_version_command == other.current_version_command
             and self.create_tarball_command == other.create_tarball_command
+            and self.actions == other.actions
         )
 
     @property
@@ -339,7 +341,7 @@ class PackageConfig:
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
-            actions=actions,
+            actions={ActionName(a): cmd for a, cmd in actions.items()},
             jobs=[
                 JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
             ],
@@ -480,7 +482,13 @@ PACKAGE_CONFIG_SCHEMA = {
         "current_version_command": {"type": "array", "items": {"type": "string"}},
         "synced_files": {"type": "array", "items": SYNCED_FILES_SCHEMA},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
-        "actions": {"type": "object", "additionalProperties": {"type": "string"}},
+        "actions": {
+            "type": "object",
+            "properties": {
+                a: {"type": "string"} for a in ActionName.get_possible_values()
+            },
+            "additionalProperties": False,
+        },
     },
     "required": ["specfile_path", "synced_files"],
 }

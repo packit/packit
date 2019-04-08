@@ -27,6 +27,7 @@ import git
 from rebasehelper.specfile import SpecFile
 
 from packit import utils
+from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -122,7 +123,7 @@ class PackitRepositoryBase:
         # TODO: make -s configurable
         self.local_project.git_repo.git.commit(*commit_args)
 
-    def run_action(self, action_name: str, method: Callable = None, *args, **kwargs):
+    def run_action(self, action: ActionName, method: Callable = None, *args, **kwargs):
         """
         Run the method in the self._with_action block.
 
@@ -138,7 +139,7 @@ class PackitRepositoryBase:
         >   self._run_action(action_name="pre-sync")
         >   # This will be used as an optional hook
 
-        :param action_name: action_name: str (Name of the action that can be overwritten
+        :param action: ActionName enum (Name of the action that can be overwritten
                                                 in the package_config.actions)
         :param method: method to run if the action was not defined by user
                     (if not specified, the action can be used for custom hooks)
@@ -146,18 +147,18 @@ class PackitRepositoryBase:
         :param kwargs: kwargs for the method
         """
         if not method:
-            logger.debug(f"Running {action_name} hook.")
-        if self.with_action(action_name=action_name):
+            logger.debug(f"Running {action} hook.")
+        if self.with_action(action=action):
             if method:
                 method(*args, **kwargs)
 
-    def has_action(self, action_name: str) -> bool:
+    def has_action(self, action: ActionName) -> bool:
         """
         Is the action defined in the config?
         """
-        return action_name in self.package_config.actions
+        return action in self.package_config.actions
 
-    def with_action(self, action_name: str) -> bool:
+    def with_action(self, action: ActionName) -> bool:
         """
         If the action is defined in the self.package_config.actions,
         we run it and return False (so we can skip the if block)
@@ -175,26 +176,26 @@ class PackitRepositoryBase:
         https://stackoverflow.com/questions/12594148/skipping-execution-of-with-block
         https://www.python.org/dev/peps/pep-0377/ (rejected)
 
-        :param action_name: str (Name of the action that can be overwritten
+        :param action: ActionName enum (Name of the action that can be overwritten
                                                 in the package_config.actions)
         :return: True, if the action is not overwritten, False when custom command was run
         """
-        logger.debug(f"Running {action_name}.")
-        if action_name in self.package_config.actions:
-            command = self.package_config.actions[action_name]
-            logger.info(f"Using user-defined script for {action_name}: {command}")
+        logger.debug(f"Running {action}.")
+        if action in self.package_config.actions:
+            command = self.package_config.actions[action]
+            logger.info(f"Using user-defined script for {action}: {command}")
             utils.run_command(cmd=command, cwd=self.local_project.working_dir)
             return False
-        logger.debug(f"Running default implementation for {action_name}.")
+        logger.debug(f"Running default implementation for {action}.")
         return True
 
-    def get_output_from_action(self, action_name: str):
+    def get_output_from_action(self, action: ActionName):
         """
         Run action if specified in the self.actions and return output
         else return None
         """
-        if action_name in self.package_config.actions:
-            command = self.package_config.actions[action_name]
-            logger.info(f"Using user-defined script for {action_name}: {command}")
+        if action in self.package_config.actions:
+            command = self.package_config.actions[action]
+            logger.info(f"Using user-defined script for {action}: {command}")
             return run_command(cmd=command, output=True)
         return None
