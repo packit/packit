@@ -21,8 +21,6 @@
 # SOFTWARE.
 
 import copy
-from os import chdir
-
 import git
 import pytest
 from flexmock import flexmock
@@ -35,6 +33,7 @@ from packit.config import get_local_package_config
 from packit.fed_mes_consume import Consumerino
 from packit.local_project import LocalProject
 from tests.spellbook import TARBALL_NAME, get_test_config
+from tests.utils import cwd
 
 
 @pytest.fixture()
@@ -67,19 +66,19 @@ def test_basic_local_update(upstream_n_distgit, mock_upstream_remote_functionali
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d = upstream_n_distgit
 
-    chdir(u)
-    c = get_test_config()
+    with cwd(u):
+        c = get_test_config()
 
-    pc = get_local_package_config(str(u))
-    pc.upstream_project_url = str(u)
-    pc.downstream_project_url = str(d)
-    up_lp = LocalProject(path_or_url=str(u))
-    api = PackitAPI(c, pc, up_lp)
-    api.sync_release("master", "0.1.0")
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        pc.downstream_project_url = str(d)
+        up_lp = LocalProject(path_or_url=str(u))
+        api = PackitAPI(c, pc, up_lp)
+        api.sync_release("master", "0.1.0")
 
-    assert (d / TARBALL_NAME).is_file()
-    spec = SpecFile(str(d / "beer.spec"), None)
-    assert spec.get_version() == "0.1.0"
+        assert (d / TARBALL_NAME).is_file()
+        spec = SpecFile(str(d / "beer.spec"), None)
+        assert spec.get_version() == "0.1.0"
 
 
 def test_basic_local_update_from_downstream(
@@ -88,18 +87,18 @@ def test_basic_local_update_from_downstream(
     flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
     u, d = downstream_n_distgit
 
-    chdir(u)
-    c = get_test_config()
-    pc = get_local_package_config(str(u))
-    pc.upstream_project_url = str(u)
-    pc.downstream_project_url = str(d)
-    up_lp = LocalProject(path_or_url=str(u))
-    api = PackitAPI(c, pc, up_lp)
-    api.sync_from_downstream("master", "master", True)
+    with cwd(u):
+        c = get_test_config()
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        pc.downstream_project_url = str(d)
+        up_lp = LocalProject(path_or_url=str(u))
+        api = PackitAPI(c, pc, up_lp)
+        api.sync_from_downstream("master", "master", True)
 
-    assert (u / "beer.spec").is_file()
-    spec = SpecFile(str(u / "beer.spec"), None)
-    assert spec.get_version() == "0.0.0"
+        assert (u / "beer.spec").is_file()
+        spec = SpecFile(str(u / "beer.spec"), None)
+        assert spec.get_version() == "0.0.0"
 
 
 def test_single_message(github_release_fedmsg, mock_upstream_remote_functionality):
