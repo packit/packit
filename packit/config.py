@@ -501,7 +501,7 @@ PACKAGE_CONFIG_SCHEMA = {
             "additionalProperties": False,
         },
     },
-    "required": ["specfile_path", "synced_files"],
+    "required": ["specfile_path"],
 }
 
 USER_CONFIG_SCHEMA = {
