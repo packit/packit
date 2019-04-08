@@ -165,6 +165,7 @@ Please, open a PR if you want to be on the list, or just let us know.
 * rebase-helper (@nforro)
 * ABRT
 * [standard-test-roles](https://pagure.io/standard-test-roles)
+* OSBS (atomic-reactor, osbs-client, koji-containerbuild) (@cverna)
 
 
 ## Resources
