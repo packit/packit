@@ -61,6 +61,7 @@ The list of projects which already have packit config in their upstream reposito
 * [user-cont/conu](https://github.com/user-cont/conu/blob/master/.packit.yaml)
 * [TomasTomecek/sen](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
 * [rebase-helper/rebase-helper](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yml)
+* [dcantrell/pykickstart](https://github.com/dcantrell/pykickstart/blob/master/packit.yaml)
 
 
 ### In-progress work
