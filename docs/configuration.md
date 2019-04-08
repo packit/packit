@@ -60,7 +60,7 @@ The list of projects which already have packit config in their upstream reposito
 * [user-cont/colin](https://github.com/user-cont/colin/blob/master/.packit.yaml)
 * [user-cont/conu](https://github.com/user-cont/conu/blob/master/.packit.yaml)
 * [TomasTomecek/sen](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
-* [rebase-helper/rebase-helper](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yaml)
+* [rebase-helper/rebase-helper](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yml)
 
 
 ### In-progress work
