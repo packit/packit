@@ -29,15 +29,15 @@ from pathlib import Path
 from typing import Sequence
 from tabulate import tabulate
 
-from packit.local_project import LocalProject
-
+from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
+from packit.local_project import LocalProject
 from packit.status import Status
+from packit.sync import sync_files
 from packit.upstream import Upstream
 from packit.utils import assert_existence
-from packit.sync import sync_files
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class PackitAPI:
         return self._dg
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
-        self.up.run_action(action_name="pre-sync")
+        self.up.run_action(action=ActionName.pre_sync)
 
         self.up.checkout_pr(pr_id=pr_id)
         local_pr_branch = f"pull-request-{pr_id}-sync"
@@ -90,7 +90,7 @@ class PackitAPI:
         self.dg.create_branch(local_pr_branch)
         self.dg.checkout_branch(local_pr_branch)
 
-        if self.up.with_action(action_name="patch"):
+        if self.up.with_action(action=ActionName.create_patches):
             patches = self.up.create_patches(
                 upstream=upstream_version, destination=self.dg.local_project.working_dir
             )
@@ -130,7 +130,7 @@ class PackitAPI:
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
 
-        self.up.run_action(action_name="init")
+        self.up.run_action(action=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
         if not full_version:
@@ -147,7 +147,7 @@ class PackitAPI:
             if not use_local_content:
                 self.up.checkout_release(full_version)
 
-            self.up.run_action(action_name="pre-sync")
+            self.up.run_action(action=ActionName.pre_sync)
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
@@ -170,14 +170,14 @@ class PackitAPI:
                 f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
 
-            if self.up.with_action(action_name="prepare-files"):
+            if self.up.with_action(action=ActionName.prepare_files):
                 sync_files(
                     self.package_config,
                     self.up.local_project.working_dir,
                     self.dg.local_project.working_dir,
                 )
                 if upstream_ref:
-                    if self.up.with_action(action_name="patch"):
+                    if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
                             upstream=upstream_ref,
                             destination=self.dg.local_project.working_dir,
@@ -188,7 +188,7 @@ class PackitAPI:
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
 
-            if self.up.has_action("prepare-files"):
+            if self.up.has_action(action=ActionName.prepare_files):
                 sync_files(
                     self.package_config,
                     self.up.local_project.working_dir,
