@@ -92,11 +92,6 @@ def generate_config(write_to_file=False, template_data=None, config_file_name=No
     # default name
     config_file_name = config_file_name or ".packit.yaml"
 
-    # find name of config file if already exists
-    for existing_config_file in CONFIG_FILE_NAMES:
-        if (Path.cwd() / existing_config_file).is_file():
-            config_file_name = existing_config_file
-
     config_template = Template(PACKIT_CONFIG_TEMPLATE)
     output_config = config_template.render(template_data)
 
