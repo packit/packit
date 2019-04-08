@@ -179,7 +179,7 @@ class SyncFilesItem(NamedTuple):
     dest: str
 
     def __repr__(self):
-        return f"[src={self.src}, dest={self.dest}]"
+        return f"SyncFilesItem(src={self.src}, dest={self.dest})"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SyncFilesItem):
@@ -193,7 +193,7 @@ class SyncFilesConfig:
         self.files_to_sync = files_to_sync
 
     def __repr__(self):
-        return f"{self.files_to_sync!r}"
+        return f"SyncFilesConfig({self.files_to_sync!r})"
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":
