@@ -558,18 +558,3 @@ class PackitAPI:
                 report_func("error", "Build watch timeout")
                 return state_reported
             time.sleep(10)
-
-    def generate(self, config_name):
-
-        config_name = config_name or ".packit.yaml"
-
-        template_data = {
-            "upstream_project_name": self.up.local_project.repo_name,
-            "downstream_package_name": self.dg.package_name,
-        }
-
-        config_template = Template(PACKIT_CONFIG_TEMPLATE)
-        output_config = config_template.render(template_data)
-
-        with open(config_name, "w+") as f:
-            f.write(output_config)

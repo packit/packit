@@ -30,9 +30,12 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import get_packit_api, cover_packit_exception
-from packit.config import pass_config, get_context_settings
+from packit.cli.utils import cover_packit_exception
+from packit.config import get_context_settings
+from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
+from pathlib import Path
+from jinja2 import Template
 
 logger = logging.getLogger(__file__)
 
@@ -44,17 +47,61 @@ logger = logging.getLogger(__file__)
 @click.option(
     "-f", "--force", is_flag=True, help="Reset config to default if already exists."
 )
-@pass_config
 @cover_packit_exception
-def generate(config, path_or_url, force):
+def generate(path_or_url, force):
     """
-        Generate new packit config.
-        """
-    api = get_packit_api(config=config, local_project=path_or_url)
-    if api.package_config and not force:
-        raise PackitException(
-            "Packit config already exists."
-            " If you want to regenerate it use `packit generate --force`"
-        )
+    Generate new packit config.
+    """
 
-    api.generate(api.package_config)
+    # find name of config file if already exists
+    config_file_name = None
+    for existing_config_file in CONFIG_FILE_NAMES:
+        if (Path.cwd() / existing_config_file).is_file():
+            config_file_name = existing_config_file
+            if not force:
+                raise PackitException(
+                    "Packit config already exists."
+                    " If you want to regenerate it use `packit generate --force`"
+                )
+            break
+
+    template_data = {
+        "upstream_project_name": path_or_url.repo_name,
+        "downstream_package_name": path_or_url.repo_name,
+    }
+
+    generate_config(
+        write_to_file=True,
+        template_data=template_data,
+        config_file_name=config_file_name,
+    )
+
+
+def generate_config(write_to_file=False, template_data=None, config_file_name=None):
+    """
+    Generate config file from provided data
+    :param write_to_file: bool, False by default
+    :param template_data: dict, example:
+    {
+        "upstream_project_name": "packitos",
+        "downstream_package_name": "packit",
+    }
+    :param config_file_name: str, name of config file, `.packit.yaml` by default
+    :return: str, generated config
+    """
+    # default name
+    config_file_name = config_file_name or ".packit.yaml"
+
+    # find name of config file if already exists
+    for existing_config_file in CONFIG_FILE_NAMES:
+        if (Path.cwd() / existing_config_file).is_file():
+            config_file_name = existing_config_file
+
+    config_template = Template(PACKIT_CONFIG_TEMPLATE)
+    output_config = config_template.render(template_data)
+
+    if write_to_file:
+        with open(config_file_name, "w+") as f:
+            f.write(output_config)
+
+    return output_config

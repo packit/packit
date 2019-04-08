@@ -352,3 +352,12 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
         remove_gpg_key_pair(
             gpg_binary=gnupg_instance.gpgbinary, fingerprint=key_fingerprint
         )
+
+def upstream_without_config(tmpdir):
+    t = Path(str(tmpdir))
+
+    u_remote = t / "upstream_remote"
+    u_remote.mkdir()
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote)
+
+    return u_remote

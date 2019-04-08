@@ -57,7 +57,7 @@ COPR2GITHUB_STATE = {
     "unknown": ("error", "Something went wrong."),
 }
 
-PACKIT_CONFIG_TEMPLATE = """# This configuration file is generated.See documentation for more information:
+PACKIT_CONFIG_TEMPLATE = """# This configuration file is generated. See the documentation for more information:
 # https://github.com/packit-service/packit/blob/master/docs/configuration.md
 
 specfile_path: {{ downstream_package_name }}.spec
@@ -74,7 +74,7 @@ downstream_package_name: {{ downstream_package_name }}
 # dist_git_namespace: rpms
 # dist_git_base_url: https://src.fedoraproject.org/
 # create_tarball_command: git archive -o "{package_name}-{version}.tar.gz" \
-#                         --prefix "{package_name}-{version}/" HEAD
+--prefix "{package_name}-{version}/" HEAD
 # current_version_command: git describe --tags --match '*.*'
 
 """
