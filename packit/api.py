@@ -374,7 +374,15 @@ class PackitAPI:
             logger.info("Downstream PRs: No open PRs.")
         status.get_dg_versions()
         status.get_up_releases()
-        status.get_builds()
+        builds = status.get_builds()
+        logger.info("\nLatest builds:")
+        if builds:
+            for build in builds:
+                koji_builds_str = "\n".join(f" - {b}" for b in builds[build])
+                logger.info(f"{build}:\n{koji_builds_str}")
+        else:
+            logger.info("There are no builds.")
+
         updates = status.get_updates()
         if updates:
             logger.info("\nLatest bodhi updates:")

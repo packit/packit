@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
@@ -108,21 +108,20 @@ class Status:
         else:
             logger.info("\nGitHub upstream releases: No releases found.")
 
-    def get_builds(self, number_of_builds: int = 3) -> None:
+    def get_builds(self, number_of_builds: int = 3) -> Dict:
         """
         Get specific number of latest builds from koji
         :param number_of_builds: int
         :return: None
         """
-        logger.info("\nLatest builds:")
         # https://github.com/fedora-infra/bodhi/issues/3058
         from bodhi.client.bindings import BodhiClient
 
         b = BodhiClient()
         builds_d = b.latest_builds(self.dg.package_name)
-
         branches = self.dg.local_project.git_project.get_branches()
         branches.remove("master")  # there is no master tag in koji
+        builds: Dict = {}
         for branch in branches:
             koji_tag = f"{branch}-updates-candidate"
             try:
@@ -133,10 +132,10 @@ class Status:
                     if len(koji_builds) > number_of_builds
                     else koji_builds
                 )
-                koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
-                logger.info(f"{branch}:\n{koji_builds_str}")
+                builds[branch] = koji_builds
             except KeyError:
-                logger.info(f"{branch}: No builds.")
+                pass
+        return builds
 
     def get_updates(self, number_of_updates: int = 3) -> List:
         """
