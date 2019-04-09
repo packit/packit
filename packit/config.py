@@ -219,7 +219,7 @@ class JobConfig(BaseConfig):
         return JobConfig(
             job=JobType[raw_dict["job"]],
             trigger=JobTriggerType[raw_dict["trigger"]],
-            notify=JobNotifyType.from_list(raw_dict["notify"]),
+            notify=JobNotifyType.from_list(raw_dict.get("notify", [])),
             metadata=raw_dict.get("metadata", {}),
         )
 
@@ -525,4 +525,3 @@ def parse_loaded_config(loaded_config: dict) -> PackageConfig:
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
         raise Exception(f"Cannot parse package config: {ex}.")
-
