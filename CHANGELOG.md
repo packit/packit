@@ -1,3 +1,33 @@
+# 0.3.0
+
+We have a brand new website: https://packit.dev/! [packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
+
+## Features
+
+* Packit supports [Source-git](https://packit.dev/source-git/).
+* You can now specify your own actions to replace default packit behavior.
+* Packit supports pagure.io-based upstream projects.
+* Packit {propose-update, sync-from-downstream} supports copying directories.
+* A new command `status`! It displays useful upstream/downstream info.
+* You can now have a config file for packit in your home directory(`~/.config/packit.yaml`).
+* Packit installed from an RPM now has manpages.
+
+## Fixes
+
+* Downstream pull requests titles now have correct version numbers.
+* `sync-from-downstream` command constructs a PR correctly when origin is a fork.
+
+## Minor
+
+* Improved documentation.
+* Code refactoring.
+* Added MIT license notice into python files.
+* CI shows code coverage and runs linters/checkers defined in pre-commit config file.
+* We've started work on packit service by implementing a handler for a Github
+  webhook. More to come in the next cycle!
+* Packit is able to authenticate as a GitHub App.
+
+
 # 0.2.0
 
 
