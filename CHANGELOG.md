@@ -1,29 +1,31 @@
 # 0.3.0
 
+We have a brand new website: https://packit.dev/! [packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
+
 ## Features
 
-* We have a brand new https://packit.dev website. [packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
-* Packit supports [Source-git](https://packit.dev/source-git/)
-* Packit supports configurable actions to replace parts of code.
+* Packit supports [Source-git](https://packit.dev/source-git/).
+* You can now specify your own actions to replace default packit behavior.
 * Packit supports pagure.io-based upstream projects.
-* Packit {propose-update, sync-from-downstream} supports copying of directories.
-* Packit is able to authenticate as GitHub App.
-* Packit has status command, which displays useful upstream/downstream info.
-* User config can be read from a file.
-* We've implemented a basic web-hook.
+* Packit {propose-update, sync-from-downstream} supports copying directories.
+* A new command `status`! It displays useful upstream/downstream info.
+* You can now have a config file for packit in your home directory(`~/.config/packit.yaml`).
+* Packit installed from an RPM now has manpages.
 
 ## Fixes
 
 * Downstream pull requests titles now have correct version numbers.
-* sync-from-downstream command constructs a PR correctly when origin is a fork.
+* `sync-from-downstream` command constructs a PR correctly when origin is a fork.
 
 ## Minor
 
 * Improved documentation.
 * Code refactoring.
 * Added MIT license notice into python files.
-* RPM spec file now generates man pages during RPM package build.
 * CI shows code coverage and runs linters/checkers defined in pre-commit config file.
+* We've started work on packit service by implementing a handler for a Github
+  webhook. More to come in the next cycle!
+* Packit is able to authenticate as a GitHub App.
 
 
 # 0.2.0
