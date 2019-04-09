@@ -57,24 +57,17 @@ COPR2GITHUB_STATE = {
     "unknown": ("error", "Something went wrong."),
 }
 
-PACKIT_CONFIG_TEMPLATE = """# This configuration file is generated. See the documentation for more information:
+PACKIT_CONFIG_TEMPLATE = """# See the documentation for more information:
 # https://github.com/packit-service/packit/blob/master/docs/configuration.md
 
-specfile_path: {{ downstream_package_name }}.spec
+specfile_path: {downstream_package_name}.spec
 
 # add or remove files that should be synced
 synced_files:
-    - {{ downstream_package_name }}.spec
+    - {downstream_package_name}.spec
+    - .packit.yaml
 
 # change these lines if upstream project name is not the same as downstream
-upstream_project_name: {{ upstream_project_name }}
-downstream_package_name: {{ downstream_package_name }}
-
-# These values are optional and filled with defaults.
-# dist_git_namespace: rpms
-# dist_git_base_url: https://src.fedoraproject.org/
-# create_tarball_command: git archive -o "{package_name}-{version}.tar.gz" \
---prefix "{package_name}-{version}/" HEAD
-# current_version_command: git describe --tags --match '*.*'
-
+upstream_project_name: {upstream_project_name}
+downstream_package_name: {downstream_package_name}
 """

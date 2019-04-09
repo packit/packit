@@ -353,6 +353,8 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
             gpg_binary=gnupg_instance.gpgbinary, fingerprint=key_fingerprint
         )
 
+
+@pytest.fixture()
 def upstream_without_config(tmpdir):
     t = Path(str(tmpdir))
 

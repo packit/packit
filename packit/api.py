@@ -38,7 +38,7 @@ from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
-from packit.constants import DEFAULT_COPR_OWNER, COPR2GITHUB_STATE,PACKIT_CONFIG_TEMPLATE
+from packit.constants import DEFAULT_COPR_OWNER, COPR2GITHUB_STATE
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, PackitInvalidConfigException
 from packit.local_project import LocalProject

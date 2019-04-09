@@ -35,7 +35,6 @@ from packit.config import get_context_settings
 from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
 from pathlib import Path
-from jinja2 import Template
 
 logger = logging.getLogger(__file__)
 
@@ -92,11 +91,12 @@ def generate_config(write_to_file=False, template_data=None, config_file_name=No
     # default name
     config_file_name = config_file_name or ".packit.yaml"
 
-    config_template = Template(PACKIT_CONFIG_TEMPLATE)
-    output_config = config_template.render(template_data)
+    output_config = PACKIT_CONFIG_TEMPLATE.format(
+        downstream_package_name=template_data["downstream_package_name"],
+        upstream_project_name=template_data["upstream_project_name"],
+    )
 
     if write_to_file:
-        with open(config_file_name, "w+") as f:
-            f.write(output_config)
+        Path(config_file_name).write_text(output_config)
 
     return output_config
