@@ -137,7 +137,7 @@ def test_get_raw_files(file, glob_files, result):
     ],
 )
 def test_get_wildcard_resolved_sync_files(files, result):
-    sync_config = get_wildcard_resolved_sync_files(
+    files_to_sync = get_wildcard_resolved_sync_files(
         package_config=flexmock(synced_files=flexmock(files_to_sync=files))
     )
-    assert sync_config.files_to_sync == result
+    assert files_to_sync == result

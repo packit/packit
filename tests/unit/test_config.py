@@ -27,9 +27,8 @@ import pytest
 from flexmock import flexmock
 from jsonschema.exceptions import ValidationError
 
-from packit.actions import ActionName
-from tests.spellbook import TESTS_DIR
 from ogr.abstract import GitProject, GitService
+from packit.actions import ActionName
 from packit.config import (
     JobConfig,
     PackageConfig,
@@ -39,9 +38,6 @@ from packit.config import (
     get_packit_config_from_repo,
     Config,
 )
-
-from packit.sync import get_wildcard_resolved_sync_files
-from tests.utils import cwd
 
 
 def test_job_config_equal():
@@ -587,76 +583,3 @@ def test_get_user_config(tmpdir):
         None
     )
     assert config.pagure_fork_token == "o"
-
-
-@pytest.mark.parametrize(
-    "packit_files,expected",
-    [
-        (
-            SyncFilesConfig(
-                files_to_sync=[SyncFilesItem(src="conftest.py", dest="conftest.py")]
-            ),
-            [SyncFilesItem(src="conftest.py", dest="conftest.py")],
-        ),
-        (
-            SyncFilesConfig(
-                files_to_sync=[
-                    SyncFilesItem(src="__init__.py", dest="__init__.py"),
-                    SyncFilesItem(src="conftest.py", dest="conftest.py"),
-                    SyncFilesItem(src="spellbook.py", dest="spellbook.py"),
-                ]
-            ),
-            [
-                SyncFilesItem(src="__init__.py", dest="__init__.py"),
-                SyncFilesItem(src="conftest.py", dest="conftest.py"),
-                SyncFilesItem(src="spellbook.py", dest="spellbook.py"),
-            ],
-        ),
-        (
-            SyncFilesConfig(
-                files_to_sync=[SyncFilesItem(src="functional/", dest="tests")]
-            ),
-            [
-                SyncFilesItem(src="functional/__init__.py", dest="tests"),
-                SyncFilesItem(src="functional/test_srpm.py", dest="tests"),
-            ],
-        ),
-        (
-            SyncFilesConfig(files_to_sync=[SyncFilesItem(src="*.py", dest="tests")]),
-            [
-                SyncFilesItem(src="__init__.py", dest="tests"),
-                SyncFilesItem(src="conftest.py", dest="tests"),
-                SyncFilesItem(src="spellbook.py", dest="tests"),
-            ],
-        ),
-        (
-            SyncFilesConfig(
-                files_to_sync=[SyncFilesItem(src="unit/test_u*.py", dest="units")]
-            ),
-            [SyncFilesItem(src="unit/test_utils.py", dest="units")],
-        ),
-        (
-            SyncFilesConfig(
-                files_to_sync=[
-                    SyncFilesItem(src="integration/test_u*.py", dest="units")
-                ]
-            ),
-            [
-                SyncFilesItem(src="integration/test_upstream.py", dest="units"),
-                SyncFilesItem(src="integration/test_update.py", dest="units"),
-            ],
-        ),
-    ],
-)
-def test_sync_files(packit_files, expected):
-    with cwd(TESTS_DIR):
-        pc = PackageConfig(
-            dist_git_base_url="https://packit.dev/",
-            downstream_package_name="packit",
-            dist_git_namespace="awesome",
-            specfile_path="fedora/package.spec",
-            synced_files=packit_files,
-        )
-        get_wildcard_resolved_sync_files(pc)
-        assert pc.synced_files
-        assert set(expected).issubset(set(pc.synced_files.files_to_sync))
