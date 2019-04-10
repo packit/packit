@@ -8,3 +8,16 @@ upstream_project_name: packitos
 downstream_package_name: packit
 current_version_command: ["python3", "setup.py", "--version"]
 create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
+jobs:
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist_git_branch: master
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist_git_branch: f30
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist_git_branch: f29
