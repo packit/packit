@@ -2,8 +2,8 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.2.0
-Release:        2%{?dist}
+Version:        0.3.0
+Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
@@ -60,6 +60,9 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 10 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.3.0-1
+- New upstream release: 0.3.0
+
 * Fri Mar 29 2019 Jiri Popelka <jpopelka@redhat.com> - 0.2.0-2
 - man pages
 
