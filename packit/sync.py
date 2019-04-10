@@ -26,7 +26,7 @@ import os
 import shutil
 from typing import List
 
-from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
+from packit.config import PackageConfig, SyncFilesItem, RawSyncFilesItem
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -34,39 +34,39 @@ logger = logging.getLogger(__name__)
 
 def get_files_from_wildcard(
     file_wildcard: str, destination: str
-) -> List[SyncFilesItem]:
+) -> List[RawSyncFilesItem]:
     """
     Get list of SyncFilesItem that match the wildcard.
 
     :param file_wildcard:   - if ends with '/' we add all files of that directory
                             - if contains '*', we use glob.glob to get matches
-    :param destination: used to create SyncFilesItem instances
-    :return: list of matching SyncFilesItem instances
+    :param destination: used to create RawSyncFilesItem instances
+    :return: list of matching RawSyncFilesItem instances
     """
     if "*" not in file_wildcard:
         if file_wildcard.endswith("/"):
             file_wildcard = f"{file_wildcard}*"
         else:
-            return [SyncFilesItem(src=file_wildcard, dest=destination)]
+            return [RawSyncFilesItem(src=file_wildcard, dest=destination)]
 
     globed_files = glob.glob(file_wildcard)
-    return [SyncFilesItem(src=file, dest=destination) for file in globed_files]
+    return [RawSyncFilesItem(src=file, dest=destination) for file in globed_files]
 
 
-def get_raw_files(file_to_sync: SyncFilesItem) -> List[SyncFilesItem]:
+def get_raw_files(file_to_sync: SyncFilesItem) -> List[RawSyncFilesItem]:
     """
     Split the  SyncFilesItem with src as a list or wildcard to multiple instances.
 
     Destination is used from the original SyncFilesItem.
 
     :param file_to_sync: SyncFilesItem to split
-    :return: [SyncFilesItem]
+    :return: [RawSyncFilesItem]
     """
     source = file_to_sync.src
     if not isinstance(source, list):
         source = [source]
 
-    files_to_sync: List[SyncFilesItem] = []
+    files_to_sync: List[RawSyncFilesItem] = []
     for file in source:
         files_to_sync += get_files_from_wildcard(
             file_wildcard=file, destination=file_to_sync.dest
@@ -74,37 +74,39 @@ def get_raw_files(file_to_sync: SyncFilesItem) -> List[SyncFilesItem]:
     return files_to_sync
 
 
-def get_wildcard_resolved_sync_files(package_config: PackageConfig) -> SyncFilesConfig:
+def get_wildcard_resolved_sync_files(
+    package_config: PackageConfig
+) -> List[RawSyncFilesItem]:
     """
     Get PackageConfig and use get_raw_files to expand wildcards or lists
     in src of the SyncFilesItem.
 
     :param package_config: PackageConfig
-    :return: SyncFilesConfig with expanded SyncFilesItem
+    :return: [RawSyncFilesItem]
     """
     logger.debug("Packit synced files %s", package_config.synced_files.files_to_sync)
-    files_to_sync: List[SyncFilesItem] = []
+    files_to_sync: List[RawSyncFilesItem] = []
     for sync in package_config.synced_files.files_to_sync:
         files_to_sync += get_raw_files(file_to_sync=sync)
 
     logger.debug(f"Resolved synced file {files_to_sync}")
-    return SyncFilesConfig(files_to_sync=files_to_sync)
+    return files_to_sync
 
 
 def sync_files(pc: PackageConfig, src_working_dir: str, dest_working_dir: str) -> None:
     """
     Sync required files from upstream to downstream.
     """
-    files_config = get_wildcard_resolved_sync_files(pc)
-    logger.debug(f"Copy synced files {files_config.files_to_sync}")
+    files_to_sync = get_wildcard_resolved_sync_files(pc)
+    logger.debug(f"Copy synced files {files_to_sync}")
 
-    for fi in files_config.files_to_sync:
+    for fi in files_to_sync:
         # Check if destination dir exists
         # If not create the destination dir
         dest_dir = os.path.join(dest_working_dir, fi.dest)
         logger.debug(f"Destination {dest_dir}")
         # Sync all source file
-        src_file = os.path.join(src_working_dir, fi.src)  # type: ignore
+        src_file = os.path.join(src_working_dir, fi.src)
         logger.debug(f"Source file {src_file}")
         if os.path.exists(src_file):
             logger.info(f"Syncing {src_file}")
