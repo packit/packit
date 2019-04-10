@@ -35,6 +35,14 @@ logger = logging.getLogger(__name__)
 def get_files_from_wildcard(
     file_wildcard: str, destination: str
 ) -> List[SyncFilesItem]:
+    """
+    Get list of SyncFilesItem that match the wildcard.
+
+    :param file_wildcard:   - if ends with '/' we add all files of that directory
+                            - if contains '*', we use glob.glob to get matches
+    :param destination: used to create SyncFilesItem instances
+    :return: list of matching SyncFilesItem instances
+    """
     if "*" not in file_wildcard:
         if file_wildcard.endswith("/"):
             file_wildcard = f"{file_wildcard}*"
@@ -46,6 +54,14 @@ def get_files_from_wildcard(
 
 
 def get_raw_files(file_to_sync: SyncFilesItem) -> List[SyncFilesItem]:
+    """
+    Split the  SyncFilesItem with src as a list or wildcard to multiple instances.
+
+    Destination is used from the original SyncFilesItem.
+
+    :param file_to_sync: SyncFilesItem to split
+    :return: [SyncFilesItem]
+    """
     source = file_to_sync.src
     if not isinstance(source, list):
         source = [source]
@@ -59,6 +75,13 @@ def get_raw_files(file_to_sync: SyncFilesItem) -> List[SyncFilesItem]:
 
 
 def get_wildcard_resolved_sync_files(package_config: PackageConfig) -> SyncFilesConfig:
+    """
+    Get PackageConfig and use get_raw_files to expand wildcards or lists
+    in src of the SyncFilesItem.
+
+    :param package_config: PackageConfig
+    :return: SyncFilesConfig with expanded SyncFilesItem
+    """
     logger.debug("Packit synced files %s", package_config.synced_files.files_to_sync)
     files_to_sync: List[SyncFilesItem] = []
     for sync in package_config.synced_files.files_to_sync:
