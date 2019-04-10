@@ -188,6 +188,11 @@ class SyncFilesItem(NamedTuple):
         return self.src == other.src and self.dest == other.dest
 
 
+class RawSyncFilesItem(SyncFilesItem):
+    src: str
+    dest: str
+
+
 class SyncFilesConfig:
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync = files_to_sync
