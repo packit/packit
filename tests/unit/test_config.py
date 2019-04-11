@@ -55,16 +55,6 @@ def get_job_config_dict_full():
     }
 
 
-@pytest.fixture()
-def job_config_dict_simple():
-    return get_job_config_dict_simple()
-
-
-@pytest.fixture()
-def job_config_dict_full():
-    return get_job_config_dict_full()
-
-
 def get_job_config_simple():
     return JobConfig(
         job=JobType.build, trigger=JobTriggerType.release, notify=[], metadata={}
