@@ -31,12 +31,13 @@ from click.testing import CliRunner
 from packit.cli.packit_base import packit_base
 from packit.config import Config
 
-
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
 UPSTREAM = DATA_DIR / "upstream_git"
 DISTGIT = DATA_DIR / "dist_git"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"
+SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
+SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
 
 
 def git_set_user_email(directory):
@@ -56,7 +57,12 @@ def get_test_config():
     return conf
 
 
-def git_add_n_commit(
+def git_add_and_commit(directory, message):
+    subprocess.check_call(["git", "add", "."], cwd=directory)
+    subprocess.check_call(["git", "commit", "-m", message], cwd=directory)
+
+
+def initiate_git_repo(
     directory, tag=None, upstream_remote="https://lol.wat", push=False
 ):
     """

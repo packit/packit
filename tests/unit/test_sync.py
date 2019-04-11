@@ -25,12 +25,8 @@ import glob
 import pytest
 from flexmock import flexmock
 
-from packit.config import SyncFilesItem
-from packit.sync import (
-    get_files_from_wildcard,
-    get_wildcard_resolved_sync_files,
-    get_raw_files,
-)
+from packit.config import SyncFilesConfig
+from packit.sync import get_files_from_wildcard, get_raw_files, SyncFilesItem
 
 
 @pytest.mark.parametrize(
@@ -136,8 +132,6 @@ def test_get_raw_files(file, glob_files, result):
         ),
     ],
 )
-def test_get_wildcard_resolved_sync_files(files, result):
-    files_to_sync = get_wildcard_resolved_sync_files(
-        package_config=flexmock(synced_files=flexmock(files_to_sync=files))
-    )
+def test_raw_files_to_sync(files, result):
+    files_to_sync = SyncFilesConfig(files_to_sync=files).raw_files_to_sync
     assert files_to_sync == result

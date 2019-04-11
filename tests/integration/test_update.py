@@ -62,7 +62,7 @@ def github_release_fedmsg():
     }
 
 
-def test_basic_local_update(upstream_n_distgit, mock_upstream_remote_functionality):
+def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstream):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d = upstream_n_distgit
 
@@ -101,8 +101,8 @@ def test_basic_local_update_from_downstream(
         assert spec.get_version() == "0.0.0"
 
 
-def test_single_message(github_release_fedmsg, mock_upstream_remote_functionality):
-    u, d = mock_upstream_remote_functionality
+def test_single_message(github_release_fedmsg, mock_remote_functionality_upstream):
+    u, d = mock_remote_functionality_upstream
 
     conf = get_test_config()
     api = PackitBotAPI(conf)
@@ -115,8 +115,8 @@ def test_single_message(github_release_fedmsg, mock_upstream_remote_functionalit
     assert spec.get_version() == "0.1.0"
 
 
-def test_loop(mock_upstream_remote_functionality, github_release_fedmsg):
-    u, d = mock_upstream_remote_functionality
+def test_loop(mock_remote_functionality_upstream, github_release_fedmsg):
+    u, d = mock_remote_functionality_upstream
 
     def mocked_iter_releases():
         msg = copy.deepcopy(github_release_fedmsg)
