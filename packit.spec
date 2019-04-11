@@ -3,7 +3,7 @@
 
 Name:           %{real_name}
 Version:        0.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
@@ -12,6 +12,14 @@ Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-click-man
+BuildRequires:  python3-GitPython
+BuildRequires:  python3-fedmsg
+BuildRequires:  python3-jsonschema
+BuildRequires:  python3-ogr
+BuildRequires:  python3-packaging
+BuildRequires:  python3-pyyaml
+BuildRequires:  python3-tabulate
+BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
@@ -60,6 +68,9 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 11 2019 Jiri Popelka <jpopelka@redhat.com> - 0.3.0-2
+- click-man needs more BuildRequires
+
 * Wed Apr 10 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.3.0-1
 - New upstream release: 0.3.0
 
