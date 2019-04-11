@@ -26,7 +26,7 @@ import os
 from enum import IntEnum
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional, List, NamedTuple, Dict
+from typing import Optional, List, NamedTuple, Dict, Union
 
 import click
 import jsonschema
@@ -175,7 +175,7 @@ class JobConfig(NamedTuple):
 
 
 class SyncFilesItem(NamedTuple):
-    src: str
+    src: Union[str, List[str]]
     dest: str
 
     def __repr__(self):
@@ -186,6 +186,11 @@ class SyncFilesItem(NamedTuple):
             raise NotImplementedError()
 
         return self.src == other.src and self.dest == other.dest
+
+
+class RawSyncFilesItem(SyncFilesItem):
+    src: str
+    dest: str
 
 
 class SyncFilesConfig:
@@ -478,7 +483,15 @@ SYNCED_FILES_SCHEMA = {
         {"type": "string"},
         {
             "type": "object",
-            "properties": {"src": {"type": "string"}, "dest": {"type": "string"}},
+            "properties": {
+                "src": {
+                    "anyOf": [
+                        {"type": "string"},
+                        {"type": "array", "items": {"type": "string"}},
+                    ]
+                },
+                "dest": {"type": "string"},
+            },
         },
     ]
 }

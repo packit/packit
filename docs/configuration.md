@@ -47,6 +47,11 @@ synced_files:
   # dest means all md files are copied into the downstream docs directory.
   - src: *.md
     dest: docs/
+  # you can specify multiple source files as well:
+  - src:
+    - doc1.md
+    - doc2.md
+    dest: docs/
 # packit was already taken on PyPI
 upstream_project_name: packitos
 downstream_package_name: packit
