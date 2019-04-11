@@ -26,6 +26,8 @@ You should place the file in the root of your upstream repo. Packit accepts thes
  `create_tarball_command`  | list of strings | a command which generates upstream tarball in the root of the upstream directory (defaults to `git archive -o "{package_name}-{version}.tar.gz" --prefix "{package_name}-{version}/" HEAD`)
  `current_version_command` | list of strings | a command which prints current upstream version (hint: `git describe`) (defaults to `git describe --tags --match '*.*'`)
  `actions`                 | string:string   | custom actions/hooks overwriting the default behavior of the workflow (more in [Actions](./actions.md))
+ `jobs`                    | list of dicts   | A list of job definitions for packit service. See below for details
+
 
 ### Minimal sample config
 
@@ -52,6 +54,54 @@ upstream_project_name: packitos
 downstream_package_name: packit
 ```
 
+
+### Packit service jobs
+
+**Packit service is not live, we are working hard to deploy it by the end of April.**
+
+Once the service starts handling events of your repository, it needs to have a clear definition of what it should do.
+
+The tasks the packit service should do are defined in section `jobs`. This is a list of dicts.
+
+Every job has two mandatory keys:
+
+1. `job` - name of the job (you can imagine this as a CLI command)
+2. `trigger` - what is the trigger for the job?
+
+Every job only supports a specific set of triggers.
+
+Jobs can also accept additional configuration in a dict `metadata`.
+
+
+#### Supported jobs
+
+**propose\_downstream**
+
+Supported triggers: **release**.
+
+Additional configuration:
+* `dist_git_branch`: name of the dist-git branch where the PR should be opened.
+
+
+**Example**
+
+```yaml
+jobs:
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist_git_branch: master
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist_git_branch: f30
+```
+
+With this configuration, packit service would react to new upstream releases
+and created a dist-git pull requests for master and f30 branches with the
+content of the upstream release.
+
+
 ### Real examples
 
 The list of projects which already have packit config in their upstream repositories:
@@ -66,8 +116,8 @@ The list of projects which already have packit config in their upstream reposito
 
 ### In-progress work
 
-You may see packit configs with much more values, such as jobs and checks
-keys. Packit is not using those values right now.
+You may see packit configs with more values: support for checks is work in progress.
+Packit is not using those values right now.
 
 
 ## User configuration file
