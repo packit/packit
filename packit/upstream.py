@@ -286,19 +286,20 @@ class Upstream(PackitRepositoryBase):
             patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
 
             logger.debug(f"PATCH: {patch_name}\n{patch_msg}")
+            git_diff_cmd = [
+                "git",
+                "diff",
+                "--patch",
+                parent.hexsha,
+                commit.hexsha,
+                "--",
+                ".",
+            ] + [
+                f'":(exclude){sync_file.src}"'
+                for sync_file in self.package_config.synced_files.raw_files_to_sync
+            ]
             diff = run_command(
-                cmd=[
-                    "git",
-                    "diff",
-                    "--patch",
-                    parent.hexsha,
-                    commit.hexsha,
-                    "--",
-                    ".",
-                    '":(exclude)redhat"',
-                ],
-                cwd=self.local_project.working_dir,
-                output=True,
+                cmd=git_diff_cmd, cwd=self.local_project.working_dir, output=True
             )
 
             with open(patch_path, mode="w") as patch_file:
