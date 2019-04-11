@@ -25,8 +25,8 @@ from io import StringIO
 
 from flask import Flask, request, jsonify
 
-from packit.bot_api import PackitBotAPI
 from packit.config import Config
+from packit.jobs import SteveJobs
 from packit.utils import set_logging
 
 
@@ -73,10 +73,11 @@ def github_release():
         f"{msg['repository']['owner']['login']}/{msg['repository']['name']}"
         f" - {msg['release']['tag_name']}"
     )
-    config = Config()
-    api = PackitBotAPI(config)
-    # Using fedmsg since the fields are the same
-    api.sync_upstream_release_with_fedmsg({"msg": msg})
+
+    config = Config.get_user_config()
+
+    steve = SteveJobs(config)
+    steve.process_message(msg)
 
     logger.removeHandler(logHandler)
     buffer.flush()

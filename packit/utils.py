@@ -26,7 +26,7 @@ import shlex
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Any
 
 import git
 
@@ -149,18 +149,6 @@ def commits_to_nice_str(commits):
     )
 
 
-def exclude_from_dict(raw_dict: dict, *args: str):
-    result = []
-    for arg in args:
-        if arg in raw_dict:
-            result.append(raw_dict[arg])
-            del raw_dict[arg]
-        else:
-            result.append(None)
-    result.append(raw_dict)
-    return result
-
-
 def is_git_repo(directory: str) -> bool:
     """
     Test, if the directory is a git repo.
@@ -212,3 +200,23 @@ def assert_existence(obj):
     """
     if obj is None:
         raise PackitException("Object needs to have a value.")
+
+
+def nested_get(d: dict, *keys, default=None) -> Any:
+    """
+    recursively obtain value from nested dict
+
+    :param d: dict
+    :param keys: path within the structure
+    :param default: a value to return by default
+
+    :return: value or None
+    """
+    response = d
+    for k in keys:
+        try:
+            response = response[k]
+        except (KeyError, AttributeError, TypeError) as ex:
+            logger.debug("can't obtain %s: %s", k, ex)
+            return default
+    return response
