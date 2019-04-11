@@ -67,6 +67,12 @@ logger = logging.getLogger(__file__)
         "If this is not specified, default to origin."
     ),
 )
+@click.option(
+    "--upstream",
+    default=None,
+    help="Git ref that points to the state of the upstream."
+    "(It is used for sourcegit repositories for patching.)",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
@@ -82,6 +88,7 @@ def update(
     force_new_sources,
     local_content,
     path_or_url,
+    upstream_ref,
     version,
     remote,  # click introspects this in LocalProjectParameter
 ):
@@ -102,4 +109,5 @@ def update(
         use_local_content=local_content,
         version=version,
         force_new_sources=force_new_sources,
+        upstream_ref=upstream_ref,
     )
