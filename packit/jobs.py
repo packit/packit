@@ -140,10 +140,6 @@ class JobHandler:
         raise NotImplementedError("This should have been implemented.")
 
 
-class KojiBuildHandler(JobHandler):
-    topic = ""
-
-
 @add_to_mapping
 class GithubReleaseHandler(JobHandler):
     name = JobType.propose_downstream
