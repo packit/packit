@@ -208,7 +208,7 @@ class JobConfig(BaseConfig):
     def __repr__(self):
         return (
             f"JobConfig(job={self.job}, notify={self.notify},"
-            f" trigger={self.trigger}, m={self.metadata})"
+            f" trigger={self.trigger}, meta={self.metadata})"
         )
 
     @classmethod
