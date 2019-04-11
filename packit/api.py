@@ -377,8 +377,8 @@ class PackitAPI:
         status.get_dg_versions()
         status.get_up_releases()
         builds = status.get_builds()
-        logger.info("\nLatest builds:")
         if builds:
+            logger.info("\nLatest builds:")
             for build in builds:
                 koji_builds_str = "\n".join(f" - {b}" for b in builds[build])
                 logger.info(f"{build}:\n{koji_builds_str}")
