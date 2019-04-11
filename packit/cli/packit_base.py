@@ -39,7 +39,7 @@ logger = logging.getLogger("packit")
 
 
 @click.group("packit", context_settings=get_context_settings())
-@click.option("-d", "--debug", is_flag=True)
+@click.option("-d", "--debug", is_flag=True, help="Enable debug logs.")
 @click.option("--fas-user", help="Fedora Account System username.")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.pass_context
