@@ -11,7 +11,7 @@ from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
 from packit.config import get_packit_config_from_repo
 from packit.local_project import LocalProject
-from packit.utils import graceful_get
+from packit.utils import nested_get
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 JOB_NAME_HANDLER_MAPPING: Dict[JobType, Type["JobHandler"]] = {}
 
 
-def job_handler(kls: Type["JobHandler"]):
+def add_to_mapping(kls: Type["JobHandler"]):
     JOB_NAME_HANDLER_MAPPING[kls.name] = kls
     return kls
 
@@ -43,18 +43,18 @@ class SteveJobs:
         self, event: dict
     ) -> Optional[Tuple[JobTriggerType, PackageConfig, GitProject]]:
         """ look into the provided event and see if it's one for a published github release """
-        action = graceful_get(event, "action")
+        action = nested_get(event, "action")
         logger.debug(f"action = {action}")
-        release = graceful_get(event, "release")
+        release = nested_get(event, "release")
         if action == "published" and release:
-            repo_namespace = graceful_get(event, "repository", "owner", "login")
-            repo_name = graceful_get(event, "repository", "name")
+            repo_namespace = nested_get(event, "repository", "owner", "login")
+            repo_name = nested_get(event, "repository", "name")
             if not (repo_namespace and repo_name):
                 logger.warning(
                     "We could not figure out the full name of the repository."
                 )
                 return None
-            release_ref = graceful_get(event, "release", "tag_name")
+            release_ref = nested_get(event, "release", "tag_name")
             if not release_ref:
                 logger.warning("Release tag name is not set.")
                 return None
@@ -144,7 +144,7 @@ class KojiBuildHandler(JobHandler):
     topic = ""
 
 
-@job_handler
+@add_to_mapping
 class GithubReleaseHandler(JobHandler):
     name = JobType.propose_downstream
     triggers = [JobTriggerType.release]

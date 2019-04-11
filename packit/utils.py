@@ -202,7 +202,7 @@ def assert_existence(obj):
         raise PackitException("Object needs to have a value.")
 
 
-def graceful_get(d: dict, *keys, default=None) -> Any:
+def nested_get(d: dict, *keys, default=None) -> Any:
     """
     recursively obtain value from nested dict
 
