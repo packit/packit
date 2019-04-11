@@ -23,26 +23,54 @@
 import json
 import logging
 import os
-from enum import IntEnum
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional, List, NamedTuple, Dict, Union
+from pprint import pformat
+from typing import Optional, List, NamedTuple, Dict
+from typing import Union
 
 import click
-import jsonschema
-from jsonschema import Draft4Validator
+from jsonschema import Draft4Validator, ValidationError
+from ogr.abstract import GitProject
 from yaml import safe_load
 
-from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES
-from packit.exceptions import PackitConfigException, PackitException
-from packit.utils import exclude_from_dict
+from packit.exceptions import (
+    PackitConfigException,
+    PackitException,
+    PackitInvalidConfigException,
+)
+from packit.schema import (
+    USER_CONFIG_SCHEMA,
+    JOB_CONFIG_SCHEMA,
+    PACKAGE_CONFIG_SCHEMA,
+    SYNCED_FILES_SCHEMA,
+)
 
 logger = logging.getLogger(__name__)
 
 
-class Config:
+class BaseConfig:
+    """ common ancestor for all the config classes, the boring stuff """
+
+    SCHEMA: dict
+
+    @classmethod
+    def validate(cls, raw_dict: dict) -> None:
+        try:
+            Draft4Validator(cls.SCHEMA).validate(raw_dict)
+        except ValidationError as ex:
+            logger.debug(f"{pformat(raw_dict)}")
+            raise PackitInvalidConfigException(
+                f"Provided configuration is not valid: {ex}."
+            )
+
+
+class Config(BaseConfig):
+    SCHEMA = USER_CONFIG_SCHEMA
+
     def __init__(self):
         self.debug: bool = False
         self.fas_user: Optional[str] = None
@@ -81,8 +109,8 @@ class Config:
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "Config":
-        if validate and not Config.is_dict_valid(raw_dict):
-            raise Exception(f"User config not valid.")
+        if validate:
+            cls.validate(raw_dict)
 
         config = Config()
 
@@ -99,10 +127,6 @@ class Config:
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
 
         return config
-
-    @classmethod
-    def is_dict_valid(cls, raw_dict: dict) -> bool:
-        return Draft4Validator(USER_CONFIG_SCHEMA).is_valid(raw_dict)
 
     @property
     def github_token(self) -> str:
@@ -146,32 +170,68 @@ def get_context_settings() -> dict:
     )
 
 
-class TriggerType(IntEnum):
-    release = 1
-    pull_request = 2
-    git_tag = 3
+class JobType(Enum):
+    """ Type of the job to execute: pick the correct handler """
+
+    propose_downstream = "propose_downstream"
+    build = "build"
 
 
-class JobConfig(NamedTuple):
-    trigger: TriggerType
-    release_to: List[str]
-    metadata: dict
+class JobTriggerType(Enum):
+    release = "release"
+    pull_request = "pull_request"
+
+
+class JobNotifyType(Enum):
+    pull_request_status = "pull_request_status"
+
+    @classmethod
+    def from_list(cls, li: List[str]) -> List["JobNotifyType"]:
+        return [cls[i] for i in li]
+
+
+class JobConfig(BaseConfig):
+    SCHEMA = JOB_CONFIG_SCHEMA
+
+    def __init__(
+        self,
+        job: JobType,
+        notify: List[JobNotifyType],
+        trigger: JobTriggerType,
+        metadata: dict,
+    ):
+        self.job = job
+        self.notify = notify
+        self.trigger = trigger
+        self.metadata = metadata
+
+    def __repr__(self):
+        return (
+            f"JobConfig(job={self.job}, notify={self.notify},"
+            f" trigger={self.trigger}, meta={self.metadata})"
+        )
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "JobConfig":
-        if validate and not JobConfig.is_dict_valid(raw_dict):
-            raise Exception(f"Job config not valid.")
+        if validate:
+            cls.validate(raw_dict)
 
-        trigger_raw, release_to, metadata = exclude_from_dict(
-            raw_dict, "trigger", "release_to"
-        )
         return JobConfig(
-            trigger=TriggerType[trigger_raw], release_to=release_to, metadata=metadata
+            job=JobType[raw_dict["job"]],
+            trigger=JobTriggerType[raw_dict["trigger"]],
+            notify=JobNotifyType.from_list(raw_dict.get("notify", [])),
+            metadata=raw_dict.get("metadata", {}),
         )
 
-    @classmethod
-    def is_dict_valid(cls, raw_dict: dict) -> bool:
-        return Draft4Validator(JOB_CONFIG_SCHEMA).is_valid(raw_dict)
+    def __eq__(self, other: object):
+        if not isinstance(other, JobConfig):
+            raise PackitConfigException("Provided object is not a JobConfig instance.")
+        return (
+            self.job == other.job
+            and self.notify == other.notify
+            and self.trigger == other.trigger
+            and self.metadata == other.metadata
+        )
 
 
 class SyncFilesItem(NamedTuple):
@@ -183,7 +243,9 @@ class SyncFilesItem(NamedTuple):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SyncFilesItem):
-            raise NotImplementedError()
+            raise PackitConfigException(
+                "Provided object is not a SyncFilesItem instance."
+            )
 
         return self.src == other.src and self.dest == other.dest
 
@@ -193,7 +255,9 @@ class RawSyncFilesItem(SyncFilesItem):
     dest: str
 
 
-class SyncFilesConfig:
+class SyncFilesConfig(BaseConfig):
+    SCHEMA = SYNCED_FILES_SCHEMA
+
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync = files_to_sync
 
@@ -202,8 +266,8 @@ class SyncFilesConfig:
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":
-        if validate and not SyncFilesConfig.is_dict_valid(raw_dict):
-            raise Exception(f"Sync files config not valid.")
+        if validate:
+            cls.validate(raw_dict)
 
         files_to_sync = []
         if isinstance(raw_dict, list):
@@ -217,10 +281,6 @@ class SyncFilesConfig:
                 files_to_sync.append(SyncFilesItem(src=f["src"], dest=f["dest"]))
 
         return SyncFilesConfig(files_to_sync=files_to_sync)
-
-    @classmethod
-    def is_dict_valid(cls, raw_dict: dict) -> bool:
-        return Draft4Validator(SYNCED_FILES_SCHEMA).is_valid(raw_dict)
 
     def __eq__(self, other: object):
         if not isinstance(other, SyncFilesConfig):
@@ -237,11 +297,13 @@ class SyncFilesConfig:
         return False
 
 
-class PackageConfig:
+class PackageConfig(BaseConfig):
     """
     Config class for upstream/downstream packages;
     this is the config people put in their repos
     """
+
+    SCHEMA = PACKAGE_CONFIG_SCHEMA
 
     def __init__(
         self,
@@ -318,7 +380,7 @@ class PackageConfig:
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "PackageConfig":
         if validate:
-            PackageConfig.validate_dict(raw_dict)
+            cls.validate(raw_dict)
 
         synced_files = raw_dict.get("synced_files", None)
         actions = raw_dict.get("actions", {})
@@ -384,10 +446,6 @@ class PackageConfig:
             # prio: new > old
             r = old
         return r
-
-    @classmethod
-    def validate_dict(cls, raw_dict: dict) -> None:
-        jsonschema.validate(raw_dict, PACKAGE_CONFIG_SCHEMA)
 
 
 def get_local_package_config(
@@ -467,67 +525,3 @@ def parse_loaded_config(loaded_config: dict) -> PackageConfig:
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
         raise Exception(f"Cannot parse package config: {ex}.")
-
-
-JOB_CONFIG_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "trigger": {"enum": ["release", "pull_request", "git_tag"]},
-        "release_to": {"type": "array", "items": {"type": "string"}},
-    },
-    "required": ["trigger", "release_to"],
-}
-
-SYNCED_FILES_SCHEMA = {
-    "anyOf": [
-        {"type": "string"},
-        {
-            "type": "object",
-            "properties": {
-                "src": {
-                    "anyOf": [
-                        {"type": "string"},
-                        {"type": "array", "items": {"type": "string"}},
-                    ]
-                },
-                "dest": {"type": "string"},
-            },
-        },
-    ]
-}
-
-PACKAGE_CONFIG_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "specfile_path": {"type": "string"},
-        "downstream_package_name": {"type": "string"},
-        "upstream_project_name": {"type": "string"},
-        "create_tarball_command": {"type": "array", "items": {"type": "string"}},
-        "current_version_command": {"type": "array", "items": {"type": "string"}},
-        "synced_files": {"type": "array", "items": SYNCED_FILES_SCHEMA},
-        "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
-        "actions": {
-            "type": "object",
-            "properties": {
-                a: {"type": "string"} for a in ActionName.get_possible_values()
-            },
-            "additionalProperties": False,
-        },
-    },
-    "required": ["specfile_path"],
-}
-
-USER_CONFIG_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "debug": {"type": "boolean"},
-        "fas_user": {"type": "string"},
-        "keytab_path": {"type": "string"},
-        "github_token": {"type": "string"},
-        "pagure_user_token": {"type": "string"},
-        "pagure_fork_token": {"type": "string"},
-        "github_app_installation_id": {"type": "string"},
-        "github_app_id": {"type": "string"},
-        "github_app_cert_path": {"type": "string"},
-    },
-}

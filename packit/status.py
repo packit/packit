@@ -125,16 +125,10 @@ class Status:
         for branch in branches:
             koji_tag = f"{branch}-updates-candidate"
             try:
-                koji_builds = [builds_d[koji_tag]]
                 # take last three builds
-                koji_builds = (
-                    koji_builds[:number_of_builds]
-                    if len(koji_builds) > number_of_builds
-                    else koji_builds
-                )
-                builds[branch] = koji_builds
+                builds[branch] = builds_d[koji_tag][:number_of_builds]
             except KeyError:
-                pass
+                logger.info(f"There are no builds for branch {branch}")
         return builds
 
     def get_updates(self, number_of_updates: int = 3) -> List:

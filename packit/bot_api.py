@@ -32,11 +32,11 @@ from typing import Dict, Optional
 
 from ogr.services.github import GithubService
 from ogr.services.pagure import PagureService
-from packit.local_project import LocalProject
 
 from packit.api import PackitAPI
 from packit.config import Config, PackageConfig, get_packit_config_from_repo
 from packit.fed_mes_consume import Consumerino
+from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
 
@@ -202,3 +202,15 @@ class PackitBotAPI:
         sg = SourceGitCheckHelper(config=self.config, package_config=package_config)
         sg.process_new_dg_flag(None)
         """
+
+    # TODO: use Steve for fedmsg as well
+    # def process_message(self, topic, msg):
+    #     steve = SteveJobs()
+    #     if not steve.do_we_process_this_fedmsg(topic, fedmsg_d=msg):
+    #         # do not log here, that would be a colossal spam
+    #         return
+    #     steve.process_message(msg)
+
+    # def listen_to_fedmsg(self):
+    #     for topic, msg in self.consumerino._yield_messages():
+    #         self.process_message(topic, msg)
