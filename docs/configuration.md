@@ -79,7 +79,7 @@ Jobs can also accept additional configuration in a dict `metadata`.
 
 Supported triggers: **release**.
 
-Additional configuration:
+Additional configuration set in the `metadata` section:
 * `dist_git_branch`: name of the dist-git branch where the PR should be opened.
 
 
@@ -98,7 +98,7 @@ jobs:
 ```
 
 With this configuration, packit service would react to new upstream releases
-and created a dist-git pull requests for master and f30 branches with the
+and create dist-git pull requests for master and f30 branches with the
 content of the upstream release.
 
 
