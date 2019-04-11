@@ -41,6 +41,8 @@
       - fedpkg
       - python3-flask
       - nss_wrapper
+      - httpd
+      - mod_wsgi
       state: present
 
   - user:
