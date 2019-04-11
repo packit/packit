@@ -22,8 +22,6 @@
 import pytest
 
 from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
-
-from packit.sync import get_wildcard_resolved_sync_files
 from tests.spellbook import TESTS_DIR
 from tests.utils import cwd
 
@@ -92,7 +90,7 @@ from tests.utils import cwd
         ),
     ],
 )
-def test_sync_files(packit_files, expected):
+def test_raw_files_to_sync(packit_files, expected):
     with cwd(TESTS_DIR):
         pc = PackageConfig(
             dist_git_base_url="https://packit.dev/",
@@ -101,5 +99,4 @@ def test_sync_files(packit_files, expected):
             specfile_path="fedora/package.spec",
             synced_files=packit_files,
         )
-        synced_files = get_wildcard_resolved_sync_files(pc)
-        assert set(synced_files) == set(expected)
+        assert set(pc.synced_files.raw_files_to_sync) == set(expected)

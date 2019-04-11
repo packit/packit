@@ -30,20 +30,27 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from ogr.abstract import PullRequest, PRStatus
-from ogr.services.github import GithubService, GithubProject
-from ogr.services.pagure import PagureProject, PagureService
-from ogr.services.our_pagure import OurPagure
 from rebasehelper.specfile import SpecFile
 
+from ogr.abstract import PullRequest, PRStatus
+from ogr.services.github import GithubService, GithubProject
+from ogr.services.our_pagure import OurPagure
+from ogr.services.pagure import PagureProject, PagureService
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
-from tests.spellbook import prepare_dist_git_repo, get_test_config
-from .spellbook import TARBALL_NAME, UPSTREAM, git_add_n_commit, DISTGIT
+from tests.spellbook import (
+    prepare_dist_git_repo,
+    get_test_config,
+    SOURCEGIT_UPSTREAM,
+    SOURCEGIT_SOURCEGIT,
+    git_add_and_commit,
+)
+from tests.utils import cwd
+from .spellbook import TARBALL_NAME, UPSTREAM, initiate_git_repo, DISTGIT
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
@@ -76,9 +83,18 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
 
 
 @pytest.fixture()
-def mock_upstream_remote_functionality(upstream_n_distgit):
+def mock_remote_functionality_upstream(upstream_n_distgit):
     u, d = upstream_n_distgit
+    return mock_remote_functionality(d, u)
 
+
+@pytest.fixture()
+def mock_remote_functionality_sourcegit(sourcegit_n_distgit):
+    u, d = sourcegit_n_distgit
+    return mock_remote_functionality(d, u)
+
+
+def mock_remote_functionality(distgit, upstream):
     def mocked_pr_create(*args, **kwargs):
         return PullRequest(
             title="",
@@ -100,7 +116,6 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
             "also-not", github_service, "set", github_repo=flexmock()
         ),
     )
-
     flexmock(
         PagureProject,
         get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
@@ -108,13 +123,11 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
         get_fork=lambda: PagureProject("", "", PagureService()),
         pr_create=mocked_pr_create,
     )
-
     flexmock(
         OurPagure,
         get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
         get_fork=lambda: PagureProject("", "", flexmock()),
     )
-
     flexmock(
         GithubProject,
         get_git_urls=lambda: {"git": UPSTREAM_PROJECT_URL},
@@ -123,14 +136,15 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
 
     def mock_download_remote_sources():
         """ mock download of the remote archive and place it into dist-git repo """
-        tarball_path = d / TARBALL_NAME
+        tarball_path = distgit / TARBALL_NAME
         hops_filename = "hops"
-        hops_path = d / hops_filename
+        hops_path = distgit / hops_filename
         hops_path.write_text("Cascade\n")
-        subprocess.check_call(["tar", "-cf", str(tarball_path), hops_filename], cwd=d)
+        subprocess.check_call(
+            ["tar", "-cf", str(tarball_path), hops_filename], cwd=distgit
+        )
 
     flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
-
     flexmock(
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,
@@ -144,15 +158,20 @@ def mock_upstream_remote_functionality(upstream_n_distgit):
             raise RuntimeError("archive does not exist")
 
     flexmock(FedPKG, init_ticket=lambda x=None: None, new_sources=mocked_new_sources)
-
-    pc = get_local_package_config(str(u))
-    pc.downstream_project_url = str(d)
-    pc.upstream_project_url = str(u)
+    pc = get_local_package_config(str(upstream))
+    pc.downstream_project_url = str(distgit)
+    pc.upstream_project_url = str(upstream)
     # https://stackoverflow.com/questions/45580215/using-flexmock-on-python-modules
     flexmock(sys.modules["packit.bot_api"]).should_receive(
         "get_packit_config_from_repo"
     ).and_return(pc)
-    return u, d
+    return upstream, distgit
+
+
+@pytest.fixture()
+def mock_patching():
+    flexmock(Upstream).should_receive("create_patches").and_return(["patches"])
+    flexmock(DistGit).should_receive("add_patches_to_specfile").with_args(["patches"])
 
 
 @pytest.fixture()
@@ -165,14 +184,38 @@ def upstream_n_distgit(tmpdir):
 
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
-    git_add_n_commit(u, tag="0.1.0")
+    initiate_git_repo(u, tag="0.1.0")
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
-    git_add_n_commit(d, push=True, upstream_remote=str(u_remote))
+    initiate_git_repo(d, push=True, upstream_remote=str(u_remote))
     prepare_dist_git_repo(d)
 
     return u, d
+
+
+@pytest.fixture()
+def sourcegit_n_distgit(tmpdir):
+    temp_dir = Path(str(tmpdir))
+
+    sourcegit_remote = temp_dir / "source_git_remote"
+    sourcegit_remote.mkdir()
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=sourcegit_remote)
+
+    sourcegit_dir = temp_dir / "source_git"
+    shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
+    initiate_git_repo(sourcegit_dir, tag="0.1.0")
+    subprocess.check_call(
+        ["cp", "-R", SOURCEGIT_SOURCEGIT, temp_dir], cwd=sourcegit_remote
+    )
+    git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
+
+    distgit_dir = temp_dir / "dist_git"
+    shutil.copytree(DISTGIT, distgit_dir)
+    initiate_git_repo(distgit_dir, push=True, upstream_remote=str(sourcegit_remote))
+    prepare_dist_git_repo(distgit_dir)
+
+    return sourcegit_dir, distgit_dir
 
 
 @pytest.fixture()
@@ -185,11 +228,11 @@ def downstream_n_distgit(tmpdir):
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
-    git_add_n_commit(d, tag="0.0.0")
+    initiate_git_repo(d, tag="0.0.0")
 
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
-    git_add_n_commit(u, push=False, upstream_remote=str(d_remote))
+    initiate_git_repo(u, push=False, upstream_remote=str(d_remote))
 
     return u, d
 
@@ -215,7 +258,7 @@ def upstream_instance(upstream_n_distgit):
 
 
 @pytest.fixture()
-def distgit_instance(upstream_n_distgit, mock_upstream_remote_functionality):
+def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
     u, d = upstream_n_distgit
     c = get_test_config()
     pc = get_local_package_config(str(u))
@@ -242,3 +285,16 @@ def api_instance(upstream_n_distgit):
     api = PackitAPI(c, pc, up_lp)
     yield u, d, api
     chdir(old_cwd)
+
+
+@pytest.fixture()
+def api_instance_source_git(sourcegit_n_distgit):
+    sourcegit, distgit = sourcegit_n_distgit
+    with cwd(sourcegit):
+        c = get_test_config()
+        pc = get_local_package_config(str(sourcegit))
+        pc.upstream_project_url = str(sourcegit)
+        pc.downstream_project_url = str(distgit)
+        up_lp = LocalProject(path_or_url=str(sourcegit))
+        api = PackitAPI(c, pc, up_lp)
+        return api
