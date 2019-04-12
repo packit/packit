@@ -48,9 +48,12 @@ from tests.spellbook import (
     SOURCEGIT_UPSTREAM,
     SOURCEGIT_SOURCEGIT,
     git_add_and_commit,
+    TARBALL_NAME,
+    UPSTREAM,
+    initiate_git_repo,
+    DISTGIT,
 )
 from tests.utils import cwd
-from .spellbook import TARBALL_NAME, UPSTREAM, initiate_git_repo, DISTGIT
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
