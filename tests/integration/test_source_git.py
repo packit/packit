@@ -98,16 +98,13 @@ def test_basic_local_update_patch_content(
 
     # direct diff in the synced file
     assert (
-        "diff --git a/.packit.json b/.packit.json\n"
-        "new file mode 100644\n"
-        "index 0000000..efa8e00\n"
-        "--- /dev/null\n"
-        "+++ b/.packit.json" in git_diff
+        "diff --git a/.packit.yaml b/.packit.yaml\n" "new file mode 100644" in git_diff
     )
+    assert "--- /dev/null\n" "+++ b/.packit.yaml" in git_diff
 
     # diff of the synced file should not be in the patch
     assert (
-        "+diff --git a/.packit.json b/.packit.json\n"
+        "+diff --git a/.packit.yaml b/.packit.yaml\n"
         "+new file mode 100644\n" not in git_diff
     )
 
