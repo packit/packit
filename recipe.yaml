@@ -20,6 +20,7 @@
       working_container:
         volumes:
         - '{{ playbook_dir }}:/src:Z'
+
   tasks:
   - name: Install all packages needed to hack on packit.
     dnf:
@@ -54,10 +55,23 @@
       path: /home
       mode: 0777
       recurse: yes
+
   - copy:
       src: ./files/passwd
       dest: '{{ home_path }}/passwd'
       mode: 0777
+
+  - name: Create /usr/share/packit directory
+    file:
+      state: directory
+      path: /usr/share/packit
+  - name: Copy packit.wsgi file
+    copy:
+      src: files/packit.wsgi
+      dest: /usr/share/packit/packit.wsgi
+      owner: apache
+      group: apache
+      mode: 0644
 
   - name: Install latest twine for sake of check command
     pip:
