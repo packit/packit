@@ -239,7 +239,7 @@ class SyncFilesConfig(BaseConfig):
 
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync = files_to_sync
-        self._raw_files_to_sync: List[RawSyncFilesItem] = None
+        self._raw_files_to_sync: Optional[List[RawSyncFilesItem]] = None
 
     def __repr__(self):
         return f"SyncFilesConfig({self.files_to_sync!r})"
