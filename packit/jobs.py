@@ -65,7 +65,41 @@ class SteveJobs:
                 repo=repo_name, namespace=repo_namespace, service=self.github_service
             )
             package_config = get_packit_config_from_repo(gh_proj, release_ref)
+            https_url = event["repository"]["html_url"]
+            package_config.upstream_project_url = https_url
             return JobTriggerType.release, package_config, gh_proj
+        return None
+
+    def get_package_config_from_github_pr(
+        self, event: dict
+    ) -> Optional[Tuple[JobTriggerType, PackageConfig, GitProject]]:
+        """ look into the provided event and see if it's one for a published github release """
+        action = nested_get(event, "action")
+        logger.debug(f"action = {action}")
+        pr_id = nested_get(event, "number")
+        if action in ["opened", "reopened", "synchronize"] and pr_id:
+            repo_namespace = nested_get(
+                event, "pull_request", "head", "repo", "owner", "login"
+            )
+            repo_name = nested_get(event, "pull_request", "head", "repo", "name")
+            if not (repo_namespace and repo_name):
+                logger.warning(
+                    "We could not figure out the full name of the repository."
+                )
+                return None
+            ref = nested_get(event, "pull_request", "head", "ref")
+            if not ref:
+                logger.warning("Ref where the PR is coming from is not set.")
+                return None
+            target_repo = nested_get(event, "repository", "full_name")
+            logger.info(f"GitHub pull request {pr_id} event for repo {target_repo}.")
+            gh_proj = GithubProject(
+                repo=repo_name, namespace=repo_namespace, service=self.github_service
+            )
+            package_config = get_packit_config_from_repo(gh_proj, ref)
+            https_url = event["repository"]["html_url"]
+            package_config.upstream_project_url = https_url
+            return JobTriggerType.pull_request, package_config, gh_proj
         return None
 
     def parse_event(
@@ -117,7 +151,7 @@ class SteveJobs:
 
 
 class JobHandler:
-    """ generic interface to handle different type of inputs """
+    """ Generic interface to handle different type of inputs """
 
     name: JobType
     triggers: List[JobTriggerType]
@@ -140,6 +174,45 @@ class JobHandler:
         raise NotImplementedError("This should have been implemented.")
 
 
+class FedmsgHandler(JobHandler):
+    """ Handlers for events from fedmsg """
+
+    topic: str
+
+
+# class NewDistGitPRFlag(FedmsgHandler):
+#     """ A new flag was added to a dist-git pull request """
+#     topic = "org.fedoraproject.prod.pagure.pull-request.flag.added"
+#     name = "?"
+#
+#     def run(self):
+#         repo_name = self.event["msg"]["pull_request"]["project"]["name"]
+#         namespace = self.event["msg"]["pull_request"]["project"]["namespace"]
+#         pr_id = self.event["msg"]["pull_request"]["id"]
+#
+#         pull_request = pagure_repo.get_pr_info(pr_id=pr_id)
+
+
+@add_to_mapping
+class GithubPullRequestHandler(JobHandler):
+    name = JobType.check_downstream
+    triggers = [JobTriggerType.pull_request]
+    # https://developer.github.com/v3/activity/events/types/#events-api-payload-28
+
+    def run(self):
+        pr_id = self.event["pull_request"]["number"]
+
+        local_project = LocalProject(git_project=self.project)
+
+        api = PackitAPI(self.config, self.package_config, local_project)
+
+        api.sync_pr(
+            pr_id=pr_id,
+            dist_git_branch=self.job.metadata.get("dist-git-branch", "master"),
+            # TODO: figure out top upstream commit for source-git here
+        )
+
+
 @add_to_mapping
 class GithubReleaseHandler(JobHandler):
     name = JobType.propose_downstream
@@ -150,11 +223,8 @@ class GithubReleaseHandler(JobHandler):
         Sync the upstream release to dist-git as a pull request.
         """
         version = self.event["release"]["tag_name"]
-        https_url = self.event["repository"]["html_url"]
 
         local_project = LocalProject(git_project=self.project)
-
-        self.package_config.upstream_project_url = https_url
 
         api = PackitAPI(self.config, self.package_config, local_project)
 
