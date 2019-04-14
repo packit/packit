@@ -5,12 +5,4 @@
   ],
   "upstream_project_name": "beerware",
   "downstream_package_name": "beer",
-  "checks": [
-    {
-      "name": "simple-koji-ci"
-    },
-    {
-      "name": "Fedora CI"
-    }
-  ]
 }

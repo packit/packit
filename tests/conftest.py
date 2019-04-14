@@ -24,18 +24,17 @@ import datetime
 import os
 import shutil
 import subprocess
-import sys
 from os import chdir
 from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from rebasehelper.specfile import SpecFile
-
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.our_pagure import OurPagure
 from ogr.services.pagure import PagureProject, PagureService
+from rebasehelper.specfile import SpecFile
+
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
@@ -78,10 +77,6 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
     pc = get_local_package_config(str(u))
     pc.downstream_project_url = str(d)
     pc.upstream_project_url = str(u)
-    # https://stackoverflow.com/questions/45580215/using-flexmock-on-python-modules
-    flexmock(sys.modules["packit.bot_api"]).should_receive(
-        "get_packit_config_from_repo"
-    ).and_return(pc)
     return u, d
 
 
@@ -164,10 +159,6 @@ def mock_remote_functionality(distgit, upstream):
     pc = get_local_package_config(str(upstream))
     pc.downstream_project_url = str(distgit)
     pc.upstream_project_url = str(upstream)
-    # https://stackoverflow.com/questions/45580215/using-flexmock-on-python-modules
-    flexmock(sys.modules["packit.bot_api"]).should_receive(
-        "get_packit_config_from_repo"
-    ).and_return(pc)
     return upstream, distgit
 
 

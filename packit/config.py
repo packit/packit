@@ -174,6 +174,7 @@ class JobType(Enum):
     """ Type of the job to execute: pick the correct handler """
 
     propose_downstream = "propose_downstream"
+    check_downstream = "check_downstream"
     build = "build"
 
 

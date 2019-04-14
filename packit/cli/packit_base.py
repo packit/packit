@@ -27,11 +27,11 @@ from pkg_resources import get_distribution
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
+from packit.cli.listen_to_fedmsg import listen_to_fedmsg
 from packit.cli.srpm import srpm
-from packit.cli.update import update
-from packit.cli.sync_from_downstream import sync_from_downstream
-from packit.cli.watch_upstream_release import watch_releases
 from packit.cli.status import status
+from packit.cli.sync_from_downstream import sync_from_downstream
+from packit.cli.update import update
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
 
@@ -64,18 +64,15 @@ def version():
     click.echo(get_distribution("packitos").version)
 
 
-# packit_base.add_command(sg2dg)
-# packit_base.add_command(sg2srpm)
-# packit_base.add_command(watcher)
 packit_base.add_command(version)
-# packit_base.add_command(watch_pr)
-packit_base.add_command(watch_releases)
 packit_base.add_command(update)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
 packit_base.add_command(create_update)
 packit_base.add_command(srpm)
 packit_base.add_command(status)
+packit_base.add_command(listen_to_fedmsg)
+
 
 if __name__ == "__main__":
     packit_base()
