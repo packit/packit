@@ -97,6 +97,9 @@ class Status:
         :param number_of_releases: int
         :return: List
         """
+        if not self.up.local_project.git_project:
+            logger.info("We couldn't track any upstream releases.")
+            return []
         latest_releases: List[Release] = []
         try:
             latest_releases = self.up.local_project.git_project.get_releases()
