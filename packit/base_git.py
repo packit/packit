@@ -275,3 +275,17 @@ class PackitRepositoryBase:
         )
         self._specfile = None  # reload the specfile object
         self.local_project.git_repo.index.write()
+
+    def get_project_url_from_distgit_spec(self) -> Optional[str]:
+        """
+        Parse spec file and return value of URL
+        """
+        # consider using rebase-helper for this: SpecFile.download_remote_sources
+        sections = self.specfile.spec_content.sections
+        package_section: List[str] = sections.get("%package", [])
+        for s in package_section:
+            if s.startswith("URL:"):
+                url = s[4:].strip()
+                logger.debug(f"Upstream project URL = {url}")
+                return url
+        return None
