@@ -73,7 +73,13 @@ class PackitRepositoryBase:
         """
         # it's not an error if the branch already exists
         origin = self.local_project.git_repo.remote("origin")
-        head = self.local_project.git_repo.create_head(branch_name, commit=base)
+        if branch_name in self.local_project.git_repo.branches:
+            logger.debug(
+                f"It seems that branch {branch_name} already exists, checking it out."
+            )
+            head = self.local_project.git_repo.branches[branch_name]
+        else:
+            head = self.local_project.git_repo.create_head(branch_name, commit=base)
 
         if setup_tracking:
             if branch_name in origin.refs:
