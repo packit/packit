@@ -295,7 +295,7 @@ class Upstream(PackitRepositoryBase):
                 "--",
                 ".",
             ] + [
-                f'":(exclude){sync_file.src}"'
+                f":(exclude){sync_file.src}"
                 for sync_file in self.package_config.synced_files.raw_files_to_sync
             ]
             diff = run_command(
