@@ -112,16 +112,15 @@ class Status:
 
         return latest_releases[:number_of_releases]
 
-    def get_builds(self, number_of_builds: int = 3) -> Dict:
+    def get_builds(self,) -> Dict:
         """
-        Get specific number of latest builds from koji
-        :param number_of_builds: int
-        :return: None
+        Get latest koji builds
         """
         # https://github.com/fedora-infra/bodhi/issues/3058
         from bodhi.client.bindings import BodhiClient
 
         b = BodhiClient()
+        # { koji-target: "latest-build-nvr"}
         builds_d = b.latest_builds(self.dg.package_name)
         branches = self.dg.local_project.git_project.get_branches()
         branches.remove("master")  # there is no master tag in koji
@@ -129,8 +128,7 @@ class Status:
         for branch in branches:
             koji_tag = f"{branch}-updates-candidate"
             try:
-                # take last three builds
-                builds[branch] = builds_d[koji_tag][:number_of_builds]
+                builds[branch] = builds_d[koji_tag]
             except KeyError:
                 logger.info(f"There are no builds for branch {branch}")
         return builds

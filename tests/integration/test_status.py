@@ -267,25 +267,24 @@ def test_get_updates(upstream_n_distgit, expected_status, number_of_updates):
     not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
 )
 @pytest.mark.parametrize(
-    "expected_results,br_list,number_of_builds",
+    "expected_results,br_list",
     (
-        ({"f30": ["colin-0.3.1-2.fc30"]}, ["f30", "master"], 1),
-        ({"f27": ["colin-0.2.0-1.fc27"]}, ["f27", "master"], 1),
-        ({"f28": ["colin-0.3.1-1.fc28"]}, ["f28", "master"], 1),
+        ({"f30": "colin-0.3.1-2.fc30"}, ["f30", "master"]),
+        ({"f27": "colin-0.2.0-1.fc27"}, ["f27", "master"]),
+        ({"f28": "colin-0.3.1-1.fc28"}, ["f28", "master"]),
         (
             {
-                "f27": ["colin-0.2.0-1.fc27"],
-                "f28": ["colin-0.3.1-1.fc28"],
-                "f29": ["colin-0.3.1-1.fc29"],
-                "f30": ["colin-0.3.1-2.fc30"],
+                "f27": "colin-0.2.0-1.fc27",
+                "f28": "colin-0.3.1-1.fc28",
+                "f29": "colin-0.3.1-1.fc29",
+                "f30": "colin-0.3.1-2.fc30",
             },
             ["f27", "f28", "f29", "f30", "master"],
-            4,
         ),
-        ({"f30": ["colin-0.3.1-2.fc30"]}, ["f30", "master"], 1),
+        ({"f30": "colin-0.3.1-2.fc30"}, ["f30", "master"]),
     ),
 )
-def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_builds):
+def test_get_builds(upstream_n_distgit, expected_results, br_list):
     u, d = upstream_n_distgit
     from bodhi.client.bindings import BodhiClient
 
@@ -294,7 +293,6 @@ def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_bui
     pc.downstream_project_url = str(d)
     pc.upstream_project_url = str(u)
     dg = DistGit(c, pc)
-    pc = get_local_package_config(str(u))
     flexmock(BodhiClient).should_receive("latest_builds").and_return(
         BODHI_LATEST_BUILDS
     )
@@ -307,9 +305,8 @@ def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_bui
         get_branches=br_list,
     )
     assert status
-    table = status.get_builds(number_of_builds)
+    table = status.get_builds()
     assert table
-    assert len(table.keys()) == number_of_builds
     assert table == expected_results
 
 
