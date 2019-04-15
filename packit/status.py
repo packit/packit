@@ -23,6 +23,8 @@
 import logging
 from typing import List, Tuple, Dict
 
+from ogr.abstract import Release
+
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -65,11 +67,12 @@ class Status:
             table = [(pr.id, pr.title, pr.url) for pr in pr_list]
         return table
 
-    def get_dg_versions(self) -> None:
+    def get_dg_versions(self) -> Dict:
         """
         Get versions from all branches in Dist-git
-        :return: None
+        :return: Dict {"branch": "version"}
         """
+        dg_versions = {}
         branches = self.dg.local_project.git_project.get_branches()
         for branch in branches:
             try:
@@ -81,32 +84,38 @@ class Status:
                 logger.debug(f"Branch {branch} is not present: {ex}")
                 continue
             try:
-                logger.info(f"{branch}: {self.dg.specfile.get_version()}")
+                dg_versions[branch] = self.dg.specfile.get_version()
             except PackitException:
                 logger.debug(f"Can't figure out the version of branch: {branch}")
         self.dg.checkout_branch("master")
 
-    def get_up_releases(self, number_of_releases: int = 5) -> None:
+        return dg_versions
+
+    def get_up_releases(self, number_of_releases: int = 5) -> List:
         """
         Get specific number of latest upstream releases
         :param number_of_releases: int
-        :return: None
+        :return: List
         """
-        latest_releases = self.up.local_project.git_project.get_releases()
-        if len(latest_releases) > 0:
-            logger.info("\nGitHub upstream releases:")
-            # take last five releases
-            latest_releases = (
-                latest_releases[:number_of_releases]
-                if len(latest_releases) > number_of_releases
-                else latest_releases
-            )
-            upstream_releases_str = "\n".join(
-                f"{release.tag_name}" for release in latest_releases
-            )
-            logger.info(upstream_releases_str)
+        latest_releases: List[Release] = []
+        try:
+            latest_releases = self.up.local_project.git_project.get_releases()
+
+            if latest_releases:
+                logger.debug("GitHub upstream releases fetched.")
+                # take last five releases
+                latest_releases = (
+                    latest_releases[:number_of_releases]
+                    if len(latest_releases) > number_of_releases
+                    else latest_releases
+                )
+                return latest_releases
+        except PackitException as e:
+            logger.debug("Failed to fetch upstream releases: %s", e)
         else:
-            logger.info("\nGitHub upstream releases: No releases found.")
+            logger.debug("GitHub upstream releases: No releases found.")
+
+        return latest_releases
 
     def get_builds(self, number_of_builds: int = 3) -> Dict:
         """

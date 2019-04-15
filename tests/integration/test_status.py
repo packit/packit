@@ -32,7 +32,7 @@ from tests.integration.bodhi_status_updates import BODHI_UPDATES
 from tests.integration.bodhi_latest_builds import BODHI_LATEST_BUILDS
 from packit.distgit import DistGit
 from ogr.services.pagure import PagureProject, PagureService
-from ogr.abstract import PullRequest, PRStatus
+from ogr.abstract import PullRequest, PRStatus, Release
 
 
 @pytest.mark.parametrize(
@@ -311,3 +311,93 @@ def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_bui
     assert table
     assert len(table.keys()) == number_of_builds
     assert table == expected_results
+
+
+@pytest.mark.parametrize(
+    "expected_releases,number_of_releases",
+    (
+        (
+            [
+                Release(
+                    "Release title1",
+                    "beer1",
+                    "0.0.1",
+                    "www.packit.dev",
+                    "23-5-2018",
+                    "www.packit.dev/tarball1",
+                ),
+                Release(
+                    "Release title2",
+                    "beer2",
+                    "0.0.2",
+                    "www.packit.dev",
+                    "23-6-2018",
+                    "www.packit.dev/tarball2",
+                ),
+                Release(
+                    "Release title3",
+                    "beer3",
+                    "0.0.3",
+                    "www.packit.dev",
+                    "23-7-2018",
+                    "www.packit.dev/tarball3",
+                ),
+            ],
+            3,
+        ),
+        (
+            [
+                Release(
+                    "Release title1",
+                    "beer1",
+                    "0.0.1",
+                    "www.packit.dev",
+                    "23-5-2018",
+                    "www.packit.dev/tarball1",
+                )
+            ],
+            1,
+        ),
+    ),
+)
+def test_get_releases(
+    upstream_instance, distgit_instance, expected_releases, number_of_releases
+):
+    u, up = upstream_instance
+    d, dg = distgit_instance
+    c = get_test_config()
+    pc = get_local_package_config(str(u))
+    up.local_project.git_project = flexmock()
+
+    flexmock(up.local_project.git_project).should_receive("get_releases").and_return(
+        expected_releases
+    )
+    status = Status(c, pc, up, dg)
+    releases = status.get_up_releases(number_of_releases)
+    assert len(releases) == number_of_releases
+    assert releases == expected_releases
+
+
+@pytest.mark.parametrize(
+    "expected_versions", ({"master": "0.0.2", "f29": "0.0.2", "f28": "0.0.2"},)
+)
+def test_get_dg_versions(upstream_n_distgit, expected_versions):
+    u, d = upstream_n_distgit
+
+    c = get_test_config()
+    pc = get_local_package_config(str(u))
+    pc.downstream_project_url = str(d)
+    pc.upstream_project_url = str(u)
+    dg = DistGit(c, pc)
+
+    flexmock(dg.local_project.git_project).should_receive("get_branches").and_return(
+        expected_versions.keys()
+    )
+    flexmock(dg.specfile).should_receive("get_version").and_return("0.0.2")
+    flexmock(dg).should_receive("checkout_branch").and_return(None)
+    flexmock(dg).should_receive("create_branch").and_return(None)
+
+    status = Status(c, pc, u, dg)
+    dg_versions = status.get_dg_versions()
+    assert dg_versions.keys() == expected_versions.keys()
+    assert dg_versions == expected_versions
