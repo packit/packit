@@ -65,5 +65,5 @@ from packit.sync import get_raw_files, SyncFilesItem, RawSyncFilesItem
 def test_get_raw_files(file, glob_files, result):
     flexmock(Path, glob=lambda x: glob_files)
 
-    files = get_raw_files(Path("."), Path("."), file, False)
+    files = get_raw_files(Path("."), Path("."), file)
     assert files == result

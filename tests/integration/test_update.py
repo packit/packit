@@ -19,9 +19,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 import pytest
 from flexmock import flexmock
+from github import Github
+from github.Repository import Repository
 from ogr.services.github import GithubProject
 
 from packit.api import PackitAPI
@@ -102,5 +103,6 @@ def test_single_message(github_release_webhook, mock_remote_functionality_upstre
     flexmock(GithubProject).should_receive("get_file_content").and_return(
         u.joinpath(".packit.json").read_text()
     )
+    flexmock(Github, get_repo=Repository(None, None, {}, None))
 
     steve.process_message(github_release_webhook)

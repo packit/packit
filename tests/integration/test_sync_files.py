@@ -97,6 +97,6 @@ def test_raw_files_to_sync(packit_files, expected):
             specfile_path="fedora/package.spec",
             synced_files=packit_files,
         )
-        assert set(
-            pc.synced_files.get_raw_files_to_sync(Path("."), Path("."), False)
-        ) == set(expected)
+        assert set(pc.synced_files.get_raw_files_to_sync(Path("."), Path("."))) == set(
+            expected
+        )
