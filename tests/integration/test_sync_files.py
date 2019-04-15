@@ -53,11 +53,7 @@ from tests.utils import cwd
             SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="data/sync_files/", dest="tests")]
             ),
-            [
-                SyncFilesItem(src="data/sync_files/a.md", dest="tests"),
-                SyncFilesItem(src="data/sync_files/b.md", dest="tests"),
-                SyncFilesItem(src="data/sync_files/c.txt", dest="tests"),
-            ],
+            [SyncFilesItem(src="data/sync_files/", dest="tests")],
         ),
         (
             SyncFilesConfig(
