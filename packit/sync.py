@@ -24,12 +24,30 @@ import glob
 import logging
 import os
 import shutil
-from typing import List
+from typing import List, NamedTuple, Union
 
-from packit.config import PackageConfig, SyncFilesItem, RawSyncFilesItem
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
+
+
+class SyncFilesItem(NamedTuple):
+    src: Union[str, List[str]]
+    dest: str
+
+    def __repr__(self):
+        return f"SyncFilesItem(src={self.src}, dest={self.dest})"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SyncFilesItem):
+            raise NotImplementedError()
+
+        return self.src == other.src and self.dest == other.dest
+
+
+class RawSyncFilesItem(SyncFilesItem):
+    src: str
+    dest: str
 
 
 def get_files_from_wildcard(
@@ -74,30 +92,12 @@ def get_raw_files(file_to_sync: SyncFilesItem) -> List[RawSyncFilesItem]:
     return files_to_sync
 
 
-def get_wildcard_resolved_sync_files(
-    package_config: PackageConfig
-) -> List[RawSyncFilesItem]:
-    """
-    Get PackageConfig and use get_raw_files to expand wildcards or lists
-    in src of the SyncFilesItem.
-
-    :param package_config: PackageConfig
-    :return: [RawSyncFilesItem]
-    """
-    logger.debug("Packit synced files %s", package_config.synced_files.files_to_sync)
-    files_to_sync: List[RawSyncFilesItem] = []
-    for sync in package_config.synced_files.files_to_sync:
-        files_to_sync += get_raw_files(file_to_sync=sync)
-
-    logger.debug(f"Resolved synced file {files_to_sync}")
-    return files_to_sync
-
-
-def sync_files(pc: PackageConfig, src_working_dir: str, dest_working_dir: str) -> None:
+def sync_files(
+    files_to_sync: List[RawSyncFilesItem], src_working_dir: str, dest_working_dir: str
+) -> None:
     """
     Sync required files from upstream to downstream.
     """
-    files_to_sync = get_wildcard_resolved_sync_files(pc)
     logger.debug(f"Copy synced files {files_to_sync}")
 
     for fi in files_to_sync:

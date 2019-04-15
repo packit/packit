@@ -27,7 +27,7 @@ from tests.spellbook import get_test_config
 from tests.utils import cwd
 
 
-def test_basic_build(upstream_n_distgit, mock_upstream_remote_functionality):
+def test_basic_build(upstream_n_distgit, mock_remote_functionality_upstream):
     u, d = upstream_n_distgit
 
     with cwd(u):
