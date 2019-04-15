@@ -223,6 +223,10 @@ class PackitAPI:
         :param fork: forks the project if set to True
         :param remote_name: name of remote where we should push; if None, try to find a ssh_url
         """
+        if not dist_git_branch:
+            raise PackitException("Dist-git branch is not set.")
+        if not upstream_branch:
+            raise PackitException("Upstream branch is not set.")
         logger.info(f"upstream active branch {self.up.active_branch}")
 
         self.dg.update_branch(dist_git_branch)
