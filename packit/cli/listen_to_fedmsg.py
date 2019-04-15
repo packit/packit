@@ -55,4 +55,4 @@ def listen_to_fedmsg(config, message_id):
             steve.process_message(fedmsg_dict)
     else:
         for topic, msg in consumerino.yield_all_messages():
-            steve.process_message(msg)
+            steve.process_message(msg, topic=topic)

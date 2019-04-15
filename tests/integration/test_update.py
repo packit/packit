@@ -20,44 +20,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import copy
-import git
 import pytest
 from flexmock import flexmock
-from git import Repo
+from ogr.services.github import GithubProject
 
 from packit.api import PackitAPI
-from packit.bot_api import PackitBotAPI
 from packit.config import get_local_package_config
-from packit.fed_mes_consume import Consumerino
+from packit.jobs import SteveJobs
 from packit.local_project import LocalProject
 from tests.spellbook import TARBALL_NAME, get_test_config
 from tests.utils import cwd, get_specfile
 
 
 @pytest.fixture()
-def github_release_fedmsg():
+def github_release_webhook():
     return {
-        "msg_id": "2019-a5034b55-339d-4fa5-a72b-db74579aeb5a",
-        "topic": "org.fedoraproject.prod.github.release",
-        "msg": {
-            "repository": {
-                "full_name": "brewery/beer",
-                "owner": {"login": "brewery"},
-                "name": "beer",
-                "html_url": "https://github.com/brewery/beer",
-            },
-            "release": {
-                "body": "Changelog content will be here",
-                "tag_name": "0.1.0",
-                "created_at": "2019-02-28T18:48:27Z",
-                "published_at": "2019-02-28T18:51:10Z",
-                "draft": False,
-                "prerelease": False,
-                "name": "Beer 0.1.0 is gooooood",
-            },
-            "action": "published",
+        "repository": {
+            "full_name": "brewery/beer",
+            "owner": {"login": "brewery"},
+            "name": "beer",
+            "html_url": "https://github.com/brewery/beer",
         },
+        "release": {
+            "body": "Changelog content will be here",
+            "tag_name": "0.1.0",
+            "created_at": "2019-02-28T18:48:27Z",
+            "published_at": "2019-02-28T18:51:10Z",
+            "draft": False,
+            "prerelease": False,
+            "name": "Beer 0.1.0 is gooooood",
+        },
+        "action": "published",
     }
 
 
@@ -100,29 +93,14 @@ def test_basic_local_update_from_downstream(
         assert spec.get_version() == "0.0.0"
 
 
-def test_single_message(github_release_fedmsg, mock_remote_functionality_upstream):
+def test_single_message(github_release_webhook, mock_remote_functionality_upstream):
     u, d = mock_remote_functionality_upstream
 
     conf = get_test_config()
-    api = PackitBotAPI(conf)
+    steve = SteveJobs(conf)
 
-    flexmock(Repo).should_receive("clone_from").and_return(git.Repo(str(u)))
+    flexmock(GithubProject).should_receive("get_file_content").and_return(
+        u.joinpath(".packit.json").read_text()
+    )
 
-    api.sync_upstream_release_with_fedmsg(github_release_fedmsg)
-    assert (d / TARBALL_NAME).is_file()
-    spec = get_specfile(str(d / "beer.spec"))
-    assert spec.get_version() == "0.1.0"
-
-
-def test_loop(mock_remote_functionality_upstream, github_release_fedmsg):
-    u, d = mock_remote_functionality_upstream
-
-    def mocked_iter_releases():
-        msg = copy.deepcopy(github_release_fedmsg)
-        yield msg["topic"], msg
-
-    flexmock(Repo).should_receive("clone_from").and_return(git.Repo(str(u)))
-    flexmock(Consumerino, iterate_releases=mocked_iter_releases)
-    conf = get_test_config()
-    api = PackitBotAPI(conf)
-    api.watch_upstream_release()
+    steve.process_message(github_release_webhook)

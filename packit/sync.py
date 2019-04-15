@@ -95,8 +95,8 @@ def sync_files(
 
     for fi in files_to_sync:
         if down_to_up:
-            dest = Path(src_working_dir).joinpath(fi.src)
-            src = Path(dest_working_dir).joinpath(fi.dest)
+            dest = Path(dest_working_dir).joinpath(fi.src)
+            src = Path(src_working_dir).joinpath(fi.dest)
         else:
             src = Path(src_working_dir).joinpath(fi.src)
             dest = Path(dest_working_dir).joinpath(fi.dest)
