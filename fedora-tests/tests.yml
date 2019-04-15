@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  roles:
+  - role: standard-test-basic
+    tags:
+    - classic
+    required_packages:
+    - python3-packit
+    - python36
+    - python3-tox
+    - python3-pytest
+    - python3-flexmock
+    - make
+    - krb5-devel
+    - rpm-libs
+    - redhat-rpm-config
+    tests:
+    - upstream:
+        dir: .
+        run: ./upstream.sh
+    - simple_app:
+        dir: .
+        run: ./simple.py
