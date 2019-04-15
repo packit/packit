@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import logging
 from pathlib import Path
 from typing import Sequence
+
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -256,7 +257,7 @@ class PackitAPI:
             self.up.commit(title=commit_msg, msg=description)
 
             # the branch may already be up, let's push forcefully
-            source_branch = self.up.push(
+            source_branch, fork_username = self.up.push(
                 self.up.local_project.ref,
                 fork=fork,
                 force=True,
@@ -267,6 +268,7 @@ class PackitAPI:
                 description,
                 source_branch=source_branch,
                 target_branch=upstream_branch,
+                fork_username=fork_username,
             )
 
     def push_and_create_pr(
