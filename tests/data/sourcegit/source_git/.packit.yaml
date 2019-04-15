@@ -1,7 +1,8 @@
 ---
-specfile_path: beer.spec
+specfile_path: fedora/beer.spec
 synced_files:
-  - beer.spec
+  - src: fedora/beer.spec
+    dest: beer.spec
   - .packit.yaml
 upstream_project_name: beerware
 downstream_package_name: beer
