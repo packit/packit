@@ -3,6 +3,8 @@ specfile_path: packit.spec
 synced_files:
   - packit.spec
   - .packit.yaml
+  - src: fedora-tests/
+    dest: tests/
 # packit was already taken on PyPI
 upstream_project_name: packitos
 downstream_package_name: packit
@@ -21,3 +23,5 @@ jobs:
   trigger: release
   metadata:
     dist_git_branch: f29
+- job: sync_from_downstream
+  trigger: commit
