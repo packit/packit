@@ -22,7 +22,7 @@
 
 import logging
 import os
-from typing import Optional, List, Tuple, Sequence
+from typing import Optional, Sequence
 
 import git
 import requests
@@ -267,47 +267,6 @@ class DistGit(PackitRepositoryBase):
     def purge_unused_git_branches(self):
         # TODO: remove branches from merged PRs
         raise NotImplementedError("not implemented yet")
-
-    def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
-        """
-        Add the given list of (patch_name, msg) to the specfile.
-
-        :param patch_list: [(patch_name, msg)] if None, the patches will be generated
-        """
-        logger.debug(f"About to add patches {patch_list} to specfile")
-        if not patch_list:
-            return
-        if not self.specfile_path:
-            raise Exception("No specfile")
-
-        with open(file=self.specfile_path, mode="r+") as spec_file:
-            last_source_position = None
-            line = spec_file.readline()
-            while line:
-                if line.startswith("Source"):
-                    last_source_position = spec_file.tell()
-                line = spec_file.readline()
-
-            if not last_source_position:
-                raise Exception("Cannot found place for patches in specfile.")
-
-            spec_file.seek(last_source_position)
-            rest_of_the_file = spec_file.read()
-            spec_file.seek(last_source_position)
-
-            spec_file.write("\n\n# PATCHES FROM SOURCE GIT:\n")
-            for i, (patch, msg) in enumerate(patch_list):
-                commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
-                spec_file.write(commented_msg)
-                spec_file.write(f"Patch{i + 1:04d}: {patch}\n")
-
-            spec_file.write("\n\n")
-            spec_file.write(rest_of_the_file)
-
-        logger.info(
-            f"Patches ({len(patch_list)}) added to the specfile ({self.specfile_path})"
-        )
-        self.local_project.git_repo.index.write()
 
     def build(self, scratch: bool = False):
         """
