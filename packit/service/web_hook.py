@@ -54,9 +54,13 @@ def github_release():
         logger.debug("/webhooks/github/release: We haven't received any JSON data.")
         return "We haven't received any JSON data."
 
+    if all([msg.get("zen"), msg.get("hook_id"), msg.get("hook")]):
+        logger.debug(f"/webhooks/github/release received ping event: {msg['hook']}")
+        return "Pong!"
+
     if not (msg.get("action") == "published" and "release" in msg):
         logger.debug("/webhooks/github/release: Not a new release event.")
-        logger.debug(f"Action={msg['action']}, keys={msg.keys()}")
+        logger.debug(f"Action={msg.get('action')}, keys={msg.keys()}")
         return "We only accept events for new Github releases."
 
     buffer = StringIO()
