@@ -24,6 +24,7 @@
 import pytest
 import datetime
 from flexmock import flexmock
+from rebasehelper.specfile import SpecFile
 
 from packit.config import get_local_package_config
 from packit.status import Status
@@ -386,7 +387,7 @@ def test_get_dg_versions(upstream_n_distgit, expected_versions):
     flexmock(dg.local_project.git_project).should_receive("get_branches").and_return(
         expected_versions.keys()
     )
-    flexmock(dg.specfile).should_receive("get_version").and_return("0.0.2")
+    flexmock(SpecFile).should_receive("get_version").and_return("0.0.2")
     flexmock(dg).should_receive("checkout_branch").and_return(None)
     flexmock(dg).should_receive("create_branch").and_return(None)
 

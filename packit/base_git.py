@@ -22,7 +22,7 @@
 import inspect
 import logging
 from pathlib import Path
-from typing import Callable, List, Tuple, Optional
+from typing import Optional, Callable, List, Tuple
 
 import git
 from rebasehelper.specfile import SpecFile
@@ -45,6 +45,7 @@ class PackitRepositoryBase:
         self.config = config
         self.package_config = package_config
         self._specfile_path: Optional[str] = None
+        self._specfile: Optional[SpecFile] = None
 
     @property
     def specfile_dir(self) -> str:
@@ -76,16 +77,20 @@ class PackitRepositoryBase:
 
     @property
     def specfile(self) -> SpecFile:
-        # changing API is fun, where else could we use inspect?
-        s = inspect.signature(SpecFile)
-        if "changelog_entry" in s.parameters:
-            return SpecFile(
-                path=self.specfile_path,
-                sources_location=self.specfile_dir,
-                changelog_entry=None,
-            )
-        else:
-            return SpecFile(path=self.specfile_path, sources_location=self.specfile_dir)
+        if self._specfile is None:
+            # changing API is fun, where else could we use inspect?
+            s = inspect.signature(SpecFile)
+            if "changelog_entry" in s.parameters:
+                self._specfile = SpecFile(
+                    path=self.specfile_path,
+                    sources_location=self.specfile_dir,
+                    changelog_entry="",
+                )
+            else:
+                self._specfile = SpecFile(
+                    path=self.specfile_path, sources_location=self.specfile_dir
+                )
+        return self._specfile
 
     def create_branch(
         self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
