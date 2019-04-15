@@ -27,14 +27,13 @@ from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from pprint import pformat
-from typing import Optional, List, NamedTuple, Dict
-from typing import Union
+from typing import Optional, List, Dict
 
 import click
 from jsonschema import Draft4Validator, ValidationError
-from ogr.abstract import GitProject
 from yaml import safe_load
 
+from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import (
@@ -48,6 +47,7 @@ from packit.schema import (
     PACKAGE_CONFIG_SCHEMA,
     SYNCED_FILES_SCHEMA,
 )
+from packit.sync import RawSyncFilesItem, SyncFilesItem, get_raw_files
 
 logger = logging.getLogger(__name__)
 
@@ -234,35 +234,24 @@ class JobConfig(BaseConfig):
         )
 
 
-class SyncFilesItem(NamedTuple):
-    src: Union[str, List[str]]
-    dest: str
-
-    def __repr__(self):
-        return f"SyncFilesItem(src={self.src}, dest={self.dest})"
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, SyncFilesItem):
-            raise PackitConfigException(
-                "Provided object is not a SyncFilesItem instance."
-            )
-
-        return self.src == other.src and self.dest == other.dest
-
-
-class RawSyncFilesItem(SyncFilesItem):
-    src: str
-    dest: str
-
-
 class SyncFilesConfig(BaseConfig):
     SCHEMA = SYNCED_FILES_SCHEMA
 
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync = files_to_sync
+        self._raw_files_to_sync: Optional[List[RawSyncFilesItem]] = None
 
     def __repr__(self):
         return f"SyncFilesConfig({self.files_to_sync!r})"
+
+    @property
+    def raw_files_to_sync(self) -> List[RawSyncFilesItem]:
+        if not self._raw_files_to_sync:
+            raw_files_to_sync: List[RawSyncFilesItem] = []
+            for sync in self.files_to_sync:
+                raw_files_to_sync += get_raw_files(file_to_sync=sync)
+            self._raw_files_to_sync = raw_files_to_sync
+        return self._raw_files_to_sync
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":
@@ -292,9 +281,7 @@ class SyncFilesConfig(BaseConfig):
         if len(self.files_to_sync) != len(other.files_to_sync):
             return False
 
-        if self.files_to_sync == other.files_to_sync:
-            return True
-        return False
+        return self.files_to_sync == other.files_to_sync
 
 
 class PackageConfig(BaseConfig):

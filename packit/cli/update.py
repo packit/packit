@@ -67,6 +67,13 @@ logger = logging.getLogger(__file__)
         "If this is not specified, default to origin."
     ),
 )
+@click.option(
+    "--upstream-ref",
+    default=None,
+    help="Git ref of the last upstream commit in the current branch "
+    "from which packit should generate patches "
+    "(this option implies the repository is source-git).",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
@@ -82,6 +89,7 @@ def update(
     force_new_sources,
     local_content,
     path_or_url,
+    upstream_ref,
     version,
     remote,  # click introspects this in LocalProjectParameter
 ):
@@ -102,4 +110,5 @@ def update(
         use_local_content=local_content,
         version=version,
         force_new_sources=force_new_sources,
+        upstream_ref=upstream_ref,
     )

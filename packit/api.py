@@ -104,7 +104,7 @@ class PackitAPI:
         self._handle_sources(add_new_sources=True, force_new_sources=False)
 
         sync_files(
-            self.package_config,
+            self.package_config.synced_files.raw_files_to_sync,
             self.up.local_project.working_dir,
             self.dg.local_project.working_dir,
         )
@@ -172,7 +172,7 @@ class PackitAPI:
 
             if self.up.with_action(action=ActionName.prepare_files):
                 sync_files(
-                    self.package_config,
+                    self.package_config.synced_files.raw_files_to_sync,
                     self.up.local_project.working_dir,
                     self.dg.local_project.working_dir,
                 )
@@ -190,7 +190,7 @@ class PackitAPI:
 
             if self.up.has_action(action=ActionName.prepare_files):
                 sync_files(
-                    self.package_config,
+                    self.package_config.synced_files.raw_files_to_sync,
                     self.up.local_project.working_dir,
                     self.dg.local_project.working_dir,
                 )
@@ -237,7 +237,7 @@ class PackitAPI:
         self.up.checkout_branch(local_pr_branch)
 
         sync_files(
-            self.package_config,
+            self.package_config.synced_files.raw_files_to_sync,
             self.dg.local_project.working_dir,
             self.up.local_project.working_dir,
         )

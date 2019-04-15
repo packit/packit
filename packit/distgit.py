@@ -301,6 +301,7 @@ class DistGit(PackitRepositoryBase):
                 spec_file.write(commented_msg)
                 spec_file.write(f"Patch{i + 1:04d}: {patch}\n")
 
+            spec_file.write("\n\n")
             spec_file.write(rest_of_the_file)
 
         logger.info(
