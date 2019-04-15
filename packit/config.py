@@ -389,13 +389,9 @@ class PackageConfig(BaseConfig):
             raw_dict, "downstream_package_name", "package_name"
         )
         specfile_path = raw_dict.get("specfile_path", None)
-        if specfile_path:
-            specfile_path = str(Path(specfile_path).resolve())
-        else:
+        if not specfile_path:
             if downstream_package_name:
-                specfile_path = str(
-                    Path.cwd().joinpath(f"{downstream_package_name}.spec")
-                )
+                specfile_path = f"{downstream_package_name}.spec"
                 logger.info(f"We guess that spec file is at {specfile_path}")
             else:
                 # guess it?
