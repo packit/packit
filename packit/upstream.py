@@ -70,7 +70,10 @@ class Upstream(PackitRepositoryBase):
 
     @property
     def specfile_path(self) -> str:
-        return self.package_config.specfile_path
+        spec_path = (
+            Path(self.local_project.working_dir) / self.package_config.specfile_path
+        )
+        return str(spec_path)
 
     def set_local_project(self):
         """ update self.local_project """
@@ -360,7 +363,9 @@ class Upstream(PackitRepositoryBase):
             return action_output
 
         ver = run_command(
-            self.package_config.current_version_command, output=True
+            self.package_config.current_version_command,
+            output=True,
+            cwd=self.local_project.working_dir,
         ).strip()
         logger.debug("version = %s", ver)
         # FIXME: this might not work when users expect the dashes
@@ -439,7 +444,7 @@ class Upstream(PackitRepositoryBase):
                     f"{dir_name}/",
                     "HEAD",
                 ]
-            run_command(archive_cmd)
+            run_command(archive_cmd, cwd=self.local_project.working_dir)
 
     def create_srpm(self, srpm_path: str = None) -> Path:
         """
@@ -448,7 +453,7 @@ class Upstream(PackitRepositoryBase):
         :param srpm_path: path to the srpm
         :return: path to the srpm
         """
-        cwd = os.getcwd()
+        cwd = self.local_project.working_dir
         cmd = [
             "rpmbuild",
             "-bs",
@@ -457,7 +462,7 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_specdir {cwd}",
             "--define",
-            f"_srcrpmdir {cwd}",
+            f"_srcrpmdir {os.getcwd()}",
             # no idea about this one, but tests were failing in tox w/o it
             "--define",
             f"_topdir {cwd}",
@@ -476,6 +481,7 @@ class Upstream(PackitRepositoryBase):
             cmd,
             output=True,
             error_message="SRPM could not be created. Is the archive present?",
+            cwd=self.local_project.working_dir,
         ).strip()
         logger.debug(f"{out}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
