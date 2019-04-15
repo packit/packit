@@ -238,6 +238,7 @@ class PackitAPI:
             self.package_config.synced_files.raw_files_to_sync,
             self.dg.local_project.working_dir,
             self.up.local_project.working_dir,
+            down_to_up=True,
         )
 
         if not no_pr:
