@@ -68,10 +68,11 @@ logger = logging.getLogger(__file__)
     ),
 )
 @click.option(
-    "--upstream",
+    "--upstream-ref",
     default=None,
-    help="Git ref that points to the state of the upstream."
-    "(It is used for sourcegit repositories for patching.)",
+    help="Git ref of the last upstream commit in the current branch "
+    "from which packit should generate patches "
+    "(this option implies the repository is source-git).",
 )
 @click.argument(
     "path_or_url",
