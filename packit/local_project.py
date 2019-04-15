@@ -23,6 +23,7 @@
 import logging
 import os
 import shutil
+from contextlib import contextmanager
 
 import git
 
@@ -157,6 +158,22 @@ class LocalProject:
                 or self._parse_git_url_from_git_repo()
                 or self._parse_namespace_from_git_url()
             )
+
+    @contextmanager
+    def git_checkout_block(self, ref: str = None):
+        """Allows temporarily checkout another git-ref."""
+        current_head = self._get_ref_from_git_repo()
+        if ref:
+            logger.debug(
+                f"Leaving old ref: '{current_head}' and checkout new ref: '{ref}'"
+            )
+            self.git_repo.git.checkout(ref)
+        yield
+        if ref:
+            logger.debug(
+                f"Leaving new ref: '{ref}' and checkout old ref: '{current_head}'"
+            )
+            self.git_repo.git.checkout(current_head)
 
     def _is_url(self, path_or_url):
         if urlparse(path_or_url).scheme:
