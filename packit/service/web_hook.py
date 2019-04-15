@@ -58,11 +58,6 @@ def github_release():
         logger.debug(f"/webhooks/github/release received ping event: {msg['hook']}")
         return "Pong!"
 
-    if not (msg.get("action") == "published" and "release" in msg):
-        logger.debug("/webhooks/github/release: Not a new release event.")
-        logger.debug(f"Action={msg.get('action')}, keys={msg.keys()}")
-        return "We only accept events for new Github releases."
-
     buffer = StringIO()
     logHandler = logging.StreamHandler(buffer)
     logHandler.setLevel(logging.INFO)
@@ -71,12 +66,6 @@ def github_release():
     )
     logHandler.setFormatter(formatter)
     logger.addHandler(logHandler)
-
-    logger.debug(
-        f"Received release event: "
-        f"{msg['repository']['owner']['login']}/{msg['repository']['name']}"
-        f" - {msg['release']['tag_name']}"
-    )
 
     config = Config.get_user_config()
 
