@@ -22,9 +22,10 @@
 
 import glob
 import logging
-import os
 import shutil
-from typing import List, NamedTuple, Union
+from pathlib import Path
+from typing import List
+from typing import NamedTuple, Union
 
 from packit.exceptions import PackitException
 
@@ -54,19 +55,8 @@ def get_files_from_wildcard(
     file_wildcard: str, destination: str
 ) -> List[RawSyncFilesItem]:
     """
-    Get list of SyncFilesItem that match the wildcard.
-
-    :param file_wildcard:   - if ends with '/' we add all files of that directory
-                            - if contains '*', we use glob.glob to get matches
-    :param destination: used to create RawSyncFilesItem instances
-    :return: list of matching RawSyncFilesItem instances
+    Evaluate globs in file_wildcard
     """
-    if "*" not in file_wildcard:
-        if file_wildcard.endswith("/"):
-            file_wildcard = f"{file_wildcard}*"
-        else:
-            return [RawSyncFilesItem(src=file_wildcard, dest=destination)]
-
     globed_files = glob.glob(file_wildcard)
     return [RawSyncFilesItem(src=file, dest=destination) for file in globed_files]
 
@@ -76,9 +66,6 @@ def get_raw_files(file_to_sync: SyncFilesItem) -> List[RawSyncFilesItem]:
     Split the  SyncFilesItem with src as a list or wildcard to multiple instances.
 
     Destination is used from the original SyncFilesItem.
-
-    :param file_to_sync: SyncFilesItem to split
-    :return: [RawSyncFilesItem]
     """
     source = file_to_sync.src
     if not isinstance(source, list):
@@ -93,25 +80,36 @@ def get_raw_files(file_to_sync: SyncFilesItem) -> List[RawSyncFilesItem]:
 
 
 def sync_files(
-    files_to_sync: List[RawSyncFilesItem], src_working_dir: str, dest_working_dir: str
+    files_to_sync: List[RawSyncFilesItem],
+    src_working_dir: str,
+    dest_working_dir: str,
+    down_to_up: bool = False,
 ) -> None:
     """
-    Sync required files from upstream to downstream.
+    Copy files b/w upstream and downstream repo.
+
+    When down_to_up is True, we copy from downstream to upstream.
+    This implies that src and dest are swapped.
     """
     logger.debug(f"Copy synced files {files_to_sync}")
 
     for fi in files_to_sync:
-        # Check if destination dir exists
-        # If not create the destination dir
-        dest_dir = os.path.join(dest_working_dir, fi.dest)
-        logger.debug(f"Destination {dest_dir}")
-        # Sync all source file
-        src_file = os.path.join(src_working_dir, fi.src)
-        logger.debug(f"Source file {src_file}")
-        if os.path.exists(src_file):
-            logger.info(f"Syncing {src_file}")
-            shutil.copy2(src_file, dest_dir)
+        if down_to_up:
+            dest = Path(src_working_dir).joinpath(fi.src)
+            src = Path(dest_working_dir).joinpath(fi.dest)
         else:
-            raise PackitException(
-                f"File {src_file} is not present in the upstream repository. "
-            )
+            src = Path(src_working_dir).joinpath(fi.src)
+            dest = Path(dest_working_dir).joinpath(fi.dest)
+        logger.debug(f"src = {src}, dest = {dest}")
+        if src.exists():
+            if src.is_dir():
+                logger.debug("src is a dir, using copytree")
+                shutil.copytree(src, dest)
+            else:
+                if fi.dest.endswith("/"):
+                    logger.info(f"Creating target directory: {dest}")
+                    dest.mkdir(parents=True, exist_ok=True)
+                logger.info(f"Copying {src} to {dest}.")
+                shutil.copy2(src, dest)
+        else:
+            raise PackitException(f"Path {src} does not exist.")
