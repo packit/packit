@@ -492,7 +492,7 @@ def get_packit_config_from_repo(
             loaded_config = safe_load(config_file_content)
         except Exception as ex:
             logger.error(f"Cannot load package config '{config_file_name}'.")
-            raise Exception(f"Cannot load package config: {ex}.")
+            raise PackitException(f"Cannot load package config: {ex}.")
 
         return parse_loaded_config(loaded_config=loaded_config)
 
