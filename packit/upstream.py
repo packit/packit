@@ -66,7 +66,7 @@ class Upstream(PackitRepositoryBase):
         self.set_local_project()
 
     @property
-    def active_branch(self):
+    def active_branch(self) -> str:
         return self.local_project.ref
 
     @property

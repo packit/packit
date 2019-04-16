@@ -204,9 +204,7 @@ class PackitAPI:
             )
         finally:
             if not use_local_content:
-                self.up.local_project.git_repo.git.checkout(
-                    current_up_branch.checkout()
-                )
+                self.up.local_project.git_repo.git.checkout(current_up_branch)
 
     def sync_from_downstream(
         self,
@@ -274,7 +272,7 @@ class PackitAPI:
         self.dg.create_pull(
             pr_title,
             pr_description,
-            source_branch=str(self.dg.local_project.ref),
+            source_branch=self.dg.local_project.ref,
             target_branch=dist_git_branch,
         )
 
