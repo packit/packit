@@ -129,6 +129,7 @@ Please, open a PR if you want to be on the list, or just let us know.
 * ABRT
 * [standard-test-roles](https://pagure.io/standard-test-roles)
 * OSBS (atomic-reactor, osbs-client, koji-containerbuild) (@cverna)
+* CoreOS (starting with rpm-ostree, ignition, and ostree) (@jlebon)
 
 
 ## Resources
