@@ -100,22 +100,14 @@ class Status:
         latest_releases: List[Release] = []
         try:
             latest_releases = self.up.local_project.git_project.get_releases()
-
-            if latest_releases:
-                logger.debug("GitHub upstream releases fetched.")
-                # take last five releases
-                latest_releases = (
-                    latest_releases[:number_of_releases]
-                    if len(latest_releases) > number_of_releases
-                    else latest_releases
-                )
-                return latest_releases
+            logger.debug("GitHub upstream releases fetched.")
         except PackitException as e:
             logger.debug("Failed to fetch upstream releases: %s", e)
-        else:
+
+        if not latest_releases:
             logger.debug("GitHub upstream releases: No releases found.")
 
-        return latest_releases
+        return latest_releases[:number_of_releases]
 
     def get_builds(self, number_of_builds: int = 3) -> Dict:
         """
