@@ -19,7 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 import logging
 import os
 import re
@@ -29,12 +28,11 @@ from typing import Optional, List, Tuple
 
 import git
 import github
+from ogr.services.github import GithubService
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
-from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
-from ogr.services.github import GithubService
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
@@ -56,8 +54,6 @@ class Upstream(PackitRepositoryBase):
         self.package_config = package_config
         self.local_project = local_project
 
-        self._specfile = None
-
         self.package_name: Optional[str] = self.package_config.downstream_package_name
 
         self.github_token = self.config.github_token
@@ -68,13 +64,6 @@ class Upstream(PackitRepositoryBase):
     @property
     def active_branch(self) -> str:
         return self.local_project.ref
-
-    @property
-    def specfile_path(self) -> str:
-        spec_path = (
-            Path(self.local_project.working_dir) / self.package_config.specfile_path
-        )
-        return str(spec_path)
 
     def set_local_project(self):
         """ update self.local_project """
@@ -105,16 +94,6 @@ class Upstream(PackitRepositoryBase):
         if not self.local_project.repo_name:
             # will this ever happen?
             self.local_project.repo_name = self.package_name
-
-    @property
-    def specfile(self):
-        if self._specfile is None:
-            self._specfile = SpecFile(
-                path=self.specfile_path,
-                sources_location=self.local_project.working_dir,
-                changelog_entry=None,
-            )
-        return self._specfile
 
     def checkout_pr(self, pr_id: int) -> None:
         """
@@ -401,12 +380,18 @@ class Upstream(PackitRepositoryBase):
             # also this code adds 3 rpmbuild dirs into the upstream repo,
             # we should ask rebase-helper not to do that
             self.specfile.set_version(version=version)
-            self.specfile.changelog_entry = changelog_entry
-            # https://github.com/rebase-helper/rebase-helper/blob/643dab4a864288327289f34e023124d5a499e04b/rebasehelper/application.py#L446-L448
-            new_log = self.specfile.get_new_log()
-            new_log.extend(self.specfile.spec_content.sections["%changelog"])
-            self.specfile.spec_content.sections["%changelog"] = new_log
-            self.specfile.save()
+
+            if hasattr(self.specfile, "update_changelog"):
+                # new rebase helper
+                self.specfile.update_changelog(changelog_entry)
+            else:
+                # old rebase helper
+                self.specfile.changelog_entry = changelog_entry
+                new_log = self.specfile.get_new_log()
+                new_log.extend(self.specfile.spec_content.sections["%changelog"])
+                self.specfile.spec_content.sections["%changelog"] = new_log
+                self.specfile.save()
+
         except RebaseHelperError as ex:
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
             raise PackitException("rebase-helper didn't do the job")
