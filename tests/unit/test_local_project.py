@@ -102,7 +102,9 @@ def test_parse_git_service_from_git_project():
 def test_parse_ref_from_git_repo():
     """Get working_dir from git_repo"""
     project = LocalProject(
-        git_repo=flexmock(active_branch="branch", head=flexmock(is_detached=False)),
+        git_repo=flexmock(
+            active_branch=flexmock(name="branch"), head=flexmock(is_detached=False)
+        ),
         refresh=False,
     )
     changed = project._parse_ref_from_git_repo()
@@ -276,7 +278,11 @@ def test_from_git_url_path_or_url_repo_name_git_service():
 
     flexmock(git).should_receive("Repo").with_args(
         path="./local/directory/to/git"
-    ).and_return(flexmock(active_branch="branch", head=flexmock(is_detached=False)))
+    ).and_return(
+        flexmock(
+            active_branch=flexmock(name="branch"), head=flexmock(is_detached=False)
+        )
+    )
 
     project = LocalProject(
         git_url="https://server.git/my_namespace/package_name",
@@ -305,7 +311,7 @@ def test_from_path_or_ulr_repo_name_git_service():
 
     flexmock(git.Repo).should_receive("clone_from").and_return(
         flexmock(
-            active_branch="branch",
+            active_branch=flexmock(name="branch"),
             working_dir="some/temp/dir",
             head=flexmock(is_detached=False),
         )
@@ -345,7 +351,9 @@ def test_from_path_or_url_ref_path():
     flexmock(git).should_receive("Repo").with_args(
         path="./local/directory/to/git"
     ).and_return(
-        flexmock(active_branch="branch", head=flexmock(is_detached=False))
+        flexmock(
+            active_branch=flexmock(name="branch"), head=flexmock(is_detached=False)
+        )
         .should_receive("remote")
         # must be a generator
         .replace_with(
