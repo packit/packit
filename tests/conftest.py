@@ -257,6 +257,15 @@ def upstream_instance(upstream_n_distgit, tmpdir):
 
 
 @pytest.fixture()
+def upstream_instance_with_two_commits(upstream_instance):
+    u, ups = upstream_instance
+    new_file = u / "new.file"
+    new_file.write_text("Some content")
+    git_add_and_commit(u, message="Add new file")
+    return u, ups
+
+
+@pytest.fixture()
 def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
     u, d = upstream_n_distgit
     c = get_test_config()
