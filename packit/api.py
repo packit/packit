@@ -104,11 +104,12 @@ class PackitAPI:
 
         self._handle_sources(add_new_sources=True, force_new_sources=False)
 
-        sync_files(
-            self.package_config.synced_files.raw_files_to_sync,
-            self.up.local_project.working_dir,
-            self.dg.local_project.working_dir,
+        raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+            Path(self.up.local_project.working_dir),
+            Path(self.dg.local_project.working_dir),
         )
+        sync_files(raw_sync_files)
+
         self.dg.commit(title=f"Sync upstream pr: {pr_id}", msg=description)
 
         self.push_and_create_pr(
@@ -172,11 +173,11 @@ class PackitAPI:
             )
 
             if self.up.with_action(action=ActionName.prepare_files):
-                sync_files(
-                    self.package_config.synced_files.raw_files_to_sync,
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
+                raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+                    Path(self.up.local_project.working_dir),
+                    Path(self.dg.local_project.working_dir),
                 )
+                sync_files(raw_sync_files)
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
@@ -190,11 +191,11 @@ class PackitAPI:
                 )
 
             if self.up.has_action(action=ActionName.prepare_files):
-                sync_files(
-                    self.package_config.synced_files.raw_files_to_sync,
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
+                raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+                    Path(self.up.local_project.working_dir),
+                    Path(self.dg.local_project.working_dir),
                 )
+                sync_files(raw_sync_files)
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
@@ -239,12 +240,12 @@ class PackitAPI:
         self.up.create_branch(local_pr_branch)
         self.up.checkout_branch(local_pr_branch)
 
-        sync_files(
-            self.package_config.synced_files.raw_files_to_sync,
-            self.dg.local_project.working_dir,
-            self.up.local_project.working_dir,
-            down_to_up=True,
+        raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+            Path(self.dg.local_project.working_dir),
+            Path(self.up.local_project.working_dir),
         )
+
+        sync_files(raw_sync_files)
 
         if not no_pr:
             description = (

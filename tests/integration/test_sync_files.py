@@ -18,10 +18,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from pathlib import Path
 
 import pytest
 
 from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
+from packit.sync import RawSyncFilesItem
 from tests.spellbook import TESTS_DIR
 from tests.utils import cwd
 
@@ -33,7 +35,7 @@ from tests.utils import cwd
             SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="conftest.py", dest="conftest.py")]
             ),
-            [SyncFilesItem(src="conftest.py", dest="conftest.py")],
+            [RawSyncFilesItem(Path("conftest.py"), Path("conftest.py"), False)],
         ),
         (
             SyncFilesConfig(
@@ -44,31 +46,31 @@ from tests.utils import cwd
                 ]
             ),
             [
-                SyncFilesItem(src="__init__.py", dest="__init__.py"),
-                SyncFilesItem(src="conftest.py", dest="conftest.py"),
-                SyncFilesItem(src="spellbook.py", dest="spellbook.py"),
+                RawSyncFilesItem(Path("__init__.py"), Path("__init__.py"), False),
+                RawSyncFilesItem(Path("conftest.py"), Path("conftest.py"), False),
+                RawSyncFilesItem(Path("spellbook.py"), Path("spellbook.py"), False),
             ],
         ),
         (
             SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="data/sync_files/", dest="tests")]
             ),
-            [SyncFilesItem(src="data/sync_files/", dest="tests")],
+            [RawSyncFilesItem(Path("data/sync_files"), Path("tests"), False)],
         ),
         (
             SyncFilesConfig(
-                files_to_sync=[SyncFilesItem(src="data/sync_files/*.md", dest="tests")]
+                files_to_sync=[SyncFilesItem(src="data/sync_files/*.md", dest="tests/")]
             ),
             [
-                SyncFilesItem(src="data/sync_files/a.md", dest="tests"),
-                SyncFilesItem(src="data/sync_files/b.md", dest="tests"),
+                RawSyncFilesItem(Path("data/sync_files/a.md"), Path("tests"), True),
+                RawSyncFilesItem(Path("data/sync_files/b.md"), Path("tests"), True),
             ],
         ),
         (
             SyncFilesConfig(
                 files_to_sync=[SyncFilesItem(src="data/sync_files/b*d", dest="example")]
             ),
-            [SyncFilesItem(src="data/sync_files/b.md", dest="example")],
+            [RawSyncFilesItem(Path("data/sync_files/b.md"), Path("example"), False)],
         ),
         (
             SyncFilesConfig(
@@ -80,8 +82,8 @@ from tests.utils import cwd
                 ]
             ),
             [
-                SyncFilesItem(src="data/sync_files/a.md", dest="tests"),
-                SyncFilesItem(src="data/sync_files/b.md", dest="tests"),
+                RawSyncFilesItem(Path("data/sync_files/a.md"), Path("tests"), False),
+                RawSyncFilesItem(Path("data/sync_files/b.md"), Path("tests"), False),
             ],
         ),
     ],
@@ -95,4 +97,6 @@ def test_raw_files_to_sync(packit_files, expected):
             specfile_path="fedora/package.spec",
             synced_files=packit_files,
         )
-        assert set(pc.synced_files.raw_files_to_sync) == set(expected)
+        assert set(
+            pc.synced_files.get_raw_files_to_sync(Path("."), Path("."), False)
+        ) == set(expected)
