@@ -69,6 +69,23 @@ Usage: packit srpm [OPTIONS] [PATH_OR_URL]
   repository, it defaults to the current working directory
 
 Options:
-  --output FILE  Write the SRPM to FILE instead of current dir.
-  -h, --help     Show this message and exit.
+  --output FILE        Write the SRPM to FILE instead of current dir.
+  --remote TEXT        Name of the remote to discover upstream project URL, If
+                       this is not specified, default to origin.
+  --upstream-ref TEXT  Git ref of the last upstream commit in the current
+                       branch from which packit should generate patches (this
+                       option implies the repository is source-git).
+  -h, --help           Show this message and exit.
 ```
+
+
+As you can see, it is possible to create SRPM for sourcegit repositories as well.
+Just add an `--upstream-ref` option to the packit command.
+
+If you have a git tag `0.1.0` specifying the upstream code,
+just run `packit srpm --upstream-ref 0.1.0` to create an SRPM file.
+It will create an archive from the given upstream reference (`0.1.0`)
+and the other commits will be added as the patches.
+
+Just make sure, that you apply all the patches in the specfile.
+(Packit only adds the patches after the sources.)
