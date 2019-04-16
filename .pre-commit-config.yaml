@@ -16,7 +16,7 @@ repos:
     - id: flake8
       args:
         - --max-line-length=100
-        - --per-file-ignores=files/packit.wsgi:F401
+        - --per-file-ignores=files/packit.wsgi:F401,E402
 -   repo: https://github.com/ambv/black
     rev: stable
     hooks:
