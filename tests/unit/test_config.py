@@ -303,7 +303,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [get_job_config_dict_full()],
             },
             PackageConfig(
-                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+                specfile_path="fedora/package.spec",
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -326,7 +326,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [get_job_config_dict_simple()],
             },
             PackageConfig(
-                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+                specfile_path="fedora/package.spec",
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -347,7 +347,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [get_job_config_dict_full()],
             },
             PackageConfig(
-                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+                specfile_path="fedora/package.spec",
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -366,7 +366,7 @@ def test_package_config_parse_error(raw):
                 "something": "stupid",
             },
             PackageConfig(
-                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+                specfile_path="fedora/package.spec",
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -389,7 +389,7 @@ def test_package_config_parse_error(raw):
                 "dist_git_base_url": "https://something.wicked",
             },
             PackageConfig(
-                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+                specfile_path="fedora/package.spec",
                 synced_files=SyncFilesConfig(
                     files_to_sync=[
                         SyncFilesItem(
@@ -417,7 +417,7 @@ def test_package_config_parse_error(raw):
                 "dist_git_base_url": "https://something.wicked",
             },
             PackageConfig(
-                specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+                specfile_path="fedora/package.spec",
                 actions={
                     ActionName.pre_sync: "some/pre-sync/command --option",
                     ActionName.get_current_version: "get-me-version",
@@ -454,7 +454,7 @@ def test_dist_git_package_url():
                 SyncFilesItem(src="fedora/foobar.spec", dest="fedora/foobar.spec")
             ]
         ),
-        specfile_path=str(Path.cwd().joinpath("fedora/package.spec")),
+        specfile_path="fedora/package.spec",
     )
     assert new_pc.specfile_path.endswith("fedora/package.spec")
     assert pc.specfile_path.endswith("fedora/package.spec")
