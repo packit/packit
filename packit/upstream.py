@@ -40,7 +40,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
-from packit.utils import run_command
+from packit.utils import run_command, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +149,7 @@ class Upstream(PackitRepositoryBase):
         :return: list of commits (last commit on the current branch.).
         """
 
-        if upstream in self.local_project.git_repo.tags:
+        if is_a_git_ref(repo=self.local_project.git_repo, ref=upstream):
             upstream_ref = upstream
         else:
             upstream_ref = f"origin/{upstream}"
@@ -166,9 +166,7 @@ class Upstream(PackitRepositoryBase):
             )
         )
         if add_usptream_head_commit:
-            commits.insert(
-                0, self.local_project.git_repo.refs[f"{upstream_ref}"].commit
-            )
+            commits.insert(0, self.local_project.git_repo.commit(upstream_ref))
 
         logger.debug(
             f"Delta ({upstream_ref}..{self.local_project.ref}): {len(commits)}"

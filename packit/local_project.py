@@ -24,6 +24,7 @@ import logging
 import os
 import shutil
 from contextlib import contextmanager
+from typing import Optional
 
 import git
 
@@ -31,8 +32,12 @@ from urllib.parse import urlparse
 from ogr.abstract import GitProject, GitService
 from packit.exceptions import PackitException
 
-from packit.utils import is_git_repo, get_repo, get_namespace_and_repo_name
-
+from packit.utils import (
+    is_git_repo,
+    get_repo,
+    get_namespace_and_repo_name,
+    is_a_git_ref,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +128,7 @@ class LocalProject:
             self.git_repo.branches[self._ref].checkout()
 
     @property
-    def ref(self):
+    def ref(self) -> Optional[str]:
         """
         Name of the HEAD if the HEAD is not detached,
         else commit hash.
@@ -167,6 +172,12 @@ class LocalProject:
             logger.debug(
                 f"Leaving old ref: '{current_head}' and checkout new ref: '{ref}'"
             )
+            if ref not in self.git_repo.refs:
+                if not is_a_git_ref(self.git_repo, ref):
+                    raise PackitException(
+                        f"Git ref '{ref}' not found, cannot checkout."
+                    )
+                ref = self.git_repo.commit(ref).hexsha
             self.git_repo.git.checkout(ref)
         yield
         if ref:
@@ -317,11 +328,11 @@ class LocalProject:
             return True
         return False
 
-    def _get_ref_from_git_repo(self):
+    def _get_ref_from_git_repo(self) -> str:
         if self.git_repo.head.is_detached:
             return self.git_repo.head.commit.hexsha
         else:
-            return self.git_repo.active_branch
+            return self.git_repo.active_branch.name
 
     def __del__(self):
         self.clean()
