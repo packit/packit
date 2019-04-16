@@ -21,9 +21,8 @@
 # SOFTWARE.
 import subprocess
 
-from rebasehelper.specfile import SpecFile
-
 from tests.spellbook import TARBALL_NAME, git_add_and_commit
+from tests.utils import get_specfile
 
 
 def test_basic_local_update_without_patching(
@@ -39,7 +38,7 @@ def test_basic_local_update_without_patching(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = SpecFile(str(distgit / "beer.spec"), None)
+    spec = get_specfile(str(distgit / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
 
@@ -52,7 +51,7 @@ def test_basic_local_update_patching(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = SpecFile(str(distgit / "beer.spec"), None)
+    spec = get_specfile(str(distgit / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
     spec_package_section = "\n".join(spec.spec_content.sections["%package"])
@@ -78,7 +77,7 @@ def test_basic_local_update_patch_content(
 
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
-    spec = SpecFile(str(distgit / "beer.spec"), None)
+    spec = get_specfile(str(distgit / "beer.spec"))
 
     spec_package_section = "\n".join(spec.spec_content.sections["%package"])
     assert "Patch0001: 0001" in spec_package_section

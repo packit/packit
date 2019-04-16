@@ -19,16 +19,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 import logging
 import os
 from typing import Optional, Sequence
 
 import git
 import requests
-from rebasehelper.specfile import SpecFile
-
 from ogr.services.pagure import PagureService
+
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
@@ -66,7 +64,6 @@ class DistGit(PackitRepositoryBase):
         logger.debug(f"Using dist-git repo {self.dist_git_url}")
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
-        self._specfile = None
 
     @property
     def local_project(self):
@@ -83,24 +80,6 @@ class DistGit(PackitRepositoryBase):
                 ),
             )
         return self._local_project
-
-    @property
-    def specfile_path(self) -> Optional[str]:
-        if self.package_name:
-            return os.path.join(
-                self.local_project.working_dir, f"{self.package_name}.spec"
-            )
-        return None
-
-    @property
-    def specfile(self) -> SpecFile:
-        if self._specfile is None:
-            self._specfile = SpecFile(
-                path=self.specfile_path,
-                sources_location=self.local_project.working_dir,
-                changelog_entry=None,
-            )
-        return self._specfile
 
     def update_branch(self, branch_name: str):
         """

@@ -19,9 +19,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import inspect
 import logging
-from typing import Optional, Callable, List, Tuple
+from pathlib import Path
+from typing import Callable, List, Tuple
 
 import git
 from rebasehelper.specfile import SpecFile
@@ -43,21 +44,31 @@ class PackitRepositoryBase:
     def __init__(self, config: Config, package_config: PackageConfig) -> None:
         self.config = config
         self.package_config = package_config
-        self._specfile = None
 
     @property
-    def specfile(self) -> SpecFile:
-        """
-        :return: an instance of SpecFile
-        """
-        raise NotImplementedError
+    def specfile_dir(self) -> str:
+        """ get dir where the spec file is"""
+        return str(Path(self.specfile_path).parent)
 
     @property
-    def specfile_path(self) -> Optional[str]:
-        """
-        :return: a path to a Spec file
-        """
-        raise NotImplementedError
+    def specfile_path(self) -> str:
+        spec_path = (
+            Path(self.local_project.working_dir) / self.package_config.specfile_path
+        )
+        return str(spec_path)
+
+    @property
+    def specfile(self):
+        # changing API is fun, where else could we use inspect?
+        s = inspect.signature(SpecFile)
+        if "changelog_entry" in s.parameters:
+            return SpecFile(
+                path=self.specfile_path,
+                sources_location=self.specfile_dir,
+                changelog_entry=None,
+            )
+        else:
+            return SpecFile(path=self.specfile_path, sources_location=self.specfile_dir)
 
     def create_branch(
         self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
