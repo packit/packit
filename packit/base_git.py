@@ -22,7 +22,7 @@
 import inspect
 import logging
 from pathlib import Path
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Optional
 
 import git
 from rebasehelper.specfile import SpecFile
@@ -44,6 +44,7 @@ class PackitRepositoryBase:
     def __init__(self, config: Config, package_config: PackageConfig) -> None:
         self.config = config
         self.package_config = package_config
+        self._specfile_path: Optional[str] = None
 
     @property
     def specfile_dir(self) -> str:
@@ -52,10 +53,26 @@ class PackitRepositoryBase:
 
     @property
     def specfile_path(self) -> str:
-        spec_path = (
-            Path(self.local_project.working_dir) / self.package_config.specfile_path
-        )
-        return str(spec_path)
+        if not self._specfile_path:
+
+            possible_paths = [
+                Path(self.local_project.working_dir)
+                / self.package_config.specfile_path,
+                Path(self.local_project.working_dir)
+                / f"{self.package_config.downstream_package_name}.spec",
+            ]
+
+            for path in possible_paths:
+                if path.exists():
+                    self._specfile_path = str(path)
+                    break
+            else:
+                raise PackitException(
+                    f"Specfile not found."
+                    f"Tried: {','.join(str(p) for p in possible_paths)} ."
+                )
+
+        return self._specfile_path
 
     @property
     def specfile(self):
