@@ -23,6 +23,7 @@
 import logging
 import os
 import re
+import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
 
@@ -491,6 +492,6 @@ class Upstream(PackitRepositoryBase):
         except IndexError:
             raise PackitException("SRPM cannot be found, something is wrong.")
         if srpm_path:
-            Path(the_srpm).rename(srpm_path)
+            shutil.move(the_srpm, srpm_path)
             return Path(srpm_path)
         return Path(the_srpm)
