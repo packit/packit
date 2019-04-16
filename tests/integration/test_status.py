@@ -314,7 +314,7 @@ def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_bui
 
 
 @pytest.mark.parametrize(
-    "expected_releases,number_of_releases",
+    "expected_releases",
     (
         (
             [
@@ -342,8 +342,7 @@ def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_bui
                     "23-7-2018",
                     "www.packit.dev/tarball3",
                 ),
-            ],
-            3,
+            ]
         ),
         (
             [
@@ -355,14 +354,11 @@ def test_get_builds(upstream_n_distgit, expected_results, br_list, number_of_bui
                     "23-5-2018",
                     "www.packit.dev/tarball1",
                 )
-            ],
-            1,
+            ]
         ),
     ),
 )
-def test_get_releases(
-    upstream_instance, distgit_instance, expected_releases, number_of_releases
-):
+def test_get_releases(upstream_instance, distgit_instance, expected_releases):
     u, up = upstream_instance
     d, dg = distgit_instance
     c = get_test_config()
@@ -373,8 +369,8 @@ def test_get_releases(
         expected_releases
     )
     status = Status(c, pc, up, dg)
-    releases = status.get_up_releases(number_of_releases)
-    assert len(releases) == number_of_releases
+    releases = status.get_up_releases()
+    assert len(releases) == len(expected_releases)
     assert releases == expected_releases
 
 
