@@ -1,6 +1,15 @@
 ---
 - name: This is a recipe for a container image where packit tests will run
   hosts: all
+  vars:
+    ansible_bender:
+      target_image:
+        environment:
+          LD_PRELOAD: ""
+          NSS_WRAPPER_PASSWD: ""
+          NSS_WRAPPER_GROUP: /etc/group
+          USER: ""
+          HOME: ""
   tasks:
   - name: Install all packages needed to run tests
     dnf:
@@ -10,4 +19,8 @@
       - krb5-devel
       - rpm-libs
       - redhat-rpm-config
+      # when running the tests in a rootless podman container, tox environment
+      # needed gcc and rpm-devel to compile the rpm-libs python bindings
+      # - gcc
+      # - rpm-devel
       state: present
