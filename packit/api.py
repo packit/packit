@@ -355,7 +355,7 @@ class PackitAPI:
         spec_version = self.up.get_specfile_version()
 
         with self.up.local_project.git_checkout_block(ref=upstream_ref):
-            self.up.create_archive()
+            self.up.create_archive(version=upstream_ref)
 
         if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):

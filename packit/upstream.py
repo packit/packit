@@ -411,21 +411,18 @@ class Upstream(PackitRepositoryBase):
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
             raise PackitException("rebase-helper didn't do the job")
 
-    def create_archive(self):
+    def create_archive(self, version: str = None):
         """
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
-
+        version = version or self.get_current_version()
         if self.with_action(action=ActionName.create_archive):
 
             if self.package_config.upstream_project_name:
-                dir_name = (
-                    f"{self.package_config.upstream_project_name}"
-                    f"-{self.get_current_version()}"
-                )
+                dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
             else:
-                dir_name = f"{self.package_name}-{self.get_current_version()}"
+                dir_name = f"{self.package_name}-{version}"
             logger.debug("name + version = %s", dir_name)
             # We don't care about the name of the archive, really
             # we just require for the archive to be placed in the cwd
