@@ -242,19 +242,20 @@ class SyncFilesConfig(BaseConfig):
 
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync: List[SyncFilesItem] = files_to_sync
-        self._raw_files_to_sync: Optional[List[RawSyncFilesItem]] = None
 
     def __repr__(self):
         return f"SyncFilesConfig({self.files_to_sync!r})"
 
-    @property
-    def raw_files_to_sync(self) -> List[RawSyncFilesItem]:
-        if not self._raw_files_to_sync:
-            raw_files_to_sync: List[RawSyncFilesItem] = []
-            for sync in self.files_to_sync:
-                raw_files_to_sync += get_raw_files(file_to_sync=sync)
-            self._raw_files_to_sync = raw_files_to_sync
-        return self._raw_files_to_sync
+    def get_raw_files_to_sync(
+        self, src_dir: Path, dest_dir: Path
+    ) -> List[RawSyncFilesItem]:
+        """
+        Evaluate sync_files: render globs and prepend full paths
+        """
+        raw_files_to_sync: List[RawSyncFilesItem] = []
+        for sync in self.files_to_sync:
+            raw_files_to_sync += get_raw_files(src_dir, dest_dir, sync)
+        return raw_files_to_sync
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":

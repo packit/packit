@@ -281,7 +281,13 @@ class Upstream(PackitRepositoryBase):
                 ".",
             ] + [
                 f":(exclude){sync_file.src}"
-                for sync_file in self.package_config.synced_files.raw_files_to_sync
+                for sync_file in self.package_config.synced_files.get_raw_files_to_sync(
+                    Path(self.local_project.working_dir),
+                    Path(
+                        # this is not important, we only care about src
+                        destination
+                    ),
+                )
             ]
             diff = run_command(
                 cmd=git_diff_cmd, cwd=self.local_project.working_dir, output=True
