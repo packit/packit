@@ -89,3 +89,22 @@ and following commits will be added as downstream patches.
 
 Just make sure, that you apply all the patches in the specfile.
 (Packit only adds the patches after the sources.)
+You can use a following setup:
+
+- Define the macro on top of the specfile:
+    ```
+    %global num_patches %{lua: c=0; for i,p in ipairs(patches) do c=c+1; end; print(c);}
+    ```
+
+- Apply the patches in the `%prep` part:
+    ```
+    %if %{num_patches}
+    git init
+    git config user.email "noreply@example.com"
+    git config user.name "John Foo"
+    git add .
+    git commit -a -q -m "%{version} baseline."
+    # Apply all the patches.
+    git am %{patches}
+    %endif
+    ```
