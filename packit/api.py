@@ -377,6 +377,7 @@ class PackitAPI:
 
         dg_versions = status.get_dg_versions()
         if dg_versions:
+            logger.info("Dist-git versions:")
             for branch, dg_version in dg_versions.items():
                 logger.info(f"{branch}: {dg_version}")
 
