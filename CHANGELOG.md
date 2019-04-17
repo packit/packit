@@ -1,3 +1,49 @@
+# 0.4.0
+
+* README.md: add CoreOS to early adopters list
+* Use flake8 args on alone rows
+* Add files/packit.wsgi into pre-commit flake8 args
+* Call web_hook application
+* Add httpd and mod_wsgi for packit-service
+* /webhooks/github/release reacts to ping event
+* create_branch: check out if it exists
+* [packit] sync from downstream branch 'master'
+* Fix escaping of git patching
+* Move specfile to subdir in tests
+* Update upstream-ref option
+* Fix double imports in tests
+* Update packit/config.py
+* Fix tests and use yaml config in sourcegit tests
+* Add tests for sourcegit
+* Fix and refactor tests
+* Filter synced files in patches
+* Add raw_files_to_sync property to SyncFilesConfig
+* Add upstrem option to propose-update
+* jobs: remove `from future` code
+* bot_api: comment out WIP code
+* address review from Jirka
+* we don't like one-letter vars
+* polish docs/conf
+* docs for jobs
+* docs,conf: simplify example config
+* status: polish
+* add tests for Steve
+* Introduce Steve Jobs
+* bring JobConfig to the next level
+* add help for --debug
+* [spec] Generating man pages during build needs all requirements
+* Add multi-source example to docs
+* Improve integration tests for sync files
+* Use RawSyncFilesItem to more clear typing
+* Add tests for sync
+* Add docs for the sync methods
+* Allow lists in the sync file source
+* add jobs to our packit config
+* -_- fix spec to 0.3.0
+* recipe-tests: attempt a fix
+* recipe: install more content from RPM
+* containerized tests: comment out and document
+
 # 0.3.0
 
 We have a brand new website: https://packit.dev/! [packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
