@@ -374,8 +374,23 @@ class PackitAPI:
             logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
         else:
             logger.info("Downstream PRs: No open PRs.")
-        status.get_dg_versions()
-        status.get_up_releases()
+
+        dg_versions = status.get_dg_versions()
+        if dg_versions:
+            logger.info("Dist-git versions:")
+            for branch, dg_version in dg_versions.items():
+                logger.info(f"{branch}: {dg_version}")
+
+        up_releases = status.get_up_releases()
+        if up_releases:
+            logger.info("\nGitHub upstream releases:")
+            upstream_releases_str = "\n".join(
+                f"{release.tag_name}" for release in up_releases
+            )
+            logger.info(upstream_releases_str)
+        else:
+            logger.info("\nGitHub upstream releases: No releases found.")
+
         builds = status.get_builds()
         if builds:
             logger.info("\nLatest builds:")
