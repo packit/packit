@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        A tool to make you happy
 
 License:        Beerware
-Source0:        beerware-0.1.0.tar.gz
+Source0:        beerware-%{version}.tar.gz
 BuildArch:      noarch
 
 %description

@@ -25,7 +25,6 @@ import git
 import pytest
 from flexmock import flexmock
 from git import Repo
-from rebasehelper.specfile import SpecFile
 
 from packit.api import PackitAPI
 from packit.bot_api import PackitBotAPI
@@ -33,7 +32,7 @@ from packit.config import get_local_package_config
 from packit.fed_mes_consume import Consumerino
 from packit.local_project import LocalProject
 from tests.spellbook import TARBALL_NAME, get_test_config
-from tests.utils import cwd
+from tests.utils import cwd, get_specfile
 
 
 @pytest.fixture()
@@ -77,7 +76,7 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
         api.sync_release("master", "0.1.0")
 
         assert (d / TARBALL_NAME).is_file()
-        spec = SpecFile(str(d / "beer.spec"), None)
+        spec = get_specfile(str(d / "beer.spec"))
         assert spec.get_version() == "0.1.0"
 
 
@@ -97,7 +96,7 @@ def test_basic_local_update_from_downstream(
         api.sync_from_downstream("master", "master", True)
 
         assert (u / "beer.spec").is_file()
-        spec = SpecFile(str(u / "beer.spec"), None)
+        spec = get_specfile(str(u / "beer.spec"))
         assert spec.get_version() == "0.0.0"
 
 
@@ -111,7 +110,7 @@ def test_single_message(github_release_fedmsg, mock_remote_functionality_upstrea
 
     api.sync_upstream_release_with_fedmsg(github_release_fedmsg)
     assert (d / TARBALL_NAME).is_file()
-    spec = SpecFile(str(d / "beer.spec"), None)
+    spec = get_specfile(str(d / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
 

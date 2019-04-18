@@ -241,23 +241,28 @@ def downstream_n_distgit(tmpdir):
 
 
 @pytest.fixture()
-def upstream_instance(upstream_n_distgit):
-    u, d = upstream_n_distgit
+def upstream_instance(upstream_n_distgit, tmpdir):
 
-    # we need to chdir(u) because when PackageConfig is created,
-    # it already expects it's in the correct directory
-    old_cwd = os.getcwd()
-    chdir(u)
-    c = get_test_config()
+    with cwd(tmpdir):
+        u, d = upstream_n_distgit
+        c = get_test_config()
 
-    pc = get_local_package_config(str(u))
-    pc.upstream_project_url = str(u)
-    pc.downstream_project_url = str(d)
-    lp = LocalProject(path_or_url=str(u))
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        pc.downstream_project_url = str(d)
+        lp = LocalProject(path_or_url=str(u))
 
-    ups = Upstream(c, pc, lp)
-    yield u, ups
-    chdir(old_cwd)
+        ups = Upstream(c, pc, lp)
+        yield u, ups
+
+
+@pytest.fixture()
+def upstream_instance_with_two_commits(upstream_instance):
+    u, ups = upstream_instance
+    new_file = u / "new.file"
+    new_file.write_text("Some content")
+    git_add_and_commit(u, message="Add new file")
+    return u, ups
 
 
 @pytest.fixture()

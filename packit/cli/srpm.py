@@ -44,6 +44,13 @@ logger = logging.getLogger("packit")
         "If this is not specified, default to origin."
     ),
 )
+@click.option(
+    "--upstream-ref",
+    default=None,
+    help="Git ref of the last upstream commit in the current branch "
+    "from which packit should generate patches "
+    "(this option implies the repository is source-git).",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
@@ -51,7 +58,13 @@ logger = logging.getLogger("packit")
 )
 @pass_config
 @cover_packit_exception
-def srpm(config, output, path_or_url, remote):
+def srpm(
+    config,
+    output,
+    path_or_url,
+    upstream_ref,
+    remote,  # click introspects this in LocalProjectParameter
+):
     """
     Create new SRPM (.src.rpm file) using content of the upstream repository.
 
@@ -59,5 +72,5 @@ def srpm(config, output, path_or_url, remote):
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    srpm_path = api.create_srpm(output_file=output)
+    srpm_path = api.create_srpm(output_file=output, upstream_ref=upstream_ref)
     logger.info("SRPM: %s", srpm_path)

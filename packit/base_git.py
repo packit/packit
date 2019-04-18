@@ -19,9 +19,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import inspect
 import logging
-from typing import Optional, Callable
+from pathlib import Path
+from typing import Callable, List, Tuple, Optional
 
 import git
 from rebasehelper.specfile import SpecFile
@@ -43,21 +44,48 @@ class PackitRepositoryBase:
     def __init__(self, config: Config, package_config: PackageConfig) -> None:
         self.config = config
         self.package_config = package_config
-        self._specfile = None
+        self._specfile_path: Optional[str] = None
+
+    @property
+    def specfile_dir(self) -> str:
+        """ get dir where the spec file is"""
+        return str(Path(self.specfile_path).parent)
+
+    @property
+    def specfile_path(self) -> str:
+        if not self._specfile_path:
+
+            possible_paths = [
+                Path(self.local_project.working_dir)
+                / self.package_config.specfile_path,
+                Path(self.local_project.working_dir)
+                / f"{self.package_config.downstream_package_name}.spec",
+            ]
+
+            for path in possible_paths:
+                if path.exists():
+                    self._specfile_path = str(path)
+                    break
+            else:
+                raise PackitException(
+                    f"Specfile not found."
+                    f"Tried: {','.join(str(p) for p in possible_paths)} ."
+                )
+
+        return self._specfile_path
 
     @property
     def specfile(self) -> SpecFile:
-        """
-        :return: an instance of SpecFile
-        """
-        raise NotImplementedError
-
-    @property
-    def specfile_path(self) -> Optional[str]:
-        """
-        :return: a path to a Spec file
-        """
-        raise NotImplementedError
+        # changing API is fun, where else could we use inspect?
+        s = inspect.signature(SpecFile)
+        if "changelog_entry" in s.parameters:
+            return SpecFile(
+                path=self.specfile_path,
+                sources_location=self.specfile_dir,
+                changelog_entry=None,
+            )
+        else:
+            return SpecFile(path=self.specfile_path, sources_location=self.specfile_dir)
 
     def create_branch(
         self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
@@ -205,3 +233,45 @@ class PackitRepositoryBase:
             logger.info(f"Using user-defined script for {action}: {command}")
             return run_command(cmd=command, output=True)
         return None
+
+    def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
+        """
+        Add the given list of (patch_name, msg) to the specfile.
+
+        :param patch_list: [(patch_name, msg)] if None, the patches will be generated
+        """
+        logger.debug(f"About to add patches {patch_list} to specfile")
+        if not patch_list:
+            return
+        if not self.specfile_path:
+            raise Exception("No specfile")
+
+        with open(file=self.specfile_path, mode="r+") as spec_file:
+            last_source_position = None
+            line = spec_file.readline()
+            while line:
+                if line.startswith("Source"):
+                    last_source_position = spec_file.tell()
+                line = spec_file.readline()
+
+            if not last_source_position:
+                raise Exception("Cannot found place for patches in specfile.")
+
+            spec_file.seek(last_source_position)
+            rest_of_the_file = spec_file.read()
+            spec_file.seek(last_source_position)
+
+            spec_file.write("\n\n# PATCHES FROM SOURCE GIT:\n")
+            for i, (patch, msg) in enumerate(patch_list):
+                commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
+                spec_file.write(commented_msg)
+                spec_file.write(f"Patch{i + 1:04d}: {patch}\n")
+
+            spec_file.write("\n\n")
+            spec_file.write(rest_of_the_file)
+
+        logger.info(
+            f"Patches ({len(patch_list)}) added to the specfile ({self.specfile_path})"
+        )
+        self._specfile = None  # reload the specfile object
+        self.local_project.git_repo.index.write()
