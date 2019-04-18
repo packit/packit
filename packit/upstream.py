@@ -19,27 +19,26 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 import logging
 import os
 import re
+import shutil
 from pathlib import Path
 from typing import Optional, List, Tuple
 
 import git
 import github
+from ogr.services.github import GithubService
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
-from rebasehelper.specfile import SpecFile
 from rebasehelper.versioneer import versioneers_runner
 
-from ogr.services.github import GithubService
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
-from packit.utils import run_command
+from packit.utils import run_command, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +54,6 @@ class Upstream(PackitRepositoryBase):
         self.package_config = package_config
         self.local_project = local_project
 
-        self._specfile = None
-
         self.package_name: Optional[str] = self.package_config.downstream_package_name
 
         self.github_token = self.config.github_token
@@ -65,12 +62,8 @@ class Upstream(PackitRepositoryBase):
         self.set_local_project()
 
     @property
-    def active_branch(self):
+    def active_branch(self) -> str:
         return self.local_project.ref
-
-    @property
-    def specfile_path(self) -> str:
-        return self.package_config.specfile_path
 
     def set_local_project(self):
         """ update self.local_project """
@@ -101,16 +94,6 @@ class Upstream(PackitRepositoryBase):
         if not self.local_project.repo_name:
             # will this ever happen?
             self.local_project.repo_name = self.package_name
-
-    @property
-    def specfile(self):
-        if self._specfile is None:
-            self._specfile = SpecFile(
-                path=self.specfile_path,
-                sources_location=self.local_project.working_dir,
-                changelog_entry=None,
-            )
-        return self._specfile
 
     def checkout_pr(self, pr_id: int) -> None:
         """
@@ -145,7 +128,7 @@ class Upstream(PackitRepositoryBase):
         :return: list of commits (last commit on the current branch.).
         """
 
-        if upstream in self.local_project.git_repo.tags:
+        if is_a_git_ref(repo=self.local_project.git_repo, ref=upstream):
             upstream_ref = upstream
         else:
             upstream_ref = f"origin/{upstream}"
@@ -162,9 +145,7 @@ class Upstream(PackitRepositoryBase):
             )
         )
         if add_usptream_head_commit:
-            commits.insert(
-                0, self.local_project.git_repo.refs[f"{upstream_ref}"].commit
-            )
+            commits.insert(0, self.local_project.git_repo.commit(upstream_ref))
 
         logger.debug(
             f"Delta ({upstream_ref}..{self.local_project.ref}): {len(commits)}"
@@ -274,18 +255,13 @@ class Upstream(PackitRepositoryBase):
 
         upstream = upstream or self.get_specfile_version()
         commits = self.get_commits_to_upstream(upstream, add_usptream_head_commit=True)
-        patch_list = []
 
         destination = destination or self.local_project.working_dir
 
+        patches_to_create = []
         for i, commit in enumerate(commits[1:]):
             parent = commits[i]
 
-            patch_name = f"{i + 1:04d}-{commit.hexsha}.patch"
-            patch_path = os.path.join(destination, patch_name)
-            patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
-
-            logger.debug(f"PATCH: {patch_name}\n{patch_msg}")
             git_diff_cmd = [
                 "git",
                 "diff",
@@ -302,6 +278,19 @@ class Upstream(PackitRepositoryBase):
                 cmd=git_diff_cmd, cwd=self.local_project.working_dir, output=True
             )
 
+            if not diff:
+                logger.info(f"No patch for commit: {commit.summary} ({commit.hexsha})")
+                continue
+
+            patches_to_create.append((commit, diff))
+
+        patch_list = []
+        for i, (commit, diff) in enumerate(patches_to_create):
+            patch_name = f"{i + 1:04d}-{commit.hexsha}.patch"
+            patch_path = os.path.join(destination, patch_name)
+            patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
+
+            logger.debug(f"Saving patch: {patch_name}\n{patch_msg}")
             with open(patch_path, mode="w") as patch_file:
                 patch_file.write(diff)
             patch_list.append((patch_name, patch_msg))
@@ -360,7 +349,9 @@ class Upstream(PackitRepositoryBase):
             return action_output
 
         ver = run_command(
-            self.package_config.current_version_command, output=True
+            self.package_config.current_version_command,
+            output=True,
+            cwd=self.local_project.working_dir,
         ).strip()
         logger.debug("version = %s", ver)
         # FIXME: this might not work when users expect the dashes
@@ -397,31 +388,34 @@ class Upstream(PackitRepositoryBase):
             # also this code adds 3 rpmbuild dirs into the upstream repo,
             # we should ask rebase-helper not to do that
             self.specfile.set_version(version=version)
-            self.specfile.changelog_entry = changelog_entry
-            # https://github.com/rebase-helper/rebase-helper/blob/643dab4a864288327289f34e023124d5a499e04b/rebasehelper/application.py#L446-L448
-            new_log = self.specfile.get_new_log()
-            new_log.extend(self.specfile.spec_content.sections["%changelog"])
-            self.specfile.spec_content.sections["%changelog"] = new_log
-            self.specfile.save()
+
+            if hasattr(self.specfile, "update_changelog"):
+                # new rebase helper
+                self.specfile.update_changelog(changelog_entry)
+            else:
+                # old rebase helper
+                self.specfile.changelog_entry = changelog_entry
+                new_log = self.specfile.get_new_log()
+                new_log.extend(self.specfile.spec_content.sections["%changelog"])
+                self.specfile.spec_content.sections["%changelog"] = new_log
+                self.specfile.save()
+
         except RebaseHelperError as ex:
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
             raise PackitException("rebase-helper didn't do the job")
 
-    def create_archive(self):
+    def create_archive(self, version: str = None):
         """
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
-
+        version = version or self.get_current_version()
         if self.with_action(action=ActionName.create_archive):
 
             if self.package_config.upstream_project_name:
-                dir_name = (
-                    f"{self.package_config.upstream_project_name}"
-                    f"-{self.get_current_version()}"
-                )
+                dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
             else:
-                dir_name = f"{self.package_name}-{self.get_current_version()}"
+                dir_name = f"{self.package_name}-{version}"
             logger.debug("name + version = %s", dir_name)
             # We don't care about the name of the archive, really
             # we just require for the archive to be placed in the cwd
@@ -439,7 +433,7 @@ class Upstream(PackitRepositoryBase):
                     f"{dir_name}/",
                     "HEAD",
                 ]
-            run_command(archive_cmd)
+            run_command(archive_cmd, cwd=self.local_project.working_dir)
 
     def create_srpm(self, srpm_path: str = None) -> Path:
         """
@@ -448,7 +442,7 @@ class Upstream(PackitRepositoryBase):
         :param srpm_path: path to the srpm
         :return: path to the srpm
         """
-        cwd = os.getcwd()
+        cwd = self.local_project.working_dir
         cmd = [
             "rpmbuild",
             "-bs",
@@ -457,7 +451,7 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_specdir {cwd}",
             "--define",
-            f"_srcrpmdir {cwd}",
+            f"_srcrpmdir {os.getcwd()}",
             # no idea about this one, but tests were failing in tox w/o it
             "--define",
             f"_topdir {cwd}",
@@ -476,6 +470,7 @@ class Upstream(PackitRepositoryBase):
             cmd,
             output=True,
             error_message="SRPM could not be created. Is the archive present?",
+            cwd=self.local_project.working_dir,
         ).strip()
         logger.debug(f"{out}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
@@ -485,6 +480,6 @@ class Upstream(PackitRepositoryBase):
         except IndexError:
             raise PackitException("SRPM cannot be found, something is wrong.")
         if srpm_path:
-            Path(the_srpm).rename(srpm_path)
+            shutil.move(the_srpm, srpm_path)
             return Path(srpm_path)
         return Path(the_srpm)

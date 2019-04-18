@@ -204,9 +204,7 @@ class PackitAPI:
             )
         finally:
             if not use_local_content:
-                self.up.local_project.git_repo.git.checkout(
-                    current_up_branch.checkout()
-                )
+                self.up.local_project.git_repo.git.checkout(current_up_branch)
 
     def sync_from_downstream(
         self,
@@ -274,7 +272,7 @@ class PackitAPI:
         self.dg.create_pull(
             pr_title,
             pr_description,
-            source_branch=str(self.dg.local_project.ref),
+            source_branch=self.dg.local_project.ref,
             target_branch=dist_git_branch,
         )
 
@@ -343,16 +341,27 @@ class PackitAPI:
             update_type=update_type,
         )
 
-    def create_srpm(self, output_file: str = None) -> Path:
+    def create_srpm(self, output_file: str = None, upstream_ref: str = None) -> Path:
         """
         Create srpm from the upstream repo
 
+        :param upstream_ref: git ref to upstream commit
         :param output_file: path + filename where the srpm should be written, defaults to cwd
         :return: a path to the srpm
         """
-        version = self.up.get_current_version()
+        version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()
-        self.up.create_archive()
+
+        with self.up.local_project.git_checkout_block(ref=upstream_ref):
+            self.up.create_archive(version=upstream_ref)
+
+        if upstream_ref:
+            if self.up.with_action(action=ActionName.create_patches):
+                patches = self.up.create_patches(
+                    upstream=upstream_ref, destination=self.up.local_project.working_dir
+                )
+                self.up.add_patches_to_specfile(patches)
+
         if version != spec_version:
             try:
                 self.up.set_spec_version(

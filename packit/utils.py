@@ -220,3 +220,11 @@ def nested_get(d: dict, *keys, default=None) -> Any:
             logger.debug("can't obtain %s: %s", k, ex)
             return default
     return response
+
+
+def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
+    try:
+        commit = repo.commit(ref)
+        return bool(commit)
+    except git.BadName:
+        return False
