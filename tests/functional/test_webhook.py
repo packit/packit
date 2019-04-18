@@ -7,7 +7,7 @@ import requests
 
 @pytest.mark.skip
 def test_prop_update_on_packit_020():
-    url = "http://localhost:5000/webhooks/github/release"
+    url = "http://localhost:5000/webhooks/github"
     payload = {
         "repository": {
             "name": "packit",
