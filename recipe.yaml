@@ -81,6 +81,7 @@
       - twine  # we need newest twine, b/c of the check command
       - readme_renderer[md]
       state: latest
+      executable: pip3
   # TODO: we should do a git config instead
   - name: "Set up git: user.email"
     command: git config --global user.email "user-cont-team@redhat.com"
@@ -108,7 +109,9 @@
   - name: Install ogr from master
     pip:
       name: git+http://github.com/packit-service/ogr.git
+      executable: pip3
   # this requires to have sources mounted inside at /src
   - name: Install packit from the current working directory
     pip:
       name: /src
+      executable: pip3
