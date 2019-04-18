@@ -255,18 +255,13 @@ class Upstream(PackitRepositoryBase):
 
         upstream = upstream or self.get_specfile_version()
         commits = self.get_commits_to_upstream(upstream, add_usptream_head_commit=True)
-        patch_list = []
 
         destination = destination or self.local_project.working_dir
 
+        patches_to_create = []
         for i, commit in enumerate(commits[1:]):
             parent = commits[i]
 
-            patch_name = f"{i + 1:04d}-{commit.hexsha}.patch"
-            patch_path = os.path.join(destination, patch_name)
-            patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
-
-            logger.debug(f"PATCH: {patch_name}\n{patch_msg}")
             git_diff_cmd = [
                 "git",
                 "diff",
@@ -283,6 +278,19 @@ class Upstream(PackitRepositoryBase):
                 cmd=git_diff_cmd, cwd=self.local_project.working_dir, output=True
             )
 
+            if not diff:
+                logger.info(f"No patch for commit: {commit.summary} ({commit.hexsha})")
+                continue
+
+            patches_to_create.append((commit, diff))
+
+        patch_list = []
+        for i, (commit, diff) in enumerate(patches_to_create):
+            patch_name = f"{i + 1:04d}-{commit.hexsha}.patch"
+            patch_path = os.path.join(destination, patch_name)
+            patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
+
+            logger.debug(f"Saving patch: {patch_name}\n{patch_msg}")
             with open(patch_path, mode="w") as patch_file:
                 patch_file.write(diff)
             patch_list.append((patch_name, patch_msg))

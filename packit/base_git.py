@@ -75,7 +75,7 @@ class PackitRepositoryBase:
         return self._specfile_path
 
     @property
-    def specfile(self):
+    def specfile(self) -> SpecFile:
         # changing API is fun, where else could we use inspect?
         s = inspect.signature(SpecFile)
         if "changelog_entry" in s.parameters:
