@@ -4,6 +4,9 @@ PACKIT_IMAGE := docker.io/usercont/packit-service
 PACKIT_TESTS_IMAGE := packit-tests
 
 build: recipe.yaml
+	docker build --rm -t $(PACKIT_IMAGE) .
+
+build_ab: recipe.yaml
 	ansible-bender build -- ./recipe.yaml
 
 push-to-dockerd:
