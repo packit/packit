@@ -5,7 +5,8 @@
     user_name: packit
     home_path: /home/{{ user_name }}
     ansible_bender:
-      base_image: fedora:29
+      base_image: registry.fedoraproject.org/f29/httpd:2.4
+      #base_image: fedora:29
       target_image:
         name: docker.io/usercont/packit-service
         environment:
@@ -20,6 +21,35 @@
         volumes:
         - '{{ playbook_dir }}:/src:Z'
   tasks:
+  - name: Install all packages needed to hack on packit.
+    dnf:
+      name:
+      - python3-pip
+      - python3-setuptools
+      - git
+      - python3-setuptools_scm
+      - python3-setuptools_scm_git_archive
+      - python3-wheel  # for bdist_wheel
+      - python3-ipdb  # for easy debugging
+      - python3-fedmsg
+      - python3-pyyaml
+      - python3-rpm
+      - python3-GitPython
+      - python3-requests
+      - python3-pygithub
+      - python3-libpagure
+      - rpm-build
+      - rebase-helper
+      - fedpkg
+      - python3-flask
+      - nss_wrapper
+      - httpd
+      - mod_wsgi
+      - mod_md
+      # till https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6 is not in official repos
+      enablerepo: testing
+      state: present
+
   - user:
       name: '{{ user_name }}'
       create_home: yes
@@ -35,6 +65,17 @@
       dest: '{{ home_path }}/passwd'
       mode: 0777
 
+  # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
+  - name: Remove /etc/httpd/state
+    file:
+      path: /etc/httpd/state
+      state: absent
+  # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
+  - name: Create link to /etc/httpd/state
+    file:
+      src: /var/lib/httpd
+      dest: /etc/httpd/state
+      state: link
   - name: Create /usr/share/packit directory
     file:
       state: directory
