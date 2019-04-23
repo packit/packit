@@ -79,15 +79,13 @@ As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configur
 #### Requirements
 
 - [podman](https://github.com/containers/libpod)
-- [ansible-bender](https://pypi.org/project/ansible-bender) >= 0.5.1
-  - it requires [buildah](https://github.com/containers/buildah)
-- ansible
+- docker
 
 #### Targets
 
 Here are some important and useful targets of [Makefile](/Makefile):
 
-Use [ansible-bender](https://pypi.org/project/ansible-bender) to build container image from [recipe.yaml](recipe.yaml):
+Build a container image for packit service:
 ```
 make build
 ```
