@@ -3,7 +3,7 @@ PY_PACKAGE := packit
 PACKIT_IMAGE := docker.io/usercont/packit-service
 PACKIT_TESTS_IMAGE := packit-tests
 
-build: recipe.yaml
+build: recipe.yaml files/install-rpm-packages.yaml
 	docker build --rm -t $(PACKIT_IMAGE) .
 
 build-with-ab: recipe.yaml
