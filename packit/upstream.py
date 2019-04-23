@@ -158,7 +158,7 @@ class Upstream(PackitRepositoryBase):
         force: bool = False,
         fork: bool = True,
         remote_name: str = None,
-    ) -> str:
+    ) -> Tuple[str, Optional[str]]:
         """
         push current branch to fork if fork=True, else to origin
 
@@ -172,6 +172,7 @@ class Upstream(PackitRepositoryBase):
         logger.debug(
             f"About to {'force ' if force else ''}push changes to branch {branch_name}."
         )
+        fork_username = None
 
         if not remote_name:
             if fork:
@@ -180,6 +181,7 @@ class Upstream(PackitRepositoryBase):
                 else:
                     # ogr is awesome! if you want to fork your own repo, you'll get it!
                     project = self.local_project.git_project.get_fork(create=True)
+                fork_username = project.namespace
                 fork_urls = project.get_git_urls()
 
                 ssh_url = fork_urls["ssh"]
@@ -210,10 +212,15 @@ class Upstream(PackitRepositoryBase):
                 f"the error is:\n{ex}"
             )
             raise PackitException(msg)
-        return str(branch_name)
+        return str(branch_name), fork_username
 
     def create_pull(
-        self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
+        self,
+        pr_title: str,
+        pr_description: str,
+        source_branch: str,
+        target_branch: str,
+        fork_username: str = None,
     ) -> None:
         """
         Create upstream pull request using the requested branches
@@ -225,9 +232,11 @@ class Upstream(PackitRepositoryBase):
                 "Please provide GITHUB_TOKEN as an environment variable."
             )
 
-        if project:
+        if self.local_project.git_project.is_fork:
             source_branch = f"{project.namespace}:{source_branch}"
             project = self.local_project.git_project.parent
+        elif fork_username:
+            source_branch = f"{fork_username}:{source_branch}"
 
         try:
             upstream_pr = project.pr_create(
@@ -272,7 +281,13 @@ class Upstream(PackitRepositoryBase):
                 ".",
             ] + [
                 f":(exclude){sync_file.src}"
-                for sync_file in self.package_config.synced_files.raw_files_to_sync
+                for sync_file in self.package_config.synced_files.get_raw_files_to_sync(
+                    Path(self.local_project.working_dir),
+                    Path(
+                        # this is not important, we only care about src
+                        destination
+                    ),
+                )
             ]
             diff = run_command(
                 cmd=git_diff_cmd, cwd=self.local_project.working_dir, output=True

@@ -20,118 +20,50 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import glob
+from pathlib import Path
 
 import pytest
 from flexmock import flexmock
 
-from packit.config import SyncFilesConfig
-from packit.sync import get_files_from_wildcard, get_raw_files, SyncFilesItem
-
-
-@pytest.mark.parametrize(
-    "file,glob_files,result",
-    [
-        ("file", "file", [SyncFilesItem(src="file", dest="dest")]),
-        (
-            "file/",
-            ["file/a", "file/b"],
-            [
-                SyncFilesItem(src="file/a", dest="dest"),
-                SyncFilesItem(src="file/b", dest="dest"),
-            ],
-        ),
-        (
-            "*.md",
-            ["a.md", "b.md"],
-            [
-                SyncFilesItem(src="a.md", dest="dest"),
-                SyncFilesItem(src="b.md", dest="dest"),
-            ],
-        ),
-    ],
-)
-def test_get_files_from_wildcard(file, glob_files, result):
-    flexmock(glob, glob=lambda x: glob_files)
-
-    files = get_files_from_wildcard(file_wildcard=file, destination="dest")
-    assert files == result
+from packit.sync import get_raw_files, SyncFilesItem, RawSyncFilesItem
 
 
 @pytest.mark.parametrize(
     "file,glob_files,result",
     [
         (
-            SyncFilesItem(src="file", dest="dest"),
-            None,
-            [SyncFilesItem(src="file", dest="dest")],
-        ),
-        (
-            SyncFilesItem(src=["file"], dest="dest"),
-            None,
-            [SyncFilesItem(src="file", dest="dest")],
-        ),
-        (
-            SyncFilesItem(src=["file1", "file2"], dest="dest"),
-            None,
+            SyncFilesItem(src="file/*", dest="dest"),
+            [Path("file/a"), Path("file/b")],
             [
-                SyncFilesItem(src="file1", dest="dest"),
-                SyncFilesItem(src="file2", dest="dest"),
+                RawSyncFilesItem(Path("file/a"), Path("dest"), False),
+                RawSyncFilesItem(Path("file/b"), Path("dest"), False),
             ],
         ),
         (
-            SyncFilesItem(src="file/", dest="dest"),
-            ["file/a", "file/b"],
+            SyncFilesItem(src="file/*", dest="dest/"),
+            [Path("file/a"), Path("file/b")],
             [
-                SyncFilesItem(src="file/a", dest="dest"),
-                SyncFilesItem(src="file/b", dest="dest"),
+                RawSyncFilesItem(Path("file/a"), Path("dest"), True),
+                RawSyncFilesItem(Path("file/b"), Path("dest"), True),
             ],
+        ),
+        (
+            SyncFilesItem(src=["a"], dest="dest/"),
+            [Path("a")],
+            [RawSyncFilesItem(Path("a"), Path("dest"), True)],
         ),
         (
             SyncFilesItem(src=["*.md"], dest="dest"),
-            ["a.md", "b.md"],
+            [Path("a.md"), Path("b.md")],
             [
-                SyncFilesItem(src="a.md", dest="dest"),
-                SyncFilesItem(src="b.md", dest="dest"),
+                RawSyncFilesItem(Path("a.md"), Path("dest"), False),
+                RawSyncFilesItem(Path("b.md"), Path("dest"), False),
             ],
         ),
     ],
 )
 def test_get_raw_files(file, glob_files, result):
-    if glob_files is not None:
-        flexmock(glob, glob=lambda x: glob_files)
+    flexmock(Path, glob=lambda x: glob_files)
 
-    files = get_raw_files(file_to_sync=file)
+    files = get_raw_files(Path("."), Path("."), file)
     assert files == result
-
-
-@pytest.mark.parametrize(
-    "files,result",
-    [
-        ([], []),
-        (
-            [SyncFilesItem(src="file", dest="dest")],
-            [SyncFilesItem(src="file", dest="dest")],
-        ),
-        (
-            [
-                SyncFilesItem(src="file1", dest="dest"),
-                SyncFilesItem(src="file2", dest="dest"),
-            ],
-            [
-                SyncFilesItem(src="file1", dest="dest"),
-                SyncFilesItem(src="file2", dest="dest"),
-            ],
-        ),
-        (
-            [SyncFilesItem(src=["file1", "file2"], dest="dest")],
-            [
-                SyncFilesItem(src="file1", dest="dest"),
-                SyncFilesItem(src="file2", dest="dest"),
-            ],
-        ),
-    ],
-)
-def test_raw_files_to_sync(files, result):
-    files_to_sync = SyncFilesConfig(files_to_sync=files).raw_files_to_sync
-    assert files_to_sync == result
