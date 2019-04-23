@@ -6,7 +6,7 @@ PACKIT_TESTS_IMAGE := packit-tests
 build: recipe.yaml
 	docker build --rm -t $(PACKIT_IMAGE) .
 
-build_ab: recipe.yaml
+build-with-ab: recipe.yaml
 	ansible-bender build -- ./recipe.yaml
 
 push-to-dockerd:
@@ -44,11 +44,11 @@ check-pypi-packaging:
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
 		'
 
-build-tests: recipe-tests.yaml
-	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
+# build-tests: recipe-tests.yaml
+# 	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
 
-shell:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(PACKIT_TESTS_IMAGE) bash
+# shell:
+# 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(PACKIT_TESTS_IMAGE) bash
 
 # we should probably run tests in a root container (sudo podman)
 # getting these type of errors with rootless:
