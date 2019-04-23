@@ -93,6 +93,10 @@ class SteveJobs:
         action = nested_get(event, "action")
         logger.debug(f"action = {action}")
         pr_id = nested_get(event, "number")
+        is_pr = nested_get(event, "pull_request")
+        if not is_pr:
+            logger.info("Not a pull request event.")
+            return None
         if action in ["opened", "reopened", "synchronize"] and pr_id:
             repo_namespace = nested_get(
                 event, "pull_request", "head", "repo", "owner", "login"
