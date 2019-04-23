@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import logging
 from pathlib import Path
 from typing import Sequence
+
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -103,11 +104,12 @@ class PackitAPI:
 
         self._handle_sources(add_new_sources=True, force_new_sources=False)
 
-        sync_files(
-            self.package_config.synced_files.raw_files_to_sync,
-            self.up.local_project.working_dir,
-            self.dg.local_project.working_dir,
+        raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+            Path(self.up.local_project.working_dir),
+            Path(self.dg.local_project.working_dir),
         )
+        sync_files(raw_sync_files)
+
         self.dg.commit(title=f"Sync upstream pr: {pr_id}", msg=description)
 
         self.push_and_create_pr(
@@ -171,11 +173,11 @@ class PackitAPI:
             )
 
             if self.up.with_action(action=ActionName.prepare_files):
-                sync_files(
-                    self.package_config.synced_files.raw_files_to_sync,
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
+                raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+                    Path(self.up.local_project.working_dir),
+                    Path(self.dg.local_project.working_dir),
                 )
+                sync_files(raw_sync_files)
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
@@ -189,11 +191,11 @@ class PackitAPI:
                 )
 
             if self.up.has_action(action=ActionName.prepare_files):
-                sync_files(
-                    self.package_config.synced_files.raw_files_to_sync,
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
+                raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+                    Path(self.up.local_project.working_dir),
+                    Path(self.dg.local_project.working_dir),
                 )
+                sync_files(raw_sync_files)
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
@@ -223,6 +225,10 @@ class PackitAPI:
         :param fork: forks the project if set to True
         :param remote_name: name of remote where we should push; if None, try to find a ssh_url
         """
+        if not dist_git_branch:
+            raise PackitException("Dist-git branch is not set.")
+        if not upstream_branch:
+            raise PackitException("Upstream branch is not set.")
         logger.info(f"upstream active branch {self.up.active_branch}")
 
         self.dg.update_branch(dist_git_branch)
@@ -234,11 +240,12 @@ class PackitAPI:
         self.up.create_branch(local_pr_branch)
         self.up.checkout_branch(local_pr_branch)
 
-        sync_files(
-            self.package_config.synced_files.raw_files_to_sync,
-            self.dg.local_project.working_dir,
-            self.up.local_project.working_dir,
+        raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+            Path(self.dg.local_project.working_dir),
+            Path(self.up.local_project.working_dir),
         )
+
+        sync_files(raw_sync_files)
 
         if not no_pr:
             description = (
@@ -251,7 +258,7 @@ class PackitAPI:
             self.up.commit(title=commit_msg, msg=description)
 
             # the branch may already be up, let's push forcefully
-            source_branch = self.up.push(
+            source_branch, fork_username = self.up.push(
                 self.up.local_project.ref,
                 fork=fork,
                 force=True,
@@ -262,6 +269,7 @@ class PackitAPI:
                 description,
                 source_branch=source_branch,
                 target_branch=upstream_branch,
+                fork_username=fork_username,
             )
 
     def push_and_create_pr(

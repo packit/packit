@@ -38,3 +38,5 @@ URM_NEW_RELEASE_TOPIC = "org.release-monitoring.prod.anitya.project.version.upda
 GH2FED_RELEASE_TOPIC = "org.fedoraproject.prod.github.release"
 
 DEFAULT_BODHI_NOTE = "New upstream release: {version}"
+
+PROD_DISTGIT_URL = "https://src.fedoraproject.org/"

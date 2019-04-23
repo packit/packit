@@ -20,11 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import glob
 import logging
-import os
 import shutil
-from typing import List, NamedTuple, Union
+from pathlib import Path
+from typing import List
+from typing import NamedTuple, Union
 
 from packit.exceptions import PackitException
 
@@ -45,40 +45,33 @@ class SyncFilesItem(NamedTuple):
         return self.src == other.src and self.dest == other.dest
 
 
-class RawSyncFilesItem(SyncFilesItem):
-    src: str
-    dest: str
+class RawSyncFilesItem(NamedTuple):
+    src: Path
+    dest: Path
+    # when dest is specified with trailing slash, it is meant to be a dir
+    dest_is_dir: bool
+
+    def __repr__(self):
+        return f"RawSyncFilesItem(src={self.src}, dest={self.dest}, dist_is_dir={self.dest_is_dir})"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RawSyncFilesItem):
+            raise NotImplementedError()
+
+        return (
+            self.src == other.src
+            and self.dest == other.dest
+            and self.dest_is_dir == other.dest_is_dir
+        )
 
 
-def get_files_from_wildcard(
-    file_wildcard: str, destination: str
+def get_raw_files(
+    src_dir: Path, dest_dir: Path, file_to_sync: SyncFilesItem
 ) -> List[RawSyncFilesItem]:
     """
-    Get list of SyncFilesItem that match the wildcard.
-
-    :param file_wildcard:   - if ends with '/' we add all files of that directory
-                            - if contains '*', we use glob.glob to get matches
-    :param destination: used to create RawSyncFilesItem instances
-    :return: list of matching RawSyncFilesItem instances
-    """
-    if "*" not in file_wildcard:
-        if file_wildcard.endswith("/"):
-            file_wildcard = f"{file_wildcard}*"
-        else:
-            return [RawSyncFilesItem(src=file_wildcard, dest=destination)]
-
-    globed_files = glob.glob(file_wildcard)
-    return [RawSyncFilesItem(src=file, dest=destination) for file in globed_files]
-
-
-def get_raw_files(file_to_sync: SyncFilesItem) -> List[RawSyncFilesItem]:
-    """
-    Split the  SyncFilesItem with src as a list or wildcard to multiple instances.
+    Split SyncFilesItem into multiple RawSyncFilesItem instances (src can be a list)
 
     Destination is used from the original SyncFilesItem.
-
-    :param file_to_sync: SyncFilesItem to split
-    :return: [RawSyncFilesItem]
     """
     source = file_to_sync.src
     if not isinstance(source, list):
@@ -86,32 +79,39 @@ def get_raw_files(file_to_sync: SyncFilesItem) -> List[RawSyncFilesItem]:
 
     files_to_sync: List[RawSyncFilesItem] = []
     for file in source:
-        files_to_sync += get_files_from_wildcard(
-            file_wildcard=file, destination=file_to_sync.dest
-        )
+        globs = src_dir.glob(file)
+        target = dest_dir.joinpath(file_to_sync.dest)
+
+        for g in globs:
+            files_to_sync.append(
+                RawSyncFilesItem(
+                    src=g,
+                    dest=target,
+                    dest_is_dir=True if file_to_sync.dest.endswith("/") else False,
+                )
+            )
     return files_to_sync
 
 
-def sync_files(
-    files_to_sync: List[RawSyncFilesItem], src_working_dir: str, dest_working_dir: str
-) -> None:
+def sync_files(files_to_sync: List[RawSyncFilesItem]) -> None:
     """
-    Sync required files from upstream to downstream.
+    Copy files b/w upstream and downstream repo.
     """
     logger.debug(f"Copy synced files {files_to_sync}")
 
     for fi in files_to_sync:
-        # Check if destination dir exists
-        # If not create the destination dir
-        dest_dir = os.path.join(dest_working_dir, fi.dest)
-        logger.debug(f"Destination {dest_dir}")
-        # Sync all source file
-        src_file = os.path.join(src_working_dir, fi.src)
-        logger.debug(f"Source file {src_file}")
-        if os.path.exists(src_file):
-            logger.info(f"Syncing {src_file}")
-            shutil.copy2(src_file, dest_dir)
+        src = Path(fi.src)
+        dest = Path(fi.dest)
+        logger.debug(f"src = {src}, dest = {dest}")
+        if src.exists():
+            if src.is_dir():
+                logger.debug("src is a dir, using copytree")
+                shutil.copytree(src, dest)
+            else:
+                if fi.dest_is_dir:
+                    logger.info(f"Creating target directory: {dest}")
+                    dest.mkdir(parents=True, exist_ok=True)
+                logger.info(f"Copying {src} to {dest}.")
+                shutil.copy2(src, dest)
         else:
-            raise PackitException(
-                f"File {src_file} is not present in the upstream repository. "
-            )
+            raise PackitException(f"Path {src} does not exist.")

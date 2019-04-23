@@ -21,33 +21,38 @@
 # SOFTWARE.
 
 """
-Watch for new pull requests and changes to existing pull requests.
+Watch for new upstream releases.
 """
 import logging
 
 import click
 
-from packit.bot_api import PackitBotAPI
 from packit.cli.utils import cover_packit_exception
 from packit.config import pass_config
+from packit.fed_mes_consume import Consumerino
+from packit.jobs import SteveJobs
 
 logger = logging.getLogger(__name__)
 
 
-@click.command("watch-pr")
+@click.command("listen-to-fedmsg")
 @click.argument("message-id", nargs=-1)
 @pass_config
 @cover_packit_exception
-def watch_pr(config, message_id):
+def listen_to_fedmsg(config, message_id):
     """
-    Watch for activity on github and create/update a downstream PR
+    Listen to events on fedmsg and process them.
 
-    :return: int, retcode
+    if MESSAGE-ID is specified, process only the selected messages
     """
-    api = PackitBotAPI(config)
+
+    consumerino = Consumerino()
+    steve = SteveJobs(config)
+
     if message_id:
         for msg_id in message_id:
-            fedmsg_dict = api.consumerino.fetch_fedmsg_dict(msg_id)
-            api.sync_upstream_pull_request_with_fedmsg(fedmsg_dict)
+            fedmsg_dict = consumerino.fetch_fedmsg_dict(msg_id)
+            steve.process_message(fedmsg_dict)
     else:
-        api.watch_upstream_pull_request()
+        for topic, msg in consumerino.yield_all_messages():
+            steve.process_message(msg, topic=topic)

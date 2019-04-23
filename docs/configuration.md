@@ -77,6 +77,8 @@ Jobs can also accept additional configuration in a dict `metadata`.
 
 **propose\_downstream**
 
+Take the new upstream release and land it in Fedora.
+
 Supported triggers: **release**.
 
 Additional configuration set in the `metadata` section:
@@ -100,6 +102,23 @@ jobs:
 With this configuration, packit service would react to new upstream releases
 and create dist-git pull requests for master and f30 branches with the
 content of the upstream release.
+
+
+**sync\_from\_downstream**
+
+Pick up a change (mass rebuild, proven packager rebuild or fix) from Fedora
+dist-git and send it to upstream repository.
+
+Supported triggers: **commit**.
+
+
+**Example**
+
+```yaml
+jobs:
+- job: sync_from_downstream
+  trigger: commit
+```
 
 
 ### Real examples

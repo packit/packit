@@ -105,7 +105,7 @@ class LocalProject:
                 git_url = git_url or path_or_url
 
         self.git_repo: git.Repo = git_repo
-        self.working_dir = working_dir
+        self.working_dir: str = working_dir
         self._ref = ref
         self.git_project = git_project
         self.git_service = git_service

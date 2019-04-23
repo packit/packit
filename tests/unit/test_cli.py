@@ -27,7 +27,7 @@ from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
 from packit.cli.packit_base import version as cli_version
 from packit.cli.update import update
-from packit.cli.watch_upstream_release import watch_releases
+from packit.cli.listen_to_fedmsg import listen_to_fedmsg
 from tests.spellbook import call_packit
 
 
@@ -55,14 +55,16 @@ def test_base_version():
     # assert version in result.output
 
 
-@pytest.mark.parametrize("cmd_function", [update, watch_releases, build, create_update])
+@pytest.mark.parametrize(
+    "cmd_function", [update, listen_to_fedmsg, build, create_update]
+)
 def test_base_subcommand_direct(cmd_function):
     result = call_packit(cmd_function, parameters=["--help"])
     assert result.exit_code == 0
 
 
 @pytest.mark.parametrize(
-    "subcommand", ["propose-update", "watch-releases", "build", "create-update"]
+    "subcommand", ["propose-update", "build", "create-update", "listen-to-fedmsg"]
 )
 def test_base_subcommand_help(subcommand):
     result = call_packit(packit_base, parameters=[subcommand, "--help"])
