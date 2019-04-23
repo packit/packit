@@ -4,7 +4,6 @@
   vars:
     user_name: packit
     home_path: /home/{{ user_name }}
-
     ansible_bender:
       base_image: fedora:29
       target_image:
@@ -20,34 +19,7 @@
       working_container:
         volumes:
         - '{{ playbook_dir }}:/src:Z'
-
   tasks:
-  - name: Install all packages needed to hack on packit.
-    dnf:
-      name:
-      - python3-pip
-      - python3-setuptools
-      - git
-      - python3-setuptools_scm
-      - python3-setuptools_scm_git_archive
-      - python3-wheel  # for bdist_wheel
-      - python3-ipdb  # for easy debugging
-      - python3-fedmsg
-      - python3-pyyaml
-      - python3-rpm
-      - python3-GitPython
-      - python3-requests
-      - python3-pygithub
-      - python3-libpagure
-      - rpm-build
-      - rebase-helper
-      - fedpkg
-      - python3-flask
-      - nss_wrapper
-      - httpd
-      - mod_wsgi
-      state: present
-
   - user:
       name: '{{ user_name }}'
       create_home: yes
@@ -106,12 +78,7 @@
     assert:
       that:
       - 'src_path.stat.isdir'
-  - name: Install ogr from master
-    pip:
-      name: git+http://github.com/packit-service/ogr.git
-      executable: pip3
-  # this requires to have sources mounted inside at /src
-  - name: Install packit from the current working directory
+  - name: Install packit from /src
     pip:
       name: /src
       executable: pip3

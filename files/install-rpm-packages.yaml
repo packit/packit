@@ -1,0 +1,30 @@
+---
+- name: Install dependencies for packit.
+  hosts: all
+  tasks:
+  - name: Install all RPM packages needed to hack on packit.
+    dnf:
+      name:
+      - python3-pip
+      - python3-setuptools
+      - git
+      - python3-setuptools_scm
+      - python3-setuptools_scm_git_archive
+      - python3-wheel  # for bdist_wheel
+      - python3-ipdb  # for easy debugging
+      - python3-fedmsg
+      - python3-pyyaml
+      - python3-rpm
+      - python3-GitPython
+      - python3-requests
+      - python3-pygithub
+      - python3-libpagure
+      - python3-ogr
+      - rpm-build
+      - rebase-helper
+      - fedpkg
+      - python3-flask
+      - nss_wrapper
+      - httpd
+      - mod_wsgi
+      state: present
