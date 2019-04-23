@@ -1,17 +1,18 @@
 FROM registry.fedoraproject.org/fedora:29
 
 ENV LANG=en_US.UTF-8
+# nicer output from the playbook run
+ENV ANSIBLE_STDOUT_CALLBACK=debug
 
 RUN ln -s /usr/bin/python3 /usr/bin/python && \
     dnf install -y ansible
 
-COPY recipe.yaml /tmp/
-COPY files /tmp/files/
 COPY . /src/
 
-RUN cd /tmp/ && \
-    ansible-playbook -vvv -c local -i localhost, recipe.yaml && \
-    dnf remove -y ansible &&  dnf clean all
+RUN cd /src/ \
+    && ansible-playbook -vv -c local -i localhost, recipe.yaml \
+    && dnf remove -y ansible \
+    && dnf clean all
 
 ENV USER=packit \
     HOME=/home/packit/ \
