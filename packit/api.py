@@ -28,6 +28,7 @@ import logging
 from pathlib import Path
 from typing import Sequence
 
+from ogr.services.github import GithubProject
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -383,6 +384,11 @@ class PackitAPI:
         return srpm_path
 
     def status(self):
+        self.up.local_project.git_project = GithubProject(
+            repo=self.up.local_project.repo_name,
+            namespace=self.up.local_project.namespace,
+            service=self.up.local_project.git_service,
+        )
         status = Status(self.config, self.package_config, self.up, self.dg)
 
         ds_prs = status.get_downstream_prs()
