@@ -47,14 +47,6 @@
       group: apache
       mode: 0644
 
-  - name: Install latest twine for sake of check command
-    pip:
-      name:
-      - twine  # we need newest twine, b/c of the check command
-      - readme_renderer[md]
-      state: latest
-      executable: pip3
-  # TODO: we should do a git config instead
   - name: "Set up git: user.email"
     command: git config --global user.email "user-cont-team@redhat.com"
   - name: "Set up git: user.name"
