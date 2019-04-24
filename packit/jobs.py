@@ -298,6 +298,19 @@ class NewDistGitCommit(FedmsgHandler):
         )
 
 
+# @add_to_mapping
+# class CoprBuildFinished(FedmsgHandler):
+#     topic="org.fedoraproject.prod.copr.build.end"
+#     name = JobType.ReportCoprResult
+#
+#     def run(self):
+#         msg = f"Build {self.event['msg']['build']} " \
+#               f"{'passed' if self.event['msg']['status'] else 'failed'}.\n" \
+#               f"\tpackage: {self.event['msg']['pkg']}\n" \
+#               f"\tchroot: {self.event['msg']['chroot']}\n"
+#         # TODO: lookup specific commit related to the build and comment on it
+#         # local cache containing "watched" copr builds?
+
 # class NewDistGitPRFlag(FedmsgHandler):
 #     """ A new flag was added to a dist-git pull request """
 #     topic = "org.fedoraproject.prod.pagure.pull-request.flag.added"
@@ -350,3 +363,55 @@ class GithubReleaseHandler(JobHandler):
             dist_git_branch=self.job.metadata.get("dist-git-branch", "master"),
             version=version,
         )
+
+
+@add_to_mapping
+class GithubCoprBuildHandlerRelease(JobHandler):
+    name = JobType.copr_build
+    triggers = [JobTriggerType.release]
+
+    def run(self):
+        clone_url = self.event["repository"]["html_url"]
+        tag_name = self.event["release"]["tag_name"]
+
+        local_project = LocalProject(git_project=self.project)
+        api = PackitAPI(self.config, self.package_config, local_project)
+
+        build_id, repo_url = api.run_copr_build(
+            namespace=self.project.namespace,
+            repo=self.project.repo,
+            committish=tag_name,
+            clone_url=clone_url,
+            chroots=self.job.metadata.get("chroots"),
+        )
+
+        # report
+        msg = f"Copr build(ID {build_id}) triggered\nMore info: {repo_url}"
+        self.project.commit_comment(
+            commit=self.project.get_sha_from_tag(tag_name), body=msg
+        )
+
+
+@add_to_mapping
+class GithubCoprBuildHandlerPR(JobHandler):
+    name = JobType.copr_build
+    triggers = [JobTriggerType.pull_request]
+
+    def run(self):
+        clone_url = nested_get(self.event, "pull_request", "head", "repo", "clone_url")
+        committish = nested_get(self.event, "pull_request", "head", "sha")
+
+        local_project = LocalProject(git_project=self.project)
+        api = PackitAPI(self.config, self.package_config, local_project)
+
+        build_id, repo_url = api.run_copr_build(
+            namespace=self.project.namespace,
+            repo=self.project.repo,
+            committish=committish,
+            clone_url=clone_url,
+            chroots=self.job.metadata.get("chroots"),
+        )
+
+        # report
+        msg = f"Copr build(ID {build_id}) triggered\nMore info: {repo_url}"
+        self.project.pr_comment(self.event["number"], msg)
