@@ -20,9 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import subprocess
+from pathlib import Path
 
+from tests.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME, git_add_and_commit
-from tests.utils import get_specfile
+from tests.utils import get_specfile, cwd
 
 
 def test_basic_local_update_without_patching(
@@ -129,3 +131,12 @@ def test_basic_local_update_patch_content(
         "-containing some text.\n"
         "+new changes\n" not in git_diff
     )
+
+
+def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
+    # TODO: we need a better test case here which will mimic the systemd use case
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path / "fedora")
+    with cwd(sg_path):
+        api_instance_source_git.create_srpm(upstream_ref="0.1.0")
+    assert list(sg_path.glob("beer-0.1.0-1.*.src.rpm"))[0].is_file()
