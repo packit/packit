@@ -55,6 +55,7 @@ USER_CONFIG_SCHEMA = {
     "type": "object",
     "properties": {
         "debug": {"type": "boolean"},
+        "dry_run": {"type": "boolean"},
         "fas_user": {"type": "string"},
         "keytab_path": {"type": "string"},
         "github_token": {"type": "string"},

@@ -86,10 +86,12 @@ class Upstream(PackitRepositoryBase):
                 self.config.github_app_id, private_key
             )
             token = integration.get_access_token(self.config.github_app_installation_id)
-            gh_service = GithubService(token=token)
+            gh_service = GithubService(token=token, read_only=self.config.dry_run)
         else:
             logger.debug("Authenticating with Github using a token.")
-            gh_service = GithubService(token=self.config.github_token)
+            gh_service = GithubService(
+                token=self.config.github_token, read_only=self.config.dry_run
+            )
         self.local_project.git_service = gh_service
         if not self.local_project.repo_name:
             # will this ever happen?
