@@ -77,6 +77,7 @@ class DistGit(PackitRepositoryBase):
                 git_service=PagureService(
                     token=self.pagure_user_token,
                     instance_url=self.package_config.dist_git_base_url,
+                    read_only=self.config.dry_run,
                 ),
             )
         return self._local_project
