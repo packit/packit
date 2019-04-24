@@ -93,7 +93,7 @@ class PackitAPI:
 
         if self.up.with_action(action=ActionName.create_patches):
             patches = self.up.create_patches(
-                upstream=upstream_version, destination=self.dg.local_project.working_dir
+                upstream=upstream_version, destination=self.dg.specfile_dir
             )
             self.dg.add_patches_to_specfile(patches)
 
@@ -181,8 +181,7 @@ class PackitAPI:
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
-                            upstream=upstream_ref,
-                            destination=self.dg.local_project.working_dir,
+                            upstream=upstream_ref, destination=self.dg.specfile_dir
                         )
                         self.dg.add_patches_to_specfile(patches)
 
@@ -360,13 +359,18 @@ class PackitAPI:
         version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()
 
-        with self.up.local_project.git_checkout_block(ref=upstream_ref):
-            self.up.create_archive(version=upstream_ref)
+        if upstream_ref:
+            # source-git code: fetch the tarball and don't check out the upstream ref
+            self.up.fetch_upstream_archive()
+        else:
+            with self.up.local_project.git_checkout_block(ref=upstream_ref):
+                # upstream repo: create the archive
+                self.up.create_archive(version=upstream_ref)
 
         if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):
                 patches = self.up.create_patches(
-                    upstream=upstream_ref, destination=self.up.local_project.working_dir
+                    upstream=upstream_ref, destination=self.up.specfile_dir
                 )
                 self.up.add_patches_to_specfile(patches)
 
