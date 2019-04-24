@@ -30,6 +30,9 @@ from typing import Sequence
 
 from tabulate import tabulate
 
+from copr.v3 import Client as CoprClient
+from copr.v3.exceptions import CoprNoResultException
+
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
@@ -421,3 +424,30 @@ class PackitAPI:
         if updates:
             logger.info("\nLatest bodhi updates:")
             logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
+
+    def run_copr_build(self, namespace, repo, clone_url, committish, chroots):
+        # get info
+        client = CoprClient.create_from_config_file()
+        owner = "dhodovsk"
+        project = f"{namespace}-{repo}"
+
+        # make sure we build on copr projects owned by packit
+        try:
+            copr_proj = client.project_proxy.get(owner, project)
+            # make sure or project has chroots set correctly
+            if set(copr_proj.chroot_repos.keys()) != set(chroots):
+                client.project_proxy.edit(owner, project, chroots=chroots)
+        except CoprNoResultException:
+            client.project_proxy.add(
+                ownername=owner,
+                projectname=project,
+                chroots=chroots,
+                decription="Repo for automatic rebuild owned by packit",
+                contact="cyborg@redhat.com",
+            )
+
+        # report
+        build = client.build_proxy.create_from_scm(
+            owner, project, clone_url, committish=committish
+        )
+        return build.id, build.repo_url

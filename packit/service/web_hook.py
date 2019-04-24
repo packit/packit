@@ -58,6 +58,30 @@ def github_release():
         logger.debug(f"/webhooks/github/release received ping event: {msg['hook']}")
         return "Pong!"
 
+    return _give_event_to_steve(msg)
+
+
+@app.route("/webhooks/github/pull_request")
+def github_pr():
+    msg = request.get_json()
+
+    if not msg:
+        logger.debug(
+            "/webhooks/github/pull_request: We haven't received any JSON data."
+        )
+        return "We haven't received any JSON data."
+
+    allowed_actions = ["opened", "edited", "reopened"]
+    if not (msg.get("action") in allowed_actions):
+        logger.debug(
+            f"/webhooks/github/pull_request: Ignoring pull_request event - {msg['action']}"
+        )
+        return "We only accept events for opened or edited pull_requests."
+
+    return _give_event_to_steve(msg)
+
+
+def _give_event_to_steve(event):
     buffer = StringIO()
     logHandler = logging.StreamHandler(buffer)
     logHandler.setLevel(logging.INFO)
@@ -70,7 +94,7 @@ def github_release():
     config = Config.get_user_config()
 
     steve = SteveJobs(config)
-    steve.process_message(msg)
+    steve.process_message(event)
 
     logger.removeHandler(logHandler)
     buffer.flush()
