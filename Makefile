@@ -3,14 +3,8 @@ PY_PACKAGE := packit
 PACKIT_IMAGE := docker.io/usercont/packit-service
 PACKIT_TESTS_IMAGE := packit-tests
 
-build: recipe.yaml
+build: recipe.yaml files/install-rpm-packages.yaml
 	docker build --rm -t $(PACKIT_IMAGE) .
-
-build-with-ab: recipe.yaml
-	ansible-bender build -- ./recipe.yaml
-
-push-to-dockerd:
-	ansible-bender push docker-daemon:$(PACKIT_IMAGE):latest
 
 # we can't use rootless podman here b/c we can't mount ~/.ssh inside (0400)
 run: recipe.yaml
@@ -30,19 +24,6 @@ prepare-check:
 
 check:
 	tox
-
-check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(SOURCE_GIT_IMAGE) bash -c '\
-		set -x \
-		&& rm -f dist/* \
-		&& python3 ./setup.py sdist bdist_wheel \
-		&& pip3 install dist/*.tar.gz \
-		&& packit --help \
-		&& pip3 show $(PY_PACKAGE) \
-		&& twine check ./dist/* \
-		&& python3 -c "import packit; assert packit.__version__" \
-		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
-		'
 
 # build-tests: recipe-tests.yaml
 # 	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)

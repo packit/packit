@@ -3,16 +3,23 @@ FROM registry.fedoraproject.org/fedora:29
 ENV LANG=en_US.UTF-8
 # nicer output from the playbook run
 ENV ANSIBLE_STDOUT_CALLBACK=debug
+RUN ln -s /usr/bin/python3 /usr/bin/python \
+    && dnf install -y ansible
 
-RUN ln -s /usr/bin/python3 /usr/bin/python && \
-    dnf install -y ansible
+# Ansible doesn't like /tmp
+COPY files/ /src/files/
 
-COPY . /src/
+# Install packages first and reuse the cache as much as possible
+RUN cd /src/ \
+    && ansible-playbook -vv -c local -i localhost, files/install-rpm-packages.yaml
+
+COPY setup.py recipe.yaml /src/
+# setuptools-scm
+COPY .git /src/.git
+COPY packit/ /src/packit/
 
 RUN cd /src/ \
-    && ansible-playbook -vv -c local -i localhost, recipe.yaml \
-    && dnf remove -y ansible \
-    && dnf clean all
+    && ansible-playbook -vv -c local -i localhost, recipe.yaml
 
 ENV USER=packit \
     HOME=/home/packit/ \
