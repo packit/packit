@@ -5,9 +5,9 @@ import logging
 from typing import List, Optional, Tuple, Dict, Type
 
 from ogr.abstract import GitProject, GitService
-from ogr.services.github import GithubProject, GithubService
-from ogr.services.pagure import PagureService
+from ogr.services.github import GithubProject
 
+from packit.ogr_services import GithubService, PagureService
 from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
 from packit.config import get_packit_config_from_repo

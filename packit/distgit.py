@@ -25,8 +25,8 @@ from typing import Optional, Sequence
 
 import git
 import requests
-from ogr.services.pagure import PagureService
 
+from packit.ogr_services import PagureService
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
