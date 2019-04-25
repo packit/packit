@@ -5,7 +5,8 @@
     user_name: packit
     home_path: /home/{{ user_name }}
     ansible_bender:
-      base_image: fedora:29
+      base_image: registry.fedoraproject.org/f29/httpd:2.4
+      #base_image: fedora:29
       target_image:
         name: docker.io/usercont/packit-service
         environment:
@@ -35,6 +36,17 @@
       dest: '{{ home_path }}/passwd'
       mode: 0777
 
+  # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
+  - name: Remove /etc/httpd/state
+    file:
+      path: /etc/httpd/state
+      state: absent
+  # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
+  - name: Create link to /etc/httpd/state
+    file:
+      src: /var/lib/httpd
+      dest: /etc/httpd/state
+      state: link
   - name: Create /usr/share/packit directory
     file:
       state: directory
@@ -60,6 +72,22 @@
     copy:
       src: files/ssh_config
       dest: /etc/ssh/ssh_config.d/01-packit.conf
+  - name: Install mod_wsgi from pip3
+    pip:
+      name:
+      - mod-wsgi
+      executable: pip3  # this requires to have sources mounted inside at /src
+  - name: Install mod-wsgi module with Python3 support
+    shell: mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf
+  #- name: Clone acme.sh
+  #  git:
+  #    repo: 'https://github.com/Neilpang/acme.sh'
+  #    dest: /acme
+  #- name: Change permission on /acme
+  #  file:
+  #    state: directory
+  #    path: /acme
+  #    mode: 0777
   - name: stat /src
     stat:
       path: /src
