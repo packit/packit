@@ -24,12 +24,13 @@ COPY packit/ /src/packit/
 RUN cd /src/ \
     && ansible-playbook -vv -c local -i localhost, recipe.yaml
 
-ENV USER=packit \
-    HOME=/home/packit/ \
-    NSS_WRAPPER_PASSWD=/home/packit/passwd \
-    NSS_WRAPPER_GROUP=/etc/group \
-    LD_PRELOAD=libnss_wrapper.so \
-    FLASK_APP=packit.service.web_hook
+#COPY ./files/httpd-packit.conf /etc/httpd/conf.d/httpd-packit.conf
+
+RUN /usr/libexec/httpd-prepare && rpm-file-permissions \
+    && chmod -R a+rwx /var/lib/httpd \
+    && chmod -R a+rwx /var/log/httpd \
+    && cp /src/files/httpd-copy.sh /usr/share/container-scripts/httpd/pre-init/50-httpd-copy.sh
+#    && cp /src/files/acme-generate.sh /usr/share/container-scripts/httpd/pre-init/60-acme-generate.sh
 
 USER 1001
 
