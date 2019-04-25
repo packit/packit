@@ -1,0 +1,6 @@
+[copr-cli]
+login = secretlogin
+username = packitko
+token = secrettoken
+copr_url = https://copr.fedorainfracloud.org
+# expiration date: 3388-10-08
