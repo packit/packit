@@ -40,3 +40,5 @@ GH2FED_RELEASE_TOPIC = "org.fedoraproject.prod.github.release"
 DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
 PROD_DISTGIT_URL = "https://src.fedoraproject.org/"
+
+DEFAULT_COPR_OWNER = "packit"

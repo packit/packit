@@ -71,7 +71,7 @@ def github_pr():
         )
         return "We haven't received any JSON data."
 
-    allowed_actions = ["opened", "edited", "reopened"]
+    allowed_actions = ["opened", "edited", "reopened", "synchronized"]
     if not (msg.get("action") in allowed_actions):
         logger.debug(
             f"/webhooks/github/pull_request: Ignoring pull_request event - {msg['action']}"
