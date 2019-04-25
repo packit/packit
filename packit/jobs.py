@@ -199,6 +199,7 @@ class SteveJobs:
                     self.pagure_service,
                     self.github_service,
                     job,
+                    trigger,
                 )
                 handler.run()
 
@@ -242,6 +243,7 @@ class JobHandler:
         distgit_service: GitService,
         upstream_service: GitService,
         job: JobConfig,
+        triggered_by: JobTriggerType,
     ):
         self.config: Config = config
         self.project: GitProject = project
@@ -250,6 +252,7 @@ class JobHandler:
         self.package_config: PackageConfig = package_config
         self.event: dict = event
         self.job: JobConfig = job
+        self.triggered_by: JobTriggerType = triggered_by
 
     def run(self):
         raise NotImplementedError("This should have been implemented.")
@@ -366,23 +369,28 @@ class GithubReleaseHandler(JobHandler):
 
 
 @add_to_mapping
-class GithubCoprBuildHandlerRelease(JobHandler):
+class GithubCoprBuildHandler(JobHandler):
     name = JobType.copr_build
-    triggers = [JobTriggerType.release]
+    triggers = [JobTriggerType.pull_request, JobTriggerType.release]
 
-    def run(self):
-        clone_url = self.event["repository"]["html_url"]
+    def handle_release(self):
+        if not self.job.metadata.get("targets"):
+            logger.error(
+                "'targets' value is required in packit config for copr_build job"
+            )
+        clone_url = self.event["repository"]["clone_url"]
         tag_name = self.event["release"]["tag_name"]
 
         local_project = LocalProject(git_project=self.project)
         api = PackitAPI(self.config, self.package_config, local_project)
 
         build_id, repo_url = api.run_copr_build(
-            namespace=self.project.namespace,
-            repo=self.project.repo,
+            owner=self.job.metadata.get("owner") or "packit",
+            project=self.job.metadata.get("project")
+            or f"{self.project.namespace}-{self.project.repo}",
             committish=tag_name,
             clone_url=clone_url,
-            chroots=self.job.metadata.get("chroots"),
+            chroots=self.job.metadata.get("targets"),
         )
 
         # report
@@ -391,13 +399,11 @@ class GithubCoprBuildHandlerRelease(JobHandler):
             commit=self.project.get_sha_from_tag(tag_name), body=msg
         )
 
-
-@add_to_mapping
-class GithubCoprBuildHandlerPR(JobHandler):
-    name = JobType.copr_build
-    triggers = [JobTriggerType.pull_request]
-
-    def run(self):
+    def handle_pull_request(self):
+        if not self.job.metadata.get("targets"):
+            logger.error(
+                "'targets' value is required in packit config for copr_build job"
+            )
         clone_url = nested_get(self.event, "pull_request", "head", "repo", "clone_url")
         committish = nested_get(self.event, "pull_request", "head", "sha")
 
@@ -405,13 +411,20 @@ class GithubCoprBuildHandlerPR(JobHandler):
         api = PackitAPI(self.config, self.package_config, local_project)
 
         build_id, repo_url = api.run_copr_build(
-            namespace=self.project.namespace,
-            repo=self.project.repo,
+            owner=self.job.metadata.get("owner") or "packit",
+            project=self.job.metadata.get("project")
+            or f"{self.project.namespace}-{self.project.repo}",
             committish=committish,
             clone_url=clone_url,
-            chroots=self.job.metadata.get("chroots"),
+            chroots=self.job.metadata.get("targets"),
         )
 
         # report
         msg = f"Copr build(ID {build_id}) triggered\nMore info: {repo_url}"
         self.project.pr_comment(self.event["number"], msg)
+
+    def run(self):
+        if self.triggered_by == JobTriggerType.pull_request:
+            self.handle_pull_request()
+        elif self.triggered_by == JobTriggerType.release:
+            self.handle_release()

@@ -120,6 +120,25 @@ jobs:
   trigger: commit
 ```
 
+**copr\_build**
+
+Gather data from new pull_request or release and use trigger new copr build with it.
+
+Supported triggers: **pull_request**, **release**.
+
+
+**Example**
+
+```yaml
+jobs:
+- job: copr_build
+  trigger: pull_request
+  metadata:
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-30-x86_64
+
+```
 
 ### Real examples
 

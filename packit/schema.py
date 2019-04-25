@@ -22,7 +22,14 @@ SYNCED_FILES_SCHEMA = {
 JOB_CONFIG_SCHEMA = {
     "type": "object",
     "properties": {
-        "job": {"enum": ["propose_downstream", "build", "sync_from_downstream"]},
+        "job": {
+            "enum": [
+                "propose_downstream",
+                "build",
+                "sync_from_downstream",
+                "copr_build",
+            ]
+        },
         "trigger": {"enum": ["release", "pull_request", "commit"]},
         "notify": {"type": "array", "items": {"enum": ["pull_request_status"]}},
         "metadata": {"type": "object"},

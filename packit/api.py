@@ -35,8 +35,9 @@ from copr.v3.exceptions import CoprNoResultException
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
+from packit.constants import DEFAULT_COPR_OWNER
 from packit.distgit import DistGit
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, PackitInvalidConfigException
 from packit.local_project import LocalProject
 from packit.status import Status
 from packit.sync import sync_files
@@ -425,29 +426,35 @@ class PackitAPI:
             logger.info("\nLatest bodhi updates:")
             logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
 
-    def run_copr_build(self, namespace, repo, clone_url, committish, chroots):
+    def run_copr_build(self, owner, project, clone_url, committish, chroots):
         # get info
         client = CoprClient.create_from_config_file()
-        owner = "dhodovsk"
-        project = f"{namespace}-{repo}"
-
-        # make sure we build on copr projects owned by packit
         try:
             copr_proj = client.project_proxy.get(owner, project)
             # make sure or project has chroots set correctly
             if set(copr_proj.chroot_repos.keys()) != set(chroots):
+                logger.info(f"Updating targets on project {owner}/{project}")
+                logger.debug(f"old = {set(copr_proj.chroot_repos.keys())}")
+                logger.debug(f"new = {set(chroots)}")
                 client.project_proxy.edit(owner, project, chroots=chroots)
         except CoprNoResultException:
-            client.project_proxy.add(
-                ownername=owner,
-                projectname=project,
-                chroots=chroots,
-                decription="Repo for automatic rebuild owned by packit",
-                contact="cyborg@redhat.com",
-            )
+            if owner == DEFAULT_COPR_OWNER:
+                logger.info("Copr project {owner}/{project} not found. Creating new.")
+                client.project_proxy.add(
+                    ownername=owner,
+                    projectname=project,
+                    chroots=chroots,
+                    decription="Repo for automatic rebuild owned by packit",
+                    contact="user-cont-team@redhat.com",
+                )
+            else:
+                raise PackitInvalidConfigException(
+                    f"Copr project {owner}/{project} not found."
+                )
 
         # report
         build = client.build_proxy.create_from_scm(
             owner, project, clone_url, committish=committish
         )
+        logger.info(f"Triggered copr build: {build.repo_url}")
         return build.id, build.repo_url

@@ -110,6 +110,25 @@ In a container, do basic checks to verify that packit can be distributed, instal
 make check-pypi-packaging
 ```
 
+### Additional configuration for development purposes
+
+#### Copr build
+
+For cases you'd like to trigger copr build in your copr project, you can configure it in
+packit configuration of your chosen package:
+```
+jobs:
+- job: copr_build
+  trigger: pull_request
+  metadata:
+    targets:
+      - some_targets
+    # (Optional) Defaults to 'packit'
+    owner: some_copr_project_owner
+    # (Optional) Defaults to <github_namespace>-<github_repo>
+    project: some_project_name
+```
+
 ### How to contribute code to packit
 
 1. Create a fork of the `packit` repository.
