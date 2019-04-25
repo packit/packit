@@ -83,6 +83,7 @@ class Config(BaseConfig):
 
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
+        self.dry_run: bool = False
 
     @classmethod
     def get_user_config(cls) -> "Config":
@@ -115,6 +116,7 @@ class Config(BaseConfig):
         config = Config()
 
         config.debug = raw_dict.get("debug", False)
+        config.dry_run = raw_dict.get("dry_run", False)
         config.fas_user = raw_dict.get("fas_user", None)
         config.keytab_path = raw_dict.get("keytab_path", None)
         config._github_token = raw_dict.get("github_token", "")
