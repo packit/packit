@@ -25,6 +25,9 @@
       - fedpkg
       - python3-flask
       - nss_wrapper
-      - httpd
-      - mod_wsgi
+      - httpd-devel
+      - mod_md
+      - python3-devel
+      # till https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6 is not in official repos
+      enablerepo: testing      -
       state: present
