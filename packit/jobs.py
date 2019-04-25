@@ -5,9 +5,9 @@ import logging
 from typing import List, Optional, Tuple, Dict, Type
 
 from ogr.abstract import GitProject, GitService
-from ogr.services.github import GithubProject, GithubService
-from ogr.services.pagure import PagureService
+from ogr.services.github import GithubProject
 
+from packit.ogr_services import GithubService, PagureService
 from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
 from packit.config import get_packit_config_from_repo
@@ -40,7 +40,9 @@ class SteveJobs:
     @property
     def github_service(self):
         if self._github_service is None:
-            self._github_service = GithubService(token=self.config.github_token)
+            self._github_service = GithubService(
+                token=self.config.github_token, read_only=self.config.dry_run
+            )
         return self._github_service
 
     @property
@@ -48,6 +50,7 @@ class SteveJobs:
         if self._pagure_service is None:
             self._pagure_service = PagureService(
                 token=self.config.pagure_user_token,
+                read_only=self.config.dry_run,
                 # TODO: how do we change to stg here? ideally in self.config
             )
         return self._pagure_service
