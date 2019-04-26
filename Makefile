@@ -1,6 +1,6 @@
 TEST_TARGET := ./tests/
 PY_PACKAGE := packit
-PACKIT_IMAGE := docker.io/usercont/packit-service
+PACKIT_IMAGE := docker.io/usercont/packit-service:master
 PACKIT_TESTS_IMAGE := packit-tests
 
 build: recipe.yaml files/install-rpm-packages.yaml
