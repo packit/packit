@@ -420,8 +420,21 @@ class GithubCoprBuildHandler(JobHandler):
         )
 
         # report
-        msg = f"Copr build(ID {build_id}) triggered\nMore info: {repo_url}"
-        self.project.pr_comment(self.event["number"], msg)
+        msg = f"Triggered copr build (ID:{build_id}).\nMore info: {repo_url}"
+        logger.info(msg)
+
+        target_repo_name = nested_get(
+            self.event, "pull_request", "base", "repo", "name"
+        )
+        target_repo_namespace = nested_get(
+            self.event, "pull_request", "base", "repo", "owner", "login"
+        )
+        pr_target_project = GithubProject(
+            repo=target_repo_name,
+            namespace=target_repo_namespace,
+            service=GithubService(token=self.config.github_token),
+        )
+        pr_target_project.pr_comment(self.event["number"], msg)
 
     def run(self):
         if self.triggered_by == JobTriggerType.pull_request:
