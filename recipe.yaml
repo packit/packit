@@ -48,11 +48,19 @@
     command: git config --global user.email "user-cont-team@redhat.com"
   - name: "Set up git: user.name"
     command: git config --global user.name "Pack It"
-  - name: Create .ssh
+  - name: Create some home dirs
     file:
       state: directory
-      path: /root/.ssh
+      path: '{{ home_path }}/{{ item }}'
       mode: 0700
+    with_items:
+    - .ssh
+    - .config
+  - name: Create /secrets
+    file:
+      state: directory
+      path: /secrets
+      mode: 0777
   - name: Copy ssh_config
     copy:
       src: files/ssh_config
