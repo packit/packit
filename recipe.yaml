@@ -72,22 +72,6 @@
     copy:
       src: files/ssh_config
       dest: /etc/ssh/ssh_config.d/01-packit.conf
-  - name: Install mod_wsgi from pip3
-    pip:
-      name:
-      - mod-wsgi
-      executable: pip3  # this requires to have sources mounted inside at /src
-  - name: Install mod-wsgi module with Python3 support
-    shell: mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf
-  #- name: Clone acme.sh
-  #  git:
-  #    repo: 'https://github.com/Neilpang/acme.sh'
-  #    dest: /acme
-  #- name: Change permission on /acme
-  #  file:
-  #    state: directory
-  #    path: /acme
-  #    mode: 0777
   - name: stat /src
     stat:
       path: /src
