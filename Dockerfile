@@ -24,13 +24,10 @@ COPY packit/ /src/packit/
 RUN cd /src/ \
     && ansible-playbook -vv -c local -i localhost, recipe.yaml
 
-#COPY ./files/httpd-packit.conf /etc/httpd/conf.d/httpd-packit.conf
-
+# TODO: add this logic to recipe.yaml
 RUN /usr/libexec/httpd-prepare && rpm-file-permissions \
     && chmod -R a+rwx /var/lib/httpd \
-    && chmod -R a+rwx /var/log/httpd \
-    && cp /src/files/httpd-copy.sh /usr/share/container-scripts/httpd/pre-init/50-httpd-copy.sh
-#    && cp /src/files/acme-generate.sh /usr/share/container-scripts/httpd/pre-init/60-acme-generate.sh
+    && chmod -R a+rwx /var/log/httpd
 
 USER 1001
 

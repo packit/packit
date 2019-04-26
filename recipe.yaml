@@ -2,8 +2,7 @@
 - name: This is a recipe for how to cook with packit
   hosts: all
   vars:
-    user_name: packit
-    home_path: /home/{{ user_name }}
+    home_path: "{{ lookup('env', 'HOME') }}"
     ansible_bender:
       base_image: registry.fedoraproject.org/f29/httpd:2.4
       #base_image: fedora:29
@@ -11,31 +10,11 @@
         name: docker.io/usercont/packit-service
         environment:
           FLASK_APP: packit.service.web_hook
-          LD_PRELOAD: libnss_wrapper.so
-          NSS_WRAPPER_PASSWD: '{{ home_path }}/passwd'
-          NSS_WRAPPER_GROUP: /etc/group
-          USER: '{{ user_name }}'
-          HOME: '{{ home_path }}'
         cmd: flask-3 run -h 0.0.0.0
       working_container:
         volumes:
         - '{{ playbook_dir }}:/src:Z'
   tasks:
-  - user:
-      name: '{{ user_name }}'
-      create_home: yes
-      home: '{{ home_path }}'
-  - file:
-      state: directory
-      path: /home
-      mode: 0777
-      recurse: yes
-
-  - copy:
-      src: ./files/passwd
-      dest: '{{ home_path }}/passwd'
-      mode: 0777
-
   # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
   - name: Remove /etc/httpd/state
     file:
