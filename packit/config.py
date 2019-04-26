@@ -480,11 +480,12 @@ def get_packit_config_from_repo(
                 f"on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
             )
-        except FileNotFoundError:
+        except FileNotFoundError as ex:
             logger.debug(
                 f"The config file '{config_file_name}' "
                 f"not found on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
+                f"{ex!r}"
             )
             continue
 
