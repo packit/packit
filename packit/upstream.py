@@ -27,19 +27,17 @@ from pathlib import Path
 from typing import Optional, List, Tuple
 
 import git
-import github
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 from rebasehelper.versioneer import versioneers_runner
 
-from packit.ogr_services import GithubService
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
+from packit.ogr_services import get_github_service
 from packit.utils import run_command, is_a_git_ref
-
 
 logger = logging.getLogger(__name__)
 
@@ -68,34 +66,13 @@ class Upstream(PackitRepositoryBase):
 
     def set_local_project(self):
         """ update self.local_project """
-        # TODO: ogr should have a method, something like this:
-        #       get_github_service(token, app_id, inst_id, cert_path) -> GithubService
-        #       the logic below should be the function
-        #       I want to leave this code here up the end of this sprint
         # TODO: in order to support any git forge here, ogr should also have a method like this:
         #       get_github_service_from_url(url, **kwargs):
         #       ogr should guess the forge based on the url; kwargs should be passed to the
         #       constructor in order to support the above
-        if (
-            self.config.github_app_id
-            and self.config.github_app_cert_path
-            and self.config.github_app_installation_id
-        ):
-            logger.info("Authenticating with Github using a Githab app.")
-            private_key = Path(self.config.github_app_cert_path).read_text()
-            integration = github.GithubIntegration(
-                self.config.github_app_id, private_key
-            )
-            token = integration.get_access_token(self.config.github_app_installation_id)
-            gh_service = GithubService(token=token, read_only=self.config.dry_run)
-        else:
-            logger.debug("Authenticating with Github using a token.")
-            gh_service = GithubService(
-                token=self.config.github_token, read_only=self.config.dry_run
-            )
-
-        self.local_project.git_service = gh_service
+        self.local_project.git_service = get_github_service(self.config)
         self.local_project.refresh_the_arguments()  # get git project from newly set git service
+
         if not self.local_project.repo_name:
             # will this ever happen?
             self.local_project.repo_name = self.package_name

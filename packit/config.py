@@ -31,9 +31,9 @@ from typing import Optional, List, Dict
 
 import click
 from jsonschema import Draft4Validator, ValidationError
+from ogr.abstract import GitProject
 from yaml import safe_load
 
-from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.exceptions import (
@@ -76,7 +76,6 @@ class Config(BaseConfig):
         self.fas_user: Optional[str] = None
         self.keytab_path: Optional[str] = None
 
-        self.github_app_installation_id: Optional[str] = None
         self.github_app_id: Optional[str] = None
         self.github_app_cert_path: Optional[str] = None
         self._github_token: str = ""
@@ -122,9 +121,6 @@ class Config(BaseConfig):
         config._github_token = raw_dict.get("github_token", "")
         config._pagure_user_token = raw_dict.get("pagure_user_token", "")
         config._pagure_fork_token = raw_dict.get("pagure_fork_token", "")
-        config.github_app_installation_id = raw_dict.get(
-            "github_app_installation_id", ""
-        )
         config.github_app_id = raw_dict.get("github_app_id", "")
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
 

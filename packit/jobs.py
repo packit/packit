@@ -5,15 +5,14 @@ import logging
 from typing import List, Optional, Tuple, Dict, Type
 
 from ogr.abstract import GitProject, GitService
-from ogr.services.github import GithubProject
 
-from packit.ogr_services import GithubService, PagureService
 from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
 from packit.config import get_packit_config_from_repo
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
+from packit.ogr_services import PagureService, get_github_project
 from packit.utils import nested_get, get_namespace_and_repo_name
 
 logger = logging.getLogger(__name__)
@@ -34,16 +33,7 @@ class SteveJobs:
 
     def __init__(self, config: Config):
         self.config = config
-        self._github_service = None
         self._pagure_service = None
-
-    @property
-    def github_service(self):
-        if self._github_service is None:
-            self._github_service = GithubService(
-                token=self.config.github_token, read_only=self.config.dry_run
-            )
-        return self._github_service
 
     @property
     def pagure_service(self):
@@ -80,8 +70,8 @@ class SteveJobs:
             logger.info(
                 f"New release event {release_ref} for repo {repo_namespace}/{repo_name}."
             )
-            gh_proj = GithubProject(
-                repo=repo_name, namespace=repo_namespace, service=self.github_service
+            gh_proj = get_github_project(
+                self.config, repo=repo_name, namespace=repo_namespace
             )
             package_config = get_packit_config_from_repo(gh_proj, release_ref)
             https_url = event["repository"]["html_url"]
@@ -116,8 +106,8 @@ class SteveJobs:
                 return None
             target_repo = nested_get(event, "repository", "full_name")
             logger.info(f"GitHub pull request {pr_id} event for repo {target_repo}.")
-            gh_proj = GithubProject(
-                repo=repo_name, namespace=repo_namespace, service=self.github_service
+            gh_proj = get_github_project(
+                self.config, repo=repo_name, namespace=repo_namespace
             )
             package_config = get_packit_config_from_repo(gh_proj, ref)
             https_url = event["repository"]["html_url"]
@@ -200,7 +190,7 @@ class SteveJobs:
                     event,
                     project,
                     self.pagure_service,
-                    self.github_service,
+                    project.service,
                     job,
                     trigger,
                 )
@@ -432,10 +422,11 @@ class GithubCoprBuildHandler(JobHandler):
         target_repo_namespace = nested_get(
             self.event, "pull_request", "base", "repo", "owner", "login"
         )
-        pr_target_project = GithubProject(
+        pr_target_project = get_github_project(
+            self.config,
             repo=target_repo_name,
             namespace=target_repo_namespace,
-            service=GithubService(token=self.config.github_token),
+            service=self.upstream_service,
         )
         pr_target_project.pr_comment(self.event["number"], msg)
 
