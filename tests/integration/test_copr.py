@@ -145,7 +145,7 @@ def test_copr_pr_handle(pr_event):
         chroots=["beer-again"],
     ).and_return(1, "http://shire").once()
     flexmock(GithubProject).should_receive("pr_comment").with_args(
-        pr_event["number"], f"Copr build(ID 1) triggered\nMore info: http://shire"
+        pr_event["number"], "Triggered copr build (ID:1).\nMore info: http://shire"
     ).and_return().once()
     c = Config()
     s = SteveJobs(c)
@@ -174,8 +174,9 @@ def test_copr_release_handle(release_event):
         chroots=[],
     ).and_return(1, "http://shire").once()
     flexmock(GithubProject).should_receive("commit_comment").with_args(
-        pr_event["number"], f"Copr build(ID 1) triggered\nMore info: http://shire"
+        pr_event["number"], "Triggered copr build (ID:1).\nMore info: http://shire"
     ).and_return().once()
+
     c = Config()
     s = SteveJobs(c)
     s.process_message(release_event)

@@ -456,5 +456,4 @@ class PackitAPI:
         build = client.build_proxy.create_from_scm(
             owner, project, clone_url, committish=committish
         )
-        logger.info(f"Triggered copr build: {build.repo_url}")
         return build.id, build.repo_url
