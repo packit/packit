@@ -179,6 +179,7 @@ class JobType(Enum):
     check_downstream = "check_downstream"
     build = "build"
     sync_from_downstream = "sync_from_downstream"
+    copr_build = "copr_build"
 
 
 class JobTriggerType(Enum):
