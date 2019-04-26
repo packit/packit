@@ -202,6 +202,7 @@ class SteveJobs:
                     self.pagure_service,
                     self.github_service,
                     job,
+                    trigger,
                 )
                 handler.run()
 
@@ -245,6 +246,7 @@ class JobHandler:
         distgit_service: GitService,
         upstream_service: GitService,
         job: JobConfig,
+        triggered_by: JobTriggerType,
     ):
         self.config: Config = config
         self.project: GitProject = project
@@ -253,6 +255,7 @@ class JobHandler:
         self.package_config: PackageConfig = package_config
         self.event: dict = event
         self.job: JobConfig = job
+        self.triggered_by: JobTriggerType = triggered_by
 
     def run(self):
         raise NotImplementedError("This should have been implemented.")
@@ -300,6 +303,19 @@ class NewDistGitCommit(FedmsgHandler):
             upstream_branch="master",  # TODO: this should be configurable
         )
 
+
+# @add_to_mapping
+# class CoprBuildFinished(FedmsgHandler):
+#     topic="org.fedoraproject.prod.copr.build.end"
+#     name = JobType.ReportCoprResult
+#
+#     def run(self):
+#         msg = f"Build {self.event['msg']['build']} " \
+#               f"{'passed' if self.event['msg']['status'] else 'failed'}.\n" \
+#               f"\tpackage: {self.event['msg']['pkg']}\n" \
+#               f"\tchroot: {self.event['msg']['chroot']}\n"
+#         # TODO: lookup specific commit related to the build and comment on it
+#         # local cache containing "watched" copr builds?
 
 # class NewDistGitPRFlag(FedmsgHandler):
 #     """ A new flag was added to a dist-git pull request """
@@ -353,3 +369,78 @@ class GithubReleaseHandler(JobHandler):
             dist_git_branch=self.job.metadata.get("dist-git-branch", "master"),
             version=version,
         )
+
+
+@add_to_mapping
+class GithubCoprBuildHandler(JobHandler):
+    name = JobType.copr_build
+    triggers = [JobTriggerType.pull_request, JobTriggerType.release]
+
+    def handle_release(self):
+        if not self.job.metadata.get("targets"):
+            logger.error(
+                "'targets' value is required in packit config for copr_build job"
+            )
+        clone_url = self.event["repository"]["clone_url"]
+        tag_name = self.event["release"]["tag_name"]
+
+        local_project = LocalProject(git_project=self.project)
+        api = PackitAPI(self.config, self.package_config, local_project)
+
+        build_id, repo_url = api.run_copr_build(
+            owner=self.job.metadata.get("owner") or "packit",
+            project=self.job.metadata.get("project")
+            or f"{self.project.namespace}-{self.project.repo}",
+            committish=tag_name,
+            clone_url=clone_url,
+            chroots=self.job.metadata.get("targets"),
+        )
+
+        # report
+        msg = f"Copr build(ID {build_id}) triggered\nMore info: {repo_url}"
+        self.project.commit_comment(
+            commit=self.project.get_sha_from_tag(tag_name), body=msg
+        )
+
+    def handle_pull_request(self):
+        if not self.job.metadata.get("targets"):
+            logger.error(
+                "'targets' value is required in packit config for copr_build job"
+            )
+        clone_url = nested_get(self.event, "pull_request", "head", "repo", "clone_url")
+        committish = nested_get(self.event, "pull_request", "head", "sha")
+
+        local_project = LocalProject(git_project=self.project)
+        api = PackitAPI(self.config, self.package_config, local_project)
+
+        build_id, repo_url = api.run_copr_build(
+            owner=self.job.metadata.get("owner") or "packit",
+            project=self.job.metadata.get("project")
+            or f"{self.project.namespace}-{self.project.repo}",
+            committish=committish,
+            clone_url=clone_url,
+            chroots=self.job.metadata.get("targets"),
+        )
+
+        # report
+        msg = f"Triggered copr build (ID:{build_id}).\nMore info: {repo_url}"
+        logger.info(msg)
+
+        target_repo_name = nested_get(
+            self.event, "pull_request", "base", "repo", "name"
+        )
+        target_repo_namespace = nested_get(
+            self.event, "pull_request", "base", "repo", "owner", "login"
+        )
+        pr_target_project = GithubProject(
+            repo=target_repo_name,
+            namespace=target_repo_namespace,
+            service=GithubService(token=self.config.github_token),
+        )
+        pr_target_project.pr_comment(self.event["number"], msg)
+
+    def run(self):
+        if self.triggered_by == JobTriggerType.pull_request:
+            self.handle_pull_request()
+        elif self.triggered_by == JobTriggerType.release:
+            self.handle_release()
