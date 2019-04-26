@@ -58,6 +58,12 @@
       owner: apache
       group: apache
       mode: 0644
+  - name: Comment out the default :8080 port
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^(Listen.+)$'
+      line: '# \1'
+      backrefs: yes
 
   - name: "Set up git: user.email"
     command: git config --global user.email "user-cont-team@redhat.com"
