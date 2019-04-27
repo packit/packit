@@ -70,8 +70,9 @@ class Upstream(PackitRepositoryBase):
         #       get_github_service_from_url(url, **kwargs):
         #       ogr should guess the forge based on the url; kwargs should be passed to the
         #       constructor in order to support the above
-        self.local_project.git_service = get_github_service(self.config)
-        self.local_project.refresh_the_arguments()  # get git project from newly set git service
+        if not self.local_project.git_service:
+            self.local_project.git_service = get_github_service(self.config)
+            self.local_project.refresh_the_arguments()  # get git project from newly set git service
 
         if not self.local_project.repo_name:
             # will this ever happen?
