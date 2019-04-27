@@ -91,25 +91,29 @@ class SteveJobs:
             logger.info("Not a pull request event.")
             return None
         if action in ["opened", "reopened", "synchronize"] and pr_id:
-            repo_namespace = nested_get(
-                event, "pull_request", "head", "repo", "owner", "login"
+            # we can't use head repo here b/c the app is set up against the upstream repo
+            # and not the fork, on the other hand, we don't process packit.yaml from
+            # the PR but what's in the upstream
+            base_repo_namespace = nested_get(
+                event, "pull_request", "base", "repo", "owner", "login"
             )
-            repo_name = nested_get(event, "pull_request", "head", "repo", "name")
-            if not (repo_namespace and repo_name):
+            base_repo_name = nested_get(event, "pull_request", "base", "repo", "name")
+
+            if not (base_repo_name and base_repo_namespace):
                 logger.warning(
                     "We could not figure out the full name of the repository."
                 )
                 return None
-            ref = nested_get(event, "pull_request", "head", "ref")
-            if not ref:
+            base_ref = nested_get(event, "pull_request", "head", "sha")
+            if not base_ref:
                 logger.warning("Ref where the PR is coming from is not set.")
                 return None
             target_repo = nested_get(event, "repository", "full_name")
             logger.info(f"GitHub pull request {pr_id} event for repo {target_repo}.")
             gh_proj = get_github_project(
-                self.config, repo=repo_name, namespace=repo_namespace
+                self.config, repo=base_repo_name, namespace=base_repo_namespace
             )
-            package_config = get_packit_config_from_repo(gh_proj, ref)
+            package_config = get_packit_config_from_repo(gh_proj, base_ref)
             https_url = event["repository"]["html_url"]
             package_config.upstream_project_url = https_url
             return JobTriggerType.pull_request, package_config, gh_proj
@@ -371,18 +375,15 @@ class GithubCoprBuildHandler(JobHandler):
             logger.error(
                 "'targets' value is required in packit config for copr_build job"
             )
-        clone_url = self.event["repository"]["clone_url"]
         tag_name = self.event["release"]["tag_name"]
 
-        local_project = LocalProject(git_project=self.project)
+        local_project = LocalProject(git_project=self.project, ref=tag_name)
         api = PackitAPI(self.config, self.package_config, local_project)
 
         build_id, repo_url = api.run_copr_build(
             owner=self.job.metadata.get("owner") or "packit",
             project=self.job.metadata.get("project")
             or f"{self.project.namespace}-{self.project.repo}",
-            committish=tag_name,
-            clone_url=clone_url,
             chroots=self.job.metadata.get("targets"),
         )
 
@@ -397,18 +398,17 @@ class GithubCoprBuildHandler(JobHandler):
             logger.error(
                 "'targets' value is required in packit config for copr_build job"
             )
-        clone_url = nested_get(self.event, "pull_request", "head", "repo", "clone_url")
-        committish = nested_get(self.event, "pull_request", "head", "sha")
+        pr_id = str(nested_get(self.event, "number"))
 
-        local_project = LocalProject(git_project=self.project)
+        local_project = LocalProject(
+            git_project=self.project, pr_id=pr_id, git_service=self.project.service
+        )
         api = PackitAPI(self.config, self.package_config, local_project)
 
         build_id, repo_url = api.run_copr_build(
             owner=self.job.metadata.get("owner") or "packit",
             project=self.job.metadata.get("project")
             or f"{self.project.namespace}-{self.project.repo}",
-            committish=committish,
-            clone_url=clone_url,
             chroots=self.job.metadata.get("targets"),
         )
 
