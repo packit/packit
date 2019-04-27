@@ -455,9 +455,6 @@ class PackitAPI:
                 raise PackitInvalidConfigException(
                     f"Copr project {owner}/{project} not found."
                 )
-
-        # report
-        build = client.build_proxy.create_from_scm(
-            owner, project, clone_url, committish=committish
-        )
+        srpm_path = self.create_srpm()
+        build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
