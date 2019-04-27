@@ -93,7 +93,9 @@ class Upstream(PackitRepositoryBase):
             gh_service = GithubService(
                 token=self.config.github_token, read_only=self.config.dry_run
             )
+
         self.local_project.git_service = gh_service
+        self.local_project.refresh_the_arguments()  # get git project from newly set git service
         if not self.local_project.repo_name:
             # will this ever happen?
             self.local_project.repo_name = self.package_name
