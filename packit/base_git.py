@@ -285,7 +285,6 @@ class PackitRepositoryBase:
         """
         Parse spec file and return value of URL
         """
-        # consider using rebase-helper for this: SpecFile.download_remote_sources
         sections = self.specfile.spec_content.sections
         package_section: List[str] = sections.get("%package", [])
         for s in package_section:
@@ -294,3 +293,6 @@ class PackitRepositoryBase:
                 logger.debug(f"Upstream project URL = {url}")
                 return url
         return None
+
+    def fetch_upstream_archive(self):
+        self.specfile.download_remote_sources()
