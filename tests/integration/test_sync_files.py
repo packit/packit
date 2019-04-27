@@ -25,7 +25,7 @@ import pytest
 from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
 from packit.sync import RawSyncFilesItem
 from tests.spellbook import TESTS_DIR
-from tests.utils import cwd
+from packit.utils import cwd
 
 
 @pytest.mark.parametrize(
