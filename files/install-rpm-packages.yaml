@@ -10,6 +10,7 @@
       - mod_md
       - nss_wrapper
       - python3-GitPython
+      - python3-gnupg
       - python3-click
       - python3-copr
       - python3-devel
