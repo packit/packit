@@ -32,7 +32,7 @@ from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
-from packit.security import Verifier
+from packit.security import CommitVerifier
 from packit.utils import run_command, cwd
 
 logger = logging.getLogger(__name__)
@@ -287,6 +287,7 @@ class PackitRepositoryBase:
         """
         Parse spec file and return value of URL
         """
+        # consider using rebase-helper for this: SpecFile.download_remote_sources
         sections = self.specfile.spec_content.sections
         package_section: List[str] = sections.get("%package", [])
         for s in package_section:
@@ -300,7 +301,7 @@ class PackitRepositoryBase:
         if self.allowed_gpg_keys is None:
             logger.info("Allowed GPG keys are not set, skipping the verification.")
 
-        ver = Verifier()
+        ver = CommitVerifier()
         last_commit = self.local_project.git_repo.head.commit
         valid = ver.check_signature_of_commit(
             commit=last_commit, possible_key_fingerprints=self.allowed_gpg_keys
