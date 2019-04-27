@@ -354,12 +354,15 @@ class PackitAPI:
             update_type=update_type,
         )
 
-    def create_srpm(self, output_file: str = None, upstream_ref: str = None) -> Path:
+    def create_srpm(
+        self, output_file: str = None, upstream_ref: str = None, srpm_dir: str = None
+    ) -> Path:
         """
         Create srpm from the upstream repo
 
         :param upstream_ref: git ref to upstream commit
         :param output_file: path + filename where the srpm should be written, defaults to cwd
+        :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: a path to the srpm
         """
         version = upstream_ref or self.up.get_current_version()
@@ -391,7 +394,7 @@ class PackitAPI:
                 self.up.bump_spec(
                     version=version, changelog_entry="Development snapshot"
                 )
-        srpm_path = self.up.create_srpm(srpm_path=output_file)
+        srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
         return srpm_path
 
     def status(self):
@@ -459,6 +462,6 @@ class PackitAPI:
                 raise PackitInvalidConfigException(
                     f"Copr project {owner}/{project} not found."
                 )
-        srpm_path = self.create_srpm()
+        srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
         build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
