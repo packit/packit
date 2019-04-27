@@ -36,7 +36,9 @@ def upstream_with_actions():
                 }
             )
         ),
-        local_project=flexmock(repo_name=flexmock()),
+        local_project=flexmock(
+            repo_name=flexmock(), refresh_the_arguments=lambda: None
+        ),
     )
 
 

@@ -144,8 +144,7 @@ class Status:
 
         b = BodhiClient()
         results = b.query(packages=self.dg.package_name)["updates"]
-        if len(results) > number_of_updates:
-            results = results[:number_of_updates]
+        results = results[:number_of_updates]
 
         return [
             [result["title"], result["karma"], result["status"]] for result in results
