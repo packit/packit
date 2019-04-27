@@ -16,7 +16,7 @@ RUN dnf install -y ansible
 RUN cd /src/ \
     && ansible-playbook -vv -c local -i localhost, files/install-rpm-packages.yaml
 
-COPY setup.py recipe.yaml /src/
+COPY setup.py setup.cfg recipe.yaml .git_archival.txt .gitattributes /src/
 # setuptools-scm
 COPY .git /src/.git
 COPY packit/ /src/packit/
