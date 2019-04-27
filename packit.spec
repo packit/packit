@@ -13,6 +13,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-click-man
 BuildRequires:  python3-GitPython
+BuildRequires:  python3-gnupg
 BuildRequires:  python3-fedmsg
 BuildRequires:  python3-jsonschema
 BuildRequires:  python3-ogr
