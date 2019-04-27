@@ -433,13 +433,15 @@ class Upstream(PackitRepositoryBase):
                 ]
             run_command(archive_cmd, cwd=self.local_project.working_dir)
 
-    def create_srpm(self, srpm_path: str = None) -> Path:
+    def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """
         Create SRPM from the actual content of the repo
 
         :param srpm_path: path to the srpm
+        :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
         """
+        srpm_dir = srpm_dir or os.getcwd()
         cwd = self.specfile_dir
         cmd = [
             "rpmbuild",
@@ -449,7 +451,7 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_specdir {cwd}",
             "--define",
-            f"_srcrpmdir {os.getcwd()}",
+            f"_srcrpmdir {srpm_dir}",
             # no idea about this one, but tests were failing in tox w/o it
             "--define",
             f"_topdir {cwd}",
@@ -462,7 +464,7 @@ class Upstream(PackitRepositoryBase):
             f"_buildrootdir {cwd}",
             self.specfile_path,
         ]
-        present_srpms = set(Path.cwd().glob("*.src.rpm"))
+        present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
         logger.debug("present srpms = %s", present_srpms)
         out = run_command(
             cmd,
