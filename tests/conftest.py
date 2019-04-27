@@ -52,7 +52,7 @@ from tests.spellbook import (
     initiate_git_repo,
     DISTGIT,
 )
-from tests.utils import cwd
+from packit.utils import cwd
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"

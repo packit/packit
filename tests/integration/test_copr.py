@@ -7,7 +7,7 @@ import json
 
 from github import Github
 from ogr.services.github import GithubProject
-from tests.utils import cwd
+from packit.utils import cwd
 from tests.spellbook import get_test_config, DATA_DIR
 from packit.api import PackitAPI
 from packit.local_project import LocalProject
