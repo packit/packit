@@ -136,6 +136,8 @@ class PackitAPI:
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
 
+        upstream_ref = upstream_ref or self.package_config.upstream_ref
+
         self.up.run_action(action=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
@@ -362,6 +364,8 @@ class PackitAPI:
         """
         version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()
+
+        upstream_ref = upstream_ref or self.package_config.upstream_ref
 
         if upstream_ref:
             # source-git code: fetch the tarball and don't check out the upstream ref
