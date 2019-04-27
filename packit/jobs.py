@@ -413,7 +413,11 @@ class GithubCoprBuildHandler(JobHandler):
         )
 
         # report
-        msg = f"Triggered copr build (ID:{build_id}).\nMore info: {repo_url}"
+        msg = (
+            f"RPM build was triggered in the Fedora COPR build service:\n\n"
+            f"* ID: {build_id}\n"
+            f"* COPR repository: {repo_url}"
+        )
         logger.info(msg)
 
         target_repo_name = nested_get(
