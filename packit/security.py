@@ -35,13 +35,27 @@ from packit.exceptions import PackitException
 logger = logging.getLogger(__name__)
 
 
-class Verifier:
+class CommitVerifier:
+    """
+    Class used for verifying git commits. Uses python-gnupg for accessing the GPG binary.
+
+    Uses `gpg2` instead of the `gpg` if it exists.
+    """
+
     def __init__(self, key_server: str = None) -> None:
+        """
+        :param key_server: GPG key server to be used, defaults to keys.fedoraproject.org
+        """
         self._gpg: Optional[GPG] = None
         self.key_server = key_server or "keys.fedoraproject.org"
 
     @property
     def gpg(self) -> GPG:
+        """
+        gnupg.GPG instance from python-gnupg
+
+        Uses `gpg2` instead of the `gpg` if it exists.
+        """
         if not self._gpg:
             for gpg_location in ["gpg2", "gpg"]:
                 try:
@@ -64,6 +78,7 @@ class Verifier:
 
     @property
     def _gpg_fingerprints(self) -> str:
+        """List of fingerprints of the saved keys"""
         return self._gpg_keys.fingerprints
 
     def download_gpg_key_if_needed(self, key_fingerprint: str) -> None:
@@ -90,6 +105,10 @@ class Verifier:
     def check_signature_of_commit(
         self, commit: git.Commit, possible_key_fingerprints: List[str]
     ) -> bool:
+        """
+        Check the validity of the commit signature
+        and test if the signer is present in the provided list.
+        """
         signer = self.get_commit_signer_fingerprint(commit)
 
         if signer not in possible_key_fingerprints:
@@ -101,6 +120,10 @@ class Verifier:
         return self.is_commit_signature_valid(commit)
 
     def is_commit_signature_valid(self, commit: git.Commit) -> bool:
+        """
+        Check the validity of the commit signature.
+        Key needs to be already present.
+        """
         commit_status = self.get_commit_signature_status(commit)
         if commit_status in VALID_SIGNATURE_STATUSES:
             logger.debug(f"Commit '{commit.hexsha}' is valid.")
@@ -111,15 +134,22 @@ class Verifier:
 
     @staticmethod
     def get_commit_signature_status(commit: git.Commit) -> "CommitSignatureStatus":
-        signature_mark = Verifier._get_commit_info(commit, pretty_format="%G?")
+        """Get a signature status from the given commit."""
+        signature_mark = CommitVerifier._get_commit_info(commit, pretty_format="%G?")
         return CommitSignatureStatus(signature_mark)
 
     @staticmethod
     def get_commit_signer_fingerprint(commit: git.Commit) -> str:
-        return Verifier._get_commit_info(commit, pretty_format="%GF")
+        """Get a signer fingerprint from the given commit"""
+        return CommitVerifier._get_commit_info(commit, pretty_format="%GF")
 
     @staticmethod
     def _get_commit_info(commit: git.Commit, pretty_format: str) -> str:
+        """
+        Return a commit information in a given format.
+
+        See `git show --help` and `--prety=format` for more information.
+        """
         try:
             return commit.repo.git.show(commit.hexsha, pretty=f"format:{pretty_format}")
         except git.GitCommandError as error:
