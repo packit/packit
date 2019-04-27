@@ -430,7 +430,7 @@ class PackitAPI:
             logger.info("\nLatest bodhi updates:")
             logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
 
-    def run_copr_build(self, owner, project, clone_url, committish, chroots):
+    def run_copr_build(self, owner, project, chroots):
         # get info
         client = CoprClient.create_from_config_file()
         try:

@@ -24,7 +24,7 @@ import logging
 import os
 import shutil
 from contextlib import contextmanager
-from typing import Optional
+from typing import Optional, Union
 
 import git
 
@@ -79,6 +79,7 @@ class LocalProject:
         offline: bool = False,
         refresh: bool = True,
         remote: str = "",
+        pr_id: Optional[str] = None,
     ) -> None:
         """
 
@@ -96,6 +97,7 @@ class LocalProject:
         :param offline: bool (do not use any network action, defaults to False)
         :param refresh: bool (calculate the missing attributes, defaults to True)
         :param remote: name of the git remote to use
+        :param pr_id: ID of the pull request to fetch and check out
         """
         self.working_dir_temporary = False
         if path_or_url:
@@ -126,6 +128,8 @@ class LocalProject:
                 self.git_repo.create_head(self._ref)
 
             self.git_repo.branches[self._ref].checkout()
+        if pr_id:
+            self.checkout_pr(pr_id)
 
     @property
     def ref(self) -> Optional[str]:
@@ -333,6 +337,19 @@ class LocalProject:
             return self.git_repo.head.commit.hexsha
         else:
             return self.git_repo.active_branch.name
+
+    def checkout_pr(self, pr_id: Union[str, int]):
+        """
+        Fetch selected PR and check it out. This will work for github and pagure, not for gitlab.
+        """
+        remote_name = self.remote or "origin"
+        rem: git.Remote = self.git_repo.remotes[remote_name]
+        remote_ref = f"+refs/pull/{pr_id}/head"
+        local_ref = f"refs/remotes/{remote_name}/pr/{pr_id}"
+        local_branch = f"pr/{pr_id}"
+        rem.fetch(f"{remote_ref}:{local_ref}")
+        self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
+        self.git_repo.branches[local_branch].checkout()
 
     def __del__(self):
         self.clean()
