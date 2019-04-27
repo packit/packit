@@ -64,15 +64,7 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
 
     flexmock(DistGit, update_branch=lambda *args, **kwargs: "0.0.0")
 
-    def mock_download_remote_sources():
-        """ mock download of the remote archive and place it into dist-git repo """
-        tarball_path = d / TARBALL_NAME
-        hops_filename = "hops"
-        hops_path = d / hops_filename
-        hops_path.write_text("Cascade\n")
-        subprocess.check_call(["tar", "-cf", str(tarball_path), hops_filename], cwd=d)
-
-    flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
+    mock_spec_download_remote_s(d)
 
     pc = get_local_package_config(str(u))
     pc.downstream_project_url = str(d)
@@ -90,6 +82,20 @@ def mock_remote_functionality_upstream(upstream_n_distgit):
 def mock_remote_functionality_sourcegit(sourcegit_n_distgit):
     u, d = sourcegit_n_distgit
     return mock_remote_functionality(d, u)
+
+
+def mock_spec_download_remote_s(path: Path):
+    def mock_download_remote_sources():
+        """ mock download of the remote archive and place it into dist-git repo """
+        tarball_path = path / TARBALL_NAME
+        hops_filename = "hops"
+        hops_path = path / hops_filename
+        hops_path.write_text("Cascade\n")
+        subprocess.check_call(
+            ["tar", "-cf", str(tarball_path), hops_filename], cwd=path
+        )
+
+    flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
 
 
 def mock_remote_functionality(distgit, upstream):
@@ -132,17 +138,8 @@ def mock_remote_functionality(distgit, upstream):
         fork_create=lambda: None,
     )
 
-    def mock_download_remote_sources():
-        """ mock download of the remote archive and place it into dist-git repo """
-        tarball_path = distgit / TARBALL_NAME
-        hops_filename = "hops"
-        hops_path = distgit / hops_filename
-        hops_path.write_text("Cascade\n")
-        subprocess.check_call(
-            ["tar", "-cf", str(tarball_path), hops_filename], cwd=distgit
-        )
+    mock_spec_download_remote_s(distgit)
 
-    flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
     flexmock(
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,

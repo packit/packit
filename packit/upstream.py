@@ -462,7 +462,7 @@ class Upstream(PackitRepositoryBase):
         :param srpm_path: path to the srpm
         :return: path to the srpm
         """
-        cwd = self.local_project.working_dir
+        cwd = self.specfile_dir
         cmd = [
             "rpmbuild",
             "-bs",
