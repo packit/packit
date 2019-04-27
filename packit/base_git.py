@@ -300,6 +300,7 @@ class PackitRepositoryBase:
     def check_last_commit(self) -> None:
         if self.allowed_gpg_keys is None:
             logger.info("Allowed GPG keys are not set, skipping the verification.")
+            return
 
         ver = CommitVerifier()
         last_commit = self.local_project.git_repo.head.commit
