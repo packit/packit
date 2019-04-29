@@ -46,7 +46,16 @@ def decorator_check_readonly(class_object) -> Any:
 PagureService: PagureServiceOrigin = decorator_check_readonly(PagureServiceOrigin)
 
 
+# TODO: upstream this to PyGithub
 class BetterGithubIntegration(github.GithubIntegration):
+    """
+    A "fork" of GithubIntegration class from PyGithub.
+
+    Since we auth as a Github app, we need to get an installation ID
+    of the app within a repo. Then we are able to get the API token
+    and work with Github's REST API
+    """
+
     def get_installation_id_for_repo(self, namespace: str, repo: str) -> str:
         """
         Get repo installation ID for a repository
