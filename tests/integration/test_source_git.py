@@ -24,7 +24,8 @@ from pathlib import Path
 
 from tests.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME, git_add_and_commit
-from tests.utils import get_specfile, cwd
+from tests.utils import get_specfile
+from packit.utils import cwd
 
 
 def test_basic_local_update_without_patching(

@@ -46,37 +46,17 @@ def get_health():
     return jsonify({"msg": "We are healthy!"})
 
 
-@app.route("/webhooks/github/release", methods=["POST"])
+@app.route("/webhooks/github", methods=["POST"])
 def github_release():
     msg = request.get_json()
 
     if not msg:
-        logger.debug("/webhooks/github/release: We haven't received any JSON data.")
+        logger.debug("/webhooks/github: we haven't received any JSON data.")
         return "We haven't received any JSON data."
 
     if all([msg.get("zen"), msg.get("hook_id"), msg.get("hook")]):
         logger.debug(f"/webhooks/github/release received ping event: {msg['hook']}")
         return "Pong!"
-
-    return _give_event_to_steve(msg)
-
-
-@app.route("/webhooks/github/pull_request")
-def github_pr():
-    msg = request.get_json()
-
-    if not msg:
-        logger.debug(
-            "/webhooks/github/pull_request: We haven't received any JSON data."
-        )
-        return "We haven't received any JSON data."
-
-    allowed_actions = ["opened", "edited", "reopened", "synchronized"]
-    if not (msg.get("action") in allowed_actions):
-        logger.debug(
-            f"/webhooks/github/pull_request: Ignoring pull_request event - {msg['action']}"
-        )
-        return "We only accept events for opened or edited pull_requests."
 
     return _give_event_to_steve(msg)
 

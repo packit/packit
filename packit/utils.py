@@ -22,9 +22,11 @@
 
 import json
 import logging
+import os
 import shlex
 import subprocess
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Tuple, Any
 
@@ -228,3 +230,21 @@ def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
         return bool(commit)
     except git.BadName:
         return False
+
+
+@contextmanager
+def cwd(target):
+    """
+    Manage cwd in a pushd/popd fashion.
+
+    Usage:
+
+        with cwd(tmpdir):
+          do something in tmpdir
+    """
+    curdir = os.getcwd()
+    os.chdir(target)
+    try:
+        yield
+    finally:
+        os.chdir(curdir)
