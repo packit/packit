@@ -24,6 +24,8 @@
 This is the official python interface for packit.
 """
 
+import time
+from datetime import datetime, timedelta
 import logging
 from pathlib import Path
 from typing import Sequence
@@ -465,3 +467,15 @@ class PackitAPI:
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
         build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
+
+    def watch_copr_build(self, build_id: int, timeout: int):
+        client = CoprClient.create_from_config_file()
+        watch_end = datetime.now() + timedelta(seconds=timeout)
+        while True:
+            build = client.build_proxy.get(build_id)
+            logger.debug(f"Watching copr build {build_id}: state - {build.state}")
+            if build.state not in ["importing", "pending", "starting", "running"]:
+                return build.state
+            if watch_end < datetime.now():
+                return "watch timeout"
+            time.sleep(10)

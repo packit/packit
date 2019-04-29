@@ -177,3 +177,21 @@ def test_copr_release_handle(release_event):
     c = Config()
     s = SteveJobs(c)
     s.process_message(release_event)
+
+
+def test_watch_build(upstream_n_distgit):
+    u, d = upstream_n_distgit
+
+    with cwd(u):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        pc.downstream_project_url = str(d)
+        up_lp = LocalProject(path_or_url=str(u))
+        api = PackitAPI(c, pc, up_lp)
+
+        flexmock(proxies.build.BuildProxy).should_receive("get").and_return(
+            Munch({"state": "pending"})
+        )
+        assert api.watch_copr_build(1, timeout=0) == "watch timeout"
