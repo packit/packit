@@ -1,19 +1,20 @@
-import flexmock
-import pytest
-from copr.v3 import Client
-import copr.v3.proxies as proxies
-from munch import Munch
 import json
 
+import copr.v3.proxies as proxies
+import pytest
+from copr.v3 import Client
+from flexmock import flexmock
 from github import Github
+from munch import Munch
 from ogr.services.github import GithubProject
+
+from packit.api import PackitAPI
+from packit.config import get_local_package_config, Config
+from packit.exceptions import PackitInvalidConfigException
+from packit.jobs import SteveJobs
+from packit.local_project import LocalProject
 from packit.utils import cwd
 from tests.spellbook import get_test_config, DATA_DIR
-from packit.api import PackitAPI
-from packit.local_project import LocalProject
-from packit.config import get_local_package_config, Config
-from packit.jobs import SteveJobs
-from packit.exceptions import PackitInvalidConfigException
 
 
 @pytest.fixture()
@@ -102,9 +103,7 @@ def test_run_copr_build(upstream_n_distgit, copr_project, copr_build, test_copr_
 
         # invalid owner + project
         with pytest.raises(PackitInvalidConfigException):
-            api.run_copr_build(
-                "not-packit", "dummy", "http://packit-source", "0.0.0", []
-            )
+            api.run_copr_build("not-packit", "dummy", [])
 
         # with project chroots update
         flexmock(proxies.project.ProjectProxy).should_receive("get").and_return(
@@ -112,12 +111,10 @@ def test_run_copr_build(upstream_n_distgit, copr_project, copr_build, test_copr_
         ).once()
         flexmock(proxies.project.ProjectProxy).should_receive("edit").once()
 
-        flexmock(proxies.build.BuildProxy).should_receive("create_from_scm").and_return(
-            copr_build
-        ).once()
-        id, url = api.run_copr_build(
-            "not-packit", "dummy", "http://packit-source", "0.0.0", [""]
-        )
+        flexmock(proxies.build.BuildProxy).should_receive(
+            "create_from_file"
+        ).and_return(copr_build).once()
+        id, url = api.run_copr_build("not-packit", "dummy", [""])
         assert id == 12345
         assert url == "https://copr-be.cloud.fedoraproject.org/results/packit/dummy"
 
