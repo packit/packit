@@ -5,29 +5,35 @@
   - name: Install all RPM packages needed to hack on packit.
     dnf:
       name:
-      - python3-pip
-      - python3-setuptools
+      - fedpkg
       - git
+      - mod_md
+      - nss_wrapper
+      - python3-GitPython
+      - python3-click
+      - python3-copr
+      - python3-devel
+      - python3-fedmsg
+      - python3-flask
+      - python3-ipdb  # for easy debugging
+      - python3-jsonschema
+      - python3-libpagure
+      - python3-mod_wsgi
+      - python3-munch
+      - python3-ogr
+      - python3-packaging
+      - python3-pip
+      - python3-pygithub
+      - python3-pyyaml
+      - python3-requests
+      - python3-rpm
+      - python3-setuptools
       - python3-setuptools_scm
       - python3-setuptools_scm_git_archive
+      - python3-tabulate
       - python3-wheel  # for bdist_wheel
-      - python3-ipdb  # for easy debugging
-      - python3-fedmsg
-      - python3-pyyaml
-      - python3-rpm
-      - python3-GitPython
-      - python3-requests
-      - python3-pygithub
-      - python3-libpagure
-      - python3-ogr
-      - rpm-build
       - rebase-helper
-      - fedpkg
-      - python3-flask
-      - nss_wrapper
-      - httpd-devel
-      - mod_md
-      - python3-devel
-      # till https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6 is not in official repos
-      enablerepo: testing      -
+      - rpm-build
+      # we need https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
+      enablerepo: testing
       state: present

@@ -136,6 +136,8 @@ class PackitAPI:
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
 
+        upstream_ref = upstream_ref or self.package_config.upstream_ref
+
         self.up.run_action(action=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
@@ -352,16 +354,21 @@ class PackitAPI:
             update_type=update_type,
         )
 
-    def create_srpm(self, output_file: str = None, upstream_ref: str = None) -> Path:
+    def create_srpm(
+        self, output_file: str = None, upstream_ref: str = None, srpm_dir: str = None
+    ) -> Path:
         """
         Create srpm from the upstream repo
 
         :param upstream_ref: git ref to upstream commit
         :param output_file: path + filename where the srpm should be written, defaults to cwd
+        :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: a path to the srpm
         """
         version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()
+
+        upstream_ref = upstream_ref or self.package_config.upstream_ref
 
         if upstream_ref:
             # source-git code: fetch the tarball and don't check out the upstream ref
@@ -387,7 +394,7 @@ class PackitAPI:
                 self.up.bump_spec(
                     version=version, changelog_entry="Development snapshot"
                 )
-        srpm_path = self.up.create_srpm(srpm_path=output_file)
+        srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
         return srpm_path
 
     def status(self):
@@ -430,7 +437,7 @@ class PackitAPI:
             logger.info("\nLatest bodhi updates:")
             logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
 
-    def run_copr_build(self, owner, project, clone_url, committish, chroots):
+    def run_copr_build(self, owner, project, chroots):
         # get info
         client = CoprClient.create_from_config_file()
         try:
@@ -448,16 +455,13 @@ class PackitAPI:
                     ownername=owner,
                     projectname=project,
                     chroots=chroots,
-                    decription="Repo for automatic rebuild owned by packit",
+                    description="Repo for automatic rebuild owned by packit",
                     contact="user-cont-team@redhat.com",
                 )
             else:
                 raise PackitInvalidConfigException(
                     f"Copr project {owner}/{project} not found."
                 )
-
-        # report
-        build = client.build_proxy.create_from_scm(
-            owner, project, clone_url, committish=committish
-        )
+        srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
+        build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url

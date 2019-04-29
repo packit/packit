@@ -31,9 +31,9 @@ from typing import Optional, List, Dict
 
 import click
 from jsonschema import Draft4Validator, ValidationError
+from ogr.abstract import GitProject
 from yaml import safe_load
 
-from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.exceptions import (
@@ -48,6 +48,7 @@ from packit.schema import (
     SYNCED_FILES_SCHEMA,
 )
 from packit.sync import RawSyncFilesItem, SyncFilesItem, get_raw_files
+from packit.utils import nested_get
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,6 @@ class Config(BaseConfig):
         self.fas_user: Optional[str] = None
         self.keytab_path: Optional[str] = None
 
-        self.github_app_installation_id: Optional[str] = None
         self.github_app_id: Optional[str] = None
         self.github_app_cert_path: Optional[str] = None
         self._github_token: str = ""
@@ -122,9 +122,6 @@ class Config(BaseConfig):
         config._github_token = raw_dict.get("github_token", "")
         config._pagure_user_token = raw_dict.get("pagure_user_token", "")
         config._pagure_fork_token = raw_dict.get("pagure_fork_token", "")
-        config.github_app_installation_id = raw_dict.get(
-            "github_app_installation_id", ""
-        )
         config.github_app_id = raw_dict.get("github_app_id", "")
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
 
@@ -313,6 +310,7 @@ class PackageConfig(BaseConfig):
         create_tarball_command: List[str] = None,
         current_version_command: List[str] = None,
         actions: Dict[ActionName, str] = None,
+        upstream_ref: Optional[str] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
@@ -328,6 +326,7 @@ class PackageConfig(BaseConfig):
         else:
             self.downstream_project_url: str = self.dist_git_package_url
         self.actions = actions or {}
+        self.upstream_ref: Optional[str] = upstream_ref
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
@@ -406,6 +405,7 @@ class PackageConfig(BaseConfig):
 
         dist_git_base_url = raw_dict.get("dist_git_base_url", None)
         dist_git_namespace = raw_dict.get("dist_git_namespace", None)
+        upstream_ref = nested_get(raw_dict, "upstream_ref")
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
@@ -420,6 +420,7 @@ class PackageConfig(BaseConfig):
             dist_git_namespace=dist_git_namespace,
             create_tarball_command=create_tarball_command,
             current_version_command=current_version_command,
+            upstream_ref=upstream_ref,
         )
         return pc
 
@@ -484,11 +485,12 @@ def get_packit_config_from_repo(
                 f"on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
             )
-        except FileNotFoundError:
+        except FileNotFoundError as ex:
             logger.debug(
                 f"The config file '{config_file_name}' "
                 f"not found on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
+                f"{ex!r}"
             )
             continue
 

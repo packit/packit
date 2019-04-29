@@ -30,7 +30,8 @@ from packit.config import get_local_package_config
 from packit.jobs import SteveJobs
 from packit.local_project import LocalProject
 from tests.spellbook import TARBALL_NAME, get_test_config
-from tests.utils import cwd, get_specfile
+from tests.utils import get_specfile
+from packit.utils import cwd
 
 
 @pytest.fixture()

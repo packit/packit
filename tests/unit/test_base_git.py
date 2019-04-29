@@ -37,7 +37,10 @@ def upstream_with_actions():
             )
         ),
         local_project=flexmock(
-            repo_name=flexmock(), refresh_the_arguments=lambda: None
+            repo_name=flexmock(),
+            refresh_the_arguments=lambda: None,
+            git_project=flexmock(),
+            git_service=flexmock(),
         ),
     )
 
