@@ -79,7 +79,12 @@ class BetterGithubIntegration(github.GithubIntegration):
             raise PackitException(
                 f"Unable to obtain installation ID for repo {namespace}/{repo}."
             )
-        return str(data["id"])
+        try:
+            return str(data.get["id"])
+        except KeyError:
+            raise PackitException(
+                f"This Github app is not installed in {namespace}/{repo}."
+            )
 
 
 # TODO: move as much logic to ogr as possible for these two functions
