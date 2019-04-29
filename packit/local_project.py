@@ -122,12 +122,7 @@ class LocalProject:
             self.refresh_the_arguments()
 
         if ref:
-            # If ref was specified, we will checkout that
-
-            if ref not in self.git_repo.branches:
-                self.git_repo.create_head(self._ref)
-
-            self.git_repo.branches[self._ref].checkout()
+            self.checkout_ref(ref)
         if pr_id:
             self.checkout_pr(pr_id)
 
@@ -337,6 +332,13 @@ class LocalProject:
             return self.git_repo.head.commit.hexsha
         else:
             return self.git_repo.active_branch.name
+
+    def checkout_ref(self, ref: str):
+        """ Check out selected ref in the git repo; equiv of git checkout -B ref """
+        if ref not in self.git_repo.branches:
+            self.git_repo.create_head(self._ref)
+
+        self.git_repo.branches[self._ref].checkout()
 
     def checkout_pr(self, pr_id: Union[str, int]):
         """
