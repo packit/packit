@@ -388,10 +388,14 @@ class GithubCoprBuildHandler(JobHandler):
         )
 
         # report
+        commit_sha = self.project.get_sha_from_tag(tag_name)
         msg = f"Copr build(ID {build_id}) triggered\nMore info: {repo_url}"
-        self.project.commit_comment(
-            commit=self.project.get_sha_from_tag(tag_name), body=msg
+        self.project.commit_comment(commit=commit_sha, body=msg)
+        build_result = api.watch_copr_build(
+            build_id, int(self.job.metadata.get("timeout")) or 60 * 60 * 2
         )
+        msg = f"Copr build {build_id} ended with result {build_result}"
+        self.project.commit_comment(commit=commit_sha, body=msg)
 
     def handle_pull_request(self):
         if not self.job.metadata.get("targets"):
@@ -432,6 +436,11 @@ class GithubCoprBuildHandler(JobHandler):
             namespace=target_repo_namespace,
             service=self.upstream_service,
         )
+        pr_target_project.pr_comment(self.event["number"], msg)
+        build_result = api.watch_copr_build(
+            build_id, int(self.job.metadata.get("timeout")) or 60 * 60 * 2
+        )
+        msg = f"Copr build {build_id} ended with result: `{build_result}`"
         pr_target_project.pr_comment(self.event["number"], msg)
 
     def run(self):
