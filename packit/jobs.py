@@ -437,9 +437,12 @@ class GithubCoprBuildHandler(JobHandler):
             service=self.upstream_service,
         )
         pr_target_project.pr_comment(self.event["number"], msg)
-        build_result = api.watch_copr_build(
-            build_id, int(self.job.metadata.get("timeout")) or 60 * 60 * 2
-        )
+        timeout = 60 * 60 * 2
+        # TODO: document this and enforce int in config
+        timeout_config = self.job.metadata.get("timeout")
+        if timeout_config:
+            timeout = int(timeout_config)
+        build_result = api.watch_copr_build(build_id, timeout)
         msg = f"Copr build {build_id} ended with result: `{build_result}`"
         pr_target_project.pr_comment(self.event["number"], msg)
 
