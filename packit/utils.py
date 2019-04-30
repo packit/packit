@@ -59,10 +59,10 @@ def get_rev_list_kwargs(opt_list):
 
 # TODO: we should use run_cmd from conu
 def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
-    logger.debug("cmd = %s", cmd)
     if not isinstance(cmd, list):
-        logger.debug("cmd = '%s'", " ".join(cmd))
         cmd = shlex.split(cmd)
+
+    logger.debug("cmd = '%s'", " ".join(cmd))
 
     cwd = cwd or str(Path.cwd())
     error_message = error_message or cmd[0]
