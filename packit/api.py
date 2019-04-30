@@ -367,6 +367,8 @@ class PackitAPI:
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: a path to the srpm
         """
+        self.up.run_action(action=ActionName.post_upstream_clone)
+
         version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()
 

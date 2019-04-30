@@ -10,6 +10,7 @@ There are also some hooks presented -- it works as an action without any default
 
 Currently, there are the following actions that you can use:
 
+### propose-update
 
 |        | name                  | working directory | when run                                                                          | description                               |
 | ------ | --------------------- | ----------------- | --------------------------------------------------------------------------------  | ----------------------------------------- |
@@ -20,6 +21,18 @@ Currently, there are the following actions that you can use:
 |        | `create-archive`      | upstream git repo | when the archive needs to be created                                              | replace the code for creating an archive  |
 |        | `get-current-version` | upstream git repo | when the current version needs to be found                                        | expect version as a stdout                |
 
+
+### srpm
+
+|        | name                  | working directory | when run                                                                          | description                               |
+| ------ | --------------------- | ----------------- | --------------------------------------------------------------------------------  | ----------------------------------------- |
+| [hook] | `post-upstream-clone` | upstream git repo | after cloning of the upstream-repo (master) and before other operation            |                                           |
+|        | `get-current-version` | upstream git repo | when the current version needs to be found                                        | expect version as a stdout                |
+|        | `create-archive`      | upstream git repo | when the archive needs to be created                                              | replace the code for creating an archive  |
+|        | `create-patches`      | upstream git repo | after sync of upstream files to the downstream                                    | replace patching                          |
+
+
+-----
 
 In your package config they can be defined like this:
 
