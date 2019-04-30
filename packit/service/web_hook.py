@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import logging
-from io import StringIO
+from concurrent.futures.thread import ThreadPoolExecutor
 
 from flask import Flask, request, jsonify
 
@@ -38,6 +38,7 @@ class PackitWebhookReceiver(Flask):
 
 app = PackitWebhookReceiver(__name__)
 logger = logging.getLogger("packit")
+threadpool_executor = ThreadPoolExecutor(max_workers=16)
 
 
 @app.route("/healthz", methods=["GET", "HEAD", "POST"])
@@ -47,7 +48,7 @@ def get_health():
 
 
 @app.route("/webhooks/github", methods=["POST"])
-def github_release():
+def github_webhook():
     msg = request.get_json()
 
     if not msg:
@@ -58,25 +59,17 @@ def github_release():
         logger.debug(f"/webhooks/github/release received ping event: {msg['hook']}")
         return "Pong!"
 
-    return _give_event_to_steve(msg)
+    # GitHub terminates the conn after 10 seconds:
+    # https://developer.github.com/v3/guides/best-practices-for-integrators/#favor-asynchronous-work-over-synchronous
+    # as a temporary workaround, before we start using celery, let's just respond right away
+    # and send github 200 that we got it
+    threadpool_executor.submit(_give_event_to_steve, msg)
+
+    return "Webhook accepted. We thank you, Github."
 
 
-def _give_event_to_steve(event):
-    buffer = StringIO()
-    logHandler = logging.StreamHandler(buffer)
-    logHandler.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    logHandler.setFormatter(formatter)
-    logger.addHandler(logHandler)
-
+def _give_event_to_steve(event: dict):
     config = Config.get_user_config()
 
     steve = SteveJobs(config)
     steve.process_message(event)
-
-    logger.removeHandler(logHandler)
-    buffer.flush()
-
-    return buffer.getvalue()
