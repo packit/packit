@@ -80,7 +80,7 @@ class BetterGithubIntegration(github.GithubIntegration):
                 f"Unable to obtain installation ID for repo {namespace}/{repo}."
             )
         try:
-            return str(data.get["id"])
+            return str(data["id"])
         except KeyError:
             raise PackitException(
                 f"This Github app is not installed in {namespace}/{repo}."
