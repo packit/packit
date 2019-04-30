@@ -185,7 +185,6 @@ The acceptable names are the same as for the package config:
  `github_token`               | string          | Github API token: this is needed when packit interacts with Github API
  `pagure_user_token`          | string          | Pagure token needed to access REST API, get it at: https://src.fedoraproject.org/settings#nav-api-tab
  `pagure_fork_token`          | string          | a token so packit can create a pull request: https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
- `github_app_installation_id` | string          | if authenticating with a github app, this is the installation ID
  `github_app_id`              | string          | github app ID used for authentication
  `github_app_cert_path`       | string          | path to a certificate associated with a github app
 
