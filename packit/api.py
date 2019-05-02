@@ -24,16 +24,15 @@
 This is the official python interface for packit.
 """
 
+import logging
 import time
 from datetime import datetime, timedelta
-import logging
 from pathlib import Path
 from typing import Sequence, Callable
 
-from tabulate import tabulate
-
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
+from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
@@ -472,7 +471,8 @@ class PackitAPI:
 
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
-    ):
+    ) -> str:
+        """ returns copr build state """
         client = CoprClient.create_from_config_file()
         watch_end = datetime.now() + timedelta(seconds=timeout)
         logger.debug(f"Watching copr build {build_id}")
@@ -490,8 +490,8 @@ class PackitAPI:
             if report_func:
                 report_func(gh_state, description)
             if gh_state != "pending":
-                return
+                return build.state
             if watch_end < datetime.now():
                 report_func("error", "Build watch timeout")
-                return
+                return build.state
             time.sleep(10)
