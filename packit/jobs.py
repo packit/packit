@@ -8,7 +8,7 @@ from ogr.abstract import GitProject, GitService
 
 from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
-from packit.config import get_packit_config_from_repo
+from packit.config import get_package_config_from_repo
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -73,7 +73,7 @@ class SteveJobs:
             gh_proj = get_github_project(
                 self.config, repo=repo_name, namespace=repo_namespace
             )
-            package_config = get_packit_config_from_repo(gh_proj, release_ref)
+            package_config = get_package_config_from_repo(gh_proj, release_ref)
             https_url = event["repository"]["html_url"]
             package_config.upstream_project_url = https_url
             return JobTriggerType.release, package_config, gh_proj
@@ -113,7 +113,7 @@ class SteveJobs:
             gh_proj = get_github_project(
                 self.config, repo=base_repo_name, namespace=base_repo_namespace
             )
-            package_config = get_packit_config_from_repo(gh_proj, base_ref)
+            package_config = get_package_config_from_repo(gh_proj, base_ref)
             https_url = event["repository"]["html_url"]
             package_config.upstream_project_url = https_url
             return JobTriggerType.pull_request, package_config, gh_proj
@@ -145,7 +145,7 @@ class SteveJobs:
             dg_proj = self.pagure_service.get_project(
                 repo=repo_name, namespace=repo_namespace
             )
-            package_config = get_packit_config_from_repo(dg_proj, ref)
+            package_config = get_package_config_from_repo(dg_proj, ref)
             return JobTriggerType.commit, package_config, dg_proj
         return None
 
