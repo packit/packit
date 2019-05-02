@@ -42,3 +42,17 @@ DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 PROD_DISTGIT_URL = "https://src.fedoraproject.org/"
 
 DEFAULT_COPR_OWNER = "packit"
+
+COPR2GITHUB_STATE = {
+    "running": ("pending", "SRPM or RPM build is running"),
+    "pending": ("pending", "build(-chroot) is waiting to be picked"),
+    "starting": ("pending", "build was picked by worker but no VM initialized yet"),
+    "importing": ("pending", "SRPM is being imported into dist-git"),
+    "forked": ("pending", "build(-chroot) was forked"),
+    "waiting": ("pending", "build(-chroot) is waiting for something else to finish"),
+    "succeeded": ("success", "build succeeded"),
+    "failed": ("failure", "build failed"),
+    "canceled": ("error", "build was canceled"),
+    "skipped": ("error", "if there was this package built already"),
+    "unknown": ("error", "undefined"),
+}
