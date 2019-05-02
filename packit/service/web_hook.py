@@ -20,10 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import hmac
 import logging
+from hashlib import sha1
 from concurrent.futures.thread import ThreadPoolExecutor
 
-from flask import Flask, request, jsonify
+from flask import Flask, abort, request, jsonify
 
 from packit.config import Config
 from packit.jobs import SteveJobs
@@ -56,20 +58,52 @@ def github_webhook():
         return "We haven't received any JSON data."
 
     if all([msg.get("zen"), msg.get("hook_id"), msg.get("hook")]):
-        logger.debug(f"/webhooks/github/release received ping event: {msg['hook']}")
+        logger.debug(f"/webhooks/github received ping event: {msg['hook']}")
         return "Pong!"
+
+    config = Config.get_user_config()
+
+    if not _validate_signature(config):
+        logger.warning(
+            f"/webhooks/github payload signature validation failed. "
+            f"Payload: {request.get_data(as_text=True)}"
+        )
+        abort(401)  # Unauthorized
 
     # GitHub terminates the conn after 10 seconds:
     # https://developer.github.com/v3/guides/best-practices-for-integrators/#favor-asynchronous-work-over-synchronous
     # as a temporary workaround, before we start using celery, let's just respond right away
     # and send github 200 that we got it
-    threadpool_executor.submit(_give_event_to_steve, msg)
+    threadpool_executor.submit(_give_event_to_steve, msg, config)
 
     return "Webhook accepted. We thank you, Github."
 
 
-def _give_event_to_steve(event: dict):
-    config = Config.get_user_config()
+def _validate_signature(config: Config) -> bool:
+    """
+    https://developer.github.com/webhooks/securing/#validating-payloads-from-github
+    https://developer.github.com/webhooks/#delivery-headers
+    """
+    if "X-Hub-Signature" not in request.headers:
+        # no signature -> no validation
+        return True
 
+    sig = request.headers["X-Hub-Signature"]
+    if not sig.startswith("sha1="):
+        logger.warning(f"Digest mode in X-Hub-Signature {sig!r} is not sha1")
+        return False
+
+    webhook_secret = config.webhook_secret.encode()
+    if not webhook_secret:
+        logger.warning("webhook_secret not specified in config")
+        # For now, don't let this stop us, but long-term return False here
+        return True
+
+    signature = sig.split("=")[1]
+    mac = hmac.new(webhook_secret, msg=request.get_data(), digestmod=sha1)
+    return hmac.compare_digest(signature, mac.hexdigest())
+
+
+def _give_event_to_steve(event: dict, config: Config):
     steve = SteveJobs(config)
     steve.process_message(event)

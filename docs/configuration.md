@@ -187,6 +187,7 @@ The acceptable names are the same as for the package config:
  `pagure_fork_token`          | string          | a token so packit can create a pull request: https://src.fedoraproject.org/fork/YOU/rpms/PACKAGE/settings#apikeys-tab
  `github_app_id`              | string          | github app ID used for authentication
  `github_app_cert_path`       | string          | path to a certificate associated with a github app
+ `webhook_secret`             | string          | when specified in a Github App settings, GitHub uses it to create a hash signature with each payload
 
 You can also specify the tokens as environment variables: `GITHUB_TOKEN`, `PAGURE_USER_TOKEN`, `PAGURE_FORK_TOKEN`.
 
