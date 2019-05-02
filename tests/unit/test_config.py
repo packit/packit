@@ -34,7 +34,7 @@ from packit.config import (
     JobTriggerType,
     SyncFilesConfig,
     SyncFilesItem,
-    get_packit_config_from_repo,
+    get_package_config_from_repo,
     Config,
     JobType,
     JobNotifyType,
@@ -475,10 +475,10 @@ def test_dist_git_package_url():
         '{"src": ".packit.yaml", "dest": ".packit2.yaml"}]}',
     ],
 )
-def test_get_packit_config_from_repo(content):
+def test_get_package_config_from_repo(content):
     flexmock(GitProject).should_receive("get_file_content").and_return(content)
     git_project = GitProject(repo="", service=GitService(), namespace="")
-    config = get_packit_config_from_repo(sourcegit_project=git_project, ref="")
+    config = get_package_config_from_repo(sourcegit_project=git_project, ref="")
     assert isinstance(config, PackageConfig)
     assert Path(config.specfile_path).name == "packit.spec"
     assert config.synced_files == SyncFilesConfig(
