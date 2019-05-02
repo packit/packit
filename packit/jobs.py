@@ -378,7 +378,10 @@ class GithubCoprBuildHandler(JobHandler):
             self.target_url = target_url
 
         def report(self, state, description):
-            logger.debug(f"Reporting state of copr build ID={self.build_id} to {state}")
+            logger.debug(
+                f"Reporting state of copr build ID={self.build_id},"
+                f" state={state}, commit={self.commit_sha}"
+            )
             self.gh_proj.set_commit_status(
                 self.commit_sha, state, self.target_url, description, "packit/rpm-build"
             )
