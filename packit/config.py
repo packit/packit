@@ -80,6 +80,7 @@ class Config(BaseConfig):
         self.github_app_id: Optional[str] = None
         self.github_app_cert_path: Optional[str] = None
         self._github_token: str = ""
+        self.webhook_secret: str = ""
 
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
@@ -124,6 +125,7 @@ class Config(BaseConfig):
         config._pagure_fork_token = raw_dict.get("pagure_fork_token", "")
         config.github_app_id = raw_dict.get("github_app_id", "")
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
+        config.webhook_secret = raw_dict.get("webhook_secret", "")
 
         return config
 
