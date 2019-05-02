@@ -453,7 +453,7 @@ class PackitAPI:
                 client.project_proxy.edit(owner, project, chroots=chroots)
         except CoprNoResultException:
             if owner == DEFAULT_COPR_OWNER:
-                logger.info("Copr project {owner}/{project} not found. Creating new.")
+                logger.info(f"Copr project {owner}/{project} not found. Creating new.")
                 client.project_proxy.add(
                     ownername=owner,
                     projectname=project,
@@ -466,6 +466,8 @@ class PackitAPI:
                     f"Copr project {owner}/{project} not found."
                 )
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
+        assert srpm_path.exists()
+        logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
         build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
 
@@ -481,17 +483,20 @@ class PackitAPI:
             build = client.build_proxy.get(build_id)
             if build.state == state_reported:
                 continue
-            logger.debug(f"COPR build {build_id}, state = {build.state}")
+            state_reported = build.state
+            logger.debug(f"COPR build {build_id}, state = {state_reported}")
             try:
-                gh_state, description = COPR2GITHUB_STATE[build.state]
+                gh_state, description = COPR2GITHUB_STATE[state_reported]
             except KeyError as exc:
                 logger.error(f"COPR gave us an invalid state: {exc}")
                 gh_state, description = "error", "Something went wrong."
             if report_func:
                 report_func(gh_state, description)
             if gh_state != "pending":
-                return build.state
+                logger.debug(f"state is now {gh_state}, ending the watch")
+                return state_reported
             if watch_end < datetime.now():
+                logger.error(f"the build did not finish in time ({timeout}s)")
                 report_func("error", "Build watch timeout")
-                return build.state
+                return state_reported
             time.sleep(10)
