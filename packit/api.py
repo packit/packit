@@ -481,7 +481,12 @@ class PackitAPI:
             build = client.build_proxy.get(build_id)
             if build.state == state_reported:
                 continue
-            gh_state, description = COPR2GITHUB_STATE[build.state]
+            logger.debug(f"COPR build {build_id}, state = {build.state}")
+            try:
+                gh_state, description = COPR2GITHUB_STATE[build.state]
+            except KeyError as exc:
+                logger.error(f"COPR gave us an invalid state: {exc}")
+                gh_state, description = "error", "Something went wrong."
             if report_func:
                 report_func(gh_state, description)
             if gh_state != "pending":
