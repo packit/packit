@@ -458,7 +458,10 @@ class PackitAPI:
                     ownername=owner,
                     projectname=project,
                     chroots=chroots,
-                    description="Repo for automatic rebuild owned by packit",
+                    description=(
+                        "Continuous builds initiated by packit service.\n"
+                        "For more info check out https://packit.dev/"
+                    ),
                     contact="user-cont-team@redhat.com",
                 )
             else:
