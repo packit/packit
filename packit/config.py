@@ -472,7 +472,7 @@ def get_local_package_config(
     raise PackitConfigException("No packit config found.")
 
 
-def get_packit_config_from_repo(
+def get_package_config_from_repo(
     sourcegit_project: GitProject, ref: str
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
