@@ -119,6 +119,7 @@ def test_run_copr_build(upstream_n_distgit, copr_project, copr_build, test_copr_
         assert url == "https://copr-be.cloud.fedoraproject.org/results/packit/dummy"
 
 
+@pytest.mark.skip
 def test_copr_pr_handle(pr_event):
     packit_yaml = (
         "{'specfile_path': '', 'synced_files': []"
@@ -149,6 +150,7 @@ def test_copr_pr_handle(pr_event):
     s.process_message(pr_event)
 
 
+@pytest.mark.skip
 def test_copr_release_handle(release_event):
     packit_yaml = (
         "{'specfile_path': '', 'synced_files': []"
@@ -179,6 +181,7 @@ def test_copr_release_handle(release_event):
     s.process_message(release_event)
 
 
+@pytest.mark.skip
 def test_watch_build(upstream_n_distgit):
     u, d = upstream_n_distgit
 
