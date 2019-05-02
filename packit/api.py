@@ -28,7 +28,7 @@ import time
 from datetime import datetime, timedelta
 import logging
 from pathlib import Path
-from typing import Sequence
+from typing import Sequence, Callable
 
 from tabulate import tabulate
 
@@ -37,7 +37,7 @@ from copr.v3.exceptions import CoprNoResultException
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
-from packit.constants import DEFAULT_COPR_OWNER
+from packit.constants import DEFAULT_COPR_OWNER, COPR2GITHUB_STATE
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, PackitInvalidConfigException
 from packit.local_project import LocalProject
@@ -470,14 +470,23 @@ class PackitAPI:
         build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
 
-    def watch_copr_build(self, build_id: int, timeout: int):
+    def watch_copr_build(
+        self, build_id: int, timeout: int, report_func: Callable = None
+    ):
         client = CoprClient.create_from_config_file()
         watch_end = datetime.now() + timedelta(seconds=timeout)
+        logger.debug(f"Watching copr build {build_id}")
+        state_reported = ""
         while True:
             build = client.build_proxy.get(build_id)
-            logger.debug(f"Watching copr build {build_id}: state - {build.state}")
-            if build.state not in ["importing", "pending", "starting", "running"]:
-                return build.state
+            if build.state == state_reported:
+                continue
+            gh_state, description = COPR2GITHUB_STATE[build.state]
+            if report_func:
+                report_func(gh_state, description)
+            if gh_state != "pending":
+                return
             if watch_end < datetime.now():
-                return "watch timeout"
+                report_func("error", "Build watch timeout")
+                return
             time.sleep(10)
