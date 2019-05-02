@@ -64,10 +64,6 @@ def github_webhook():
     config = Config.get_user_config()
 
     if not _validate_signature(config):
-        logger.warning(
-            f"/webhooks/github payload signature validation failed. "
-            f"Payload: {request.get_data(as_text=True)}"
-        )
         abort(401)  # Unauthorized
 
     # GitHub terminates the conn after 10 seconds:
@@ -101,7 +97,13 @@ def _validate_signature(config: Config) -> bool:
 
     signature = sig.split("=")[1]
     mac = hmac.new(webhook_secret, msg=request.get_data(), digestmod=sha1)
-    return hmac.compare_digest(signature, mac.hexdigest())
+    digest_is_valid = hmac.compare_digest(signature, mac.hexdigest())
+    if not digest_is_valid:
+        logger.warning(f"/webhooks/github payload signature validation failed.")
+        logger.debug(f"X-Hub-Signature: {sig!r}")
+        logger.debug(f"Computed signature: {mac.hexdigest()}")
+    # TODO: return digest_is_valid
+    return True
 
 
 def _give_event_to_steve(event: dict, config: Config):
