@@ -407,25 +407,27 @@ class GithubCoprBuildHandler(JobHandler):
         timeout_config = self.job.metadata.get("timeout")
         if timeout_config:
             timeout = int(timeout_config)
-        api.watch_copr_build(build_id, timeout, r.report)
+        api.watch_copr_build(build_id, timeout, report_func=r.report)
 
     def handle_pull_request(self):
         if not self.job.metadata.get("targets"):
             logger.error(
                 "'targets' value is required in packit config for copr_build job"
             )
-        pr_id = str(nested_get(self.event, "number"))
+        pr_id_int = nested_get(self.event, "number")
+        pr_id = str(pr_id_int)
 
         local_project = LocalProject(
             git_project=self.project, pr_id=pr_id, git_service=self.project.service
         )
         api = PackitAPI(self.config, self.package_config, local_project)
 
+        default_project_name = f"{self.project.namespace}-{self.project.repo}-{pr_id}"
+        owner = self.job.metadata.get("owner") or "packit"
+        project = self.job.metadata.get("project") or default_project_name
+
         build_id, repo_url = api.run_copr_build(
-            owner=self.job.metadata.get("owner") or "packit",
-            project=self.job.metadata.get("project")
-            or f"{self.project.namespace}-{self.project.repo}",
-            chroots=self.job.metadata.get("targets"),
+            owner=owner, project=project, chroots=self.job.metadata.get("targets")
         )
         timeout = 60 * 60 * 2
         # TODO: document this and enforce int in config
@@ -434,7 +436,19 @@ class GithubCoprBuildHandler(JobHandler):
             timeout = int(timeout_config)
         commit_sha = nested_get(self.event, "pull_request", "head", "sha")
         r = self.BuildStatusReporter(self.project, commit_sha, build_id, repo_url)
-        api.watch_copr_build(build_id, timeout, r.report)
+        build_state = api.watch_copr_build(build_id, timeout, report_func=r.report)
+        if build_state == "succeeded":
+            msg = (
+                f"Congratulations! The build [has finished]({repo_url})"
+                " successfully. :champagne:\n\n"
+                "You can install the built RPMs by following these steps:\n\n"
+                "* `sudo yum install -y dnf-plugins-core` on RHEL 8\n"
+                "* `sudo dnf install -y dnf-plugins-core` on Fedora\n"
+                f"* `dnf copr enable {owner}/{project}`\n"
+                "* And now you can install the packages.\n"
+                "\nPlease note that the RPMs should be used only in a testing environment."
+            )
+            self.project.pr_comment(pr_id_int, msg)
 
     def run(self):
         if self.triggered_by == JobTriggerType.pull_request:
