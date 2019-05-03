@@ -8,14 +8,18 @@ from typing import Any, Type, Optional
 
 import github
 from ogr.abstract import GitService
-from ogr.services.github import GithubService, GithubProject
+from ogr.services.github import GithubService as GithubServiceOrigin
+from ogr.services.github import GithubProject
 from ogr.services.pagure import PagureService as PagureServiceOrigin
+from ogr.mock_core import PersistentObjectStorage
 
 from packit.config import Config
 from packit.exceptions import PackitException
 
 READ_ONLY_NAME = "read_only"
 logger = logging.getLogger(__name__)
+# avoid pyflakes to raise error of unused import (used for mocking)
+_ = PersistentObjectStorage
 
 
 def check_read_only_support(kls: Type[GitService]):
@@ -34,16 +38,18 @@ def decorator_check_readonly(class_object) -> Any:
 
     @functools.wraps(class_object)
     def output_class(*args, **kwargs):
-        if kwargs[READ_ONLY_NAME]:
-            check_read_only_support(class_object)
-            return class_object(*args, **kwargs)
-        kwargs.pop(READ_ONLY_NAME)
+        if kwargs.get(READ_ONLY_NAME) is not None:
+            if kwargs[READ_ONLY_NAME]:
+                check_read_only_support(class_object)
+                return class_object(*args, **kwargs)
+            kwargs.pop(READ_ONLY_NAME)
         return class_object(*args, **kwargs)
 
     return output_class
 
 
-PagureService: PagureServiceOrigin = decorator_check_readonly(PagureServiceOrigin)
+PagureService: Type[PagureServiceOrigin] = decorator_check_readonly(PagureServiceOrigin)
+GithubService: Type[GithubServiceOrigin] = decorator_check_readonly(GithubServiceOrigin)
 
 
 # TODO: upstream this to PyGithub
@@ -90,9 +96,8 @@ class BetterGithubIntegration(github.GithubIntegration):
 # TODO: move as much logic to ogr as possible for these two functions
 def get_github_service(
     config: Config, namespace: Optional[str] = None, repo: Optional[str] = None
-) -> GithubService:
+) -> GithubServiceOrigin:
     """ initiate the GithubService """
-    gh_service_kls: Type[GithubService] = decorator_check_readonly(GithubService)
     if config.github_app_id and config.github_app_cert_path and namespace and repo:
         logger.debug("Authenticating with Github using a Githab app.")
         private_key = Path(config.github_app_cert_path).read_text()
@@ -100,10 +105,10 @@ def get_github_service(
         inst_id = integration.get_installation_id_for_repo(namespace, repo)
         inst_auth = integration.get_access_token(inst_id)
         token = inst_auth.token
-        gh_service = gh_service_kls(token=token, read_only=config.dry_run)
+        gh_service = GithubService(token=token, read_only=config.dry_run)
     else:
         logger.debug("Authenticating with Github using a token.")
-        gh_service = gh_service_kls(token=config.github_token, read_only=config.dry_run)
+        gh_service = GithubService(token=config.github_token, read_only=config.dry_run)
 
     # test we have correct credentials
     # hmmm, Github tells me we are not allowed to this, we need to tick more perms
@@ -113,9 +118,12 @@ def get_github_service(
 
 
 def get_github_project(
-    config: Config, namespace: str, repo: str, service: Optional[GithubService] = None
+    config: Config,
+    namespace: str,
+    repo: str,
+    service: Optional[GithubServiceOrigin] = None,
 ) -> GithubProject:
-    github_service: GithubService = service or get_github_service(
+    github_service: GithubServiceOrigin = service or get_github_service(
         config, namespace=namespace, repo=repo
     )
     gh_proj = GithubProject(repo=repo, namespace=namespace, service=github_service)

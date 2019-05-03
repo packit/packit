@@ -1,0 +1,28 @@
+GET:
+  https://src.fedoraproject.org//api/0/rpms/python-ogr/git/branches:
+    empty:
+      empty:
+        branches:
+        - f29
+        - f30
+        - master
+        total_branches: 3
+  https://src.fedoraproject.org//api/0/rpms/python-ogr/pull-requests:
+    '{''status'': ''Open''}':
+      empty:
+        args:
+          assignee: null
+          author: null
+          page: 1
+          per_page: 20
+          status: Open
+        pagination:
+          first: https://src.fedoraproject.org/api/0/rpms/python-ogr/pull-requests?status=Open&page=1&per_page=20
+          last: https://src.fedoraproject.org/api/0/rpms/python-ogr/pull-requests?status=Open&page=0&per_page=20
+          next: null
+          page: 1
+          pages: 0
+          per_page: 20
+          prev: null
+        requests: []
+        total_requests: 0
