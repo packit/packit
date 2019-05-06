@@ -1,10 +1,9 @@
-import functools
 import inspect
 import json
 import logging
 from http.client import HTTPSConnection
 from pathlib import Path
-from typing import Any, Type, Optional
+from typing import Type, Optional
 
 import github
 from ogr.abstract import GitService
@@ -22,30 +21,30 @@ logger = logging.getLogger(__name__)
 _ = PersistentObjectStorage
 
 
-def check_read_only_support(kls: Type[GitService]):
-    if "read_only" not in inspect.signature(kls).parameters:
-        raise PackitException("Read only mode is not supported by ogr library")
-
-
-def decorator_check_readonly(class_object) -> Any:
+def decorator_check_readonly(class_input: Type[object]) -> Type[object]:
     """
     Check Service Class and replace readonly parameter based if set and ogr  supports it
     otherwise remove this key and call ogr without that
 
-    :param class_object: object of ogr class what has to be changed if readonly mode is set
-    :return: Object instance
+    :param class_input: class object of ogr class what has to be changed if readonly mode is set
+    :return: Class Object
     """
 
-    @functools.wraps(class_object)
-    def output_class(*args, **kwargs):
-        if kwargs.get(READ_ONLY_NAME) is not None:
-            if kwargs[READ_ONLY_NAME]:
-                check_read_only_support(class_object)
-                return class_object(*args, **kwargs)
-            kwargs.pop(READ_ONLY_NAME)
-        return class_object(*args, **kwargs)
+    def check_read_only_support(kls: Type[GitService]):
+        if READ_ONLY_NAME not in inspect.signature(kls).parameters:
+            raise PackitException("Read only mode is not supported by ogr library")
 
-    return output_class
+    # ignore this mypy type check because it is very dynamical and not able to properly wrote it
+    class OutputClass(class_input):  # type: ignore
+        def __init__(self, *args, **kwargs):
+            if kwargs.get(READ_ONLY_NAME) is not None:
+                if kwargs[READ_ONLY_NAME]:
+                    check_read_only_support(class_input)
+                else:
+                    kwargs.pop(READ_ONLY_NAME)
+            super().__init__(*args, **kwargs)
+
+    return OutputClass
 
 
 PagureService: Type[PagureServiceOrigin] = decorator_check_readonly(PagureServiceOrigin)

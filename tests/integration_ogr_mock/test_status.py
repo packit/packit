@@ -61,7 +61,7 @@ class TestStatus(unittest.TestCase):
         )
         # put peristent storage class attribute to pagure and github where it is used
         packit.distgit.PagureService.persistent_storage = self.storage_pagure
-        packit.ogr_services.GithubServiceOrigin.persistent_storage = self.storage_github
+        packit.ogr_services.GithubService.persistent_storage = self.storage_github
 
         self.service_github = packit.ogr_services.GithubService(
             token=self.conf.github_token
