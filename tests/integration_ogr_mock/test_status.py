@@ -31,6 +31,7 @@ from packit.config import get_package_config_from_repo
 from packit.status import Status
 from packit.local_project import LocalProject
 from packit.config import Config
+from ogr.mock_core import PersistentObjectStorage
 
 DATA_DIR = "test_data"
 PERSISTENT_DATA_PREFIX = os.path.join(
@@ -53,10 +54,10 @@ class TestStatus(unittest.TestCase):
     def setUp(self):
         self.conf = self.get_test_config()
         self.is_write_mode = bool(os.environ.get("FORCE_WRITE"))
-        self.storage_pagure = packit.ogr_services.PersistentObjectStorage(
+        self.storage_pagure = PersistentObjectStorage(
             self.datafile_pagure, self.is_write_mode
         )
-        self.storage_github = packit.ogr_services.PersistentObjectStorage(
+        self.storage_github = PersistentObjectStorage(
             self.datafile_github, self.is_write_mode
         )
         # put peristent storage class attribute to pagure and github where it is used

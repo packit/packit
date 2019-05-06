@@ -10,15 +10,12 @@ from ogr.abstract import GitService
 from ogr.services.github import GithubService as GithubServiceOrigin
 from ogr.services.github import GithubProject
 from ogr.services.pagure import PagureService as PagureServiceOrigin
-from ogr.mock_core import PersistentObjectStorage
 
 from packit.config import Config
 from packit.exceptions import PackitException
 
 READ_ONLY_NAME = "read_only"
 logger = logging.getLogger(__name__)
-# avoid pyflakes to raise error of unused import (used for mocking)
-_ = PersistentObjectStorage
 
 
 def decorator_check_readonly(class_input: Type[object]) -> Type[object]:
