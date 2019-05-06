@@ -107,5 +107,9 @@ def _validate_signature(config: Config) -> bool:
 
 
 def _give_event_to_steve(event: dict, config: Config):
-    steve = SteveJobs(config)
-    steve.process_message(event)
+    try:
+        steve = SteveJobs(config)
+        steve.process_message(event)
+    except Exception as ex:
+        logger.error("There was an exception while processing the event.")
+        logger.exception(ex)
