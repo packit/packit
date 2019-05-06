@@ -26,7 +26,6 @@ Display status
 
 import logging
 import os
-
 import click
 
 from packit.cli.types import LocalProjectParameter

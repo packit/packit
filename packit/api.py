@@ -403,12 +403,15 @@ class PackitAPI:
     def status(self):
         status = Status(self.config, self.package_config, self.up, self.dg)
 
-        ds_prs = status.get_downstream_prs()
-        if ds_prs:
-            logger.info("Downstream PRs:")
-            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
-        else:
-            logger.info("Downstream PRs: No open PRs.")
+        try:
+            ds_prs = status.get_downstream_prs()
+            if ds_prs:
+                logger.info("Downstream PRs:")
+                logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+            else:
+                logger.info("Downstream PRs: No open PRs.")
+        except Exception as jde:
+            print(jde)
 
         dg_versions = status.get_dg_versions()
         if dg_versions:
