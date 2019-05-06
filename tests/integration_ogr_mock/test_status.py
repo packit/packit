@@ -53,19 +53,18 @@ class TestStatus(unittest.TestCase):
     def setUp(self):
         self.conf = self.get_test_config()
         self.is_write_mode = bool(os.environ.get("FORCE_WRITE"))
-
         self.storage_pagure = packit.ogr_services.PersistentObjectStorage(
             self.datafile_pagure, self.is_write_mode
         )
-        packit.distgit.PagureService.persistent_storage = self.storage_pagure
-
         self.storage_github = packit.ogr_services.PersistentObjectStorage(
             self.datafile_github, self.is_write_mode
         )
-        packit.ogr_services.GithubService.persistent_storage = self.storage_github
+        # put peristent storage class attribute to pagure and github where it is used
+        packit.distgit.PagureService.persistent_storage = self.storage_pagure
+        packit.ogr_services.GithubServiceOrigin.persistent_storage = self.storage_github
 
         self.service_github = packit.ogr_services.GithubService(
-            token=self.conf.github_token, persistent_storage=self.storage_github
+            token=self.conf.github_token
         )
         self.project_ogr = self.service_github.get_project(
             namespace="packit-service", repo="ogr"
