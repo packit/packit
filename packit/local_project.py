@@ -344,6 +344,7 @@ class LocalProject:
         """
         Fetch selected PR and check it out. This will work for github and pagure, not for gitlab.
         """
+        logger.info(f"Checking out PR {pr_id}")
         remote_name = self.remote or "origin"
         rem: git.Remote = self.git_repo.remotes[remote_name]
         remote_ref = f"+refs/pull/{pr_id}/head"
