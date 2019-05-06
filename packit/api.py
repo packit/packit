@@ -433,8 +433,7 @@ class PackitAPI:
         if builds:
             logger.info("\nLatest builds:")
             for build in builds:
-                koji_builds_str = "\n".join(f" - {b}" for b in builds[build])
-                logger.info(f"{build}:\n{koji_builds_str}")
+                logger.info(f"{build}:\n- {builds[build]}")
         else:
             logger.info("There are no builds.")
 
