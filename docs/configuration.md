@@ -28,6 +28,7 @@ You should place the file in the root of your upstream repo. Packit accepts thes
  `current_version_command` | list of strings | a command which prints current upstream version (hint: `git describe`) (defaults to `git describe --tags --match '*.*'`)
  `actions`                 | string:string   | custom actions/hooks overwriting the default behavior of the workflow (more in [Actions](./actions.md))
  `jobs`                    | list of dicts   | a list of job definitions for packit service. See below for details
+ `allowed_gpg_keys`        | list of strings | a list of gpg-key fingerprints; if specified, one of the configured keys have to sign the last commit when syncing release or pull-request
 
 
 ### Minimal sample config
