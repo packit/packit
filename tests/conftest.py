@@ -54,6 +54,7 @@ from tests.spellbook import (
     initiate_git_repo,
     DISTGIT,
 )
+from tests.utils import remove_gpg_key_pair
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
@@ -362,4 +363,8 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
     keys_imported = gnupg_instance.import_keys(private_gpg_key)
     key_fingerprint = keys_imported.fingerprints[0]
     yield key_fingerprint
-    gnupg_instance.delete_keys(key_fingerprint)
+
+    if key_fingerprint in gnupg_instance.list_keys(secret=True).fingerprints:
+        remove_gpg_key_pair(
+            gpg_binary=gnupg_instance.gpgbinary, fingerprint=key_fingerprint
+        )
