@@ -118,6 +118,7 @@ class CommitVerifier:
             return False
 
         if status == CommitSignatureStatus.cannot_be_checked:
+            # We need to download keys before getting the signer
             for key in possible_key_fingerprints:
                 self.download_gpg_key_if_needed(key_fingerprint=key)
 
@@ -131,9 +132,10 @@ class CommitVerifier:
             logger.debug("Signature author not authorized.")
             return False
 
-        self.download_gpg_key_if_needed(key_fingerprint=signer)
-
-        return self.is_commit_signature_valid(commit)
+        is_valid = self.is_commit_signature_valid(commit)
+        if not is_valid:
+            logger.debug("Commit signature is not valid.")
+        return is_valid
 
     def is_commit_signature_valid(self, commit: git.Commit) -> bool:
         """
