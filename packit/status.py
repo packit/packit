@@ -123,9 +123,11 @@ class Status:
         # { koji-target: "latest-build-nvr"}
         builds_d = b.latest_builds(self.dg.package_name)
         branches = self.dg.local_project.git_project.get_branches()
-        branches.remove("master")  # there is no master tag in koji
         builds: Dict = {}
         for branch in branches:
+            # there is no master tag in koji
+            if branch == ("master"):
+                continue
             koji_tag = f"{branch}-updates-candidate"
             try:
                 builds[branch] = builds_d[koji_tag]
