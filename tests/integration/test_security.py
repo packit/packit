@@ -21,7 +21,6 @@
 # SOFTWARE.
 import pytest
 from flexmock import flexmock
-from gnupg import GenKey
 
 from packit.api import PackitAPI
 from packit.exceptions import PackitException
@@ -39,10 +38,10 @@ def test_allowed_gpg_keys_not_allowed(
     allowed_gpg_keys,
     sourcegit_n_distgit,
     api_instance_source_git: PackitAPI,
-    gnupg_key: GenKey,
+    gnupg_key_fingerprint: str,
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
-        message="signed commit", gpg_sign=gnupg_key.fingerprint, allow_empty=True
+        message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
     )
 
     api_instance_source_git.up.allowed_gpg_keys = allowed_gpg_keys
@@ -52,11 +51,11 @@ def test_allowed_gpg_keys_not_allowed(
 
 
 def test_allowed_gpg_keys_allowed(
-    sourcegit_n_distgit, api_instance_source_git: PackitAPI, gnupg_key: GenKey
+    sourcegit_n_distgit, api_instance_source_git: PackitAPI, gnupg_key_fingerprint: str
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
-        message="signed commit", gpg_sign=gnupg_key.fingerprint, allow_empty=True
+        message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
     )
 
-    api_instance_source_git.up.allowed_gpg_keys = [gnupg_key.fingerprint]
+    api_instance_source_git.up.allowed_gpg_keys = [gnupg_key_fingerprint]
     api_instance_source_git.up.check_last_commit()
