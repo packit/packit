@@ -92,7 +92,10 @@ class CommitVerifier:
             return
 
         try:
-            self.gpg.recv_keys(self.key_server, key_fingerprint)
+            result = self.gpg.recv_keys(self.key_server, key_fingerprint)
+            if not result.fingerprints:
+                raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
+
         except ValueError as error:
             # python-gnupg do not recognise KEY_CONSIDERED response from gpg2
             if "KEY_CONSIDERED" not in str(error):
@@ -109,7 +112,20 @@ class CommitVerifier:
         Check the validity of the commit signature
         and test if the signer is present in the provided list.
         """
+        status = self.get_commit_signature_status(commit=commit)
+        if status == CommitSignatureStatus.no_signature:
+            logger.debug("Commit not signed.")
+            return False
+
+        if status == CommitSignatureStatus.cannot_be_checked:
+            for key in possible_key_fingerprints:
+                self.download_gpg_key_if_needed(key_fingerprint=key)
+
         signer = self.get_commit_signer_fingerprint(commit)
+
+        if not signer:
+            logger.debug("Cannot get a signer of the commit.")
+            return False
 
         if signer not in possible_key_fingerprints:
             logger.debug("Signature author not authorized.")
