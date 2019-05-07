@@ -20,36 +20,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+Functional tests for propose-update command
+"""
+import os
+from packit.api import PackitAPI
+from tests.integration_ogr_mock.test_status import PackitUnittestOgr
 
-from tests.integration_ogr_mock.testbase import PackitUnittestOgr
 
+class ProposeUpdate(PackitUnittestOgr):
+    datafile_github = "TestPropose_github.yaml"
+    datafile_pagure = "TestPropose_pagure.yaml"
 
-class TestStatus(PackitUnittestOgr):
-    datafile_github = "TestStatus_github.yaml"
-    datafile_pagure = "TestStatus_pagure.yaml"
+    def setUp(self):
+        super().setUp()
+        self.api = PackitAPI(
+            config=self.conf, package_config=self.pc, upstream_local_project=self.lp
+        )
+        self.api._up = self.upstream
+        self.api._dg = self.dg
 
-    def test_status(self):
-        assert self.status
+    def test_propose_update(self):
+        # change specfile little bit to have there some change
+        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
+        with open(specfile_location, "a") as myfile:
+            myfile.write("# test text")
 
-    def test_distgen_versions(self):
-        table = self.status.get_dg_versions()
-        assert table
-        assert len(table) >= 3
-
-    def test_builds(self):
-        table = self.status.get_builds()
-        assert table
-        assert len(table) >= 2
-
-    def test_updates(self):
-        table = self.status.get_updates()
-        assert table
-        assert len(table) >= 3
-
-    def test_up_releases(self):
-        table = self.status.get_up_releases()
-        assert len(table) >= 5
-
-    def test_dowstream_pr(self):
-        table = self.status.get_downstream_prs()
-        assert len(table) == 0
+        self.api.sync_release("master")

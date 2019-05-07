@@ -1,0 +1,67 @@
+GET:
+  /repos/packit-service/ogr:
+    empty:
+    - 200
+    - access-control-allow-origin: '*'
+      access-control-expose-headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+        X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type
+      cache-control: private, max-age=60, s-maxage=60
+      content-encoding: gzip
+      content-security-policy: default-src 'none'
+      content-type: application/json; charset=utf-8
+      date: Tue, 07 May 2019 11:07:08 GMT
+      etag: W/"fec1c4d5d5a67c99ed1230ca3b562c21"
+      last-modified: Thu, 02 May 2019 12:42:42 GMT
+      referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
+      server: GitHub.com
+      status: 200 OK
+      strict-transport-security: max-age=31536000; includeSubdomains; preload
+      transfer-encoding: chunked
+      vary: Accept, Authorization, Cookie, X-GitHub-OTP
+      x-accepted-oauth-scopes: repo
+      x-content-type-options: nosniff
+      x-frame-options: deny
+      x-github-media-type: github.v3; format=json
+      x-github-request-id: 3868:2D99:B90E8F:1D96F4A:5CD166DC
+      x-oauth-scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+        admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+      x-ratelimit-limit: '5000'
+      x-ratelimit-remaining: '4930'
+      x-ratelimit-reset: '1557230828'
+      x-xss-protection: 1; mode=block
+    - '{"id":161636700,"node_id":"MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=","name":"ogr","full_name":"packit-service/ogr","private":false,"owner":{"login":"packit-service","id":46870917,"node_id":"MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3","avatar_url":"https://avatars3.githubusercontent.com/u/46870917?v=4","gravatar_id":"","url":"https://api.github.com/users/packit-service","html_url":"https://github.com/packit-service","followers_url":"https://api.github.com/users/packit-service/followers","following_url":"https://api.github.com/users/packit-service/following{/other_user}","gists_url":"https://api.github.com/users/packit-service/gists{/gist_id}","starred_url":"https://api.github.com/users/packit-service/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/packit-service/subscriptions","organizations_url":"https://api.github.com/users/packit-service/orgs","repos_url":"https://api.github.com/users/packit-service/repos","events_url":"https://api.github.com/users/packit-service/events{/privacy}","received_events_url":"https://api.github.com/users/packit-service/received_events","type":"Organization","site_admin":false},"html_url":"https://github.com/packit-service/ogr","description":"One
+      Git library to Rule -- one API for many git forges","fork":false,"url":"https://api.github.com/repos/packit-service/ogr","forks_url":"https://api.github.com/repos/packit-service/ogr/forks","keys_url":"https://api.github.com/repos/packit-service/ogr/keys{/key_id}","collaborators_url":"https://api.github.com/repos/packit-service/ogr/collaborators{/collaborator}","teams_url":"https://api.github.com/repos/packit-service/ogr/teams","hooks_url":"https://api.github.com/repos/packit-service/ogr/hooks","issue_events_url":"https://api.github.com/repos/packit-service/ogr/issues/events{/number}","events_url":"https://api.github.com/repos/packit-service/ogr/events","assignees_url":"https://api.github.com/repos/packit-service/ogr/assignees{/user}","branches_url":"https://api.github.com/repos/packit-service/ogr/branches{/branch}","tags_url":"https://api.github.com/repos/packit-service/ogr/tags","blobs_url":"https://api.github.com/repos/packit-service/ogr/git/blobs{/sha}","git_tags_url":"https://api.github.com/repos/packit-service/ogr/git/tags{/sha}","git_refs_url":"https://api.github.com/repos/packit-service/ogr/git/refs{/sha}","trees_url":"https://api.github.com/repos/packit-service/ogr/git/trees{/sha}","statuses_url":"https://api.github.com/repos/packit-service/ogr/statuses/{sha}","languages_url":"https://api.github.com/repos/packit-service/ogr/languages","stargazers_url":"https://api.github.com/repos/packit-service/ogr/stargazers","contributors_url":"https://api.github.com/repos/packit-service/ogr/contributors","subscribers_url":"https://api.github.com/repos/packit-service/ogr/subscribers","subscription_url":"https://api.github.com/repos/packit-service/ogr/subscription","commits_url":"https://api.github.com/repos/packit-service/ogr/commits{/sha}","git_commits_url":"https://api.github.com/repos/packit-service/ogr/git/commits{/sha}","comments_url":"https://api.github.com/repos/packit-service/ogr/comments{/number}","issue_comment_url":"https://api.github.com/repos/packit-service/ogr/issues/comments{/number}","contents_url":"https://api.github.com/repos/packit-service/ogr/contents/{+path}","compare_url":"https://api.github.com/repos/packit-service/ogr/compare/{base}...{head}","merges_url":"https://api.github.com/repos/packit-service/ogr/merges","archive_url":"https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}","downloads_url":"https://api.github.com/repos/packit-service/ogr/downloads","issues_url":"https://api.github.com/repos/packit-service/ogr/issues{/number}","pulls_url":"https://api.github.com/repos/packit-service/ogr/pulls{/number}","milestones_url":"https://api.github.com/repos/packit-service/ogr/milestones{/number}","notifications_url":"https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}","labels_url":"https://api.github.com/repos/packit-service/ogr/labels{/name}","releases_url":"https://api.github.com/repos/packit-service/ogr/releases{/id}","deployments_url":"https://api.github.com/repos/packit-service/ogr/deployments","created_at":"2018-12-13T12:33:52Z","updated_at":"2019-05-02T12:42:42Z","pushed_at":"2019-05-02T12:42:41Z","git_url":"git://github.com/packit-service/ogr.git","ssh_url":"git@github.com:packit-service/ogr.git","clone_url":"https://github.com/packit-service/ogr.git","svn_url":"https://github.com/packit-service/ogr","homepage":"","size":687,"stargazers_count":5,"watchers_count":5,"language":"Python","has_issues":true,"has_projects":true,"has_downloads":true,"has_wiki":true,"has_pages":false,"forks_count":7,"mirror_url":null,"archived":false,"disabled":false,"open_issues_count":12,"license":{"key":"mit","name":"MIT
+      License","spdx_id":"MIT","url":"https://api.github.com/licenses/mit","node_id":"MDc6TGljZW5zZTEz"},"forks":7,"open_issues":12,"watchers":5,"default_branch":"master","permissions":{"admin":true,"push":true,"pull":true},"allow_squash_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"organization":{"login":"packit-service","id":46870917,"node_id":"MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3","avatar_url":"https://avatars3.githubusercontent.com/u/46870917?v=4","gravatar_id":"","url":"https://api.github.com/users/packit-service","html_url":"https://github.com/packit-service","followers_url":"https://api.github.com/users/packit-service/followers","following_url":"https://api.github.com/users/packit-service/following{/other_user}","gists_url":"https://api.github.com/users/packit-service/gists{/gist_id}","starred_url":"https://api.github.com/users/packit-service/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/packit-service/subscriptions","organizations_url":"https://api.github.com/users/packit-service/orgs","repos_url":"https://api.github.com/users/packit-service/repos","events_url":"https://api.github.com/users/packit-service/events{/privacy}","received_events_url":"https://api.github.com/users/packit-service/received_events","type":"Organization","site_admin":false},"network_count":7,"subscribers_count":9}'
+  https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml:
+    '{''ref'': ''master''}':
+    - 200
+    - access-control-allow-origin: '*'
+      access-control-expose-headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+        X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type
+      cache-control: private, max-age=60, s-maxage=60
+      content-encoding: gzip
+      content-security-policy: default-src 'none'
+      content-type: application/json; charset=utf-8
+      date: Tue, 07 May 2019 11:07:09 GMT
+      etag: W/"c0f9dd82667d2f9c6dcd9cc7551f046958cc5dd5"
+      last-modified: Thu, 02 May 2019 12:42:40 GMT
+      referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
+      server: GitHub.com
+      status: 200 OK
+      strict-transport-security: max-age=31536000; includeSubdomains; preload
+      transfer-encoding: chunked
+      vary: Accept, Authorization, Cookie, X-GitHub-OTP
+      x-accepted-oauth-scopes: ''
+      x-content-type-options: nosniff
+      x-frame-options: deny
+      x-github-media-type: github.v3; format=json
+      x-github-request-id: 3868:2D99:B90E9D:1D96F57:5CD166DC
+      x-oauth-scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+        admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+      x-ratelimit-limit: '5000'
+      x-ratelimit-remaining: '4929'
+      x-ratelimit-reset: '1557230829'
+      x-xss-protection: 1; mode=block
+    - '{"name":".packit.yaml","path":".packit.yaml","sha":"c0f9dd82667d2f9c6dcd9cc7551f046958cc5dd5","size":326,"url":"https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master","html_url":"https://github.com/packit-service/ogr/blob/master/.packit.yaml","git_url":"https://api.github.com/repos/packit-service/ogr/git/blobs/c0f9dd82667d2f9c6dcd9cc7551f046958cc5dd5","download_url":"https://raw.githubusercontent.com/packit-service/ogr/master/.packit.yaml","type":"file","content":"LS0tCnNwZWNmaWxlX3BhdGg6IHB5dGhvbi1vZ3Iuc3BlYwpzeW5jZWRfZmls\nZXM6CiAgLSBweXRob24tb2dyLnNwZWMKdXBzdHJlYW1fcHJvamVjdF9uYW1l\nOiBvZ3IKZG93bnN0cmVhbV9wYWNrYWdlX25hbWU6IHB5dGhvbi1vZ3IKIyB0\naGUgdmVyc2lvbiBpcyBkaWZmZXJlbnQgdGhhbiB3aXRoIGJhc2ljIGdpdCBk\nZXNjcmliZQpjcmVhdGVfdGFyYmFsbF9jb21tYW5kOiBbInB5dGhvbjMiLCAi\nc2V0dXAucHkiLCAic2Rpc3QiLCAiLS1kaXN0LWRpciIsICIuIl0KY3VycmVu\ndF92ZXJzaW9uX2NvbW1hbmQ6IFsicHl0aG9uMyIsICJzZXR1cC5weSIsICIt\nLXZlcnNpb24iXQo=\n","encoding":"base64","_links":{"self":"https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master","git":"https://api.github.com/repos/packit-service/ogr/git/blobs/c0f9dd82667d2f9c6dcd9cc7551f046958cc5dd5","html":"https://github.com/packit-service/ogr/blob/master/.packit.yaml"}}'
