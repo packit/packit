@@ -57,7 +57,10 @@ def test_basic_local_update_empty_patch(
     spec = get_specfile(str(distgit / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
-    spec_package_section = "\n".join(spec.spec_content.sections["%package"])
+    spec_package_section = ""
+    for section in spec.spec_content.sections:
+        if "%package" in section[0]:
+            spec_package_section += "\n".join(section[1])
     assert "# PATCHES FROM SOURCE GIT" not in spec_package_section
     assert not spec.patches["applied"]
     assert not spec.patches["not_applied"]
@@ -78,7 +81,10 @@ def test_basic_local_update_patch_content(
 
     spec = get_specfile(str(distgit / "beer.spec"))
 
-    spec_package_section = "\n".join(spec.spec_content.sections["%package"])
+    spec_package_section = ""
+    for section in spec.spec_content.sections:
+        if "%package" in section[0]:
+            spec_package_section += "\n".join(section[1])
     assert "Patch0001: 0001" in spec_package_section
     assert "Patch0002: 0002" not in spec_package_section  # no empty patches
 
