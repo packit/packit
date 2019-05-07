@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import logging
+
 from typing import List, Tuple, Dict
 
 from ogr.abstract import Release

@@ -26,9 +26,11 @@ This is the official python interface for packit.
 
 import logging
 import time
+import asyncio
+
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Sequence, Callable
+from typing import Sequence, Callable, List, Tuple, Dict
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
@@ -411,28 +413,51 @@ class PackitAPI:
         srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
         return srpm_path
 
+    async def status_get_downstream_prs(self, status) -> List[Tuple[int, str, str]]:
+        try:
+            return status.get_downstream_prs()
+        except Exception as exc:
+            # https://github.com/packit-service/ogr/issues/67 work-around
+            logger.error(f"Failed when getting downstream PRs: {exc}")
+            return []
+
+    async def status_get_dg_versions(self, status) -> Dict:
+        return status.get_dg_versions()
+
+    async def status_get_up_releases(self, status) -> List:
+        return status.get_up_releases()
+
+    async def status_get_builds(self, status) -> Dict:
+        return status.get_builds()
+
+    async def status_get_updates(self, status) -> List:
+        return status.get_updates()
+
     def status(self):
         status = Status(self.config, self.package_config, self.up, self.dg)
+        loop = asyncio.get_event_loop()
+        all_statuses = asyncio.gather(
+            self.status_get_downstream_prs(status),
+            self.status_get_dg_versions(status),
+            self.status_get_up_releases(status),
+            self.status_get_builds(status),
+            self.status_get_updates(status),
+        )
+        res = loop.run_until_complete(all_statuses)
+        loop.close()
+        (ds_prs, dg_versions, up_releases, builds, updates) = res
 
-        try:
-            ds_prs = status.get_downstream_prs()
-        # Libpagure raises general Exception when API call response can't be decoded
-        except Exception as exc:
-            logger.error(f"Failed when getting downstream PRs: {exc}")
+        if ds_prs:
+            logger.info("Downstream PRs:")
+            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
         else:
-            if ds_prs:
-                logger.info("Downstream PRs:")
-                logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
-            else:
-                logger.info("Downstream PRs: No open PRs.")
+            logger.info("Downstream PRs: No open PRs.")
 
-        dg_versions = status.get_dg_versions()
         if dg_versions:
             logger.info("Dist-git versions:")
             for branch, dg_version in dg_versions.items():
                 logger.info(f"{branch}: {dg_version}")
 
-        up_releases = status.get_up_releases()
         if up_releases:
             logger.info("\nGitHub upstream releases:")
             upstream_releases_str = "\n".join(
@@ -442,18 +467,16 @@ class PackitAPI:
         else:
             logger.info("\nGitHub upstream releases: No releases found.")
 
-        builds = status.get_builds()
+        if updates:
+            logger.info("\nLatest bodhi updates:")
+            logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
+
         if builds:
             logger.info("\nLatest builds:")
             for branch, branch_builds in builds.items():
                 logger.info(f"{branch}: {branch_builds}")
         else:
             logger.info("There are no builds.")
-
-        updates = status.get_updates()
-        if updates:
-            logger.info("\nLatest bodhi updates:")
-            logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
 
     def run_copr_build(self, owner, project, chroots):
         # get info
