@@ -24,6 +24,39 @@
 Functional tests for srpm comand
 """
 from pathlib import Path
+import os
+import flexmock
+from subprocess import check_output
+import unittest
+from packit.api import PackitAPI
+from tests.integration.testbase import PackitUnittestOgr
+
+
+class ProposeUpdate(PackitUnittestOgr):
+    def setUp(self):
+        super().setUp()
+        self.api = PackitAPI(
+            config=self.conf, package_config=self.pc, upstream_local_project=self.lp
+        )
+        self.api._up = self.upstream
+        self.api._dg = self.dg
+        # Do not upload package, because no credentials given in CI
+        flexmock(self.api).should_receive("_handle_sources").and_return(None)
+        self.set_git_user()
+
+    @unittest.skip(
+        "Issue in ogr causing that User is not stored in persistent yaml files for pagure"
+    )
+    def test_propose_update(self):
+        # change specfile little bit to have there some change
+        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
+        with open(specfile_location, "a") as myfile:
+            myfile.write("# test text")
+        check_output(
+            f"cd {self.lp.working_dir}; git commit -m 'test change' python-ogr.spec",
+            shell=True,
+        )
+        self.api.sync_release("master")
 
 
 def test_srpm(api_instance):
