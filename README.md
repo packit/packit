@@ -139,12 +139,7 @@ Options:
 * cockpit (@martinpitt)
 * iptables (@jsynacek)
 
-## What's blocking the on-boarding
-
-Issues which block on-boarding.
-
-
-## Current status
+## Currently on-boarding
 
  Package name       | Contacts                  | Links (Bugzillas, PRs, etc.)
 --------------------|---------------------------|----------------------------------------------------------------------
