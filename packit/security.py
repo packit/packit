@@ -83,7 +83,7 @@ class CommitVerifier:
 
     def download_gpg_key_if_needed(self, key_fingerprint: str) -> None:
         """
-        Download the gpg key from the self.keyserver
+        Download the gpg key from the self.key_server
         if it is not present.
 
         :param key_fingerprint: str (fingerprint of the gpg key)
@@ -129,12 +129,12 @@ class CommitVerifier:
             return False
 
         if signer not in possible_key_fingerprints:
-            logger.debug("Signature author not authorized.")
+            logger.warning("Signature author not authorized.")
             return False
 
         is_valid = self.is_commit_signature_valid(commit)
         if not is_valid:
-            logger.debug("Commit signature is not valid.")
+            logger.warning("Commit {commit.hexsha!r} signature is not valid.")
         return is_valid
 
     def is_commit_signature_valid(self, commit: git.Commit) -> bool:
@@ -144,10 +144,10 @@ class CommitVerifier:
         """
         commit_status = self.get_commit_signature_status(commit)
         if commit_status in VALID_SIGNATURE_STATUSES:
-            logger.debug(f"Commit '{commit.hexsha}' is valid.")
+            logger.debug(f"Commit '{commit.hexsha}' signature is valid.")
             return True
 
-        logger.debug(f"Commit '{commit.hexsha}' is not valid.")
+        logger.warning(f"Commit '{commit.hexsha}' signature is not valid.")
         return False
 
     @staticmethod
@@ -166,14 +166,13 @@ class CommitVerifier:
         """
         Return a commit information in a given format.
 
-        See `git show --help` and `--prety=format` for more information.
+        See `git show --help` and `--pretty=format` for more information.
         """
         try:
             return commit.repo.git.show(commit.hexsha, pretty=f"format:{pretty_format}")
         except git.GitCommandError as error:
             raise PackitException(
-                f"Cannot find a commit '{commit.hexsha}' when checking commit signatures.",
-                error,
+                f"Cannot find commit {commit.hexsha!r} to check its signature.", error
             )
 
 
