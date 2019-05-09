@@ -34,6 +34,4 @@
       - python3-wheel  # for bdist_wheel
       - rebase-helper
       - rpm-build
-      # we need https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
-      enablerepo: testing
       state: present
