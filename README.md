@@ -112,24 +112,39 @@ Options:
 ...
 ```
 
+## Already on-boarded
 
-## Candidates for early adoption
+ Package name      | Contacts                  | Link to packit configuration file
+-------------------|---------------------------|----------------------------------------------------------------------
+ rebase-helper     | @nforro                   | [.packit.yaml](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yml)
+ pykickstart       | @dcantrell @larskarlitski | [packit.yaml](https://github.com/dcantrell/pykickstart/blob/master/packit.yaml)
+ packit            |                           | [.packit.yaml](https://github.com/packit-service/packit/blob/master/.packit.yaml)
+ colin             |                           | [.packit.yaml](https://github.com/user-cont/colin/blob/master/.packit.yaml)
+ conu              |                           | [.packit.yaml](https://github.com/user-cont/conu/blob/master/.packit.yaml)
+ sen               | @TomasTomecek             | [.packit.yaml](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
+ ogr               | @frantiseklachman         | [.packit.yaml](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
 
-Please, open a PR if you want to be on the list, or just let us know.
+## Who is interested
 
 * Identity team (@pvoborni)
-* Plumbers & shells (@msekletar @lnykryn @siteshwar)
-* pykickstart (@dcantrell @larskarlitski)
+* Plumbers - Source Git (@msekletar @lnykryn)
+* shells (@siteshwar)
 * python-operator-courier (Ralph Bean)
 * @thrix
 * youtube-dl (Till Mass)
-* anaconda (@jkonecny12)
 * [greenboot](https://github.com/LorbusChris/greenboot/) (@LorbusChris)
-* rebase-helper (@nforro)
 * ABRT
-* [standard-test-roles](https://pagure.io/standard-test-roles)
 * OSBS (atomic-reactor, osbs-client, koji-containerbuild) (@cverna)
 * CoreOS (starting with rpm-ostree, ignition, and ostree) (@jlebon)
+* cockpit (@martinpitt)
+* iptables (@jsynacek)
+
+## Currently on-boarding
+
+ Package name       | Contacts                  | Links (Bugzillas, PRs, etc.)
+--------------------|---------------------------|----------------------------------------------------------------------
+ anaconda           | @jkonecny12               | [BZ1697339](https://bugzilla.redhat.com/show_bug.cgi?id=1697339)
+ [standard-test-roles](https://pagure.io/standard-test-roles)|                           | [PR325](https://pagure.io/standard-test-roles/pull-request/325)
 
 
 ## Resources
