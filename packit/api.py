@@ -26,6 +26,8 @@ This is the official python interface for packit.
 
 import logging
 import time
+import jsonschema
+
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable
@@ -405,13 +407,13 @@ class PackitAPI:
 
         try:
             ds_prs = status.get_downstream_prs()
-            if ds_prs:
-                logger.info("Downstream PRs:")
-                logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
-            else:
-                logger.info("Downstream PRs: No open PRs.")
-        except Exception as jde:
-            print(jde)
+        except jsonschema.exceptions.ValidationError as jev:
+            print(jev)
+        if ds_prs:
+            logger.info("Downstream PRs:")
+            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+        else:
+            logger.info("Downstream PRs: No open PRs.")
 
         dg_versions = status.get_dg_versions()
         if dg_versions:
@@ -432,8 +434,8 @@ class PackitAPI:
         builds = status.get_builds()
         if builds:
             logger.info("\nLatest builds:")
-            for build in builds:
-                logger.info(f"{build}:\n- {builds[build]}")
+            for branch, branch_builds in builds.items():
+                logger.info(f"{branch}: {branch_builds}")
         else:
             logger.info("There are no builds.")
 
