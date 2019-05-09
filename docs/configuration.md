@@ -141,18 +141,6 @@ jobs:
 
 ```
 
-### Real examples
-
-The list of projects which already have packit config in their upstream repositories:
-* [packit-service/packit](https://github.com/packit-service/packit/blob/master/.packit.yaml)
-* [packit-service/ogr](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
-* [user-cont/colin](https://github.com/user-cont/colin/blob/master/.packit.yaml)
-* [user-cont/conu](https://github.com/user-cont/conu/blob/master/.packit.yaml)
-* [TomasTomecek/sen](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
-* [rebase-helper/rebase-helper](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yml)
-* [dcantrell/pykickstart](https://github.com/dcantrell/pykickstart/blob/master/packit.yaml)
-
-
 ### In-progress work
 
 You may see packit configs with more values: support for checks is work in progress.
