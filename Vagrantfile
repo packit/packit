@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
     config.vm.box_version = "29.20181024.1"
 
     config.vm.provider "virtualbox" do |virtualbox|
-        virtualbox.memory = 512
+        virtualbox.memory = 1024
     end
 
     config.vm.provision "shell", inline: <<-SHELL
