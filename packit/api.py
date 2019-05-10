@@ -26,12 +26,14 @@ This is the official python interface for packit.
 
 import logging
 import time
+
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
+from jsonschema import ValidationError
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -403,12 +405,16 @@ class PackitAPI:
     def status(self):
         status = Status(self.config, self.package_config, self.up, self.dg)
 
-        ds_prs = status.get_downstream_prs()
-        if ds_prs:
-            logger.info("Downstream PRs:")
-            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+        try:
+            ds_prs = status.get_downstream_prs()
+        except ValidationError as exc:
+            logger.error(f"Failed when getting downstream PRs: {exc}")
         else:
-            logger.info("Downstream PRs: No open PRs.")
+            if ds_prs:
+                logger.info("Downstream PRs:")
+                logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+            else:
+                logger.info("Downstream PRs: No open PRs.")
 
         dg_versions = status.get_dg_versions()
         if dg_versions:
@@ -429,9 +435,8 @@ class PackitAPI:
         builds = status.get_builds()
         if builds:
             logger.info("\nLatest builds:")
-            for build in builds:
-                koji_builds_str = "\n".join(f" - {b}" for b in builds[build])
-                logger.info(f"{build}:\n{koji_builds_str}")
+            for branch, branch_builds in builds.items():
+                logger.info(f"{branch}: {branch_builds}")
         else:
             logger.info("There are no builds.")
 
