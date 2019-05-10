@@ -111,6 +111,7 @@ class CommitVerifier:
         """
         Check the validity of the commit signature
         and test if the signer is present in the provided list.
+        (Commit without signature returns False.)
         """
         status = self.get_commit_signature_status(commit=commit)
         if status == CommitSignatureStatus.no_signature:
