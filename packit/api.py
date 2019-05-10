@@ -413,7 +413,8 @@ class PackitAPI:
         srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
         return srpm_path
 
-    async def status_get_downstream_prs(self, status) -> List[Tuple[int, str, str]]:
+    @staticmethod
+    async def status_get_downstream_prs(status) -> List[Tuple[int, str, str]]:
         try:
             return status.get_downstream_prs()
         except Exception as exc:
@@ -421,16 +422,20 @@ class PackitAPI:
             logger.error(f"Failed when getting downstream PRs: {exc}")
             return []
 
-    async def status_get_dg_versions(self, status) -> Dict:
+    @staticmethod
+    async def status_get_dg_versions(status) -> Dict:
         return status.get_dg_versions()
 
-    async def status_get_up_releases(self, status) -> List:
+    @staticmethod
+    async def status_get_up_releases(status) -> List:
         return status.get_up_releases()
 
-    async def status_get_builds(self, status) -> Dict:
+    @staticmethod
+    async def status_get_builds(status) -> Dict:
         return status.get_builds()
 
-    async def status_get_updates(self, status) -> List:
+    @staticmethod
+    async def status_get_updates(status) -> List:
         return status.get_updates()
 
     def status(self):
@@ -448,35 +453,39 @@ class PackitAPI:
         (ds_prs, dg_versions, up_releases, builds, updates) = res
 
         if ds_prs:
-            logger.info("Downstream PRs:")
+            logger.info("\nDownstream PRs:")
             logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
         else:
-            logger.info("Downstream PRs: No open PRs.")
+            logger.info("\nNo downstream PRs found.")
 
         if dg_versions:
-            logger.info("Dist-git versions:")
+            logger.info("\nDist-git versions:")
             for branch, dg_version in dg_versions.items():
                 logger.info(f"{branch}: {dg_version}")
+        else:
+            logger.info("\nNo Dist-git versions found")
 
         if up_releases:
-            logger.info("\nGitHub upstream releases:")
+            logger.info("\nUpstream releases:")
             upstream_releases_str = "\n".join(
                 f"{release.tag_name}" for release in up_releases
             )
             logger.info(upstream_releases_str)
         else:
-            logger.info("\nGitHub upstream releases: No releases found.")
+            logger.info("\nNo upstream releases found.")
 
         if updates:
-            logger.info("\nLatest bodhi updates:")
+            logger.info("\nLatest Bodhi updates:")
             logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
+        else:
+            logger.info("\nNo Bodhi updates found")
 
         if builds:
-            logger.info("\nLatest builds:")
+            logger.info("\nLatest Koji builds:")
             for branch, branch_builds in builds.items():
                 logger.info(f"{branch}: {branch_builds}")
         else:
-            logger.info("There are no builds.")
+            logger.info("No Koji builds found.")
 
     def run_copr_build(self, owner, project, chroots):
         # get info
