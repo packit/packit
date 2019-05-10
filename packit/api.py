@@ -79,9 +79,15 @@ class PackitAPI:
         return self._dg
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
+        assert_existence(self.dg.local_project)
+        # do not add anything between distgit clone and saving gpg keys!
+        self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
+
         self.up.run_action(action=ActionName.pre_sync)
 
         self.up.checkout_pr(pr_id=pr_id)
+        self.dg.check_last_commit()
+
         local_pr_branch = f"pull-request-{pr_id}-sync"
         # fetch and reset --hard upstream/$branch?
         self.dg.create_branch(
@@ -135,7 +141,10 @@ class PackitAPI:
         Update given package in Fedora
         """
         assert_existence(self.up.local_project)
+
         assert_existence(self.dg.local_project)
+        # do not add anything between distgit clone and saving gpg keys!
+        self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
@@ -155,6 +164,8 @@ class PackitAPI:
             #       release = 232, tag = v232
             if not use_local_content:
                 self.up.checkout_release(full_version)
+
+            self.dg.check_last_commit()
 
             self.up.run_action(action=ActionName.pre_sync)
 

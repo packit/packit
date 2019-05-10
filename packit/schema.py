@@ -46,6 +46,7 @@ PACKAGE_CONFIG_SCHEMA = {
         "upstream_ref": {"type": "string"},
         "create_tarball_command": {"type": "array", "items": {"type": "string"}},
         "current_version_command": {"type": "array", "items": {"type": "string"}},
+        "allowed_gpg_keys": {"type": "array", "items": {"type": "string"}},
         "synced_files": {"type": "array", "items": SYNCED_FILES_SCHEMA},
         "jobs": {"type": "array", "items": JOB_CONFIG_SCHEMA},
         "actions": {

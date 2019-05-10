@@ -16,6 +16,7 @@ repos:
     - id: check-merge-conflict
     - id: check-yaml
     - id: detect-private-key
+      exclude: tests/conftest.py
     - id: end-of-file-fixer
     - id: trailing-whitespace
     - id: flake8

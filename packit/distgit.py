@@ -21,17 +21,22 @@
 # SOFTWARE.
 import logging
 import os
-from typing import Optional, Sequence
+from typing import Optional, Sequence, List
 
 import git
 import requests
 
-from packit.ogr_services import PagureService
 from packit.base_git import PackitRepositoryBase
-from packit.config import Config, PackageConfig, SyncFilesConfig
-from packit.exceptions import PackitException
+from packit.config import (
+    Config,
+    PackageConfig,
+    SyncFilesConfig,
+    get_local_package_config,
+)
+from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
+from packit.ogr_services import PagureService
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +69,7 @@ class DistGit(PackitRepositoryBase):
         logger.debug(f"Using dist-git repo {self.dist_git_url}")
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self.dist_git_namespace: str = self.package_config.dist_git_namespace
+        self._downstream_config: Optional[PackageConfig] = None
 
     @property
     def local_project(self):
@@ -81,6 +87,17 @@ class DistGit(PackitRepositoryBase):
                 ),
             )
         return self._local_project
+
+    @property
+    def downstream_config(self) -> Optional[PackageConfig]:
+        if not self._downstream_config:
+            try:
+                self._downstream_config = get_local_package_config(
+                    self.local_project.working_dir
+                )
+            except PackitConfigException:
+                return None
+        return self._downstream_config
 
     def update_branch(self, branch_name: str):
         """
@@ -316,3 +333,8 @@ class DistGit(PackitRepositoryBase):
                 f"There is a problem with creating the bodhi update:\n{ex}"
             )
         return result["alias"]
+
+    def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[List[str]]:
+        if self.downstream_config:
+            return self.downstream_config.allowed_gpg_keys
+        return None

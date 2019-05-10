@@ -32,6 +32,7 @@ from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
+from packit.security import CommitVerifier
 from packit.utils import run_command, cwd
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ class PackitRepositoryBase:
         self.package_config = package_config
         self._specfile_path: Optional[str] = None
         self._specfile: Optional[SpecFile] = None
+        self.allowed_gpg_keys: Optional[List[str]] = None
 
     @property
     def specfile_dir(self) -> str:
@@ -285,6 +287,7 @@ class PackitRepositoryBase:
         """
         Parse spec file and return value of URL
         """
+        # consider using rebase-helper for this: SpecFile.download_remote_sources
         sections = self.specfile.spec_content.sections
         package_section: List[str] = sections.get("%package", [])
         for s in package_section:
@@ -293,6 +296,21 @@ class PackitRepositoryBase:
                 logger.debug(f"Upstream project URL = {url}")
                 return url
         return None
+
+    def check_last_commit(self) -> None:
+        if self.allowed_gpg_keys is None:
+            logger.debug("Allowed GPG keys are not set, skipping the verification.")
+            return
+
+        ver = CommitVerifier()
+        last_commit = self.local_project.git_repo.head.commit
+        valid = ver.check_signature_of_commit(
+            commit=last_commit, possible_key_fingerprints=self.allowed_gpg_keys
+        )
+        if not valid:
+            msg = f"Last commit '{last_commit.hexsha}' not signed by the authorized gpg key."
+            logger.warning(msg)
+            raise PackitException(msg)
 
     def fetch_upstream_archive(self):
         # TODO: there is a bug in rebase-helper that it saves the source in cwd
