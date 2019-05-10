@@ -313,6 +313,7 @@ class PackageConfig(BaseConfig):
         current_version_command: List[str] = None,
         actions: Dict[ActionName, str] = None,
         upstream_ref: Optional[str] = None,
+        allowed_gpg_keys: Optional[List[str]] = None,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
@@ -329,6 +330,7 @@ class PackageConfig(BaseConfig):
             self.downstream_project_url: str = self.dist_git_package_url
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
+        self.allowed_gpg_keys = allowed_gpg_keys
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
@@ -363,6 +365,7 @@ class PackageConfig(BaseConfig):
             and self.current_version_command == other.current_version_command
             and self.create_tarball_command == other.create_tarball_command
             and self.actions == other.actions
+            and self.allowed_gpg_keys == other.allowed_gpg_keys
         )
 
     @property
@@ -408,6 +411,9 @@ class PackageConfig(BaseConfig):
         dist_git_base_url = raw_dict.get("dist_git_base_url", None)
         dist_git_namespace = raw_dict.get("dist_git_namespace", None)
         upstream_ref = nested_get(raw_dict, "upstream_ref")
+
+        allowed_gpg_keys = raw_dict.get("allowed_gpg_keys", None)
+
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
@@ -423,6 +429,7 @@ class PackageConfig(BaseConfig):
             create_tarball_command=create_tarball_command,
             current_version_command=current_version_command,
             upstream_ref=upstream_ref,
+            allowed_gpg_keys=allowed_gpg_keys,
         )
         return pc
 
