@@ -26,7 +26,6 @@ This is the official python interface for packit.
 
 import logging
 import time
-import jsonschema
 
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -34,6 +33,7 @@ from typing import Sequence, Callable
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
+from jsonschema import ValidationError
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -407,13 +407,14 @@ class PackitAPI:
 
         try:
             ds_prs = status.get_downstream_prs()
-        except jsonschema.exceptions.ValidationError as jev:
-            print(jev)
-        if ds_prs:
-            logger.info("Downstream PRs:")
-            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+        except ValidationError as exc:
+            logger.error(f"Failed when getting downstream PRs: {exc}")
         else:
-            logger.info("Downstream PRs: No open PRs.")
+            if ds_prs:
+                logger.info("Downstream PRs:")
+                logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+            else:
+                logger.info("Downstream PRs: No open PRs.")
 
         dg_versions = status.get_dg_versions()
         if dg_versions:
