@@ -26,14 +26,12 @@ This is the official python interface for packit.
 
 import logging
 import time
-
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
-from jsonschema import ValidationError
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -407,7 +405,8 @@ class PackitAPI:
 
         try:
             ds_prs = status.get_downstream_prs()
-        except ValidationError as exc:
+        # Libpagure raises general Exception when API call response can't be decoded
+        except Exception as exc:
             logger.error(f"Failed when getting downstream PRs: {exc}")
         else:
             if ds_prs:
