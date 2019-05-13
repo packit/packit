@@ -15,17 +15,6 @@
         volumes:
         - '{{ playbook_dir }}:/src:Z'
   tasks:
-  # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
-  - name: Remove /etc/httpd/state
-    file:
-      path: /etc/httpd/state
-      state: absent
-  # Workaround for https://bodhi.fedoraproject.org/updates/FEDORA-2019-52487848d6
-  - name: Create link to /etc/httpd/state
-    file:
-      src: /var/lib/httpd
-      dest: /etc/httpd/state
-      state: link
   - name: Create /usr/share/packit directory
     file:
       state: directory
