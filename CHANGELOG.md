@@ -1,3 +1,26 @@
+# 0.4.0
+
+## Features
+* Packit service now submits builds in [copr](https://copr.fedorainfracloud.org) and once they're done it adds a GitHub status and comment with instructions how to install the builds.
+* Packit service is now configurable via [jobs](https://github.com/packit-service/packit/blob/master/docs/configuration.md#packit-service-jobs) defined in configuration file.
+* Packit is now able to check GPG signatures of the upstream commits against configured fingerprints.
+* [CLI] `srpm` command now works also with [Source-git](https://packit.dev/source-git/).
+* Fedmsg parsing has been unified into a single `listen-to-fedmsg` command.
+* Packit service: Github webhook now reacts to ping event and validates payload signature.
+
+## Fixes
+* More source-git related changes have been applied.
+* Few tracebacks when using CLI have been fixed.
+
+## Minor
+* Packit service runs on httpd server.
+* [CLI] `status` command now uses asyncio to get information from different sources.
+* CLI now has `--dry-run` option to not perform any remote changes (pull requests or comments).
+* Repository now includes Dockerfile and we by default use Docker instead of ansible-builder to build container image.
+* Repository now includes Vagranfile.
+* List of on-boarded projects has been moved to [README.md](https://github.com/packit-service/packit/blob/master/README.md#already-on-boarded)
+
+
 # 0.3.0
 
 We have a brand new website: https://packit.dev/! [packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
