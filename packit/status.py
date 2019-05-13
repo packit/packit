@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import logging
+
 from typing import List, Tuple, Dict
 
 from ogr.abstract import Release
@@ -59,6 +60,7 @@ class Status:
         """
         table: List[Tuple[int, str, str]] = []
         pr_list = self.dg.local_project.git_project.get_pr_list()
+        logger.debug("Downstream PRs fetched.")
         if len(pr_list) > 0:
             # take last `number_of_prs` PRs
             pr_list = (
@@ -74,6 +76,7 @@ class Status:
         """
         dg_versions = {}
         branches = self.dg.local_project.git_project.get_branches()
+        logger.debug("Dist-git branches fetched.")
         for branch in branches:
             try:
                 self.dg.create_branch(
@@ -100,15 +103,13 @@ class Status:
         if not self.up.local_project.git_project:
             logger.info("We couldn't track any upstream releases.")
             return []
+
         latest_releases: List[Release] = []
         try:
             latest_releases = self.up.local_project.git_project.get_releases()
-            logger.debug("GitHub upstream releases fetched.")
+            logger.debug("Upstream releases fetched.")
         except PackitException as e:
             logger.debug("Failed to fetch upstream releases: %s", e)
-
-        if not latest_releases:
-            logger.debug("GitHub upstream releases: No releases found.")
 
         return latest_releases[:number_of_releases]
 
@@ -123,10 +124,11 @@ class Status:
         # { koji-target: "latest-build-nvr"}
         builds_d = b.latest_builds(self.dg.package_name)
         branches = self.dg.local_project.git_project.get_branches()
+        logger.debug("Latest koji builds fetched.")
         builds: Dict = {}
         for branch in branches:
             # there is no master tag in koji
-            if branch == ("master"):
+            if branch == "master":
                 continue
             koji_tag = f"{branch}-updates-candidate"
             try:
@@ -146,6 +148,7 @@ class Status:
 
         b = BodhiClient()
         results = b.query(packages=self.dg.package_name)["updates"]
+        logger.debug("Bodhi updates fetched.")
         results = results[:number_of_updates]
 
         return [
