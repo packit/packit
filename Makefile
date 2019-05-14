@@ -25,15 +25,6 @@ prepare-check:
 check:
 	tox
 
-up-vagrant:
-	vagrant up
-
-provision-vagrant:
-	vagrant provision
-
-halt-vagrant:
-	vagrant halt
-
 # build-tests: recipe-tests.yaml
 # 	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
 
