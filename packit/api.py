@@ -416,6 +416,7 @@ class PackitAPI:
     @staticmethod
     async def status_get_downstream_prs(status) -> List[Tuple[int, str, str]]:
         try:
+            await asyncio.sleep(0)
             return status.get_downstream_prs()
         except Exception as exc:
             # https://github.com/packit-service/ogr/issues/67 work-around
@@ -424,32 +425,39 @@ class PackitAPI:
 
     @staticmethod
     async def status_get_dg_versions(status) -> Dict:
+        await asyncio.sleep(0)
         return status.get_dg_versions()
 
     @staticmethod
     async def status_get_up_releases(status) -> List:
+        await asyncio.sleep(0)
         return status.get_up_releases()
 
     @staticmethod
     async def status_get_builds(status) -> Dict:
+        await asyncio.sleep(0)
         return status.get_builds()
 
     @staticmethod
     async def status_get_updates(status) -> List:
+        await asyncio.sleep(0)
         return status.get_updates()
 
     def status(self):
         status = Status(self.config, self.package_config, self.up, self.dg)
         loop = asyncio.get_event_loop()
-        all_statuses = asyncio.gather(
-            self.status_get_downstream_prs(status),
-            self.status_get_dg_versions(status),
-            self.status_get_up_releases(status),
-            self.status_get_builds(status),
-            self.status_get_updates(status),
-        )
-        res = loop.run_until_complete(all_statuses)
-        loop.close()
+        try:
+            res = loop.run_until_complete(
+                asyncio.gather(
+                    self.status_get_downstream_prs(status),
+                    self.status_get_dg_versions(status),
+                    self.status_get_up_releases(status),
+                    self.status_get_builds(status),
+                    self.status_get_updates(status),
+                )
+            )
+        finally:
+            loop.close()
         (ds_prs, dg_versions, up_releases, builds, updates) = res
 
         if ds_prs:
