@@ -122,7 +122,7 @@ Options:
  colin             |                           | [.packit.yaml](https://github.com/user-cont/colin/blob/master/.packit.yaml)
  conu              |                           | [.packit.yaml](https://github.com/user-cont/conu/blob/master/.packit.yaml)
  sen               | @TomasTomecek             | [.packit.yaml](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
- ogr               | @frantiseklachman         | [.packit.yaml](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
+ ogr               | @lachmanfrantisek         | [.packit.yaml](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
 
 ## Who is interested
 
