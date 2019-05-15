@@ -22,8 +22,8 @@
 
 import hmac
 import logging
-from hashlib import sha1
 from concurrent.futures.thread import ThreadPoolExecutor
+from hashlib import sha1
 
 from flask import Flask, abort, request, jsonify
 
@@ -98,12 +98,12 @@ def _validate_signature(config: Config) -> bool:
     signature = sig.split("=")[1]
     mac = hmac.new(webhook_secret, msg=request.get_data(), digestmod=sha1)
     digest_is_valid = hmac.compare_digest(signature, mac.hexdigest())
-    if not digest_is_valid:
+    if digest_is_valid:
+        logger.debug(f"/webhooks/github payload signature OK.")
+    else:
         logger.warning(f"/webhooks/github payload signature validation failed.")
-        logger.debug(f"X-Hub-Signature: {sig!r}")
-        logger.debug(f"Computed signature: {mac.hexdigest()}")
-    # TODO: return digest_is_valid
-    return True
+        logger.debug(f"X-Hub-Signature: {sig!r} != computed: {mac.hexdigest()}")
+    return digest_is_valid
 
 
 def _give_event_to_steve(event: dict, config: Config):
