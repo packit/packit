@@ -14,9 +14,9 @@
 
 ## Minor
 * Packit service runs on httpd server.
-* [CLI] `status` command now uses asyncio to get information from different sources.
+* [CLI] `status` command now access remote APIs asynchronously in parallel, which should speed up the execution.
 * CLI now has `--dry-run` option to not perform any remote changes (pull requests or comments).
-* Repository now includes Dockerfile and we by default use Docker instead of ansible-builder to build container image.
+* Repository now includes Dockerfile and we by default use Docker instead of ansible-bender to build container image.
 * Repository now includes Vagranfile.
 * List of on-boarded projects has been moved to [README.md](https://github.com/packit-service/packit/blob/master/README.md#already-on-boarded)
 
