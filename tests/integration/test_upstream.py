@@ -115,7 +115,7 @@ def test_create_srpm(upstream_instance, tmpdir):
 
     with pytest.raises(PackitException) as exc:
         ups.create_srpm()
-    assert "SRPM could not be created. Is the archive present?" in str(exc.value)
+    assert "Failed to create SRPM." == str(exc.value)
 
     ups.create_archive()
     srpm = ups.create_srpm()

@@ -549,7 +549,9 @@ class PackitAPI:
                 logger.error(f"COPR gave us an invalid state: {exc}")
                 gh_state, description = "error", "Something went wrong."
             if report_func:
-                report_func(gh_state, description)
+                report_func(
+                    gh_state, description, build_id=build.id, url=build.repo_url
+                )
             if gh_state != "pending":
                 logger.debug(f"state is now {gh_state}, ending the watch")
                 return state_reported

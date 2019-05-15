@@ -10,7 +10,7 @@ from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
 from packit.config import get_package_config_from_repo
 from packit.distgit import DistGit
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
 from packit.ogr_services import PagureService, get_github_project
 from packit.utils import nested_get, get_namespace_and_repo_name
@@ -365,26 +365,31 @@ class GithubReleaseHandler(JobHandler):
         )
 
 
+class BuildStatusReporter:
+    def __init__(self, gh_proj: GitProject, commit_sha: str):
+        self.gh_proj = gh_proj
+        self.commit_sha = commit_sha
+
+    def report(
+        self,
+        state: str,
+        description: str,
+        build_id: Optional[str] = None,
+        target_url: str = "",
+    ):
+        logger.debug(
+            f"Reporting state of copr build ID={build_id},"
+            f" state={state}, commit={self.commit_sha}"
+        )
+        self.gh_proj.set_commit_status(
+            self.commit_sha, state, target_url, description, "packit/rpm-build"
+        )
+
+
 @add_to_mapping
 class GithubCoprBuildHandler(JobHandler):
     name = JobType.copr_build
     triggers = [JobTriggerType.pull_request, JobTriggerType.release]
-
-    class BuildStatusReporter:
-        def __init__(self, gh_proj, commit_sha, build_id, target_url):
-            self.gh_proj = gh_proj
-            self.commit_sha = commit_sha
-            self.build_id = build_id
-            self.target_url = target_url
-
-        def report(self, state, description):
-            logger.debug(
-                f"Reporting state of copr build ID={self.build_id},"
-                f" state={state}, commit={self.commit_sha}"
-            )
-            self.gh_proj.set_commit_status(
-                self.commit_sha, state, self.target_url, description, "packit/rpm-build"
-            )
 
     def handle_release(self):
         if not self.job.metadata.get("targets"):
@@ -428,17 +433,21 @@ class GithubCoprBuildHandler(JobHandler):
         default_project_name = f"{self.project.namespace}-{self.project.repo}-{pr_id}"
         owner = self.job.metadata.get("owner") or "packit"
         project = self.job.metadata.get("project") or default_project_name
+        commit_sha = nested_get(self.event, "pull_request", "head", "sha")
+        r = self.BuildStatusReporter(self.project, commit_sha)
 
-        build_id, repo_url = api.run_copr_build(
-            owner=owner, project=project, chroots=self.job.metadata.get("targets")
-        )
+        try:
+            build_id, repo_url = api.run_copr_build(
+                owner=owner, project=project, chroots=self.job.metadata.get("targets")
+            )
+        except FailedCreateSRPM:
+            r.report("failure", "Failed to create SRPM.")
+            return
         timeout = 60 * 60 * 2
         # TODO: document this and enforce int in config
         timeout_config = self.job.metadata.get("timeout")
         if timeout_config:
             timeout = int(timeout_config)
-        commit_sha = nested_get(self.event, "pull_request", "head", "sha")
-        r = self.BuildStatusReporter(self.project, commit_sha, build_id, repo_url)
         build_state = api.watch_copr_build(build_id, timeout, report_func=r.report)
         if build_state == "succeeded":
             msg = (
