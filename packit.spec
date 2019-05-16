@@ -2,8 +2,8 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.3.0
-Release:        2%{?dist}
+Version:        0.4.0
+Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
@@ -56,12 +56,16 @@ rm -rf %{pypi_name}.egg-info
 
 %install
 %py3_install
+%if 0%{?fedora} >= 30
 python3 setup.py --command-packages=click_man.commands man_pages --target %{buildroot}%{_mandir}/man1
+%endif
 
 %files
 %license LICENSE
 %{_bindir}/packit
+%if 0%{?fedora} >= 30
 %{_mandir}/man1/packit*.1*
+%endif
 
 %files -n python3-%{real_name}
 %license LICENSE
@@ -69,6 +73,10 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 %{python3_sitelib}/*
 
 %changelog
+* Wed May 15 2019 Jiri Popelka <jpopelka@redhat.com> - 0.4.0-1
+- New upstream release: 0.4.0
+- Build man pages since F30
+
 * Thu Apr 11 2019 Jiri Popelka <jpopelka@redhat.com> - 0.3.0-2
 - click-man needs more BuildRequires
 
