@@ -145,6 +145,7 @@ Options:
 --------------------|---------------------------|----------------------------------------------------------------------
  anaconda           | @jkonecny12               | [BZ1697339](https://bugzilla.redhat.com/show_bug.cgi?id=1697339)
  [standard-test-roles](https://pagure.io/standard-test-roles)|                           | [PR325](https://pagure.io/standard-test-roles/pull-request/325)
+ rear               | @gdha                     | [PR2145](https://github.com/rear/rear/pull/2145)
 
 
 ## Resources
