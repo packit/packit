@@ -105,7 +105,11 @@ def sync_files(files_to_sync: List[RawSyncFilesItem]) -> None:
         logger.debug(f"src = {src}, dest = {dest}")
         if src.exists():
             if src.is_dir():
-                logger.debug("src is a dir, using copytree")
+                logger.debug("src is a dir, will use copytree")
+                if dest.is_dir():
+                    logger.debug(f"dest dir {dest!r} exists, rmtree it first")
+                    shutil.rmtree(dest, ignore_errors=True)
+                logger.info(f"Copying tree {src} to {dest}.")
                 shutil.copytree(src, dest)
             else:
                 if fi.dest_is_dir:
