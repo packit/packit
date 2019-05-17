@@ -30,7 +30,11 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from rebasehelper.versioneer import versioneers_runner
+
+try:
+    from rebasehelper.plugins.plugin_manager import plugin_manager
+except ImportError:
+    from rebasehelper.versioneer import versioneers_runner
 
 from packit.config import Config
 from packit.exceptions import PackitException
@@ -59,7 +63,10 @@ def test_get_current_version(upstream_instance):
 )
 def test_get_version(upstream_instance, m_v, exp):
     u, ups = upstream_instance
-    flexmock(versioneers_runner, run=lambda **kw: m_v)
+    try:
+        flexmock(plugin_manager.versioneers, run=lambda **kw: m_v)
+    except NameError:
+        flexmock(versioneers_runner, run=lambda **kw: m_v)
 
     assert ups.get_version() == exp
 

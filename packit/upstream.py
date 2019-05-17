@@ -29,7 +29,11 @@ from typing import Optional, List, Tuple
 import git
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
-from rebasehelper.versioneer import versioneers_runner
+
+try:
+    from rebasehelper.plugins.plugin_manager import plugin_manager
+except ImportError:
+    from rebasehelper.versioneer import versioneers_runner
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
@@ -301,7 +305,12 @@ class Upstream(PackitRepositoryBase):
 
         :return: the version string (e.g. "1.0.0")
         """
-        version = versioneers_runner.run(
+        try:
+            get_version = plugin_manager.versioneers.run
+        except NameError:
+            get_version = versioneers_runner.run
+
+        version = get_version(
             versioneer=None,
             package_name=self.package_config.downstream_package_name,
             category=None,
