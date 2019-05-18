@@ -31,3 +31,7 @@ class PackitConfigException(PackitException):
 
 class PackitInvalidConfigException(PackitConfigException):
     """ provided configuration file is not valid """
+
+
+class FailedCreateSRPM(PackitException):
+    """ Failed to create SRPM """

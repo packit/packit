@@ -38,7 +38,7 @@ except ImportError:
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
 from packit.ogr_services import get_github_service
 from packit.utils import run_command, is_a_git_ref
@@ -475,12 +475,17 @@ class Upstream(PackitRepositoryBase):
         ]
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
         logger.debug("present srpms = %s", present_srpms)
-        out = run_command(
-            cmd,
-            output=True,
-            error_message="SRPM could not be created. Is the archive present?",
-            cwd=self.local_project.working_dir,
-        ).strip()
+        try:
+            out = run_command(
+                cmd,
+                output=True,
+                error_message="SRPM could not be created.",
+                cwd=self.local_project.working_dir,
+            ).strip()
+        except PackitException as ex:
+            logger.error(f"Failed to create SRPM: {ex!r}")
+            # TODO: provide logs as well
+            raise FailedCreateSRPM("Failed to create SRPM.")
         logger.debug(f"{out}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
         reg = r": (.+\.src\.rpm)$"
