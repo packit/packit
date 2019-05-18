@@ -1,3 +1,7 @@
+# 0.4.1
+
+* Patch release with few fixes/minor changes.
+
 # 0.4.0
 
 ## Features
@@ -11,6 +15,7 @@
 ## Fixes
 * More source-git related changes have been applied.
 * Few tracebacks when using CLI have been fixed.
+* RPM package now really contains generated man pages.
 
 ## Minor
 * Packit service runs on httpd server.
@@ -23,7 +28,8 @@
 
 # 0.3.0
 
-We have a brand new website: https://packit.dev/! [packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
+We have a brand new website: https://packit.dev/!
+[packit.dev repo](https://github.com/packit-service/packit.dev) contains source content for [Hugo website engine](https://gohugo.io).
 
 ## Features
 
@@ -31,7 +37,7 @@ We have a brand new website: https://packit.dev/! [packit.dev repo](https://gith
 * You can now specify your own actions to replace default packit behavior.
 * Packit supports pagure.io-based upstream projects.
 * Packit {propose-update, sync-from-downstream} supports copying directories.
-* A new command `status`! It displays useful upstream/downstream info.
+* A new `status` command to display useful upstream/downstream info.
 * You can now have a config file for packit in your home directory(`~/.config/packit.yaml`).
 * Packit installed from an RPM now has manpages.
 

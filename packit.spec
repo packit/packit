@@ -2,7 +2,7 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.4.0
+Version:        0.4.1
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -73,6 +73,9 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 %{python3_sitelib}/*
 
 %changelog
+* Sat May 18 2019 Jiri Popelka <jpopelka@redhat.com> - 0.4.1-1
+- Patch release
+
 * Wed May 15 2019 Jiri Popelka <jpopelka@redhat.com> - 0.4.0-1
 - New upstream release: 0.4.0
 - Build man pages since F30
