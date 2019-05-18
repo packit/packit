@@ -21,20 +21,21 @@ For the run-down of the planned work, please see the task-list below.
   * [x] Bring new upstream releases into Fedora rawhide as dist-git pull
         requests. (`propose-update` command included in in 0.1.0 release)
   * [x] Build the change once it's merged. #137
-  * [ ] Send new downstream changes back to upstream. (so the spec files are in
+  * [x] Send new downstream changes back to upstream. (so the spec files are in
         sync) #145
   * [x] Packit can create bodhi updates. #139
   * [x] Ability to propose updates also to stable releases of Fedora.
   * [ ] Create SRPMs from the upstream repository
-  * [ ] Build RPMs in COPR and integrate the results into Github.
+  * [x] Build RPMs in COPR and integrate the results into Github.
 * [ ] source-git
-  * [ ] Packit can create a SRPM from a source-git repo.
+  * [x] Packit can create a SRPM from a source-git repo.
   * [ ] You can release to rawhide from source-git using packit.
   * [ ] Packit can create a source-git repository.
   * [ ] Packit helps developers with their source-git repositories.
 * [ ] Packit as a service
-  * [ ] Packit reacts to Github webhooks.
-  * [ ] Have a github app for packit.
+  * [x] Packit reacts to Github webhooks.
+  * [x] Have a Github app for packit.
+    * [ ] Github app is on Marketplace.
   * [ ] Packit service is deployed and usable by anyone.
 
 
