@@ -124,7 +124,8 @@ Options:
  conu              |                           | [.packit.yaml](https://github.com/user-cont/conu/blob/master/.packit.yaml)
  sen               | @TomasTomecek             | [.packit.yaml](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
  ogr               | @lachmanfrantisek         | [.packit.yaml](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
-
+ rear               | @gdha                    | [PR2145](https://github.com/rear/rear/pull/2145)
+ 
 ## Who is interested
 
 * Identity team (@pvoborni)
@@ -146,8 +147,6 @@ Options:
 --------------------|---------------------------|----------------------------------------------------------------------
  anaconda           | @jkonecny12               | [BZ1697339](https://bugzilla.redhat.com/show_bug.cgi?id=1697339)
  [standard-test-roles](https://pagure.io/standard-test-roles)|                           | [PR325](https://pagure.io/standard-test-roles/pull-request/325)
- rear               | @gdha                     | [PR2145](https://github.com/rear/rear/pull/2145)
-
 
 ## Resources
 
