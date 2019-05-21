@@ -25,6 +25,7 @@ import logging
 import sys
 
 import click
+from github import GithubException
 
 from packit.api import PackitAPI
 from packit.config import get_local_package_config, Config
@@ -66,6 +67,17 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                 else:
                     logger.error(exc)
                 sys.exit(exit_code or 2)
+            except GithubException as exc:
+                if config and config.debug:
+                    logger.exception(exc)
+                else:
+                    logger.error(exc)
+                    click.echo(
+                        "Your token is not supplied.\n"
+                        "Please fill your token here: \n"
+                        "https://github.com/settings/tokens\n"
+                    )
+                sys.exit(exit_code or 3)
             except Exception as exc:
                 if config and config.debug:
                     logger.exception(exc)
@@ -77,7 +89,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                         "https://github.com/packit-service/packit/issues",
                         err=True,
                     )
-                sys.exit(exit_code or 3)
+                sys.exit(exit_code or 4)
 
         return covered_func
 
