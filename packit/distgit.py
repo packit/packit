@@ -25,6 +25,7 @@ from typing import Optional, Sequence, List
 
 import git
 import requests
+from ogr.services.pagure import PagureService
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
@@ -36,7 +37,6 @@ from packit.config import (
 from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
-from packit.ogr_services import PagureService
 
 logger = logging.getLogger(__name__)
 
