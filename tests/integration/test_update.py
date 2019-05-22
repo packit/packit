@@ -21,17 +21,13 @@
 # SOFTWARE.
 import pytest
 from flexmock import flexmock
-from github import Github
-from github.Repository import Repository
-from ogr.services.github import GithubProject
 
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
-from packit.jobs import SteveJobs
 from packit.local_project import LocalProject
+from packit.utils import cwd
 from tests.spellbook import TARBALL_NAME, get_test_config
 from tests.utils import get_specfile
-from packit.utils import cwd
 
 
 @pytest.fixture()
@@ -93,17 +89,3 @@ def test_basic_local_update_from_downstream(
         assert (u / "beer.spec").is_file()
         spec = get_specfile(str(u / "beer.spec"))
         assert spec.get_version() == "0.0.0"
-
-
-def test_single_message(github_release_webhook, mock_remote_functionality_upstream):
-    u, d = mock_remote_functionality_upstream
-
-    conf = get_test_config()
-    steve = SteveJobs(conf)
-
-    flexmock(GithubProject).should_receive("get_file_content").and_return(
-        u.joinpath(".packit.json").read_text()
-    )
-    flexmock(Github, get_repo=Repository(None, None, {}, None))
-
-    steve.process_message(github_release_webhook)
