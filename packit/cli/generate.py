@@ -59,7 +59,7 @@ def generate(path_or_url, force):
             config_file_name = existing_config_file
             if not force:
                 raise PackitException(
-                    "Packit config already exists."
+                    f"Packit config {config_file_name} already exists."
                     " If you want to regenerate it use `packit generate --force`"
                 )
             break
