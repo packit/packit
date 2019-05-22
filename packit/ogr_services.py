@@ -68,10 +68,20 @@ def get_github_service(
         inst_id = integration.get_installation_id_for_repo(namespace, repo)
         inst_auth = integration.get_access_token(inst_id)
         token = inst_auth.token
-        gh_service = GithubService(token=token, read_only=config.dry_run)
+        gh_service_kwargs = dict(token=token, read_only=config.dry_run)
     else:
         logger.debug("Authenticating with Github using a token.")
-        gh_service = GithubService(token=config.github_token, read_only=config.dry_run)
+        gh_service_kwargs = dict(token=config.github_token, read_only=config.dry_run)
+    if config.github_requests_log_path:
+        if config.github_token:
+            write_mode = True
+        else:
+            write_mode = False
+        s = PersistentObjectStorage(
+            storage_file=config.github_requests_log_path, is_write_mode=write_mode
+        )
+        gh_service_kwargs.update(dict(persistent_storage=s))
+    gh_service = GithubService(**gh_service_kwargs)
 
     # test we have correct credentials
     # hmmm, Github tells me we are not allowed to this, we need to tick more perms
@@ -81,12 +91,9 @@ def get_github_service(
 
 
 def get_github_project(
-    config: Config,
-    namespace: str,
-    repo: str,
-    service: Optional[GithubService] = None,
+    config: Config, namespace: str, repo: str, service: Optional[GithubService] = None
 ) -> GithubProject:
-    github_service: GithubService= service or get_github_service(
+    github_service: GithubService = service or get_github_service(
         config, namespace=namespace, repo=repo
     )
     gh_proj = GithubProject(repo=repo, namespace=namespace, service=github_service)
