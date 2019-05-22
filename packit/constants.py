@@ -56,3 +56,18 @@ COPR2GITHUB_STATE = {
     "skipped": ("error", "The build was already done."),
     "unknown": ("error", "Something went wrong."),
 }
+
+PACKIT_CONFIG_TEMPLATE = """# See the documentation for more information:
+# https://github.com/packit-service/packit/blob/master/docs/configuration.md
+
+specfile_path: {downstream_package_name}.spec
+
+# add or remove files that should be synced
+synced_files:
+    - {downstream_package_name}.spec
+    - .packit.yaml
+
+# change these lines if upstream project name is not the same as downstream
+upstream_project_name: {upstream_project_name}
+downstream_package_name: {downstream_package_name}
+"""
