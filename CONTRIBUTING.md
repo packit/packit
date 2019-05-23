@@ -74,6 +74,21 @@ make build-tests && make test-in-container
 
 As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configuration in [Jenkinsfile](Jenkinsfile).
 
+
+#### Storing HTTP communication offline
+
+OGR enables you to store complete HTTP requests offline. We can then use those
+cached HTTP communication during testing.
+
+In order to use this feature, you have to set `github_requests_log_path` on
+`Config`. You can then use `get_github_service` from `ogr_services` to get
+GithubService which has everything set up:
+
+1. If `github_token` is set, all the HTTP requests will be stored in the file
+2. If the token is not set, offline http requests will be used instead of
+   talking to live GitHub API.
+
+
 ### Makefile
 
 #### Requirements

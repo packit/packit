@@ -86,6 +86,10 @@ class Config(BaseConfig):
         self._pagure_fork_token: str = ""
         self.dry_run: bool = False
 
+        # path to a file where OGR should store HTTP requests
+        # this is used for packit testing: don't expose this to users
+        self.github_requests_log_path: str = ""
+
     @classmethod
     def get_user_config(cls) -> "Config":
         xdg_config_home = os.getenv("XDG_CONFIG_HOME")
