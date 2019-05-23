@@ -5,6 +5,7 @@ import logging
 from typing import List, Optional, Tuple, Dict, Type
 
 from ogr.abstract import GitProject, GitService
+from ogr.services.pagure import PagureService
 
 from packit.api import PackitAPI
 from packit.config import JobConfig, JobTriggerType, JobType, PackageConfig, Config
@@ -12,7 +13,7 @@ from packit.config import get_package_config_from_repo
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
-from packit.ogr_services import PagureService, get_github_project
+from packit.ogr_services import get_github_project
 from packit.utils import nested_get, get_namespace_and_repo_name
 
 logger = logging.getLogger(__name__)
