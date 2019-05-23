@@ -49,7 +49,8 @@ When you are contributing to changelog, please follow these suggestions:
 
 * The changelog is meant to be read by everyone. Imagine that an average user
   will read it and should understand the changes.
-* Every line should be a complete sentence. Either tell what is the change that the tool is doing or describe it precisely:
+* Every line should be a complete sentence. Either tell what is the change that
+  the tool is doing or describe it precisely:
   * Bad: `Use search method in label regex`
   * Good: `Packit now uses search method when...`
 * And finally, with the changelogs we are essentially selling our projects:
@@ -65,11 +66,6 @@ We use [Tox](https://pypi.org/project/tox) with configuration in [tox.ini](tox.i
 Running tests locally:
 ```
 make prepare-check && make check
-```
-
-Running tests in a container (currently broken, PRs are welcome):
-```
-make build-tests && make test-in-container
 ```
 
 As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configuration in [Jenkinsfile](Jenkinsfile).
@@ -93,18 +89,9 @@ GithubService which has everything set up:
 
 #### Requirements
 
-- [podman](https://github.com/containers/libpod)
-- docker
+- ansible
 
 #### Targets
-
-Here are some important and useful targets of [Makefile](/Makefile):
-
-Build a container image for packit service:
-```
-make build
-```
-
 Run [recipe-tests.yaml](recipe-tests.yaml) ansible playbook to install packages needed to run tests:
 ```
 make prepare-check
@@ -113,16 +100,6 @@ make prepare-check
 Run tests locally:
 ```
 make check
-```
-
-Start shell in a container from the image previously built with `make build`:
-```
-make shell
-```
-
-In a container, do basic checks to verify that packit can be distributed, installed and imported:
-```
-make check-pypi-packaging
 ```
 
 ### Additional configuration for development purposes
@@ -139,7 +116,7 @@ jobs:
     targets:
       - some_targets
     # (Optional) Defaults to 'packit'
-    owner: some_copr_project_owner
+    owner: <your_fedora_username>
     # (Optional) Defaults to <github_namespace>-<github_repo>
     project: some_project_name
 ```
