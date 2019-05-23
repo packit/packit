@@ -124,8 +124,8 @@ Options:
  conu              |                           | [.packit.yaml](https://github.com/user-cont/conu/blob/master/.packit.yaml)
  sen               | @TomasTomecek             | [.packit.yaml](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
  ogr               | @lachmanfrantisek         | [.packit.yaml](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
- rear               | @gdha                    | [PR2145](https://github.com/rear/rear/pull/2145)
- 
+ rear              | @gdha                     | [PR2145](https://github.com/rear/rear/pull/2145)
+
 ## Who is interested
 
 * Identity team (@pvoborni)
