@@ -3,6 +3,15 @@
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
 
+## Elevator pitch
+
+Packit  is a CLI tool that helps developers auto-package upstream projects
+ into Fedora operating system.
+With just one configuration file in your upstream repository,
+packit will automatically generate RPM packages for Fedora
+and update them as you update your source upstream.
+With packit you can build SRPMs, trigger koji builds and even
+create bodhi updates, effectively replacing the whole Fedora packaging workflow.
 
 ## Plan and current status
 
