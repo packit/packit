@@ -411,7 +411,7 @@ class GithubCoprBuildHandler(JobHandler):
 
         # report
         commit_sha = self.project.get_sha_from_tag(tag_name)
-        r = self.BuildStatusReporter(self.project, commit_sha, build_id, repo_url)
+        r = BuildStatusReporter(self.project, commit_sha, build_id, repo_url)
         timeout = 60 * 60 * 2
         timeout_config = self.job.metadata.get("timeout")
         if timeout_config:
@@ -435,7 +435,7 @@ class GithubCoprBuildHandler(JobHandler):
         owner = self.job.metadata.get("owner") or "packit"
         project = self.job.metadata.get("project") or default_project_name
         commit_sha = nested_get(self.event, "pull_request", "head", "sha")
-        r = self.BuildStatusReporter(self.project, commit_sha)
+        r = BuildStatusReporter(self.project, commit_sha)
 
         try:
             build_id, repo_url = api.run_copr_build(
