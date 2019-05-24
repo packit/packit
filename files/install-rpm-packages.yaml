@@ -7,19 +7,15 @@
       name:
       - fedpkg
       - git
-      - mod_md
-      - nss_wrapper
       - python3-GitPython
       - python3-gnupg
       - python3-click
       - python3-copr
       - python3-devel
       - python3-fedmsg
-      - python3-flask
       - python3-ipdb  # for easy debugging
       - python3-jsonschema
       - python3-libpagure
-      - python3-mod_wsgi
       - python3-munch
       - python3-ogr
       - python3-packaging
