@@ -24,10 +24,9 @@
 This is the official python interface for packit.
 """
 
+import asyncio
 import logging
 import time
-import asyncio
-
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict
@@ -260,11 +259,12 @@ class PackitAPI:
         self.up.checkout_branch(local_pr_branch)
 
         raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
-            Path(self.dg.local_project.working_dir),
-            Path(self.up.local_project.working_dir),
+            dest_dir=Path(self.dg.local_project.working_dir),
+            src_dir=Path(self.up.local_project.working_dir),
         )
 
-        sync_files(raw_sync_files)
+        reverse_raw_sync_files = [raw_file.reversed() for raw_file in raw_sync_files]
+        sync_files(reverse_raw_sync_files, fail_on_missing=False)
 
         if not no_pr:
             description = (

@@ -64,6 +64,11 @@ class RawSyncFilesItem(NamedTuple):
             and self.dest_is_dir == other.dest_is_dir
         )
 
+    def reversed(self) -> "RawSyncFilesItem":
+        return RawSyncFilesItem(
+            src=self.dest, dest=self.src, dest_is_dir=self.dest_is_dir
+        )
+
 
 def get_raw_files(
     src_dir: Path, dest_dir: Path, file_to_sync: SyncFilesItem
@@ -93,7 +98,7 @@ def get_raw_files(
     return files_to_sync
 
 
-def sync_files(files_to_sync: List[RawSyncFilesItem]) -> None:
+def sync_files(files_to_sync: List[RawSyncFilesItem], fail_on_missing=False) -> None:
     """
     Copy files b/w upstream and downstream repo.
     """
@@ -118,4 +123,7 @@ def sync_files(files_to_sync: List[RawSyncFilesItem]) -> None:
                 logger.info(f"Copying {src} to {dest}.")
                 shutil.copy2(src, dest)
         else:
-            raise PackitException(f"Path {src} does not exist.")
+            if fail_on_missing:
+                raise PackitException(f"Path {src} does not exist.")
+            else:
+                logger.info(f"Path {src} does not exist. Not syncing.")
