@@ -29,7 +29,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
@@ -233,16 +233,19 @@ class PackitAPI:
         no_pr: bool = False,
         fork: bool = True,
         remote_name: str = None,
+        exclude_files: Iterable[str] = None,
     ):
         """
         Sync content of Fedora dist-git repo back to upstream
 
+        :param exclude_files: files that will be excluded from the sync
         :param dist_git_branch: branch in dist-git
         :param upstream_branch: upstream branch
         :param no_pr: won't create a pull request if set to True
         :param fork: forks the project if set to True
         :param remote_name: name of remote where we should push; if None, try to find a ssh_url
         """
+        exclude_files = exclude_files or []
         if not dist_git_branch:
             raise PackitException("Dist-git branch is not set.")
         if not upstream_branch:
@@ -263,7 +266,11 @@ class PackitAPI:
             src_dir=Path(self.up.local_project.working_dir),
         )
 
-        reverse_raw_sync_files = [raw_file.reversed() for raw_file in raw_sync_files]
+        reverse_raw_sync_files = [
+            raw_file.reversed()
+            for raw_file in raw_sync_files
+            if Path(raw_file.dest).name not in exclude_files
+        ]
         sync_files(reverse_raw_sync_files, fail_on_missing=False)
 
         if not no_pr:
