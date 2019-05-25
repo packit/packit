@@ -451,10 +451,12 @@ class PackitAPI:
         if upstream_ref:
             # source-git code: fetch the tarball and don't check out the upstream ref
             self.up.fetch_upstream_archive()
+            source_dir = self.up.specfile_dir
         else:
-            with self.up.local_project.git_checkout_block(ref=upstream_ref):
-                # upstream repo: create the archive
-                self.up.create_archive(version=version)
+            # upstream repo: create the archive
+            archive = self.up.create_archive(version=version)
+            self.up.specfile.set_tag("Source0", archive)
+            source_dir = self.up.local_project.working_dir
 
         if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):
@@ -464,17 +466,33 @@ class PackitAPI:
                 )
                 self.up.add_patches_to_specfile(patches)
 
-        if version != spec_version:
-            logger.info("set version %r in spec", version)
-            try:
-                self.up.set_spec_version(
-                    version=version, changelog_entry="- Development snapshot"
-                )
-            except PackitException:
-                self.up.bump_spec(
-                    version=version, changelog_entry="Development snapshot"
-                )
-        srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
+        old_release = self.up.specfile.get_release_number()
+        try:
+            old_release_int = int(old_release)
+            new_release = old_release_int + 1
+        except Exception:
+            new_release = old_release
+        commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
+
+        if upstream_ref:
+            release_to_update = f"{new_release}.g{commit}"
+            msg = f"Downstream changes ({commit})"
+        else:
+            release_to_update = f"{new_release}.dev.g{commit}"
+            msg = f"Development snapshot ({commit})"
+
+        try:
+            self.up.set_spec_version(
+                release=release_to_update, changelog_entry=f"- {msg}"
+            )
+        except PackitException:
+            self.up.bump_spec(
+                version=f"{spec_version}-{release_to_update}", changelog_entry=msg
+            )
+
+        srpm_path = self.up.create_srpm(
+            srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
+        )
         if not srpm_path.exists():
             raise PackitException(
                 f"SRPM was created successfully, but can't be found at {srpm_path}"
