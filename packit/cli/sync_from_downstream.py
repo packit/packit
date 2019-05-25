@@ -62,6 +62,7 @@ logger = logging.getLogger(__file__)
         "If this is not specified, push to a fork if the repo can be forked."
     ),
 )
+@click.option("-x", "--exclude", help="File to exclude from sync", multiple=True)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
@@ -70,7 +71,7 @@ logger = logging.getLogger(__file__)
 @cover_packit_exception
 @pass_config
 def sync_from_downstream(
-    config, dist_git_branch, upstream_branch, no_pr, path_or_url, fork, remote
+    config, dist_git_branch, upstream_branch, no_pr, path_or_url, fork, remote, exclude
 ):
     """
     Copy synced files from Fedora dist-git into upstream by opening a pull request.
@@ -80,5 +81,10 @@ def sync_from_downstream(
     """
     api = get_packit_api(config=config, local_project=path_or_url)
     api.sync_from_downstream(
-        dist_git_branch, upstream_branch, no_pr=no_pr, fork=fork, remote_name=remote
+        dist_git_branch,
+        upstream_branch,
+        no_pr=no_pr,
+        fork=fork,
+        remote_name=remote,
+        exclude_files=exclude,
     )
