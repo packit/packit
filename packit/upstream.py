@@ -442,43 +442,45 @@ class Upstream(PackitRepositoryBase):
                 return base[archive_basename_len:]
         return ".tar.gz"
 
-    def create_archive(self, version: str = None):
+    def create_archive(self, version: str = None) -> str:
         """
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
+        if self.has_action(action=ActionName.create_archive):
+            return self.get_output_from_action(action=ActionName.create_archive)
+
         version = version or self.get_current_version()
-        if self.with_action(action=ActionName.create_archive):
-            if self.package_config.upstream_project_name:
-                dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
-            else:
-                dir_name = f"{self.package_config.downstream_package_name}-{version}"
-            logger.debug("name + version = %s", dir_name)
-            # We don't care about the name of the archive, really
-            # we just require for the archive to be placed in the cwd
-            if self.package_config.create_tarball_command:
-                archive_cmd = self.package_config.create_tarball_command
-            else:
-                archive_extension = self.get_archive_extension(dir_name, version)
-                if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
-                    raise PackitException(
-                        "The target archive doesn't use a common extension ({}), "
-                        "git archive can't be used. Please provide your own script "
-                        "for archive creation.".format(
-                            ", ".join(COMMON_ARCHIVE_EXTENSIONS)
-                        )
+
+        if self.package_config.upstream_project_name:
+            dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
+        else:
+            dir_name = f"{self.package_config.downstream_package_name}-{version}"
+        logger.debug("name + version = %s", dir_name)
+
+        if self.package_config.create_tarball_command:
+            archive_cmd = self.package_config.create_tarball_command
+        else:
+            archive_extension = self.get_archive_extension(dir_name, version)
+            if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
+                raise PackitException(
+                    "The target archive doesn't use a common extension ({}), "
+                    "git archive can't be used. Please provide your own script "
+                    "for archive creation.".format(
+                        ", ".join(COMMON_ARCHIVE_EXTENSIONS)
                     )
-                archive_name = f"{dir_name}{archive_extension}"
-                archive_cmd = [
-                    "git",
-                    "archive",
-                    "-o",
-                    archive_name,
-                    "--prefix",
-                    f"{dir_name}/",
-                    "HEAD",
-                ]
-            self.command_handler.run_command(archive_cmd, return_output=True)
+                )
+            archive_name = f"{dir_name}{archive_extension}"
+            archive_cmd = [
+                "git",
+                "archive",
+                "-o",
+                archive_name,
+                "--prefix",
+                f"{dir_name}/",
+                "HEAD",
+            ]
+        return self.command_handler.run_command(archive_cmd, return_output=True)
 
     def create_srpm(
         self, srpm_path: str = None, source_dir: str = None, srpm_dir: str = None
