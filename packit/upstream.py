@@ -400,7 +400,9 @@ class Upstream(PackitRepositoryBase):
         cmd.append(str(self.absolute_specfile_path))
         run_command(cmd)
 
-    def set_spec_version(self, version: str, changelog_entry: str):
+    def set_spec_version(
+        self, version: str = None, release: str = None, changelog_entry: str = None
+    ):
         """
         Set version in spec and add a changelog_entry.
 
@@ -408,9 +410,16 @@ class Upstream(PackitRepositoryBase):
         :param changelog_entry: accompanying changelog entry
         """
         try:
-            # also this code adds 3 rpmbuild dirs into the upstream repo,
-            # we should ask rebase-helper not to do that
-            self.specfile.set_version(version=version)
+            if version:
+                # also this code adds 3 rpmbuild dirs into the upstream repo,
+                # we should ask rebase-helper not to do that
+                self.specfile.set_version(version=version)
+
+            if release:
+                self.specfile.set_release_number(release=release)
+
+            if not changelog_entry:
+                return
 
             if hasattr(self.specfile, "update_changelog"):
                 # new rebase helper
