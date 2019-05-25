@@ -480,10 +480,13 @@ class Upstream(PackitRepositoryBase):
                 ]
             self.command_handler.run_command(archive_cmd, return_output=True)
 
-    def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
+    def create_srpm(
+        self, srpm_path: str = None, source_dir: str = None, srpm_dir: str = None
+    ) -> Path:
         """
         Create SRPM from the actual content of the repo
 
+        :param source_dir: path with the source files (defaults to dir with specfile)
         :param srpm_path: path to the srpm
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
@@ -498,7 +501,7 @@ class Upstream(PackitRepositoryBase):
             "rpmbuild",
             "-bs",
             "--define",
-            f"_sourcedir {rpmbuild_dir}",
+            f"_sourcedir {source_dir or rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
