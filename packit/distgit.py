@@ -222,9 +222,7 @@ class DistGit(PackitRepositoryBase):
         :return: str, path to the archive
         """
         self.specfile.download_remote_sources()
-        archive = os.path.join(
-            self.local_project.working_dir, self.upstream_archive_name
-        )
+        archive = os.path.join(self.specfile_dir, self.upstream_archive_name)
         logger.info(f"Downloaded archive: {archive!r}")
         return archive
 
