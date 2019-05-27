@@ -1,8 +1,12 @@
 # Pack It! [![Build Status](https://ci.centos.org/job/packit-master/badge/icon)](https://ci.centos.org/job/packit-master)
 
-This project provides tooling and automation to integrate upstream open source
-projects into Fedora operating system.
+## Elevator pitch
 
+Packit is a CLI tool that helps developers auto-package upstream projects
+into Fedora operating system.
+You can use packit to continously build your upstream project in Fedora.
+With packit you can create SRPMs, open pull requests in dist-git, submit koji builds and even
+create bodhi updates, effectively replacing the whole Fedora packaging workflow.
 
 ## Plan and current status
 
@@ -25,7 +29,7 @@ For the run-down of the planned work, please see the task-list below.
         sync) #145
   * [x] Packit can create bodhi updates. #139
   * [x] Ability to propose updates also to stable releases of Fedora.
-  * [ ] Create SRPMs from the upstream repository
+  * [x] Create SRPMs from the upstream repository
   * [x] Build RPMs in COPR and integrate the results into Github.
 * [ ] source-git
   * [x] Packit can create a SRPM from a source-git repo.
