@@ -71,11 +71,11 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                 if config and config.debug:
                     logger.exception(exc)
                 else:
-                    logger.error(exc)
                     click.echo(
-                        "Your token is not supplied.\n"
-                        "Please fill your token here: \n"
-                        "https://github.com/settings/tokens\n"
+                        "We've encountered an error while talking to GitHub API, please make sure"
+                        " that you pass GitHub API token and it has correct permissions, \n"
+                        f"precise error message: {exc} \n"
+                        "https://github.com/packit-service/packit/tree/master/docs\n"
                     )
                 sys.exit(exit_code or 3)
             except Exception as exc:
