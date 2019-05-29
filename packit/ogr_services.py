@@ -78,7 +78,9 @@ def get_github_service(
         else:
             write_mode = False
         s = PersistentObjectStorage(
-            storage_file=config.github_requests_log_path, is_write_mode=write_mode
+            storage_file=config.github_requests_log_path,
+            is_write_mode=write_mode,
+            dump_after_store=True,
         )
         gh_service_kwargs.update(dict(persistent_storage=s))
     gh_service = GithubService(**gh_service_kwargs)
