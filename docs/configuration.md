@@ -74,7 +74,7 @@ synced_files:
 
 ### Packit service jobs
 
-**Packit service is not live, we are working hard to deploy it by the end of April.**
+**Packit service is not live, we are workin on opening it to the world in June.**
 
 Once the service starts handling events of your repository, it needs to have a clear definition of what it should do.
 
