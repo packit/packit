@@ -38,24 +38,39 @@ This is a sample config which is meant for packit itself.
 ```yaml
 specfile_path: packit.spec
 synced_files:
-  # Copy a file from root of the upstream repo to dist-git.
   - packit.spec
-  # src: a file in root of the upstream repository
-  # dest: path within the downstream repository
-  - src: packit.spec
-    dest: redhat/packit.spec
-  # also supports globbing
-  - src: *.md
-    dest: docs/
-  # you can specify multiple source files as well:
-  - src:
-    - doc1.md
-    - doc2.md
-    dest: docs/
 upstream_project_name: packitos
 downstream_package_name: packit
 ```
 
+### More examples of `synced_files`
+
+```yaml
+synced_files:
+
+  # Copy a file from root of the upstream repo to dist-git.
+  - packit.spec
+
+  # If you copy packit.yaml downstream, you can then take advantage of
+  # `sync-from-downstream` command.
+  - .packit.yaml
+
+  # src: a file in root of the upstream repository
+  # dest: path within the downstream repository
+  - src: packit.spec
+    dest: redhat/packit.spec
+
+  # Also supports globbing: copy everything from fedora-packaging folder and
+  # put it to the root of the dist-git repo.
+  - src: fedora-packaging/*
+    dest: .
+
+  # You can specify multiple source files as well:
+  - src:
+    - package.spec
+    - some-file
+    dest: .
+```
 
 ### Packit service jobs
 
