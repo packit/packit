@@ -1,19 +1,22 @@
-prepare-check:
-	ansible-playbook -b -K -i inventory-local -c local ./recipe-tests.yaml
+CONTAINER_NAME=packit
+CONTAINER_EXEC=podman exec $(CONTAINER_NAME)
 
-check:
-	tox
+test_container: test_container_remove
+	rsync -a $(CURDIR)/ /tmp/packit
+	podman build --tag $(CONTAINER_NAME) .
+	podman run --name $(CONTAINER_NAME) -ti -d -v /tmp/packit:/src:Z $(CONTAINER_NAME)
+	sleep 2
 
-# build-tests: recipe-tests.yaml
-# 	ansible-bender build -- ./recipe-tests.yaml $(SOURCE_GIT_IMAGE) $(PACKIT_TESTS_IMAGE)
+test_container_remove:
+	podman stop $(CONTAINER_NAME) || true
+	podman rm -f $(CONTAINER_NAME) || true
+	podman image rm $(CONTAINER_NAME) || true
 
-# shell:
-# 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(PACKIT_TESTS_IMAGE) bash
+install:
+	pip3 install .
 
-# we should probably run tests in a root container (sudo podman)
-# getting these type of errors with rootless:
-#   error: [Errno 13] Permission denied: '/src/.tox/py36/lib/python3.6/site-packages/rpm-4.14.2.1-py3.6-linux-x86_64.egg'
-# even though it doesn't make any sense: after tox fails, I can access the file
-# just fine: a bug in fuse-overlayfs?
-# test-in-container:
-# 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(PACKIT_TESTS_IMAGE) make check
+check: install
+	PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=yes --verbose --showlocals --cov=packit --cov-report=term-missing tests
+
+check_in_container: test_container
+	$(CONTAINER_EXEC) make check
