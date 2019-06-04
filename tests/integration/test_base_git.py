@@ -1,19 +1,18 @@
 from flexmock import flexmock
 
 from packit.actions import ActionName
-from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig
+from packit.command_runner import CommandRunner
 
 
 def test_get_output_from_action_defined():
     echo_cmd = "echo 'hello world'"
 
-    packit_repository_base = PackitRepositoryBase(
+    command_runner = CommandRunner(
         config=flexmock(),
         package_config=flexmock(PackageConfig(actions={ActionName.pre_sync: echo_cmd})),
+        local_project=flexmock(working_dir="."),
     )
 
-    packit_repository_base.local_project = flexmock(working_dir=".")
-
-    result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
+    result = command_runner.get_output_from_action(ActionName.pre_sync)
     assert result == "hello world\n"

@@ -84,7 +84,7 @@ class PackitAPI:
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
-        self.up.run_action(action=ActionName.pre_sync)
+        self.up.command_runner.run_action(action=ActionName.pre_sync)
 
         self.up.checkout_pr(pr_id=pr_id)
         self.dg.check_last_commit()
@@ -103,7 +103,7 @@ class PackitAPI:
         self.dg.create_branch(local_pr_branch)
         self.dg.checkout_branch(local_pr_branch)
 
-        if self.up.with_action(action=ActionName.create_patches):
+        if self.up.command_runner.with_action(action=ActionName.create_patches):
             patches = self.up.create_patches(
                 upstream=upstream_version, destination=self.dg.specfile_dir
             )
@@ -149,7 +149,7 @@ class PackitAPI:
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
-        self.up.run_action(action=ActionName.post_upstream_clone)
+        self.up.command_runner.run_action(action=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
         if not full_version:
@@ -168,7 +168,7 @@ class PackitAPI:
 
             self.dg.check_last_commit()
 
-            self.up.run_action(action=ActionName.pre_sync)
+            self.up.command_runner.run_action(action=ActionName.pre_sync)
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
@@ -191,14 +191,16 @@ class PackitAPI:
                 f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
 
-            if self.up.with_action(action=ActionName.prepare_files):
+            if self.up.command_runner.with_action(action=ActionName.prepare_files):
                 raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
                 )
                 sync_files(raw_sync_files)
                 if upstream_ref:
-                    if self.up.with_action(action=ActionName.create_patches):
+                    if self.up.command_runner.with_action(
+                        action=ActionName.create_patches
+                    ):
                         patches = self.up.create_patches(
                             upstream=upstream_ref, destination=self.dg.specfile_dir
                         )
@@ -208,7 +210,7 @@ class PackitAPI:
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
 
-            if self.up.has_action(action=ActionName.prepare_files):
+            if self.up.command_runner.has_action(action=ActionName.prepare_files):
                 raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
@@ -386,7 +388,7 @@ class PackitAPI:
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: a path to the srpm
         """
-        self.up.run_action(action=ActionName.post_upstream_clone)
+        self.up.command_runner.run_action(action=ActionName.post_upstream_clone)
 
         version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()
@@ -402,7 +404,7 @@ class PackitAPI:
                 self.up.create_archive(version=upstream_ref)
 
         if upstream_ref:
-            if self.up.with_action(action=ActionName.create_patches):
+            if self.up.command_runner.with_action(action=ActionName.create_patches):
                 patches = self.up.create_patches(
                     upstream=upstream_ref, destination=self.up.specfile_dir
                 )

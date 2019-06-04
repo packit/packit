@@ -42,6 +42,7 @@ from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
 from packit.ogr_services import get_github_service
 from packit.utils import run_command, is_a_git_ref
+from packit.command_runner import CommandRunner
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,15 @@ class Upstream(PackitRepositoryBase):
         self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self.set_local_project()
+        self._command_runner = None
+
+    @property
+    def command_runner(self):
+        if self._command_runner is None:
+            self._command_runner = CommandRunner(
+                self.config, self.package_config, self.local_project
+            )
+        return self._command_runner
 
     @property
     def active_branch(self) -> str:
@@ -349,7 +359,7 @@ class Upstream(PackitRepositoryBase):
 
         :return: e.g. 0.1.1.dev86+ga17a559.d20190315 or 0.6.1.1.gce4d84e
         """
-        action_output = self.get_output_from_action(
+        action_output = self.command_runner.get_output_from_action(
             action=ActionName.get_current_version
         )
         if action_output:
@@ -417,7 +427,7 @@ class Upstream(PackitRepositoryBase):
         repository, only committed changes are present in the archive
         """
         version = version or self.get_current_version()
-        if self.with_action(action=ActionName.create_archive):
+        if self.command_runner.with_action(action=ActionName.create_archive):
 
             if self.package_config.upstream_project_name:
                 dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
