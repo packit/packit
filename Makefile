@@ -1,22 +1,19 @@
 CONTAINER_NAME=packit
-CONTAINER_EXEC=podman exec $(CONTAINER_NAME)
+CONTAINER_RUN=podman run --rm -ti -v /tmp/packit:/src:Z $(CONTAINER_NAME)
 
-test_container: test_container_remove
-	rsync -a $(CURDIR)/ /tmp/packit
+test_container:
 	podman build --tag $(CONTAINER_NAME) .
-	podman run --name $(CONTAINER_NAME) -ti -d -v /tmp/packit:/src:Z $(CONTAINER_NAME)
 	sleep 2
 
 test_container_remove:
-	podman stop $(CONTAINER_NAME) || true
-	podman rm -f $(CONTAINER_NAME) || true
-	podman image rm $(CONTAINER_NAME) || true
-
+	podman image rm $(CONTAINER_NAME)
 install:
-	pip3 install .
+	pip3 install --user .
 
-check: install
-	PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=yes --verbose --showlocals --cov=packit --cov-report=term-missing tests
+check:
+	find . -name "*.pyc" -exec rm {} \;
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=yes --verbose --showlocals --cov=packit --cov-report=term-missing tests
 
 check_in_container: test_container
-	$(CONTAINER_EXEC) make check
+	rsync -a $(CURDIR)/ /tmp/packit
+	$(CONTAINER_RUN) make check

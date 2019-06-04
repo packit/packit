@@ -9,6 +9,12 @@
       - git
       - dnf-utils
       - python3-pip
+  - name: Install test rpm dependencies
+    dnf:
+      name:
+      - python3-flexmock
+      - python3-pytest
+      - python3-pytest-cov
       state: present
 
   - name: Install runtime RPM deps
@@ -22,5 +28,5 @@
   - name: Install build RPM depoendencies
     command: dnf -y builddep packit.spec
 
-  - name: Install pit test dependencies
-    command: pip3 install flexmock pytest pytest-cov pre-commit
+  - name: Install pip pre-commit
+    command: pip3 install pre-commit
