@@ -11,16 +11,17 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.provision "shell", inline: <<-SHELL
-        set -x
-        dnf install -y ansible
+        cd /vagrant
+        cp files/install-requirements.yaml .
+        dnf -y install ansible || true
     SHELL
 
     config.vm.provision :ansible_local do |ansible|
 	    ansible.verbose = "v"
-	    ansible.playbook = "files/install-requirements.yaml"
-	    ansible.extra_vars = { ansible_python_interpreter: "/usr/bin/python3" }
+	    ansible.playbook = "./install-requirements.yaml"
 	    ansible.become = true
     end
+
     config.vm.provision "shell", inline: <<-SHELL
         cd /vagrant
         pip3 install .
