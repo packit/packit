@@ -1,0 +1,32 @@
+---
+- name: Install dependencies for packit.
+  hosts: all
+  tasks:
+  - name: Install generic packages
+    dnf:
+      name:
+      - make
+      - git
+      - dnf-utils
+      - python3-pip
+  - name: Install test rpm dependencies
+    dnf:
+      name:
+      - python3-flexmock
+      - python3-pytest
+      - python3-pytest-cov
+      state: present
+
+  - name: Install runtime RPM deps
+    dnf:
+      name:
+        - fedpkg
+        - rpmdevtools
+        - python3-bodhi-client
+      state: present
+
+  - name: Install build RPM depoendencies
+    command: dnf -y builddep packit.spec
+
+  - name: Install pip pre-commit
+    command: pip3 install pre-commit
