@@ -40,6 +40,7 @@ def command_runner():
                 }
             )
         ),
+        local_project=flexmock(working_dir="."),
     )
 
 
