@@ -244,8 +244,8 @@ def test_package_config_not_equal(not_equal_package_config):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/foobar.spec"],
                 "actions": {
-                    "pre-sync": "some/pre-sync/command --option",
-                    "get-current-version": "get-me-version",
+                    "pre-sync": ["some/pre-sync/command --option"],
+                    "get-current-version": ["get-me-version"],
                 },
             },
             True,
@@ -255,7 +255,7 @@ def test_package_config_not_equal(not_equal_package_config):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/foobar.spec"],
                 "actions": {
-                    "pre-sync": "some/pre-sync/command --option",
+                    "pre-sync": ["some/pre-sync/command --option"],
                     "unknown-action": "nothing",
                 },
             },
@@ -407,8 +407,8 @@ def test_package_config_parse_error(raw):
             {
                 "specfile_path": "fedora/package.spec",
                 "actions": {
-                    "pre-sync": "some/pre-sync/command --option",
-                    "get-current-version": "get-me-version",
+                    "pre-sync": ["some/pre-sync/command --option"],
+                    "get-current-version": ["get-me-version"],
                 },
                 "jobs": [],
                 "something": "stupid",
@@ -419,8 +419,8 @@ def test_package_config_parse_error(raw):
             PackageConfig(
                 specfile_path="fedora/package.spec",
                 actions={
-                    ActionName.pre_sync: "some/pre-sync/command --option",
-                    ActionName.get_current_version: "get-me-version",
+                    ActionName.pre_sync: ["some/pre-sync/command --option"],
+                    ActionName.get_current_version: ["get-me-version"],
                 },
                 jobs=[],
                 upstream_project_url="https://github.com/asd/qwe",
