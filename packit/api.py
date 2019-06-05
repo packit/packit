@@ -84,7 +84,7 @@ class PackitAPI:
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
-        self.up.run_action(action=ActionName.pre_sync)
+        self.up.run_action(actions=ActionName.pre_sync)
 
         self.up.checkout_pr(pr_id=pr_id)
         self.dg.check_last_commit()
@@ -149,8 +149,7 @@ class PackitAPI:
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
-
-        self.up.run_action(action=ActionName.post_upstream_clone)
+        self.up.run_action(actions=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
         if not full_version:
@@ -169,7 +168,7 @@ class PackitAPI:
 
             self.dg.check_last_commit()
 
-            self.up.run_action(action=ActionName.pre_sync)
+            self.up.run_action(actions=ActionName.pre_sync)
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
@@ -388,7 +387,7 @@ class PackitAPI:
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: a path to the srpm
         """
-        self.up.run_action(action=ActionName.post_upstream_clone)
+        self.up.run_action(actions=ActionName.post_upstream_clone)
 
         version = upstream_ref or self.up.get_current_version()
         spec_version = self.up.get_specfile_version()

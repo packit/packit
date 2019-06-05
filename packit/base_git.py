@@ -184,7 +184,7 @@ class PackitRepositoryBase:
         # TODO: make -s configurable
         self.local_project.git_repo.git.commit(*commit_args)
 
-    def run_action(self, action: ActionName, method: Callable = None, *args, **kwargs):
+    def run_action(self, actions: ActionName, method: Callable = None, *args, **kwargs):
         """
         Run the method in the self._with_action block.
 
@@ -200,7 +200,7 @@ class PackitRepositoryBase:
         >   self._run_action(action_name="pre-sync")
         >   # This will be used as an optional hook
 
-        :param action: ActionName enum (Name of the action that can be overwritten
+        :param actions: ActionName enum (Name of the action that can be overwritten
                                                 in the package_config.actions)
         :param method: method to run if the action was not defined by user
                     (if not specified, the action can be used for custom hooks)
@@ -208,8 +208,8 @@ class PackitRepositoryBase:
         :param kwargs: kwargs for the method
         """
         if not method:
-            logger.debug(f"Running {action} hook.")
-        if self.with_action(action=action):
+            logger.debug(f"Running {actions} hook.")
+        if self.with_action(action=actions):
             if method:
                 method(*args, **kwargs)
 
@@ -243,9 +243,11 @@ class PackitRepositoryBase:
         """
         logger.debug(f"Running {action}.")
         if action in self.package_config.actions:
-            command_l = shlex.split(self.package_config.actions[action])
-            logger.info(f"Using user-defined script for {action}: {command_l}")
-            self.command_handler.run_command(command=command_l)
+            command = self.package_config.actions[action]
+            for cmd in command:
+                command_l = shlex.split(cmd)
+                logger.info(f"Using user-defined script for {action}: {command_l}")
+                self.command_handler.run_command(command=command_l)
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True

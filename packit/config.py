@@ -353,7 +353,7 @@ class PackageConfig(BaseConfig):
         dist_git_base_url: str = None,
         create_tarball_command: List[str] = None,
         current_version_command: List[str] = None,
-        actions: Dict[ActionName, str] = None,
+        actions: Dict[ActionName, List[str]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
     ):

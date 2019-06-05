@@ -19,8 +19,8 @@ def distgit_with_actions():
         package_config=flexmock(
             PackageConfig(
                 actions={
-                    ActionName.pre_sync: "command --a",
-                    ActionName.get_current_version: "command --b",
+                    ActionName.pre_sync: ["command --a"],
+                    ActionName.get_current_version: ["command --b"],
                 }
             )
         ),
@@ -34,8 +34,8 @@ def upstream_with_actions():
         package_config=flexmock(
             PackageConfig(
                 actions={
-                    ActionName.pre_sync: "command --a",
-                    ActionName.get_current_version: "command --b",
+                    ActionName.pre_sync: ["command --a"],
+                    ActionName.get_current_version: ["command --b"],
                 }
             )
         ),
@@ -57,6 +57,22 @@ def packit_repository_base():
                 ActionName.pre_sync: "command --a",
                 ActionName.get_current_version: "command --b",
             }
+            )
+        )
+
+
+
+@pytest.fixture()
+def packit_repository_base_more_actions():
+    return PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(
+            PackageConfig(
+                actions={
+                    ActionName.pre_sync: ["command --a", "command --a"],
+                    ActionName.get_current_version: ["command --b"],
+                }
+            )
         ),
     )
 
@@ -121,7 +137,7 @@ def test_run_action_hook_not_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    packit_repository_base.run_action(action=ActionName.create_patches)
+    packit_repository_base.run_action(actions=ActionName.create_patches)
 
 
 def test_run_action_not_defined(packit_repository_base):
@@ -171,6 +187,29 @@ def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object)
     packit_repository_base_with_sandcastle_object.config.actions_handler = "sandcastle"
     packit_repository_base_with_sandcastle_object.run_action(
         ActionName.pre_sync, None, "arg", "kwarg"
+    )
+
+
+def test_run_action_more_actions(packit_repository_base_more_actions):
+    flexmock(utils).should_receive("run_command").with_args(
+        cmd="command --a", cwd="my/working/dir"
+    ).times(2)
+
+    packit_repository_base_more_actions.local_project = flexmock(
+        working_dir="my/working/dir"
+    )
+
+    action_method = (
+        flexmock()
+        .should_receive("action_function")
+        .with_args("arg", kwarg="kwarg")
+        .times(0)
+        .mock()
+        .action_function
+    )
+
+    packit_repository_base_more_actions.run_action(
+        ActionName.pre_sync, action_method, "arg", kwarg="kwarg"
     )
 
 
