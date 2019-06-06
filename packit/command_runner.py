@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Type
+from typing import Dict, Type, List
 
 from packit import utils
 from packit.config import RunCommandType
@@ -27,11 +27,15 @@ class RunCommandHandler:
         self,
         local_project: LocalProject = None,
         openshift_deployer: OpenshiftDeployer = None,
+        cwd: str = None,
+        output: bool = True,
     ):
         self.local_project = local_project
         self.openshift_deployer = openshift_deployer
+        self.cwd = cwd
+        self.output = output
 
-    def run_command(self, command: str):
+    def run_command(self, command: List[str]):
         raise NotImplementedError("This should be implemented")
 
 
@@ -39,25 +43,27 @@ class RunCommandHandler:
 class CLIRunCommandHandler(RunCommandHandler):
     name = RunCommandType.cli
 
-    def run_command(self, command: str):
+    def run_command(self, command: List[str]):
         """
         Executes command in current working directory
         :param command: command to execute
         :param cwd: LocalProject directory
+        :param output: Print command output
         :return:
         """
-        return utils.run_command(cmd=command, cwd=self.local_project.working_dir)
+        return utils.run_command(cmd=command, cwd=self.cwd, output=self.output)
 
 
 @add_run_command
 class OpenShiftRunCommandHandler(RunCommandHandler):
     name = RunCommandType.openshift
 
-    def run_command(self, command: str):
+    def run_command(self, command: List[str]):
         """
         Executes command in VolumeMount directory
         :param command: command to execute
         :param cwd: Mount directory in OpenShift
+        :param output: Print command output
         :return:
         """
         return self.openshift_deployer.exec(command=command)

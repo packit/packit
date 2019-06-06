@@ -2,14 +2,14 @@ from flexmock import flexmock
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.config import PackageConfig
+from packit.config import PackageConfig, Config
 
 
 def test_get_output_from_action_defined():
     echo_cmd = "echo 'hello world'"
 
     packit_repository_base = PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(Config()),
         package_config=flexmock(PackageConfig(actions={ActionName.pre_sync: echo_cmd})),
     )
 

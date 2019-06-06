@@ -121,7 +121,11 @@ def test_run_action_not_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        ActionName.create_patches, action_method, "arg", kwarg="kwarg"
+        ActionName.create_patches,
+        action_method,
+        openshift_deployer=None,
+        arg="arg",
+        kwarg="kwarg",
     )
 
 
@@ -142,7 +146,11 @@ def test_run_action_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        ActionName.pre_sync, action_method, "arg", kwarg="kwarg"
+        ActionName.pre_sync,
+        action_method,
+        openshift_deployer=None,
+        arg="arg",
+        kwarg="kwarg",
     )
 
 
