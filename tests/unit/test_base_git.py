@@ -48,7 +48,7 @@ def upstream_with_actions():
 @pytest.fixture()
 def packit_repository_base():
     return PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
                 actions={

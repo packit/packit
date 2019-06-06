@@ -29,7 +29,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
@@ -45,6 +45,7 @@ from packit.status import Status
 from packit.sync import sync_files
 from packit.upstream import Upstream
 from packit.utils import assert_existence
+from generator.deploy_openshift_pod import OpenshiftDeployer
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,7 @@ class PackitAPI:
         self.config = config
         self.package_config = package_config
         self.upstream_local_project = upstream_local_project
+        self.openshift_deployer: Optional[OpenshiftDeployer] = None
 
         self._up = None
         self._dg = None
@@ -149,7 +151,10 @@ class PackitAPI:
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
-        self.up.run_action(action=ActionName.post_upstream_clone)
+        self.up.run_action(
+            action=ActionName.post_upstream_clone,
+            openshift_deployer=self.openshift_deployer,
+        )
 
         full_version = version or self.up.get_version()
         if not full_version:
@@ -168,7 +173,9 @@ class PackitAPI:
 
             self.dg.check_last_commit()
 
-            self.up.run_action(action=ActionName.pre_sync)
+            self.up.run_action(
+                action=ActionName.pre_sync, openshift_deployer=self.openshift_deployer
+            )
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
             # fetch and reset --hard upstream/$branch?
