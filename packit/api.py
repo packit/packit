@@ -86,7 +86,9 @@ class PackitAPI:
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
-        self.up.run_action(action=ActionName.pre_sync)
+        self.up.run_action(
+            action=ActionName.pre_sync, openshift_deployer=self.openshift_deployer
+        )
 
         self.up.checkout_pr(pr_id=pr_id)
         self.dg.check_last_commit()
