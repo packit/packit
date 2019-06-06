@@ -27,13 +27,15 @@ from typing import Optional, Callable, List, Tuple
 import git
 from rebasehelper.specfile import SpecFile
 
-from packit import utils
 from packit.actions import ActionName
-from packit.config import Config, PackageConfig
+from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
-from packit.utils import run_command, cwd
+from packit.utils import cwd
+from packit.command_runner import RUN_COMMAND_HANDLER_MAPPING
+
+from generator.deploy_openshift_pod import OpenshiftDeployer
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +166,14 @@ class PackitRepositoryBase:
         # TODO: make -s configurable
         self.local_project.git_repo.git.commit(*commit_args)
 
-    def run_action(self, action: ActionName, method: Callable = None, *args, **kwargs):
+    def run_action(
+        self,
+        action: ActionName,
+        method: Callable = None,
+        openshift_deployer: OpenshiftDeployer = None,
+        *args,
+        **kwargs,
+    ):
         """
         Run the method in the self._with_action block.
 
@@ -182,6 +191,7 @@ class PackitRepositoryBase:
 
         :param action: ActionName enum (Name of the action that can be overwritten
                                                 in the package_config.actions)
+        :param openshift_deployer: OpenshiftDeployer to execute actions in a POD.
         :param method: method to run if the action was not defined by user
                     (if not specified, the action can be used for custom hooks)
         :param args: args for the method
@@ -189,7 +199,7 @@ class PackitRepositoryBase:
         """
         if not method:
             logger.debug(f"Running {action} hook.")
-        if self.with_action(action=action):
+        if self.with_action(action=action, openshift_deployer=openshift_deployer):
             if method:
                 method(*args, **kwargs)
 
@@ -199,7 +209,9 @@ class PackitRepositoryBase:
         """
         return action in self.package_config.actions
 
-    def with_action(self, action: ActionName) -> bool:
+    def with_action(
+        self, action: ActionName, openshift_deployer: OpenshiftDeployer = None
+    ) -> bool:
         """
         If the action is defined in the self.package_config.actions,
         we run it and return False (so we can skip the if block)
@@ -219,16 +231,36 @@ class PackitRepositoryBase:
 
         :param action: ActionName enum (Name of the action that can be overwritten
                                                 in the package_config.actions)
+        :param openshift_deployer: OpenshiftDeployer to execute actions in a POD.
         :return: True, if the action is not overwritten, False when custom command was run
         """
         logger.debug(f"Running {action}.")
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            utils.run_command(cmd=command, cwd=self.local_project.working_dir)
-            return False
+            self.run_command(command)
+            return True
         logger.debug(f"Running default implementation for {action}.")
         return True
+
+    def run_command(self, command: str, openshift_deployer: OpenshiftDeployer = None):
+        logger.debug(f"Openshift is defined in packit config {self.config}")
+        select_handler = (
+            RunCommandType.openshift if self.config.openshift else RunCommandType.cli
+        )
+        logger.debug(f"Handler {select_handler}.")
+        handler_kls = RUN_COMMAND_HANDLER_MAPPING.get(select_handler, None)
+        if not handler_kls:
+            logger.warning(f"There is not handler for run_command")
+            return False
+        if select_handler == RunCommandType.openshift:
+            # TODO we need a reference to class OpenshiftDeployer
+            handler = handler_kls(openshift_deployer=openshift_deployer)
+        elif select_handler == RunCommandType.cli:
+            handler = handler_kls(local_project=self.local_project)
+        else:
+            return False
+        handler.run_command(command)
 
     def get_output_from_action(self, action: ActionName):
         """
@@ -238,7 +270,7 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            return run_command(cmd=command, output=True)
+            return self.run_command(command=command)
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
