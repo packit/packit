@@ -85,7 +85,7 @@ class Config(BaseConfig):
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
         self.dry_run: bool = False
-        self.openshift: Optional[str] = None
+        self.openshift: Optional[str] = "cli"
 
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users

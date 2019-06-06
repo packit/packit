@@ -7,6 +7,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig, Config
 from packit.distgit import DistGit
 from packit.upstream import Upstream
+from packit.command_runner import CLIRunCommandHandler
 
 
 @pytest.fixture()
@@ -89,9 +90,9 @@ def test_with_action_defined(packit_repository_base):
 
 
 def test_with_action_working_dir(packit_repository_base):
-    flexmock(utils).should_receive("run_command").with_args(
-        cmd="command --a", cwd="my/working/dir"
-    ).once()
+    flexmock(CLIRunCommandHandler).should_receive("run_command").with_args(
+        command=["command", "--a"]
+    ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
@@ -107,7 +108,7 @@ def test_run_action_hook_not_defined(packit_repository_base):
 
 
 def test_run_action_not_defined(packit_repository_base):
-    flexmock(utils).should_receive("run_command").times(0)
+    flexmock(CLIRunCommandHandler).should_receive("run_command").times(0)
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
@@ -119,16 +120,15 @@ def test_run_action_not_defined(packit_repository_base):
         .mock()
         .action_function
     )
-
     packit_repository_base.run_action(
-        ActionName.create_patches, action_method, "arg", "kwarg"
+        ActionName.create_patches, action_method, None, "arg", kwarg="kwarg"
     )
 
 
 def test_run_action_defined(packit_repository_base):
-    flexmock(utils).should_receive("run_command").with_args(
-        cmd="command --a", cwd="my/working/dir"
-    ).once()
+    flexmock(CLIRunCommandHandler).should_receive("run_command").with_args(
+        command=["command", "--a"]
+    ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
@@ -142,12 +142,12 @@ def test_run_action_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        ActionName.pre_sync, action_method, "arg", "kwarg"
+        ActionName.pre_sync, action_method, None, "arg", "kwarg"
     )
 
 
 def test_get_output_from_action_not_defined(packit_repository_base):
-    flexmock(utils).should_receive("run_command").times(0)
+    flexmock(CLIRunCommandHandler).should_receive("run_command").times(0)
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
