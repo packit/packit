@@ -238,20 +238,24 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            self.run_command([command])
-            return True
+            self.run_handler_command([command], openshift_deployer=openshift_deployer)
+            return False
         logger.debug(f"Running default implementation for {action}.")
         return True
 
-    def run_command(
+    def run_handler_command(
         self,
         command: List[str],
         openshift_deployer: OpenshiftDeployer = None,
         output: bool = True,
     ):
-        logger.debug(f"Openshift is defined in packit config {self.config}")
+        logger.debug(
+            f"RunCommandType in packit config 'openshift|cli': {self.config.openshift}"
+        )
         select_handler = (
-            RunCommandType.openshift if self.config.openshift else RunCommandType.cli
+            RunCommandType.openshift
+            if self.config.openshift == RunCommandType.openshift
+            else RunCommandType.cli
         )
         logger.debug(f"Handler {select_handler}.")
         handler_kls = RUN_COMMAND_HANDLER_MAPPING.get(select_handler, None)
@@ -279,7 +283,7 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            return self.run_command(command=[command])
+            return self.run_handler_command(command=[command])
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
