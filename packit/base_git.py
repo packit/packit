@@ -238,12 +238,17 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            self.run_command(command)
+            self.run_command([command])
             return True
         logger.debug(f"Running default implementation for {action}.")
         return True
 
-    def run_command(self, command: str, openshift_deployer: OpenshiftDeployer = None):
+    def run_command(
+        self,
+        command: List[str],
+        openshift_deployer: OpenshiftDeployer = None,
+        output: bool = True,
+    ):
         logger.debug(f"Openshift is defined in packit config {self.config}")
         select_handler = (
             RunCommandType.openshift if self.config.openshift else RunCommandType.cli
@@ -257,10 +262,14 @@ class PackitRepositoryBase:
             # TODO we need a reference to class OpenshiftDeployer
             handler = handler_kls(openshift_deployer=openshift_deployer)
         elif select_handler == RunCommandType.cli:
-            handler = handler_kls(local_project=self.local_project)
+            handler = handler_kls(
+                local_project=self.local_project,
+                cwd=self.local_project.working_dir,
+                output=output,
+            )
         else:
             return False
-        handler.run_command(command)
+        handler.run_command(command=command)
 
     def get_output_from_action(self, action: ActionName):
         """
@@ -270,7 +279,7 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            return self.run_command(command=command)
+            return self.run_command(command=[command])
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
