@@ -21,6 +21,7 @@
 # SOFTWARE.
 import inspect
 import logging
+import shlex
 from pathlib import Path
 from typing import Optional, Callable, List, Tuple
 
@@ -238,42 +239,32 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            self.run_handler_command([command], openshift_deployer=openshift_deployer)
+            self.run_handler_command(
+                command=command, openshift_deployer=openshift_deployer
+            )
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True
 
     def run_handler_command(
-        self,
-        command: List[str],
-        openshift_deployer: OpenshiftDeployer = None,
-        output: bool = True,
+        self, command, openshift_deployer: OpenshiftDeployer = None, output: bool = True
     ):
         logger.debug(
             f"RunCommandType in packit config 'openshift|cli': {self.config.openshift}"
         )
-        select_handler = (
-            RunCommandType.openshift
-            if self.config.openshift == RunCommandType.openshift
-            else RunCommandType.cli
-        )
-        logger.debug(f"Handler {select_handler}.")
-        handler_kls = RUN_COMMAND_HANDLER_MAPPING.get(select_handler, None)
-        if not handler_kls:
-            logger.warning(f"There is not handler for run_command")
-            return False
-        if select_handler == RunCommandType.openshift:
-            # TODO we need a reference to class OpenshiftDeployer
-            handler = handler_kls(openshift_deployer=openshift_deployer)
-        elif select_handler == RunCommandType.cli:
+        select_handler = RunCommandType[self.config.openshift]
+        handler_kls = RUN_COMMAND_HANDLER_MAPPING[select_handler]
+        if not handler_kls or select_handler == RunCommandType.cli:
             handler = handler_kls(
                 local_project=self.local_project,
                 cwd=self.local_project.working_dir,
                 output=output,
             )
         else:
-            return False
-        handler.run_command(command=command)
+            handler = handler_kls(openshift_deployer=openshift_deployer)
+        if not isinstance(command, list):
+            command = shlex.split(command)
+        return handler.run_command(command=command)
 
     def get_output_from_action(self, action: ActionName):
         """
@@ -283,7 +274,7 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            return self.run_handler_command(command=[command])
+            return self.run_handler_command(command=command)
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
