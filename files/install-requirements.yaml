@@ -8,6 +8,7 @@
       - make
       - git
       - dnf-utils
+      - gcc
       - python3-pip
   - name: Install test rpm dependencies
     dnf:
@@ -15,6 +16,9 @@
       - python3-flexmock
       - python3-pytest
       - python3-pytest-cov
+      # These are needed for pip3 install .
+      - python3-devel
+      - krb5-devel
       state: present
 
   - name: Install runtime RPM deps
@@ -25,8 +29,10 @@
         - python3-bodhi-client
       state: present
 
-  - name: Install build RPM depoendencies
-    command: dnf -y builddep packit.spec
+  - name: Install packit-service sandbox for using run_command
+    pip:
+      name: git+https://github.com/packit-service/generator
+      executable: pip3
 
   - name: Install pip pre-commit
     command: pip3 install pre-commit
