@@ -250,9 +250,9 @@ class PackitRepositoryBase:
         self, command, openshift_deployer: OpenshiftDeployer = None, output: bool = True
     ):
         logger.debug(
-            f"RunCommandType in packit config 'openshift|cli': {self.config.openshift}"
+            f"RunCommandType in packit config 'openshift|cli': {self.config.actions_environment}"
         )
-        select_handler = RunCommandType[self.config.openshift]
+        select_handler = RunCommandType[self.config.actions_environment]
         handler_kls = RUN_COMMAND_HANDLER_MAPPING[select_handler]
         if not handler_kls or select_handler == RunCommandType.cli:
             handler = handler_kls(
