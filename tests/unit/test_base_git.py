@@ -91,7 +91,7 @@ def test_with_action_defined(packit_repository_base):
 
 def test_with_action_working_dir(packit_repository_base):
     flexmock(CLIRunCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"]
+        command=["command", "--a"], openshift_deployer=None
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -127,7 +127,7 @@ def test_run_action_not_defined(packit_repository_base):
 
 def test_run_action_defined(packit_repository_base):
     flexmock(CLIRunCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"]
+        command=["command", "--a"], openshift_deployer=None
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")

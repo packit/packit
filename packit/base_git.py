@@ -36,7 +36,6 @@ from packit.security import CommitVerifier
 from packit.utils import cwd
 from packit.command_runner import RUN_COMMAND_HANDLER_MAPPING
 
-from generator.deploy_openshift_pod import OpenshiftDeployer
 
 logger = logging.getLogger(__name__)
 
@@ -171,7 +170,7 @@ class PackitRepositoryBase:
         self,
         action: ActionName,
         method: Callable = None,
-        openshift_deployer: OpenshiftDeployer = None,
+        openshift_deployer=None,
         *args,
         **kwargs,
     ):
@@ -210,9 +209,7 @@ class PackitRepositoryBase:
         """
         return action in self.package_config.actions
 
-    def with_action(
-        self, action: ActionName, openshift_deployer: OpenshiftDeployer = None
-    ) -> bool:
+    def with_action(self, action: ActionName, openshift_deployer=None) -> bool:
         """
         If the action is defined in the self.package_config.actions,
         we run it and return False (so we can skip the if block)
@@ -246,9 +243,14 @@ class PackitRepositoryBase:
         logger.debug(f"Running default implementation for {action}.")
         return True
 
-    def run_handler_command(
-        self, command, openshift_deployer: OpenshiftDeployer = None, output: bool = True
-    ):
+    def run_handler_command(self, command, openshift_deployer=None, output=True):
+        """
+        Run command in a handler.
+        :param command: Command to run in CLI or in Openshift POD
+        :param openshift_deployer: reference to Openshift POD class
+        :param output: return a stdout
+        :return:
+        """
         logger.debug(
             f"RunCommandType in packit config 'openshift|cli': {self.config.actions_environment}"
         )
@@ -261,12 +263,14 @@ class PackitRepositoryBase:
                 output=output,
             )
         else:
-            handler = handler_kls(openshift_deployer=openshift_deployer)
+            handler = handler_kls()
         if not isinstance(command, list):
             command = shlex.split(command)
-        return handler.run_command(command=command)
+        return handler.run_command(
+            command=command, openshift_deployer=openshift_deployer
+        )
 
-    def get_output_from_action(self, action: ActionName):
+    def get_output_from_action(self, action: ActionName, openshift_deployer=None):
         """
         Run action if specified in the self.actions and return output
         else return None
@@ -274,7 +278,9 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            return self.run_handler_command(command=command)
+            return self.run_handler_command(
+                command=command, openshift_deployer=openshift_deployer
+            )
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:

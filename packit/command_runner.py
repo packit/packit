@@ -4,7 +4,6 @@ from typing import Dict, Type, List
 from packit import utils
 from packit.config import RunCommandType
 from packit.local_project import LocalProject
-from generator.deploy_openshift_pod import OpenshiftDeployer
 
 
 logger = logging.getLogger(__name__)
@@ -24,18 +23,13 @@ class RunCommandHandler:
     name: RunCommandType
 
     def __init__(
-        self,
-        local_project: LocalProject = None,
-        openshift_deployer: OpenshiftDeployer = None,
-        cwd: str = None,
-        output: bool = True,
+        self, local_project: LocalProject = None, cwd: str = None, output: bool = True
     ):
         self.local_project = local_project
-        self.openshift_deployer = openshift_deployer
         self.cwd = cwd
         self.output = output
 
-    def run_command(self, command: List[str]):
+    def run_command(self, command: List[str], openshift_deployer=None):
         raise NotImplementedError("This should be implemented")
 
 
@@ -43,12 +37,12 @@ class RunCommandHandler:
 class CLIRunCommandHandler(RunCommandHandler):
     name = RunCommandType.cli
 
-    def run_command(self, command: List[str]):
+    def run_command(self, command: List[str], openshift_deployer=None):
         """
         Executes command in current working directory
         :param command: command to execute
-        :param cwd: LocalProject directory
-        :param output: Print command output
+        :param openshift_deployer: reference to Openshift Deployer class.
+        This is not valid for this use case
         :return:
         """
         return utils.run_command(cmd=command, cwd=self.cwd, output=self.output)
@@ -58,7 +52,11 @@ class CLIRunCommandHandler(RunCommandHandler):
 class OpenShiftRunCommandHandler(RunCommandHandler):
     name = RunCommandType.openshift
 
-    def run_command(self, command: List[str]):
+    from generator.deploy_openshift_pod import OpenshiftDeployer
+
+    def run_command(
+        self, command: List[str], openshift_deployer: OpenshiftDeployer = None
+    ):
         """
         Executes command in VolumeMount directory
         :param command: command to execute
@@ -66,4 +64,4 @@ class OpenShiftRunCommandHandler(RunCommandHandler):
         :param output: Print command output
         :return:
         """
-        return self.openshift_deployer.exec(command=command)
+        return openshift_deployer.exec(command=command)
