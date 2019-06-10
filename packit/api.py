@@ -29,7 +29,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
@@ -45,7 +45,6 @@ from packit.status import Status
 from packit.sync import sync_files
 from packit.upstream import Upstream
 from packit.utils import assert_existence
-from generator.deploy_openshift_pod import OpenshiftDeployer
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +59,6 @@ class PackitAPI:
         self.config = config
         self.package_config = package_config
         self.upstream_local_project = upstream_local_project
-        self.openshift_deployer: Optional[OpenshiftDeployer] = None
 
         self._up = None
         self._dg = None
@@ -81,13 +79,19 @@ class PackitAPI:
             self._dg = DistGit(config=self.config, package_config=self.package_config)
         return self._dg
 
-    def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
+    def sync_pr(
+        self,
+        pr_id,
+        dist_git_branch: str,
+        upstream_version: str = None,
+        openshift_deployer=None,
+    ):
         assert_existence(self.dg.local_project)
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
         self.up.run_action(
-            action=ActionName.pre_sync, openshift_deployer=self.openshift_deployer
+            action=ActionName.pre_sync, openshift_deployer=openshift_deployer
         )
 
         self.up.checkout_pr(pr_id=pr_id)
@@ -141,6 +145,7 @@ class PackitAPI:
         version: str = None,
         force_new_sources=False,
         upstream_ref: str = None,
+        openshift_deployer=None,
     ):
         """
         Update given package in Fedora
@@ -154,8 +159,7 @@ class PackitAPI:
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
         self.up.run_action(
-            action=ActionName.post_upstream_clone,
-            openshift_deployer=self.openshift_deployer,
+            action=ActionName.post_upstream_clone, openshift_deployer=openshift_deployer
         )
 
         full_version = version or self.up.get_version()
@@ -176,7 +180,7 @@ class PackitAPI:
             self.dg.check_last_commit()
 
             self.up.run_action(
-                action=ActionName.pre_sync, openshift_deployer=self.openshift_deployer
+                action=ActionName.pre_sync, openshift_deployer=openshift_deployer
             )
 
             local_pr_branch = f"{full_version}-{dist_git_branch}-update"
