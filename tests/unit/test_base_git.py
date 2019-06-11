@@ -7,7 +7,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig, Config
 from packit.distgit import DistGit
 from packit.upstream import Upstream
-from packit.command_runner import CLIRunCommandHandler
+from packit.command_runner import LocalRunCommandHandler, SandcastleRunCommandHandler
 
 
 @pytest.fixture()
@@ -58,6 +58,23 @@ def packit_repository_base():
                 }
             )
         ),
+        sandcastle_object=None,
+    )
+
+
+@pytest.fixture()
+def packit_repository_base_with_sandcastle_object():
+    return PackitRepositoryBase(
+        config=flexmock(Config()),
+        package_config=flexmock(
+            PackageConfig(
+                actions={
+                    ActionName.pre_sync: "command --a",
+                    ActionName.get_current_version: "command --b",
+                }
+            )
+        ),
+        sandcastle_object=flexmock(),
     )
 
 
@@ -90,8 +107,8 @@ def test_with_action_defined(packit_repository_base):
 
 
 def test_with_action_working_dir(packit_repository_base):
-    flexmock(CLIRunCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], openshift_deployer=None
+    flexmock(LocalRunCommandHandler).should_receive("run_command").with_args(
+        command=["command", "--a"]
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -108,7 +125,7 @@ def test_run_action_hook_not_defined(packit_repository_base):
 
 
 def test_run_action_not_defined(packit_repository_base):
-    flexmock(CLIRunCommandHandler).should_receive("run_command").times(0)
+    flexmock(LocalRunCommandHandler).should_receive("run_command").times(0)
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
@@ -121,13 +138,13 @@ def test_run_action_not_defined(packit_repository_base):
         .action_function
     )
     packit_repository_base.run_action(
-        ActionName.create_patches, action_method, None, "arg", kwarg="kwarg"
+        ActionName.create_patches, action_method, "arg", kwarg="kwarg"
     )
 
 
 def test_run_action_defined(packit_repository_base):
-    flexmock(CLIRunCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], openshift_deployer=None
+    flexmock(LocalRunCommandHandler).should_receive("run_command").with_args(
+        command=["command", "--a"]
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -142,12 +159,24 @@ def test_run_action_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        ActionName.pre_sync, action_method, None, "arg", "kwarg"
+        ActionName.pre_sync, action_method, "arg", "kwarg"
+    )
+
+
+def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object):
+    flexmock(SandcastleRunCommandHandler).should_receive("run_command").with_args(
+        command=["command", "--a"]
+    ).and_return("command --a").once()
+    packit_repository_base_with_sandcastle_object.config.actions_environment = (
+        "sandcastle"
+    )
+    packit_repository_base_with_sandcastle_object.run_action(
+        ActionName.pre_sync, None, "arg", "kwarg"
     )
 
 
 def test_get_output_from_action_not_defined(packit_repository_base):
-    flexmock(CLIRunCommandHandler).should_receive("run_command").times(0)
+    flexmock(LocalRunCommandHandler).should_receive("run_command").times(0)
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
