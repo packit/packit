@@ -23,45 +23,49 @@ class RunCommandHandler:
     name: RunCommandType
 
     def __init__(
-        self, local_project: LocalProject = None, cwd: str = None, output: bool = True
+        self,
+        local_project: LocalProject = None,
+        cwd: str = None,
+        output: bool = True,
+        sandcastle_object=None,
     ):
         self.local_project = local_project
         self.cwd = cwd
         self.output = output
+        self.sandcastle_object = sandcastle_object
 
-    def run_command(self, command: List[str], openshift_deployer=None):
+    def run_command(self, command: List[str]):
         raise NotImplementedError("This should be implemented")
 
 
 @add_run_command
-class CLIRunCommandHandler(RunCommandHandler):
-    name = RunCommandType.cli
+class LocalRunCommandHandler(RunCommandHandler):
+    name = RunCommandType.local
 
-    def run_command(self, command: List[str], openshift_deployer=None):
+    def run_command(self, command: List[str]):
         """
         Executes command in current working directory
         :param command: command to execute
-        :param openshift_deployer: reference to Openshift Deployer class.
         This is not valid for this use case
-        :return:
+        :return: Output of command
         """
         return utils.run_command(cmd=command, cwd=self.cwd, output=self.output)
 
 
 @add_run_command
-class OpenShiftRunCommandHandler(RunCommandHandler):
-    name = RunCommandType.openshift
+class SandcastleRunCommandHandler(RunCommandHandler):
+    name = RunCommandType.sandcastle
 
+    # TODO rename it to
+    # from sandcastle.api import Sandcastle
+    # as https://github.com/packit-service/sandcastle/pull/9
+    # is merged
     from generator.deploy_openshift_pod import OpenshiftDeployer
 
-    def run_command(
-        self, command: List[str], openshift_deployer: OpenshiftDeployer = None
-    ):
+    def run_command(self, command: List[str]):
         """
         Executes command in VolumeMount directory
         :param command: command to execute
-        :param cwd: Mount directory in OpenShift
-        :param output: Print command output
-        :return:
+        :return: Output of command from sandcastle_object
         """
-        return openshift_deployer.exec(command=command)
+        return self.sandcastle_object.exec(command=command)
