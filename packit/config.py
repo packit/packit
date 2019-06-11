@@ -85,7 +85,7 @@ class Config(BaseConfig):
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
         self.dry_run: bool = False
-        self.actions_environment: Optional[str] = "cli"
+        self.actions_environment: Optional[str] = "local"
 
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users
@@ -131,7 +131,7 @@ class Config(BaseConfig):
         config.github_app_id = raw_dict.get("github_app_id", "")
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
         config.webhook_secret = raw_dict.get("webhook_secret", "")
-        config.actions_environment = raw_dict.get("openshift", "cli")
+        config.actions_environment = raw_dict.get("actions_handler", "local")
 
         return config
 
@@ -178,8 +178,8 @@ def get_context_settings() -> dict:
 
 
 class RunCommandType(Enum):
-    openshift = "openshift"
-    cli = "cli"
+    sandcastle = "sandcastle"
+    local = "local"
 
 
 class JobType(Enum):
