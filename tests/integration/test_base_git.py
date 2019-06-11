@@ -1,3 +1,4 @@
+import pytest
 from flexmock import flexmock
 
 from packit.actions import ActionName
@@ -43,3 +44,22 @@ def test_get_output_from_action_defined_in_sandcastle_object():
     flexmock(OpenshiftDeployer).should_receive("exec").and_return(echo_cmd)
     result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
     assert result == "hello world"
+
+
+@pytest.mark.skip(
+    reason="Skipping since we don't have an OpenShift cluster by default."
+)
+def test_run_in_sandbox():
+    packit_repository_base = PackitRepositoryBase(
+        config=Config(),
+        package_config=PackageConfig(actions={ActionName.pre_sync: "ls -lha"}),
+        sandcastle_object=OpenshiftDeployer(
+            image_reference="docker.io/usercont/sandcastle",
+            k8s_namespace_name="myproject",
+        ),
+    )
+    packit_repository_base.config.actions_environment = "sandcastle"
+
+    result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
+    assert "total 4.0K" in result
+    assert "drwxr-xr-x. 1 root root" in result
