@@ -68,4 +68,6 @@ class SandcastleRunCommandHandler(RunCommandHandler):
         :param command: command to execute
         :return: Output of command from sandcastle_object
         """
+        if not self.sandcastle_object.is_pod_already_deployed():
+            self.sandcastle_object.run()
         return self.sandcastle_object.exec(command=command)

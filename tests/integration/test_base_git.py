@@ -28,6 +28,9 @@ def test_get_output_from_action_defined():
 def test_get_output_from_action_defined_in_sandcastle_object():
     echo_cmd = "hello world"
     flexmock(OpenshiftDeployer).should_receive("get_api_client").and_return("something")
+    flexmock(OpenshiftDeployer).should_receive("is_pod_already_deployed").and_return(
+        True
+    )
     packit_repository_base = PackitRepositoryBase(
         config=flexmock(Config()),
         package_config=flexmock(PackageConfig(actions={ActionName.pre_sync: echo_cmd})),
