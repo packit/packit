@@ -8,7 +8,6 @@
       - make
       - git
       - dnf-utils
-      - gcc
       - python3-pip
   - name: Install test rpm dependencies
     dnf:
@@ -31,7 +30,7 @@
 
   - name: Install packit-service sandcastle for using run_command
     pip:
-      name: git+https://github.com/packit-service/generator
+      name: git+https://github.com/packit-service/sandcastle
       executable: pip3
 
   - name: Install pip pre-commit
