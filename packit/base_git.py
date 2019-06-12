@@ -261,7 +261,6 @@ class PackitRepositoryBase:
             )
         else:
             handler = handler_kls(sandcastle_object=self.sandcastle_object)
-        logger.debug(handler)
         if not isinstance(command, list):
             command = shlex.split(command)
         return handler.run_command(command=command)
