@@ -56,6 +56,12 @@ class Upstream(PackitRepositoryBase):
         local_project: LocalProject,
         sandcastle_object=None,
     ):
+        """
+        sandcastle_object is an object to Sandcastle.
+        https://github.com/packit-service/sandcastle
+        from sandcastle.api import Sandcastle
+        The object handles OpenShift PODs like create, delete, exec command in a POD etc.
+        """
         super().__init__(
             config=config,
             package_config=package_config,
