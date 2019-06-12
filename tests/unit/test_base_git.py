@@ -167,9 +167,7 @@ def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object)
     flexmock(SandcastleRunCommandHandler).should_receive("run_command").with_args(
         command=["command", "--a"]
     ).and_return("command --a").once()
-    packit_repository_base_with_sandcastle_object.config.actions_environment = (
-        "sandcastle"
-    )
+    packit_repository_base_with_sandcastle_object.config.actions_handler = "sandcastle"
     packit_repository_base_with_sandcastle_object.run_action(
         ActionName.pre_sync, None, "arg", "kwarg"
     )

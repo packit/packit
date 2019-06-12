@@ -39,7 +39,7 @@ def test_get_output_from_action_defined_in_sandcastle_object():
             image_reference="fooimage", k8s_namespace_name="default"
         ),
     )
-    packit_repository_base.config.actions_environment = "sandcastle"
+    packit_repository_base.config.actions_handler = "sandcastle"
 
     flexmock(OpenshiftDeployer).should_receive("exec").and_return(echo_cmd)
     result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
@@ -58,7 +58,7 @@ def test_run_in_sandbox():
             k8s_namespace_name="myproject",
         ),
     )
-    packit_repository_base.config.actions_environment = "sandcastle"
+    packit_repository_base.config.actions_handler = "sandcastle"
 
     result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
     assert "total 4.0K" in result
