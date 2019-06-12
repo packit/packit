@@ -249,9 +249,9 @@ class PackitRepositoryBase:
         :return:
         """
         logger.debug(
-            f"'actions_handler' defined in 'packit.yaml' is '{self.config.actions_environment}'"
+            f"'actions_handler' defined in 'packit.yaml' is '{self.config.actions_handler}'"
         )
-        select_handler = RunCommandType[self.config.actions_environment]
+        select_handler = RunCommandType[self.config.actions_handler]
         handler_kls = RUN_COMMAND_HANDLER_MAPPING[select_handler]
         if not handler_kls or select_handler == RunCommandType.local:
             handler = handler_kls(
