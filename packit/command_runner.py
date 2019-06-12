@@ -56,11 +56,7 @@ class LocalRunCommandHandler(RunCommandHandler):
 class SandcastleRunCommandHandler(RunCommandHandler):
     name = RunCommandType.sandcastle
 
-    # TODO rename it to
-    # from sandcastle.api import Sandcastle
-    # as https://github.com/packit-service/sandcastle/pull/9
-    # is merged
-    from generator.deploy_openshift_pod import OpenshiftDeployer
+    from sandcastle.api import Sandcastle
 
     def run_command(self, command: List[str]):
         """

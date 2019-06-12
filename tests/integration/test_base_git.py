@@ -5,11 +5,7 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig, Config
 
-# TODO rename it to
-# from sandcastle.api import Sandcastle
-# as https://github.com/packit-service/sandcastle/pull/9
-# is merged
-from generator.deploy_openshift_pod import OpenshiftDeployer
+from sandcastle.api import Sandcastle
 
 
 def test_get_output_from_action_defined():
@@ -28,20 +24,18 @@ def test_get_output_from_action_defined():
 
 def test_get_output_from_action_defined_in_sandcastle_object():
     echo_cmd = "hello world"
-    flexmock(OpenshiftDeployer).should_receive("get_api_client").and_return("something")
-    flexmock(OpenshiftDeployer).should_receive("is_pod_already_deployed").and_return(
-        True
-    )
+    flexmock(Sandcastle).should_receive("get_api_client").and_return("something")
+    flexmock(Sandcastle).should_receive("is_pod_already_deployed").and_return(True)
     packit_repository_base = PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd}),
-        sandcastle_object=OpenshiftDeployer(
+        sandcastle_object=Sandcastle(
             image_reference="fooimage", k8s_namespace_name="default"
         ),
     )
     packit_repository_base.config.actions_handler = "sandcastle"
 
-    flexmock(OpenshiftDeployer).should_receive("exec").and_return(echo_cmd)
+    flexmock(Sandcastle).should_receive("exec").and_return(echo_cmd)
     result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
     assert result == "hello world"
 
@@ -53,7 +47,7 @@ def test_run_in_sandbox():
     packit_repository_base = PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(actions={ActionName.pre_sync: "ls -lha"}),
-        sandcastle_object=OpenshiftDeployer(
+        sandcastle_object=Sandcastle(
             image_reference="docker.io/usercont/sandcastle",
             k8s_namespace_name="myproject",
         ),
