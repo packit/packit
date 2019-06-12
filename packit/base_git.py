@@ -47,6 +47,12 @@ class PackitRepositoryBase:
     def __init__(
         self, config: Config, package_config: PackageConfig, sandcastle_object=None
     ) -> None:
+        """
+        sandcastle_object is an object to Sandcastle.
+        https://github.com/packit-service/sandcastle
+        from sandcastle.api import Sandcastle
+        The object handles OpenShift PODs like create, delete, exec command in a POD etc.
+        """
         self.config = config
         self.package_config = package_config
         self._specfile_path: Optional[str] = None

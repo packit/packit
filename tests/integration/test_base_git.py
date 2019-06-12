@@ -33,8 +33,8 @@ def test_get_output_from_action_defined_in_sandcastle_object():
         True
     )
     packit_repository_base = PackitRepositoryBase(
-        config=flexmock(Config()),
-        package_config=flexmock(PackageConfig(actions={ActionName.pre_sync: echo_cmd})),
+        config=Config(),
+        package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd}),
         sandcastle_object=OpenshiftDeployer(
             image_reference="fooimage", k8s_namespace_name="default"
         ),
