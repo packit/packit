@@ -19,8 +19,8 @@ def distgit_with_actions():
         package_config=flexmock(
             PackageConfig(
                 actions={
-                    ActionName.pre_sync: ["command --a"],
-                    ActionName.get_current_version: ["command --b"],
+                    ActionName.pre_sync: "command --a",
+                    ActionName.get_current_version: "command --b",
                 }
             )
         ),
@@ -34,8 +34,8 @@ def upstream_with_actions():
         package_config=flexmock(
             PackageConfig(
                 actions={
-                    ActionName.pre_sync: ["command --a"],
-                    ActionName.get_current_version: ["command --b"],
+                    ActionName.pre_sync: "command --a",
+                    ActionName.get_current_version: "command --b",
                 }
             )
         ),
@@ -57,8 +57,9 @@ def packit_repository_base():
                 ActionName.pre_sync: "command --a",
                 ActionName.get_current_version: "command --b",
             }
+
             )
-        )
+    )
 
 
 
@@ -70,7 +71,7 @@ def packit_repository_base_more_actions():
             PackageConfig(
                 actions={
                     ActionName.pre_sync: ["command --a", "command --a"],
-                    ActionName.get_current_version: ["command --b"],
+                    ActionName.get_current_version: "command --b",
                 }
             )
         ),
