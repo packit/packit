@@ -244,6 +244,11 @@ class PackitRepositoryBase:
         logger.debug(f"Running {action}.")
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
+            if isinstance(command, str):
+                commands = [command]
+            else:
+                commands = command
+            logger.debug(commands)
             for cmd in command:
                 command_l = shlex.split(cmd)
                 logger.info(f"Using user-defined script for {action}: {command_l}")
