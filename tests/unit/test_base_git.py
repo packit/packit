@@ -66,7 +66,7 @@ def packit_repository_base():
 @pytest.fixture()
 def packit_repository_base_more_actions():
     return PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
                 actions={
@@ -192,9 +192,7 @@ def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object)
 
 
 def test_run_action_more_actions(packit_repository_base_more_actions):
-    flexmock(utils).should_receive("run_command").with_args(
-        cmd="command --a", cwd="my/working/dir"
-    ).times(2)
+    flexmock(LocalRunCommandHandler).should_receive("run_command").times(2)
 
     packit_repository_base_more_actions.local_project = flexmock(
         working_dir="my/working/dir"
@@ -208,7 +206,6 @@ def test_run_action_more_actions(packit_repository_base_more_actions):
         .mock()
         .action_function
     )
-
     packit_repository_base_more_actions.run_action(
         ActionName.pre_sync, action_method, "arg", kwarg="kwarg"
     )
