@@ -21,19 +21,21 @@
 # SOFTWARE.
 import inspect
 import logging
+import shlex
 from pathlib import Path
 from typing import Optional, Callable, List, Tuple
 
 import git
 from rebasehelper.specfile import SpecFile
 
-from packit import utils
 from packit.actions import ActionName
-from packit.config import Config, PackageConfig
+from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
-from packit.utils import run_command, cwd
+from packit.utils import cwd
+from packit.command_runner import RUN_COMMAND_HANDLER_MAPPING
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,12 +44,21 @@ class PackitRepositoryBase:
     # mypy complains when this is a property
     local_project: LocalProject
 
-    def __init__(self, config: Config, package_config: PackageConfig) -> None:
+    def __init__(
+        self, config: Config, package_config: PackageConfig, sandcastle_object=None
+    ) -> None:
+        """
+        sandcastle_object is an object to Sandcastle.
+        https://github.com/packit-service/sandcastle
+        from sandcastle.api import Sandcastle
+        The object handles OpenShift PODs like create, delete, exec command in a POD etc.
+        """
         self.config = config
         self.package_config = package_config
         self._specfile_path: Optional[str] = None
         self._specfile: Optional[SpecFile] = None
         self.allowed_gpg_keys: Optional[List[str]] = None
+        self.sandcastle_object = sandcastle_object
 
     @property
     def specfile_dir(self) -> str:
@@ -225,10 +236,34 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            utils.run_command(cmd=command, cwd=self.local_project.working_dir)
+            self.run_handler_command(command=command)
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True
+
+    def run_handler_command(self, command, output=True):
+        """
+        Run command in a handler.
+        :param command: Command to run in CLI or in Openshift POD
+        :param output: return a stdout
+        :return:
+        """
+        logger.debug(
+            f"'actions_handler' defined in 'packit.yaml' is '{self.config.actions_handler}'"
+        )
+        select_handler = RunCommandType[self.config.actions_handler]
+        handler_kls = RUN_COMMAND_HANDLER_MAPPING[select_handler]
+        if not handler_kls or select_handler == RunCommandType.local:
+            handler = handler_kls(
+                local_project=self.local_project,
+                cwd=self.local_project.working_dir,
+                output=output,
+            )
+        else:
+            handler = handler_kls(sandcastle_object=self.sandcastle_object)
+        if not isinstance(command, list):
+            command = shlex.split(command)
+        return handler.run_command(command=command)
 
     def get_output_from_action(self, action: ActionName):
         """
@@ -238,7 +273,7 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command = self.package_config.actions[action]
             logger.info(f"Using user-defined script for {action}: {command}")
-            return run_command(cmd=command, output=True)
+            return self.run_handler_command(command=command)
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:

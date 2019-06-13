@@ -70,7 +70,7 @@ def test_cover_packit_exception_decorator_exit_code_keyboard_interrupt():
 
 
 def test_cover_packit_exception_decorator_exit_code_other_exception():
-    flexmock(sys).should_receive("exit").with_args(3)
+    flexmock(sys).should_receive("exit").with_args(4)
 
     class CustomException(Exception):
         pass
@@ -126,7 +126,7 @@ def test_cover_packit_exception_decorator_config_debug_true():
 
 
 def test_cover_packit_exception_decorator_other_exception():
-    flexmock(sys).should_receive("exit").with_args(3)
+    flexmock(sys).should_receive("exit").with_args(4)
 
     class CustomException(Exception):
         pass

@@ -25,8 +25,13 @@
         - python3-bodhi-client
       state: present
 
-  - name: Install build RPM depoendencies
+  - name: Install build RPM dependencies
     command: dnf -y builddep packit.spec
+
+  - name: Install packit-service sandcastle for using run_command
+    pip:
+      name: git+https://github.com/packit-service/sandcastle
+      executable: pip3
 
   - name: Install pip pre-commit
     command: pip3 install pre-commit

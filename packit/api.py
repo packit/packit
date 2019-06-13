@@ -55,10 +55,12 @@ class PackitAPI:
         config: Config,
         package_config: PackageConfig,
         upstream_local_project: LocalProject,
+        sandcastle=None,
     ) -> None:
         self.config = config
         self.package_config = package_config
         self.upstream_local_project = upstream_local_project
+        self.sandcastle = sandcastle
 
         self._up = None
         self._dg = None
@@ -70,6 +72,7 @@ class PackitAPI:
                 config=self.config,
                 package_config=self.package_config,
                 local_project=self.upstream_local_project,
+                sandcastle_object=self.sandcastle,
             )
         return self._up
 
