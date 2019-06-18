@@ -570,3 +570,8 @@ class PackitAPI:
                 report_func("error", "Build watch timeout")
                 return state_reported
             time.sleep(10)
+
+    def clean(self):
+        """ clean up stuff once all the work is done """
+        if self._up:
+            self.up.command_handler.clean()
