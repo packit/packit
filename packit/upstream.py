@@ -50,26 +50,17 @@ class Upstream(PackitRepositoryBase):
     """ interact with upstream project """
 
     def __init__(
-        self,
-        config: Config,
-        package_config: PackageConfig,
-        local_project: LocalProject,
-        sandcastle_object=None,
+        self, config: Config, package_config: PackageConfig, local_project: LocalProject
     ):
         """
-        sandcastle_object is an object to Sandcastle.
-        https://github.com/packit-service/sandcastle
-        from sandcastle.api import Sandcastle
-        The object handles OpenShift PODs like create, delete, exec command in a POD etc.
+        :param config: global configuration
+        :param package_config: configuration of the upstream project
+        :param local_project: public offender
         """
-        super().__init__(
-            config=config,
-            package_config=package_config,
-            sandcastle_object=sandcastle_object,
-        )
+        self.local_project = local_project
+        super().__init__(config=config, package_config=package_config)
         self.config = config
         self.package_config = package_config
-        self.local_project = local_project
 
         self.package_name: Optional[str] = self.package_config.downstream_package_name
 
@@ -369,10 +360,8 @@ class Upstream(PackitRepositoryBase):
         if action_output:
             return action_output
 
-        ver = run_command(
-            self.package_config.current_version_command,
-            output=True,
-            cwd=self.local_project.working_dir,
+        ver = self.command_handler.run_command(
+            self.package_config.current_version_command, return_output=True
         ).strip()
         logger.debug("version = %s", ver)
         # FIXME: this might not work when users expect the dashes
@@ -395,7 +384,7 @@ class Upstream(PackitRepositoryBase):
             cmd += ["--new", version]
         if changelog_entry:
             cmd += ["--comment", changelog_entry]
-        cmd.append(self.specfile_path)
+        cmd.append(str(self.absolute_specfile_path))
         run_command(cmd)
 
     def set_spec_version(self, version: str, changelog_entry: str):
@@ -443,7 +432,8 @@ class Upstream(PackitRepositoryBase):
             if self.package_config.create_tarball_command:
                 archive_cmd = self.package_config.create_tarball_command
             else:
-                # FIXME: .tar.gz is naive
+                # FIXME: .tar.gz is naive, we could guess it from archive suffix in spec
+                #        or ask people to tell us
                 archive_name = f"{dir_name}.tar.gz"
                 archive_cmd = [
                     "git",
@@ -454,7 +444,7 @@ class Upstream(PackitRepositoryBase):
                     f"{dir_name}/",
                     "HEAD",
                 ]
-            run_command(archive_cmd, cwd=self.local_project.working_dir)
+            self.command_handler.run_command(archive_cmd, return_output=True)
 
     def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """
@@ -464,38 +454,39 @@ class Upstream(PackitRepositoryBase):
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
         """
-        srpm_dir = srpm_dir or os.getcwd()
-        cwd = self.specfile_dir
+        if self.running_in_service():
+            srpm_dir = self.config.command_handler_work_dir
+            rpmbuild_dir = Path(self.config.command_handler_work_dir).joinpath(
+                Path(self.package_config.specfile_path).parent
+            )
+        else:
+            srpm_dir = srpm_dir or os.getcwd()
+            rpmbuild_dir = self.absolute_specfile_dir
         cmd = [
             "rpmbuild",
             "-bs",
             "--define",
-            f"_sourcedir {cwd}",
+            f"_sourcedir {rpmbuild_dir}",
             "--define",
-            f"_specdir {cwd}",
+            f"_specdir {rpmbuild_dir}",
             "--define",
             f"_srcrpmdir {srpm_dir}",
             # no idea about this one, but tests were failing in tox w/o it
             "--define",
-            f"_topdir {cwd}",
+            f"_topdir {rpmbuild_dir}",
             # we also need these 3 so that rpmbuild won't create them
             "--define",
-            f"_builddir {cwd}",
+            f"_builddir {rpmbuild_dir}",
             "--define",
-            f"_rpmdir {cwd}",
+            f"_rpmdir {rpmbuild_dir}",
             "--define",
-            f"_buildrootdir {cwd}",
-            self.specfile_path,
+            f"_buildrootdir {rpmbuild_dir}",
+            self.package_config.specfile_path,
         ]
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
         logger.debug("present srpms = %s", present_srpms)
         try:
-            out = run_command(
-                cmd,
-                output=True,
-                error_message="SRPM could not be created.",
-                cwd=self.local_project.working_dir,
-            ).strip()
+            out = self.command_handler.run_command(cmd, return_output=True).strip()
         except PackitException as ex:
             logger.error(f"Failed to create SRPM: {ex!r}")
             # TODO: provide logs as well

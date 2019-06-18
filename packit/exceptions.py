@@ -25,6 +25,13 @@ class PackitException(Exception):
     pass
 
 
+class PackitCommandFailedError(PackitException):
+    """ A command failed """
+
+    def __init__(self, output):
+        self.output = output
+
+
 class PackitConfigException(PackitException):
     pass
 

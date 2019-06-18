@@ -3,9 +3,11 @@ from flexmock import flexmock
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.config import PackageConfig, Config
+from packit.config import PackageConfig, Config, RunCommandType
 
 from sandcastle.api import Sandcastle
+
+from packit.local_project import LocalProject
 
 
 def test_get_output_from_action_defined():
@@ -22,22 +24,21 @@ def test_get_output_from_action_defined():
     assert result == "hello world\n"
 
 
-def test_get_output_from_action_defined_in_sandcastle_object():
+def test_get_output_from_action_defined_in_sandcastle():
     echo_cmd = "hello world"
-    flexmock(Sandcastle).should_receive("get_api_client").and_return("something")
+    flexmock(Sandcastle).should_receive("get_api_client")
     flexmock(Sandcastle).should_receive("is_pod_already_deployed").and_return(True)
+    c = Config()
+    c.command_handler = RunCommandType.sandcastle
     packit_repository_base = PackitRepositoryBase(
-        config=Config(),
-        package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd}),
-        sandcastle_object=Sandcastle(
-            image_reference="fooimage", k8s_namespace_name="default"
-        ),
+        config=c, package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd})
     )
-    packit_repository_base.config.actions_handler = "sandcastle"
+    packit_repository_base.local_project = LocalProject()
 
+    flexmock(Sandcastle).should_receive("run")
     flexmock(Sandcastle).should_receive("exec").and_return(echo_cmd)
     result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
-    assert result == "hello world"
+    assert result == echo_cmd
 
 
 @pytest.mark.skip(
@@ -47,10 +48,6 @@ def test_run_in_sandbox():
     packit_repository_base = PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(actions={ActionName.pre_sync: "ls -lha"}),
-        sandcastle_object=Sandcastle(
-            image_reference="docker.io/usercont/sandcastle",
-            k8s_namespace_name="myproject",
-        ),
     )
     packit_repository_base.config.actions_handler = "sandcastle"
 

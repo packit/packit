@@ -21,6 +21,7 @@
 # SOFTWARE.
 import logging
 import os
+from pathlib import Path
 from typing import Optional, Sequence, List
 
 import git
@@ -98,6 +99,17 @@ class DistGit(PackitRepositoryBase):
             except PackitConfigException:
                 return None
         return self._downstream_config
+
+    @property
+    def absolute_specfile_path(self) -> Path:
+        if not self._specfile_path:
+            self._specfile_path = (
+                Path(self.local_project.working_dir)
+                / f"{self.package_config.downstream_package_name}.spec"
+            )
+            if not self._specfile_path.exists():
+                raise PackitException(f"Specfile {self._specfile_path} not found.")
+        return self._specfile_path
 
     def update_branch(self, branch_name: str):
         """
@@ -215,14 +227,14 @@ class DistGit(PackitRepositoryBase):
         logger.debug(f"Upstream archive name is {archive_name!r}")
         return archive_name
 
-    def download_upstream_archive(self) -> str:
+    def download_upstream_archive(self) -> Path:
         """
         Fetch archive for the current upstream release defined in dist-git's spec
 
         :return: str, path to the archive
         """
         self.specfile.download_remote_sources()
-        archive = os.path.join(self.specfile_dir, self.upstream_archive_name)
+        archive = self.absolute_specfile_dir.joinpath(self.upstream_archive_name)
         logger.info(f"Downloaded archive: {archive!r}")
         return archive
 
