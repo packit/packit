@@ -33,6 +33,10 @@ class CommandHandler:
     def run_command(self, command: List[str], return_output=True):
         raise NotImplementedError("This should be implemented")
 
+    def clean(self):
+        """ clean up the mess after we're done """
+        logger.info("nothing to clean")
+
 
 @add_run_command
 class LocalCommandHandler(CommandHandler):
