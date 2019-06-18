@@ -29,13 +29,12 @@ import git
 from rebasehelper.specfile import SpecFile
 
 from packit.actions import ActionName
+from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
 from packit.utils import cwd
-from packit.command_runner import RUN_COMMAND_HANDLER_MAPPING
-
 
 logger = logging.getLogger(__name__)
 
@@ -44,47 +43,56 @@ class PackitRepositoryBase:
     # mypy complains when this is a property
     local_project: LocalProject
 
-    def __init__(
-        self, config: Config, package_config: PackageConfig, sandcastle_object=None
-    ) -> None:
+    def __init__(self, config: Config, package_config: PackageConfig) -> None:
         """
-        sandcastle_object is an object to Sandcastle.
-        https://github.com/packit-service/sandcastle
-        from sandcastle.api import Sandcastle
-        The object handles OpenShift PODs like create, delete, exec command in a POD etc.
+        :param config: global configuration
+        :param package_config: configuration of the upstream project
         """
         self.config = config
         self.package_config = package_config
-        self._specfile_path: Optional[str] = None
+        self._specfile_path: Optional[Path] = None
         self._specfile: Optional[SpecFile] = None
         self.allowed_gpg_keys: Optional[List[str]] = None
-        self.sandcastle_object = sandcastle_object
+
+        self.handler_kls = RUN_COMMAND_HANDLER_MAPPING[self.config.command_handler]
+        self._command_handler: Optional[CommandHandler] = None
 
     @property
-    def specfile_dir(self) -> str:
+    def command_handler(self) -> CommandHandler:
+        if self._command_handler is None:
+            self._command_handler = self.handler_kls(
+                local_project=self.local_project, config=self.config
+            )
+        return self._command_handler
+
+    def running_in_service(self) -> bool:
+        """ are we running in packit service? """
+        return self.command_handler.name == RunCommandType.sandcastle
+
+    @property
+    def absolute_specfile_dir(self) -> Path:
         """ get dir where the spec file is"""
-        return str(Path(self.specfile_path).parent)
+        return Path(self.absolute_specfile_path).parent
 
     @property
-    def specfile_path(self) -> str:
+    def absolute_specfile_path(self) -> Path:
         if not self._specfile_path:
-
-            possible_paths = [
-                Path(self.local_project.working_dir)
-                / self.package_config.specfile_path,
-                Path(self.local_project.working_dir)
-                / f"{self.package_config.downstream_package_name}.spec",
-            ]
-
-            for path in possible_paths:
-                if path.exists():
-                    self._specfile_path = str(path)
-                    break
-            else:
-                raise PackitException(
-                    f"Specfile not found."
-                    f"Tried: {','.join(str(p) for p in possible_paths)} ."
-                )
+            # TODO: we should probably have a "discovery" phase before
+            #  creating Upstream, DistGit objects
+            #       when things which we don't know are discovered
+            # possible_paths = [
+            #     Path(self.local_project.working_dir)
+            #     / f"{self.package_config.downstream_package_name}.spec",
+            # ]
+            # for path in possible_paths:
+            #     if path.exists():
+            #         self._specfile_path = str(path)
+            #         break
+            self._specfile_path = Path(self.local_project.working_dir).joinpath(
+                self.package_config.specfile_path
+            )
+            if not self._specfile_path.exists():
+                raise PackitException(f"Specfile {self._specfile_path} not found.")
 
         return self._specfile_path
 
@@ -95,13 +103,14 @@ class PackitRepositoryBase:
             s = inspect.signature(SpecFile)
             if "changelog_entry" in s.parameters:
                 self._specfile = SpecFile(
-                    path=self.specfile_path,
-                    sources_location=self.specfile_dir,
+                    path=self.absolute_specfile_path,
+                    sources_location=str(self.absolute_specfile_dir),
                     changelog_entry="",
                 )
             else:
                 self._specfile = SpecFile(
-                    path=self.specfile_path, sources_location=self.specfile_dir
+                    path=self.absolute_specfile_path,
+                    sources_location=str(self.absolute_specfile_dir),
                 )
         return self._specfile
 
@@ -234,36 +243,12 @@ class PackitRepositoryBase:
         """
         logger.debug(f"Running {action}.")
         if action in self.package_config.actions:
-            command = self.package_config.actions[action]
-            logger.info(f"Using user-defined script for {action}: {command}")
-            self.run_handler_command(command=command)
+            command_l = shlex.split(self.package_config.actions[action])
+            logger.info(f"Using user-defined script for {action}: {command_l}")
+            self.command_handler.run_command(command=command_l)
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True
-
-    def run_handler_command(self, command, output=True):
-        """
-        Run command in a handler.
-        :param command: Command to run in CLI or in Openshift POD
-        :param output: return a stdout
-        :return:
-        """
-        logger.debug(
-            f"'actions_handler' defined in 'packit.yaml' is '{self.config.actions_handler}'"
-        )
-        select_handler = RunCommandType[self.config.actions_handler]
-        handler_kls = RUN_COMMAND_HANDLER_MAPPING[select_handler]
-        if not handler_kls or select_handler == RunCommandType.local:
-            handler = handler_kls(
-                local_project=self.local_project,
-                cwd=self.local_project.working_dir,
-                output=output,
-            )
-        else:
-            handler = handler_kls(sandcastle_object=self.sandcastle_object)
-        if not isinstance(command, list):
-            command = shlex.split(command)
-        return handler.run_command(command=command)
 
     def get_output_from_action(self, action: ActionName):
         """
@@ -271,9 +256,9 @@ class PackitRepositoryBase:
         else return None
         """
         if action in self.package_config.actions:
-            command = self.package_config.actions[action]
-            logger.info(f"Using user-defined script for {action}: {command}")
-            return self.run_handler_command(command=command)
+            command_l = shlex.split(self.package_config.actions[action])
+            logger.info(f"Using user-defined script for {action}: {command_l}")
+            return self.command_handler.run_command(command_l, return_output=True)
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
@@ -285,10 +270,8 @@ class PackitRepositoryBase:
         logger.debug(f"About to add patches {patch_list} to specfile")
         if not patch_list:
             return
-        if not self.specfile_path:
-            raise Exception("No specfile")
 
-        with open(file=self.specfile_path, mode="r+") as spec_file:
+        with open(file=str(self.absolute_specfile_path), mode="r+") as spec_file:
             last_source_position = None
             line = spec_file.readline()
             while line:
@@ -313,7 +296,7 @@ class PackitRepositoryBase:
             spec_file.write(rest_of_the_file)
 
         logger.info(
-            f"Patches ({len(patch_list)}) added to the specfile ({self.specfile_path})"
+            f"Patches ({len(patch_list)}) added to the specfile ({self.absolute_specfile_path})"
         )
         self._specfile = None  # reload the specfile object
         self.local_project.git_repo.index.write()
@@ -360,5 +343,5 @@ class PackitRepositoryBase:
         #   File "rebasehelper/helpers/download_helper.py", line 162, in download_file
         #     with open(destination_path, 'wb') as local_file:
         # PermissionError: [Errno 13] Permission denied: 'systemd-8bca462.tar.gz'
-        with cwd(self.specfile_dir):
+        with cwd(self.absolute_specfile_dir):
             self.specfile.download_remote_sources()

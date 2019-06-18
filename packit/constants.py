@@ -71,3 +71,5 @@ synced_files:
 upstream_project_name: {upstream_project_name}
 downstream_package_name: {downstream_package_name}
 """
+
+SANDCASTLE_WORK_DIR = "/sandcastle"
