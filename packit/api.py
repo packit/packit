@@ -121,7 +121,7 @@ class PackitAPI:
             Path(self.up.local_project.working_dir),
             Path(self.dg.local_project.working_dir),
         )
-        sync_files(raw_sync_files)
+        sync_files(self.dg.local_project.working_dir, raw_sync_files)
 
         self.dg.commit(title=f"Sync upstream pr: {pr_id}", msg=description)
 
@@ -143,7 +143,6 @@ class PackitAPI:
         Update given package in Fedora
         """
         assert_existence(self.up.local_project)
-
         assert_existence(self.dg.local_project)
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
@@ -197,7 +196,7 @@ class PackitAPI:
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
                 )
-                sync_files(raw_sync_files)
+                sync_files(self.dg.local_project.working_dir, raw_sync_files)
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
@@ -215,7 +214,7 @@ class PackitAPI:
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
                 )
-                sync_files(raw_sync_files)
+                sync_files(self.dg.local_project.working_dir, raw_sync_files)
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
@@ -273,7 +272,11 @@ class PackitAPI:
             for raw_file in raw_sync_files
             if Path(raw_file.dest).name not in exclude_files
         ]
-        sync_files(reverse_raw_sync_files, fail_on_missing=False)
+        sync_files(
+            self.dg.local_project.working_dir,
+            reverse_raw_sync_files,
+            fail_on_missing=False,
+        )
 
         if not no_pr:
             description = (
