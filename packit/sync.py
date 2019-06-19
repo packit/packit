@@ -22,11 +22,13 @@
 
 import logging
 import shutil
+import os
 from pathlib import Path
 from typing import List
 from typing import NamedTuple, Union
 
 from packit.exceptions import PackitException
+from packit.constants import SYNCING_NOTE
 
 logger = logging.getLogger(__name__)
 
@@ -81,12 +83,10 @@ def get_raw_files(
     source = file_to_sync.src
     if not isinstance(source, list):
         source = [source]
-
     files_to_sync: List[RawSyncFilesItem] = []
     for file in source:
         globs = src_dir.glob(file)
         target = dest_dir.joinpath(file_to_sync.dest)
-
         for g in globs:
             files_to_sync.append(
                 RawSyncFilesItem(
@@ -98,11 +98,18 @@ def get_raw_files(
     return files_to_sync
 
 
-def sync_files(files_to_sync: List[RawSyncFilesItem], fail_on_missing=False) -> None:
+def sync_files(
+    working_dir, files_to_sync: List[RawSyncFilesItem], fail_on_missing=False
+) -> None:
     """
     Copy files b/w upstream and downstream repo.
     """
     logger.debug(f"Copy synced files {files_to_sync}")
+
+    path = os.path.join(working_dir, "README.packit")
+    logger.debug(f"Path of README {path}")
+    with open(path, "w") as f:
+        f.write(SYNCING_NOTE)
 
     for fi in files_to_sync:
         src = Path(fi.src)
