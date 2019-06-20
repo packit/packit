@@ -58,6 +58,7 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run):
     ctx.obj = c
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
+        set_logging(logger_name="sandcastle", level=logging.DEBUG)
         logger.debug("logging set to DEBUG")
     else:
         set_logging(level=logging.INFO)

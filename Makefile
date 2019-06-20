@@ -1,5 +1,6 @@
 CONTAINER_NAME=packit
 CONTAINER_RUN=podman run --rm -ti -v /tmp/packit:/src:Z $(CONTAINER_NAME)
+TEST_TARGET := ./tests/
 
 test_container:
 	podman build --tag $(CONTAINER_NAME) .
@@ -12,7 +13,7 @@ install:
 
 check:
 	find . -name "*.pyc" -exec rm {} \;
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=yes --verbose --showlocals --cov=packit --cov-report=term-missing tests
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=yes --verbose --showlocals --cov=packit --cov-report=term-missing $(TEST_TARGET)
 
 check_in_container: test_container
 	rsync -a $(CURDIR)/ /tmp/packit
