@@ -35,7 +35,7 @@ from ogr.abstract import GitProject
 from yaml import safe_load
 
 from packit.actions import ActionName
-from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
+from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL, SANDCASTLE_WORK_DIR
 from packit.exceptions import (
     PackitConfigException,
     PackitException,
@@ -85,7 +85,21 @@ class Config(BaseConfig):
         self._pagure_user_token: str = ""
         self._pagure_fork_token: str = ""
         self.dry_run: bool = False
-        self.actions_handler: Optional[str] = "local"
+
+        # %%% ACTIONS HANDLER CONFIGURATION %%%
+        # these values are specific to packit service when we run actions in a sandbox
+        # users will never set these, so let's hide those from them
+
+        # name of the handler to run actions and commands, default to current env
+        self.command_handler: RunCommandType = RunCommandType.local
+        # a dir where the PV is mounted: both in sandbox and in worker
+        self.command_handler_work_dir: str = ""
+        # name of the PVC so that the sandbox has the same volume mounted
+        self.command_handler_pvc_env_var: str = ""  # pointer to pointer, lol
+        # name of sandbox container image
+        self.command_handler_image_reference: str = "docker.io/usercont/sandcastle"
+        # do I really need to explain this?
+        self.command_handler_k8s_namespace: str = "myproject"
 
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users
@@ -131,7 +145,24 @@ class Config(BaseConfig):
         config.github_app_id = raw_dict.get("github_app_id", "")
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
         config.webhook_secret = raw_dict.get("webhook_secret", "")
-        config.actions_handler = raw_dict.get("actions_handler", "local")
+
+        config.command_handler = RunCommandType.local
+        a_h = raw_dict.get("actions_handler")
+        if a_h:
+            config.command_handler = RunCommandType(a_h)
+        config.command_handler_work_dir = raw_dict.get(
+            "command_handler_work_dir ", SANDCASTLE_WORK_DIR
+        )
+        config.command_handler_pvc_env_var = raw_dict.get(
+            "command_handler_pvc_env_var ", "SANDCASTLE_PVC"
+        )
+        config.command_handler_image_reference = raw_dict.get(
+            "command_handler_image_reference", "docker.io/usercont/sandcastle"
+        )
+        # default project for oc cluster up
+        config.command_handler_k8s_namespace = raw_dict.get(
+            "command_handler_k8s_namespace ", "myproject"
+        )
 
         return config
 

@@ -55,12 +55,10 @@ class PackitAPI:
         config: Config,
         package_config: PackageConfig,
         upstream_local_project: LocalProject,
-        sandcastle=None,
     ) -> None:
         self.config = config
         self.package_config = package_config
         self.upstream_local_project = upstream_local_project
-        self.sandcastle = sandcastle
 
         self._up = None
         self._dg = None
@@ -72,7 +70,6 @@ class PackitAPI:
                 config=self.config,
                 package_config=self.package_config,
                 local_project=self.upstream_local_project,
-                sandcastle_object=self.sandcastle,
             )
         return self._up
 
@@ -108,7 +105,8 @@ class PackitAPI:
 
         if self.up.with_action(action=ActionName.create_patches):
             patches = self.up.create_patches(
-                upstream=upstream_version, destination=self.dg.specfile_dir
+                upstream=upstream_version,
+                destination=str(self.dg.absolute_specfile_dir),
             )
             self.dg.add_patches_to_specfile(patches)
 
@@ -203,7 +201,8 @@ class PackitAPI:
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
-                            upstream=upstream_ref, destination=self.dg.specfile_dir
+                            upstream=upstream_ref,
+                            destination=str(self.dg.absolute_specfile_dir),
                         )
                         self.dg.add_patches_to_specfile(patches)
 
@@ -328,7 +327,7 @@ class PackitAPI:
                     make_new_sources = True
             if make_new_sources:
                 archive = self.dg.download_upstream_archive()
-                self.dg.upload_to_lookaside_cache(archive)
+                self.dg.upload_to_lookaside_cache(str(archive))
 
     def build(self, dist_git_branch: str, scratch: bool = False):
         """
@@ -407,7 +406,8 @@ class PackitAPI:
         if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):
                 patches = self.up.create_patches(
-                    upstream=upstream_ref, destination=self.up.specfile_dir
+                    upstream=upstream_ref,
+                    destination=str(self.up.absolute_specfile_dir),
                 )
                 self.up.add_patches_to_specfile(patches)
 
@@ -570,3 +570,8 @@ class PackitAPI:
                 report_func("error", "Build watch timeout")
                 return state_reported
             time.sleep(10)
+
+    def clean(self):
+        """ clean up stuff once all the work is done """
+        if self._up:
+            self.up.command_handler.clean()
