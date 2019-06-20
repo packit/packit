@@ -1,5 +1,6 @@
 import pytest
 from flexmock import flexmock
+from sandcastle import Sandcastle
 
 from packit import utils
 from packit.actions import ActionName
@@ -163,6 +164,7 @@ def test_run_action_defined(packit_repository_base):
 
 
 def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object):
+    flexmock(Sandcastle).should_receive("get_api_client").and_return(None)
     flexmock(SandcastleCommandHandler).should_receive("run_command").with_args(
         command=["command", "-a"]
     ).and_return("command -a").once()
