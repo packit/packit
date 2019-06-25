@@ -57,23 +57,19 @@ def packit_repository_base():
                 ActionName.pre_sync: "command --a",
                 ActionName.get_current_version: "command --b",
             }
-
-            )
+        ),
     )
-
 
 
 @pytest.fixture()
 def packit_repository_base_more_actions():
     return PackitRepositoryBase(
-        config=flexmock(Config()),
-        package_config=flexmock(
-            PackageConfig(
-                actions={
-                    ActionName.pre_sync: ["command --a", "command --a"],
-                    ActionName.get_current_version: "command --b",
-                }
-            )
+        config=Config(),
+        package_config=PackageConfig(
+            actions={
+                ActionName.pre_sync: ["command --a", "command --a"],
+                ActionName.get_current_version: "command --b",
+            }
         ),
     )
 
@@ -192,7 +188,7 @@ def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object)
 
 
 def test_run_action_more_actions(packit_repository_base_more_actions):
-    flexmock(LocalRunCommandHandler).should_receive("run_command").times(2)
+    flexmock(LocalCommandHandler).should_receive("run_command").times(2)
 
     packit_repository_base_more_actions.local_project = flexmock(
         working_dir="my/working/dir"
