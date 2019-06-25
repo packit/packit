@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import asyncio
 import logging
 import time
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable
@@ -37,7 +38,7 @@ from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
-from packit.constants import DEFAULT_COPR_OWNER, COPR2GITHUB_STATE
+from packit.constants import DEFAULT_COPR_OWNER, COPR2GITHUB_STATE, SYNCING_NOTE
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, PackitInvalidConfigException
 from packit.local_project import LocalProject
@@ -143,7 +144,6 @@ class PackitAPI:
         Update given package in Fedora
         """
         assert_existence(self.up.local_project)
-
         assert_existence(self.dg.local_project)
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
@@ -190,6 +190,11 @@ class PackitAPI:
                 f"Upstream tag: {full_version}\n"
                 f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
+
+            path = os.path.join(self.dg.local_project.working_dir, "README.packit")
+            logger.debug(f"Path of README {path}")
+            with open(path, "w") as f:
+                f.write(SYNCING_NOTE)
 
             if self.up.with_action(action=ActionName.prepare_files):
                 raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
