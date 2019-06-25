@@ -248,10 +248,9 @@ class PackitRepositoryBase:
                 commands = [command]
             else:
                 commands = command
-            logger.debug(commands)
+            logger.info(f"Using user-defined script for {action}: {commands}")
             for cmd in commands:
                 command_l = shlex.split(cmd)
-                logger.info(f"Using user-defined script for {action}: {command_l}")
                 self.command_handler.run_command(command=command_l)
             return False
         logger.debug(f"Running default implementation for {action}.")
