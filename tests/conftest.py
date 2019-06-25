@@ -34,7 +34,6 @@ from rebasehelper.specfile import SpecFile
 
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
-from ogr.services.our_pagure import OurPagure
 from ogr.services.pagure import PagureProject, PagureService
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
@@ -128,11 +127,6 @@ def mock_remote_functionality(distgit, upstream):
         fork_create=lambda: None,
         get_fork=lambda: PagureProject("", "", PagureService()),
         pr_create=mocked_pr_create,
-    )
-    flexmock(
-        OurPagure,
-        get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
-        get_fork=lambda: PagureProject("", "", flexmock()),
     )
     flexmock(
         GithubProject,
