@@ -5,6 +5,7 @@ tweaked for your package.
 
 Packit supports some actions, that can be defined in the configuration file.
 The part of the default behaviour is then skipped, and the configured command is called instead.
+Packit is able to execute more commands. Each action can accept list of commands.
 
 There are also some hooks presented -- it works as an action without any default behaviour.
 
@@ -46,5 +47,7 @@ downstream_package_name: package
 dist_git_url: https://src.fedoraproject.org/rpms/package.git
 actions:
   prepare-files: "make prepare"
-  create-archive: "make archive"
+  create-archive:
+  - "make archive"
+  - "ls"
 ```
