@@ -147,21 +147,21 @@ class Config(BaseConfig):
         config.webhook_secret = raw_dict.get("webhook_secret", "")
 
         config.command_handler = RunCommandType.local
-        a_h = raw_dict.get("actions_handler")
+        a_h = raw_dict.get("command_handler")
         if a_h:
             config.command_handler = RunCommandType(a_h)
         config.command_handler_work_dir = raw_dict.get(
-            "command_handler_work_dir ", SANDCASTLE_WORK_DIR
+            "command_handler_work_dir", SANDCASTLE_WORK_DIR
         )
         config.command_handler_pvc_env_var = raw_dict.get(
-            "command_handler_pvc_env_var ", "SANDCASTLE_PVC"
+            "command_handler_pvc_env_var", "SANDCASTLE_PVC"
         )
         config.command_handler_image_reference = raw_dict.get(
             "command_handler_image_reference", "docker.io/usercont/sandcastle"
         )
         # default project for oc cluster up
         config.command_handler_k8s_namespace = raw_dict.get(
-            "command_handler_k8s_namespace ", "myproject"
+            "command_handler_k8s_namespace", "myproject"
         )
 
         return config
