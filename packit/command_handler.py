@@ -62,18 +62,19 @@ class SandcastleCommandHandler(CommandHandler):
         :param config:
         """
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
-        from sandcastle.api import Sandcastle, VolumeSpec
+        from sandcastle.api import Sandcastle, MappedDir
 
         super().__init__(local_project, config)
-        v = VolumeSpec(
-            path=local_project.working_dir,
-            pvc_from_env=config.command_handler_pvc_env_var,
+        md = MappedDir(
+            local_dir=local_project.working_dir,
+            path=config.command_handler_work_dir,
+            with_interim_pvc=True,
         )
         self.sandcastle = Sandcastle(
             image_reference=config.command_handler_image_reference,
             k8s_namespace_name=config.command_handler_k8s_namespace,
             working_dir=config.command_handler_work_dir,
-            volume_mounts=[v],
+            mapped_dirs=[md],
         )
 
     def run_command(self, command: List[str], return_output=True) -> Optional[str]:
