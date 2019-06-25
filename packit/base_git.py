@@ -54,6 +54,7 @@ class PackitRepositoryBase:
         self._specfile: Optional[SpecFile] = None
         self.allowed_gpg_keys: Optional[List[str]] = None
 
+        logger.debug("command handler = %s", self.config.command_handler)
         self.handler_kls = RUN_COMMAND_HANDLER_MAPPING[self.config.command_handler]
         self._command_handler: Optional[CommandHandler] = None
 
