@@ -52,7 +52,8 @@ PACKAGE_CONFIG_SCHEMA = {
         "actions": {
             "type": "object",
             "properties": {
-                a: {"type": "string"} for a in ActionName.get_possible_values()
+                a: {"type": ["string", "array"]}
+                for a in ActionName.get_possible_values()
             },
             "additionalProperties": False,
         },
