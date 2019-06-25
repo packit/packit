@@ -69,6 +69,7 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
         assert (d / TARBALL_NAME).is_file()
         spec = get_specfile(str(d / "beer.spec"))
         assert spec.get_version() == "0.1.0"
+        assert (d / "README.packit").is_file()
 
 
 def test_basic_local_update_from_downstream(

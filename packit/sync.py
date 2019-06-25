@@ -81,12 +81,10 @@ def get_raw_files(
     source = file_to_sync.src
     if not isinstance(source, list):
         source = [source]
-
     files_to_sync: List[RawSyncFilesItem] = []
     for file in source:
         globs = src_dir.glob(file)
         target = dest_dir.joinpath(file_to_sync.dest)
-
         for g in globs:
             files_to_sync.append(
                 RawSyncFilesItem(
