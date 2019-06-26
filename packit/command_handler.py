@@ -86,6 +86,7 @@ class SandcastleCommandHandler(CommandHandler):
         """
         if not self.sandcastle.is_pod_already_deployed():
             self.sandcastle.run()
+        logger.info("running command: %s", command)
         out = self.sandcastle.exec(command=command)
         if return_output:
             return out

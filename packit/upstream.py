@@ -421,7 +421,6 @@ class Upstream(PackitRepositoryBase):
         """
         version = version or self.get_current_version()
         if self.with_action(action=ActionName.create_archive):
-
             if self.package_config.upstream_project_name:
                 dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
             else:
@@ -489,7 +488,6 @@ class Upstream(PackitRepositoryBase):
             out = self.command_handler.run_command(cmd, return_output=True).strip()
         except PackitException as ex:
             logger.error(f"Failed to create SRPM: {ex!r}")
-            # TODO: provide logs as well
             raise FailedCreateSRPM("Failed to create SRPM.")
         logger.debug(f"{out}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
