@@ -221,12 +221,14 @@ class JobType(Enum):
     build = "build"
     sync_from_downstream = "sync_from_downstream"
     copr_build = "copr_build"
+    add_to_whitelist = "add_to_whitelist"
 
 
 class JobTriggerType(Enum):
     release = "release"
     pull_request = "pull_request"
     commit = "commit"
+    installation = "installation"
 
 
 class JobNotifyType(Enum):
