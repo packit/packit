@@ -8,8 +8,8 @@ synced_files:
 # packit was already taken on PyPI
 upstream_project_name: packitos
 downstream_package_name: packit
-current_version_command: ["python3", "setup.py", "--version"]
-create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
+current_version_command: ["bash", "-c", "git checkout -q fedora-tests/ && python3 setup.py --version"]
+create_tarball_command: ["bash", "-c", "git checkout -q fedora-tests/ && python3 setup.py sdist --dist-dir ."]
 jobs:
 - job: propose_downstream
   trigger: release
