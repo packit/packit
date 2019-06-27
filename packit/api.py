@@ -405,7 +405,7 @@ class PackitAPI:
         else:
             with self.up.local_project.git_checkout_block(ref=upstream_ref):
                 # upstream repo: create the archive
-                self.up.create_archive(version=upstream_ref)
+                self.up.create_archive(version=version)
 
         if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):
