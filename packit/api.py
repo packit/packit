@@ -416,6 +416,7 @@ class PackitAPI:
                 self.up.add_patches_to_specfile(patches)
 
         if version != spec_version:
+            logger.info("set version %r in spec", version)
             try:
                 self.up.set_spec_version(
                     version=version, changelog_entry="- Development snapshot"
