@@ -1,3 +1,10 @@
+# 0.4.2
+
+* Packit now uses [Sandcastle](https://github.com/packit-service/sandcastle) to run untrusted commands in a sandbox.
+* Service code has been moved to separate [repo](https://github.com/packit-service/packit-service).
+* [Actions](https://github.com/packit-service/packit/blob/master/docs/actions.md) [now support](https://github.com/packit-service/packit/pull/363) more commands per action.
+* Lots of code, documentation and tests fixes.
+
 # 0.4.1
 
 * Patch release with few fixes/minor changes.
