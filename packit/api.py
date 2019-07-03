@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import asyncio
 import logging
 import os
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable
@@ -38,7 +39,7 @@ from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
-from packit.constants import DEFAULT_COPR_OWNER, COPR2GITHUB_STATE, SYNCING_NOTE
+from packit.constants import COPR2GITHUB_STATE, SYNCING_NOTE
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, PackitInvalidConfigException
 from packit.local_project import LocalProject
@@ -530,9 +531,20 @@ class PackitAPI:
         else:
             logger.info("No Koji builds found.")
 
-    def run_copr_build(self, owner, project, chroots):
+    def run_copr_build(
+        self, project: str, chroots: List[str], owner: str = None
+    ) -> Tuple[int, str]:
+        """
+
+        :param project:
+        :param chroots:
+        :param owner: defaults to username from copr config file
+        :return: id of the created build and url to its repo
+        """
         # get info
         client = CoprClient.create_from_config_file()
+        configured_owner = client.config.get("username")
+        owner = owner or configured_owner
         try:
             copr_proj = client.project_proxy.get(owner, project)
             # make sure or project has chroots set correctly
@@ -542,7 +554,7 @@ class PackitAPI:
                 logger.debug(f"new = {set(chroots)}")
                 client.project_proxy.edit(owner, project, chroots=chroots)
         except CoprNoResultException:
-            if owner == DEFAULT_COPR_OWNER:
+            if owner == configured_owner:
                 logger.info(f"Copr project {owner}/{project} not found. Creating new.")
                 client.project_proxy.add(
                     ownername=owner,
