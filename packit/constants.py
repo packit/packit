@@ -43,8 +43,6 @@ DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
 PROD_DISTGIT_URL = "https://src.fedoraproject.org/"
 
-DEFAULT_COPR_OWNER = "packit"
-
 COPR2GITHUB_STATE = {
     "running": ("pending", "The RPM build was triggered."),
     "pending": ("pending", "The RPM build has started."),
