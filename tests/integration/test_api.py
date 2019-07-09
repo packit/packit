@@ -27,7 +27,6 @@ from pathlib import Path
 import os
 import flexmock
 from subprocess import check_output
-import unittest
 from packit.api import PackitAPI
 from tests.integration.testbase import PackitUnittestOgr
 
@@ -44,9 +43,6 @@ class ProposeUpdate(PackitUnittestOgr):
         flexmock(self.api).should_receive("_handle_sources").and_return(None)
         self.set_git_user()
 
-    @unittest.skip(
-        "Issue in ogr causing that User is not stored in persistent yaml files for pagure"
-    )
     def test_propose_update(self):
         # change specfile little bit to have there some change
         specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
