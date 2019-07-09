@@ -57,7 +57,6 @@ def get_rev_list_kwargs(opt_list):
     return result
 
 
-# TODO: we should use run_cmd from conu
 def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
@@ -248,3 +247,18 @@ def cwd(target):
         yield
     finally:
         os.chdir(curdir)
+
+
+def rpmdev_bumpspec(
+    specfile_path: Path, comment: str, version: str, changelog_file: str = None
+):
+    """
+    wrapper on top of rpmdev-bumpspec utility
+
+    :return:
+    """
+    cmd = ["rpmdev-bumpspec", f"--comment={comment}", f"--new={version}"]
+    if changelog_file:
+        cmd += [f"--file={changelog_file}"]
+    cmd += [str(specfile_path)]
+    run_command(cmd)

@@ -14,5 +14,5 @@ BuildArch:      noarch
 true
 
 %changelog
-* Mon Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1
+* Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1
 - No brewing, yet.

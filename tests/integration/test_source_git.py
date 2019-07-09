@@ -95,10 +95,11 @@ def test_basic_local_update_patch_content(
     assert "-Version:        0.0.0\n+Version:        0.1.0" in git_diff
     assert "+# PATCHES FROM SOURCE GIT:" in git_diff
     assert (
-        "-* Mon Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1\n"
-        "-- No brewing, yet.\n"
-        "+* Mon Feb 25 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.1.0-1\n"
-        "+- Initial brewing" in git_diff
+        " - 0.1.0-1\n"
+        "+- new upstream release: 0.1.0\n"
+        "+\n"
+        " * Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1\n"
+        " - No brewing, yet.\n" in git_diff
     )
 
     # direct diff in the synced file
