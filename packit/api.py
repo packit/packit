@@ -570,7 +570,7 @@ class PackitAPI:
             if gh_state != "pending":
                 logger.debug(f"state is now {gh_state}, ending the watch")
                 return state_reported
-            if watch_end < datetime.now():
+            if datetime.now() > watch_end:
                 logger.error(f"the build did not finish in time ({timeout}s)")
                 report_func("error", "Build watch timeout")
                 return state_reported

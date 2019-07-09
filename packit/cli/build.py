@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import logging
-import os
+from os import getcwd
 
 import click
 
@@ -46,9 +46,7 @@ logger = logging.getLogger(__file__)
 @click.option(
     "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
 )
-@click.argument(
-    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
-)
+@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
 def build(config, dist_git_path, dist_git_branch, scratch, path_or_url):

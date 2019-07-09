@@ -25,21 +25,20 @@ Display status
 """
 
 import logging
-import os
+from os import getcwd
+
 import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception
-from packit.config import pass_config, get_context_settings
 from packit.cli.utils import get_packit_api
+from packit.config import pass_config, get_context_settings
 
 logger = logging.getLogger(__file__)
 
 
 @click.command("status", context_settings=get_context_settings())
-@click.argument(
-    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
-)
+@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
 def status(config, path_or_url):

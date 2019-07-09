@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import logging
-import os
+from os import getcwd
 
 import click
 
@@ -56,9 +56,7 @@ logger = logging.getLogger(__file__)
     required=False,
     default="enhancement",
 )
-@click.argument(
-    "path_or_url", type=LocalProjectParameter(), default=os.path.abspath(os.path.curdir)
-)
+@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
 def create_update(

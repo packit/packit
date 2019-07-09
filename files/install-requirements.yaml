@@ -2,13 +2,14 @@
 - name: Install dependencies for packit.
   hosts: all
   tasks:
-  - name: Install generic packages
+  - name: Install generic RPM packages
     dnf:
       name:
       - make
       - git
       - dnf-utils
       - python3-pip
+
   - name: Install test rpm dependencies
     dnf:
       name:
@@ -28,10 +29,10 @@
   - name: Install build RPM dependencies
     command: dnf -y builddep packit.spec
 
-  - name: Install sandcastle, our sandboxing tech (needed when running as a service)
+  - name: Pip install sandcastle, our sandboxing tech (needed when running as a service)
     pip:
       name: git+https://github.com/packit-service/sandcastle
-      executable: pip3
 
-  - name: Install pip pre-commit
-    command: pip3 install pre-commit
+  - name: Pip install pre-commit
+    pip:
+      name: pre-commit
