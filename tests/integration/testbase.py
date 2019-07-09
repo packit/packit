@@ -51,9 +51,12 @@ class PackitUnittestOgr(unittest.TestCase):
         self.conf = self.get_test_config()
         file_pagure = self.get_datafile_filename(service_name="pagure")
         file_github = self.get_datafile_filename(service_name="github")
-        self.is_write_mode = bool(os.environ.get("FORCE_WRITE"))
-        self.storage_pagure = PersistentObjectStorage(file_pagure, self.is_write_mode)
-        self.storage_github = PersistentObjectStorage(file_github, self.is_write_mode)
+        self.storage_pagure = PersistentObjectStorage(
+            file_pagure, dump_after_store=True
+        )
+        self.storage_github = PersistentObjectStorage(
+            file_github, dump_after_store=True
+        )
         # put peristent storage class attribute to pagure and github where it is used
         packit.distgit.PagureService.persistent_storage = self.storage_pagure
         packit.ogr_services.GithubService.persistent_storage = self.storage_github
@@ -67,6 +70,8 @@ class PackitUnittestOgr(unittest.TestCase):
         self.pc = get_package_config_from_repo(
             sourcegit_project=self.project_ogr, ref="master"
         )
+        if not self.pc:
+            raise RuntimeError("Package config not found.")
         self.dg = packit.distgit.DistGit(self.conf, self.pc)
         self.lp = LocalProject(git_project=self.project_ogr)
         self.upstream = packit.upstream.Upstream(
