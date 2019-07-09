@@ -25,7 +25,7 @@ Update selected component from upstream in Fedora
 """
 
 import logging
-import os
+from os import getcwd
 
 import click
 
@@ -77,7 +77,7 @@ logger = logging.getLogger(__file__)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
-    default=os.path.abspath(os.path.curdir),
+    default=getcwd(),
 )
 @click.argument("version", required=False)
 @pass_config

@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import logging
-import os
+from os import getcwd
 
 import click
 
@@ -54,7 +54,7 @@ logger = logging.getLogger("packit")
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
-    default=os.path.abspath(os.path.curdir),
+    default=getcwd(),
 )
 @pass_config
 @cover_packit_exception
