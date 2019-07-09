@@ -34,7 +34,7 @@ from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
-from packit.utils import cwd
+from packit.utils import cwd, rpmdev_bumpspec
 
 logger = logging.getLogger(__name__)
 
@@ -352,3 +352,23 @@ class PackitRepositoryBase:
         # PermissionError: [Errno 13] Permission denied: 'systemd-8bca462.tar.gz'
         with cwd(self.absolute_specfile_dir):
             self.specfile.download_remote_sources()
+
+    def set_specfile_content(self, specfile: SpecFile, version: str, comment: str):
+        """
+        update this specfile using provided specfile + rpmdev-bumpsec
+        preserve changelog in this spec
+
+        :param specfile:
+        :param version:
+        :param comment:
+        :return:
+        """
+        this_changelog = self.specfile.spec_content.section("%changelog")
+        this_version = self.specfile.get_version()
+        self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
+        self.specfile.spec_content.replace_section("%changelog", this_changelog)
+        # if version is equal, rpmdev bumpspec won't do anything
+        self.specfile.set_version(this_version)
+        self.specfile.save()
+        rpmdev_bumpspec(self.absolute_specfile_path, comment=comment, version=version)
+        self.specfile._update_data()  # refresh the spec after we changed it

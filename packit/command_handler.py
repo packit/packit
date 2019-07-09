@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Type, List, Optional
+from typing import Dict, Type, List
 
 from packit import utils
 from packit.config import RunCommandType, Config
@@ -30,7 +30,13 @@ class CommandHandler:
         self.local_project = local_project
         self.config = config
 
-    def run_command(self, command: List[str], return_output=True):
+    def run_command(self, command: List[str], return_output: bool = True):
+        """
+        exec a command
+
+        :param command: the command
+        :param return_output: return output from this method if True
+        """
         raise NotImplementedError("This should be implemented")
 
     def clean(self):
@@ -44,8 +50,10 @@ class LocalCommandHandler(CommandHandler):
 
     def run_command(self, command: List[str], return_output=True):
         """
-        :param command: command to execute
-        :param return_output: return output of the command if True
+        exec a command
+
+        :param command: the command
+        :param return_output: return output from this method if True
         """
         return utils.run_command(
             cmd=command, cwd=self.local_project.working_dir, output=return_output
@@ -76,12 +84,12 @@ class SandcastleCommandHandler(CommandHandler):
             mapped_dir=md,
         )
 
-    def run_command(self, command: List[str], return_output=True) -> Optional[str]:
+    def run_command(self, command: List[str], return_output=True):
         """
         Executes command in a sandbox provided by sandcastle.
 
-        :param command: command to execute
-        :param return_output: return the output as str if True
+        :param command: the command
+        :param return_output: return output from this method if True
         """
         if not self.sandcastle.is_pod_already_deployed():
             self.sandcastle.run()
