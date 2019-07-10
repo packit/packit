@@ -454,13 +454,11 @@ class Upstream(PackitRepositoryBase):
         :return: path to the srpm
         """
         if self.running_in_service():
-            srpm_dir = self.config.command_handler_work_dir
-            rpmbuild_dir = Path(self.config.command_handler_work_dir).joinpath(
-                Path(self.package_config.specfile_path).parent
-            )
+            srpm_dir = "."
+            rpmbuild_dir = "."
         else:
             srpm_dir = srpm_dir or os.getcwd()
-            rpmbuild_dir = self.absolute_specfile_dir
+            rpmbuild_dir = str(self.absolute_specfile_dir)
         cmd = [
             "rpmbuild",
             "-bs",

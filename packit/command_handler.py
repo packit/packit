@@ -73,8 +73,7 @@ class SandcastleCommandHandler(CommandHandler):
         self.sandcastle = Sandcastle(
             image_reference=config.command_handler_image_reference,
             k8s_namespace_name=config.command_handler_k8s_namespace,
-            working_dir=config.command_handler_work_dir,
-            mapped_dirs=[md],
+            mapped_dir=md,
         )
 
     def run_command(self, command: List[str], return_output=True) -> Optional[str]:
