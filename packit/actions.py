@@ -30,7 +30,8 @@ class ActionName(Enum):
     Can be defined by user in the per-package config file and used to overwrite the default
     implementation.
 
-    New action needs to be added here and to the table in the `./docs/actions.md`.
+    New action needs to be added here and to the table in the
+    `https://github.com/packit-service/packit.dev/content/user-docs/actions.md`.
     (Some values are also used in tests:
     - tests/unit/test_config.py
     - tests/unit/test_actions.py
