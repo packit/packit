@@ -498,4 +498,6 @@ class Upstream(PackitRepositoryBase):
         if srpm_path:
             shutil.move(the_srpm, srpm_path)
             return Path(srpm_path)
+        if self.running_in_service():
+            return Path(self.local_project.working_dir).joinpath(the_srpm)
         return Path(the_srpm)
