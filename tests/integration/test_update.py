@@ -70,6 +70,10 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
         spec = get_specfile(str(d / "beer.spec"))
         assert spec.get_version() == "0.1.0"
         assert (d / "README.packit").is_file()
+        # assert that we have changelog entries for both versions
+        changelog = "\n".join(spec.spec_content.section("%changelog"))
+        assert "0.0.0" in changelog
+        assert "0.1.0" in changelog
 
 
 def test_basic_local_update_from_downstream(
