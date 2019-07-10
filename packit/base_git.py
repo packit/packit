@@ -358,10 +358,9 @@ class PackitRepositoryBase:
         update this specfile using provided specfile + rpmdev-bumpsec
         preserve changelog in this spec
 
-        :param specfile:
-        :param version:
-        :param comment:
-        :return:
+        :param specfile: specfile to get changes from (we update self.specfile)
+        :param version: version to set in self.specfile
+        :param comment: new comment for the version in %changelog
         """
         this_changelog = self.specfile.spec_content.section("%changelog")
         this_version = self.specfile.get_version()
