@@ -38,6 +38,7 @@ except ImportError:
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
+from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
 from packit.ogr_services import get_github_service
@@ -414,6 +415,20 @@ class Upstream(PackitRepositoryBase):
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
             raise PackitException("rebase-helper didn't do the job")
 
+    def get_archive_extension(self, archive_basename: str, version: str) -> str:
+        """
+        Obtains archive extension from SpecFile based on basename of the archive.
+        Defaults to .tar.gz if no Source corresponds to the basename.
+        """
+        for source in self.specfile.get_sources():
+            base = os.path.basename(source)
+            # Version in archive_basename could contain hash, the version
+            # can be different from Spec version. Replace it to ensure proper match.
+            base = base.replace(self.specfile.get_version(), version)
+            if base.startswith(archive_basename):
+                return base[len(archive_basename):]
+        return ".tar.gz"
+
     def create_archive(self, version: str = None):
         """
         Create archive, using `git archive` by default, from the content of the upstream
@@ -431,9 +446,14 @@ class Upstream(PackitRepositoryBase):
             if self.package_config.create_tarball_command:
                 archive_cmd = self.package_config.create_tarball_command
             else:
-                # FIXME: .tar.gz is naive, we could guess it from archive suffix in spec
-                #        or ask people to tell us
-                archive_name = f"{dir_name}.tar.gz"
+                archive_extension = self.get_archive_extension(dir_name, version)
+                if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
+                    raise PackitException(
+                        "The target archive doesn't use a common extension ({}), "
+                        "git archive can't be used. Please provide your own script "
+                        "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
+                    )
+                archive_name = f"{dir_name}{archive_extension}"
                 archive_cmd = [
                     "git",
                     "archive",
