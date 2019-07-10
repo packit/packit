@@ -58,7 +58,7 @@ COPR2GITHUB_STATE = {
 }
 
 PACKIT_CONFIG_TEMPLATE = """# See the documentation for more information:
-# https://github.com/packit-service/packit/blob/master/docs/configuration.md
+# https://packit.dev/user-docs/configuration/
 
 specfile_path: {downstream_package_name}.spec
 
