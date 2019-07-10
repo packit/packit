@@ -436,6 +436,10 @@ class PackitAPI:
                     version=version, changelog_entry="Development snapshot"
                 )
         srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
+        if not srpm_path.exists():
+            raise PackitException(
+                f"SRPM was created successfully, but can't be found at {srpm_path}"
+            )
         return srpm_path
 
     @staticmethod
@@ -549,7 +553,6 @@ class PackitAPI:
                     f"Copr project {owner}/{project} not found."
                 )
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
-        assert srpm_path.exists()
         logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
         build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url

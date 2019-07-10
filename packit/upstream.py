@@ -494,6 +494,7 @@ class Upstream(PackitRepositoryBase):
             the_srpm = re.findall(reg, out)[0]
         except IndexError:
             raise PackitException("SRPM cannot be found, something is wrong.")
+        logger.info("SRPM is %s", the_srpm)
         if srpm_path:
             shutil.move(the_srpm, srpm_path)
             return Path(srpm_path)
