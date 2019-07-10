@@ -73,14 +73,8 @@ def get_github_service(
         logger.debug("Authenticating with Github using a token.")
         gh_service_kwargs = dict(token=config.github_token, read_only=config.dry_run)
     if config.github_requests_log_path:
-        if config.github_token:
-            write_mode = True
-        else:
-            write_mode = False
         s = PersistentObjectStorage(
-            storage_file=config.github_requests_log_path,
-            is_write_mode=write_mode,
-            dump_after_store=True,
+            storage_file=config.github_requests_log_path, dump_after_store=True
         )
         gh_service_kwargs.update(dict(persistent_storage=s))
     gh_service = GithubService(**gh_service_kwargs)
