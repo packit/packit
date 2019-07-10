@@ -23,7 +23,7 @@ For the run-down of the planned work, please see the task-list below.
 
 * [ ] E2E workflow for getting upstream releases into Fedora using packit CLI.
   * [x] Bring new upstream releases into Fedora rawhide as dist-git pull
-        requests. ([propose-update](https://packit.dev/user-docs/cli/propose-update/) command included in 0.1.0 release)
+        requests. ([propose-update](https://packit.dev/docs/cli/propose-update/) command included in 0.1.0 release)
   * [x] Build the change once it's merged. #137
   * [x] Send new downstream changes back to upstream. (so the spec files are in
         sync) #145
@@ -47,16 +47,16 @@ For the run-down of the planned work, please see the task-list below.
 
 This list contains workflows covered by packit tool and links to the documentation.
 
-* [Update Fedora dist-git with an upstream release.](https://packit.dev/user-docs/cli/propose-update/)
-* [Build content of a Fedora dist-git branch in koji.](https://packit.dev/user-docs/cli/build/)
-* [Create a bodhi update.](https://packit.dev/user-docs/cli/create-bodhi-update/)
-* [Create a SRPM from the current content in the upstream repository.](https://packit.dev/user-docs/cli/srpm/)
-* [Sync content of the Fedora dist-git repo into the upstream repository.](https://packit.dev/user-docs/cli/sync-from-downstream/)
+* [Update Fedora dist-git with an upstream release.](https://packit.dev/docs/cli/propose-update/)
+* [Build content of a Fedora dist-git branch in koji.](https://packit.dev/docs/cli/build/)
+* [Create a bodhi update.](https://packit.dev/docs/cli/create-bodhi-update/)
+* [Create a SRPM from the current content in the upstream repository.](https://packit.dev/docs]/cli/srpm/)
+* [Sync content of the Fedora dist-git repo into the upstream repository.](https://packit.dev/docs]/cli/sync-from-downstream/)
 
 
 ## Configuration
 
-Configuration file for packit is described [here](http://packit.dev/user-docs/configuration/).
+Configuration file for packit is described [here](http://packit.dev/docs]/configuration/).
 
 TL;DR
 

@@ -1,1 +1,1 @@
-The content of this document was moved to our website: https://packit.dev/user-docs/configuration/
+The content of this document was moved to our website: https://packit.dev/docs/configuration/
