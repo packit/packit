@@ -201,6 +201,15 @@ class PackitAPI:
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
                 )
+
+                # exclude spec, we have special plans for it
+                raw_sync_files = [
+                    x for x in raw_sync_files if x.src != self.up.absolute_specfile_path
+                ]
+
+                comment = f"- new upstream release: {full_version}"
+                self.dg.set_specfile_content(self.up.specfile, full_version, comment)
+
                 sync_files(raw_sync_files)
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
@@ -214,6 +223,7 @@ class PackitAPI:
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
 
+            # when the action is defined, we still need to copy the files
             if self.up.has_action(action=ActionName.prepare_files):
                 raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
                     Path(self.up.local_project.working_dir),
@@ -426,6 +436,10 @@ class PackitAPI:
                     version=version, changelog_entry="Development snapshot"
                 )
         srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
+        if not srpm_path.exists():
+            raise PackitException(
+                f"SRPM was created successfully, but can't be found at {srpm_path}"
+            )
         return srpm_path
 
     @staticmethod
@@ -539,7 +553,6 @@ class PackitAPI:
                     f"Copr project {owner}/{project} not found."
                 )
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
-        assert srpm_path.exists()
         logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
         build = client.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
