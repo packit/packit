@@ -62,6 +62,7 @@ logger = logging.getLogger(__file__)
 @click.option(
     "--no-pr",
     is_flag=True,
+    default=False,
     help="Do not create a pull request to downstream repository.",
 )
 @click.option(
