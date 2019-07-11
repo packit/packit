@@ -46,7 +46,10 @@ logger = logging.getLogger(__file__)
     "--upstream-branch", help="Target branch in upstream to sync to.", default="master"
 )
 @click.option(
-    "--no-pr", is_flag=True, help="Do not create a pull request to upstream repository."
+    "--no-pr",
+    is_flag=True,
+    default=False,
+    help="Do not create a pull request to upstream repository.",
 )
 @click.option(
     "--fork/--no-fork",

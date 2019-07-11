@@ -60,6 +60,12 @@ logger = logging.getLogger(__file__)
     help="Upload the new sources also when the archive is already in the lookaside cache.",
 )
 @click.option(
+    "--no-pr",
+    is_flag=True,
+    default=False,
+    help="Do not create a pull request to downstream repository.",
+)
+@click.option(
     "--remote",
     default=None,
     help=(
@@ -87,6 +93,7 @@ def update(
     dist_git_path,
     dist_git_branch,
     force_new_sources,
+    no_pr,
     local_content,
     path_or_url,
     upstream_ref,
@@ -111,4 +118,5 @@ def update(
         version=version,
         force_new_sources=force_new_sources,
         upstream_ref=upstream_ref,
+        create_pr=not no_pr,
     )

@@ -26,12 +26,12 @@ This is the official python interface for packit.
 
 import asyncio
 import logging
-import time
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable
 
+import time
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
 from tabulate import tabulate
@@ -139,6 +139,7 @@ class PackitAPI:
         version: str = None,
         force_new_sources=False,
         upstream_ref: str = None,
+        create_pr: bool = True,
     ):
         """
         Update given package in Fedora
@@ -169,22 +170,21 @@ class PackitAPI:
             self.dg.check_last_commit()
 
             self.up.run_action(actions=ActionName.pre_sync)
-
-            local_pr_branch = f"{full_version}-{dist_git_branch}-update"
-            # fetch and reset --hard upstream/$branch?
-            logger.info(f"Using {dist_git_branch!r} dist-git branch")
-
             self.dg.create_branch(
                 dist_git_branch,
                 base=f"remotes/origin/{dist_git_branch}",
                 setup_tracking=True,
             )
 
+            # fetch and reset --hard upstream/$branch?
+            logger.info(f"Using {dist_git_branch!r} dist-git branch")
             self.dg.update_branch(dist_git_branch)
             self.dg.checkout_branch(dist_git_branch)
 
-            self.dg.create_branch(local_pr_branch)
-            self.dg.checkout_branch(local_pr_branch)
+            if create_pr:
+                local_pr_branch = f"{full_version}-{dist_git_branch}-update"
+                self.dg.create_branch(local_pr_branch)
+                self.dg.checkout_branch(local_pr_branch)
 
             description = (
                 f"Upstream tag: {full_version}\n"
@@ -233,11 +233,15 @@ class PackitAPI:
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
-            self.push_and_create_pr(
-                pr_title=f"Update to upstream release {full_version}",
-                pr_description=description,
-                dist_git_branch=dist_git_branch,
-            )
+            if create_pr:
+                self.push_and_create_pr(
+                    pr_title=f"Update to upstream release {full_version}",
+                    pr_description=description,
+                    dist_git_branch=dist_git_branch,
+                )
+            else:
+                logger.info(f"Pushing changes to '{dist_git_branch}' distgit branch.")
+                self.dg.local_project.git_repo.remote().push()
         finally:
             if not use_local_content:
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
