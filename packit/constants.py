@@ -31,12 +31,7 @@ CONFIG_FILE_NAMES = [
     "packit.json",
 ]
 
-COMMON_ARCHIVE_EXTENSIONS = [
-    ".tar.gz",
-    ".tar.bz2",
-    ".tar.xz",
-    ".zip",
-]
+COMMON_ARCHIVE_EXTENSIONS = [".tar.gz", ".tar.bz2", ".tar.xz", ".zip"]
 
 # fedmsg topics
 URM_NEW_RELEASE_TOPIC = "org.release-monitoring.prod.anitya.project.version.update"
