@@ -13,7 +13,7 @@
 
 ## Features
 * Packit service now submits builds in [copr](https://copr.fedorainfracloud.org) and once they're done it adds a GitHub status and comment with instructions how to install the builds.
-* Packit service is now configurable via [jobs](https://packit.dev/user-docs/configuration/#packit-service-jobs) defined in configuration file.
+* Packit service is now configurable via [jobs](https://packit.dev/docs/configuration/#packit-service-jobs) defined in configuration file.
 * Packit is now able to check GPG signatures of the upstream commits against configured fingerprints.
 * [CLI] `srpm` command now works also with [Source-git](https://packit.dev/source-git/).
 * Fedmsg parsing has been unified into a single `listen-to-fedmsg` command.
@@ -117,7 +117,7 @@ The first official release of packit!
 ## Features
 
 * `packit propose-update` brings a new upstream release into Fedora rawhide.
-  For more info, please [check out the documentation](https://packit.dev/user-docs/cli/propose-update/).
+  For more info, please [check out the documentation](https://packit.dev/docs/cli/propose-update/).
 
 * `packit watch-releases` listens to github events for new upstream releases.
   If an upstream project uses packit, it would bring the upstream release into
