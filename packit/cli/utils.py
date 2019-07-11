@@ -106,7 +106,7 @@ def get_packit_api(
     Load the package config, set other options and return the PackitAPI
     """
     package_config = get_local_package_config(
-        local_project.working_dir, try_local_dir_first=True
+        local_project.working_dir, try_local_dir_last=True
     )
 
     if dist_git_path:
