@@ -26,6 +26,7 @@ import shutil
 import subprocess
 from os import chdir
 from pathlib import Path
+from typing import Tuple
 
 import pytest
 from flexmock import flexmock
@@ -99,7 +100,7 @@ def mock_spec_download_remote_s(path: Path):
     flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
 
 
-def mock_remote_functionality(distgit, upstream):
+def mock_remote_functionality(distgit: Path, upstream: Path):
     def mocked_pr_create(*args, **kwargs):
         return PullRequest(
             title="",
@@ -136,12 +137,18 @@ def mock_remote_functionality(distgit, upstream):
 
     mock_spec_download_remote_s(distgit)
 
+    dglp = LocalProject(
+        working_dir=str(distgit),
+        git_url="https://packit.dev/rpms/beer",
+        git_service=PagureService(),
+    )
     flexmock(
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,
         # let's not hammer the production lookaside cache webserver
         is_archive_in_lookaside_cache=lambda archive_path: False,
         build=lambda scratch: None,
+        local_project=dglp,
     )
 
     def mocked_new_sources(sources=None):
@@ -162,7 +169,7 @@ def mock_patching():
 
 
 @pytest.fixture()
-def upstream_distgit_remote(tmpdir):
+def upstream_distgit_remote(tmpdir) -> Tuple[Path, Path, Path]:
     t = Path(str(tmpdir))
 
     u_remote = t / "upstream_remote"
@@ -239,7 +246,7 @@ def upstream_instance(upstream_n_distgit, tmpdir):
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
         pc.downstream_project_url = str(d)
-        lp = LocalProject(path_or_url=str(u))
+        lp = LocalProject(working_dir=str(u))
 
         ups = Upstream(c, pc, lp)
         yield u, ups
@@ -277,7 +284,7 @@ def api_instance(upstream_n_distgit):
 
     pc = get_local_package_config(str(u))
     pc.upstream_project_url = str(u)
-    up_lp = LocalProject(path_or_url=str(u))
+    up_lp = LocalProject(working_dir=str(u))
 
     api = PackitAPI(c, pc, up_lp)
     yield u, d, api
@@ -292,7 +299,7 @@ def api_instance_source_git(sourcegit_n_distgit):
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
         pc.downstream_project_url = str(distgit)
-        up_lp = LocalProject(path_or_url=str(sourcegit))
+        up_lp = LocalProject(working_dir=str(sourcegit))
         api = PackitAPI(c, pc, up_lp)
         return api
 

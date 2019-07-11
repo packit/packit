@@ -29,6 +29,7 @@ import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Tuple, Any
+from urllib.parse import urlparse
 
 import git
 
@@ -262,3 +263,19 @@ def rpmdev_bumpspec(
         cmd += [f"--file={changelog_file}"]
     cmd += [str(specfile_path)]
     run_command(cmd)
+
+
+def is_str_url(inp: str) -> bool:
+    """ is provided string a URL? """
+    if not inp:
+        return False
+    parsed = urlparse(inp)
+    if parsed.scheme:
+        logger.debug(f"Provided input {inp} is an url, scheme: {parsed.scheme}")
+        return True
+    elif inp.startswith("git@"):
+        url = urlparse(inp.replace(":", "/", 1).replace("git@", "git+ssh://", 1))
+        logger.debug(f"SSH style url {url} found.")
+        return True
+    logger.warning(f"{inp} is not an URL we recognize")
+    return False

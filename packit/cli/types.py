@@ -19,10 +19,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import logging
+import os
 
 import click
 
 from packit.local_project import LocalProject
+from packit.utils import is_str_url
+
+logger = logging.getLogger(__name__)
 
 
 class LocalProjectParameter(click.ParamType):
@@ -55,9 +60,21 @@ class LocalProjectParameter(click.ParamType):
                             branch_name = param.default
             remote_name = ctx.params.get(self.remote_param_name, None)
 
-            local_project = LocalProject(
-                path_or_url=value, ref=branch_name, remote=remote_name
-            )
+            if os.path.isdir(value):
+                logger.info(f"Input is a directory: {value}")
+                local_project = LocalProject(
+                    working_dir=value, ref=branch_name, remote=remote_name
+                )
+            elif is_str_url(value):
+                logger.info(f"Input is a URL to a git repo: {value}")
+                local_project = LocalProject(
+                    git_url=value, ref=branch_name, remote=remote_name
+                )
+            else:
+                self.fail(
+                    "Provided input path_or_url is not a directory nor an URL of a git repo."
+                )
+
             if not local_project.working_dir and not local_project.git_url:
                 self.fail(
                     "Parameter is not an existing directory nor correct git url.",
