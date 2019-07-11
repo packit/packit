@@ -101,12 +101,31 @@ def test_set_spec_ver(upstream_instance):
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
 
 
-def test_create_archive(upstream_instance):
+def change_source0_ext(upstream, extension):
+    preamble = upstream.specfile.spec_content.section('%package')
+    for i, line in enumerate(preamble):
+        if line.startswith('Source0'):
+            source = line.split()[1]
+            start = line.index(source)
+            source = source.rstrip("".join(Path(source).suffixes)) + extension
+            preamble[i] = line[:start] + source
+    upstream.specfile.save()
+
+
+@pytest.mark.parametrize('extension', [
+    '.tar.gz',
+    '.tar.bz2',
+], ids=[
+    '.tar.gz',
+    '.tar.bz2'
+])
+def test_create_archive(upstream_instance, extension):
     u, ups = upstream_instance
+    change_source0_ext(ups, extension)
 
     ups.create_archive()
 
-    assert u.glob("*.tar.gz")
+    assert u.glob(f"*{extension}")
 
     u.joinpath("README").write_text("\nEven better now!\n")
     subprocess.check_call(["git", "add", "."], cwd=u)
@@ -114,7 +133,15 @@ def test_create_archive(upstream_instance):
 
     ups.create_archive()
 
-    assert len(list(u.glob("*.tar.gz"))) == 2
+    assert len(list(u.glob(f"*{extension}"))) == 2
+
+
+def test_create_uncommon_archive(upstream_instance):
+    u, ups = upstream_instance
+    change_source0_ext(ups, '.cpio')
+
+    with pytest.raises(PackitException):
+        ups.create_archive()
 
 
 def test_create_srpm(upstream_instance, tmpdir):
