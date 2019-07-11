@@ -162,7 +162,7 @@ def mock_patching():
 
 
 @pytest.fixture()
-def upstream_n_distgit(tmpdir):
+def upstream_distgit_remote(tmpdir):
     t = Path(str(tmpdir))
 
     u_remote = t / "upstream_remote"
@@ -178,7 +178,13 @@ def upstream_n_distgit(tmpdir):
     initiate_git_repo(d, push=True, upstream_remote=str(u_remote))
     prepare_dist_git_repo(d)
 
-    return u, d
+    return u, d, u_remote
+
+
+@pytest.fixture()
+def upstream_n_distgit(upstream_distgit_remote):
+    upstream, distgit, _ = upstream_distgit_remote
+    return upstream, distgit
 
 
 @pytest.fixture()

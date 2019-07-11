@@ -19,6 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import subprocess
+from pathlib import Path
+
 import pytest
 from flexmock import flexmock
 
@@ -74,6 +77,33 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
         changelog = "\n".join(spec.spec_content.section("%changelog"))
         assert "0.0.0" in changelog
         assert "0.1.0" in changelog
+
+
+def test_basic_local_update_direct_push(
+    upstream_distgit_remote, mock_remote_functionality_upstream
+):
+    """ basic propose-update test: mock remote API, use local upstream and dist-git """
+    upstream, distgit, remote_dir = upstream_distgit_remote
+
+    with cwd(upstream):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(upstream))
+        pc.upstream_project_url = str(upstream)
+        pc.downstream_project_url = str(distgit)
+        up_lp = LocalProject(path_or_url=str(upstream))
+        api = PackitAPI(c, pc, up_lp)
+        api.sync_release("master", "0.1.0", create_pr=False)
+
+        remote_dir_clone = Path(f"{remote_dir}-clone")
+        subprocess.check_call(
+            ["git", "clone", remote_dir, str(remote_dir_clone)],
+            cwd=str(remote_dir_clone.parent),
+        )
+
+        spec = get_specfile(str(remote_dir_clone / "beer.spec"))
+        assert spec.get_version() == "0.1.0"
+        assert (remote_dir_clone / "README.packit").is_file()
 
 
 def test_basic_local_update_from_downstream(
