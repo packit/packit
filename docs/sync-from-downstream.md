@@ -1,1 +1,1 @@
-The content of this document was moved to our website: https://packit.dev/user-docs/cli/sync-from-downstream/
+The content of this document was moved to our website: https://packit.dev/docs/cli/sync-from-downstream/
