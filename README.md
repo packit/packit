@@ -56,7 +56,7 @@ This list contains workflows covered by packit tool and links to the documentati
 
 ## Configuration
 
-Configuration file for packit is described [here](http://packit.dev/docs]/configuration/).
+Configuration file for packit is described [here](http://packit.dev/docs/configuration/).
 
 TL;DR
 
