@@ -46,10 +46,11 @@ logger = logging.getLogger(__file__)
 @click.option(
     "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
 )
+@click.option("--nowait", is_flag=True, default=False, help="Don't wait on build")
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
-def build(config, dist_git_path, dist_git_branch, scratch, path_or_url):
+def build(config, dist_git_path, dist_git_branch, scratch, nowait, path_or_url):
     """
     Build selected upstream project in Fedora.
 
@@ -61,4 +62,4 @@ def build(config, dist_git_path, dist_git_branch, scratch, path_or_url):
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
-    api.build(dist_git_branch, scratch=scratch)
+    api.build(dist_git_branch, scratch=scratch, nowait=nowait)
