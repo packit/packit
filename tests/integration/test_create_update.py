@@ -299,7 +299,7 @@ def test_basic_bodhi_update(
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
         pc.downstream_project_url = str(d)
-        up_lp = LocalProject(path_or_url=u)
+        up_lp = LocalProject(working_dir=u)
 
         api = PackitAPI(c, pc, up_lp)
 

@@ -23,7 +23,7 @@
 import pytest
 from packit.exceptions import PackitException
 
-from packit.utils import get_namespace_and_repo_name
+from packit.utils import get_namespace_and_repo_name, is_str_url
 
 
 @pytest.mark.parametrize(
@@ -45,3 +45,17 @@ def test_get_ns_repo_exc():
         get_namespace_and_repo_name(url)
     msg = f"Invalid URL format, can't obtain namespace and repository name: {url}"
     assert msg in str(ex.value)
+
+
+@pytest.mark.parametrize(
+    "inp,ok",
+    [
+        ("/", False),
+        (None, False),
+        ("https://github.com/packit-service/packit", True),
+        ("git@github.com:packit-service/ogr", True),
+        ("ssh://ttomecek@pkgs.fedoraproject.org/rpms/alot.git", True),
+    ],
+)
+def test_is_str_url(inp, ok):
+    assert is_str_url(inp) == ok

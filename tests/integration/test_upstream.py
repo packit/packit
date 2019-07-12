@@ -102,9 +102,9 @@ def test_set_spec_ver(upstream_instance):
 
 
 def change_source0_ext(upstream, extension):
-    preamble = upstream.specfile.spec_content.section('%package')
+    preamble = upstream.specfile.spec_content.section("%package")
     for i, line in enumerate(preamble):
-        if line.startswith('Source0'):
+        if line.startswith("Source0"):
             source = line.split()[1]
             start = line.index(source)
             source = source.rstrip("".join(Path(source).suffixes)) + extension
@@ -112,13 +112,9 @@ def change_source0_ext(upstream, extension):
     upstream.specfile.save()
 
 
-@pytest.mark.parametrize('extension', [
-    '.tar.gz',
-    '.tar.bz2',
-], ids=[
-    '.tar.gz',
-    '.tar.bz2'
-])
+@pytest.mark.parametrize(
+    "extension", [".tar.gz", ".tar.bz2"], ids=[".tar.gz", ".tar.bz2"]
+)
 def test_create_archive(upstream_instance, extension):
     u, ups = upstream_instance
     change_source0_ext(ups, extension)
@@ -138,7 +134,7 @@ def test_create_archive(upstream_instance, extension):
 
 def test_create_uncommon_archive(upstream_instance):
     u, ups = upstream_instance
-    change_source0_ext(ups, '.cpio')
+    change_source0_ext(ups, ".cpio")
 
     with pytest.raises(PackitException):
         ups.create_archive()
