@@ -21,17 +21,14 @@
 # SOFTWARE.
 
 import logging
-import os
 import shutil
 from contextlib import contextmanager
 from typing import Optional, Union
 
 import git
-
-from urllib.parse import urlparse
 from ogr.abstract import GitProject, GitService
-from packit.exceptions import PackitException
 
+from packit.exceptions import PackitException
 from packit.utils import (
     is_git_repo,
     get_repo,
@@ -56,8 +53,6 @@ class LocalProject:
     - full_name: "$namespace/$repo"
     - namespace: namespace of the remote project
     - repo_name: name of the remote project
-    - path_or_url: working_dir if the directory exists
-                    and git_url if the request is valid
 
 
     Local project can compute other attributes if it is possible.
@@ -75,7 +70,6 @@ class LocalProject:
         full_name: str = "",
         namespace: str = "",
         repo_name: str = "",
-        path_or_url: str = "",
         offline: bool = False,
         refresh: bool = True,
         remote: str = "",
@@ -92,20 +86,12 @@ class LocalProject:
         :param full_name: str ("$namespace/$repo")
         :param namespace: str (namespace of the remote project)
         :param repo_name: str (name of the remote project)
-        :param path_or_url: str (used as working_dir if it is an existing directory,
-                                used as git_url if the it is a request-able url)
         :param offline: bool (do not use any network action, defaults to False)
         :param refresh: bool (calculate the missing attributes, defaults to True)
         :param remote: name of the git remote to use
         :param pr_id: ID of the pull request to fetch and check out
         """
         self.working_dir_temporary = False
-        if path_or_url:
-            if os.path.isdir(path_or_url):
-                working_dir = working_dir or path_or_url
-            elif not offline and self._is_url(path_or_url):
-                git_url = git_url or path_or_url
-
         self.git_repo: git.Repo = git_repo
         self.working_dir: str = working_dir
         self._ref = ref
@@ -184,23 +170,6 @@ class LocalProject:
                 f"Leaving new ref: '{ref}' and checkout old ref: '{current_head}'"
             )
             self.git_repo.git.checkout(current_head)
-
-    def _is_url(self, path_or_url):
-        if urlparse(path_or_url).scheme:
-            url = urlparse(path_or_url)
-            logger.debug(f"Url {path_or_url} parsed. Resulting scheme: {url.scheme}")
-            return True
-        elif path_or_url.startswith("git@"):
-            url = urlparse(
-                path_or_url.replace(":", "/", 1).replace("git@", "git+ssh://", 1)
-            )
-            logger.debug(f"SSH style url {path_or_url} found.")
-            logger.debug(
-                f"Url parsed after replacing with {url.geturl()}. Resulting scheme: {url.scheme}"
-            )
-            return True
-        logger.warning("path_or_url is nor directory nor url")
-        return False
 
     def _parse_repo_name_full_name_and_namespace(self):
         change = False

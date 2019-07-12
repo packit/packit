@@ -426,7 +426,8 @@ class Upstream(PackitRepositoryBase):
             # can be different from Spec version. Replace it to ensure proper match.
             base = base.replace(self.specfile.get_version(), version)
             if base.startswith(archive_basename):
-                return base[len(archive_basename):]
+                archive_basename_len = len(archive_basename)
+                return base[archive_basename_len:]
         return ".tar.gz"
 
     def create_archive(self, version: str = None):
@@ -451,7 +452,9 @@ class Upstream(PackitRepositoryBase):
                     raise PackitException(
                         "The target archive doesn't use a common extension ({}), "
                         "git archive can't be used. Please provide your own script "
-                        "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
+                        "for archive creation.".format(
+                            ", ".join(COMMON_ARCHIVE_EXTENSIONS)
+                        )
                     )
                 archive_name = f"{dir_name}{archive_extension}"
                 archive_cmd = [
