@@ -150,6 +150,7 @@ class PackitAPI:
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
+        create_pr = create_pr or self.package_config.create_pr
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
