@@ -63,8 +63,6 @@ class Upstream(PackitRepositoryBase):
         self.config = config
         self.package_config = package_config
 
-        self.package_name: Optional[str] = self.package_config.downstream_package_name
-
         self.github_token = self.config.github_token
         self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
@@ -86,7 +84,7 @@ class Upstream(PackitRepositoryBase):
 
         if not self.local_project.repo_name:
             # will this ever happen?
-            self.local_project.repo_name = self.package_name
+            self.local_project.repo_name = self.package_config.downstream_package_name
 
     def checkout_pr(self, pr_id: int) -> None:
         """
@@ -440,7 +438,7 @@ class Upstream(PackitRepositoryBase):
             if self.package_config.upstream_project_name:
                 dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
             else:
-                dir_name = f"{self.package_name}-{version}"
+                dir_name = f"{self.package_config.downstream_package_name}-{version}"
             logger.debug("name + version = %s", dir_name)
             # We don't care about the name of the archive, really
             # we just require for the archive to be placed in the cwd

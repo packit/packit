@@ -122,7 +122,7 @@ class Status:
 
         b = BodhiClient()
         # { koji-target: "latest-build-nvr"}
-        builds_d = b.latest_builds(self.dg.package_name)
+        builds_d = b.latest_builds(self.dg.package_config.downstream_package_name)
         branches = self.dg.local_project.git_project.get_branches()
         logger.debug("Latest koji builds fetched.")
         builds: Dict = {}
@@ -147,7 +147,9 @@ class Status:
         from bodhi.client.bindings import BodhiClient
 
         b = BodhiClient()
-        results = b.query(packages=self.dg.package_name)["updates"]
+        results = b.query(packages=self.dg.package_config.downstream_package_name)[
+            "updates"
+        ]
         logger.debug("Bodhi updates fetched.")
         results = results[:number_of_updates]
 
