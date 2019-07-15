@@ -64,7 +64,6 @@ class DistGit(PackitRepositoryBase):
         self.github_token = self.config.github_token
         self.pagure_user_token = self.config.pagure_user_token
         self.pagure_fork_token = self.config.pagure_fork_token
-        self.package_name: Optional[str] = self.package_config.downstream_package_name
         self.fas_user = self.config.fas_user
         self.dist_git_url: str = self.package_config.downstream_project_url
         logger.debug(f"Using dist-git repo {self.dist_git_url}")
@@ -79,7 +78,7 @@ class DistGit(PackitRepositoryBase):
             self._local_project = LocalProject(
                 git_url=self.dist_git_url,
                 namespace=self.dist_git_namespace,
-                repo_name=self.package_name,
+                repo_name=self.package_config.downstream_package_name,
                 git_service=PagureService(
                     token=self.pagure_user_token,
                     instance_url=self.package_config.dist_git_base_url,
@@ -258,7 +257,8 @@ class DistGit(PackitRepositoryBase):
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
-                f"https://src.fedoraproject.org/lookaside/pkgs/{self.package_name}/{archive_name}/"
+                "https://src.fedoraproject.org/lookaside/pkgs/"
+                f"{self.package_config.downstream_package_name}/{archive_name}/"
             )
             if res.ok:
                 logger.info(
@@ -299,28 +299,31 @@ class DistGit(PackitRepositoryBase):
         # https://github.com/fedora-infra/bodhi/issues/3058
         from bodhi.client.bindings import BodhiClient, BodhiClientException
 
-        if not self.package_name:
-            raise PackitException("Package name is not set.")
         # bodhi will likely prompt for username and password if kerb ticket is not up
         b = BodhiClient()
         if not koji_builds:
             # alternatively we can call something like `koji latest-build rawhide sen`
-            builds_d = b.latest_builds(self.package_name)
+            builds_d = b.latest_builds(self.package_config.downstream_package_name)
 
             builds_str = "\n".join(f" - {b}" for b in builds_d)
-            logger.debug(f"Koji builds for package {self.package_name}: \n{builds_str}")
+            logger.debug(
+                "Koji builds for package "
+                f"{self.package_config.downstream_package_name}: \n{builds_str}"
+            )
 
             koji_tag = f"{dist_git_branch}-updates-candidate"
             try:
                 koji_builds = [builds_d[koji_tag]]
                 koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
                 logger.info(
-                    f"Koji builds for package {self.package_name} and koji tag {koji_tag}:"
+                    "Koji builds for package "
+                    f"{self.package_config.downstream_package_name} and koji tag {koji_tag}:"
                     f"\n{koji_builds_str}"
                 )
             except KeyError:
                 raise PackitException(
-                    f"There is no build for {self.package_name} in koji tag {koji_tag}"
+                    f"There is no build for {self.package_config.downstream_package_name} "
+                    "in koji tag {koji_tag}"
                 )
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us

@@ -110,7 +110,7 @@ def get_packit_api(
     )
 
     if dist_git_path:
-        package_config.downstream_project_url = dist_git_path
+        package_config._downstream_project_url = dist_git_path
     package_config.upstream_project_url = local_project.working_dir
 
     api = PackitAPI(
