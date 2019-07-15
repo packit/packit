@@ -17,4 +17,4 @@ check:
 
 check_in_container: test_container
 	rsync -a $(CURDIR)/ /tmp/packit
-	$(CONTAINER_RUN) bash -c "pip3 install .; make check"
+	$(CONTAINER_RUN) bash -c "pip3 install .; make check TEST_TARGET=$(TEST_TARGET)"
