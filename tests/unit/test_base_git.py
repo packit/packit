@@ -18,10 +18,11 @@ def distgit_with_actions():
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
+                downstream_package_name="beer",
                 actions={
                     ActionName.pre_sync: "command --a",
                     ActionName.get_current_version: "command --b",
-                }
+                },
             )
         ),
     )

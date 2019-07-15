@@ -133,12 +133,14 @@ def test_package_config_equal(job_config_simple):
             files_to_sync=[SyncFilesItem(src="packit.yaml", dest="packit.yaml")]
         ),
         jobs=[job_config_simple],
+        downstream_package_name="package",
     ) == PackageConfig(
         specfile_path="fedora/package.spec",
         synced_files=SyncFilesConfig(
             files_to_sync=[SyncFilesItem(src="packit.yaml", dest="packit.yaml")]
         ),
         jobs=[job_config_simple],
+        downstream_package_name="package",
     )
 
 
@@ -301,6 +303,7 @@ def test_package_config_parse_error(raw):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
                 "jobs": [get_job_config_dict_full()],
+                "downstream_package_name": "package",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -312,6 +315,7 @@ def test_package_config_parse_error(raw):
                     ]
                 ),
                 jobs=[get_job_config_full()],
+                downstream_package_name="package",
             ),
         ),
         (
@@ -324,6 +328,7 @@ def test_package_config_parse_error(raw):
                     "directory/files",
                 ],
                 "jobs": [get_job_config_dict_simple()],
+                "downstream_package_name": "package",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -338,6 +343,7 @@ def test_package_config_parse_error(raw):
                     ]
                 ),
                 jobs=[get_job_config_simple()],
+                downstream_package_name="package",
             ),
         ),
         (
@@ -345,6 +351,7 @@ def test_package_config_parse_error(raw):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
                 "jobs": [get_job_config_dict_full()],
+                "downstream_package_name": "package",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -356,6 +363,7 @@ def test_package_config_parse_error(raw):
                     ]
                 ),
                 jobs=[get_job_config_full()],
+                downstream_package_name="package",
             ),
         ),
         (
@@ -364,6 +372,7 @@ def test_package_config_parse_error(raw):
                 "synced_files": ["fedora/package.spec", "somefile"],
                 "jobs": [get_job_config_dict_full()],
                 "something": "stupid",
+                "downstream_package_name": "package",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -376,6 +385,7 @@ def test_package_config_parse_error(raw):
                     ]
                 ),
                 jobs=[get_job_config_full()],
+                downstream_package_name="package",
             ),
         ),
         (
@@ -387,6 +397,7 @@ def test_package_config_parse_error(raw):
                 "upstream_project_url": "https://github.com/asd/qwe",
                 "upstream_project_name": "qwe",
                 "dist_git_base_url": "https://something.wicked",
+                "downstream_package_name": "package",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -401,6 +412,7 @@ def test_package_config_parse_error(raw):
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
                 dist_git_base_url="https://something.wicked",
+                downstream_package_name="package",
             ),
         ),
         (
@@ -415,6 +427,7 @@ def test_package_config_parse_error(raw):
                 "upstream_project_url": "https://github.com/asd/qwe",
                 "upstream_project_name": "qwe",
                 "dist_git_base_url": "https://something.wicked",
+                "downstream_package_name": "package",
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -426,6 +439,7 @@ def test_package_config_parse_error(raw):
                 upstream_project_url="https://github.com/asd/qwe",
                 upstream_project_name="qwe",
                 dist_git_base_url="https://something.wicked",
+                downstream_package_name="package",
             ),
         ),
     ],
