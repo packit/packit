@@ -54,10 +54,12 @@ class FedPKG:
             fail=fail,
         )
 
-    def build(self, scratch: bool = False):
-        cmd = [self.fedpkg_exec, "build", "--nowait"]
+    def build(self, scratch: bool = False, nowait: bool = False):
+        cmd = [self.fedpkg_exec, "build"]
         if scratch:
             cmd.append("--scratch")
+        if nowait:
+            cmd.append("--nowait")
         out = run_command(
             cmd=cmd,
             cwd=self.directory,
