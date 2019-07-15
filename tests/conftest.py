@@ -147,7 +147,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         push_to_fork=lambda *args, **kwargs: None,
         # let's not hammer the production lookaside cache webserver
         is_archive_in_lookaside_cache=lambda archive_path: False,
-        build=lambda scratch: None,
+        build=lambda scratch, nowait: None,
         local_project=dglp,
     )
 

@@ -347,12 +347,13 @@ class PackitAPI:
                 archive = self.dg.download_upstream_archive()
                 self.dg.upload_to_lookaside_cache(str(archive))
 
-    def build(self, dist_git_branch: str, scratch: bool = False):
+    def build(self, dist_git_branch: str, scratch: bool = False, nowait: bool = False):
         """
         Build component in koji
 
         :param dist_git_branch: ref in dist-git
         :param scratch: should the build be a scratch build?
+        :param nowait: don't wait on build?
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
@@ -365,7 +366,7 @@ class PackitAPI:
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
-        self.dg.build(scratch=scratch)
+        self.dg.build(scratch=scratch, nowait=nowait)
 
     def create_update(
         self,
