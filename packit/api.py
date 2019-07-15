@@ -32,7 +32,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable
 
-import time
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
 from tabulate import tabulate
@@ -64,6 +63,7 @@ class PackitAPI:
 
         self._up = None
         self._dg = None
+        self._copr = None
 
     @property
     def up(self):
@@ -80,6 +80,12 @@ class PackitAPI:
         if self._dg is None:
             self._dg = DistGit(config=self.config, package_config=self.package_config)
         return self._dg
+
+    @property
+    def copr(self):
+        if self._copr is None:
+            self._copr = CoprClient.create_from_config_file()
+        return self._copr
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
         assert_existence(self.dg.local_project)
@@ -542,21 +548,20 @@ class PackitAPI:
         :return: id of the created build and url to its repo
         """
         # get info
-        client = CoprClient.create_from_config_file()
-        configured_owner = client.config.get("username")
+        configured_owner = self.copr.config.get("username")
         owner = owner or configured_owner
         try:
-            copr_proj = client.project_proxy.get(owner, project)
+            copr_proj = self.copr.project_proxy.get(owner, project)
             # make sure or project has chroots set correctly
             if set(copr_proj.chroot_repos.keys()) != set(chroots):
                 logger.info(f"Updating targets on project {owner}/{project}")
                 logger.debug(f"old = {set(copr_proj.chroot_repos.keys())}")
                 logger.debug(f"new = {set(chroots)}")
-                client.project_proxy.edit(owner, project, chroots=chroots)
+                self.copr.project_proxy.edit(owner, project, chroots=chroots)
         except CoprNoResultException:
             if owner == configured_owner:
                 logger.info(f"Copr project {owner}/{project} not found. Creating new.")
-                client.project_proxy.add(
+                self.copr.project_proxy.add(
                     ownername=owner,
                     projectname=project,
                     chroots=chroots,
@@ -572,19 +577,18 @@ class PackitAPI:
                 )
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
         logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
-        build = client.build_proxy.create_from_file(owner, project, srpm_path)
+        build = self.copr.build_proxy.create_from_file(owner, project, srpm_path)
         return build.id, build.repo_url
 
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
     ) -> str:
         """ returns copr build state """
-        client = CoprClient.create_from_config_file()
         watch_end = datetime.now() + timedelta(seconds=timeout)
         logger.debug(f"Watching copr build {build_id}")
         state_reported = ""
         while True:
-            build = client.build_proxy.get(build_id)
+            build = self.copr.build_proxy.get(build_id)
             if build.state == state_reported:
                 continue
             state_reported = build.state
