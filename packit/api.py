@@ -30,7 +30,7 @@ import os
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
@@ -355,13 +355,20 @@ class PackitAPI:
                 archive = self.dg.download_upstream_archive()
                 self.dg.upload_to_lookaside_cache(str(archive))
 
-    def build(self, dist_git_branch: str, scratch: bool = False, nowait: bool = False):
+    def build(
+        self,
+        dist_git_branch: str,
+        scratch: bool = False,
+        nowait: bool = False,
+        koji_target: Optional[str] = None,
+    ):
         """
-        Build component in koji
+        Build component in Fedora infra (defaults to koji)
 
         :param dist_git_branch: ref in dist-git
         :param scratch: should the build be a scratch build?
         :param nowait: don't wait on build?
+        :param koji_target: koji target to pick (see `koji list-targets`)
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
 
@@ -374,7 +381,7 @@ class PackitAPI:
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
-        self.dg.build(scratch=scratch, nowait=nowait)
+        self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_update(
         self,

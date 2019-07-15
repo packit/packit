@@ -44,13 +44,18 @@ logger = logging.getLogger(__file__)
     "Otherwise clone the repo in a temporary directory.",
 )
 @click.option(
+    "--koji-target", help="Koji target to build inside (see `koji list-targets`)."
+)
+@click.option(
     "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
 )
 @click.option("--nowait", is_flag=True, default=False, help="Don't wait on build")
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
-def build(config, dist_git_path, dist_git_branch, scratch, nowait, path_or_url):
+def build(
+    config, dist_git_path, dist_git_branch, scratch, nowait, path_or_url, koji_target
+):
     """
     Build selected upstream project in Fedora.
 
@@ -62,4 +67,4 @@ def build(config, dist_git_path, dist_git_branch, scratch, nowait, path_or_url):
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
-    api.build(dist_git_branch, scratch=scratch, nowait=nowait)
+    api.build(dist_git_branch, scratch=scratch, nowait=nowait, koji_target=koji_target)

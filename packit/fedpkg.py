@@ -21,8 +21,10 @@
 # SOFTWARE.
 
 from pathlib import Path
+from typing import Optional
 
-from packit.utils import run_command, logger
+from packit import utils  # so we can mock utils
+from packit.utils import logger
 
 
 class FedPKG:
@@ -47,27 +49,32 @@ class FedPKG:
         if not Path(self.directory).is_dir():
             raise Exception("Cannot access fedpkg repository:")
 
-        return run_command(
+        return utils.run_command(
             cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
             error_message=f"Adding new sources failed:",
             fail=fail,
         )
 
-    def build(self, scratch: bool = False, nowait: bool = False):
+    def build(
+        self,
+        scratch: bool = False,
+        nowait: bool = False,
+        koji_target: Optional[str] = None,
+    ):
         cmd = [self.fedpkg_exec, "build"]
         if scratch:
             cmd.append("--scratch")
         if nowait:
             cmd.append("--nowait")
-        out = run_command(
+        if koji_target:
+            cmd += ["--target", koji_target]
+        utils.run_command(
             cmd=cmd,
             cwd=self.directory,
             error_message="Submission of build to koji failed.",
             fail=True,
-            output=True,
         )
-        logger.info("%s", out)
 
     def init_ticket(self, keytab: str = None):
         # TODO: this method has nothing to do with fedpkg, pull it out
@@ -85,6 +92,6 @@ class FedPKG:
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
             cmd = ["kinit", "-R", f"{self.fas_username}@FEDORAPROJECT.ORG"]
-        return run_command(
+        return utils.run_command(
             cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
         )
