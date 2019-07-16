@@ -1,6 +1,5 @@
 import pytest
 from flexmock import flexmock
-from sandcastle import Sandcastle
 
 from packit import utils
 from packit.actions import ActionName
@@ -10,6 +9,7 @@ from packit.distgit import DistGit
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
+from tests.spellbook import can_a_module_be_imported
 
 
 @pytest.fixture()
@@ -176,7 +176,12 @@ def test_run_action_defined(packit_repository_base):
     )
 
 
+@pytest.mark.skipif(
+    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+)
 def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object):
+    from sandcastle import Sandcastle
+
     flexmock(Sandcastle).should_receive("get_api_client").and_return(None)
     flexmock(SandcastleCommandHandler).should_receive("run_command").with_args(
         command=["command", "-a"]
