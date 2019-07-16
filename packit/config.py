@@ -358,6 +358,7 @@ class PackageConfig(BaseConfig):
         actions: Dict[ActionName, str] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
+        create_pr: Optional[bool] = True,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
@@ -372,6 +373,7 @@ class PackageConfig(BaseConfig):
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
+        self.create_pr = create_pr
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
@@ -416,6 +418,7 @@ class PackageConfig(BaseConfig):
             and self.create_tarball_command == other.create_tarball_command
             and self.actions == other.actions
             and self.allowed_gpg_keys == other.allowed_gpg_keys
+            and self.create_pr == other.create_pr
         )
 
     @property
@@ -463,6 +466,7 @@ class PackageConfig(BaseConfig):
         upstream_ref = nested_get(raw_dict, "upstream_ref")
 
         allowed_gpg_keys = raw_dict.get("allowed_gpg_keys", None)
+        create_pr = raw_dict.get("create_pr", True)
 
         pc = PackageConfig(
             specfile_path=specfile_path,
@@ -480,6 +484,7 @@ class PackageConfig(BaseConfig):
             current_version_command=current_version_command,
             upstream_ref=upstream_ref,
             allowed_gpg_keys=allowed_gpg_keys,
+            create_pr=create_pr,
         )
         return pc
 
