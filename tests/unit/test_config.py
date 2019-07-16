@@ -134,6 +134,7 @@ def test_package_config_equal(job_config_simple):
         ),
         jobs=[job_config_simple],
         downstream_package_name="package",
+        create_pr=True,
     ) == PackageConfig(
         specfile_path="fedora/package.spec",
         synced_files=SyncFilesConfig(
@@ -141,6 +142,7 @@ def test_package_config_equal(job_config_simple):
         ),
         jobs=[job_config_simple],
         downstream_package_name="package",
+        create_pr=True,
     )
 
 
@@ -193,6 +195,7 @@ def test_package_config_equal(job_config_simple):
                 ]
             ),
             jobs=[get_job_config_full()],
+            create_pr=False,
         ),
     ],
 )
@@ -209,6 +212,7 @@ def test_package_config_not_equal(not_equal_package_config):
                 ]
             ),
             jobs=[j],
+            create_pr=True,
         )
         == not_equal_package_config
     )
@@ -304,6 +308,7 @@ def test_package_config_parse_error(raw):
                 "synced_files": ["fedora/package.spec"],
                 "jobs": [get_job_config_dict_full()],
                 "downstream_package_name": "package",
+                "create_pr": False,
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -316,6 +321,7 @@ def test_package_config_parse_error(raw):
                 ),
                 jobs=[get_job_config_full()],
                 downstream_package_name="package",
+                create_pr=False,
             ),
         ),
         (
@@ -457,6 +463,7 @@ def test_dist_git_package_url():
         "dist_git_namespace": "awesome",
         "synced_files": ["fedora/foobar.spec"],
         "specfile_path": "fedora/package.spec",
+        "create_pr": False,
     }
     new_pc = PackageConfig.get_from_dict(di)
     pc = PackageConfig(
@@ -469,12 +476,14 @@ def test_dist_git_package_url():
             ]
         ),
         specfile_path="fedora/package.spec",
+        create_pr=False,
     )
     assert new_pc.specfile_path.endswith("fedora/package.spec")
     assert pc.specfile_path.endswith("fedora/package.spec")
     assert pc == new_pc
     assert pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
     assert new_pc.dist_git_package_url == "https://packit.dev/awesome/packit.git"
+    assert not pc.create_pr
 
 
 @pytest.mark.parametrize(
