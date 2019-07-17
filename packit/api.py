@@ -541,9 +541,11 @@ class PackitAPI:
         self, project: str, chroots: List[str], owner: str = None
     ) -> Tuple[int, str]:
         """
+        Submit a build to copr build system using an SRPM using the current checkout.
 
-        :param project:
-        :param chroots:
+        :param project: name of the copr project to build
+                        inside (defaults to something long and ugly)
+        :param chroots: a list of COPR chroots (targets) e.g. fedora-rawhide-x86_64
         :param owner: defaults to username from copr config file
         :return: id of the created build and url to its repo
         """
