@@ -25,6 +25,7 @@ import logging
 import click
 from pkg_resources import get_distribution
 
+from packit.cli.copr_build import copr_build
 from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.srpm import srpm
@@ -75,6 +76,7 @@ packit_base.add_command(version)
 packit_base.add_command(update)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
+packit_base.add_command(copr_build)
 packit_base.add_command(create_update)
 packit_base.add_command(srpm)
 packit_base.add_command(status)
