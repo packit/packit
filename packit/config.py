@@ -358,7 +358,7 @@ class PackageConfig(BaseConfig):
         actions: Dict[ActionName, str] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
-        create_pr: Optional[bool] = True,
+        create_pr: Optional[bool] = False,
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
@@ -466,7 +466,7 @@ class PackageConfig(BaseConfig):
         upstream_ref = nested_get(raw_dict, "upstream_ref")
 
         allowed_gpg_keys = raw_dict.get("allowed_gpg_keys", None)
-        create_pr = raw_dict.get("create_pr", True)
+        create_pr = raw_dict.get("create_pr", False)
 
         pc = PackageConfig(
             specfile_path=specfile_path,
