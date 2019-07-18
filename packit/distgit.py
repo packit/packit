@@ -276,15 +276,21 @@ class DistGit(PackitRepositoryBase):
         # TODO: remove branches from merged PRs
         raise NotImplementedError("not implemented yet")
 
-    def build(self, scratch: bool = False, nowait: bool = False):
+    def build(
+        self,
+        scratch: bool = False,
+        nowait: bool = False,
+        koji_target: Optional[str] = None,
+    ):
         """
         Perform a `fedpkg build` in the repository
 
         :param scratch: should the build be a scratch build?
         :param nowait: don't wait on build?
+        :param koji_target: koji target to pick (see `koji list-targets`)
         """
         fpkg = FedPKG(directory=self.local_project.working_dir)
-        fpkg.build(scratch=scratch, nowait=nowait)
+        fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_bodhi_update(
         self,
