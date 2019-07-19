@@ -147,12 +147,25 @@ class PackitAPI:
         force_new_sources=False,
         upstream_ref: str = None,
         create_pr: bool = True,
+        force: bool = False,
     ):
         """
         Update given package in Fedora
+
+        :param dist_git_branch: branch in dist-git
+        :param use_local_content: don't check out anything
+        :param version: upstream version to update in Fedora
+        :param force_new_sources: don't check the lookaside cache and perform new-sources
+        :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
+        :param create_pr: create a pull request if set to True
+        :param force: ignore changes in the git index
         """
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
+        if not force and self.up.is_dirty() and not use_local_content:
+            raise PackitException(
+                "The repository is dirty, will not discard the changes. Use --force to bypass."
+            )
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
@@ -262,6 +275,7 @@ class PackitAPI:
         fork: bool = True,
         remote_name: str = None,
         exclude_files: Iterable[str] = None,
+        force: bool = False,
     ):
         """
         Sync content of Fedora dist-git repo back to upstream
@@ -272,6 +286,7 @@ class PackitAPI:
         :param no_pr: won't create a pull request if set to True
         :param fork: forks the project if set to True
         :param remote_name: name of remote where we should push; if None, try to find a ssh_url
+        :param force: ignore changes in the git index
         """
         exclude_files = exclude_files or []
         if not dist_git_branch:
@@ -280,6 +295,10 @@ class PackitAPI:
             raise PackitException("Upstream branch is not set.")
         logger.info(f"upstream active branch {self.up.active_branch}")
 
+        if not force and self.up.is_dirty():
+            raise PackitException(
+                "The repository is dirty, will not discard the changes. Use --force to bypass."
+            )
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
