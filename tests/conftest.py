@@ -64,7 +64,13 @@ UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
 def mock_downstream_remote_functionality(downstream_n_distgit):
     u, d = downstream_n_distgit
 
-    flexmock(DistGit, update_branch=lambda *args, **kwargs: "0.0.0")
+    dglp = LocalProject(
+        working_dir=str(d),
+        git_url="https://packit.dev/rpms/beer",
+        git_service=PagureService(),
+    )
+
+    flexmock(DistGit, update_branch=lambda *args, **kwargs: "0.0.0", local_project=dglp)
 
     mock_spec_download_remote_s(d)
 
