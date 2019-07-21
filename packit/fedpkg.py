@@ -76,6 +76,13 @@ class FedPKG:
             fail=True,
         )
 
+    def clone(self, package_name: str, target_path: str, anonymous: bool = False):
+        cmd = [self.fedpkg_exec, "-q", "clone"]
+        if anonymous:
+            cmd += ["-a"]
+        cmd += [package_name, target_path]
+        utils.run_command(cmd=cmd)
+
     def init_ticket(self, keytab: str = None):
         # TODO: this method has nothing to do with fedpkg, pull it out
         if not keytab:
