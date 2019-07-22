@@ -20,6 +20,7 @@ BuildRequires:  python3-ogr
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pyyaml
 BuildRequires:  python3-tabulate
+BuildRequires:  python3-cccolutils
 BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
