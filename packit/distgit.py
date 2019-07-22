@@ -74,26 +74,35 @@ class DistGit(PackitRepositoryBase):
     def local_project(self):
         """ return an instance of LocalProject """
         if self._local_project is None:
-            tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
-            f = FedPKG(self.fas_user, tmpdir)
-            f.clone(
-                self.package_config.downstream_package_name,
-                tmpdir,
-                anonymous=not cccolutils.has_creds(),
+            pagure_service = PagureService(
+                token=self.pagure_user_token,
+                instance_url=self.package_config.dist_git_base_url,
+                read_only=self.config.dry_run,
             )
-
-            self._local_project = LocalProject(
-                working_dir=tmpdir,
-                git_url=self.package_config.dist_git_package_url,
-                namespace=self.package_config.dist_git_namespace,
-                repo_name=self.package_config.downstream_package_name,
-                git_service=PagureService(
-                    token=self.pagure_user_token,
-                    instance_url=self.package_config.dist_git_base_url,
-                    read_only=self.config.dry_run,
-                ),
-            )
-            self._local_project.working_dir_temporary = True
+            if self.package_config.dist_git_clone_path:
+                self._local_project = LocalProject(
+                    working_dir=self.package_config.dist_git_clone_path,
+                    git_url=self.package_config.dist_git_package_url,
+                    namespace=self.package_config.dist_git_namespace,
+                    repo_name=self.package_config.downstream_package_name,
+                    git_service=pagure_service,
+                )
+            else:
+                tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
+                f = FedPKG(self.fas_user, tmpdir)
+                f.clone(
+                    self.package_config.downstream_package_name,
+                    tmpdir,
+                    anonymous=not cccolutils.has_creds(),
+                )
+                self._local_project = LocalProject(
+                    working_dir=tmpdir,
+                    git_url=self.package_config.dist_git_package_url,
+                    namespace=self.package_config.dist_git_namespace,
+                    repo_name=self.package_config.downstream_package_name,
+                    git_service=pagure_service,
+                )
+                self._local_project.working_dir_temporary = True
         return self._local_project
 
     @property

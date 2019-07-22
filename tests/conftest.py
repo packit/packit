@@ -75,7 +75,7 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
     mock_spec_download_remote_s(d)
 
     pc = get_local_package_config(str(u))
-    pc._downstream_project_url = str(d)
+    pc.dist_git_clone_path = str(d)
     pc.upstream_project_url = str(u)
     return u, d
 
@@ -162,7 +162,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
 
     flexmock(FedPKG, init_ticket=lambda x=None: None, new_sources=mocked_new_sources)
     pc = get_local_package_config(str(upstream))
-    pc._downstream_project_url = str(distgit)
+    pc.dist_git_clone_path = str(distgit)
     pc.upstream_project_url = str(upstream)
     return upstream, distgit
 
@@ -250,7 +250,7 @@ def upstream_instance(upstream_n_distgit, tmpdir):
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        pc._downstream_project_url = str(d)
+        pc.dist_git_clone_path = str(d)
         lp = LocalProject(working_dir=str(u))
 
         ups = Upstream(c, pc, lp)
@@ -271,7 +271,7 @@ def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
     u, d = upstream_n_distgit
     c = get_test_config()
     pc = get_local_package_config(str(u))
-    pc._downstream_project_url = str(d)
+    pc.dist_git_clone_path = str(d)
     pc.upstream_project_url = str(u)
     dg = DistGit(c, pc)
     return d, dg
@@ -303,7 +303,7 @@ def api_instance_source_git(sourcegit_n_distgit):
         c = get_test_config()
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
-        pc._downstream_project_url = str(distgit)
+        pc.dist_git_clone_path = str(distgit)
         up_lp = LocalProject(working_dir=str(sourcegit))
         api = PackitAPI(c, pc, up_lp)
         return api

@@ -38,7 +38,7 @@ def test_basic_build(upstream_n_distgit, mock_remote_functionality_upstream):
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        pc._downstream_project_url = str(d)
+        pc.dist_git_clone_path = str(d)
         up_lp = LocalProject(working_dir=u)
 
         api = PackitAPI(c, pc, up_lp)
