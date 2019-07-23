@@ -80,6 +80,13 @@ logger = logging.getLogger(__file__)
     "from which packit should generate patches "
     "(this option implies the repository is source-git).",
 )
+@click.option(
+    "--force",
+    "-f",
+    default=False,
+    is_flag=True,
+    help="Don't discard changes in the git repo by default, unless this is set.",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(remote_param_name="remote"),
@@ -99,6 +106,7 @@ def update(
     upstream_ref,
     version,
     remote,  # click introspects this in LocalProjectParameter
+    force,
 ):
     """
     Release current upstream release into Fedora
@@ -119,4 +127,5 @@ def update(
         force_new_sources=force_new_sources,
         upstream_ref=upstream_ref,
         create_pr=not no_pr,
+        force=force,
     )
