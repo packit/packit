@@ -176,4 +176,4 @@ def test_github_app(upstream_instance, tmpdir):
     )
     ups.config = Config.get_user_config()
 
-    assert ups.local_project.git_service._token == "test"
+    assert ups.local_project.git_service.token == "test"

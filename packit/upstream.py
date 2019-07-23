@@ -30,6 +30,8 @@ import git
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 
+from ogr import GithubService
+
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
 except ImportError:
@@ -41,7 +43,6 @@ from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
-from packit.ogr_services import get_github_service
 from packit.utils import run_command, is_a_git_ref
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,15 @@ class Upstream(PackitRepositoryBase):
         #       ogr should guess the forge based on the url; kwargs should be passed to the
         #       constructor in order to support the above
         if not self.local_project.git_service:
-            self.local_project.git_service = get_github_service(self.config)
+            if self.config.github_app_cert_path:
+                private_key = Path(self.config.github_app_cert_path).read_text()
+            else:
+                private_key = None
+            self.local_project.git_service = GithubService(
+                token=self.config.github_token,
+                github_app_id=self.config.github_app_id,
+                github_app_private_key=private_key,
+            )
             self.local_project.refresh_the_arguments()  # get git project from newly set git service
 
         if not self.local_project.repo_name:

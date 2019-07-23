@@ -20,7 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
+
 from packit.utils import set_logging
 
 # debug logs from packit while testing
 set_logging(level=10)
+
+os.environ["RECORD_REQUESTS"] = "TRUE"
