@@ -370,6 +370,8 @@ class PackageConfig(BaseConfig):
         self._downstream_package_name: Optional[str] = downstream_package_name
         self.dist_git_base_url: str = dist_git_base_url or PROD_DISTGIT_URL
         self._downstream_project_url: str = downstream_project_url
+        # path to a local git clone of the dist-git repo; None means to clone in a tmpdir
+        self.dist_git_clone_path: Optional[str] = None
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
