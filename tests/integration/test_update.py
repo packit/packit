@@ -64,7 +64,7 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        pc._downstream_project_url = str(d)
+        pc.dist_git_clone_path = str(d)
         up_lp = LocalProject(working_dir=str(u))
         api = PackitAPI(c, pc, up_lp)
         api.sync_release("master", "0.1.0")
@@ -90,7 +90,7 @@ def test_basic_local_update_direct_push(
 
         pc = get_local_package_config(str(upstream))
         pc.upstream_project_url = str(upstream)
-        pc._downstream_project_url = str(distgit)
+        pc.dist_git_clone_path = str(distgit)
         up_lp = LocalProject(working_dir=str(upstream))
         api = PackitAPI(c, pc, up_lp)
         api.sync_release("master", "0.1.0", create_pr=False)
@@ -116,7 +116,7 @@ def test_basic_local_update_from_downstream(
         c = get_test_config()
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        pc._downstream_project_url = str(d)
+        pc.dist_git_clone_path = str(d)
         up_lp = LocalProject(working_dir=str(u))
         api = PackitAPI(c, pc, up_lp)
         api.sync_from_downstream("master", "master", True)
