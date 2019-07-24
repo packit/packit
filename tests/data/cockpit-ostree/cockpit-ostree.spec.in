@@ -1,0 +1,34 @@
+Name: cockpit-ostree
+Version: @VERSION@
+Release: 1%{?dist}
+BuildArch: noarch
+Summary: Cockpit user interface for rpm-ostree
+License: LGPLv2+
+Requires: cockpit-bridge >= 125
+Requires: cockpit-system >= 125
+# On RHEL Atomic 7, the package name is different (curiously not on CentOS Atomic)
+%if 0%{?rhel} == 7
+Requires: rpm-ostree-client
+%else
+Requires: rpm-ostree
+%endif
+
+# Download from https://github.com/cockpit-project/cockpit-ostree/releases
+Source: cockpit-ostree-%{version}.tar.gz
+
+%description
+Cockpit component for managing software updates for ostree based systems.
+
+%prep
+%setup -n cockpit-ostree
+
+%install
+%make_install
+
+# drop source maps, they are large and just for debugging
+find %{buildroot}%{_datadir}/cockpit/ -name '*.map' | xargs rm --verbose
+
+%files
+%{_datadir}/cockpit/*
+
+%changelog
