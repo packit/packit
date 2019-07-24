@@ -40,6 +40,7 @@ from packit.config import (
 from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
+from packit.utils import cwd
 
 logger = logging.getLogger(__name__)
 
@@ -249,7 +250,8 @@ class DistGit(PackitRepositoryBase):
 
         :return: str, path to the archive
         """
-        self.specfile.download_remote_sources()
+        with cwd(self.local_project.working_dir):
+            self.specfile.download_remote_sources()
         archive = self.absolute_specfile_dir.joinpath(self.upstream_archive_name)
         logger.info(f"Downloaded archive: {archive!r}")
         return archive

@@ -35,6 +35,7 @@ TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
 UPSTREAM = DATA_DIR / "upstream_git"
 DISTGIT = DATA_DIR / "dist_git"
+UP_COCKPIT_OSTREE = DATA_DIR / "cockpit-ostree"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"
 SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
 SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
