@@ -77,7 +77,14 @@ class FedPKG:
         )
 
     def clone(self, package_name: str, target_path: str, anonymous: bool = False):
-        cmd = [self.fedpkg_exec, "-q", "clone"]
+        """
+        clone a dist-git repo; this has to be done in current env
+        b/c we don't have the keytab in sandbox
+        """
+        cmd = [self.fedpkg_exec]
+        if self.fas_username:
+            cmd += ["--user", self.fas_username]
+        cmd += ["-q", "clone"]
         if anonymous:
             cmd += ["-a"]
         cmd += [package_name, target_path]
@@ -85,7 +92,7 @@ class FedPKG:
 
     def init_ticket(self, keytab: str = None):
         # TODO: this method has nothing to do with fedpkg, pull it out
-        if not keytab:
+        if not keytab and not self.fas_username:
             logger.info("won't be doing kinit, no credentials provided")
             return
         if keytab and Path(keytab).is_file():
