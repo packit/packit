@@ -1,0 +1,38 @@
+---
+- name: Install RPM dependencies for  packit.
+  hosts: all
+  vars:
+    project_dir: /src
+    with_testing: false
+  tasks:
+  - set_fact:
+      project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
+    when: zuul is defined
+  - name: stat {{ project_dir }}
+    stat:
+      path: '{{ project_dir }}'
+    tags:
+    - no-cache
+    register: src_path
+  - name: Install generic RPM packages
+    dnf:
+      name:
+      - make
+      - git
+      - dnf-utils
+      - python3-pip
+    become: true
+  - name: Install runtime RPM deps
+    dnf:
+      name:
+        - fedpkg
+        - rpmdevtools
+        - python3-bodhi-client
+        - python3-cccolutils
+      state: present
+    become: true
+  - name: Install build RPM dependencies
+    command: dnf -y builddep packit.spec
+    args:
+      chdir: '{{ project_dir }}'
+    become: true
