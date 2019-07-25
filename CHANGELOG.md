@@ -1,3 +1,47 @@
+# 0.5.0
+
+* have a dedicated var in packageconfig for local dg clone
+* don't discard changes if the repo is dirty
+* clone dist-git repos with fedpkg-clone
+* set create_pr to False
+* enable specifying koji target in build command
+* cleaning up Jirka's mess (docstring)
+* [cli] copr-build
+* [PackitAPI] copr client as attribute/property
+* [PackitAPI.run_copr_build()] default owner is the configured user
+* skip test if sandcastle is not installed
+* Add support create_pr option into packit.yaml
+* make: add a way to pass args to pytest in cont
+* evaluate downstream_package_name lazily
+* Allow to (not) wait for dist-git build
+* pre-commit
+* exterminate path_or_url
+* cli: path_or_url should overwrite default: cwd
+* By default --no-pr options are False
+* Add tests for the new feature
+* Add support for other tarball formats
+* Test the direct push
+* Option --no-pr to propose-update
+* Allow direct push for sync-release
+* Update README.md
+* Update README.md
+* Update README.md
+* Move user-docs to docs
+* construct absolute srpm path when running in service
+* PersistentObjectStorage.__init__() no longer accepts write_mode
+* add breadcrumbs when diagnosing SRPM builds
+* fill docstring for set_spec_content
+* docs now live in https://packit.dev/ symlinks to MD files
+* preserve %changelog and bump spec when updating in fedora
+* adapt testing to ogr 0.5.0
+* packit.xml: revert service workaround
+* adapt to latest sandcastle
+* one line define
+* pre-commit autoupdate
+* harmless :-) tweak
+* os.path.abspath(os.path.curdir) -> os.getcwd()
+* Update Dockerfile & install-requirements.yaml
+
 # 0.4.2
 
 * Packit now uses [Sandcastle](https://github.com/packit-service/sandcastle) to run untrusted commands in a sandbox.
