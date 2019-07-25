@@ -1,0 +1,70 @@
+---
+- project:
+    name: packit-service/packit
+    check:
+      jobs:
+        - tests-pre-commit
+        - tests-rpm
+        - tests-pip-deps
+        - tests-pip-deps-master
+    gate:
+      jobs:
+        - tests-pre-commit
+        - tests-rpm
+        - tests-pip-deps
+        - tests-pip-deps-master
+
+
+- job:
+    name: tests-pre-commit
+    parent: base
+    description: Check precommit
+    run: files/zuul-pre-commit.yaml
+    extra-vars:
+      ansible_python_interpreter: /usr/bin/python3
+    nodeset:
+      nodes:
+        - name: test-node
+          label: cloud-fedora-30
+
+- job:
+    name: tests-rpm
+    parent: base
+    description: Run tests of packit via rpms
+    pre-run: files/zuul-install-requirements-rpms.yaml
+    run: files/zuul-tests.yaml
+    extra-vars:
+      with_testing: true
+      ansible_python_interpreter: /usr/bin/python3
+    nodeset:
+      nodes:
+        - name: test-node
+          label: cloud-fedora-30
+
+- job:
+    name: tests-pip-deps
+    parent: base
+    description: Run tests of packit via pip installed dependencies
+    pre-run: files/zuul-install-requirements-pip.yaml
+    run: files/zuul-tests.yaml
+    extra-vars:
+      with_testing: true
+      ansible_python_interpreter: /usr/bin/python3
+    nodeset:
+      nodes:
+        - name: test-node
+          label: cloud-fedora-30
+
+- job:
+    name: tests-pip-deps-master
+    parent: base
+    description: Run tests of packit via pip installed dependencies
+    pre-run: files/zuul-install-requirements-pip-master.yaml
+    run: files/zuul-tests.yaml
+    extra-vars:
+      with_testing: true
+      ansible_python_interpreter: /usr/bin/python3
+    nodeset:
+      nodes:
+        - name: test-node
+          label: cloud-fedora-30
