@@ -1,0 +1,9 @@
+---
+- project:
+    name: packit-service/packit
+    check:
+      jobs:
+        - noop
+    gate:
+      jobs:
+- noop
