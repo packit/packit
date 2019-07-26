@@ -69,4 +69,3 @@ class PackitUnittestOgr(unittest.TestCase):
 
     def tearDown(self):
         PersistentObjectStorage().dump()
-        PersistentObjectStorage().dump()
