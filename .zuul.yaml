@@ -6,13 +6,13 @@
         - tests-pre-commit
         - tests-rpm
         - tests-pip-deps
-        - tests-pip-deps-master
+        - tests-git-master
     gate:
       jobs:
         - tests-pre-commit
         - tests-rpm
         - tests-pip-deps
-        - tests-pip-deps-master
+        - tests-git-master
 
 
 - job:
@@ -56,10 +56,10 @@
           label: cloud-fedora-30
 
 - job:
-    name: tests-pip-deps-master
+    name: tests-git-master
     parent: base
     description: Run tests of packit via pip installed dependencies
-    pre-run: files/zuul-install-requirements-pip-master.yaml
+    pre-run: files/zuul-install-requirements-git-master.yaml
     run: files/zuul-tests.yaml
     extra-vars:
       with_testing: true
