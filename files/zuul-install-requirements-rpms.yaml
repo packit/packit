@@ -1,27 +1,9 @@
 ---
 - name: Install RPM dependencies for packit.
   hosts: all
-  vars:
-    project_dir: /src
-    with_testing: false
   tasks:
-  - set_fact:
-      project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
-    when: zuul is defined
-  - name: stat {{ project_dir }}
-    stat:
-      path: '{{ project_dir }}'
-    tags:
-    - no-cache
-    register: src_path
-  - name: Install generic RPM packages
-    dnf:
-      name:
-      - make
-      - git
-      - dnf-utils
-      - python3-pip
-    become: true
+  - include_tasks: tasks/zuul-project-setup.yaml
+  - include_tasks: tasks/generic-dnf-requirements.yaml
   - name: Install runtime RPM deps
     dnf:
       name:

@@ -1,0 +1,8 @@
+---
+- name: Install specific RPMs to be able to use PIP installation
+  dnf:
+    name:
+    - krb5-devel
+    - gcc
+    - python3-devel
+  become: true

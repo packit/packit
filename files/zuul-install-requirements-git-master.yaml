@@ -1,22 +1,9 @@
 ---
-- name: Install dependencies for PIP packit.
+- name: Install dependencies for packit.
   hosts: all
   tasks:
-  - name: Install generic RPM packages
-    dnf:
-      name:
-      - make
-      - git
-      - dnf-utils
-      - python3-pip
-    become: true
-  - name: Install specific RPMs to be able to use clean PIP installation
-    dnf:
-      name:
-      - krb5-devel
-      - gcc
-      - python3-devel
-    become: true
+  - include_tasks: tasks/generic-dnf-requirements.yaml
+  - include_tasks: tasks/python-compile-deps.yaml
 
   - name: Pip install ogr from master
     pip:
