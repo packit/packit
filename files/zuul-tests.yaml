@@ -1,24 +1,8 @@
 ---
 - name: This is a recipe for how to run packit tests
   hosts: all
-  vars:
-    project_dir: /src
-    with_testing: false
   tasks:
-  - set_fact:
-      project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
-    when: zuul is defined
-  - name: stat {{ project_dir }}
-    stat:
-      path: '{{ project_dir }}'
-    tags:
-    - no-cache
-    register: src_path
-  - name: Let's make sure {{ project_dir }} is present
-    assert:
-      that:
-      - 'src_path.stat.isdir'
-
+  - include_tasks: tasks/zuul-project-setup.yaml
   - name: Install test rpm dependencies
     dnf:
       name:
@@ -42,4 +26,3 @@
     command: make check
     args:
       chdir: '{{ project_dir }}'
-    when: with_testing

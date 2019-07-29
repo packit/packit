@@ -1,0 +1,14 @@
+---
+- set_fact:
+    project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
+  when: zuul is defined
+- name: stat {{ project_dir }}
+  stat:
+    path: '{{ project_dir }}'
+  tags:
+  - no-cache
+  register: src_path
+- name: Let's make sure {{ project_dir }} is present
+  assert:
+    that:
+    - 'src_path.stat.isdir'

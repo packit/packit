@@ -1,12 +1,8 @@
 ---
 - name: Run pre-commit
   hosts: all
-  vars:
-    project_dir: .
   tasks:
-  - set_fact:
-      project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
-    when: zuul is defined
+  - include_tasks: tasks/zuul-project-setup.yaml
   - name: Install git
     dnf:
       name:
