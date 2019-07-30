@@ -70,20 +70,21 @@ make prepare-check && make check
 
 As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configuration in [Jenkinsfile](Jenkinsfile).
 
+When running the tests we are using the pregenerated responses that are saved in the ./tests/integration/test_data.
+If you need to generate a new file, just run the tests and provide environment variables for the service.
+The missing file will be automatically generated from the real response. Do not forget to commit the file as well.
 
-#### Storing HTTP communication offline
+If you need to regenerate a response file, just remove it and rerun the tests.
 
-OGR enables you to store complete HTTP requests offline. We can then use those
-cached HTTP communication during testing.
+The saving of the responses is turned on by the `RECORD_REQUESTS` environment variable.
+The file, that will be used for storing, can be set by `RESPONSE_FILE` variable
+or by setting the `storage_file` property of the persistent storage singleton.
+This is the code used for base test class in the `setUp`:
 
-In order to use this feature, you have to set `github_requests_log_path` on
-`Config`. You can then use `get_github_service` from `ogr_services` to get
-GithubService which has everything set up:
-
-1. If `github_token` is set, all the HTTP requests will be stored in the file
-2. If the token is not set, offline http requests will be used instead of
-   talking to live GitHub API.
-
+```python
+response_file = self.get_datafile_filename() # name generated from the test name
+PersistentObjectStorage().storage_file = response_file
+```
 
 ### Makefile
 
