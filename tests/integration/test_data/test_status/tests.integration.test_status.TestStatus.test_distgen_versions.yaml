@@ -10,7 +10,7 @@ GET:
         content-length: '6199'
         content-security-policy: default-src 'none'
         content-type: application/json; charset=utf-8
-        date: Tue, 09 Jul 2019 14:18:49 GMT
+        date: Tue, 09 Jul 2019 14:18:36 GMT
         etag: '"9bc49617b0fa9ca9a7df65ea537be7f8"'
         last-modified: Tue, 09 Jul 2019 13:56:33 GMT
         referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
@@ -22,10 +22,10 @@ GET:
         x-content-type-options: nosniff
         x-frame-options: deny
         x-github-media-type: github.v3; format=json
-        x-github-request-id: 5E47:4403B:8AC56E9:AC9F0B5:5D24A248
+        x-github-request-id: 3DBC:7583:1956270:1F9D0DF:5D24A23C
         x-oauth-scopes: repo, user
         x-ratelimit-limit: '5000'
-        x-ratelimit-remaining: '4985'
+        x-ratelimit-remaining: '4989'
         x-ratelimit-reset: '1562685389'
         x-xss-protection: 1; mode=block
       - !!binary |
@@ -138,7 +138,7 @@ GET:
         dmVudHNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNraXQtc2VydmljZS9y
         ZWNlaXZlZF9ldmVudHMiLCJ0eXBlIjoiT3JnYW5pemF0aW9uIiwic2l0ZV9hZG1pbiI6ZmFsc2V9
         LCJuZXR3b3JrX2NvdW50IjoxMSwic3Vic2NyaWJlcnNfY291bnQiOjEwfQ==
-  /repos/packit-service/ogr/contents.packit.yaml:
+  'https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml':
     '{''ref'': ''master''}':
     - - 200
       - access-control-allow-origin: '*'
@@ -149,7 +149,7 @@ GET:
         content-length: '1630'
         content-security-policy: default-src 'none'
         content-type: application/json; charset=utf-8
-        date: Tue, 09 Jul 2019 14:18:48 GMT
+        date: Tue, 09 Jul 2019 14:18:36 GMT
         etag: '"a21746029528d3a2d3fc376008aec5d4ce990d5a"'
         last-modified: Tue, 09 Jul 2019 13:56:30 GMT
         referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
@@ -161,10 +161,10 @@ GET:
         x-content-type-options: nosniff
         x-frame-options: deny
         x-github-media-type: github.v3; format=json
-        x-github-request-id: 3BFE:47862:42F22D3:52E6527:5D24A248
+        x-github-request-id: 48F7:447FD:8EE5EFA:B1FA4F0:5D24A23C
         x-oauth-scopes: repo, user
         x-ratelimit-limit: '5000'
-        x-ratelimit-remaining: '4986'
+        x-ratelimit-remaining: '4990'
         x-ratelimit-reset: '1562685389'
         x-xss-protection: 1; mode=block
       - !!binary |

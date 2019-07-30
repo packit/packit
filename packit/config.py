@@ -31,9 +31,9 @@ from typing import Optional, List, Dict
 
 import click
 from jsonschema import Draft4Validator, ValidationError
-from ogr.abstract import GitProject
 from yaml import safe_load
 
+from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL, SANDCASTLE_WORK_DIR
 from packit.exceptions import (

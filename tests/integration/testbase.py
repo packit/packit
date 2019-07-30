@@ -1,16 +1,15 @@
-import unittest
-import os
 import inspect
+import os
+import unittest
 from subprocess import check_output, CalledProcessError
 
 import packit.distgit
 import packit.upstream
-import packit.ogr_services
+from ogr import GithubService
+from ogr.persistent_storage import PersistentObjectStorage
+from packit.config import Config
 from packit.config import get_package_config_from_repo
 from packit.local_project import LocalProject
-from packit.config import Config
-from ogr.mock_core import PersistentObjectStorage
-
 
 DATA_DIR = "test_data"
 PERSISTENT_DATA_PREFIX = os.path.join(
@@ -28,12 +27,12 @@ class PackitUnittestOgr(unittest.TestCase):
         conf.dry_run = True
         return conf
 
-    def get_datafile_filename(self, service_name, suffix="yaml"):
+    def get_datafile_filename(self, suffix="yaml"):
         prefix = PERSISTENT_DATA_PREFIX
         test_file_name = os.path.basename(inspect.getfile(self.__class__)).rsplit(
             ".", 1
         )[0]
-        test_class_name = f"{self.id()}_{service_name}.{suffix}"
+        test_class_name = f"{self.id()}.{suffix}"
         testdata_dirname = os.path.join(prefix, test_file_name)
         os.makedirs(testdata_dirname, mode=0o777, exist_ok=True)
         return os.path.join(testdata_dirname, test_class_name)
@@ -49,21 +48,11 @@ class PackitUnittestOgr(unittest.TestCase):
 
     def setUp(self):
         self.conf = self.get_test_config()
-        file_pagure = self.get_datafile_filename(service_name="pagure")
-        file_github = self.get_datafile_filename(service_name="github")
-        self.storage_pagure = PersistentObjectStorage(
-            file_pagure, dump_after_store=True
-        )
-        self.storage_github = PersistentObjectStorage(
-            file_github, dump_after_store=True
-        )
-        # put peristent storage class attribute to pagure and github where it is used
-        packit.distgit.PagureService.persistent_storage = self.storage_pagure
-        packit.ogr_services.GithubService.persistent_storage = self.storage_github
+        response_file = self.get_datafile_filename()
+        PersistentObjectStorage().storage_file = response_file
+        PersistentObjectStorage().dump_after_store = True
 
-        self.service_github = packit.ogr_services.GithubService(
-            token=self.conf.github_token
-        )
+        self.service_github = GithubService(token=self.conf.github_token)
         self.project_ogr = self.service_github.get_project(
             namespace="packit-service", repo="ogr"
         )
@@ -79,5 +68,4 @@ class PackitUnittestOgr(unittest.TestCase):
         )
 
     def tearDown(self):
-        self.storage_pagure.dump()
-        self.storage_github.dump()
+        PersistentObjectStorage().dump()
