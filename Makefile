@@ -13,7 +13,7 @@ install:
 
 check:
 	find . -name "*.pyc" -exec rm {} \;
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=yes --verbose --showlocals --cov=packit --cov-report=term-missing $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals --cov=packit --cov-report=term-missing $(TEST_TARGET)
 
 check_in_container: test_container
 	rsync -a $(CURDIR)/ /tmp/packit
