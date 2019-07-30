@@ -157,7 +157,7 @@ class Upstream(PackitRepositoryBase):
         )
         return commits
 
-    def push(
+    def push_to_fork(
         self,
         branch_name: str,
         force: bool = False,
@@ -208,9 +208,7 @@ class Upstream(PackitRepositoryBase):
                 remote_name = "origin"
         logger.info(f"Pushing to remote {remote_name} using branch {branch_name}.")
         try:
-            self.local_project.git_repo.remote(remote_name).push(
-                refspec=branch_name, force=force
-            )
+            self.push(refspec=branch_name, force=force, remote_name=remote_name)
         except git.GitError as ex:
             msg = (
                 f"Unable to push to remote {remote_name} using branch {branch_name}, "

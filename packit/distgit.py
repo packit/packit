@@ -182,9 +182,7 @@ class DistGit(PackitRepositoryBase):
             )
 
         try:
-            self.local_project.git_repo.remote(fork_remote_name).push(
-                refspec=branch_name, force=force
-            )
+            self.push(refspec=branch_name, remote_name=fork_remote_name, force=force)
         except git.GitError as ex:
             msg = (
                 f"Unable to push to remote {fork_remote_name} using branch {branch_name}, "
