@@ -261,8 +261,7 @@ class PackitAPI:
                     dist_git_branch=dist_git_branch,
                 )
             else:
-                logger.info(f"Pushing changes to '{dist_git_branch}' distgit branch.")
-                self.dg.local_project.git_repo.remote().push()
+                self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
             if not use_local_content:
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
@@ -331,7 +330,7 @@ class PackitAPI:
             self.up.commit(title=commit_msg, msg=description)
 
             # the branch may already be up, let's push forcefully
-            source_branch, fork_username = self.up.push(
+            source_branch, fork_username = self.up.push_to_fork(
                 self.up.local_project.ref,
                 fork=fork,
                 force=True,
