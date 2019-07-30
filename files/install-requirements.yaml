@@ -25,6 +25,7 @@
         - rpmdevtools
         - python3-bodhi-client
         - python3-cccolutils
+        - rpmdevtools
       state: present
 
   - name: Install build RPM dependencies
