@@ -1,0 +1,28 @@
+---
+- name: Run pre-commit
+  hosts: all
+  tasks:
+  - include_tasks: tasks/zuul-project-setup.yaml
+  - name: Install git
+    dnf:
+      name:
+      - git-core
+      - python36
+    become: true
+  - name: Install pre-commit PyPI package
+    pip:
+      name: pre-commit
+    become: true
+    tags:
+    - stop-layering
+
+  - name: Install pre-commit for the repo
+    command: pre-commit install
+    args:
+      chdir: "{{ project_dir }}"
+    become: true
+
+  - name: Run it
+    command: pre-commit run --all-files
+    args:
+      chdir: "{{ project_dir }}"

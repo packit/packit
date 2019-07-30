@@ -1,0 +1,6 @@
+---
+- name: Install dependencies for PIP packit.
+  hosts: all
+  tasks:
+  - include_tasks: tasks/generic-dnf-requirements.yaml
+  - include_tasks: tasks/python-compile-deps.yaml

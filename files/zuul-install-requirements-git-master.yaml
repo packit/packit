@@ -1,0 +1,11 @@
+---
+- name: Install dependencies for packit.
+  hosts: all
+  tasks:
+  - include_tasks: tasks/generic-dnf-requirements.yaml
+  - include_tasks: tasks/python-compile-deps.yaml
+
+  - name: Pip install ogr from master
+    pip:
+      name: git+https://github.com/packit-service/ogr
+    become: true
