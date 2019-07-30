@@ -10,7 +10,7 @@ GET:
         content-length: '6199'
         content-security-policy: default-src 'none'
         content-type: application/json; charset=utf-8
-        date: Tue, 09 Jul 2019 14:18:55 GMT
+        date: Tue, 09 Jul 2019 14:18:24 GMT
         etag: '"9bc49617b0fa9ca9a7df65ea537be7f8"'
         last-modified: Tue, 09 Jul 2019 13:56:33 GMT
         referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
@@ -22,10 +22,10 @@ GET:
         x-content-type-options: nosniff
         x-frame-options: deny
         x-github-media-type: github.v3; format=json
-        x-github-request-id: 2EF0:4403B:8AC5E5E:AC9FA31:5D24A24F
+        x-github-request-id: 0C47:447FC:6B5D985:85DAE10:5D24A230
         x-oauth-scopes: repo, user
         x-ratelimit-limit: '5000'
-        x-ratelimit-remaining: '4980'
+        x-ratelimit-remaining: '4991'
         x-ratelimit-reset: '1562685389'
         x-xss-protection: 1; mode=block
       - !!binary |
@@ -138,7 +138,7 @@ GET:
         dmVudHNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNraXQtc2VydmljZS9y
         ZWNlaXZlZF9ldmVudHMiLCJ0eXBlIjoiT3JnYW5pemF0aW9uIiwic2l0ZV9hZG1pbiI6ZmFsc2V9
         LCJuZXR3b3JrX2NvdW50IjoxMSwic3Vic2NyaWJlcnNfY291bnQiOjEwfQ==
-  /repos/packit-service/ogr/contents.packit.yaml:
+  'https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml':
     '{''ref'': ''master''}':
     - - 200
       - access-control-allow-origin: '*'
@@ -149,7 +149,7 @@ GET:
         content-length: '1630'
         content-security-policy: default-src 'none'
         content-type: application/json; charset=utf-8
-        date: Tue, 09 Jul 2019 14:18:55 GMT
+        date: Tue, 09 Jul 2019 14:18:24 GMT
         etag: '"a21746029528d3a2d3fc376008aec5d4ce990d5a"'
         last-modified: Tue, 09 Jul 2019 13:56:30 GMT
         referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
@@ -161,10 +161,10 @@ GET:
         x-content-type-options: nosniff
         x-frame-options: deny
         x-github-media-type: github.v3; format=json
-        x-github-request-id: 78D7:4403A:6A9DDAF:849442A:5D24A24E
+        x-github-request-id: 2FB8:7584:3ABBAE0:4900E1D:5D24A230
         x-oauth-scopes: repo, user
         x-ratelimit-limit: '5000'
-        x-ratelimit-remaining: '4981'
+        x-ratelimit-remaining: '4992'
         x-ratelimit-reset: '1562685389'
         x-xss-protection: 1; mode=block
       - !!binary |

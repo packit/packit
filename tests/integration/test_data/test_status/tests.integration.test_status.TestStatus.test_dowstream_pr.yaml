@@ -138,7 +138,7 @@ GET:
         dmVudHNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNraXQtc2VydmljZS9y
         ZWNlaXZlZF9ldmVudHMiLCJ0eXBlIjoiT3JnYW5pemF0aW9uIiwic2l0ZV9hZG1pbiI6ZmFsc2V9
         LCJuZXR3b3JrX2NvdW50IjoxMSwic3Vic2NyaWJlcnNfY291bnQiOjEwfQ==
-  /repos/packit-service/ogr/contents.packit.yaml:
+  'https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml':
     '{''ref'': ''master''}':
     - - 200
       - access-control-allow-origin: '*'

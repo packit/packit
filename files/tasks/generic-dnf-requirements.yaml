@@ -6,4 +6,7 @@
     - git
     - dnf-utils
     - python3-pip
+    - rpmdevtools
+    - python3-bodhi-client
+    - fedpkg
   become: true
