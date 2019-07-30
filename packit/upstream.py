@@ -30,7 +30,12 @@ import git
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 
-from ogr import GithubService
+try:
+    # ogr < 0.5
+    from ogr import GithubService
+except ImportError:
+    # ogr >= 0.5
+    from ogr.services.github import GithubService
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
