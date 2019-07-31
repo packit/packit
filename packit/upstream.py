@@ -467,19 +467,18 @@ class Upstream(PackitRepositoryBase):
             dir_name = f"{self.package_config.downstream_package_name}-{version}"
         logger.debug("name + version = %s", dir_name)
 
+        archive_extension = self.get_archive_extension(dir_name, version)
+        if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
+            raise PackitException(
+                "The target archive doesn't use a common extension ({}), "
+                "git archive can't be used. Please provide your own script "
+                "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
+            )
+        archive_name = f"{dir_name}{archive_extension}"
+
         if self.package_config.create_tarball_command:
             archive_cmd = self.package_config.create_tarball_command
         else:
-            archive_extension = self.get_archive_extension(dir_name, version)
-            if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
-                raise PackitException(
-                    "The target archive doesn't use a common extension ({}), "
-                    "git archive can't be used. Please provide your own script "
-                    "for archive creation.".format(
-                        ", ".join(COMMON_ARCHIVE_EXTENSIONS)
-                    )
-                )
-            archive_name = f"{dir_name}{archive_extension}"
             archive_cmd = [
                 "git",
                 "archive",
@@ -489,7 +488,8 @@ class Upstream(PackitRepositoryBase):
                 f"{dir_name}/",
                 "HEAD",
             ]
-        return self.command_handler.run_command(archive_cmd, return_output=True)
+        self.command_handler.run_command(archive_cmd, return_output=True)
+        return archive_name
 
     def create_srpm(
         self, srpm_path: str = None, source_dir: str = None, srpm_dir: str = None

@@ -451,7 +451,7 @@ class PackitAPI:
         if upstream_ref:
             # source-git code: fetch the tarball and don't check out the upstream ref
             self.up.fetch_upstream_archive()
-            source_dir = self.up.specfile_dir
+            source_dir = self.up.absolute_specfile_dir
         else:
             # upstream repo: create the archive
             archive = self.up.create_archive(version=version)
