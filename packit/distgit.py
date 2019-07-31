@@ -252,8 +252,8 @@ class DistGit(PackitRepositoryBase):
         """
         with cwd(self.local_project.working_dir):
             self.specfile.download_remote_sources()
-        archive = self.absolute_specfile_dir.joinpath(self.upstream_archive_name)
-        logger.info(f"Downloaded archive: {archive!r}")
+        archive = self.absolute_specfile_dir / self.upstream_archive_name
+        logger.info(f"Downloaded archive: {archive}")
         return archive
 
     def upload_to_lookaside_cache(self, archive_path: str) -> None:
