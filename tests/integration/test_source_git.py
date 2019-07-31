@@ -147,4 +147,4 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
     mock_spec_download_remote_s(sg_path / "fedora")
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref="0.1.0")
-    assert list(sg_path.glob("beer-0.1.0-1.*.src.rpm"))[0].is_file()
+    assert list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0].is_file()
