@@ -40,6 +40,7 @@ projects into Fedora operating system.
 
 %package -n     python3-%{real_name}
 Summary:        %{summary}
+Requires:       python3-ogr
 %{?python_provide:%python_provide python3-%{real_name}}
 
 %description -n python3-%{real_name}
