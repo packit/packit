@@ -222,6 +222,8 @@ class JobType(Enum):
     sync_from_downstream = "sync_from_downstream"
     copr_build = "copr_build"
     add_to_whitelist = "add_to_whitelist"
+    tests = "tests"
+    report_test_results = "report_test_results"
 
 
 class JobTriggerType(Enum):
@@ -229,6 +231,7 @@ class JobTriggerType(Enum):
     pull_request = "pull_request"
     commit = "commit"
     installation = "installation"
+    testing_farm_results = "testing_farm_results"
 
 
 class JobNotifyType(Enum):
