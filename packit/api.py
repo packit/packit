@@ -470,7 +470,7 @@ class PackitAPI:
         try:
             old_release_int = int(old_release)
             new_release = old_release_int + 1
-        except Exception:
+        except ValueError:
             new_release = old_release
         commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
 
