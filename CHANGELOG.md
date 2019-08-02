@@ -10,13 +10,14 @@ All the documentation was moved to our site: https://packit.dev/docs
   command.
 * There is a new command `copr-build` which enables you to submit builds into
   Fedora COPR build system.
-* The config file how a new attribute called `create_pr` which tells packit
+* The config file now has a new attribute called `create_pr` which tells packit
   whether it should create pull requests in dist-git or push directly.
 * `build` command now waits for the build to finish and has a `--nowait`.
 * Packit now supports the most popular archive formats, not just .tar.gz
   (thanks to @FrNecas for contributing this feature)
-* Command `propose-update` can now push directly to dist-git.
-* When doing a `propoes-update`, packit no longer does a 1:1 copy, instead it
+* Command `propose-update` can now push directly to dist-git. This can be
+  controlled via a CLI option `--nopr` or in a config using `create_pr` value.
+* When doing a `propose-update`, packit no longer does a 1:1 copy, instead it
   copies everything from the upstream spec except for %changelog and then
   performs `rpmdev-bumpspec`.
 
