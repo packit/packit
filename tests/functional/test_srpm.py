@@ -38,3 +38,28 @@ def test_srpm_custom_path(upstream_instance):
     custom_path = "sooooorc.rpm"
     call_real_packit(parameters=["--debug", "srpm", "--output", custom_path], cwd=u)
     assert u.joinpath(custom_path).is_file()
+
+
+def test_srpm_twice_with_custom_name(upstream_instance):
+    u, ups = upstream_instance
+    custom_path = "sooooorc.rpm"
+    call_real_packit(parameters=["--debug", "srpm", "--output", custom_path], cwd=u)
+    assert u.joinpath(custom_path).is_file()
+
+    custom_path2 = "sooooorc2.rpm"
+    call_real_packit(parameters=["--debug", "srpm", "--output", custom_path2], cwd=u)
+    assert u.joinpath(custom_path2).is_file()
+
+
+def test_srpm_twice(upstream_instance):
+    u, ups = upstream_instance
+    call_real_packit(parameters=["--debug", "srpm"], cwd=u)
+    call_real_packit(parameters=["--debug", "srpm"], cwd=u)
+
+    srpm_files = list(u.glob("*.src.rpm"))
+    assert len(srpm_files) == 2
+
+    srpm1, srpm2 = srpm_files
+    name1, name2 = "beer-0.1.0-2", "beer-0.1.0-3"
+    assert srpm1.name.startswith(name1) or srpm2.name.startswith(name1)
+    assert srpm1.name.startswith(name2) or srpm2.name.startswith(name2)
