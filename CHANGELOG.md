@@ -1,3 +1,42 @@
+# 0.5.0
+
+All the documentation was moved to our site: https://packit.dev/docs
+
+## Features
+
+* If you set up `fas_username` in your config, packit will perform kinit before
+  doing an authenticated dist-git clone.
+* You can now specify a koji target when building in koji using the `build`
+  command.
+* There is a new command `copr-build` which enables you to submit builds into
+  Fedora COPR build system.
+* The config file how a new attribute called `create_pr` which tells packit
+  whether it should create pull requests in dist-git or push directly.
+* `build` command now waits for the build to finish and has a `--nowait`.
+* Packit now supports the most popular archive formats, not just .tar.gz
+  (thanks to @FrNecas for contributing this feature)
+* Command `propose-update` can now push directly to dist-git.
+* When doing a `propoes-update`, packit no longer does a 1:1 copy, instead it
+  copies everything from the upstream spec except for %changelog and then
+  performs `rpmdev-bumpspec`.
+
+## Fixes
+
+* SRPMs are now being correctly created from source-git repos.
+* Packit is now able to clone a dist-git repo using authentication (`fedpkg
+  clone`) and push to it afterwards.
+* `packit status` now displays also a latest rawhide koji build.
+* The command `propose-update` does no longer fail when looking for an upstream
+  archive.
+* Packit no longer discards changes in the local git repo if it's dirty.
+
+## Minor
+
+* Several improvements to text printed by packit.
+* We are now using Zuul for testing and have multiple jobs set up to verify
+  packit works against different versions of dependant software.
+
+
 # 0.4.2
 
 * Packit now uses [Sandcastle](https://github.com/packit-service/sandcastle) to run untrusted commands in a sandbox.
