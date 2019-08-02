@@ -90,7 +90,8 @@ class DistGit(PackitRepositoryBase):
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
-                f = FedPKG(self.fas_user, tmpdir)
+                f = FedPKG(fas_username=self.fas_user, directory=tmpdir)
+                f.init_ticket(self.config.keytab_path)
                 f.clone(
                     self.package_config.downstream_package_name,
                     tmpdir,
@@ -181,9 +182,7 @@ class DistGit(PackitRepositoryBase):
             )
 
         try:
-            self.local_project.git_repo.remote(fork_remote_name).push(
-                refspec=branch_name, force=force
-            )
+            self.push(refspec=branch_name, remote_name=fork_remote_name, force=force)
         except git.GitError as ex:
             msg = (
                 f"Unable to push to remote {fork_remote_name} using branch {branch_name}, "
@@ -262,8 +261,8 @@ class DistGit(PackitRepositoryBase):
         """
         # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("About to upload to lookaside cache")
-        f = FedPKG(self.fas_user, self.local_project.working_dir)
-        f.init_ticket()
+        f = FedPKG(fas_username=self.fas_user, directory=self.local_project.working_dir)
+        f.init_ticket(self.config.keytab_path)
         try:
             f.new_sources(sources=archive_path)
         except Exception as ex:
@@ -309,7 +308,10 @@ class DistGit(PackitRepositoryBase):
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
         """
-        fpkg = FedPKG(directory=self.local_project.working_dir)
+        fpkg = FedPKG(
+            fas_username=self.fas_user, directory=self.local_project.working_dir
+        )
+        fpkg.init_ticket(self.config.keytab_path)
         fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_bodhi_update(

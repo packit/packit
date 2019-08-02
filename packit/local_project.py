@@ -23,7 +23,7 @@
 import logging
 import shutil
 from contextlib import contextmanager
-from typing import Optional, Union
+from typing import Optional, Union, Iterable
 
 import git
 from ogr.abstract import GitProject, GitService
@@ -322,6 +322,19 @@ class LocalProject:
         rem.fetch(f"{remote_ref}:{local_ref}")
         self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
         self.git_repo.branches[local_branch].checkout()
+
+    def push(
+        self, refspec: str, remote_name: str = "origin", force: bool = False
+    ) -> Iterable[git.PushInfo]:
+        """
+        push changes to a remote using provided refspec
+
+        :param refspec: e.g. "master", "HEAD:f30"
+        :param remote_name: name of the remote where we push
+        :param force: force push: yes or no?
+        :return: a list of git.remote.PushInfo objects - have fun
+        """
+        return self.git_repo.remote(name=remote_name).push(refspec=refspec, force=force)
 
     def __del__(self):
         self.clean()

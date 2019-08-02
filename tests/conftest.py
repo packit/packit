@@ -31,11 +31,11 @@ from typing import Tuple
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
-from rebasehelper.specfile import SpecFile
-
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService
+from rebasehelper.specfile import SpecFile
+
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
@@ -177,9 +177,10 @@ def mock_patching():
 def upstream_distgit_remote(tmpdir) -> Tuple[Path, Path, Path]:
     t = Path(str(tmpdir))
 
-    u_remote = t / "upstream_remote"
-    u_remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote)
+    u_remote_path = t / "upstream_remote"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
 
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
@@ -187,10 +188,10 @@ def upstream_distgit_remote(tmpdir) -> Tuple[Path, Path, Path]:
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
-    initiate_git_repo(d, push=True, upstream_remote=str(u_remote))
+    initiate_git_repo(d, push=True, upstream_remote=str(u_remote_path))
     prepare_dist_git_repo(d)
 
-    return u, d, u_remote
+    return u, d, u_remote_path
 
 
 @pytest.fixture()

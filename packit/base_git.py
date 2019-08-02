@@ -23,9 +23,10 @@ import inspect
 import logging
 import shlex
 from pathlib import Path
-from typing import Optional, Callable, List, Tuple
+from typing import Optional, Callable, List, Tuple, Iterable
 
 import git
+from git import PushInfo
 from rebasehelper.specfile import SpecFile
 
 from packit.actions import ActionName
@@ -375,3 +376,28 @@ class PackitRepositoryBase:
     def is_dirty(self) -> bool:
         """ is the git repo dirty? """
         return self.local_project.git_repo.is_dirty()
+
+    def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
+        """ push selected refspec to a git remote """
+        logger.info(f"pushing changes to remote {remote_name} using refspec {refspec}")
+        push_infos_list: Iterable[PushInfo] = self.local_project.push(
+            refspec, remote_name=remote_name, force=force
+        )
+        for pi in push_infos_list:
+            logger.info(f"push summary: {pi.summary}")
+            push_failed = [
+                bool(x & pi.flags)
+                for x in (
+                    PushInfo.ERROR,
+                    PushInfo.REMOTE_FAILURE,
+                    PushInfo.REMOTE_REJECTED,
+                    PushInfo.NO_MATCH,  # this looks like it's not used in gitpython
+                    PushInfo.REJECTED,
+                    PushInfo.UP_TO_DATE,  # is this an error?
+                )
+            ]
+            if any(push_failed):
+                logger.debug(f"push_info flags: {pi.flags}")
+                raise PackitException(
+                    f"We were unable to push to dist-git: {pi.summary}."
+                )

@@ -65,7 +65,7 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
     logger.debug("cmd = '%s'", " ".join(cmd))
 
     cwd = cwd or str(Path.cwd())
-    error_message = error_message or cmd[0]
+    error_message = error_message or f"Command {cmd} failed."
 
     shell = subprocess.run(
         cmd,
