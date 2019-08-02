@@ -398,7 +398,9 @@ class Upstream(PackitRepositoryBase):
         cmd.append(str(self.absolute_specfile_path))
         run_command(cmd)
 
-    def set_spec_version(self, version: str, changelog_entry: str):
+    def set_spec_version(
+        self, version: str = None, release: str = None, changelog_entry: str = None
+    ):
         """
         Set version in spec and add a changelog_entry.
 
@@ -406,9 +408,16 @@ class Upstream(PackitRepositoryBase):
         :param changelog_entry: accompanying changelog entry
         """
         try:
-            # also this code adds 3 rpmbuild dirs into the upstream repo,
-            # we should ask rebase-helper not to do that
-            self.specfile.set_version(version=version)
+            if version:
+                # also this code adds 3 rpmbuild dirs into the upstream repo,
+                # we should ask rebase-helper not to do that
+                self.specfile.set_version(version=version)
+
+            if release:
+                self.specfile.set_release_number(release=release)
+
+            if not changelog_entry:
+                return
 
             if hasattr(self.specfile, "update_changelog"):
                 # new rebase helper
@@ -440,48 +449,53 @@ class Upstream(PackitRepositoryBase):
                 return base[archive_basename_len:]
         return ".tar.gz"
 
-    def create_archive(self, version: str = None):
+    def create_archive(self, version: str = None) -> str:
         """
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
-        version = version or self.get_current_version()
-        if self.with_action(action=ActionName.create_archive):
-            if self.package_config.upstream_project_name:
-                dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
-            else:
-                dir_name = f"{self.package_config.downstream_package_name}-{version}"
-            logger.debug("name + version = %s", dir_name)
-            # We don't care about the name of the archive, really
-            # we just require for the archive to be placed in the cwd
-            if self.package_config.create_tarball_command:
-                archive_cmd = self.package_config.create_tarball_command
-            else:
-                archive_extension = self.get_archive_extension(dir_name, version)
-                if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
-                    raise PackitException(
-                        "The target archive doesn't use a common extension ({}), "
-                        "git archive can't be used. Please provide your own script "
-                        "for archive creation.".format(
-                            ", ".join(COMMON_ARCHIVE_EXTENSIONS)
-                        )
-                    )
-                archive_name = f"{dir_name}{archive_extension}"
-                archive_cmd = [
-                    "git",
-                    "archive",
-                    "-o",
-                    archive_name,
-                    "--prefix",
-                    f"{dir_name}/",
-                    "HEAD",
-                ]
-            self.command_handler.run_command(archive_cmd, return_output=True)
+        if self.has_action(action=ActionName.create_archive):
+            return self.get_output_from_action(action=ActionName.create_archive)
 
-    def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
+        version = version or self.get_current_version()
+
+        if self.package_config.upstream_project_name:
+            dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
+        else:
+            dir_name = f"{self.package_config.downstream_package_name}-{version}"
+        logger.debug("name + version = %s", dir_name)
+
+        archive_extension = self.get_archive_extension(dir_name, version)
+        if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
+            raise PackitException(
+                "The target archive doesn't use a common extension ({}), "
+                "git archive can't be used. Please provide your own script "
+                "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
+            )
+        archive_name = f"{dir_name}{archive_extension}"
+
+        if self.package_config.create_tarball_command:
+            archive_cmd = self.package_config.create_tarball_command
+        else:
+            archive_cmd = [
+                "git",
+                "archive",
+                "-o",
+                archive_name,
+                "--prefix",
+                f"{dir_name}/",
+                "HEAD",
+            ]
+        self.command_handler.run_command(archive_cmd, return_output=True)
+        return archive_name
+
+    def create_srpm(
+        self, srpm_path: str = None, source_dir: str = None, srpm_dir: str = None
+    ) -> Path:
         """
         Create SRPM from the actual content of the repo
 
+        :param source_dir: path with the source files (defaults to dir with specfile)
         :param srpm_path: path to the srpm
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
@@ -496,7 +510,7 @@ class Upstream(PackitRepositoryBase):
             "rpmbuild",
             "-bs",
             "--define",
-            f"_sourcedir {rpmbuild_dir}",
+            f"_sourcedir {source_dir or rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
