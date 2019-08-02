@@ -503,6 +503,7 @@ class Upstream(PackitRepositoryBase):
         if self.running_in_service():
             srpm_dir = "."
             rpmbuild_dir = "."
+            source_dir = "."
         else:
             srpm_dir = srpm_dir or os.getcwd()
             rpmbuild_dir = str(self.absolute_specfile_dir)
