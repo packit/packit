@@ -427,6 +427,12 @@ class Upstream(PackitRepositoryBase):
             if not changelog_entry:
                 return
 
+            if not self.specfile.spec_content.section("%changelog"):
+                logger.debug(
+                    "The specfile doesn't have any %changelog, will not set it."
+                )
+                return
+
             if hasattr(self.specfile, "update_changelog"):
                 # new rebase helper
                 self.specfile.update_changelog(changelog_entry)
