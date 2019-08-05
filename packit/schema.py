@@ -28,6 +28,7 @@ JOB_CONFIG_SCHEMA = {
                 "build",
                 "sync_from_downstream",
                 "copr_build",
+                "tests",
             ]
         },
         "trigger": {"enum": ["release", "pull_request", "commit"]},
