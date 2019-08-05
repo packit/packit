@@ -27,6 +27,7 @@ import subprocess
 from pathlib import Path
 
 from click.testing import CliRunner
+from packit.utils import run_command
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
@@ -126,3 +127,7 @@ def does_bumpspec_know_new():
     """ does rpmdev-bumpspec know --new? """
     h = subprocess.check_output(["rpmdev-bumpspec", "--help"])
     return b"--new" in h
+
+
+def build_srpm(path: Path):
+    run_command(["rpmbuild", "--rebuild", str(path)])

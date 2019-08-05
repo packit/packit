@@ -38,7 +38,7 @@ except ImportError:
 
 from packit.config import Config
 from packit.exceptions import PackitException
-from tests.spellbook import does_bumpspec_know_new
+from tests.spellbook import does_bumpspec_know_new, build_srpm
 
 
 def test_get_spec_version(upstream_instance):
@@ -155,6 +155,7 @@ def test_create_srpm(upstream_instance, tmpdir):
     srpm_path = Path(tmpdir).joinpath("custom.src.rpm")
     srpm = ups.create_srpm(srpm_path=srpm_path)
     assert srpm.exists()
+    build_srpm(srpm)
 
 
 def test_github_app(upstream_instance, tmpdir):
