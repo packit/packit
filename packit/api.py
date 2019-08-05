@@ -442,8 +442,7 @@ class PackitAPI:
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
-        version = upstream_ref or self.up.get_current_version()
-        spec_version = self.up.get_specfile_version()
+        current_git_describe_version = self.up.get_current_version()
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
@@ -453,9 +452,11 @@ class PackitAPI:
             source_dir = self.up.absolute_specfile_dir
         else:
             # upstream repo: create the archive
-            archive = self.up.create_archive(version=version)
+            archive = self.up.create_archive(version=current_git_describe_version)
             self.up.specfile.set_tag("Source0", archive)
             source_dir = self.up.local_project.working_dir
+
+        commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
 
         if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):
@@ -465,30 +466,24 @@ class PackitAPI:
                 )
                 self.up.add_patches_to_specfile(patches)
 
-        old_release = self.up.specfile.get_release_number()
-        try:
-            old_release_int = int(old_release)
-            new_release = old_release_int + 1
-        except ValueError:
-            new_release = old_release
-        commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
-
-        if upstream_ref:
+            old_release = self.up.specfile.get_release_number()
+            try:
+                old_release_int = int(old_release)
+                new_release = old_release_int + 1
+            except ValueError:
+                new_release = old_release
             release_to_update = f"{new_release}.g{commit}"
             msg = f"Downstream changes ({commit})"
-        else:
-            release_to_update = f"{new_release}.dev.g{commit}"
-            msg = f"Development snapshot ({commit})"
-
-        try:
             self.up.set_spec_version(
                 release=release_to_update, changelog_entry=f"- {msg}"
             )
-        except PackitException:
+        else:
+            msg = f"Development snapshot ({commit})"
             self.up.bump_spec(
-                version=f"{spec_version}-{release_to_update}", changelog_entry=msg
+                version=f"{current_git_describe_version}",
+                changelog_entry=msg,
+                bump_release=True,
             )
-
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
         )
