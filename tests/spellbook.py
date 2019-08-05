@@ -35,6 +35,7 @@ from packit.config import Config
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
 UPSTREAM = DATA_DIR / "upstream_git"
+EMPTY_CHANGELOG = DATA_DIR / "empty_changelog"
 DISTGIT = DATA_DIR / "dist_git"
 UP_COCKPIT_OSTREE = DATA_DIR / "cockpit-ostree"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"

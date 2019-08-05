@@ -25,20 +25,31 @@ Tests for Upstream class
 """
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 from flexmock import flexmock
 
+from packit.local_project import LocalProject
+from packit.upstream import Upstream
+from packit.utils import cwd
+
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
 except ImportError:
     from rebasehelper.versioneer import versioneers_runner
 
-from packit.config import Config
+from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitException
-from tests.spellbook import does_bumpspec_know_new, build_srpm
+from tests.spellbook import (
+    does_bumpspec_know_new,
+    build_srpm,
+    get_test_config,
+    initiate_git_repo,
+    EMPTY_CHANGELOG,
+)
 
 
 def test_get_spec_version(upstream_instance):
@@ -99,6 +110,34 @@ def test_set_spec_ver(upstream_instance):
 
     assert ups.get_specfile_version() == new_ver
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
+
+
+def test_set_spec_ver_empty_changelog(tmpdir):
+    t = Path(str(tmpdir))
+
+    u_remote_path = t / "upstream_remote"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+
+    u = t / "upstream_git"
+    shutil.copytree(EMPTY_CHANGELOG, u)
+    initiate_git_repo(u, tag="0.1.0")
+
+    with cwd(tmpdir):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        lp = LocalProject(working_dir=str(u))
+
+        ups = Upstream(c, pc, lp)
+
+    new_ver = "1.2.3"
+    ups.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+
+    assert ups.get_specfile_version() == new_ver
+    assert "%changelog" not in u.joinpath("beer.spec").read_text()
 
 
 def change_source0_ext(upstream, extension):
