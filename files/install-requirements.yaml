@@ -24,6 +24,7 @@
         - fedpkg
         - rpmdevtools
         - python3-bodhi-client
+        - python3-koji
         - python3-cccolutils
         - rpmdevtools
       state: present
