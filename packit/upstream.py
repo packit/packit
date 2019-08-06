@@ -375,19 +375,25 @@ class Upstream(PackitRepositoryBase):
             self.package_config.current_version_command, return_output=True
         ).strip()
         logger.debug("version = %s", ver)
-        # FIXME: this might not work when users expect the dashes
-        #  but! RPM refuses dashes in version/release
+        # RPM refuses dashes in version/release
         ver = ver.replace("-", ".")
         logger.debug("sanitized version = %s", ver)
         return ver
 
-    def bump_spec(self, version: str = None, changelog_entry: str = None):
+    def bump_spec(
+        self,
+        version: str = None,
+        changelog_entry: str = None,
+        bump_release: bool = False,
+    ):
         """
         Run rpmdev-bumpspec on the upstream spec file: it enables
         changing version and adding a changelog entry
 
         :param version: new version which should be present in the spec
         :param changelog_entry: new changelog entry (just the comment)
+        :param bump_release: "bump trailing .<DIGIT> component if found, append .1 if not"
+                             from the rpmdev-bumpspec --help
         """
         cmd = ["rpmdev-bumpspec"]
         if version:
@@ -395,6 +401,8 @@ class Upstream(PackitRepositoryBase):
             cmd += ["--new", version]
         if changelog_entry:
             cmd += ["--comment", changelog_entry]
+        if bump_release:
+            cmd += ["-r"]
         cmd.append(str(self.absolute_specfile_path))
         run_command(cmd)
 
@@ -417,6 +425,12 @@ class Upstream(PackitRepositoryBase):
                 self.specfile.set_release_number(release=release)
 
             if not changelog_entry:
+                return
+
+            if not self.specfile.spec_content.section("%changelog"):
+                logger.debug(
+                    "The specfile doesn't have any %changelog, will not set it."
+                )
                 return
 
             if hasattr(self.specfile, "update_changelog"):
