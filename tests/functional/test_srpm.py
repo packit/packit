@@ -24,31 +24,39 @@
 Functional tests for srpm comand
 """
 
-from tests.spellbook import call_real_packit
+from tests.spellbook import call_real_packit, build_srpm
 
 
 def test_srpm_command(upstream_instance):
     u, ups = upstream_instance
     call_real_packit(parameters=["--debug", "srpm"], cwd=u)
-    assert list(u.glob("*.src.rpm"))[0].exists()
+    srpm_path = list(u.glob("*.src.rpm"))[0]
+    assert srpm_path.exists()
+    build_srpm(srpm_path)
 
 
 def test_srpm_custom_path(upstream_instance):
     u, ups = upstream_instance
     custom_path = "sooooorc.rpm"
     call_real_packit(parameters=["--debug", "srpm", "--output", custom_path], cwd=u)
-    assert u.joinpath(custom_path).is_file()
+    srpm_path = u.joinpath(custom_path)
+    assert srpm_path.is_file()
+    build_srpm(srpm_path)
 
 
 def test_srpm_twice_with_custom_name(upstream_instance):
     u, ups = upstream_instance
     custom_path = "sooooorc.rpm"
     call_real_packit(parameters=["--debug", "srpm", "--output", custom_path], cwd=u)
-    assert u.joinpath(custom_path).is_file()
+    srpm_path1 = u.joinpath(custom_path)
+    assert srpm_path1.is_file()
+    build_srpm(srpm_path1)
 
     custom_path2 = "sooooorc2.rpm"
     call_real_packit(parameters=["--debug", "srpm", "--output", custom_path2], cwd=u)
-    assert u.joinpath(custom_path2).is_file()
+    srpm_path2 = u.joinpath(custom_path2)
+    assert srpm_path2.is_file()
+    build_srpm(srpm_path2)
 
 
 def test_srpm_twice(upstream_instance):
@@ -56,10 +64,9 @@ def test_srpm_twice(upstream_instance):
     call_real_packit(parameters=["--debug", "srpm"], cwd=u)
     call_real_packit(parameters=["--debug", "srpm"], cwd=u)
 
+    # since we build from the 0.1.0, we would get the same SRPM because of '--new 0.1.0'
     srpm_files = list(u.glob("*.src.rpm"))
-    assert len(srpm_files) == 2
 
-    srpm1, srpm2 = srpm_files
-    name1, name2 = "beer-0.1.0-2", "beer-0.1.0-3"
-    assert srpm1.name.startswith(name1) or srpm2.name.startswith(name1)
-    assert srpm1.name.startswith(name2) or srpm2.name.startswith(name2)
+    assert srpm_files[0].exists()
+
+    build_srpm(srpm_files[0])

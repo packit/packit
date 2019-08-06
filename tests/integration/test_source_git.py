@@ -23,7 +23,7 @@ import subprocess
 from pathlib import Path
 
 from tests.conftest import mock_spec_download_remote_s
-from tests.spellbook import TARBALL_NAME, git_add_and_commit
+from tests.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
 from tests.utils import get_specfile
 from packit.utils import cwd
 
@@ -147,4 +147,6 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
     mock_spec_download_remote_s(sg_path / "fedora")
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref="0.1.0")
-    assert list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0].is_file()
+    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    assert srpm_path.is_file()
+    build_srpm(srpm_path)
