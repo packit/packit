@@ -11,14 +11,12 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.provision "shell", inline: <<-SHELL
-        cd /vagrant
-        cp files/install-requirements.yaml .
         dnf -y install ansible || true
     SHELL
 
     config.vm.provision :ansible_local do |ansible|
 	    ansible.verbose = "v"
-	    ansible.playbook = "./install-requirements.yaml"
+	    ansible.playbook = "files/install-requirements.yaml"
 	    ansible.become = true
     end
 
