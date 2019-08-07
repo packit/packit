@@ -4,17 +4,5 @@
   tasks:
   - include_tasks: tasks/zuul-project-setup.yaml
   - include_tasks: tasks/generic-dnf-requirements.yaml
-  - name: Install runtime RPM deps
-    dnf:
-      name:
-        - fedpkg
-        - rpmdevtools
-        - python3-bodhi-client
-        - python3-cccolutils
-      state: present
-    become: true
-  - name: Install build RPM dependencies
-    command: dnf -y builddep packit.spec
-    args:
-      chdir: '{{ project_dir }}'
-    become: true
+  - include_tasks: tasks/rpm-runtime-deps.yaml
+  - include_tasks: tasks/build-rpm-deps.yaml

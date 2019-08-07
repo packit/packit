@@ -224,7 +224,6 @@ class JobType(Enum):
     add_to_whitelist = "add_to_whitelist"
     tests = "tests"
     report_test_results = "report_test_results"
-    pull_request_action = "pull_request_action"
 
 
 class JobTriggerType(Enum):
@@ -233,7 +232,6 @@ class JobTriggerType(Enum):
     commit = "commit"
     installation = "installation"
     testing_farm_results = "testing_farm_results"
-    comment = "comment"
 
 
 class JobNotifyType(Enum):
