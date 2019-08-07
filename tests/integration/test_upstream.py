@@ -215,5 +215,7 @@ def test_github_app(upstream_instance, tmpdir):
         str(tmpdir)
     )
     ups.config = Config.get_user_config()
-
-    assert ups.local_project.git_service.token == "test"
+    if os.environ.get("GITHUB_TOKEN"):
+        assert os.environ.get("GITHUB_TOKEN") == ups.local_project.git_service.token
+    else:
+        assert ups.local_project.git_service.token == "test"
