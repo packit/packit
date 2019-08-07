@@ -7,138 +7,32 @@ GET:
           X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes,
           X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type
         cache-control: private, max-age=60, s-maxage=60
-        content-length: '6199'
+        content-encoding: gzip
         content-security-policy: default-src 'none'
         content-type: application/json; charset=utf-8
-        date: Tue, 09 Jul 2019 14:18:55 GMT
-        etag: '"9bc49617b0fa9ca9a7df65ea537be7f8"'
-        last-modified: Tue, 09 Jul 2019 13:56:33 GMT
+        date: Wed, 07 Aug 2019 07:11:44 GMT
+        etag: W/"301fdfb767dadc5214f987033d1889ae"
+        last-modified: Tue, 06 Aug 2019 11:03:49 GMT
         referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
         server: GitHub.com
         status: 200 OK
         strict-transport-security: max-age=31536000; includeSubdomains; preload
-        vary: Accept-Encoding
+        transfer-encoding: chunked
+        vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
         x-accepted-oauth-scopes: repo
         x-content-type-options: nosniff
         x-frame-options: deny
         x-github-media-type: github.v3; format=json
-        x-github-request-id: 2EF0:4403B:8AC5E5E:AC9FA31:5D24A24F
-        x-oauth-scopes: repo, user
+        x-github-request-id: 2D2C:2C029:876ED7:A8B2E1:5D4A79AF
+        x-oauth-scopes: admin:org, gist, notifications, repo, user, write:discussion
         x-ratelimit-limit: '5000'
-        x-ratelimit-remaining: '4980'
-        x-ratelimit-reset: '1562685389'
+        x-ratelimit-remaining: '4978'
+        x-ratelimit-reset: '1565165467'
         x-xss-protection: 1; mode=block
-      - !!binary |
-        eyJpZCI6MTYxNjM2NzAwLCJub2RlX2lkIjoiTURFd09sSmxjRzl6YVhSdmNua3hOakUyTXpZM01E
-        QT0iLCJuYW1lIjoib2dyIiwiZnVsbF9uYW1lIjoicGFja2l0LXNlcnZpY2Uvb2dyIiwicHJpdmF0
-        ZSI6ZmFsc2UsIm93bmVyIjp7ImxvZ2luIjoicGFja2l0LXNlcnZpY2UiLCJpZCI6NDY4NzA5MTcs
-        Im5vZGVfaWQiOiJNREV5T2s5eVoyRnVhWHBoZEdsdmJqUTJPRGN3T1RFMyIsImF2YXRhcl91cmwi
-        OiJodHRwczovL2F2YXRhcnMzLmdpdGh1YnVzZXJjb250ZW50LmNvbS91LzQ2ODcwOTE3P3Y9NCIs
-        ImdyYXZhdGFyX2lkIjoiIiwidXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNr
-        aXQtc2VydmljZSIsImh0bWxfdXJsIjoiaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl
-        IiwiZm9sbG93ZXJzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vdXNlcnMvcGFja2l0LXNl
-        cnZpY2UvZm9sbG93ZXJzIiwiZm9sbG93aW5nX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20v
-        dXNlcnMvcGFja2l0LXNlcnZpY2UvZm9sbG93aW5ney9vdGhlcl91c2VyfSIsImdpc3RzX3VybCI6
-        Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vdXNlcnMvcGFja2l0LXNlcnZpY2UvZ2lzdHN7L2dpc3Rf
-        aWR9Iiwic3RhcnJlZF91cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3VzZXJzL3BhY2tpdC1z
-        ZXJ2aWNlL3N0YXJyZWR7L293bmVyfXsvcmVwb30iLCJzdWJzY3JpcHRpb25zX3VybCI6Imh0dHBz
-        Oi8vYXBpLmdpdGh1Yi5jb20vdXNlcnMvcGFja2l0LXNlcnZpY2Uvc3Vic2NyaXB0aW9ucyIsIm9y
-        Z2FuaXphdGlvbnNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNraXQtc2Vy
-        dmljZS9vcmdzIiwicmVwb3NfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNr
-        aXQtc2VydmljZS9yZXBvcyIsImV2ZW50c191cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3Vz
-        ZXJzL3BhY2tpdC1zZXJ2aWNlL2V2ZW50c3svcHJpdmFjeX0iLCJyZWNlaXZlZF9ldmVudHNfdXJs
-        IjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNraXQtc2VydmljZS9yZWNlaXZlZF9l
-        dmVudHMiLCJ0eXBlIjoiT3JnYW5pemF0aW9uIiwic2l0ZV9hZG1pbiI6ZmFsc2V9LCJodG1sX3Vy
-        bCI6Imh0dHBzOi8vZ2l0aHViLmNvbS9wYWNraXQtc2VydmljZS9vZ3IiLCJkZXNjcmlwdGlvbiI6
-        Ik9uZSBHaXQgbGlicmFyeSB0byBSdWxlIC0tIG9uZSBBUEkgZm9yIG1hbnkgZ2l0IGZvcmdlcyIs
-        ImZvcmsiOmZhbHNlLCJ1cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1z
-        ZXJ2aWNlL29nciIsImZvcmtzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFj
-        a2l0LXNlcnZpY2Uvb2dyL2ZvcmtzIiwia2V5c191cmwiOiJodHRwczovL2FwaS5naXRodWIuY29t
-        L3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9rZXlzey9rZXlfaWR9IiwiY29sbGFib3JhdG9yc191
-        cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9jb2xs
-        YWJvcmF0b3Jzey9jb2xsYWJvcmF0b3J9IiwidGVhbXNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHVi
-        LmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvdGVhbXMiLCJob29rc191cmwiOiJodHRwczov
-        L2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9ob29rcyIsImlzc3VlX2V2
-        ZW50c191cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29n
-        ci9pc3N1ZXMvZXZlbnRzey9udW1iZXJ9IiwiZXZlbnRzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1
-        Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL2V2ZW50cyIsImFzc2lnbmVlc191cmwiOiJo
-        dHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9hc3NpZ25lZXN7
-        L3VzZXJ9IiwiYnJhbmNoZXNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNr
-        aXQtc2VydmljZS9vZ3IvYnJhbmNoZXN7L2JyYW5jaH0iLCJ0YWdzX3VybCI6Imh0dHBzOi8vYXBp
-        LmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL3RhZ3MiLCJibG9ic191cmwiOiJo
-        dHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9naXQvYmxvYnN7
-        L3NoYX0iLCJnaXRfdGFnc191cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tp
-        dC1zZXJ2aWNlL29nci9naXQvdGFnc3svc2hhfSIsImdpdF9yZWZzX3VybCI6Imh0dHBzOi8vYXBp
-        LmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL2dpdC9yZWZzey9zaGF9IiwidHJl
-        ZXNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3Iv
-        Z2l0L3RyZWVzey9zaGF9Iiwic3RhdHVzZXNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9y
-        ZXBvcy9wYWNraXQtc2VydmljZS9vZ3Ivc3RhdHVzZXMve3NoYX0iLCJsYW5ndWFnZXNfdXJsIjoi
-        aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvbGFuZ3VhZ2Vz
-        Iiwic3RhcmdhemVyc191cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1z
-        ZXJ2aWNlL29nci9zdGFyZ2F6ZXJzIiwiY29udHJpYnV0b3JzX3VybCI6Imh0dHBzOi8vYXBpLmdp
-        dGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL2NvbnRyaWJ1dG9ycyIsInN1YnNjcmli
-        ZXJzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dy
-        L3N1YnNjcmliZXJzIiwic3Vic2NyaXB0aW9uX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20v
-        cmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL3N1YnNjcmlwdGlvbiIsImNvbW1pdHNfdXJsIjoiaHR0
-        cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvY29tbWl0c3svc2hh
-        fSIsImdpdF9jb21taXRzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0
-        LXNlcnZpY2Uvb2dyL2dpdC9jb21taXRzey9zaGF9IiwiY29tbWVudHNfdXJsIjoiaHR0cHM6Ly9h
-        cGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvY29tbWVudHN7L251bWJlcn0i
-        LCJpc3N1ZV9jb21tZW50X3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0
-        LXNlcnZpY2Uvb2dyL2lzc3Vlcy9jb21tZW50c3svbnVtYmVyfSIsImNvbnRlbnRzX3VybCI6Imh0
-        dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL2NvbnRlbnRzL3sr
-        cGF0aH0iLCJjb21wYXJlX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0
-        LXNlcnZpY2Uvb2dyL2NvbXBhcmUve2Jhc2V9Li4ue2hlYWR9IiwibWVyZ2VzX3VybCI6Imh0dHBz
-        Oi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL21lcmdlcyIsImFyY2hp
-        dmVfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3Iv
-        e2FyY2hpdmVfZm9ybWF0fXsvcmVmfSIsImRvd25sb2Fkc191cmwiOiJodHRwczovL2FwaS5naXRo
-        dWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9kb3dubG9hZHMiLCJpc3N1ZXNfdXJsIjoi
-        aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvaXNzdWVzey9u
-        dW1iZXJ9IiwicHVsbHNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQt
-        c2VydmljZS9vZ3IvcHVsbHN7L251bWJlcn0iLCJtaWxlc3RvbmVzX3VybCI6Imh0dHBzOi8vYXBp
-        LmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL21pbGVzdG9uZXN7L251bWJlcn0i
-        LCJub3RpZmljYXRpb25zX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0
-        LXNlcnZpY2Uvb2dyL25vdGlmaWNhdGlvbnN7P3NpbmNlLGFsbCxwYXJ0aWNpcGF0aW5nfSIsImxh
-        YmVsc191cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29n
-        ci9sYWJlbHN7L25hbWV9IiwicmVsZWFzZXNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9y
-        ZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvcmVsZWFzZXN7L2lkfSIsImRlcGxveW1lbnRzX3VybCI6
-        Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL2RlcGxveW1l
-        bnRzIiwiY3JlYXRlZF9hdCI6IjIwMTgtMTItMTNUMTI6MzM6NTJaIiwidXBkYXRlZF9hdCI6IjIw
-        MTktMDctMDlUMTM6NTY6MzNaIiwicHVzaGVkX2F0IjoiMjAxOS0wNy0wOVQxMzo1NjozMVoiLCJn
-        aXRfdXJsIjoiZ2l0Oi8vZ2l0aHViLmNvbS9wYWNraXQtc2VydmljZS9vZ3IuZ2l0Iiwic3NoX3Vy
-        bCI6ImdpdEBnaXRodWIuY29tOnBhY2tpdC1zZXJ2aWNlL29nci5naXQiLCJjbG9uZV91cmwiOiJo
-        dHRwczovL2dpdGh1Yi5jb20vcGFja2l0LXNlcnZpY2Uvb2dyLmdpdCIsInN2bl91cmwiOiJodHRw
-        czovL2dpdGh1Yi5jb20vcGFja2l0LXNlcnZpY2Uvb2dyIiwiaG9tZXBhZ2UiOiIiLCJzaXplIjox
-        MjI2LCJzdGFyZ2F6ZXJzX2NvdW50Ijo4LCJ3YXRjaGVyc19jb3VudCI6OCwibGFuZ3VhZ2UiOiJQ
-        eXRob24iLCJoYXNfaXNzdWVzIjp0cnVlLCJoYXNfcHJvamVjdHMiOnRydWUsImhhc19kb3dubG9h
-        ZHMiOnRydWUsImhhc193aWtpIjp0cnVlLCJoYXNfcGFnZXMiOmZhbHNlLCJmb3Jrc19jb3VudCI6
-        MTEsIm1pcnJvcl91cmwiOm51bGwsImFyY2hpdmVkIjpmYWxzZSwiZGlzYWJsZWQiOmZhbHNlLCJv
-        cGVuX2lzc3Vlc19jb3VudCI6MTQsImxpY2Vuc2UiOnsia2V5IjoibWl0IiwibmFtZSI6Ik1JVCBM
-        aWNlbnNlIiwic3BkeF9pZCI6Ik1JVCIsInVybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vbGlj
-        ZW5zZXMvbWl0Iiwibm9kZV9pZCI6Ik1EYzZUR2xqWlc1elpURXoifSwiZm9ya3MiOjExLCJvcGVu
-        X2lzc3VlcyI6MTQsIndhdGNoZXJzIjo4LCJkZWZhdWx0X2JyYW5jaCI6Im1hc3RlciIsInBlcm1p
-        c3Npb25zIjp7ImFkbWluIjp0cnVlLCJwdXNoIjp0cnVlLCJwdWxsIjp0cnVlfSwiYWxsb3dfc3F1
-        YXNoX21lcmdlIjp0cnVlLCJhbGxvd19tZXJnZV9jb21taXQiOnRydWUsImFsbG93X3JlYmFzZV9t
-        ZXJnZSI6dHJ1ZSwib3JnYW5pemF0aW9uIjp7ImxvZ2luIjoicGFja2l0LXNlcnZpY2UiLCJpZCI6
-        NDY4NzA5MTcsIm5vZGVfaWQiOiJNREV5T2s5eVoyRnVhWHBoZEdsdmJqUTJPRGN3T1RFMyIsImF2
-        YXRhcl91cmwiOiJodHRwczovL2F2YXRhcnMzLmdpdGh1YnVzZXJjb250ZW50LmNvbS91LzQ2ODcw
-        OTE3P3Y9NCIsImdyYXZhdGFyX2lkIjoiIiwidXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91
-        c2Vycy9wYWNraXQtc2VydmljZSIsImh0bWxfdXJsIjoiaHR0cHM6Ly9naXRodWIuY29tL3BhY2tp
-        dC1zZXJ2aWNlIiwiZm9sbG93ZXJzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vdXNlcnMv
-        cGFja2l0LXNlcnZpY2UvZm9sbG93ZXJzIiwiZm9sbG93aW5nX3VybCI6Imh0dHBzOi8vYXBpLmdp
-        dGh1Yi5jb20vdXNlcnMvcGFja2l0LXNlcnZpY2UvZm9sbG93aW5ney9vdGhlcl91c2VyfSIsImdp
-        c3RzX3VybCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vdXNlcnMvcGFja2l0LXNlcnZpY2UvZ2lz
-        dHN7L2dpc3RfaWR9Iiwic3RhcnJlZF91cmwiOiJodHRwczovL2FwaS5naXRodWIuY29tL3VzZXJz
-        L3BhY2tpdC1zZXJ2aWNlL3N0YXJyZWR7L293bmVyfXsvcmVwb30iLCJzdWJzY3JpcHRpb25zX3Vy
-        bCI6Imh0dHBzOi8vYXBpLmdpdGh1Yi5jb20vdXNlcnMvcGFja2l0LXNlcnZpY2Uvc3Vic2NyaXB0
-        aW9ucyIsIm9yZ2FuaXphdGlvbnNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9w
-        YWNraXQtc2VydmljZS9vcmdzIiwicmVwb3NfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91
-        c2Vycy9wYWNraXQtc2VydmljZS9yZXBvcyIsImV2ZW50c191cmwiOiJodHRwczovL2FwaS5naXRo
-        dWIuY29tL3VzZXJzL3BhY2tpdC1zZXJ2aWNlL2V2ZW50c3svcHJpdmFjeX0iLCJyZWNlaXZlZF9l
-        dmVudHNfdXJsIjoiaHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS91c2Vycy9wYWNraXQtc2VydmljZS9y
-        ZWNlaXZlZF9ldmVudHMiLCJ0eXBlIjoiT3JnYW5pemF0aW9uIiwic2l0ZV9hZG1pbiI6ZmFsc2V9
-        LCJuZXR3b3JrX2NvdW50IjoxMSwic3Vic2NyaWJlcnNfY291bnQiOjEwfQ==
-  'https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml':
+      - '{"id":161636700,"node_id":"MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=","name":"ogr","full_name":"packit-service/ogr","private":false,"owner":{"login":"packit-service","id":46870917,"node_id":"MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3","avatar_url":"https://avatars3.githubusercontent.com/u/46870917?v=4","gravatar_id":"","url":"https://api.github.com/users/packit-service","html_url":"https://github.com/packit-service","followers_url":"https://api.github.com/users/packit-service/followers","following_url":"https://api.github.com/users/packit-service/following{/other_user}","gists_url":"https://api.github.com/users/packit-service/gists{/gist_id}","starred_url":"https://api.github.com/users/packit-service/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/packit-service/subscriptions","organizations_url":"https://api.github.com/users/packit-service/orgs","repos_url":"https://api.github.com/users/packit-service/repos","events_url":"https://api.github.com/users/packit-service/events{/privacy}","received_events_url":"https://api.github.com/users/packit-service/received_events","type":"Organization","site_admin":false},"html_url":"https://github.com/packit-service/ogr","description":"One
+        Git library to Rule -- one API for many git forges","fork":false,"url":"https://api.github.com/repos/packit-service/ogr","forks_url":"https://api.github.com/repos/packit-service/ogr/forks","keys_url":"https://api.github.com/repos/packit-service/ogr/keys{/key_id}","collaborators_url":"https://api.github.com/repos/packit-service/ogr/collaborators{/collaborator}","teams_url":"https://api.github.com/repos/packit-service/ogr/teams","hooks_url":"https://api.github.com/repos/packit-service/ogr/hooks","issue_events_url":"https://api.github.com/repos/packit-service/ogr/issues/events{/number}","events_url":"https://api.github.com/repos/packit-service/ogr/events","assignees_url":"https://api.github.com/repos/packit-service/ogr/assignees{/user}","branches_url":"https://api.github.com/repos/packit-service/ogr/branches{/branch}","tags_url":"https://api.github.com/repos/packit-service/ogr/tags","blobs_url":"https://api.github.com/repos/packit-service/ogr/git/blobs{/sha}","git_tags_url":"https://api.github.com/repos/packit-service/ogr/git/tags{/sha}","git_refs_url":"https://api.github.com/repos/packit-service/ogr/git/refs{/sha}","trees_url":"https://api.github.com/repos/packit-service/ogr/git/trees{/sha}","statuses_url":"https://api.github.com/repos/packit-service/ogr/statuses/{sha}","languages_url":"https://api.github.com/repos/packit-service/ogr/languages","stargazers_url":"https://api.github.com/repos/packit-service/ogr/stargazers","contributors_url":"https://api.github.com/repos/packit-service/ogr/contributors","subscribers_url":"https://api.github.com/repos/packit-service/ogr/subscribers","subscription_url":"https://api.github.com/repos/packit-service/ogr/subscription","commits_url":"https://api.github.com/repos/packit-service/ogr/commits{/sha}","git_commits_url":"https://api.github.com/repos/packit-service/ogr/git/commits{/sha}","comments_url":"https://api.github.com/repos/packit-service/ogr/comments{/number}","issue_comment_url":"https://api.github.com/repos/packit-service/ogr/issues/comments{/number}","contents_url":"https://api.github.com/repos/packit-service/ogr/contents/{+path}","compare_url":"https://api.github.com/repos/packit-service/ogr/compare/{base}...{head}","merges_url":"https://api.github.com/repos/packit-service/ogr/merges","archive_url":"https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}","downloads_url":"https://api.github.com/repos/packit-service/ogr/downloads","issues_url":"https://api.github.com/repos/packit-service/ogr/issues{/number}","pulls_url":"https://api.github.com/repos/packit-service/ogr/pulls{/number}","milestones_url":"https://api.github.com/repos/packit-service/ogr/milestones{/number}","notifications_url":"https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}","labels_url":"https://api.github.com/repos/packit-service/ogr/labels{/name}","releases_url":"https://api.github.com/repos/packit-service/ogr/releases{/id}","deployments_url":"https://api.github.com/repos/packit-service/ogr/deployments","created_at":"2018-12-13T12:33:52Z","updated_at":"2019-08-06T11:03:49Z","pushed_at":"2019-08-06T11:28:35Z","git_url":"git://github.com/packit-service/ogr.git","ssh_url":"git@github.com:packit-service/ogr.git","clone_url":"https://github.com/packit-service/ogr.git","svn_url":"https://github.com/packit-service/ogr","homepage":"","size":1428,"stargazers_count":8,"watchers_count":8,"language":"Python","has_issues":true,"has_projects":true,"has_downloads":true,"has_wiki":true,"has_pages":false,"forks_count":12,"mirror_url":null,"archived":false,"disabled":false,"open_issues_count":21,"license":{"key":"mit","name":"MIT
+        License","spdx_id":"MIT","url":"https://api.github.com/licenses/mit","node_id":"MDc6TGljZW5zZTEz"},"forks":12,"open_issues":21,"watchers":8,"default_branch":"master","permissions":{"admin":true,"push":true,"pull":true},"allow_squash_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"organization":{"login":"packit-service","id":46870917,"node_id":"MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3","avatar_url":"https://avatars3.githubusercontent.com/u/46870917?v=4","gravatar_id":"","url":"https://api.github.com/users/packit-service","html_url":"https://github.com/packit-service","followers_url":"https://api.github.com/users/packit-service/followers","following_url":"https://api.github.com/users/packit-service/following{/other_user}","gists_url":"https://api.github.com/users/packit-service/gists{/gist_id}","starred_url":"https://api.github.com/users/packit-service/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/packit-service/subscriptions","organizations_url":"https://api.github.com/users/packit-service/orgs","repos_url":"https://api.github.com/users/packit-service/repos","events_url":"https://api.github.com/users/packit-service/events{/privacy}","received_events_url":"https://api.github.com/users/packit-service/received_events","type":"Organization","site_admin":false},"network_count":12,"subscribers_count":10}'
+  https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml:
     '{''ref'': ''master''}':
     - - 200
       - access-control-allow-origin: '*'
@@ -146,54 +40,26 @@ GET:
           X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes,
           X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type
         cache-control: private, max-age=60, s-maxage=60
-        content-length: '1630'
+        content-encoding: gzip
         content-security-policy: default-src 'none'
         content-type: application/json; charset=utf-8
-        date: Tue, 09 Jul 2019 14:18:55 GMT
-        etag: '"a21746029528d3a2d3fc376008aec5d4ce990d5a"'
-        last-modified: Tue, 09 Jul 2019 13:56:30 GMT
+        date: Wed, 07 Aug 2019 07:11:44 GMT
+        etag: W/"809e35c9e35707fbb1db688641084c1e510bd85b"
+        last-modified: Tue, 06 Aug 2019 11:03:46 GMT
         referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
         server: GitHub.com
         status: 200 OK
         strict-transport-security: max-age=31536000; includeSubdomains; preload
-        vary: Accept-Encoding
+        transfer-encoding: chunked
+        vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
         x-accepted-oauth-scopes: ''
         x-content-type-options: nosniff
         x-frame-options: deny
         x-github-media-type: github.v3; format=json
-        x-github-request-id: 78D7:4403A:6A9DDAF:849442A:5D24A24E
-        x-oauth-scopes: repo, user
+        x-github-request-id: 2D2C:2C029:876F27:A8B326:5D4A79B0
+        x-oauth-scopes: admin:org, gist, notifications, repo, user, write:discussion
         x-ratelimit-limit: '5000'
-        x-ratelimit-remaining: '4981'
-        x-ratelimit-reset: '1562685389'
+        x-ratelimit-remaining: '4977'
+        x-ratelimit-reset: '1565165467'
         x-xss-protection: 1; mode=block
-      - !!binary |
-        eyJuYW1lIjoiLnBhY2tpdC55YW1sIiwicGF0aCI6Ii5wYWNraXQueWFtbCIsInNoYSI6ImEyMTc0
-        NjAyOTUyOGQzYTJkM2ZjMzc2MDA4YWVjNWQ0Y2U5OTBkNWEiLCJzaXplIjo2MDIsInVybCI6Imh0
-        dHBzOi8vYXBpLmdpdGh1Yi5jb20vcmVwb3MvcGFja2l0LXNlcnZpY2Uvb2dyL2NvbnRlbnRzLy5w
-        YWNraXQueWFtbD9yZWY9bWFzdGVyIiwiaHRtbF91cmwiOiJodHRwczovL2dpdGh1Yi5jb20vcGFj
-        a2l0LXNlcnZpY2Uvb2dyL2Jsb2IvbWFzdGVyLy5wYWNraXQueWFtbCIsImdpdF91cmwiOiJodHRw
-        czovL2FwaS5naXRodWIuY29tL3JlcG9zL3BhY2tpdC1zZXJ2aWNlL29nci9naXQvYmxvYnMvYTIx
-        NzQ2MDI5NTI4ZDNhMmQzZmMzNzYwMDhhZWM1ZDRjZTk5MGQ1YSIsImRvd25sb2FkX3VybCI6Imh0
-        dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9wYWNraXQtc2VydmljZS9vZ3IvbWFzdGVy
-        Ly5wYWNraXQueWFtbCIsInR5cGUiOiJmaWxlIiwiY29udGVudCI6IkxTMHRDaU1nWkc5amN6b2dh
-        SFIwY0hNNkx5OW5hWFJvZFdJdVkyOXRMM0JoWTJ0cGRDMXpaWEoyYVdObFxuTDNCaFkydHBkQzlp
-        Ykc5aUwyMWhjM1JsY2k5a2IyTnpMMk52Ym1acFozVnlZWFJwYjI0dWJXUUtjM0JsXG5ZMlpwYkdW
-        ZmNHRjBhRG9nY0hsMGFHOXVMVzluY2k1emNHVmpDbk41Ym1ObFpGOW1hV3hsY3pvS0lDQXRcbklI
-        QjVkR2h2YmkxdlozSXVjM0JsWXdwMWNITjBjbVZoYlY5d2NtOXFaV04wWDI1aGJXVTZJRzluY2dw
-        a1xuYjNkdWMzUnlaV0Z0WDNCaFkydGhaMlZmYm1GdFpUb2djSGwwYUc5dUxXOW5jZ29qSUhSb1pT
-        QjJaWEp6XG5hVzl1SUdseklHUnBabVpsY21WdWRDQjBhR0Z1SUhkcGRHZ2dZbUZ6YVdNZ1oybDBJ
-        R1JsYzJOeWFXSmxcbkNtTnlaV0YwWlY5MFlYSmlZV3hzWDJOdmJXMWhibVE2SUZzaWNIbDBhRzl1
-        TXlJc0lDSnpaWFIxY0M1d1xuZVNJc0lDSnpaR2x6ZENJc0lDSXRMV1JwYzNRdFpHbHlJaXdnSWk0
-        aVhRcGpkWEp5Wlc1MFgzWmxjbk5wXG5iMjVmWTI5dGJXRnVaRG9nV3lKd2VYUm9iMjR6SWl3Z0lu
-        TmxkSFZ3TG5CNUlpd2dJaTB0ZG1WeWMybHZcbmJpSmRDbXB2WW5NNkNpMGdhbTlpT2lCemVXNWpY
-        Mlp5YjIxZlpHOTNibk4wY21WaGJRb2dJSFJ5YVdkblxuWlhJNklHTnZiVzFwZEFvdElHcHZZam9n
-        WTI5d2NsOWlkV2xzWkFvZ0lIUnlhV2RuWlhJNklIQjFiR3hmXG5jbVZ4ZFdWemRBb2dJRzFsZEdG
-        a1lYUmhPZ29nSUNBZ2RHRnlaMlYwY3pvS0lDQWdJQzBnWm1Wa2IzSmhcbkxUSTVMWGc0Tmw4Mk5B
-        b2dJQ0FnTFNCbVpXUnZjbUV0Y21GM2FHbGtaUzE0T0RaZk5qUUtJQ0FnSUMwZ1xuWm1Wa2IzSmhM
-        VE13TFhnNE5sODJOQW89XG4iLCJlbmNvZGluZyI6ImJhc2U2NCIsIl9saW5rcyI6eyJzZWxmIjoi
-        aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9wYWNraXQtc2VydmljZS9vZ3IvY29udGVudHMv
-        LnBhY2tpdC55YW1sP3JlZj1tYXN0ZXIiLCJnaXQiOiJodHRwczovL2FwaS5naXRodWIuY29tL3Jl
-        cG9zL3BhY2tpdC1zZXJ2aWNlL29nci9naXQvYmxvYnMvYTIxNzQ2MDI5NTI4ZDNhMmQzZmMzNzYw
-        MDhhZWM1ZDRjZTk5MGQ1YSIsImh0bWwiOiJodHRwczovL2dpdGh1Yi5jb20vcGFja2l0LXNlcnZp
-        Y2Uvb2dyL2Jsb2IvbWFzdGVyLy5wYWNraXQueWFtbCJ9fQ==
+      - '{"name":".packit.yaml","path":".packit.yaml","sha":"809e35c9e35707fbb1db688641084c1e510bd85b","size":851,"url":"https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master","html_url":"https://github.com/packit-service/ogr/blob/master/.packit.yaml","git_url":"https://api.github.com/repos/packit-service/ogr/git/blobs/809e35c9e35707fbb1db688641084c1e510bd85b","download_url":"https://raw.githubusercontent.com/packit-service/ogr/master/.packit.yaml","type":"file","content":"LS0tCiMgZG9jczogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl\nL3BhY2tpdC9ibG9iL21hc3Rlci9kb2NzL2NvbmZpZ3VyYXRpb24ubWQKc3Bl\nY2ZpbGVfcGF0aDogcHl0aG9uLW9nci5zcGVjCnN5bmNlZF9maWxlczoKICAt\nIHB5dGhvbi1vZ3Iuc3BlYwp1cHN0cmVhbV9wcm9qZWN0X25hbWU6IG9ncgpk\nb3duc3RyZWFtX3BhY2thZ2VfbmFtZTogcHl0aG9uLW9ncgojIHRoZSB2ZXJz\naW9uIGlzIGRpZmZlcmVudCB0aGFuIHdpdGggYmFzaWMgZ2l0IGRlc2NyaWJl\nCmNyZWF0ZV90YXJiYWxsX2NvbW1hbmQ6IFsicHl0aG9uMyIsICJzZXR1cC5w\neSIsICJzZGlzdCIsICItLWRpc3QtZGlyIiwgIi4iXQpjdXJyZW50X3ZlcnNp\nb25fY29tbWFuZDogWyJweXRob24zIiwgInNldHVwLnB5IiwgIi0tdmVyc2lv\nbiJdCmpvYnM6Ci0gam9iOiBzeW5jX2Zyb21fZG93bnN0cmVhbQogIHRyaWdn\nZXI6IGNvbW1pdAotIGpvYjogcHJvcG9zZV9kb3duc3RyZWFtCiAgdHJpZ2dl\ncjogcmVsZWFzZQogIG1ldGFkYXRhOgogICAgZGlzdC1naXQtYnJhbmNoOiBt\nYXN0ZXIKLSBqb2I6IHByb3Bvc2VfZG93bnN0cmVhbQogIHRyaWdnZXI6IHJl\nbGVhc2UKICBtZXRhZGF0YToKICAgIGRpc3QtZ2l0LWJyYW5jaDogZjMwCi0g\nam9iOiBwcm9wb3NlX2Rvd25zdHJlYW0KICB0cmlnZ2VyOiByZWxlYXNlCiAg\nbWV0YWRhdGE6CiAgICBkaXN0LWdpdC1icmFuY2g6IGYyOQotIGpvYjogY29w\ncl9idWlsZAogIHRyaWdnZXI6IHB1bGxfcmVxdWVzdAogIG1ldGFkYXRhOgog\nICAgdGFyZ2V0czoKICAgIC0gZmVkb3JhLTI5LXg4Nl82NAogICAgLSBmZWRv\ncmEtcmF3aGlkZS14ODZfNjQKICAgIC0gZmVkb3JhLTMwLXg4Nl82NAo=\n","encoding":"base64","_links":{"self":"https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master","git":"https://api.github.com/repos/packit-service/ogr/git/blobs/809e35c9e35707fbb1db688641084c1e510bd85b","html":"https://github.com/packit-service/ogr/blob/master/.packit.yaml"}}'
