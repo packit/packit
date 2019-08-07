@@ -28,7 +28,7 @@ from typing import Optional, Sequence, List
 import cccolutils
 import git
 import requests
-from ogr.services.pagure import PagureService
+from ogr import PagureService
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
