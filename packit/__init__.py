@@ -20,10 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
+import builtins
+
 from pkg_resources import get_distribution, DistributionNotFound
+
 
 try:
     __version__ = get_distribution(__name__).version
 except DistributionNotFound:
     # package is not installed
     pass
+
+if os.getenv("RECORD_REQUESTS"):
+    from packit.session_recording import (
+        upgrade_import_system,
+        ReplaceType,
+        RequestResponseHandling,
+        tempfile,
+    )
+
+    HANDLE_MODULE_LIST = [
+        ("requests", {"who_name": "rebasehelper"}),
+        (
+            "requests",
+            {"who_name": "packit.distgit"},
+            {"head": [ReplaceType.DECORATOR, RequestResponseHandling.decorator]},
+        ),
+        (
+            "tempfile",
+            {"who_name": "packit.distgit"},
+            {"": [ReplaceType.REPLACE, tempfile]},
+        ),
+    ]
+
+    builtins.__import__ = upgrade_import_system(
+        builtins.__import__,
+        name_filters=HANDLE_MODULE_LIST,
+        debug_file="import_module.log",
+    )

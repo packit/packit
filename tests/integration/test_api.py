@@ -43,7 +43,7 @@ class ProposeUpdate(PackitUnittestOgr):
         self.api._dg = self.dg
         # Do not upload package, because no credentials given in CI
         flexmock(self.api).should_receive("_handle_sources").and_return(None)
-        flexmock(self.api.dg).should_receive("push_to_fork").and_return(None)
+        # flexmock(self.api.dg).should_receive("push_to_fork").and_return(None)
         self.set_git_user()
 
     def test_propose_update(self):

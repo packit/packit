@@ -22,4 +22,4 @@ check_in_container: tests_image
 
 
 check_in_container_regenerate_data: tests_image
-	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .;make check TESTS_TARGET=$(TESTS_INTEGRATION_PATH) GITHUB_TOKEN=${GITHUB_TOKEN} PAGURE_TOKEN=${PAGURE_TOKEN}"
+	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .;make check TESTS_TARGET=$(TESTS_TARGET) GITHUB_TOKEN=${GITHUB_TOKEN} PAGURE_TOKEN=${PAGURE_TOKEN} RECORD_REQUESTS=${RECORD_REQUESTS}"
