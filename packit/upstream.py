@@ -24,7 +24,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
@@ -504,7 +504,10 @@ class Upstream(PackitRepositoryBase):
         return archive_name
 
     def create_srpm(
-        self, srpm_path: str = None, source_dir: str = None, srpm_dir: str = None
+        self,
+        srpm_path: str = None,
+        source_dir: Union[str, Path] = None,
+        srpm_dir: str = None,
     ) -> Path:
         """
         Create SRPM from the actual content of the repo
@@ -517,7 +520,6 @@ class Upstream(PackitRepositoryBase):
         if self.running_in_service():
             srpm_dir = "."
             rpmbuild_dir = "."
-            source_dir = "."
         else:
             srpm_dir = srpm_dir or os.getcwd()
             rpmbuild_dir = str(self.absolute_specfile_dir)
