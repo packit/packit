@@ -1,7 +1,7 @@
 CONTAINER_NAME=packit
 TESTS_INTEGRATION_PATH=tests/integration
 TEST_DATA_PATH=$(TESTS_INTEGRATION_PATH)/test_data
-CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src:Z $(CONTAINER_NAME)
+CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=disable $(CONTAINER_NAME)
 TEST_TARGET := ./tests
 
 test_container:
