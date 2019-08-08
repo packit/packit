@@ -446,15 +446,22 @@ class PackitAPI:
 
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
+        if self.up.running_in_service():
+            relative_to = Path(self.config.command_handler_work_dir)
+        else:
+            relative_to = Path.cwd()
+
         if upstream_ref:
             # source-git code: fetch the tarball and don't check out the upstream ref
             self.up.fetch_upstream_archive()
-            source_dir = self.up.absolute_specfile_dir
+            source_dir = self.up.absolute_specfile_dir.relative_to(relative_to)
         else:
             # upstream repo: create the archive
             archive = self.up.create_archive(version=current_git_describe_version)
             self.up.specfile.set_tag("Source0", archive)
-            source_dir = self.up.local_project.working_dir
+            source_dir = Path(self.up.local_project.working_dir).relative_to(
+                relative_to
+            )
 
         commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
 
