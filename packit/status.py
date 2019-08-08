@@ -1,7 +1,7 @@
 # MIT License
 #
 # Copyright (c) 2018-2019 Red Hat, Inc.
-
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -19,13 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 import logging
-
+from datetime import datetime, timedelta
 from typing import List, Tuple, Dict
 
+from koji import ClientSession, BUILD_STATES
 from ogr.abstract import Release
-
 from packit.config import Config, PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -115,19 +114,26 @@ class Status:
 
     def get_builds(self,) -> Dict:
         """
-        Get latest koji builds
+        Get latest koji builds as a dict of branch: latest build in that branch.
         """
-        # https://github.com/fedora-infra/bodhi/issues/3058
-        from bodhi.client.bindings import BodhiClient
-
-        b = BodhiClient()
-        # { koji-target: "latest-build-nvr"}
-        builds_d = b.latest_builds(self.dg.package_config.downstream_package_name)
-        logger.debug(f"Latest Koji builds fetched (from Bodhi): {builds_d}.")
-        builds: Dict = {}
-        for tag, nvr in builds_d.items():
-            if tag.endswith("-updates-candidate"):
-                builds[tag[: -len("-updates-candidate")]] = nvr
+        session = ClientSession(baseurl="https://koji.fedoraproject.org/kojihub")
+        package_id = session.getPackageID(
+            self.dg.package_config.downstream_package_name
+        )
+        # This method returns only latest builds,
+        # so we don't need to get whole build history from Koji,
+        # get just recent year to speed things up.
+        since = datetime.now() - timedelta(days=365)
+        builds_l = session.listBuilds(
+            packageID=package_id,
+            state=BUILD_STATES["COMPLETE"],
+            completeAfter=since.timestamp(),
+        )
+        logger.debug(f"Recent Koji builds fetched: {[b['nvr'] for b in builds_l]}")
+        # Select latest build for each branch.
+        # [{'nvr': 'python-ogr-0.5.0-1.fc29'}, {'nvr':'python-ogr-0.6.0-1.fc29'}]
+        # -> {'fc29': 'python-ogr-0.6.0-1.fc29'}
+        builds = {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
         return builds
 
     def get_updates(self, number_of_updates: int = 3) -> List:
