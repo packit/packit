@@ -3,30 +3,10 @@
   hosts: all
   tasks:
   - include_tasks: tasks/zuul-project-setup.yaml
-  - name: Install test rpm dependencies
-    dnf:
-      name:
-      - python3-flexmock
-      - python3-pytest
-      - python3-pytest-cov
-      state: present
-    become: true
-
-  - name: "set up git: email"
-    command: git config --global user.email test@example.com
-  - name: "set up git: name"
-    command: git config --global user.name "Packit Test Suite"
-
-  - name: Pip install sandcastle, our sandboxing tech (needed when running as a service)
-    pip:
-      name: git+https://github.com/packit-service/sandcastle
-    become: true
-
-  - name: Install packit from {{ project_dir }}
-    pip:
-      name: '{{ project_dir }}'
-    become: true
-
+  - include_tasks: tasks/rpm-test-deps.yaml
+  - include_tasks: tasks/sandcastle-master.yaml
+  - include_tasks: tasks/install-packit.yaml
+  - include_tasks: tasks/configure-git.yaml
   - name: Run tests
     command: make check
     args:

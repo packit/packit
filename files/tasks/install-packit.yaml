@@ -1,0 +1,5 @@
+---
+- name: Install packit from {{ project_dir }}
+  pip:
+    name: '{{ project_dir }}'
+  become: true
