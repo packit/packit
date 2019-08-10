@@ -1,0 +1,5 @@
+---
+- name: "set up git: email"
+  command: git config --global user.email test@example.com
+- name: "set up git: name"
+  command: git config --global user.name "Packit Test Suite"
