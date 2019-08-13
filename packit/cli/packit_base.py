@@ -48,6 +48,9 @@ logger = logging.getLogger("packit")
     is_flag=True,
     help="Do not perform any remote changes (pull requests or comments).",
 )
+@click.version_option(
+    version=get_distribution("packitos").version, message="%(version)s"
+)
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab, dry_run):
     """Integrate upstream open source projects into Fedora operating system."""
@@ -66,13 +69,6 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run):
         logger.debug("logging set to INFO")
 
 
-@click.command("version")
-def version():
-    """Display the version."""
-    click.echo(get_distribution("packitos").version)
-
-
-packit_base.add_command(version)
 packit_base.add_command(update)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
