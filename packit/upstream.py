@@ -31,13 +31,6 @@ from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 
 try:
-    # ogr < 0.5
-    from ogr import GithubService
-except ImportError:
-    # ogr >= 0.5
-    from ogr.services.github import GithubService
-
-try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
 except ImportError:
     from rebasehelper.versioneer import versioneers_runner
@@ -64,41 +57,26 @@ class Upstream(PackitRepositoryBase):
         :param package_config: configuration of the upstream project
         :param local_project: public offender
         """
-        self.local_project = local_project
+        self._local_project = local_project
         super().__init__(config=config, package_config=package_config)
         self.config = config
         self.package_config = package_config
 
-        self.github_token = self.config.github_token
         self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
-        self.set_local_project()
+
+    @property
+    def local_project(self):
+        if not self._local_project.git_project:
+            self._local_project.git_project = self.config.get_project(
+                url=self.upstream_project_url
+            )
+            self._local_project.refresh_the_arguments()
+        return self._local_project
 
     @property
     def active_branch(self) -> str:
         return self.local_project.ref
-
-    def set_local_project(self):
-        """ update self.local_project """
-        # TODO: in order to support any git forge here, ogr should also have a method like this:
-        #       get_github_service_from_url(url, **kwargs):
-        #       ogr should guess the forge based on the url; kwargs should be passed to the
-        #       constructor in order to support the above
-        if not self.local_project.git_service:
-            if self.config.github_app_cert_path:
-                private_key = Path(self.config.github_app_cert_path).read_text()
-            else:
-                private_key = None
-            self.local_project.git_service = GithubService(
-                token=self.config.github_token,
-                github_app_id=self.config.github_app_id,
-                github_app_private_key=private_key,
-            )
-            self.local_project.refresh_the_arguments()  # get git project from newly set git service
-
-        if not self.local_project.repo_name:
-            # will this ever happen?
-            self.local_project.repo_name = self.package_config.downstream_package_name
 
     def get_commits_to_upstream(
         self, upstream: str, add_usptream_head_commit=False
@@ -211,11 +189,6 @@ class Upstream(PackitRepositoryBase):
         Create upstream pull request using the requested branches
         """
         project = self.local_project.git_project
-
-        if not self.github_token:
-            raise PackitException(
-                "Please provide GITHUB_TOKEN as an environment variable."
-            )
 
         if self.local_project.git_project.is_fork:
             source_branch = f"{project.namespace}:{source_branch}"
