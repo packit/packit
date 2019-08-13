@@ -100,24 +100,6 @@ class Upstream(PackitRepositoryBase):
             # will this ever happen?
             self.local_project.repo_name = self.package_config.downstream_package_name
 
-    def checkout_pr(self, pr_id: int) -> None:
-        """
-        Checkout the branch for the pr.
-
-        TODO: Move this to ogr and make it compatible with other git forges.
-        """
-        self.local_project.git_repo.remote().fetch(
-            refspec=f"pull/{pr_id}/head:pull/{pr_id}"
-        )
-        self.local_project.git_repo.refs[f"pull/{pr_id}"].checkout()
-
-    def checkout_release(self, version: str) -> None:
-        logger.info("Checking out upstream version %s", version)
-        try:
-            self.local_project.git_repo.git.checkout(version)
-        except Exception as ex:
-            raise PackitException(f"Cannot checkout release tag: {ex}.")
-
     def get_commits_to_upstream(
         self, upstream: str, add_usptream_head_commit=False
     ) -> List[git.Commit]:

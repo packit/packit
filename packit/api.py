@@ -187,7 +187,7 @@ class PackitAPI:
             # TODO: this is also naive, upstream may use different tagging scheme, e.g.
             #       release = 232, tag = v232
             if not use_local_content:
-                self.up.checkout_release(full_version)
+                self.up.local_project.checkout_release(full_version)
 
             self.dg.check_last_commit()
 
