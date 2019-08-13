@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 import pytest
+from pkg_resources import get_distribution
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
-from packit.cli.packit_base import version as cli_version
 from packit.cli.update import update
 from tests.spellbook import call_packit
 
@@ -36,22 +36,11 @@ def test_base_help():
     assert "Usage: packit [OPTIONS] COMMAND [ARGS]..." in result.output
 
 
-def test_base_version_direct():
-    # This test requires packit on pythonpath
-    result = call_packit(cli_version)
-    assert result.exit_code == 0
-
-
 def test_base_version():
     # This test requires packit on pythonpath
-    result = call_packit(parameters=["version"])
+    result = call_packit(parameters=["--version"])
     assert result.exit_code == 0
-    # TODO: figure out the correct version getter:
-    # version = get_version(root="../..", relative_to=__file__)
-    # name_ver = get_distribution(__name__).version
-    # packit_ver = get_distribution("packit").version
-    # packitos_ver = get_distribution("packitos").version
-    # assert version in result.output
+    assert result.output.strip() == get_distribution("packitos").version
 
 
 @pytest.mark.parametrize("cmd_function", [update, build, create_update])
