@@ -25,8 +25,9 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from ogr.abstract import GitProject, GitService
 
+from ogr import GithubService, PagureService
+from ogr.abstract import GitProject, GitService
 from packit.actions import ActionName
 from packit.config import (
     JobConfig,
@@ -520,8 +521,8 @@ def test_get_user_config(tmpdir):
         "debug: true\n"
         "fas_user: rambo\n"
         "keytab_path: './rambo.keytab'\n"
-        "github_token: ra\n"
-        "pagure_user_token: mb\n"
+        "github_token: GITHUB_TOKEN\n"
+        "pagure_user_token: PAGURE_TOKEN\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
         str(tmpdir)
@@ -530,14 +531,37 @@ def test_get_user_config(tmpdir):
     assert config.debug and isinstance(config.debug, bool)
     assert config.fas_user == "rambo"
     assert config.keytab_path == "./rambo.keytab"
-    flexmock(os).should_receive("getenv").with_args("GITHUB_TOKEN", "").and_return(None)
-    assert config.github_token == "ra"
-    flexmock(os).should_receive("getenv").with_args("PAGURE_USER_TOKEN", "").and_return(
-        None
+
+    assert GithubService(token="GITHUB_TOKEN") in config.services
+    assert PagureService(token="PAGURE_TOKEN") in config.services
+
+
+def test_get_user_config_new_authentication(tmpdir):
+    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+    user_config_file_path.write_text(
+        "---\n"
+        "debug: true\n"
+        "fas_user: rambo\n"
+        "keytab_path: './rambo.keytab'\n"
+        "authentication:\n"
+        "    github.com:\n"
+        "        token: GITHUB_TOKEN\n"
+        "    pagure:\n"
+        "        token: PAGURE_TOKEN\n"
+        '        instance_url: "https://my.pagure.org"\n'
     )
-    assert config.pagure_user_token == "mb"
-    flexmock(os).should_receive("getenv").with_args("PAGURE_FORK_TOKEN", "").and_return(
-        None
+    flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
+        str(tmpdir)
+    )
+    config = Config.get_user_config()
+    assert config.debug and isinstance(config.debug, bool)
+    assert config.fas_user == "rambo"
+    assert config.keytab_path == "./rambo.keytab"
+
+    assert GithubService(token="GITHUB_TOKEN") in config.services
+    assert (
+        PagureService(token="PAGURE_TOKEN", instance_url="https://my.pagure.org")
+        in config.services
     )
 
 
