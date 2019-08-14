@@ -67,8 +67,9 @@ synced_files:
     - {downstream_package_name}.spec
     - .packit.yaml
 
-# change these lines if upstream project name is not the same as downstream
+# name in upstream package repository/registry (e.g. in PyPI)
 upstream_project_name: {upstream_project_name}
+# downstream (Fedora) RPM package name
 downstream_package_name: {downstream_package_name}
 """
 
