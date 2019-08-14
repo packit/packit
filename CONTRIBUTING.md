@@ -68,7 +68,7 @@ Running tests locally:
 make prepare-check && make check
 ```
 
-As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configuration in [Jenkinsfile](Jenkinsfile).
+As a CI we use [Zuul](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit) with a configuration in [.zuul.yaml](.zuul.yaml).
 
 When running the tests we are using the pregenerated responses that are saved in the ./tests/integration/test_data.
 If you need to generate a new file, just run the tests and provide environment variables for the service.
