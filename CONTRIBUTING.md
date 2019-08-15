@@ -65,10 +65,11 @@ We use [Tox](https://pypi.org/project/tox) with configuration in [tox.ini](tox.i
 
 Running tests locally:
 ```
-make prepare-check && make check
+make check_in_container
 ```
 
-As a CI we use [CentOS CI](https://ci.centos.org/job/packit-pr/) with a configuration in [Jenkinsfile](Jenkinsfile).
+As a CI we use [Zuul](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit) with a configuration in [.zuul.yaml](.zuul.yaml).
+If you want to re-run CI/tests in a pull request, just include `recheck` in a comment.
 
 When running the tests we are using the pregenerated responses that are saved in the ./tests/integration/test_data.
 If you need to generate a new file, just run the tests and provide environment variables for the service.
@@ -84,23 +85,6 @@ This is the code used for base test class in the `setUp`:
 ```python
 response_file = self.get_datafile_filename() # name generated from the test name
 PersistentObjectStorage().storage_file = response_file
-```
-
-### Makefile
-
-#### Requirements
-
-- ansible
-
-#### Targets
-Run [recipe-tests.yaml](recipe-tests.yaml) ansible playbook to install packages needed to run tests:
-```
-make prepare-check
-```
-
-Run tests locally:
-```
-make check
 ```
 
 ### Additional configuration for development purposes
