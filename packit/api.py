@@ -301,11 +301,14 @@ class PackitAPI:
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
-        local_pr_branch = f"{dist_git_branch}-downstream-sync"
         logger.info(f'using "{dist_git_branch}" dist-git branch')
 
-        self.up.create_branch(local_pr_branch)
-        self.up.checkout_branch(local_pr_branch)
+        if no_pr:
+            self.up.checkout_branch(upstream_branch)
+        else:
+            local_pr_branch = f"{dist_git_branch}-downstream-sync"
+            self.up.create_branch(local_pr_branch)
+            self.up.checkout_branch(local_pr_branch)
 
         raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
             dest_dir=Path(self.dg.local_project.working_dir),
