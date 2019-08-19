@@ -34,6 +34,7 @@ from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
+from munch import Munch
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -585,6 +586,14 @@ class PackitAPI:
         else:
             logger.info("No Koji builds found.")
 
+    @staticmethod
+    def _copr_web_build_url(build: Munch):
+        """ Construct web frontend url because build.repo_url is not much user-friendly."""
+        return (
+            "https://copr.fedorainfracloud.org/coprs/"
+            f"{build.owner}/{build.projectname}/build/{build.id}/"
+        )
+
     def run_copr_build(
         self, project: str, chroots: List[str], owner: str = None
     ) -> Tuple[int, str]:
@@ -595,7 +604,7 @@ class PackitAPI:
                         inside (defaults to something long and ugly)
         :param chroots: a list of COPR chroots (targets) e.g. fedora-rawhide-x86_64
         :param owner: defaults to username from copr config file
-        :return: id of the created build and url to its repo
+        :return: id of the created build and url to the build web page
         """
         # get info
         configured_owner = self.copr.config.get("username")
@@ -628,7 +637,7 @@ class PackitAPI:
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
         logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
         build = self.copr.build_proxy.create_from_file(owner, project, srpm_path)
-        return build.id, build.repo_url
+        return build.id, self._copr_web_build_url(build)
 
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
@@ -650,7 +659,10 @@ class PackitAPI:
                 gh_state, description = "error", "Something went wrong."
             if report_func:
                 report_func(
-                    gh_state, description, build_id=build.id, url=build.repo_url
+                    gh_state,
+                    description,
+                    build_id=build.id,
+                    url=self._copr_web_build_url(build),
                 )
             if gh_state != "pending":
                 logger.debug(f"state is now {gh_state}, ending the watch")
