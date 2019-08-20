@@ -218,8 +218,8 @@ def nested_get(d: dict, *keys, default=None) -> Any:
     for k in keys:
         try:
             response = response[k]
-        except (KeyError, AttributeError, TypeError) as ex:
-            logger.debug("can't obtain %s: %s", k, ex)
+        except (KeyError, AttributeError, TypeError):
+            # logger.debug("can't obtain %s: %s", k, ex)
             return default
     return response
 
