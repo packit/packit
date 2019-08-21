@@ -163,6 +163,7 @@ class Status:
         ]
         updates = []
         for [update, karma, status, branch] in all_updates:
+            # Don't return more than one stable update per branch
             if branch not in stable_branches or status != "stable":
                 updates.append([update, karma, status])
                 if status == "stable":
