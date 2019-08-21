@@ -21,7 +21,7 @@
 # SOFTWARE.
 import logging
 from datetime import datetime, timedelta
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Set
 
 from koji import ClientSession, BUILD_STATES
 from ogr.abstract import Release
@@ -150,8 +150,23 @@ class Status:
             "updates"
         ]
         logger.debug("Bodhi updates fetched.")
-        results = results[:number_of_updates]
 
-        return [
-            [result["title"], result["karma"], result["status"]] for result in results
+        stable_branches: Set[str] = set()
+        all_updates = [
+            [
+                result["title"],
+                result["karma"],
+                result["status"],
+                result["release"]["branch"],
+            ]
+            for result in results
         ]
+        updates = []
+        for [update, karma, status, branch] in all_updates:
+            if branch not in stable_branches or status != "stable":
+                updates.append([update, karma, status])
+                if status == "stable":
+                    stable_branches.add(branch)
+            if len(updates) == number_of_updates:
+                break
+        return updates
