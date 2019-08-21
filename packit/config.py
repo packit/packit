@@ -23,6 +23,7 @@
 import json
 import logging
 import os
+import warnings
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
@@ -83,7 +84,6 @@ class Config(BaseConfig):
         self.webhook_secret: str = ""
 
         self._pagure_user_token: str = ""
-        self._pagure_fork_token: str = ""
         self.dry_run: bool = False
 
         # %%% ACTIONS HANDLER CONFIGURATION %%%
@@ -141,7 +141,11 @@ class Config(BaseConfig):
         config.keytab_path = raw_dict.get("keytab_path", None)
         config._github_token = raw_dict.get("github_token", "")
         config._pagure_user_token = raw_dict.get("pagure_user_token", "")
-        config._pagure_fork_token = raw_dict.get("pagure_fork_token", "")
+        if raw_dict.get("pagure_fork_token"):
+            warnings.warn(
+                "packit no longer accepts 'pagure_fork_token'"
+                " value (https://github.com/packit-service/packit/issues/495)"
+            )
         config.github_app_id = raw_dict.get("github_app_id", "")
         config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
         config.webhook_secret = raw_dict.get("webhook_secret", "")
@@ -179,14 +183,6 @@ class Config(BaseConfig):
         if token:
             return token
         return self._pagure_user_token
-
-    @property
-    def pagure_fork_token(self) -> str:
-        """ this is needed to create pull requests """
-        token = os.getenv("PAGURE_FORK_TOKEN", "")
-        if token:
-            return token
-        return self._pagure_fork_token
 
 
 pass_config = click.make_pass_decorator(Config)
