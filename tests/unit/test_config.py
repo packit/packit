@@ -522,7 +522,6 @@ def test_get_user_config(tmpdir):
         "keytab_path: './rambo.keytab'\n"
         "github_token: ra\n"
         "pagure_user_token: mb\n"
-        "pagure_fork_token: o\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
         str(tmpdir)
@@ -540,4 +539,16 @@ def test_get_user_config(tmpdir):
     flexmock(os).should_receive("getenv").with_args("PAGURE_FORK_TOKEN", "").and_return(
         None
     )
-    assert config.pagure_fork_token == "o"
+
+
+def test_user_config_fork_token(tmpdir, recwarn):
+    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+    user_config_file_path.write_text(
+        "---\n" "pagure_fork_token: yes-is-true-in-yaml-are-you-kidding-me?\n"
+    )
+    flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
+        str(tmpdir)
+    )
+    Config.get_user_config()
+    w = recwarn.pop(UserWarning)
+    assert "pagure_fork_token" in str(w.message)

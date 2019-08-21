@@ -33,7 +33,6 @@ class PackitUnittestOgr(unittest.TestCase):
     def get_test_config():
         conf = Config()
         conf._pagure_user_token = os.environ.get("PAGURE_TOKEN", "test")
-        conf._pagure_fork_token = os.environ.get("PAGURE_FORK_TOKEN", "test")
         conf._github_token = os.environ.get("GITHUB_TOKEN", "test")
         conf.dry_run = True
         return conf

@@ -71,7 +71,7 @@ USER_CONFIG_SCHEMA = {
         "keytab_path": {"type": "string"},
         "github_token": {"type": "string"},
         "pagure_user_token": {"type": "string"},
-        "pagure_fork_token": {"type": "string"},
+        "pagure_fork_token": {"type": "string"},  # let's leave this here for a while
         "github_app_installation_id": {"type": "string"},
         "github_app_id": {"type": "string"},
         "github_app_cert_path": {"type": "string"},
