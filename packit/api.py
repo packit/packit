@@ -591,7 +591,7 @@ class PackitAPI:
         """ Construct web frontend url because build.repo_url is not much user-friendly."""
         return (
             "https://copr.fedorainfracloud.org/coprs/"
-            f"{build.owner}/{build.projectname}/build/{build.id}/"
+            f"{build.ownername}/{build.projectname}/build/{build.id}/"
         )
 
     def run_copr_build(

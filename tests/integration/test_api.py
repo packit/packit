@@ -23,10 +23,12 @@
 """    custom_path = "sooooorc.rpm"
 Functional tests for srpm comand
 """
-from pathlib import Path
 import os
-import flexmock
+from pathlib import Path
 from subprocess import check_output
+
+from flexmock import flexmock
+
 from packit.api import PackitAPI
 from tests.integration.testbase import PackitUnittestOgr
 
