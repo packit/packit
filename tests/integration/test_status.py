@@ -53,7 +53,7 @@ class TestStatus(PackitUnittestOgr):
             branch = update[-4:]
             if status == "stable":
                 stable_branches.append(branch)
-            assert len(set(stable_branches)) == len(stable_branches)
+        assert len(set(stable_branches)) == len(stable_branches)
 
     def test_up_releases(self):
         table = self.status.get_up_releases()
