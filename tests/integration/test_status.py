@@ -47,6 +47,14 @@ class TestStatus(PackitUnittestOgr):
         assert table
         assert len(table) >= 3
 
+        # Check if get_updates doesn't return more than one stable update per branch
+        stable_branches = []
+        for [update, _, status] in table:
+            branch = update[-4:]
+            if status == "stable":
+                stable_branches.append(branch)
+            assert len(set(stable_branches)) == len(stable_branches)
+
     def test_up_releases(self):
         table = self.status.get_up_releases()
         assert len(table) >= 5
