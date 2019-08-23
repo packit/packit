@@ -1,26 +1,25 @@
-CONTAINER_NAME=packit
+TESTS_IMAGE=packit-tests
 TESTS_INTEGRATION_PATH=tests/integration
-TEST_DATA_PATH=$(TESTS_INTEGRATION_PATH)/test_data
-CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=disable $(CONTAINER_NAME)
-TEST_TARGET := ./tests
+TESTS_CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=disable $(TESTS_IMAGE)
+TESTS_TARGET := ./tests
 
-test_container:
-	podman build --tag $(CONTAINER_NAME) .
+tests_image:
+	podman build --tag $(TESTS_IMAGE) .
 	sleep 2
 
-test_container_remove:
-	podman image rm $(CONTAINER_NAME)
+tests_image_remove:
+	podman rmi $(TESTS_IMAGE)
 
 install:
 	pip3 install --user .
 
 check:
 	find . -name "*.pyc" -exec rm {} \;
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals --cov=packit --cov-report=term-missing $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals --cov=packit --cov-report=term-missing $(TESTS_TARGET)
 
-check_in_container: test_container
-	$(CONTAINER_RUN) bash -c "pip3 install .; make check TEST_TARGET=$(TEST_TARGET)"
+check_in_container: tests_image
+	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .; make check TESTS_TARGET=$(TESTS_TARGET)"
 
 
-check_in_container_regenerate_data: test_container
-	$(CONTAINER_RUN) bash -c "pip3 install .;make check TEST_TARGET=$(TESTS_INTEGRATION_PATH) GITHUB_TOKEN=${GITHUB_TOKEN} PAGURE_TOKEN=${PAGURE_TOKEN}"
+check_in_container_regenerate_data: tests_image
+	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .;make check TESTS_TARGET=$(TESTS_INTEGRATION_PATH) GITHUB_TOKEN=${GITHUB_TOKEN} PAGURE_TOKEN=${PAGURE_TOKEN}"
