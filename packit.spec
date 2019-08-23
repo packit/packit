@@ -8,7 +8,7 @@ Summary:        A tool for integrating upstream projects with Fedora operating s
 
 License:        MIT
 URL:            https://github.com/packit-service/packit
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        %pypi_source
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-click-man
