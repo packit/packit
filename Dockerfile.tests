@@ -1,5 +1,5 @@
-# pip3 install packit from this repo.
-# To build packit image on docker hub.
+# Packit (test) dependencies.
+# To run tests locally via 'make check_in_container'.
 
 FROM fedora:30
 
@@ -8,10 +8,10 @@ RUN dnf -y install ansible
 ENV ANSIBLE_STDOUT_CALLBACK=debug
 
 COPY files/tasks/*.yaml /files/tasks/
-COPY files/install-requirements.yaml /files/
+COPY files/*.yaml /files/
 COPY *.spec .
 
 RUN ansible-playbook -v -c local -i localhost, /files/install-requirements.yaml
-RUN pip3 install .
+RUN ansible-playbook -v -c local -i localhost, /files/install-tests-requirements.yaml
 
 WORKDIR /src

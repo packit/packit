@@ -4,7 +4,7 @@ TESTS_CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=d
 TESTS_TARGET := ./tests
 
 tests_image:
-	podman build --tag $(TESTS_IMAGE) .
+	podman build --tag $(TESTS_IMAGE) -f Dockerfile.tests .
 	sleep 2
 
 tests_image_remove:

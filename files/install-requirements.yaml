@@ -5,11 +5,5 @@
     project_dir: "{{ playbook_dir }}/.."
   tasks:
   - include_tasks: tasks/generic-dnf-requirements.yaml
+  - include_tasks: tasks/build-rpm-deps.yaml
   - include_tasks: tasks/python-compile-deps.yaml
-  - include_tasks: tasks/ogr-from-master.yaml
-  - include_tasks: tasks/rpm-test-deps.yaml
-  - include_tasks: tasks/sandcastle-master.yaml
-  - include_tasks: tasks/configure-git.yaml
-  - name: Pip install pre-commit
-    pip:
-      name: pre-commit
