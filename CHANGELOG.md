@@ -1,3 +1,30 @@
+# 0.5.1
+
+## Breaking changes
+
+* Command `version` no longer exists and is now replaced with a `--version`
+  option. (thanks to @FrNecas)
+
+## Fixes
+
+* Fix creation of SRPMs - they can be rebuilt now properly.
+* Don't update %changelog if it's not present in the spec file.
+* Koji builds are now obtained using koji, not bodhi, in `status` command which
+  should yield more consistent results.
+* Comments in generated .packit.yaml (using `generate` command) should be now
+  more accurate.
+* Command `sync-from-downstream` no longer creates a branch when using option
+  `--no-pr`.
+* Building in copr now yields an URL to frontend instead of a link to log files.
+* `status` command now displays one update per stable Fedora release.
+
+## Minor
+
+* We are using softwarefactory.io Zuul now instead of Centos CI jenkins.
+* CONTRIBUTING.md file is now fully up to date when it comes to CI testing.
+* Updates to our testing scripts.
+
+
 # 0.5.0
 
 All the documentation was moved to our site: https://packit.dev/docs
