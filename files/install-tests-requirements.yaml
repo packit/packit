@@ -1,0 +1,13 @@
+---
+- name: Install dependencies for packit tests.
+  hosts: all
+  vars:
+    project_dir: "{{ playbook_dir }}/.."
+  tasks:
+  - include_tasks: tasks/rpm-test-deps.yaml
+  - include_tasks: tasks/configure-git.yaml
+  - include_tasks: tasks/ogr-from-master.yaml
+  - include_tasks: tasks/sandcastle-master.yaml
+  - name: Pip install pre-commit
+    pip:
+      name: pre-commit
