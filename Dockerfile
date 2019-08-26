@@ -3,8 +3,10 @@
 
 FROM fedora:30
 
-ENV ANSIBLE_STDOUT_CALLBACK=debug
-WORKDIR /src
+ENV ANSIBLE_STDOUT_CALLBACK=debug \
+    WORKDIR=/src
+
+WORKDIR ${WORKDIR}
 
 RUN dnf -y install ansible
 
@@ -14,4 +16,4 @@ COPY *.spec ${WORKDIR}/
 RUN ansible-playbook -v -c local -i localhost, ${WORKDIR}/files/install-requirements.yaml
 
 COPY ./ ${WORKDIR}/
-RUN cd ${WORKDIR}/ && pip3 install .
+RUN pip3 install ${WORKDIR}/
