@@ -21,6 +21,7 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-pyyaml
 BuildRequires:  python3-tabulate
 BuildRequires:  python3-cccolutils
+BuildRequires:  python3-koji
 BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
@@ -29,6 +30,8 @@ BuildRequires:  python3dist(setuptools-scm-git-archive)
 Requires:       fedpkg
 # bumpspec
 Requires:       rpmdevtools
+# doesn't have the python3dist provide
+Requires:       python3-koji
 Requires:       python3-bodhi-client
 Requires:       python3-%{real_name} = %{version}-%{release}
 
