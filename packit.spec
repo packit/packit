@@ -2,13 +2,13 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.5.0
+Version:        0.5.1
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
 URL:            https://github.com/packit-service/packit
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        %pypi_source
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-click-man
@@ -74,6 +74,9 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 %{python3_sitelib}/*
 
 %changelog
+* Fri Aug 23 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.5.1-1
+- new upstream release: 0.5.1
+
 * Fri Aug 02 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.5.0-1
 - new upstream release: 0.5.0
 
