@@ -55,7 +55,6 @@ def git_set_user_email(directory):
 def get_test_config():
     conf = Config()
     conf._pagure_user_token = "test"
-    conf._pagure_fork_token = "test"
     conf._github_token = "test"
     return conf
 
