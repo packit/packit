@@ -165,7 +165,7 @@ def store_function_output(func: Callable) -> Any:
         if not get_if_recording():
             return func(*args, **kwargs)
         else:
-            keys = [func.__name__]
+            keys = [inspect.getmodule(func).__name__, func.__name__]
             # removed extension because using tempfiles
             # + [x for x in args if isinstance(int, str)] + [f"{k}={v}" for k, v in kwargs.items()]
 
@@ -260,7 +260,7 @@ class RequestResponseHandling:
     @staticmethod
     def execute_all_keys(func: Callable, *args, **kwargs):
         keys = (
-            [func.__name__]
+            [inspect.getmodule(func).__name__, func.__name__]
             + [x for x in args if isinstance(int, str)]
             + [f"{k}:{v}" for k, v in kwargs.items()]
         )
@@ -275,16 +275,19 @@ class RequestResponseHandling:
         return internal
 
     @staticmethod
-    def decorator_selected_keys(func: Callable, item_list: list) -> Any:
-        @functools.wraps(func)
-        def internal(*args, **kwargs):
-            keys = [func.__name__]
-            for item in item_list:
-                if isinstance(item, int):
-                    keys.append(args[item])
-                else:
-                    keys.append(kwargs[item])
-            return RequestResponseHandling.execute(keys, func, *args, **kwargs)
+    def decorator_selected_keys(*, item_list: list) -> Any:
+        def internal(func: Callable):
+            @functools.wraps(func)
+            def internal_internal(*args, **kwargs):
+                keys = [inspect.getmodule(func).__name__, func.__name__]
+                for item in item_list:
+                    if isinstance(item, int):
+                        keys.append(args[item])
+                    else:
+                        keys.append(kwargs[item])
+                return RequestResponseHandling.execute(keys, func, *args, **kwargs)
+
+            return internal_internal
 
         return internal
 
@@ -330,13 +333,26 @@ def upgrade_import_system(
                         for key, replacement in filter_item[2].items():
                             replace_type = replacement[0]
                             replace_object = replacement[1]
+                            original_obj = out
+                            parent_obj = out
+                            # traverse into
+                            if len(key) > 0:
+                                for key_item in key.split("."):
+                                    parent_obj = original_obj
+                                    original_obj = getattr(original_obj, key_item)
                             if replace_type == ReplaceType.FUNCTION:
-                                setattr(out, key, replace_object)
+                                setattr(
+                                    parent_obj, original_obj.__name__, replace_object
+                                )
                                 text.append(
                                     f"\treplacing {key} by function {replace_object.__name__}\n"
                                 )
                             elif replace_type == ReplaceType.DECORATOR:
-                                setattr(out, key, replace_object(getattr(out, key)))
+                                setattr(
+                                    parent_obj,
+                                    original_obj.__name__,
+                                    replace_object(original_obj),
+                                )
                                 text.append(
                                     f"\tdecorate {key}  by {replace_object.__name__}\n"
                                 )

@@ -408,7 +408,9 @@ class StoreAnyRequest(Base):
         prepare to avoid leak authentication to data
         """
         self.requests.post = session_recording.RequestResponseHandling.decorator_selected_keys(
-            self.requests.post, [0]
+            item_list=[0]
+        )(
+            self.requests.post
         )
         response_before = self.requests.post(self.domain)
         response_google_before = self.requests.post(
@@ -428,7 +430,9 @@ class StoreAnyRequest(Base):
         Check exceptions if using partial keys storing
         """
         self.requests.post = session_recording.RequestResponseHandling.decorator_selected_keys(
-            self.requests.post, [0, "data"]
+            item_list=[0, "data"]
+        )(
+            self.requests.post
         )
         self.requests.post(self.domain, data={"a": "b"})
         response_2 = self.requests.post(self.domain, data={"c": "d"})

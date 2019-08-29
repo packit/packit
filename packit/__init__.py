@@ -38,14 +38,57 @@ if os.getenv("RECORD_REQUESTS"):
         ReplaceType,
         RequestResponseHandling,
         tempfile,
+        store_function_output,
     )
 
+    # ("", {}),
     HANDLE_MODULE_LIST = [
+        ("git", {}),
+        ("", {"who_name": "git"}),
         ("requests", {"who_name": "rebasehelper"}),
         (
-            "requests",
+            "^requests$",
             {"who_name": "packit.distgit"},
             {"head": [ReplaceType.DECORATOR, RequestResponseHandling.decorator]},
+        ),
+        (
+            "download_helper",
+            {"who_name": "lookaside_cache_helper"},
+            {
+                "DownloadHelper.request": [
+                    ReplaceType.DECORATOR,
+                    RequestResponseHandling.decorator_selected_keys(item_list=[0]),
+                ]
+            },
+        ),
+        (
+            "^requests$",
+            {"who_name": "copr.client.client"},
+            {
+                "request": [
+                    ReplaceType.DECORATOR,
+                    RequestResponseHandling.decorator_selected_keys(
+                        item_list=["method", "url"]
+                    ),
+                ]
+            },
+        ),
+        (
+            "^requests$",
+            {"who_name": "copr.v3.requests"},
+            {
+                "request": [
+                    ReplaceType.DECORATOR,
+                    RequestResponseHandling.decorator_selected_keys(
+                        item_list=["method", "url"]
+                    ),
+                ]
+            },
+        ),
+        (
+            "cmd",
+            {"who_name": "git"},
+            {"Git.execute": [ReplaceType.DECORATOR, store_function_output]},
         ),
         (
             "tempfile",
