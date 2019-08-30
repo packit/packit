@@ -42,15 +42,7 @@ if os.getenv("RECORD_REQUESTS"):
     )
 
     # ("", {}),
-    HANDLE_MODULE_LIST = [
-        ("git", {}),
-        ("", {"who_name": "git"}),
-        ("requests", {"who_name": "rebasehelper"}),
-        (
-            "^requests$",
-            {"who_name": "packit.distgit"},
-            {"head": [ReplaceType.DECORATOR, RequestResponseHandling.decorator]},
-        ),
+    REBASE_HELPER = [
         (
             "download_helper",
             {"who_name": "lookaside_cache_helper"},
@@ -61,6 +53,18 @@ if os.getenv("RECORD_REQUESTS"):
                 ]
             },
         ),
+        (
+            "^requests$",
+            {"who_name": "lookaside_cache_helper"},
+            {
+                "post": [
+                    ReplaceType.DECORATOR,
+                    RequestResponseHandling.decorator_selected_keys(item_list=[0]),
+                ]
+            },
+        ),
+    ]
+    COPR = [
         (
             "^requests$",
             {"who_name": "copr.client.client"},
@@ -84,18 +88,32 @@ if os.getenv("RECORD_REQUESTS"):
                     ),
                 ]
             },
-        ),
-        (
-            "cmd",
-            {"who_name": "git"},
-            {"Git.execute": [ReplaceType.DECORATOR, store_function_output]},
-        ),
+        )
+    ]
+    PACKIT = [
         (
             "tempfile",
             {"who_name": "packit.distgit"},
             {"": [ReplaceType.REPLACE, tempfile]},
         ),
+        (
+            "^requests$",
+            {"who_name": "packit.distgit"},
+            {"head": [ReplaceType.DECORATOR, RequestResponseHandling.decorator]},
+        )
     ]
+    GIT = [
+        (
+            "cmd",
+            {"who_name": "git"},
+            {"Git.execute": [ReplaceType.DECORATOR, store_function_output]},
+        )
+    ]
+    SEARCH = [
+        ("git", {}),
+        #("", {"who_name": "git"})
+    ]
+    HANDLE_MODULE_LIST = REBASE_HELPER + COPR + PACKIT + GIT + SEARCH
 
     builtins.__import__ = upgrade_import_system(
         builtins.__import__,
