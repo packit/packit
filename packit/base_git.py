@@ -339,18 +339,6 @@ class PackitRepositoryBase:
             raise PackitException(msg)
 
     def fetch_upstream_archive(self):
-        # TODO: there is a bug in rebase-helper that it saves the source in cwd
-        #   File "/src/packit/base_git.py", line 298, in fetch_upstream_archive
-        #     self.specfile.download_remote_sources()
-        #   File "rebasehelper/specfile.py", line 220, in download_remote_sources
-        #     LookasideCacheHelper.download('fedpkg', os.path.dirname(self.path), self.get_
-        #   File "rebasehelper/helpers/lookaside_cache_helper.py", line 122, in download
-        #     cls._download_source(tool, url, package, source['filename'], source['hashtype'],
-        #   File "rebasehelper/helpers/lookaside_cache_helper.py", line 109, in _download_source
-        #     try:
-        #   File "rebasehelper/helpers/download_helper.py", line 162, in download_file
-        #     with open(destination_path, 'wb') as local_file:
-        # PermissionError: [Errno 13] Permission denied: 'systemd-8bca462.tar.gz'
         with cwd(self.absolute_specfile_dir):
             self.specfile.download_remote_sources()
 
