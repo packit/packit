@@ -503,6 +503,57 @@ class Upstream(PackitRepositoryBase):
         self.command_handler.run_command(archive_cmd, return_output=True)
         return archive_name
 
+    def fix_spec(self, version: str):
+        """
+        In order to create a SRPM from current git checkout, we need to have the spec reference
+        the tarball and unpack it. This method updates the spec so it's possible.
+        """
+        archive = self.create_archive(version=version)
+        for line in self.specfile.spec_content.section("%package"):
+            if line.startswith(self.package_config.spec_source_id):
+                break
+        else:
+            raise PackitException(
+                f"The spec file doesn't have sources set via {self.package_config.spec_source_id}"
+            )
+        self.specfile.set_tag(self.package_config.spec_source_id, archive)
+
+        prep = self.specfile.spec_content.section("%prep")
+        if not prep:
+            logger.warning("this package doesn't have a %prep section")
+            return
+
+        # stolen from tito, thanks!
+        # https://github.com/dgoodwin/tito/blob/master/src/tito/common.py#L695
+        regex = re.compile(r"^(\s*%(?:auto)?setup)(.*?)$")
+        for idx, line in enumerate(prep):
+            m = regex.match(line)
+            if m:
+                break
+        else:
+            logger.error(
+                "this package is not using %(auto)setup macro in prep, "
+                "packit can't work in this environment"
+            )
+            return
+        new_setup_line = m[1]
+        # replace -n with our -n because it's better
+        args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
+        if args_match:
+            new_setup_line += args_match.group(1)
+            new_setup_line += args_match.group(2)
+        else:
+            new_setup_line += m[2]
+        new_setup_line += f" -n {self.package_config.upstream_project_name}-{version}"
+
+        logger.debug(
+            f"new {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
+            f" line:\n{new_setup_line}"
+        )
+        prep[idx] = new_setup_line
+        self.specfile.spec_content.replace_section("%prep", prep)
+        self.specfile._write_spec_content()
+
     def create_srpm(
         self,
         srpm_path: str = None,

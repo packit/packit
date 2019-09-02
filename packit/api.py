@@ -460,9 +460,7 @@ class PackitAPI:
             self.up.fetch_upstream_archive()
             source_dir = self.up.absolute_specfile_dir.relative_to(relative_to)
         else:
-            # upstream repo: create the archive
-            archive = self.up.create_archive(version=current_git_describe_version)
-            self.up.specfile.set_tag("Source0", archive)
+            self.up.fix_spec(version=current_git_describe_version)
             source_dir = Path(self.up.local_project.working_dir).relative_to(
                 relative_to
             )

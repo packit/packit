@@ -359,7 +359,8 @@ class PackageConfig(BaseConfig):
         actions: Dict[ActionName, str] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
-        create_pr: Optional[bool] = False,
+        create_pr: bool = False,
+        spec_source_id: str = "Source0",
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
@@ -376,7 +377,8 @@ class PackageConfig(BaseConfig):
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
-        self.create_pr = create_pr
+        self.create_pr: bool = create_pr
+        self.spec_source_id: str = spec_source_id
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
@@ -422,6 +424,7 @@ class PackageConfig(BaseConfig):
             and self.actions == other.actions
             and self.allowed_gpg_keys == other.allowed_gpg_keys
             and self.create_pr == other.create_pr
+            and self.spec_source_id == other.spec_source_id
         )
 
     @property
@@ -471,6 +474,17 @@ class PackageConfig(BaseConfig):
         allowed_gpg_keys = raw_dict.get("allowed_gpg_keys", None)
         create_pr = raw_dict.get("create_pr", False)
 
+        # it can be int as well
+        spec_source_id = raw_dict.get("spec_source_id", "Source0")
+        try:
+            spec_source_id = int(spec_source_id)
+        except ValueError:
+            # not a number
+            pass
+        else:
+            # is a number!
+            spec_source_id = f"Source{spec_source_id}"
+
         pc = PackageConfig(
             specfile_path=specfile_path,
             synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
@@ -488,6 +502,7 @@ class PackageConfig(BaseConfig):
             upstream_ref=upstream_ref,
             allowed_gpg_keys=allowed_gpg_keys,
             create_pr=create_pr,
+            spec_source_id=spec_source_id,
         )
         return pc
 
