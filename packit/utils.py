@@ -76,12 +76,12 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         universal_newlines=True,
     )
 
-    if not output:
-        # output is returned, let the caller process it
-        logger.debug("%s", shell.stdout)
+    stdout = shell.stdout.strip()
     stderr = shell.stderr.strip()
+    if stdout:
+        logger.debug("STDOUT: %s", stdout)
     if stderr:
-        logger.error("%s", shell.stderr)
+        logger.info("STDERR: %s", stderr)
 
     if shell.returncode != 0:
         logger.error("Command %s failed", shell.args)
