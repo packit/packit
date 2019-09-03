@@ -37,12 +37,12 @@ from packit.config import pass_config, get_context_settings
 logger = logging.getLogger(__file__)
 
 
-@click.command("push-update", context_settings=get_context_settings())
-@click.argument("update_alias", default=None)
+@click.command("push-updates", context_settings=get_context_settings())
+@click.option("--update_alias", default=None)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
-def push_update(update_alias, config, path_or_url):
+def push_updates(update_alias, config, path_or_url):
     """
     Push the update/updates to stable.
 

@@ -413,7 +413,7 @@ def request_response():
 @pytest.mark.skipif(
     not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
 )
-def test_push_update(upstream_n_distgit, query_response, request_response):
+def test_push_updates(upstream_n_distgit, query_response, request_response):
 
     from bodhi.client.bindings import BodhiClient
 

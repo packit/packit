@@ -706,7 +706,7 @@ class PackitAPI:
 
     @staticmethod
     def days_in_testing(update) -> int:
-        if update["date_testing"]:
+        if update.get("date_testing"):
             date_testing = datetime.strptime(
                 update["date_testing"], "%Y-%m-%d %H:%M:%S"
             )
@@ -718,7 +718,7 @@ class PackitAPI:
         if not updates:
             logger.info("No updates found.")
         for update in updates:
-            if self.days_in_testing(update) >= 7:
+            if self.days_in_testing(update) >= update["stable_days"]:
                 self.push_bodhi_update(update["alias"])
 
     def clean(self):
