@@ -13,7 +13,11 @@ RUN dnf -y install ansible
 COPY files/tasks/*.yaml ${WORKDIR}/files/tasks/
 COPY files/install-requirements.yaml ${WORKDIR}/files/
 COPY *.spec ${WORKDIR}/
-RUN ansible-playbook -v -c local -i localhost, ${WORKDIR}/files/install-requirements.yaml
+RUN ansible-playbook -v -c local -i localhost, ${WORKDIR}/files/install-requirements.yaml \
+    && dnf clean all
 
 COPY ./ ${WORKDIR}/
-RUN pip3 install ${WORKDIR}/
+RUN pip3 install ${WORKDIR}/ \
+    && rm -rf ~/.cache/*
+
+RUN cd / && rm -rf ${WORKDIR}/ && mkdir ${WORKDIR}/
