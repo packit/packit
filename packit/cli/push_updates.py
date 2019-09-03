@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 """
-Push the update/updates to stable.
+Push Bodhi updates from testing to stable.
 """
 
 import logging
@@ -38,14 +38,15 @@ logger = logging.getLogger(__file__)
 
 
 @click.command("push-updates", context_settings=get_context_settings())
-@click.option("--update_alias", default=None)
+@click.option("--update-alias", help="For example FEDORA-2019-ee5674e22c", default=None)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
 def push_updates(update_alias, config, path_or_url):
     """
-    Push the update/updates to stable.
+    Find all Bodhi updates that have been in testing for more than 'Stable days' (7 by default)
+    and push them to stable.
 
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    api.push_updates(alias=update_alias)
+    api.push_updates(update_alias)
