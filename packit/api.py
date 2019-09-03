@@ -611,7 +611,12 @@ class PackitAPI:
         )
 
     def run_copr_build(
-        self, project: str, chroots: List[str], owner: str = None
+        self,
+        project: str,
+        chroots: List[str],
+        owner: str = None,
+        description: str = None,
+        instructions: str = None,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -620,6 +625,8 @@ class PackitAPI:
                         inside (defaults to something long and ugly)
         :param chroots: a list of COPR chroots (targets) e.g. fedora-rawhide-x86_64
         :param owner: defaults to username from copr config file
+        :param description: description of the copr build
+        :param instructions: instructions of the copr build
         :return: id of the created build and url to the build web page
         """
         # get info
@@ -632,7 +639,13 @@ class PackitAPI:
                 logger.info(f"Updating targets on project {owner}/{project}")
                 logger.debug(f"old = {set(copr_proj.chroot_repos.keys())}")
                 logger.debug(f"new = {set(chroots)}")
-                self.copr.project_proxy.edit(owner, project, chroots=chroots)
+                self.copr.project_proxy.edit(
+                    owner,
+                    project,
+                    chroots=chroots,
+                    description=description,
+                    instructions=instructions,
+                )
         except CoprNoResultException:
             if owner == configured_owner:
                 logger.info(f"Copr project {owner}/{project} not found. Creating new.")
@@ -641,7 +654,8 @@ class PackitAPI:
                     projectname=project,
                     chroots=chroots,
                     description=(
-                        "Continuous builds initiated by packit service.\n"
+                        description
+                        or "Continuous builds initiated by packit service.\n"
                         "For more info check out https://packit.dev/"
                     ),
                     contact="https://github.com/packit-service/packit/issues",
@@ -649,6 +663,7 @@ class PackitAPI:
                     unlisted_on_hp=True,
                     # delete project after the specified period of time
                     delete_after_days=180,
+                    instructions=instructions,
                 )
             else:
                 raise PackitInvalidConfigException(

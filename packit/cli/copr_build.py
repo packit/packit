@@ -46,10 +46,14 @@ from packit.config import pass_config, get_context_settings
     help="Comma separated list of chroots to build in. (defaults to 'fedora-rawhide-x86_64')",
     default="fedora-rawhide-x86_64",
 )
+@click.option("--description", default=None)
+@click.option("--instructions", default=None)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
-def copr_build(config, nowait, owner, project, targets, path_or_url):
+def copr_build(
+    config, nowait, owner, project, targets, path_or_url, description, instructions
+):
     """
     Build selected upstream project in COPR.
 
@@ -59,7 +63,11 @@ def copr_build(config, nowait, owner, project, targets, path_or_url):
     api = get_packit_api(config=config, local_project=path_or_url)
     default_project_name = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
     build_id, repo_url = api.run_copr_build(
-        project=project or default_project_name, chroots=targets.split(","), owner=owner
+        project=project or default_project_name,
+        chroots=targets.split(","),
+        owner=owner,
+        description=description,
+        instructions=instructions,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if not nowait:
