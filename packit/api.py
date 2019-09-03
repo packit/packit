@@ -716,10 +716,12 @@ class PackitAPI:
     def push_updates(self, update_alias: Optional[str] = None):
         updates = self.get_testing_updates(update_alias)
         if not updates:
-            logger.info("No updates found.")
+            logger.info("No testing updates found.")
         for update in updates:
             if self.days_in_testing(update) >= update["stable_days"]:
                 self.push_bodhi_update(update["alias"])
+            else:
+                logger.debug(f"{update['alias']} is not ready to be pushed to stable")
 
     def clean(self):
         """ clean up stuff once all the work is done """
