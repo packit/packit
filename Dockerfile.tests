@@ -12,6 +12,7 @@ COPY files/*.yaml /files/
 COPY *.spec .
 
 RUN ansible-playbook -v -c local -i localhost, /files/install-requirements.yaml
-RUN ansible-playbook -v -c local -i localhost, /files/install-tests-requirements.yaml
+RUN ansible-playbook -v -c local -i localhost, /files/install-tests-requirements.yaml \
+    && dnf clean all
 
 WORKDIR /src
