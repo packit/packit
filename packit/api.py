@@ -673,6 +673,56 @@ class PackitAPI:
                 return state_reported
             time.sleep(10)
 
+    @staticmethod
+    def push_bodhi_update(update_alias: str):
+        from bodhi.client.bindings import BodhiClient, UpdateNotFound
+
+        b = BodhiClient()
+        try:
+            response = b.request(update=update_alias, request="stable")
+            logger.debug(f"Bodhi response:\n{response}")
+            logger.info(
+                f"Bodhi update {response['alias']} pushed to stable:\n"
+                f"- {response['url']}\n"
+                f"- stable_karma: {response['stable_karma']}\n"
+                f"- unstable_karma: {response['unstable_karma']}\n"
+                f"- notes:\n{response['notes']}\n"
+            )
+        except UpdateNotFound:
+            logger.error("Update was not found.")
+
+    def get_testing_updates(self, update_alias: Optional[str]) -> List:
+        from bodhi.client.bindings import BodhiClient
+
+        b = BodhiClient()
+        results = b.query(
+            alias=update_alias,
+            packages=self.dg.package_config.downstream_package_name,
+            status="testing",
+        )["updates"]
+        logger.debug("Bodhi updates with status 'testing' fetched.")
+
+        return results
+
+    @staticmethod
+    def days_in_testing(update) -> int:
+        if update.get("date_testing"):
+            date_testing = datetime.strptime(
+                update["date_testing"], "%Y-%m-%d %H:%M:%S"
+            )
+            return (datetime.utcnow() - date_testing).days
+        return 0
+
+    def push_updates(self, update_alias: Optional[str] = None):
+        updates = self.get_testing_updates(update_alias)
+        if not updates:
+            logger.info("No testing updates found.")
+        for update in updates:
+            if self.days_in_testing(update) >= update["stable_days"]:
+                self.push_bodhi_update(update["alias"])
+            else:
+                logger.debug(f"{update['alias']} is not ready to be pushed to stable")
+
     def clean(self):
         """ clean up stuff once all the work is done """
         if self._up:
