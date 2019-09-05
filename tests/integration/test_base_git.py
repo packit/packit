@@ -37,6 +37,7 @@ def test_get_output_from_action_defined_in_sandcastle():
 
     flexmock(Sandcastle).should_receive("run")
     flexmock(Sandcastle).should_receive("exec").and_return(echo_cmd)
+    flexmock(Sandcastle).should_receive("delete_pod").and_return(None)
     result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
     assert result == echo_cmd
 

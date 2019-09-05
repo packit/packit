@@ -468,16 +468,22 @@ class Upstream(PackitRepositoryBase):
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
-        if self.has_action(action=ActionName.create_archive):
-            return self.get_output_from_action(action=ActionName.create_archive)
-
         version = version or self.get_current_version()
 
         if self.package_config.upstream_project_name:
-            dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
+            dir_name = f"{self.package_config.upstream_project_name}-{version}"
         else:
             dir_name = f"{self.package_config.downstream_package_name}-{version}"
         logger.debug("name + version = %s", dir_name)
+
+        env = {
+            "PACKIT_PROJECT_VERSION": version,
+            "PACKIT_PROJECT_NAME_VERSION": dir_name,
+        }
+        if self.has_action(action=ActionName.create_archive):
+            return self.get_output_from_action(
+                action=ActionName.create_archive, env=env
+            )
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
@@ -500,15 +506,14 @@ class Upstream(PackitRepositoryBase):
                 f"{dir_name}/",
                 "HEAD",
             ]
-        self.command_handler.run_command(archive_cmd, return_output=True)
+        self.command_handler.run_command(archive_cmd, return_output=True, env=env)
         return archive_name
 
-    def fix_spec(self, version: str):
+    def fix_spec(self, archive: str, version: str, commit: str):
         """
         In order to create a SRPM from current git checkout, we need to have the spec reference
         the tarball and unpack it. This method updates the spec so it's possible.
         """
-        archive = self.create_archive(version=version)
         for line in self.specfile.spec_content.section("%package"):
             if line.startswith(self.package_config.spec_source_id):
                 break
@@ -553,6 +558,9 @@ class Upstream(PackitRepositoryBase):
         prep[idx] = new_setup_line
         self.specfile.spec_content.replace_section("%prep", prep)
         self.specfile._write_spec_content()
+
+        msg = f"Development snapshot ({commit})"
+        self.bump_spec(version=f"{version}", changelog_entry=msg, bump_release=True)
 
     def create_srpm(
         self,
