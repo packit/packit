@@ -26,7 +26,7 @@ Functional tests for srpm comand
 import os
 from pathlib import Path
 from subprocess import check_output
-
+from rebasehelper.exceptions import RebaseHelperError
 from flexmock import flexmock
 
 from packit.api import PackitAPI
@@ -41,12 +41,23 @@ class ProposeUpdate(PackitUnittestOgr):
         )
         self.api._up = self.upstream
         self.api._dg = self.dg
-        # Do not upload package, because no credentials given in CI
-        flexmock(self.api).should_receive("_handle_sources").and_return(None)
-        # flexmock(self.api.dg).should_receive("push_to_fork").and_return(None)
         self.set_git_user()
 
-    def test_propose_update(self):
+    def test_comment_in_spec(self):
+        # change specfile little bit to have there some change
+        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
+        version_increase = "10.0.0"
+        with open(specfile_location, "a") as myfile:
+            myfile.write("\n# comment\n")
+        check_output(
+            f"cd {self.lp.working_dir};"
+            f"git commit -m 'test change' python-ogr.spec;"
+            f"git tag -a {version_increase} -m 'my version {version_increase}'",
+            shell=True,
+        )
+        self.api.sync_release("master")
+
+    def check_version_increase(self):
         # change specfile little bit to have there some change
         specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
         with open(specfile_location, "r") as myfile:
@@ -69,6 +80,15 @@ class ProposeUpdate(PackitUnittestOgr):
             shell=True,
         )
         self.api.sync_release("master")
+
+    def test_version_change_exception(self):
+        # check if it raises exception, because sources are not uploaded in distgit
+        self.assertRaises(RebaseHelperError, self.check_version_increase)
+
+    def test_version_change_mocked(self):
+        # version is not not uploaded, so skip in this test
+        flexmock(self.api).should_receive("_handle_sources").and_return(None)
+        self.check_version_increase()
 
 
 def test_srpm(api_instance):

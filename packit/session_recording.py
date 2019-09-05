@@ -10,6 +10,10 @@ from requests.structures import CaseInsensitiveDict
 import inspect
 from enum import Enum
 import datetime
+from git.remote import PushInfo
+from git.util import IterableList
+from git.refs.head import HEAD
+from git.repo.base import Repo
 
 from ogr.persistent_storage import PersistentObjectStorage
 from ogr.utils import SingletonMeta
@@ -187,10 +191,7 @@ def run_command_wrapper(cmd, error_message=None, cwd=None, fail=True, output=Fal
     )
 
 
-class RequestResponseHandling:
-    __response_keys = ["status_code", "_content", "encoding", "reason"]
-    __ignored = ["cookies"]
-    __response_keys_special = ["raw", "_next", "headers", "elapsed"]
+class Decorators:
     persistent_storage = STORAGE
 
     def __init__(
@@ -200,6 +201,63 @@ class RequestResponseHandling:
         if pstorage:
             self.persistent_storage = pstorage
         self.store_keys = store_keys
+
+    def write(self, obj):
+        raise NotImplementedError()
+
+    def read(self):
+        raise NotImplementedError()
+
+    @classmethod
+    def execute(cls, keys: list, func: Callable, *args, **kwargs):
+        rrstorage = cls(store_keys=keys)
+        if rrstorage.persistent_storage.is_write_mode:
+            response = func(*args, **kwargs)
+            rrstorage.write(response)
+            return response
+        else:
+            response = rrstorage.read()
+            return response
+
+    @classmethod
+    def execute_all_keys(cls, func: Callable, *args, **kwargs):
+        keys = (
+            [inspect.getmodule(func).__name__, func.__name__]
+            + [x for x in args if isinstance(int, str)]
+            + [f"{k}:{v}" for k, v in kwargs.items()]
+        )
+        return cls.execute(keys, func, *args, **kwargs)
+
+    @classmethod
+    def decorator(cls, func: Callable) -> Any:
+        @functools.wraps(func)
+        def internal(*args, **kwargs):
+            return cls.execute_all_keys(func, *args, **kwargs)
+
+        return internal
+
+    @classmethod
+    def decorator_selected_keys(cls, *, item_list: list) -> Any:
+        def internal(func: Callable):
+            @functools.wraps(func)
+            def internal_internal(*args, **kwargs):
+                keys = [inspect.getmodule(func).__name__, func.__name__]
+                for item in item_list:
+                    if isinstance(item, int):
+                        keys.append(args[item])
+                    else:
+                        keys.append(kwargs[item])
+                return cls.execute(keys, func, *args, **kwargs)
+
+            return internal_internal
+
+        return internal
+
+
+class RequestResponseHandling(Decorators):
+    __response_keys = ["status_code", "_content", "encoding", "reason"]
+    __ignored = ["cookies"]
+    __response_keys_special = ["raw", "_next", "headers", "elapsed"]
 
     def write(self, response: Response) -> Response:
         self.persistent_storage.store(self.store_keys, self._to_dict(response))
@@ -246,50 +304,68 @@ class RequestResponseHandling:
                 setattr(response, "_next", data[key])
         return response
 
-    @staticmethod
-    def execute(keys: list, func: Callable, *args, **kwargs):
-        rrstorage = RequestResponseHandling(store_keys=keys)
-        if rrstorage.persistent_storage.is_write_mode:
-            response = func(*args, **kwargs)
-            rrstorage.write(response=response)
-            return response
-        else:
-            response = rrstorage.read()
-            return response
 
-    @staticmethod
-    def execute_all_keys(func: Callable, *args, **kwargs):
-        keys = (
-            [inspect.getmodule(func).__name__, func.__name__]
-            + [x for x in args if isinstance(int, str)]
-            + [f"{k}:{v}" for k, v in kwargs.items()]
-        )
-        return RequestResponseHandling.execute(keys, func, *args, **kwargs)
+class GenericObjectStorage(Decorators):
+    __response_keys: list = list()
+    object_type = object
 
-    @staticmethod
-    def decorator(func: Callable) -> Any:
-        @functools.wraps(func)
-        def internal(*args, **kwargs):
-            return RequestResponseHandling.execute_all_keys(func, *args, **kwargs)
+    def write(self, obj: Any) -> Any:
+        self.persistent_storage.store(self.store_keys, self._to_seriazable(obj))
+        return obj
 
-        return internal
+    def read(self):
+        data = self.persistent_storage.read(self.store_keys)
+        obj = self._from_seriazable(data)
+        return obj
 
-    @staticmethod
-    def decorator_selected_keys(*, item_list: list) -> Any:
-        def internal(func: Callable):
-            @functools.wraps(func)
-            def internal_internal(*args, **kwargs):
-                keys = [inspect.getmodule(func).__name__, func.__name__]
-                for item in item_list:
-                    if isinstance(item, int):
-                        keys.append(args[item])
-                    else:
-                        keys.append(kwargs[item])
-                return RequestResponseHandling.execute(keys, func, *args, **kwargs)
+    def _to_seriazable(self, obj: Any) -> Any:
+        output = dict()
+        for key in self.__response_keys:
+            output[key] = getattr(obj, key)
+        return output
 
-            return internal_internal
+    def _from_seriazable(self, data: Any) -> Any:
+        out = self.object_type()
+        for key in self.__response_keys:
+            setattr(out, key, data[key])
+        return out
 
-        return internal
+
+class PushInfoStorageList(GenericObjectStorage):
+    __ignored = ["_remote"]
+    __response_keys_special = ["local_ref"]
+    __response_keys = list(
+        set(PushInfo.__slots__) - set(__ignored) - set(__response_keys_special)
+    )
+
+    object_type = IterableList
+
+    def _to_seriazable(self, obj: Any) -> Any:
+        output = list()
+        for item in obj:
+            tmp = dict()
+            for key in self.__response_keys:
+                tmp[key] = getattr(item, key)
+            for key in self.__response_keys_special:
+                if key == "local_ref":
+                    tmp[key] = [
+                        getattr(item, key).repo.git_dir,
+                        getattr(item, key).path,
+                    ]
+            output.append(tmp)
+        return output
+
+    def _from_seriazable(self, data: Any) -> Any:
+        out = self.object_type("name")
+        for item in data:
+            tmp = PushInfo(None, None, None, None)
+            for key in self.__response_keys:
+                setattr(tmp, key, item[key])
+            for key in self.__response_keys_special:
+                if key == "local_ref":
+                    setattr(tmp, key, HEAD(Repo(item[key][0])))
+            out.append(tmp)
+        return out
 
 
 class ReplaceType(Enum):

@@ -38,11 +38,11 @@ if os.getenv("RECORD_REQUESTS"):
         ReplaceType,
         RequestResponseHandling,
         tempfile,
-        store_function_output,
+        PushInfoStorageList,
     )
 
     # ("", {}),
-    REBASE_HELPER = [
+    REBASE_HELPER: list = [
         (
             "download_helper",
             {"who_name": "lookaside_cache_helper"},
@@ -64,7 +64,7 @@ if os.getenv("RECORD_REQUESTS"):
             },
         ),
     ]
-    COPR = [
+    COPR: list = [
         (
             "^requests$",
             {"who_name": "copr.client.client"},
@@ -88,9 +88,9 @@ if os.getenv("RECORD_REQUESTS"):
                     ),
                 ]
             },
-        )
+        ),
     ]
-    PACKIT = [
+    PACKIT: list = [
         (
             "tempfile",
             {"who_name": "packit.distgit"},
@@ -100,18 +100,23 @@ if os.getenv("RECORD_REQUESTS"):
             "^requests$",
             {"who_name": "packit.distgit"},
             {"head": [ReplaceType.DECORATOR, RequestResponseHandling.decorator]},
-        )
+        ),
     ]
-    GIT = [
+    GIT: list = [
         (
-            "cmd",
-            {"who_name": "git"},
-            {"Git.execute": [ReplaceType.DECORATOR, store_function_output]},
+            "git",
+            {"who_name": "local_project"},
+            {
+                "remote.Remote.push": [
+                    ReplaceType.DECORATOR,
+                    PushInfoStorageList.decorator_selected_keys(item_list=[]),
+                ]
+            },
         )
     ]
-    SEARCH = [
+    SEARCH: list = [
         ("git", {}),
-        #("", {"who_name": "git"})
+        # ("", {"who_name": "git"})
     ]
     HANDLE_MODULE_LIST = REBASE_HELPER + COPR + PACKIT + GIT + SEARCH
 
