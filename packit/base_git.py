@@ -23,7 +23,7 @@ import inspect
 import logging
 import shlex
 from pathlib import Path
-from typing import Optional, Callable, List, Tuple, Iterable
+from typing import Optional, Callable, List, Tuple, Iterable, Dict
 
 import git
 from git import PushInfo
@@ -221,7 +221,7 @@ class PackitRepositoryBase:
         """
         return action in self.package_config.actions
 
-    def with_action(self, action: ActionName) -> bool:
+    def with_action(self, action: ActionName, env: Optional[Dict] = None) -> bool:
         """
         If the action is defined in the self.package_config.actions,
         we run it and return False (so we can skip the if block)
@@ -241,6 +241,7 @@ class PackitRepositoryBase:
 
         :param action: ActionName enum (Name of the action that can be overwritten
                                                 in the package_config.actions)
+        :param env: dict with env vars to set for the command
         :return: True, if the action is not overwritten, False when custom command was run
         """
         logger.debug(f"Running {action}.")
@@ -253,12 +254,12 @@ class PackitRepositoryBase:
             logger.info(f"Using user-defined script for {action}: {commands}")
             for cmd in commands:
                 command_l = shlex.split(cmd)
-                self.command_handler.run_command(command=command_l)
+                self.command_handler.run_command(command=command_l, env=env)
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True
 
-    def get_output_from_action(self, action: ActionName):
+    def get_output_from_action(self, action: ActionName, env: Optional[Dict] = None):
         """
         Run action if specified in the self.actions and return output
         else return None
@@ -266,7 +267,9 @@ class PackitRepositoryBase:
         if action in self.package_config.actions:
             command_l = shlex.split(self.package_config.actions[action])
             logger.info(f"Using user-defined script for {action}: {command_l}")
-            return self.command_handler.run_command(command_l, return_output=True)
+            return self.command_handler.run_command(
+                command_l, return_output=True, env=env
+            )
         return None
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
