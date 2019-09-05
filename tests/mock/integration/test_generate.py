@@ -1,7 +1,7 @@
 from os import chdir
 import unittest
 
-from tests.spellbook import call_packit
+from tests.mock.spellbook import call_packit
 
 
 # TODO: fix the test

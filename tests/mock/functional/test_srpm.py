@@ -24,7 +24,7 @@
 Functional tests for srpm comand
 """
 
-from tests.spellbook import call_real_packit, build_srpm
+from tests.mock.spellbook import call_real_packit, build_srpm
 
 
 def test_srpm_command(upstream_instance):

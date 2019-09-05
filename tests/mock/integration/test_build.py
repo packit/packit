@@ -24,7 +24,7 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.local_project import LocalProject
-from tests.spellbook import get_test_config
+from tests.mock.spellbook import get_test_config
 from packit.utils import cwd
 
 from packit import utils

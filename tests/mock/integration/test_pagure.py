@@ -27,7 +27,7 @@ from pathlib import Path
 import pytest
 from ogr.services.pagure import PagureService
 
-from tests.spellbook import git_set_user_email
+from tests.mock.spellbook import git_set_user_email
 
 
 @pytest.mark.skipif(

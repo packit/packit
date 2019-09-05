@@ -27,7 +27,7 @@ from munch import Munch
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.local_project import LocalProject
-from tests.spellbook import get_test_config, can_a_module_be_imported
+from tests.mock.spellbook import get_test_config, can_a_module_be_imported
 from packit.utils import cwd
 
 

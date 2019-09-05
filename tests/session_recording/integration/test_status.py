@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from packit.status import Status
-from tests.integration.testbase import PackitUnittestOgr
+from tests.session_recording.integration.testbase import PackitUnittestOgr
 
 
 class TestStatus(PackitUnittestOgr):

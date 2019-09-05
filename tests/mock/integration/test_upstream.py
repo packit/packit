@@ -43,7 +43,7 @@ except ImportError:
 
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitException
-from tests.spellbook import (
+from tests.mock.spellbook import (
     does_bumpspec_know_new,
     build_srpm,
     get_test_config,

@@ -11,7 +11,7 @@ from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
-from tests.spellbook import can_a_module_be_imported
+from tests.mock.spellbook import can_a_module_be_imported
 
 
 @pytest.fixture()

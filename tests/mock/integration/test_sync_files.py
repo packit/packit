@@ -24,7 +24,7 @@ import pytest
 
 from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
 from packit.sync import RawSyncFilesItem
-from tests.spellbook import TESTS_DIR
+from tests.mock.spellbook import TESTS_DIR
 from packit.utils import cwd
 
 

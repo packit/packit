@@ -1,7 +1,7 @@
 TESTS_IMAGE=packit-tests
 TESTS_INTEGRATION_PATH=tests/integration
 TESTS_CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=disable $(TESTS_IMAGE)
-TESTS_TARGET := ./tests
+TESTS_TARGET := ./tests/mock
 
 tests_image:
 	podman build --tag $(TESTS_IMAGE) -f Dockerfile.tests .

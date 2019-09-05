@@ -27,7 +27,7 @@ from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
 from packit.cli.update import update
-from tests.spellbook import call_packit
+from tests.mock.spellbook import call_packit
 
 
 def test_base_help():

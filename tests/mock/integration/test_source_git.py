@@ -22,9 +22,9 @@
 import subprocess
 from pathlib import Path
 
-from tests.conftest import mock_spec_download_remote_s
-from tests.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
-from tests.utils import get_specfile
+from tests.mock.conftest import mock_spec_download_remote_s
+from tests.mock.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
+from tests.mock.utils import get_specfile
 from packit.utils import cwd
 
 

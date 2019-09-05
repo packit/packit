@@ -43,7 +43,7 @@ from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd
-from tests.spellbook import (
+from tests.mock.spellbook import (
     prepare_dist_git_repo,
     get_test_config,
     SOURCEGIT_UPSTREAM,
@@ -54,7 +54,7 @@ from tests.spellbook import (
     initiate_git_repo,
     DISTGIT,
 )
-from tests.utils import remove_gpg_key_pair
+from tests.mock.utils import remove_gpg_key_pair
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"

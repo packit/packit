@@ -27,7 +27,7 @@ from gnupg import GPG
 from packit.api import PackitAPI
 from packit.exceptions import PackitException
 from packit.security import CommitVerifier
-from tests.utils import remove_gpg_key_pair
+from tests.mock.utils import remove_gpg_key_pair
 
 
 def test_allowed_gpg_keys_none(sourcegit_n_distgit, api_instance_source_git: PackitAPI):

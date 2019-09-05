@@ -29,8 +29,8 @@ from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.local_project import LocalProject
 from packit.utils import cwd
-from tests.spellbook import TARBALL_NAME, get_test_config
-from tests.utils import get_specfile
+from tests.mock.spellbook import TARBALL_NAME, get_test_config
+from tests.mock.utils import get_specfile
 
 
 @pytest.fixture()
