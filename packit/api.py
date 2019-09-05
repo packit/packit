@@ -625,8 +625,8 @@ class PackitAPI:
                         inside (defaults to something long and ugly)
         :param chroots: a list of COPR chroots (targets) e.g. fedora-rawhide-x86_64
         :param owner: defaults to username from copr config file
-        :param description: description of the copr build
-        :param instructions: instructions of the copr build
+        :param description: description of the project
+        :param instructions: installation instructions for the project
         :return: id of the created build and url to the build web page
         """
         # get info
