@@ -23,6 +23,7 @@
 """
 A book with our finest spells
 """
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -38,6 +39,8 @@ UPSTREAM = DATA_DIR / "upstream_git"
 EMPTY_CHANGELOG = DATA_DIR / "empty_changelog"
 DISTGIT = DATA_DIR / "dist_git"
 UP_COCKPIT_OSTREE = DATA_DIR / "cockpit-ostree"
+UP_OSBUILD = DATA_DIR / "osbuild"
+UP_SNAPD = DATA_DIR / "snapd"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"
 SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
 SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
@@ -65,7 +68,11 @@ def git_add_and_commit(directory, message):
 
 
 def initiate_git_repo(
-    directory, tag=None, upstream_remote="https://lol.wat", push=False
+    directory,
+    tag=None,
+    upstream_remote="https://lol.wat",
+    push=False,
+    copy_from: str = None,
 ):
     """
     Initiate a git repo for testing.
@@ -74,14 +81,19 @@ def initiate_git_repo(
     :param tag: if set, tag the latest commit with this tag
     :param upstream_remote: name of the origin - upstream remote
     :param push: push to the remote?
+    :param copy_from: source tree to copy to the newly created git repo
     """
+    if copy_from:
+        shutil.copytree(copy_from, directory)
     subprocess.check_call(["git", "init", "."], cwd=directory)
     Path(directory).joinpath("README").write_text("Best upstream project ever!")
     git_set_user_email(directory)
     subprocess.check_call(["git", "add", "."], cwd=directory)
     subprocess.check_call(["git", "commit", "-m", "initial commit"], cwd=directory)
     if tag:
-        subprocess.check_call(["git", "tag", tag], cwd=directory)
+        subprocess.check_call(
+            ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag], cwd=directory
+        )
     subprocess.check_call(
         ["git", "remote", "add", "origin", upstream_remote], cwd=directory
     )
@@ -94,9 +106,10 @@ def initiate_git_repo(
         )
 
 
-def prepare_dist_git_repo(directory):
+def prepare_dist_git_repo(directory, push=True):
     subprocess.check_call(["git", "branch", "f30"], cwd=directory)
-    subprocess.check_call(["git", "push", "-u", "origin", "f30:f30"], cwd=directory)
+    if push:
+        subprocess.check_call(["git", "push", "-u", "origin", "f30:f30"], cwd=directory)
 
 
 def can_a_module_be_imported(module_name):
