@@ -46,8 +46,14 @@ from packit.config import pass_config, get_context_settings
     help="Comma separated list of chroots to build in. (defaults to 'fedora-rawhide-x86_64')",
     default="fedora-rawhide-x86_64",
 )
-@click.option("--description", default=None)
-@click.option("--instructions", default=None)
+@click.option(
+    "--description", help="Description of the project to build in.", default=None
+)
+@click.option(
+    "--instructions",
+    help="Installation instructions for the project to build in.",
+    default=None,
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
