@@ -516,23 +516,39 @@ class PackitAPI:
 
     @staticmethod
     async def status_get_dg_versions(status) -> Dict:
-        await asyncio.sleep(0)
-        return status.get_dg_versions()
+        try:
+            await asyncio.sleep(0)
+            return status.get_dg_versions()
+        except Exception as exc:
+            logger.error(f"Failed when getting Dist-git versions: {exc}")
+            return {}
 
     @staticmethod
     async def status_get_up_releases(status) -> List:
-        await asyncio.sleep(0)
-        return status.get_up_releases()
+        try:
+            await asyncio.sleep(0)
+            return status.get_up_releases()
+        except Exception as exc:
+            logger.error(f"Failed when getting upstream releases: {exc}")
+            return []
 
     @staticmethod
     async def status_get_builds(status) -> Dict:
-        await asyncio.sleep(0)
-        return status.get_builds()
+        try:
+            await asyncio.sleep(0)
+            return status.get_builds()
+        except Exception as exc:
+            logger.error(f"Failed when getting Koji builds: {exc}")
+            return {}
 
     @staticmethod
     async def status_get_updates(status) -> List:
-        await asyncio.sleep(0)
-        return status.get_updates()
+        try:
+            await asyncio.sleep(0)
+            return status.get_updates()
+        except Exception as exc:
+            logger.error(f"Failed when getting Bodhi updates: {exc}")
+            return []
 
     def status(self):
         status = Status(self.config, self.package_config, self.up, self.dg)
@@ -562,7 +578,7 @@ class PackitAPI:
             for branch, dg_version in dg_versions.items():
                 logger.info(f"{branch}: {dg_version}")
         else:
-            logger.info("\nNo Dist-git versions found")
+            logger.info("\nNo Dist-git versions found.")
 
         if up_releases:
             logger.info("\nUpstream releases:")
@@ -577,7 +593,7 @@ class PackitAPI:
             logger.info("\nLatest Bodhi updates:")
             logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
         else:
-            logger.info("\nNo Bodhi updates found")
+            logger.info("\nNo Bodhi updates found.")
 
         if builds:
             logger.info("\nLatest Koji builds:")
