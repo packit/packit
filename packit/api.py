@@ -629,6 +629,10 @@ class PackitAPI:
                         "For more info check out https://packit.dev/"
                     ),
                     contact="user-cont-team@redhat.com",
+                    # don't show project on Copr homepage
+                    unlisted_on_hp=True,
+                    # delete project after the specified period of time
+                    delete_after_days=180,
                 )
             else:
                 raise PackitInvalidConfigException(
