@@ -663,7 +663,11 @@ class PackitAPI:
                     unlisted_on_hp=True,
                     # delete project after the specified period of time
                     delete_after_days=180,
-                    instructions=instructions,
+                    instructions=instructions
+                    or "You can check out the upstream project"
+                    f"{self.upstream_local_project.git_url} to find out how to consume these"
+                    "builds. This copr project is created and handled by the packit project"
+                    "(https://packit.dev/).",
                 )
             else:
                 raise PackitInvalidConfigException(
