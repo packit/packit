@@ -30,6 +30,7 @@ from packit.utils import get_namespace_and_repo_name, is_str_url
     "url,namespace,repo_name",
     [
         ("https://github.com/org/name", "org", "name"),
+        ("https://github.com/org/name/", "org", "name"),
         ("https://github.com/org/name.git", "org", "name"),
         ("git@github.com:org/name", "org", "name"),
         ("git@github.com:org/name.git", "org", "name"),
