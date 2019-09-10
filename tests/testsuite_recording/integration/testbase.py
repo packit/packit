@@ -5,13 +5,7 @@ from subprocess import check_output, CalledProcessError
 
 import packit.distgit
 import packit.upstream
-
-try:
-    # ogr < 0.5
-    from ogr import GithubService
-except ImportError:
-    # ogr >= 0.5
-    from ogr.services.github import GithubService
+from ogr import GithubService, PagureService
 try:
     # ogr < 0.5
     from ogr.mock_core import PersistentObjectStorage
@@ -32,8 +26,13 @@ class PackitUnittestOgr(unittest.TestCase):
     @staticmethod
     def get_test_config():
         conf = Config()
-        conf._pagure_user_token = os.environ.get("PAGURE_TOKEN", "test")
-        conf._github_token = os.environ.get("GITHUB_TOKEN", "test")
+        pagure_user_token = os.environ.get("PAGURE_TOKEN", "test")
+        github_token = os.environ.get("GITHUB_TOKEN", "test")
+        conf.services = {
+            PagureService(token=pagure_user_token),
+            GithubService(token=github_token),
+        }
+
         conf.dry_run = True
         return conf
 
@@ -62,9 +61,8 @@ class PackitUnittestOgr(unittest.TestCase):
         PersistentObjectStorage().storage_file = response_file
         PersistentObjectStorage().dump_after_store = True
 
-        self.service_github = GithubService(token=self.conf.github_token)
-        self.project_ogr = self.service_github.get_project(
-            namespace="packit-service", repo="ogr"
+        self.project_ogr = self.conf.get_project(
+            url="https://github.com/packit-service/ogr"
         )
         self.pc = get_package_config_from_repo(
             sourcegit_project=self.project_ogr, ref="master"
