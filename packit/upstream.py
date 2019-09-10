@@ -468,16 +468,22 @@ class Upstream(PackitRepositoryBase):
         Create archive, using `git archive` by default, from the content of the upstream
         repository, only committed changes are present in the archive
         """
-        if self.has_action(action=ActionName.create_archive):
-            return self.get_output_from_action(action=ActionName.create_archive)
-
         version = version or self.get_current_version()
 
         if self.package_config.upstream_project_name:
-            dir_name = f"{self.package_config.upstream_project_name}" f"-{version}"
+            dir_name = f"{self.package_config.upstream_project_name}-{version}"
         else:
             dir_name = f"{self.package_config.downstream_package_name}-{version}"
         logger.debug("name + version = %s", dir_name)
+
+        env = {
+            "PACKIT_PROJECT_VERSION": version,
+            "PACKIT_PROJECT_NAME_VERSION": dir_name,
+        }
+        if self.has_action(action=ActionName.create_archive):
+            return self.get_output_from_action(
+                action=ActionName.create_archive, env=env
+            )
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
@@ -500,8 +506,61 @@ class Upstream(PackitRepositoryBase):
                 f"{dir_name}/",
                 "HEAD",
             ]
-        self.command_handler.run_command(archive_cmd, return_output=True)
+        self.command_handler.run_command(archive_cmd, return_output=True, env=env)
         return archive_name
+
+    def fix_spec(self, archive: str, version: str, commit: str):
+        """
+        In order to create a SRPM from current git checkout, we need to have the spec reference
+        the tarball and unpack it. This method updates the spec so it's possible.
+        """
+        for line in self.specfile.spec_content.section("%package"):
+            if line.startswith(self.package_config.spec_source_id):
+                break
+        else:
+            raise PackitException(
+                f"The spec file doesn't have sources set via {self.package_config.spec_source_id}"
+            )
+        self.specfile.set_tag(self.package_config.spec_source_id, archive)
+
+        prep = self.specfile.spec_content.section("%prep")
+        if not prep:
+            logger.warning("this package doesn't have a %prep section")
+            return
+
+        # stolen from tito, thanks!
+        # https://github.com/dgoodwin/tito/blob/master/src/tito/common.py#L695
+        regex = re.compile(r"^(\s*%(?:auto)?setup)(.*?)$")
+        for idx, line in enumerate(prep):
+            m = regex.match(line)
+            if m:
+                break
+        else:
+            logger.error(
+                "this package is not using %(auto)setup macro in prep, "
+                "packit can't work in this environment"
+            )
+            return
+        new_setup_line = m[1]
+        # replace -n with our -n because it's better
+        args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
+        if args_match:
+            new_setup_line += args_match.group(1)
+            new_setup_line += args_match.group(2)
+        else:
+            new_setup_line += m[2]
+        new_setup_line += f" -n {self.package_config.upstream_project_name}-{version}"
+
+        logger.debug(
+            f"new {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
+            f" line:\n{new_setup_line}"
+        )
+        prep[idx] = new_setup_line
+        self.specfile.spec_content.replace_section("%prep", prep)
+        self.specfile._write_spec_content()
+
+        msg = f"Development snapshot ({commit})"
+        self.bump_spec(version=f"{version}", changelog_entry=msg, bump_release=True)
 
     def create_srpm(
         self,

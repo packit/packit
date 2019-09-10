@@ -447,8 +447,8 @@ class PackitAPI:
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
         current_git_describe_version = self.up.get_current_version()
-
         upstream_ref = upstream_ref or self.package_config.upstream_ref
+        commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
 
         if self.up.running_in_service():
             relative_to = Path(self.config.command_handler_work_dir)
@@ -459,17 +459,6 @@ class PackitAPI:
             # source-git code: fetch the tarball and don't check out the upstream ref
             self.up.fetch_upstream_archive()
             source_dir = self.up.absolute_specfile_dir.relative_to(relative_to)
-        else:
-            # upstream repo: create the archive
-            archive = self.up.create_archive(version=current_git_describe_version)
-            self.up.specfile.set_tag("Source0", archive)
-            source_dir = Path(self.up.local_project.working_dir).relative_to(
-                relative_to
-            )
-
-        commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
-
-        if upstream_ref:
             if self.up.with_action(action=ActionName.create_patches):
                 patches = self.up.create_patches(
                     upstream=upstream_ref,
@@ -489,11 +478,18 @@ class PackitAPI:
                 release=release_to_update, changelog_entry=f"- {msg}"
             )
         else:
-            msg = f"Development snapshot ({commit})"
-            self.up.bump_spec(
-                version=f"{current_git_describe_version}",
-                changelog_entry=msg,
-                bump_release=True,
+            archive = self.up.create_archive(version=current_git_describe_version)
+            env = {
+                "PACKIT_PROJECT_VERSION": current_git_describe_version,
+                "PACKIT_PROJECT_COMMIT": commit,
+                "PACKIT_PROJECT_ARCHIVE": archive,
+            }
+            if self.up.with_action(action=ActionName.fix_spec, env=env):
+                self.up.fix_spec(
+                    archive=archive, version=current_git_describe_version, commit=commit
+                )
+            source_dir = Path(self.up.local_project.working_dir).relative_to(
+                relative_to
             )
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
@@ -764,5 +760,5 @@ class PackitAPI:
 
     def clean(self):
         """ clean up stuff once all the work is done """
-        if self._up:
-            self.up.command_handler.clean()
+        # command handlers have nothing to clean
+        logger.debug("PackitAPI.cleanup (there are no objects to clean)")

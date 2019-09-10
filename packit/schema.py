@@ -58,6 +58,8 @@ PACKAGE_CONFIG_SCHEMA = {
             },
             "additionalProperties": False,
         },
+        "create_pr": {"type": "boolean"},
+        "spec_source_id": {"type": ["string", "integer"]},
     },
     "required": ["specfile_path"],
 }

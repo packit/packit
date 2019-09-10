@@ -1,0 +1,5 @@
+specfile_path: osbuild.spec
+upstream_project_name: osbuild
+downstream_package_name: osbuild
+current_version_command: ["python3", "setup.py", "--version"]
+spec_source_id: "0"

@@ -29,12 +29,8 @@ import git
 from ogr.abstract import GitProject, GitService
 
 from packit.exceptions import PackitException
-from packit.utils import (
-    is_git_repo,
-    get_repo,
-    get_namespace_and_repo_name,
-    is_a_git_ref,
-)
+from packit import utils
+from packit.utils import is_git_repo, get_repo, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -286,7 +282,7 @@ class LocalProject:
 
     def _parse_namespace_from_git_url(self):
         if self.git_url and (not self.namespace or not self.repo_name):
-            namespace, repo_name = get_namespace_and_repo_name(self.git_url)
+            namespace, repo_name = utils.get_namespace_and_repo_name(self.git_url)
             if namespace == self.namespace and repo_name == self.repo_name:
                 return False
             self.namespace, self.repo_name = namespace, repo_name
