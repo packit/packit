@@ -45,6 +45,7 @@ class ActionName(Enum):
     prepare_files = "prepare-files"
     create_archive = "create-archive"
     get_current_version = "get-current-version"
+    fix_spec = "fix-spec-file"
 
     @classmethod
     def is_valid_action(cls, action: str) -> bool:

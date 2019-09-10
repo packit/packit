@@ -28,7 +28,7 @@ import subprocess
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional, Dict
 from urllib.parse import urlparse
 
 import git
@@ -58,7 +58,14 @@ def get_rev_list_kwargs(opt_list):
     return result
 
 
-def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
+def run_command(
+    cmd,
+    error_message=None,
+    cwd=None,
+    fail=True,
+    output=False,
+    env: Optional[Dict] = None,
+):
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
 
@@ -74,14 +81,15 @@ def run_command(cmd, error_message=None, cwd=None, fail=True, output=False):
         shell=False,
         cwd=cwd,
         universal_newlines=True,
+        env=env,
     )
 
-    if not output:
-        # output is returned, let the caller process it
-        logger.debug("%s", shell.stdout)
+    stdout = shell.stdout.strip()
     stderr = shell.stderr.strip()
+    if stdout:
+        logger.debug("STDOUT: %s", stdout)
     if stderr:
-        logger.error("%s", shell.stderr)
+        logger.info("STDERR: %s", stderr)
 
     if shell.returncode != 0:
         logger.error("Command %s failed", shell.args)
