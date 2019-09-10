@@ -7,7 +7,7 @@
   - include_tasks: tasks/sandcastle-master.yaml
   - include_tasks: tasks/install-packit.yaml
   - include_tasks: tasks/configure-git.yaml
-  - name: Run mock tests
-    command: make check TESTS_TARGET=tests/mock
+  - name: Run session recorded tests
+    command: make check TESTS_TARGET=tests/session_recording
     args:
       chdir: '{{ project_dir }}'
