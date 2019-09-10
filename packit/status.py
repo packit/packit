@@ -99,7 +99,7 @@ class Status:
         :param number_of_releases: int
         :return: List
         """
-        if not self.up.local_project.git_project:
+        if self.up.local_project.git_project is None:
             logger.info("We couldn't track any upstream releases.")
             return []
 

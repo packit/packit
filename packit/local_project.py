@@ -216,7 +216,7 @@ class LocalProject:
         return False
 
     def _parse_git_service_from_git_project(self):
-        if self.git_project and not self.git_service and not self.offline:
+        if (self.git_project is not None) and not self.git_service and not self.offline:
             self.git_service = self.git_project.service
             return True
         return False

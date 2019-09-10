@@ -28,6 +28,7 @@ from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
+from packit.utils import is_a_git_ref, run_command
 from rebasehelper.exceptions import RebaseHelperError
 
 try:
@@ -41,7 +42,6 @@ from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
-from packit.utils import run_command, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -62,16 +62,20 @@ class Upstream(PackitRepositoryBase):
         self.config = config
         self.package_config = package_config
 
-        self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
 
     @property
     def local_project(self):
-        if not self._local_project.git_project:
+        if self._local_project.git_project is None:
+            if not self.package_config.upstream_project_url:
+                raise PackitException(
+                    "Please, set 'upstream_project_url' in your config file."
+                )
+
             self._local_project.git_project = self.config.get_project(
-                url=self.upstream_project_url
+                url=self.package_config.upstream_project_url
             )
-            self._local_project.refresh_the_arguments()
+            # self._local_project.refresh_the_arguments()
         return self._local_project
 
     @property

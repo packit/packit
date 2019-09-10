@@ -25,13 +25,14 @@ import logging
 import os
 import warnings
 from enum import Enum
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from pprint import pformat
 from typing import Optional, List, Dict, Set, Union
 
 import click
 from jsonschema import Draft4Validator, ValidationError
+from lazy_object_proxy import Proxy
 from yaml import safe_load
 
 from ogr import GithubService, get_instances_from_dict, PagureService, get_project
@@ -206,7 +207,7 @@ class Config(BaseConfig):
 
         return services
 
-    def get_project(self, url: str) -> GitProject:
+    def _get_project(self, url: str) -> GitProject:
         try:
             project = get_project(url=url, custom_instances=self.services)
         except OgrException as ex:
@@ -214,6 +215,9 @@ class Config(BaseConfig):
             logger.warning(msg)
             raise PackitConfigException(msg, ex)
         return project
+
+    def get_project(self, url: str) -> GitProject:
+        return Proxy(partial(self._get_project, url))
 
 
 pass_config = click.make_pass_decorator(Config)
