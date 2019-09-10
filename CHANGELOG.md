@@ -1,3 +1,40 @@
+# 0.6.0
+
+We keep our documentation up to date: https://packit.dev/docs - you can learn
+how to use all the latest features.
+
+## Breaking changes
+
+* `pagure_fork_token` is no longer needed given a change which happened in
+  pagure (src.fedoraproject.org); [Pierre](https://pagure.io/user/pingou)
+  rocks!
+* New COPR projects created by packit are no longer listed in the COPR
+  dashboard and are set to be deleted after 180 days upon being created.
+
+## Features
+
+* There is a new command `push-updates` to mark bodhi updates for stable.
+* Packit now sets description and instructions for newly created COPR projects.
+* There is a new config option to set ID of a spec file Source which packit
+  should operate on (defaults to 0). Packit now also updates the `%[auto]setup`
+  macro in `%prep` so that the generated archive is correctly unpacked - this
+  behavior matches what tito does.
+* There is a new action `fix-spec` which by default sets Source0, %version and
+  %setup macros in spec file - you can override it with your own
+  implementation. [Documentation](https://packit.dev/docs/actions)
+* Packit now sets certain environment variables during `fix-spec` and
+  `create-archive` actions. You can read more about this in the documentation
+  for actions.
+
+## Fixes
+
+* Packit can be again installed as an RPM: it correctly depends on koji client
+  library now.
+* If an error happens in a section while doing `status`, the section is now
+  skipped and rest of the information is printed.
+* Packit is able to handle URLs to git repo if they end with a slash.
+
+
 # 0.5.1
 
 ## Breaking changes
