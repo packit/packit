@@ -19,3 +19,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+"""    custom_path = "sooooorc.rpm"
+Functional tests for srpm comand
+"""
+from pathlib import Path
+
+
+def test_srpm(api_instance):
+    u, d, api = api_instance
+    api.create_srpm()
+    assert list(Path.cwd().glob("*.src.rpm"))[0].exists()
+
+
+def test_srpm_custom_path(api_instance):
+    u, d, api = api_instance
+    custom_path = "sooooorc.rpm"
+    api.create_srpm(output_file=custom_path)
+    assert Path.cwd().joinpath(custom_path).is_file()

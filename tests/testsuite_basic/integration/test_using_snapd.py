@@ -19,3 +19,42 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+"""
+E2E tests which utilize cockpit projects
+"""
+import shutil
+from pathlib import Path
+
+import pytest
+
+from packit.api import PackitAPI
+from packit.config import get_local_package_config
+from packit.local_project import LocalProject
+from packit.utils import cwd
+from tests.testsuite_basic.spellbook import (
+    initiate_git_repo,
+    get_test_config,
+    build_srpm,
+    UP_SNAPD,
+)
+
+
+@pytest.fixture()
+def snapd(tmpdir):
+    t = Path(str(tmpdir))
+    u = t / "up"
+    shutil.copytree(UP_SNAPD, u)
+    initiate_git_repo(u, tag="2.41")
+    return u
+
+
+def test_srpm_snapd(snapd):
+    pc = get_local_package_config(str(snapd))
+    up_lp = LocalProject(working_dir=str(snapd))
+    c = get_test_config()
+    api = PackitAPI(c, pc, up_lp)
+    with cwd(snapd):
+        path = api.create_srpm()
+    assert path.exists()
+    build_srpm(path)

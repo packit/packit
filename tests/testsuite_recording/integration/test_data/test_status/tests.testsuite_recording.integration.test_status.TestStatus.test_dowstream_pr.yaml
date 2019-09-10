@@ -1,0 +1,98 @@
+GET:
+  /repos/packit-service/ogr:
+    empty:
+    - - 200
+      - access-control-allow-origin: '*'
+        access-control-expose-headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+          X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes,
+          X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type
+        cache-control: private, max-age=60, s-maxage=60
+        content-encoding: gzip
+        content-security-policy: default-src 'none'
+        content-type: application/json; charset=utf-8
+        date: Tue, 10 Sep 2019 12:15:20 GMT
+        etag: W/"6f54a6efea8fb2ba3a9711f095599f41"
+        last-modified: Tue, 10 Sep 2019 11:56:55 GMT
+        referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
+        server: GitHub.com
+        status: 200 OK
+        strict-transport-security: max-age=31536000; includeSubdomains; preload
+        transfer-encoding: chunked
+        vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
+        x-accepted-oauth-scopes: repo
+        x-content-type-options: nosniff
+        x-frame-options: deny
+        x-github-media-type: github.v3; format=json
+        x-github-request-id: 3A46:3112:552EB:8D70D:5D7793D8
+        x-oauth-scopes: admin:org, gist, notifications, repo, user, write:discussion
+        x-ratelimit-limit: '5000'
+        x-ratelimit-remaining: '4993'
+        x-ratelimit-reset: '1568121295'
+        x-xss-protection: 1; mode=block
+      - '{"id":161636700,"node_id":"MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=","name":"ogr","full_name":"packit-service/ogr","private":false,"owner":{"login":"packit-service","id":46870917,"node_id":"MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3","avatar_url":"https://avatars3.githubusercontent.com/u/46870917?v=4","gravatar_id":"","url":"https://api.github.com/users/packit-service","html_url":"https://github.com/packit-service","followers_url":"https://api.github.com/users/packit-service/followers","following_url":"https://api.github.com/users/packit-service/following{/other_user}","gists_url":"https://api.github.com/users/packit-service/gists{/gist_id}","starred_url":"https://api.github.com/users/packit-service/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/packit-service/subscriptions","organizations_url":"https://api.github.com/users/packit-service/orgs","repos_url":"https://api.github.com/users/packit-service/repos","events_url":"https://api.github.com/users/packit-service/events{/privacy}","received_events_url":"https://api.github.com/users/packit-service/received_events","type":"Organization","site_admin":false},"html_url":"https://github.com/packit-service/ogr","description":"One
+        Git library to Rule -- one API for many git forges","fork":false,"url":"https://api.github.com/repos/packit-service/ogr","forks_url":"https://api.github.com/repos/packit-service/ogr/forks","keys_url":"https://api.github.com/repos/packit-service/ogr/keys{/key_id}","collaborators_url":"https://api.github.com/repos/packit-service/ogr/collaborators{/collaborator}","teams_url":"https://api.github.com/repos/packit-service/ogr/teams","hooks_url":"https://api.github.com/repos/packit-service/ogr/hooks","issue_events_url":"https://api.github.com/repos/packit-service/ogr/issues/events{/number}","events_url":"https://api.github.com/repos/packit-service/ogr/events","assignees_url":"https://api.github.com/repos/packit-service/ogr/assignees{/user}","branches_url":"https://api.github.com/repos/packit-service/ogr/branches{/branch}","tags_url":"https://api.github.com/repos/packit-service/ogr/tags","blobs_url":"https://api.github.com/repos/packit-service/ogr/git/blobs{/sha}","git_tags_url":"https://api.github.com/repos/packit-service/ogr/git/tags{/sha}","git_refs_url":"https://api.github.com/repos/packit-service/ogr/git/refs{/sha}","trees_url":"https://api.github.com/repos/packit-service/ogr/git/trees{/sha}","statuses_url":"https://api.github.com/repos/packit-service/ogr/statuses/{sha}","languages_url":"https://api.github.com/repos/packit-service/ogr/languages","stargazers_url":"https://api.github.com/repos/packit-service/ogr/stargazers","contributors_url":"https://api.github.com/repos/packit-service/ogr/contributors","subscribers_url":"https://api.github.com/repos/packit-service/ogr/subscribers","subscription_url":"https://api.github.com/repos/packit-service/ogr/subscription","commits_url":"https://api.github.com/repos/packit-service/ogr/commits{/sha}","git_commits_url":"https://api.github.com/repos/packit-service/ogr/git/commits{/sha}","comments_url":"https://api.github.com/repos/packit-service/ogr/comments{/number}","issue_comment_url":"https://api.github.com/repos/packit-service/ogr/issues/comments{/number}","contents_url":"https://api.github.com/repos/packit-service/ogr/contents/{+path}","compare_url":"https://api.github.com/repos/packit-service/ogr/compare/{base}...{head}","merges_url":"https://api.github.com/repos/packit-service/ogr/merges","archive_url":"https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}","downloads_url":"https://api.github.com/repos/packit-service/ogr/downloads","issues_url":"https://api.github.com/repos/packit-service/ogr/issues{/number}","pulls_url":"https://api.github.com/repos/packit-service/ogr/pulls{/number}","milestones_url":"https://api.github.com/repos/packit-service/ogr/milestones{/number}","notifications_url":"https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}","labels_url":"https://api.github.com/repos/packit-service/ogr/labels{/name}","releases_url":"https://api.github.com/repos/packit-service/ogr/releases{/id}","deployments_url":"https://api.github.com/repos/packit-service/ogr/deployments","created_at":"2018-12-13T12:33:52Z","updated_at":"2019-09-10T11:56:55Z","pushed_at":"2019-09-10T12:13:09Z","git_url":"git://github.com/packit-service/ogr.git","ssh_url":"git@github.com:packit-service/ogr.git","clone_url":"https://github.com/packit-service/ogr.git","svn_url":"https://github.com/packit-service/ogr","homepage":"","size":1988,"stargazers_count":15,"watchers_count":15,"language":"Python","has_issues":true,"has_projects":true,"has_downloads":true,"has_wiki":true,"has_pages":false,"forks_count":13,"mirror_url":null,"archived":false,"disabled":false,"open_issues_count":33,"license":{"key":"mit","name":"MIT
+        License","spdx_id":"MIT","url":"https://api.github.com/licenses/mit","node_id":"MDc6TGljZW5zZTEz"},"forks":13,"open_issues":33,"watchers":15,"default_branch":"master","permissions":{"admin":true,"push":true,"pull":true},"allow_squash_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"organization":{"login":"packit-service","id":46870917,"node_id":"MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3","avatar_url":"https://avatars3.githubusercontent.com/u/46870917?v=4","gravatar_id":"","url":"https://api.github.com/users/packit-service","html_url":"https://github.com/packit-service","followers_url":"https://api.github.com/users/packit-service/followers","following_url":"https://api.github.com/users/packit-service/following{/other_user}","gists_url":"https://api.github.com/users/packit-service/gists{/gist_id}","starred_url":"https://api.github.com/users/packit-service/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/packit-service/subscriptions","organizations_url":"https://api.github.com/users/packit-service/orgs","repos_url":"https://api.github.com/users/packit-service/repos","events_url":"https://api.github.com/users/packit-service/events{/privacy}","received_events_url":"https://api.github.com/users/packit-service/received_events","type":"Organization","site_admin":false},"network_count":13,"subscribers_count":8}'
+  https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml:
+    '{''ref'': ''master''}':
+    - - 200
+      - access-control-allow-origin: '*'
+        access-control-expose-headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+          X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes,
+          X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type
+        cache-control: private, max-age=60, s-maxage=60
+        content-encoding: gzip
+        content-security-policy: default-src 'none'
+        content-type: application/json; charset=utf-8
+        date: Tue, 10 Sep 2019 12:15:20 GMT
+        etag: W/"809e35c9e35707fbb1db688641084c1e510bd85b"
+        last-modified: Tue, 10 Sep 2019 11:56:52 GMT
+        referrer-policy: origin-when-cross-origin, strict-origin-when-cross-origin
+        server: GitHub.com
+        status: 200 OK
+        strict-transport-security: max-age=31536000; includeSubdomains; preload
+        transfer-encoding: chunked
+        vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
+        x-accepted-oauth-scopes: ''
+        x-content-type-options: nosniff
+        x-frame-options: deny
+        x-github-media-type: github.v3; format=json
+        x-github-request-id: 3A46:3112:552ED:8D70F:5D7793D8
+        x-oauth-scopes: admin:org, gist, notifications, repo, user, write:discussion
+        x-ratelimit-limit: '5000'
+        x-ratelimit-remaining: '4992'
+        x-ratelimit-reset: '1568121295'
+        x-xss-protection: 1; mode=block
+      - '{"name":".packit.yaml","path":".packit.yaml","sha":"809e35c9e35707fbb1db688641084c1e510bd85b","size":851,"url":"https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master","html_url":"https://github.com/packit-service/ogr/blob/master/.packit.yaml","git_url":"https://api.github.com/repos/packit-service/ogr/git/blobs/809e35c9e35707fbb1db688641084c1e510bd85b","download_url":"https://raw.githubusercontent.com/packit-service/ogr/master/.packit.yaml","type":"file","content":"LS0tCiMgZG9jczogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl\nL3BhY2tpdC9ibG9iL21hc3Rlci9kb2NzL2NvbmZpZ3VyYXRpb24ubWQKc3Bl\nY2ZpbGVfcGF0aDogcHl0aG9uLW9nci5zcGVjCnN5bmNlZF9maWxlczoKICAt\nIHB5dGhvbi1vZ3Iuc3BlYwp1cHN0cmVhbV9wcm9qZWN0X25hbWU6IG9ncgpk\nb3duc3RyZWFtX3BhY2thZ2VfbmFtZTogcHl0aG9uLW9ncgojIHRoZSB2ZXJz\naW9uIGlzIGRpZmZlcmVudCB0aGFuIHdpdGggYmFzaWMgZ2l0IGRlc2NyaWJl\nCmNyZWF0ZV90YXJiYWxsX2NvbW1hbmQ6IFsicHl0aG9uMyIsICJzZXR1cC5w\neSIsICJzZGlzdCIsICItLWRpc3QtZGlyIiwgIi4iXQpjdXJyZW50X3ZlcnNp\nb25fY29tbWFuZDogWyJweXRob24zIiwgInNldHVwLnB5IiwgIi0tdmVyc2lv\nbiJdCmpvYnM6Ci0gam9iOiBzeW5jX2Zyb21fZG93bnN0cmVhbQogIHRyaWdn\nZXI6IGNvbW1pdAotIGpvYjogcHJvcG9zZV9kb3duc3RyZWFtCiAgdHJpZ2dl\ncjogcmVsZWFzZQogIG1ldGFkYXRhOgogICAgZGlzdC1naXQtYnJhbmNoOiBt\nYXN0ZXIKLSBqb2I6IHByb3Bvc2VfZG93bnN0cmVhbQogIHRyaWdnZXI6IHJl\nbGVhc2UKICBtZXRhZGF0YToKICAgIGRpc3QtZ2l0LWJyYW5jaDogZjMwCi0g\nam9iOiBwcm9wb3NlX2Rvd25zdHJlYW0KICB0cmlnZ2VyOiByZWxlYXNlCiAg\nbWV0YWRhdGE6CiAgICBkaXN0LWdpdC1icmFuY2g6IGYyOQotIGpvYjogY29w\ncl9idWlsZAogIHRyaWdnZXI6IHB1bGxfcmVxdWVzdAogIG1ldGFkYXRhOgog\nICAgdGFyZ2V0czoKICAgIC0gZmVkb3JhLTI5LXg4Nl82NAogICAgLSBmZWRv\ncmEtcmF3aGlkZS14ODZfNjQKICAgIC0gZmVkb3JhLTMwLXg4Nl82NAo=\n","encoding":"base64","_links":{"self":"https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master","git":"https://api.github.com/repos/packit-service/ogr/git/blobs/809e35c9e35707fbb1db688641084c1e510bd85b","html":"https://github.com/packit-service/ogr/blob/master/.packit.yaml"}}'
+  https://src.fedoraproject.org//api/0/rpms/python-ogr/pull-requests:
+    '{''status'': ''Open''}':
+      empty:
+      - content: !!binary |
+          ewogICJhcmdzIjogewogICAgImFzc2lnbmVlIjogbnVsbCwKICAgICJhdXRob3IiOiBudWxsLAog
+          ICAgInBhZ2UiOiAxLAogICAgInBlcl9wYWdlIjogMjAsCiAgICAic3RhdHVzIjogIk9wZW4iCiAg
+          fSwKICAicGFnaW5hdGlvbiI6IHsKICAgICJmaXJzdCI6ICJodHRwczovL3NyYy5mZWRvcmFwcm9q
+          ZWN0Lm9yZy9hcGkvMC9ycG1zL3B5dGhvbi1vZ3IvcHVsbC1yZXF1ZXN0cz9zdGF0dXM9T3BlbiZw
+          YWdlPTEmcGVyX3BhZ2U9MjAiLAogICAgImxhc3QiOiAiaHR0cHM6Ly9zcmMuZmVkb3JhcHJvamVj
+          dC5vcmcvYXBpLzAvcnBtcy9weXRob24tb2dyL3B1bGwtcmVxdWVzdHM/c3RhdHVzPU9wZW4mcGFn
+          ZT0wJnBlcl9wYWdlPTIwIiwKICAgICJuZXh0IjogbnVsbCwKICAgICJwYWdlIjogMSwKICAgICJw
+          YWdlcyI6IDAsCiAgICAicGVyX3BhZ2UiOiAyMCwKICAgICJwcmV2IjogbnVsbAogIH0sCiAgInJl
+          cXVlc3RzIjogW10sCiAgInRvdGFsX3JlcXVlc3RzIjogMAp9
+        json:
+          args:
+            assignee: null
+            author: null
+            page: 1
+            per_page: 20
+            status: Open
+          pagination:
+            first: https://src.fedoraproject.org/api/0/rpms/python-ogr/pull-requests?status=Open&page=1&per_page=20
+            last: https://src.fedoraproject.org/api/0/rpms/python-ogr/pull-requests?status=Open&page=0&per_page=20
+            next: null
+            page: 1
+            pages: 0
+            per_page: 20
+            prev: null
+          requests: []
+          total_requests: 0
+        ok: true
+        reason: OK
+        status_code: 200
