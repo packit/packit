@@ -32,6 +32,7 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 
+from ogr import GithubService
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd
@@ -207,15 +208,18 @@ def test_github_app(upstream_instance, tmpdir):
     user_config_file_path = t / ".packit.yaml"
     user_config_file_path.write_text(
         "---\n"
-        f"github_app_cert_path: {fake_cert_path}\n"
-        "github_app_id: qwe\n"
-        "github_app_installation_id: asd\n"
+        f"authentication:\n"
+        f"    github.com:\n"
+        f"        github_app_private_key_path: {fake_cert_path}\n"
+        f"        github_app_id: qwe\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
         str(tmpdir)
     )
     ups.config = Config.get_user_config()
-    if os.environ.get("GITHUB_TOKEN"):
-        assert os.environ.get("GITHUB_TOKEN") == ups.local_project.git_service.token
-    else:
-        assert ups.local_project.git_service.token == "test"
+    assert (
+        GithubService(
+            github_app_private_key_path=str(fake_cert_path), github_app_id="qwe"
+        )
+        in ups.config.services
+    )
