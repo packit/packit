@@ -5,9 +5,8 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig, Config, RunCommandType
 
-from sandcastle.api import Sandcastle
-
 from packit.local_project import LocalProject
+from tests.testsuite_basic.spellbook import can_a_module_be_imported
 
 
 def test_get_output_from_action_defined():
@@ -24,7 +23,12 @@ def test_get_output_from_action_defined():
     assert result == "hello world\n"
 
 
+@pytest.mark.skipif(
+    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+)
 def test_get_output_from_action_defined_in_sandcastle():
+    from sandcastle.api import Sandcastle
+
     echo_cmd = "hello world"
     flexmock(Sandcastle).should_receive("get_api_client")
     flexmock(Sandcastle).should_receive("is_pod_already_deployed").and_return(True)
