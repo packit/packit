@@ -78,7 +78,7 @@ def get_existing_config(path):
     for existing_config_file in CONFIG_FILE_NAMES:
         if (Path(path) / existing_config_file).is_file():
             return existing_config_file
-    return ""
+    return None
 
 
 def generate_config(config_file_name, write_to_file=False, template_data=None):
