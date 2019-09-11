@@ -36,7 +36,7 @@ from packit.config import get_context_settings
 from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
 
-logger = logging.getLogger("packit")
+logger = logging.getLogger(__name__)
 
 
 @click.command("generate", context_settings=get_context_settings())
