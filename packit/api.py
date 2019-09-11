@@ -658,7 +658,7 @@ class PackitAPI:
                     # don't show project on Copr homepage
                     unlisted_on_hp=True,
                     # delete project after the specified period of time
-                    delete_after_days=180,
+                    delete_after_days=60,
                     instructions=instructions
                     or "You can check out the upstream project"
                     f"{self.upstream_local_project.git_url} to find out how to consume these"
