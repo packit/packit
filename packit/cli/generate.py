@@ -27,6 +27,7 @@ Generate initial configuration for packit
 import logging
 from os import getcwd
 from pathlib import Path
+from typing import Optional
 
 import click
 
@@ -73,7 +74,7 @@ def generate(path_or_url, force):
     )
 
 
-def get_existing_config(path):
+def get_existing_config(path: str) -> Optional[str]:
     # find name of config file if already exists
     for existing_config_file in CONFIG_FILE_NAMES:
         if (Path(path) / existing_config_file).is_file():
@@ -81,7 +82,9 @@ def get_existing_config(path):
     return None
 
 
-def generate_config(config_file_name, write_to_file=False, template_data=None):
+def generate_config(
+    config_file_name: str, write_to_file: bool = False, template_data: dict = None
+) -> str:
     """
     Generate config file from provided data
     :param write_to_file: bool, False by default
