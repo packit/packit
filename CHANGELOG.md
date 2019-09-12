@@ -1,3 +1,7 @@
+# 0.6.1
+
+This patch release contains only few bug-fixes on top of 0.6.0.
+
 # 0.6.0
 
 We keep our documentation up to date: https://packit.dev/docs - you can learn
