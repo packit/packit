@@ -74,6 +74,11 @@ def run_command(
     cwd = cwd or str(Path.cwd())
     error_message = error_message or f"Command {cmd} failed."
 
+    # we need to pass complete env to Popen, otherwise we lose everything from os.environ
+    cmd_env = os.environ
+    if env:
+        cmd_env.update(env)
+
     shell = subprocess.run(
         cmd,
         stdout=subprocess.PIPE,
@@ -81,7 +86,7 @@ def run_command(
         shell=False,
         cwd=cwd,
         universal_newlines=True,
-        env=env,
+        env=cmd_env,
     )
 
     stdout = shell.stdout.strip()
