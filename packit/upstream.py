@@ -369,7 +369,7 @@ class Upstream(PackitRepositoryBase):
             action=ActionName.get_current_version
         )
         if action_output:
-            return action_output
+            return action_output[-1]
 
         ver = self.command_handler.run_command(
             self.package_config.current_version_command, return_output=True
@@ -481,9 +481,10 @@ class Upstream(PackitRepositoryBase):
             "PACKIT_PROJECT_NAME_VERSION": dir_name,
         }
         if self.has_action(action=ActionName.create_archive):
-            return self.get_output_from_action(
+            outputs = self.get_output_from_action(
                 action=ActionName.create_archive, env=env
-            ).strip()
+            )
+            return outputs[-1].strip() if outputs else None
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
