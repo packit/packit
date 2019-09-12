@@ -50,17 +50,17 @@ def generate(path_or_url, force):
     """
     Generate new packit config.
     """
-
-    config_file_name = get_existing_config(path_or_url.working_dir)
-    if config_file_name:
+    working_dir = Path(path_or_url.working_dir)
+    config_path = get_existing_config(working_dir)
+    if config_path:
         if not force:
             raise PackitException(
-                f"Packit config {config_file_name} already exists."
+                f"Packit config {config_path} already exists."
                 " If you want to regenerate it use `packit generate --force`"
             )
     else:
         # Use default name
-        config_file_name = Path(path_or_url.working_dir) / ".packit.yaml"
+        config_path = working_dir / ".packit.yaml"
 
     template_data = {
         "upstream_project_name": path_or_url.repo_name,
@@ -68,32 +68,31 @@ def generate(path_or_url, force):
     }
 
     generate_config(
-        write_to_file=True,
-        template_data=template_data,
-        config_file_name=config_file_name,
+        config_file=config_path, write_to_file=True, template_data=template_data
     )
 
 
-def get_existing_config(path: str) -> Optional[str]:
+def get_existing_config(working_dir: Path) -> Optional[Path]:
     # find name of config file if already exists
-    for existing_config_file in CONFIG_FILE_NAMES:
-        if (Path(path) / existing_config_file).is_file():
-            return existing_config_file
+    for config_file_name in CONFIG_FILE_NAMES:
+        config_file_path = working_dir / config_file_name
+        if config_file_path.is_file():
+            return config_file_path
     return None
 
 
 def generate_config(
-    config_file_name: str, write_to_file: bool = False, template_data: dict = None
+    config_file: Path, write_to_file: bool = False, template_data: dict = None
 ) -> str:
     """
     Generate config file from provided data
-    :param write_to_file: bool, False by default
+    :param config_file: Path, .packit.yaml by default
+    :param write_to_file: bool, write to config_file? False by default
     :param template_data: dict, example:
     {
         "upstream_project_name": "packitos",
         "downstream_package_name": "packit",
     }
-    :param config_file_name: str, name of config file, `.packit.yaml` by default
     :return: str, generated config
     """
     output_config = PACKIT_CONFIG_TEMPLATE.format(
@@ -102,7 +101,7 @@ def generate_config(
     )
 
     if write_to_file:
-        Path(config_file_name).write_text(output_config)
-        logger.debug(f"Packit config file '{config_file_name}' changed.")
+        config_file.write_text(output_config)
+        logger.debug(f"Packit config file '{config_file}' changed.")
 
     return output_config
