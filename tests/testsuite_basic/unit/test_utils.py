@@ -23,7 +23,7 @@
 import pytest
 from packit.exceptions import PackitException
 
-from packit.utils import get_namespace_and_repo_name, is_str_url
+from packit.utils import get_namespace_and_repo_name, is_str_url, run_command
 
 
 @pytest.mark.parametrize(
@@ -60,3 +60,7 @@ def test_get_ns_repo_exc():
 )
 def test_is_str_url(inp, ok):
     assert is_str_url(inp) == ok
+
+
+def test_run_command_w_env():
+    run_command(["bash", "-c", "env | grep PATH"], env={"X": "Y"})
