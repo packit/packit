@@ -259,18 +259,27 @@ class PackitRepositoryBase:
         logger.debug(f"Running default implementation for {action}.")
         return True
 
-    def get_output_from_action(self, action: ActionName, env: Optional[Dict] = None):
+    def get_output_from_action(
+        self, action: ActionName, env: Optional[Dict] = None
+    ) -> Optional[List[str]]:
         """
-        Run action if specified in the self.actions and return output
-        else return None
+        Run self.actions[action] command(s) and return their outputs.
         """
-        if action in self.package_config.actions:
-            command_l = shlex.split(self.package_config.actions[action])
+        commands = self.package_config.actions.get(action)
+        if not commands:
+            return None
+        if isinstance(commands, str):
+            commands = [commands]
+
+        outputs = []
+        for command in commands:
+            command_l = shlex.split(command)
             logger.info(f"Using user-defined script for {action}: {command_l}")
-            return self.command_handler.run_command(
-                command_l, return_output=True, env=env
+            outputs.append(
+                self.command_handler.run_command(command_l, return_output=True, env=env)
             )
-        return None
+        logger.debug(f"Action command output: {outputs}")
+        return outputs
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
         """
