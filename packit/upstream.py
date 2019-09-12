@@ -483,7 +483,7 @@ class Upstream(PackitRepositoryBase):
         if self.has_action(action=ActionName.create_archive):
             return self.get_output_from_action(
                 action=ActionName.create_archive, env=env
-            )
+            ).strip()
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:

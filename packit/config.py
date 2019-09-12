@@ -28,7 +28,7 @@ from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from pprint import pformat
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 import click
 from jsonschema import Draft4Validator, ValidationError
@@ -356,7 +356,7 @@ class PackageConfig(BaseConfig):
         dist_git_base_url: str = None,
         create_tarball_command: List[str] = None,
         current_version_command: List[str] = None,
-        actions: Dict[ActionName, str] = None,
+        actions: Dict[ActionName, Union[str, List[str]]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = False,
