@@ -261,9 +261,9 @@ class PackitRepositoryBase:
 
     def get_output_from_action(
         self, action: ActionName, env: Optional[Dict] = None
-    ) -> Optional[str]:
+    ) -> Optional[List[str]]:
         """
-        Run self.actions[action] command(s) and return output of (last if there are more) command.
+        Run self.actions[action] command(s) and return their outputs.
         """
         commands = self.package_config.actions.get(action)
         if not commands:
@@ -278,9 +278,8 @@ class PackitRepositoryBase:
             outputs.append(
                 self.command_handler.run_command(command_l, return_output=True, env=env)
             )
-        output = outputs[-1] if outputs else None
-        logger.debug(f"Action command output: {output!r}")
-        return output
+        logger.debug(f"Action command output: {outputs}")
+        return outputs
 
     def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
         """

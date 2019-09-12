@@ -80,4 +80,4 @@ def test_get_output_from_action(
         else:
             raise
     if expected_output:
-        assert out == expected_output
+        assert out[-1] == expected_output
