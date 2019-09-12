@@ -9,9 +9,15 @@ from packit.local_project import LocalProject
 from tests.testsuite_basic.spellbook import can_a_module_be_imported
 
 
-def test_get_output_from_action_defined():
-    echo_cmd = "echo 'hello world'"
-
+@pytest.mark.parametrize(
+    "echo_cmd",
+    [
+        "echo 'hello world'",
+        # should return output of only the last one
+        ["echo 'ignore me'", "echo 'hello world'"],
+    ],
+)
+def test_get_output_from_action_defined(echo_cmd):
     packit_repository_base = PackitRepositoryBase(
         config=flexmock(Config()),
         package_config=flexmock(PackageConfig(actions={ActionName.pre_sync: echo_cmd})),
