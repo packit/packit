@@ -27,6 +27,7 @@ Generate initial configuration for packit
 import logging
 from os import getcwd
 from pathlib import Path
+from typing import Optional
 
 import click
 
@@ -36,7 +37,7 @@ from packit.config import get_context_settings
 from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 @click.command("generate", context_settings=get_context_settings())
@@ -49,18 +50,17 @@ def generate(path_or_url, force):
     """
     Generate new packit config.
     """
-
-    # find name of config file if already exists
-    config_file_name = None
-    for existing_config_file in CONFIG_FILE_NAMES:
-        if (Path.cwd() / existing_config_file).is_file():
-            config_file_name = existing_config_file
-            if not force:
-                raise PackitException(
-                    f"Packit config {config_file_name} already exists."
-                    " If you want to regenerate it use `packit generate --force`"
-                )
-            break
+    working_dir = Path(path_or_url.working_dir)
+    config_path = get_existing_config(working_dir)
+    if config_path:
+        if not force:
+            raise PackitException(
+                f"Packit config {config_path} already exists."
+                " If you want to regenerate it use `packit generate --force`"
+            )
+    else:
+        # Use default name
+        config_path = working_dir / ".packit.yaml"
 
     template_data = {
         "upstream_project_name": path_or_url.repo_name,
@@ -68,33 +68,40 @@ def generate(path_or_url, force):
     }
 
     generate_config(
-        write_to_file=True,
-        template_data=template_data,
-        config_file_name=config_file_name,
+        config_file=config_path, write_to_file=True, template_data=template_data
     )
 
 
-def generate_config(write_to_file=False, template_data=None, config_file_name=None):
+def get_existing_config(working_dir: Path) -> Optional[Path]:
+    # find name of config file if already exists
+    for config_file_name in CONFIG_FILE_NAMES:
+        config_file_path = working_dir / config_file_name
+        if config_file_path.is_file():
+            return config_file_path
+    return None
+
+
+def generate_config(
+    config_file: Path, write_to_file: bool = False, template_data: dict = None
+) -> str:
     """
     Generate config file from provided data
-    :param write_to_file: bool, False by default
+    :param config_file: Path, .packit.yaml by default
+    :param write_to_file: bool, write to config_file? False by default
     :param template_data: dict, example:
     {
         "upstream_project_name": "packitos",
         "downstream_package_name": "packit",
     }
-    :param config_file_name: str, name of config file, `.packit.yaml` by default
     :return: str, generated config
     """
-    # default name
-    config_file_name = config_file_name or ".packit.yaml"
-
     output_config = PACKIT_CONFIG_TEMPLATE.format(
         downstream_package_name=template_data["downstream_package_name"],
         upstream_project_name=template_data["upstream_project_name"],
     )
 
     if write_to_file:
-        Path(config_file_name).write_text(output_config)
+        config_file.write_text(output_config)
+        logger.debug(f"Packit config file '{config_file}' changed.")
 
     return output_config
