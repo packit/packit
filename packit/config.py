@@ -170,10 +170,10 @@ class Config(BaseConfig):
             services = get_instances_from_dict(instances=raw_dict["authentication"])
         else:
             logger.warning(
-                "Please,"
+                "Please, "
                 "use 'authentication' key in the user configuration "
                 "to set tokens for GitHub and Pagure. "
-                "New method supports more services and direct keys will be remove in the future.\n"
+                "New method supports more services and direct keys will be removed in the future.\n"
                 "Example:\n"
                 "authentication:\n"
                 "    github.com:\n"
