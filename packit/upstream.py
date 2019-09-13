@@ -484,7 +484,17 @@ class Upstream(PackitRepositoryBase):
             outputs = self.get_output_from_action(
                 action=ActionName.create_archive, env=env
             )
-            return outputs[-1].strip() if outputs else None
+            if not outputs:
+                raise PackitException("No output from create-archive action.")
+            # one of the returned strings has to contain existing archive name
+            for archive_name in reversed(outputs):
+                if Path(archive_name.strip()).is_file():
+                    logger.info(f"Created archive: {archive_name.strip()}")
+                    return archive_name
+            else:
+                raise PackitException(
+                    "No existing file in create-archive action output."
+                )
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
