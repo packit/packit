@@ -56,11 +56,13 @@ class PackitAPI:
         self,
         config: Config,
         package_config: PackageConfig,
-        upstream_local_project: LocalProject,
+        upstream_local_project: LocalProject = None,
+        downstream_local_project: LocalProject = None,
     ) -> None:
         self.config = config
         self.package_config = package_config
         self.upstream_local_project = upstream_local_project
+        self.downstream_local_project = downstream_local_project
 
         self._up = None
         self._dg = None
