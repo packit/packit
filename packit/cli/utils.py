@@ -109,13 +109,36 @@ def get_packit_api(
         local_project.working_dir, try_local_dir_last=True
     )
 
+    remote_urls = local_project.git_repo.remote().urls
+
+    lp_upstream = None
+    lp_downstream = None
+    for url in remote_urls:
+        if (
+            package_config.upstream_project_url
+            and package_config.upstream_project_url in url
+        ):
+            lp_upstream = local_project
+            break
+
+        if package_config.dist_git_base_url in url:
+            lp_downstream = local_project
+            break
+    else:
+        logger.warning(
+            "We cannot determine, "
+            "if the input is upstream or downstream. "
+            "Using upstream as a default."
+        )
+        lp_upstream = local_project
+
     if dist_git_path:
         package_config.dist_git_clone_path = dist_git_path
-    package_config.upstream_project_url = local_project.working_dir
 
     api = PackitAPI(
         config=config,
         package_config=package_config,
-        upstream_local_project=local_project,
+        upstream_local_project=lp_upstream,
+        downstream_local_project=lp_downstream,
     )
     return api
