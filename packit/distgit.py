@@ -28,7 +28,6 @@ from typing import Optional, Sequence, List
 import cccolutils
 import git
 import requests
-from ogr import PagureService
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
@@ -64,8 +63,6 @@ class DistGit(PackitRepositoryBase):
 
         self._local_project = None
 
-        self.github_token = self.config.github_token
-        self.pagure_user_token = self.config.pagure_user_token
         self.fas_user = self.config.fas_user
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self._downstream_config: Optional[PackageConfig] = None
@@ -74,18 +71,17 @@ class DistGit(PackitRepositoryBase):
     def local_project(self):
         """ return an instance of LocalProject """
         if self._local_project is None:
-            pagure_service = PagureService(
-                token=self.pagure_user_token,
-                instance_url=self.package_config.dist_git_base_url,
-                read_only=self.config.dry_run,
+            dist_git_project = self.config.get_project(
+                url=self.package_config.dist_git_package_url
             )
+
             if self.package_config.dist_git_clone_path:
                 self._local_project = LocalProject(
                     working_dir=self.package_config.dist_git_clone_path,
                     git_url=self.package_config.dist_git_package_url,
                     namespace=self.package_config.dist_git_namespace,
                     repo_name=self.package_config.downstream_package_name,
-                    git_service=pagure_service,
+                    git_project=dist_git_project,
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
@@ -101,9 +97,10 @@ class DistGit(PackitRepositoryBase):
                     git_url=self.package_config.dist_git_package_url,
                     namespace=self.package_config.dist_git_namespace,
                     repo_name=self.package_config.downstream_package_name,
-                    git_service=pagure_service,
+                    git_project=dist_git_project,
                 )
                 self._local_project.working_dir_temporary = True
+            self._local_project.refresh_the_arguments()
         return self._local_project
 
     @property
@@ -201,11 +198,6 @@ class DistGit(PackitRepositoryBase):
         )
         project = self.local_project.git_project
 
-        if not self.pagure_user_token:
-            raise PackitException(
-                "Please provide PAGURE_USER_TOKEN as an environment variable."
-            )
-
         project_fork = project.get_fork()
         if not project_fork:
             project.fork_create()
@@ -253,7 +245,9 @@ class DistGit(PackitRepositoryBase):
         """
         # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("About to upload to lookaside cache")
-        f = FedPKG(fas_username=self.fas_user, directory=self.local_project.working_dir)
+        f = FedPKG(
+            fas_username=self.config.fas_user, directory=self.local_project.working_dir
+        )
         f.init_ticket(self.config.keytab_path)
         try:
             f.new_sources(sources=archive_path)

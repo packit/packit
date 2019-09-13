@@ -28,14 +28,8 @@ from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
+from packit.utils import is_a_git_ref, run_command
 from rebasehelper.exceptions import RebaseHelperError
-
-try:
-    # ogr < 0.5
-    from ogr import GithubService
-except ImportError:
-    # ogr >= 0.5
-    from ogr.services.github import GithubService
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -48,7 +42,6 @@ from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.local_project import LocalProject
-from packit.utils import run_command, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -64,59 +57,30 @@ class Upstream(PackitRepositoryBase):
         :param package_config: configuration of the upstream project
         :param local_project: public offender
         """
-        self.local_project = local_project
+        self._local_project = local_project
         super().__init__(config=config, package_config=package_config)
         self.config = config
         self.package_config = package_config
 
-        self.github_token = self.config.github_token
-        self.upstream_project_url: str = self.package_config.upstream_project_url
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
-        self.set_local_project()
+
+    @property
+    def local_project(self):
+        if self._local_project.git_project is None:
+            if not self.package_config.upstream_project_url:
+                raise PackitException(
+                    "Please, set 'upstream_project_url' in your config file."
+                )
+
+            self._local_project.git_project = self.config.get_project(
+                url=self.package_config.upstream_project_url
+            )
+            # self._local_project.refresh_the_arguments()
+        return self._local_project
 
     @property
     def active_branch(self) -> str:
         return self.local_project.ref
-
-    def set_local_project(self):
-        """ update self.local_project """
-        # TODO: in order to support any git forge here, ogr should also have a method like this:
-        #       get_github_service_from_url(url, **kwargs):
-        #       ogr should guess the forge based on the url; kwargs should be passed to the
-        #       constructor in order to support the above
-        if not self.local_project.git_service:
-            if self.config.github_app_cert_path:
-                private_key = Path(self.config.github_app_cert_path).read_text()
-            else:
-                private_key = None
-            self.local_project.git_service = GithubService(
-                token=self.config.github_token,
-                github_app_id=self.config.github_app_id,
-                github_app_private_key=private_key,
-            )
-            self.local_project.refresh_the_arguments()  # get git project from newly set git service
-
-        if not self.local_project.repo_name:
-            # will this ever happen?
-            self.local_project.repo_name = self.package_config.downstream_package_name
-
-    def checkout_pr(self, pr_id: int) -> None:
-        """
-        Checkout the branch for the pr.
-
-        TODO: Move this to ogr and make it compatible with other git forges.
-        """
-        self.local_project.git_repo.remote().fetch(
-            refspec=f"pull/{pr_id}/head:pull/{pr_id}"
-        )
-        self.local_project.git_repo.refs[f"pull/{pr_id}"].checkout()
-
-    def checkout_release(self, version: str) -> None:
-        logger.info("Checking out upstream version %s", version)
-        try:
-            self.local_project.git_repo.git.checkout(version)
-        except Exception as ex:
-            raise PackitException(f"Cannot checkout release tag: {ex}.")
 
     def get_commits_to_upstream(
         self, upstream: str, add_usptream_head_commit=False
@@ -229,11 +193,6 @@ class Upstream(PackitRepositoryBase):
         Create upstream pull request using the requested branches
         """
         project = self.local_project.git_project
-
-        if not self.github_token:
-            raise PackitException(
-                "Please provide GITHUB_TOKEN as an environment variable."
-            )
 
         if self.local_project.git_project.is_fork:
             source_branch = f"{project.namespace}:{source_branch}"

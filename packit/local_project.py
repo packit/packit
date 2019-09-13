@@ -26,8 +26,8 @@ from contextlib import contextmanager
 from typing import Optional, Union, Iterable
 
 import git
-from ogr.abstract import GitProject, GitService
 
+from ogr.abstract import GitProject, GitService
 from packit.exceptions import PackitException
 from packit import utils
 from packit.utils import is_git_repo, get_repo, is_a_git_ref
@@ -216,7 +216,7 @@ class LocalProject:
         return False
 
     def _parse_git_service_from_git_project(self):
-        if self.git_project and not self.git_service and not self.offline:
+        if (self.git_project is not None) and not self.git_service and not self.offline:
             self.git_service = self.git_project.service
             return True
         return False
@@ -318,6 +318,13 @@ class LocalProject:
         rem.fetch(f"{remote_ref}:{local_ref}")
         self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
         self.git_repo.branches[local_branch].checkout()
+
+    def checkout_release(self, version: str) -> None:
+        logger.info("Checking out upstream version %s", version)
+        try:
+            self.git_repo.git.checkout(version)
+        except Exception as ex:
+            raise PackitException(f"Cannot checkout release tag: {ex}.")
 
     def push(
         self, refspec: str, remote_name: str = "origin", force: bool = False

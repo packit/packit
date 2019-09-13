@@ -25,16 +25,19 @@ import logging
 import os
 import warnings
 from enum import Enum
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from pprint import pformat
-from typing import Optional, List, Dict, Union
+from typing import Optional, List, Dict, Set, Union
 
 import click
 from jsonschema import Draft4Validator, ValidationError
+from lazy_object_proxy import Proxy
 from yaml import safe_load
 
-from ogr.abstract import GitProject
+from ogr import GithubService, get_instances_from_dict, PagureService, get_project
+from ogr.abstract import GitProject, GitService
+from ogr.exceptions import OgrException
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL, SANDCASTLE_WORK_DIR
 from packit.exceptions import (
@@ -78,13 +81,10 @@ class Config(BaseConfig):
         self.fas_user: Optional[str] = None
         self.keytab_path: Optional[str] = None
 
-        self.github_app_id: Optional[str] = None
-        self.github_app_cert_path: Optional[str] = None
-        self._github_token: str = ""
         self.webhook_secret: str = ""
-
-        self._pagure_user_token: str = ""
         self.dry_run: bool = False
+
+        self.services: Set[GitService] = set()
 
         # %%% ACTIONS HANDLER CONFIGURATION %%%
         # these values are specific to packit service when we run actions in a sandbox
@@ -139,15 +139,7 @@ class Config(BaseConfig):
         config.dry_run = raw_dict.get("dry_run", False)
         config.fas_user = raw_dict.get("fas_user", None)
         config.keytab_path = raw_dict.get("keytab_path", None)
-        config._github_token = raw_dict.get("github_token", "")
-        config._pagure_user_token = raw_dict.get("pagure_user_token", "")
-        if raw_dict.get("pagure_fork_token"):
-            warnings.warn(
-                "packit no longer accepts 'pagure_fork_token'"
-                " value (https://github.com/packit-service/packit/issues/495)"
-            )
-        config.github_app_id = raw_dict.get("github_app_id", "")
-        config.github_app_cert_path = raw_dict.get("github_app_cert_path", "")
+
         config.webhook_secret = raw_dict.get("webhook_secret", "")
 
         config.command_handler = RunCommandType.local
@@ -168,21 +160,64 @@ class Config(BaseConfig):
             "command_handler_k8s_namespace", "myproject"
         )
 
+        config.services = Config.load_authentication(raw_dict)
         return config
 
-    @property
-    def github_token(self) -> str:
-        token = os.getenv("GITHUB_TOKEN", "")
-        if token:
-            return token
-        return self._github_token
+    @staticmethod
+    def load_authentication(raw_dict):
+        services = set()
+        if "authentication" in raw_dict:
+            services = get_instances_from_dict(instances=raw_dict["authentication"])
+        else:
+            logger.warning(
+                "Please, "
+                "use 'authentication' key in the user configuration "
+                "to set tokens for GitHub and Pagure. "
+                "New method supports more services and direct keys will be removed in the future.\n"
+                "Example:\n"
+                "authentication:\n"
+                "    github.com:\n"
+                "        token: GITHUB_TOKEN\n"
+                "    pagure:\n"
+                "        token: PAGURE_TOKEN\n"
+                '        instance_url: "https://src.fedoraproject.org"\n'
+            )
+            github_app_id = raw_dict.get("github_app_id")
+            github_app_cert_path = raw_dict.get("github_app_cert_path")
+            github_token = raw_dict.get("github_token")
+            services.add(
+                GithubService(
+                    token=github_token,
+                    github_app_id=github_app_id,
+                    github_app_private_key_path=github_app_cert_path,
+                )
+            )
+            pagure_user_token = raw_dict.get("pagure_user_token")
+            if raw_dict.get("pagure_fork_token"):
+                warnings.warn(
+                    "packit no longer accepts 'pagure_fork_token'"
+                    " value (https://github.com/packit-service/packit/issues/495)"
+                )
+            services.add(
+                PagureService(
+                    token=pagure_user_token,
+                    instance_url="https://src.fedoraproject.org",
+                )
+            )
 
-    @property
-    def pagure_user_token(self) -> str:
-        token = os.getenv("PAGURE_USER_TOKEN", "")
-        if token:
-            return token
-        return self._pagure_user_token
+        return services
+
+    def _get_project(self, url: str) -> GitProject:
+        try:
+            project = get_project(url=url, custom_instances=self.services)
+        except OgrException as ex:
+            msg = f"Authentication for url '{url}' is missing in the config."
+            logger.warning(msg)
+            raise PackitConfigException(msg, ex)
+        return project
+
+    def get_project(self, url: str) -> GitProject:
+        return Proxy(partial(self._get_project, url))
 
 
 pass_config = click.make_pass_decorator(Config)
