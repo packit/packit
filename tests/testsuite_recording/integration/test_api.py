@@ -1,4 +1,7 @@
 import os
+
+import git
+
 from packit.api import PackitAPI
 from subprocess import check_output
 from flexmock import flexmock
@@ -15,7 +18,8 @@ class ProposeUpdate(PackitUnittestOgr):
         self.api._dg = self.dg
         # Do not upload package, because no credentials given in CI
         flexmock(self.api).should_receive("_handle_sources").and_return(None)
-        flexmock(self.api.dg).should_receive("push_to_fork").and_return(None)
+        flexmock(self.api.dg).should_receive("push").and_return(None)
+        flexmock(git.HEAD).should_receive("commit").and_return("hash-of-some-commit")
         self.set_git_user()
 
     def test_propose_update(self):
