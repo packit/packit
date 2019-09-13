@@ -3,6 +3,7 @@ synced_files:
   - cockpit-ostree.spec
 upstream_project_name: cockpit-ostree
 downstream_package_name: cockpit-ostree
+upstream_project_url: "https://github.com/cockpit-project/cockpit-ostree"
 actions:
   post-upstream-clone: make cockpit-ostree.spec
   create-archive: make dist-gzip

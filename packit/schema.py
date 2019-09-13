@@ -77,5 +77,6 @@ USER_CONFIG_SCHEMA = {
         "github_app_installation_id": {"type": "string"},
         "github_app_id": {"type": "string"},
         "github_app_cert_path": {"type": "string"},
+        "authentication": {"type": "object"},
     },
 }
