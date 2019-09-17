@@ -483,6 +483,10 @@ class Upstream(PackitRepositoryBase):
         """
         In order to create a SRPM from current git checkout, we need to have the spec reference
         the tarball and unpack it. This method updates the spec so it's possible.
+
+        :param archive: relative path to the archive: used as Source0
+        :param version: version to set in the spec
+        :param commit: commit to set in the changelog
         """
         for line in self.specfile.spec_content.section("%package"):
             if line.startswith(self.package_config.spec_source_id):
@@ -519,6 +523,10 @@ class Upstream(PackitRepositoryBase):
             new_setup_line += args_match.group(2)
         else:
             new_setup_line += m[2]
+        if not self.package_config.upstream_project_name:
+            raise PackitException(
+                f'"upstream_project_name" is not set: unable to fix the spec file; please set it.'
+            )
         new_setup_line += f" -n {self.package_config.upstream_project_name}-{version}"
 
         logger.debug(
