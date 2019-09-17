@@ -180,6 +180,16 @@ def test_create_uncommon_archive(upstream_instance):
         ups.create_archive()
 
 
+def test_fix_spec(upstream_instance):
+    u, ups = upstream_instance
+
+    ups.package_config.upstream_project_name = None
+    with pytest.raises(PackitException) as ex:
+        ups.fix_spec("asd.tar.gz", "1.2.3", "abcdef123")
+
+    assert '"upstream_project_name" is not set' in str(ex.value)
+
+
 def test_create_srpm(upstream_instance, tmpdir):
     u, ups = upstream_instance
 

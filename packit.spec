@@ -22,6 +22,7 @@ BuildRequires:  python3-pyyaml
 BuildRequires:  python3-tabulate
 BuildRequires:  python3-cccolutils
 BuildRequires:  python3-koji
+BuildRequires:  python3-lazy-object-proxy
 BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
