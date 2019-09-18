@@ -79,6 +79,32 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
         assert "0.1.0" in changelog
 
 
+def test_basic_local_update_using_distgit(
+    upstream_n_distgit, mock_remote_functionality_upstream
+):
+    """ basic propose-update test: mock remote API, use local upstream and dist-git """
+    u, d = upstream_n_distgit
+
+    with cwd(d):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(d))
+        pc.upstream_project_url = str(u)
+        pc.dist_git_clone_path = str(d)
+        dg_lp = LocalProject(working_dir=str(d))
+        api = PackitAPI(config=c, package_config=pc, downstream_local_project=dg_lp)
+        api.sync_release("master", "0.1.0")
+
+        assert (d / TARBALL_NAME).is_file()
+        spec = get_specfile(str(d / "beer.spec"))
+        assert spec.get_version() == "0.1.0"
+        assert (d / "README.packit").is_file()
+        # assert that we have changelog entries for both versions
+        changelog = "\n".join(spec.spec_content.section("%changelog"))
+        assert "0.0.0" in changelog
+        assert "0.1.0" in changelog
+
+
 def test_basic_local_update_direct_push(
     upstream_distgit_remotes, mock_remote_functionality_upstream
 ):
@@ -93,6 +119,33 @@ def test_basic_local_update_direct_push(
         pc.dist_git_clone_path = str(distgit)
         up_lp = LocalProject(working_dir=str(upstream))
         api = PackitAPI(config=c, package_config=pc, upstream_local_project=up_lp)
+        api.sync_release("master", "0.1.0", create_pr=False)
+
+        remote_dir_clone = Path(f"{distgit_remote}-clone")
+        subprocess.check_call(
+            ["git", "clone", distgit_remote, str(remote_dir_clone)],
+            cwd=str(remote_dir_clone.parent),
+        )
+
+        spec = get_specfile(str(remote_dir_clone / "beer.spec"))
+        assert spec.get_version() == "0.1.0"
+        assert (remote_dir_clone / "README.packit").is_file()
+
+
+def test_basic_local_update_direct_push_using_distgit(
+    upstream_distgit_remotes, mock_remote_functionality_upstream
+):
+    """ basic propose-update test: mock remote API, use local upstream and dist-git """
+    upstream, distgit, _, distgit_remote = upstream_distgit_remotes
+
+    with cwd(distgit):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(upstream))
+        pc.upstream_project_url = str(upstream)
+        pc.dist_git_clone_path = str(distgit)
+        dg_lp = LocalProject(working_dir=str(distgit))
+        api = PackitAPI(config=c, package_config=pc, downstream_local_project=dg_lp)
         api.sync_release("master", "0.1.0", create_pr=False)
 
         remote_dir_clone = Path(f"{distgit_remote}-clone")
