@@ -80,10 +80,10 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
 
 
 def test_basic_local_update_direct_push(
-    upstream_distgit_remote, mock_remote_functionality_upstream
+    upstream_distgit_remotes, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    upstream, distgit, remote_dir = upstream_distgit_remote
+    upstream, distgit, _, distgit_remote = upstream_distgit_remotes
 
     with cwd(upstream):
         c = get_test_config()
@@ -92,12 +92,12 @@ def test_basic_local_update_direct_push(
         pc.upstream_project_url = str(upstream)
         pc.dist_git_clone_path = str(distgit)
         up_lp = LocalProject(working_dir=str(upstream))
-        api = PackitAPI(c, pc, up_lp)
+        api = PackitAPI(config=c, package_config=pc, upstream_local_project=up_lp)
         api.sync_release("master", "0.1.0", create_pr=False)
 
-        remote_dir_clone = Path(f"{remote_dir}-clone")
+        remote_dir_clone = Path(f"{distgit_remote}-clone")
         subprocess.check_call(
-            ["git", "clone", remote_dir, str(remote_dir_clone)],
+            ["git", "clone", distgit_remote, str(remote_dir_clone)],
             cwd=str(remote_dir_clone.parent),
         )
 
