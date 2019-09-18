@@ -490,9 +490,12 @@ class PackitAPI:
                 self.up.fix_spec(
                     archive=archive, version=current_git_describe_version, commit=commit
                 )
-            source_dir = Path(self.up.local_project.working_dir).relative_to(
-                relative_to
-            )
+            if self.up.local_project.working_dir.startswith(str(relative_to)):
+                source_dir = Path(self.up.local_project.working_dir).relative_to(
+                    relative_to
+                )
+            else:
+                source_dir = Path(self.up.local_project.working_dir)
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
         )
