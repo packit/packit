@@ -141,7 +141,7 @@ def test_basic_local_update_direct_push_using_distgit(
     with cwd(distgit):
         c = get_test_config()
 
-        pc = get_local_package_config(str(upstream))
+        pc = get_local_package_config(str(distgit))
         pc.upstream_project_url = str(upstream)
         pc.dist_git_clone_path = str(distgit)
         dg_lp = LocalProject(working_dir=str(distgit))
