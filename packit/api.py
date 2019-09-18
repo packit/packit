@@ -31,6 +31,7 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
+from pkg_resources import get_distribution
 
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException
@@ -216,7 +217,11 @@ class PackitAPI:
             path = os.path.join(self.dg.local_project.working_dir, "README.packit")
             logger.debug(f"Path of README {path}")
             with open(path, "w") as f:
-                f.write(SYNCING_NOTE)
+                f.write(
+                    SYNCING_NOTE.format(
+                        packit_version=get_distribution("packitos").version
+                    )
+                )
 
             if self.up.with_action(action=ActionName.prepare_files):
                 raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
