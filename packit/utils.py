@@ -193,7 +193,9 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
     return repo
 
 
-def get_namespace_and_repo_name(url: str) -> Tuple[str, str]:
+def get_namespace_and_repo_name(url: str) -> Tuple[Optional[str], str]:
+    if Path(url).exists():
+        return None, Path(url).name
     url = url.strip("/")
     try:
         if url.endswith(".git"):
