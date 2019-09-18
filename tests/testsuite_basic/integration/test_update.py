@@ -177,3 +177,24 @@ def test_basic_local_update_from_downstream(
         assert (u / "beer.spec").is_file()
         spec = get_specfile(str(u / "beer.spec"))
         assert spec.get_version() == "0.0.0"
+
+
+def test_basic_local_update_from_downstream_using_distgit(
+    downstream_n_distgit, mock_downstream_remote_functionality
+):
+    flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
+    u, d = downstream_n_distgit
+
+    with cwd(d):
+        c = get_test_config()
+        pc = get_local_package_config(str(d))
+        pc.upstream_project_url = str(u)
+        pc.dist_git_clone_path = str(d)
+        dg_lp = LocalProject(working_dir=str(d))
+        api = PackitAPI(config=c, package_config=pc, downstream_local_project=dg_lp)
+        api.sync_from_downstream("master", "master", True)
+
+        cloned_upstream = Path(api.up.local_project.working_dir)
+        assert (cloned_upstream / "beer.spec").is_file()
+        spec = get_specfile(str(cloned_upstream / "beer.spec"))
+        assert spec.get_version() == "0.0.0"
