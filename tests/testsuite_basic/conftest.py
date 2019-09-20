@@ -21,10 +21,8 @@
 # SOFTWARE.
 
 import datetime
-import os
 import shutil
 import subprocess
-from os import chdir
 from pathlib import Path
 from typing import Tuple
 
@@ -37,6 +35,7 @@ from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService
 from packit.api import PackitAPI
+from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
@@ -288,19 +287,11 @@ def api_instance(upstream_and_remote, distgit_and_remote):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
 
-    # we need to chdir(u) because when PackageConfig is created,
-    # it already expects it's in the correct directory
-    old_cwd = os.getcwd()
-    chdir(str(u))
     c = get_test_config()
-
-    pc = get_local_package_config(str(u))
-    pc.upstream_project_url = str(u)
-    up_lp = LocalProject(working_dir=str(u))
-
-    api = PackitAPI(c, pc, up_lp)
-    yield u, d, api
-    chdir(old_cwd)
+    api = get_packit_api(
+        config=c, local_project=LocalProject(working_dir=str(Path.cwd()))
+    )
+    return u, d, api
 
 
 @pytest.fixture()
@@ -383,3 +374,21 @@ def upstream_without_config(tmpdir):
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote)
 
     return u_remote
+
+
+@pytest.fixture(params=["upstream", "distgit"])
+def cwd_upstream_or_distgit(request, upstream_and_remote, distgit_and_remote):
+    """
+    Run the code once from upstream and once from distgit directory.
+
+    When using be careful to
+        - specify this fixture in the right place
+        (the order of the parameters means order of the execution)
+        - to not overwrite the cwd in the other fixture or in the test itself
+    """
+    cwd_path = {"upstream": upstream_and_remote[0], "distgit": distgit_and_remote[0]}[
+        request.param
+    ]
+
+    with cwd(cwd_path):
+        yield cwd_path

@@ -24,11 +24,7 @@ import pytest
 from flexmock import flexmock
 from munch import Munch
 
-from packit.api import PackitAPI
-from packit.config import get_local_package_config
-from packit.local_project import LocalProject
-from packit.utils import cwd
-from tests.testsuite_basic.spellbook import get_test_config, can_a_module_be_imported
+from tests.testsuite_basic.spellbook import can_a_module_be_imported
 
 
 @pytest.fixture()
@@ -414,26 +410,16 @@ def request_response():
     not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
 )
 def test_push_updates(
-    upstream_and_remote, distgit_and_remote, query_response, request_response
+    cwd_upstream_or_distgit, api_instance, query_response, request_response
 ):
     from bodhi.client.bindings import BodhiClient
 
-    u, _ = upstream_and_remote
-    d, _ = distgit_and_remote
-    with cwd(u):
-        c = get_test_config()
+    u, d, api = api_instance
 
-        pc = get_local_package_config(str(u))
-        pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
-        up_lp = LocalProject(working_dir=str(u))
+    flexmock(BodhiClient)
+    BodhiClient.should_receive("query").and_return(query_response).once()
+    BodhiClient.should_receive("request").with_args(
+        update="FEDORA-2019-89c99f680c", request="stable"
+    ).and_return(request_response).once()
 
-        api = PackitAPI(c, pc, up_lp)
-
-        flexmock(BodhiClient)
-        BodhiClient.should_receive("query").and_return(query_response).once()
-        BodhiClient.should_receive("request").with_args(
-            update="FEDORA-2019-89c99f680c", request="stable"
-        ).and_return(request_response).once()
-
-        api.push_updates()
+    api.push_updates()
