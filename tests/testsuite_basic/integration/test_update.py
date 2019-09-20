@@ -25,11 +25,8 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 
-from packit.api import PackitAPI
-from packit.config import get_local_package_config
 from packit.local_project import LocalProject
-from packit.utils import cwd
-from tests.testsuite_basic.spellbook import TARBALL_NAME, get_test_config
+from tests.testsuite_basic.spellbook import TARBALL_NAME
 from tests.testsuite_basic.utils import get_specfile
 
 
@@ -56,153 +53,74 @@ def github_release_webhook():
 
 
 def test_basic_local_update(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    u, _ = upstream_and_remote
-    d, _ = distgit_and_remote
 
-    with cwd(u):
-        c = get_test_config()
+    u, d, api = api_instance
 
-        pc = get_local_package_config(str(u))
-        pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
-        up_lp = LocalProject(working_dir=str(u))
-        api = PackitAPI(c, pc, up_lp)
-        api.sync_release("master", "0.1.0")
+    api.sync_release("master", "0.1.0")
 
-        assert (d / TARBALL_NAME).is_file()
-        spec = get_specfile(str(d / "beer.spec"))
-        assert spec.get_version() == "0.1.0"
-        assert (d / "README.packit").is_file()
-        # assert that we have changelog entries for both versions
-        changelog = "\n".join(spec.spec_content.section("%changelog"))
-        assert "0.0.0" in changelog
-        assert "0.1.0" in changelog
+    assert (d / TARBALL_NAME).is_file()
+    spec = get_specfile(str(d / "beer.spec"))
+    assert spec.get_version() == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
 
 
 def test_basic_local_update_using_distgit(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    u, _ = upstream_and_remote
-    d, _ = distgit_and_remote
+    u, d, api = api_instance
 
-    with cwd(d):
-        c = get_test_config()
+    api.sync_release("master", "0.1.0")
 
-        pc = get_local_package_config(str(d))
-        pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
-        dg_lp = LocalProject(working_dir=str(d))
-        api = PackitAPI(config=c, package_config=pc, downstream_local_project=dg_lp)
-        api.sync_release("master", "0.1.0")
-
-        assert (d / TARBALL_NAME).is_file()
-        spec = get_specfile(str(d / "beer.spec"))
-        assert spec.get_version() == "0.1.0"
-        assert (d / "README.packit").is_file()
-        # assert that we have changelog entries for both versions
-        changelog = "\n".join(spec.spec_content.section("%changelog"))
-        assert "0.0.0" in changelog
-        assert "0.1.0" in changelog
+    assert (d / TARBALL_NAME).is_file()
+    spec = get_specfile(str(d / "beer.spec"))
+    assert spec.get_version() == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
 
 
 def test_basic_local_update_direct_push(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
+    u, d, api = api_instance
+    _, distgit_remote = distgit_and_remote
 
-    upstream, _ = upstream_and_remote
-    distgit, distgit_remote = distgit_and_remote
+    api.sync_release("master", "0.1.0", create_pr=False)
 
-    with cwd(upstream):
-        c = get_test_config()
+    remote_dir_clone = Path(f"{distgit_remote}-clone")
+    subprocess.check_call(
+        ["git", "clone", distgit_remote, str(remote_dir_clone)],
+        cwd=str(remote_dir_clone.parent),
+    )
 
-        pc = get_local_package_config(str(upstream))
-        pc.upstream_project_url = str(upstream)
-        pc.dist_git_clone_path = str(distgit)
-        up_lp = LocalProject(working_dir=str(upstream))
-        api = PackitAPI(config=c, package_config=pc, upstream_local_project=up_lp)
-        api.sync_release("master", "0.1.0", create_pr=False)
-
-        remote_dir_clone = Path(f"{distgit_remote}-clone")
-        subprocess.check_call(
-            ["git", "clone", distgit_remote, str(remote_dir_clone)],
-            cwd=str(remote_dir_clone.parent),
-        )
-
-        spec = get_specfile(str(remote_dir_clone / "beer.spec"))
-        assert spec.get_version() == "0.1.0"
-        assert (remote_dir_clone / "README.packit").is_file()
-
-
-def test_basic_local_update_direct_push_using_distgit(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
-):
-    """ basic propose-update test: mock remote API, use local upstream and dist-git """
-
-    upstream, _ = upstream_and_remote
-    distgit, distgit_remote = distgit_and_remote
-
-    with cwd(distgit):
-        c = get_test_config()
-
-        pc = get_local_package_config(str(distgit))
-        pc.upstream_project_url = str(upstream)
-        pc.dist_git_clone_path = str(distgit)
-        dg_lp = LocalProject(working_dir=str(distgit))
-        api = PackitAPI(config=c, package_config=pc, downstream_local_project=dg_lp)
-        api.sync_release("master", "0.1.0", create_pr=False)
-
-        remote_dir_clone = Path(f"{distgit_remote}-clone")
-        subprocess.check_call(
-            ["git", "clone", distgit_remote, str(remote_dir_clone)],
-            cwd=str(remote_dir_clone.parent),
-        )
-
-        spec = get_specfile(str(remote_dir_clone / "beer.spec"))
-        assert spec.get_version() == "0.1.0"
-        assert (remote_dir_clone / "README.packit").is_file()
+    spec = get_specfile(str(remote_dir_clone / "beer.spec"))
+    assert spec.get_version() == "0.1.0"
+    assert (remote_dir_clone / "README.packit").is_file()
 
 
 def test_basic_local_update_from_downstream(
-    downstream_n_distgit, mock_downstream_remote_functionality
+    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
 ):
     flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
-    u, d = downstream_n_distgit
+    u, d, api = api_instance
 
-    with cwd(u):
-        c = get_test_config()
-        pc = get_local_package_config(str(u))
-        pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
-        up_lp = LocalProject(working_dir=str(u))
-        api = PackitAPI(c, pc, up_lp)
-        api.sync_from_downstream("master", "master", True)
+    api.sync_from_downstream("master", "master", True)
 
-        assert (u / "beer.spec").is_file()
-        spec = get_specfile(str(u / "beer.spec"))
-        assert spec.get_version() == "0.0.0"
-
-
-def test_basic_local_update_from_downstream_using_distgit(
-    downstream_n_distgit, mock_downstream_remote_functionality
-):
-    flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
-    u, d = downstream_n_distgit
-
-    with cwd(d):
-        c = get_test_config()
-        pc = get_local_package_config(str(d))
-        pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
-        dg_lp = LocalProject(working_dir=str(d))
-        api = PackitAPI(config=c, package_config=pc, downstream_local_project=dg_lp)
-        api.sync_from_downstream("master", "master", True)
-
-        cloned_upstream = Path(api.up.local_project.working_dir)
-        assert (cloned_upstream / "beer.spec").is_file()
-        spec = get_specfile(str(cloned_upstream / "beer.spec"))
-        assert spec.get_version() == "0.0.0"
+    new_upstream = Path(api.up.local_project.working_dir)
+    assert (new_upstream / "beer.spec").is_file()
+    spec = get_specfile(str(new_upstream / "beer.spec"))
+    assert spec.get_version() == "0.0.0"

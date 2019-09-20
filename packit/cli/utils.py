@@ -119,10 +119,12 @@ def get_packit_api(
             and package_config.upstream_project_url in url
         ):
             lp_upstream = local_project
+            logger.debug("Input directory is an upstream repository.")
             break
 
         if package_config.dist_git_base_url in url:
             lp_downstream = local_project
+            logger.debug("Input directory is a downstream repository.")
             break
     else:
         logger.warning(

@@ -20,10 +20,7 @@ def test_generate_pass(upstream_without_config):
     assert (u / ".packit.yaml").is_file()
 
 
-def test_generate_fail(upstream_and_remote):
-    u, _ = upstream_and_remote
-    chdir(str(u))
-
+def test_generate_fail(cwd_upstream_or_distgit):
     # This test requires packit on pythonpath
     result = call_packit(parameters=["generate"])
 
