@@ -5,12 +5,12 @@ from git import PushInfo
 from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
+from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
 from packit.config import PackageConfig, Config, RunCommandType
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
-from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
 from tests.testsuite_basic.spellbook import can_a_module_be_imported
 
 
@@ -224,8 +224,9 @@ def test_get_output_from_action_not_defined(packit_repository_base):
     assert result is None
 
 
-def test_base_push_bad(upstream_distgit_remote):
-    _, distgit, _ = upstream_distgit_remote
+def test_base_push_bad(distgit_and_remote):
+    distgit, _ = distgit_and_remote
+
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
         working_dir=str(distgit), git_url="https://github.com/packit-service/lol"
@@ -241,8 +242,9 @@ def test_base_push_bad(upstream_distgit_remote):
     assert "unable to push" in str(e.value)
 
 
-def test_base_push_good(upstream_distgit_remote):
-    _, distgit, _ = upstream_distgit_remote
+def test_base_push_good(distgit_and_remote):
+    distgit, _ = distgit_and_remote
+
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
         working_dir=str(distgit), git_url="https://github.com/packit-service/lol"

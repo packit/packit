@@ -30,7 +30,7 @@ from packit.security import CommitVerifier
 from tests.testsuite_basic.utils import remove_gpg_key_pair
 
 
-def test_allowed_gpg_keys_none(sourcegit_n_distgit, api_instance_source_git: PackitAPI):
+def test_allowed_gpg_keys_none(api_instance_source_git: PackitAPI):
     api_instance_source_git.up.allowed_gpg_keys = None
     flexmock(CommitVerifier).should_receive("check_signature_of_commit").times(0)
     api_instance_source_git.up.check_last_commit()
@@ -38,10 +38,7 @@ def test_allowed_gpg_keys_none(sourcegit_n_distgit, api_instance_source_git: Pac
 
 @pytest.mark.parametrize("allowed_gpg_keys", [[], ["abcd", "efgh"]])
 def test_allowed_gpg_keys_not_allowed(
-    allowed_gpg_keys,
-    sourcegit_n_distgit,
-    api_instance_source_git: PackitAPI,
-    gnupg_key_fingerprint: str,
+    allowed_gpg_keys, api_instance_source_git: PackitAPI, gnupg_key_fingerprint: str
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
         message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
@@ -54,7 +51,7 @@ def test_allowed_gpg_keys_not_allowed(
 
 
 def test_allowed_gpg_keys_allowed(
-    sourcegit_n_distgit, api_instance_source_git: PackitAPI, gnupg_key_fingerprint: str
+    api_instance_source_git: PackitAPI, gnupg_key_fingerprint: str
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
         message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
@@ -65,10 +62,7 @@ def test_allowed_gpg_keys_allowed(
 
 
 def test_allowed_gpg_keys_not_existing_key(
-    sourcegit_n_distgit,
-    api_instance_source_git: PackitAPI,
-    gnupg_instance: GPG,
-    gnupg_key_fingerprint: str,
+    api_instance_source_git: PackitAPI, gnupg_instance: GPG, gnupg_key_fingerprint: str
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
         message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True

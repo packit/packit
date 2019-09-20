@@ -55,9 +55,12 @@ def github_release_webhook():
     }
 
 
-def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstream):
+def test_basic_local_update(
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    u, d = upstream_n_distgit
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
 
     with cwd(u):
         c = get_test_config()
@@ -80,10 +83,11 @@ def test_basic_local_update(upstream_n_distgit, mock_remote_functionality_upstre
 
 
 def test_basic_local_update_using_distgit(
-    upstream_n_distgit, mock_remote_functionality_upstream
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    u, d = upstream_n_distgit
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
 
     with cwd(d):
         c = get_test_config()
@@ -106,10 +110,12 @@ def test_basic_local_update_using_distgit(
 
 
 def test_basic_local_update_direct_push(
-    upstream_distgit_remotes, mock_remote_functionality_upstream
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    upstream, distgit, _, distgit_remote = upstream_distgit_remotes
+
+    upstream, _ = upstream_and_remote
+    distgit, distgit_remote = distgit_and_remote
 
     with cwd(upstream):
         c = get_test_config()
@@ -133,10 +139,12 @@ def test_basic_local_update_direct_push(
 
 
 def test_basic_local_update_direct_push_using_distgit(
-    upstream_distgit_remotes, mock_remote_functionality_upstream
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-    upstream, distgit, _, distgit_remote = upstream_distgit_remotes
+
+    upstream, _ = upstream_and_remote
+    distgit, distgit_remote = distgit_and_remote
 
     with cwd(distgit):
         c = get_test_config()
