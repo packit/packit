@@ -1,7 +1,10 @@
 import unittest
 from os import chdir
 
-from tests.testsuite_basic.spellbook import call_packit
+from tests.testsuite_basic.spellbook import (
+    call_packit,
+    call_real_packit_and_return_exit_code,
+)
 
 
 # TODO: fix the test
@@ -21,7 +24,8 @@ def test_generate_pass(upstream_without_config):
 
 
 def test_generate_fail(cwd_upstream_or_distgit):
-    # This test requires packit on pythonpath
-    result = call_packit(parameters=["generate"])
+    result = call_real_packit_and_return_exit_code(
+        parameters=["generate"], cwd=str(cwd_upstream_or_distgit)
+    )
 
-    assert result.exit_code == 2  # packit config already exists --force needed
+    assert result == 2  # packit config already exists --force needed

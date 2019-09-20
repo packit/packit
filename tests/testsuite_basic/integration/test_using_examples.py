@@ -23,7 +23,6 @@
 """
 E2E tests which utilize cockpit projects
 """
-import shutil
 from pathlib import Path
 
 import pytest
@@ -37,24 +36,25 @@ from tests.testsuite_basic.spellbook import (
     get_test_config,
     build_srpm,
     UP_SNAPD,
+    UP_OSBUILD,
 )
 
 
-@pytest.fixture()
-def snapd(tmpdir):
+@pytest.fixture(params=[(UP_SNAPD, "2.41"), (UP_OSBUILD, "2")])
+def example_upstream(request, tmpdir):
+    example_path, tag = request.param
     t = Path(str(tmpdir))
     u = t / "up"
-    shutil.copytree(UP_SNAPD, u)
-    initiate_git_repo(u, tag="2.41")
+    initiate_git_repo(u, tag=tag, copy_from=example_path)
     return u
 
 
-def test_srpm_snapd(snapd):
-    pc = get_local_package_config(str(snapd))
-    up_lp = LocalProject(working_dir=str(snapd))
+def test_srpm_on_example(example_upstream):
+    pc = get_local_package_config(str(example_upstream))
+    up_lp = LocalProject(working_dir=str(example_upstream))
     c = get_test_config()
     api = PackitAPI(c, pc, up_lp)
-    with cwd(snapd):
+    with cwd(example_upstream):
         path = api.create_srpm()
     assert path.exists()
     build_srpm(path)
