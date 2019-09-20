@@ -1,5 +1,5 @@
-from os import chdir
 import unittest
+from os import chdir
 
 from tests.testsuite_basic.spellbook import call_packit
 
@@ -20,9 +20,9 @@ def test_generate_pass(upstream_without_config):
     assert (u / ".packit.yaml").is_file()
 
 
-def test_generate_fail(upstream_n_distgit):
-    u, d = upstream_n_distgit
-    chdir(u)
+def test_generate_fail(upstream_and_remote):
+    u, _ = upstream_and_remote
+    chdir(str(u))
 
     # This test requires packit on pythonpath
     result = call_packit(parameters=["generate"])

@@ -72,8 +72,9 @@ def test_srpm_twice(upstream_instance):
     build_srpm(srpm_files[0])
 
 
-def test_srpm_command_using_distgit(upstream_n_distgit):
-    u, d = upstream_n_distgit
+def test_srpm_command_using_distgit(upstream_and_remote, distgit_and_remote):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
     call_real_packit(parameters=["--debug", "srpm"], cwd=d)
     srpm_path = list(d.glob("*.src.rpm"))[0]
     assert srpm_path.exists()

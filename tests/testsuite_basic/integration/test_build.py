@@ -21,17 +21,19 @@
 # SOFTWARE.
 from flexmock import flexmock
 
+from packit import utils
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.local_project import LocalProject
-from tests.testsuite_basic.spellbook import get_test_config
 from packit.utils import cwd
+from tests.testsuite_basic.spellbook import get_test_config
 
-from packit import utils
 
-
-def test_basic_build(upstream_n_distgit, mock_remote_functionality_upstream):
-    u, d = upstream_n_distgit
+def test_basic_build(
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
 
     with cwd(u):
         c = get_test_config()
@@ -39,7 +41,7 @@ def test_basic_build(upstream_n_distgit, mock_remote_functionality_upstream):
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
         pc.dist_git_clone_path = str(d)
-        up_lp = LocalProject(working_dir=u)
+        up_lp = LocalProject(working_dir=str(u))
 
         api = PackitAPI(c, pc, up_lp)
         flexmock(utils).should_receive("run_command").with_args(

@@ -22,21 +22,23 @@
 import subprocess
 from pathlib import Path
 
+from packit.utils import cwd
 from tests.testsuite_basic.conftest import mock_spec_download_remote_s
 from tests.testsuite_basic.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
 from tests.testsuite_basic.utils import get_specfile
-from packit.utils import cwd
 
 
 def test_basic_local_update_without_patching(
-    sourcegit_n_distgit,
+    sourcegit_and_remote,
+    distgit_and_remote,
     mock_patching,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
     """ propose-update for sourcegit test: mock remote API, use local upstream and dist-git """
 
-    sourcegit, distgit = sourcegit_n_distgit
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
 
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
@@ -46,11 +48,11 @@ def test_basic_local_update_without_patching(
 
 
 def test_basic_local_update_empty_patch(
-    sourcegit_n_distgit, mock_remote_functionality_sourcegit, api_instance_source_git
+    distgit_and_remote, mock_remote_functionality_sourcegit, api_instance_source_git
 ):
     """ propose-update for sourcegit test: mock remote API, use local upstream and dist-git """
 
-    sourcegit, distgit = sourcegit_n_distgit
+    distgit, _ = distgit_and_remote
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
@@ -67,11 +69,15 @@ def test_basic_local_update_empty_patch(
 
 
 def test_basic_local_update_patch_content(
-    sourcegit_n_distgit, mock_remote_functionality_sourcegit, api_instance_source_git
+    sourcegit_and_remote,
+    distgit_and_remote,
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
 ):
     """ propose-update for sourcegit test: mock remote API, use local upstream and dist-git """
 
-    sourcegit, distgit = sourcegit_n_distgit
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
 
     source_file = sourcegit / "big-source-file.txt"
     source_file.write_text("new changes")

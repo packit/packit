@@ -81,15 +81,17 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
 
 
 @pytest.fixture()
-def mock_remote_functionality_upstream(upstream_n_distgit):
-    u, d = upstream_n_distgit
+def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
     return mock_remote_functionality(d, u)
 
 
 @pytest.fixture()
-def mock_remote_functionality_sourcegit(sourcegit_n_distgit):
-    u, d = sourcegit_n_distgit
-    return mock_remote_functionality(d, u)
+def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote):
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+    return mock_remote_functionality(upstream=sourcegit, distgit=distgit)
 
 
 def mock_spec_download_remote_s(path: Path):
@@ -174,43 +176,38 @@ def mock_patching():
 
 
 @pytest.fixture()
-def upstream_distgit_remotes(tmpdir) -> Tuple[Path, Path, Path, Path]:
+def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
     t = Path(str(tmpdir))
 
     u_remote_path = t / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
 
-    d_remote_path = t / "dist_git_remote"
-    d_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
-
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
     initiate_git_repo(u, tag="0.1.0")
+
+    return u, u_remote_path
+
+
+@pytest.fixture()
+def distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
+    t = Path(str(tmpdir))
+
+    d_remote_path = t / "dist_git_remote"
+    d_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
     initiate_git_repo(d, push=True, upstream_remote=str(d_remote_path))
     prepare_dist_git_repo(d)
 
-    return u, d, u_remote_path, d_remote_path
+    return d, d_remote_path
 
 
 @pytest.fixture()
-def upstream_distgit_remote(upstream_distgit_remotes) -> Tuple[Path, Path, Path]:
-    upstream, distgit, upstream_remote_path, _ = upstream_distgit_remotes
-    return upstream, distgit, upstream_remote_path
-
-
-@pytest.fixture()
-def upstream_n_distgit(upstream_distgit_remote):
-    upstream, distgit, _ = upstream_distgit_remote
-    return upstream, distgit
-
-
-@pytest.fixture()
-def sourcegit_n_distgit(tmpdir):
+def sourcegit_and_remote(tmpdir):
     temp_dir = Path(str(tmpdir))
 
     sourcegit_remote = temp_dir / "source_git_remote"
@@ -225,12 +222,7 @@ def sourcegit_n_distgit(tmpdir):
     )
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
-    distgit_dir = temp_dir / "dist_git"
-    shutil.copytree(DISTGIT, distgit_dir)
-    initiate_git_repo(distgit_dir, push=True, upstream_remote=str(sourcegit_remote))
-    prepare_dist_git_repo(distgit_dir)
-
-    return sourcegit_dir, distgit_dir
+    return sourcegit_dir, sourcegit_remote
 
 
 @pytest.fixture()
@@ -253,9 +245,10 @@ def downstream_n_distgit(tmpdir):
 
 
 @pytest.fixture()
-def upstream_instance(upstream_n_distgit, tmpdir):
+def upstream_instance(upstream_and_remote, distgit_and_remote, tmpdir):
     with cwd(tmpdir):
-        u, d = upstream_n_distgit
+        u, _ = upstream_and_remote
+        d, _ = distgit_and_remote
         c = get_test_config()
 
         pc = get_local_package_config(str(u))
@@ -277,8 +270,11 @@ def upstream_instance_with_two_commits(upstream_instance):
 
 
 @pytest.fixture()
-def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
-    u, d = upstream_n_distgit
+def distgit_instance(
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
     c = get_test_config()
     pc = get_local_package_config(str(u))
     pc.dist_git_clone_path = str(d)
@@ -288,8 +284,9 @@ def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
 
 
 @pytest.fixture()
-def api_instance(upstream_n_distgit):
-    u, d = upstream_n_distgit
+def api_instance(upstream_and_remote, distgit_and_remote):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
 
     # we need to chdir(u) because when PackageConfig is created,
     # it already expects it's in the correct directory
@@ -307,8 +304,9 @@ def api_instance(upstream_n_distgit):
 
 
 @pytest.fixture()
-def api_instance_source_git(sourcegit_n_distgit):
-    sourcegit, distgit = sourcegit_n_distgit
+def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
     with cwd(sourcegit):
         c = get_test_config()
         pc = get_local_package_config(str(sourcegit))

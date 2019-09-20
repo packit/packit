@@ -27,8 +27,8 @@ from munch import Munch
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.local_project import LocalProject
-from tests.testsuite_basic.spellbook import get_test_config, can_a_module_be_imported
 from packit.utils import cwd
+from tests.testsuite_basic.spellbook import get_test_config, can_a_module_be_imported
 
 
 @pytest.fixture()
@@ -281,7 +281,8 @@ def bodhi_response():
     ),
 )
 def test_basic_bodhi_update(
-    upstream_n_distgit,
+    upstream_and_remote,
+    distgit_and_remote,
     mock_remote_functionality_upstream,
     branch,
     update_type,
@@ -292,7 +293,9 @@ def test_basic_bodhi_update(
     # https://github.com/fedora-infra/bodhi/issues/3058
     from bodhi.client.bindings import BodhiClient
 
-    u, d = upstream_n_distgit
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
+
     with cwd(u):
         c = get_test_config()
 

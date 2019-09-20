@@ -27,8 +27,8 @@ from munch import Munch
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.local_project import LocalProject
-from tests.testsuite_basic.spellbook import get_test_config, can_a_module_be_imported
 from packit.utils import cwd
+from tests.testsuite_basic.spellbook import get_test_config, can_a_module_be_imported
 
 
 @pytest.fixture()
@@ -413,18 +413,20 @@ def request_response():
 @pytest.mark.skipif(
     not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
 )
-def test_push_updates(upstream_n_distgit, query_response, request_response):
-
+def test_push_updates(
+    upstream_and_remote, distgit_and_remote, query_response, request_response
+):
     from bodhi.client.bindings import BodhiClient
 
-    u, d = upstream_n_distgit
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
     with cwd(u):
         c = get_test_config()
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
         pc.dist_git_clone_path = str(d)
-        up_lp = LocalProject(working_dir=u)
+        up_lp = LocalProject(working_dir=str(u))
 
         api = PackitAPI(c, pc, up_lp)
 
