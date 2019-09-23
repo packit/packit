@@ -21,9 +21,17 @@
 # SOFTWARE.
 
 import pytest
-from packit.exceptions import PackitException
+import sys
+from flexmock import flexmock
 
-from packit.utils import get_namespace_and_repo_name, is_str_url, run_command
+from packit.exceptions import PackitException
+from packit.utils import (
+    get_namespace_and_repo_name,
+    is_str_url,
+    run_command,
+    get_packit_version,
+)
+from pkg_resources import DistributionNotFound, Distribution
 
 
 @pytest.mark.parametrize(
@@ -64,3 +72,15 @@ def test_is_str_url(inp, ok):
 
 def test_run_command_w_env():
     run_command(["bash", "-c", "env | grep PATH"], env={"X": "Y"})
+
+
+def test_get_packit_version_not_installed():
+    flexmock(sys.modules["packit.utils"]).should_receive("get_distribution").and_raise(
+        DistributionNotFound
+    )
+    assert get_packit_version() == "NOT_INSTALLED"
+
+
+def test_get_packit_version():
+    flexmock(Distribution).should_receive("version").and_return("0.1.0")
+    assert get_packit_version() == "0.1.0"

@@ -28,6 +28,7 @@ import subprocess
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
+from pkg_resources import get_distribution, DistributionNotFound
 from typing import Tuple, Any, Optional, Dict
 from urllib.parse import urlparse
 
@@ -293,3 +294,10 @@ def is_str_url(inp: str) -> bool:
         return True
     logger.warning(f"{inp} is not an URL we recognize")
     return False
+
+
+def get_packit_version() -> str:
+    try:
+        return get_distribution("packitos").version
+    except DistributionNotFound:
+        return "NOT_INSTALLED"
