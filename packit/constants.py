@@ -75,4 +75,7 @@ downstream_package_name: {downstream_package_name}
 
 SANDCASTLE_WORK_DIR = "/sandcastle"
 
-SYNCING_NOTE = "This repository is maintained by packit.\nhttps://packit.dev/\n"
+SYNCING_NOTE = (
+    "This repository is maintained by packit.\nhttps://packit.dev/\n"
+    "The file was generated using packit {packit_version}.\n"
+)

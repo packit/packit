@@ -55,6 +55,9 @@ logger = logging.getLogger("packit")
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab, dry_run):
     """Integrate upstream open source projects into Fedora operating system."""
+    packit_version = get_distribution("packitos").version
+    logger.info(f"Packit {packit_version} is being used.")
+
     c = Config.get_user_config()
     c.debug = debug or c.debug
     c.dry_run = dry_run or c.dry_run
