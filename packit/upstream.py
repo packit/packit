@@ -488,14 +488,30 @@ class Upstream(PackitRepositoryBase):
         :param version: version to set in the spec
         :param commit: commit to set in the changelog
         """
+        prefix = "Source"
+        regex = re.compile(r"^Source\s*:.+$")
         for line in self.specfile.spec_content.section("%package"):
-            if line.startswith(self.package_config.spec_source_id):
+            # we are looking for Source lines
+            if line.startswith(prefix):
+                # it's a Source line!
+                if line.startswith(self.package_config.spec_source_id):
+                    # it even matches the specific Source\d+
+                    full_name = self.package_config.spec_source_id
+                elif regex.match(line):
+                    # okay, let's try the other very common default
+                    # https://github.com/packit-service/packit/issues/536#issuecomment-534074925
+                    full_name = prefix
+                else:
+                    # nope, let's continue the search
+                    continue
+                # we found it!
                 break
         else:
             raise PackitException(
-                f"The spec file doesn't have sources set via {self.package_config.spec_source_id}"
+                "The spec file doesn't have sources set "
+                f"via {self.package_config.spec_source_id} nor {prefix}."
             )
-        self.specfile.set_tag(self.package_config.spec_source_id, archive)
+        self.specfile.set_tag(full_name, archive)
 
         prep = self.specfile.spec_content.section("%prep")
         if not prep:
