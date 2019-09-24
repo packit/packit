@@ -55,8 +55,9 @@ logger = logging.getLogger("packit")
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab, dry_run):
     """Integrate upstream open source projects into Fedora operating system."""
-    packit_version = get_distribution("packitos").version
-    logger.info(f"Packit {packit_version} is being used.")
+    if debug:
+        # to be able to logger.debug() also in get_user_config()
+        set_logging(level=logging.DEBUG)
 
     c = Config.get_user_config()
     c.debug = debug or c.debug
@@ -64,13 +65,15 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run):
     c.fas_user = fas_user or c.fas_user
     c.keytab_path = keytab or c.keytab_path
     ctx.obj = c
+
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
         set_logging(logger_name="sandcastle", level=logging.DEBUG)
-        logger.debug("logging set to DEBUG")
     else:
         set_logging(level=logging.INFO)
-        logger.debug("logging set to INFO")
+
+    packit_version = get_distribution("packitos").version
+    logger.info(f"Packit {packit_version} is being used.")
 
 
 packit_base.add_command(update)
