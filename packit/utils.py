@@ -144,6 +144,7 @@ def set_logging(
     if level != logging.NOTSET:
         logger = logging.getLogger(logger_name)
         logger.setLevel(level)
+        logger.debug(f"logging set to {logging.getLevelName(level)}")
 
         # do not readd handlers if they are already present
         if not [x for x in logger.handlers if isinstance(x, handler_class)]:
