@@ -114,12 +114,16 @@ def get_packit_api(
     lp_upstream = None
     lp_downstream = None
     for url in remote_urls:
-        if (
-            package_config.upstream_project_url
-            and package_config.upstream_project_url in url
-        ):
-            lp_upstream = local_project
-            logger.debug("Input directory is an upstream repository.")
+        if package_config.upstream_project_url:
+            if package_config.upstream_project_url in url:
+                lp_upstream = local_project
+                logger.debug("Input directory is an upstream repository.")
+            else:
+                lp_downstream = local_project
+                logger.debug(
+                    "Input directory is a downstream repository "
+                    "(upstream url does not match git remote)."
+                )
             break
 
         if package_config.dist_git_base_url in url:

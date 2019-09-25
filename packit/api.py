@@ -81,7 +81,11 @@ class PackitAPI:
     @property
     def dg(self):
         if self._dg is None:
-            self._dg = DistGit(config=self.config, package_config=self.package_config)
+            self._dg = DistGit(
+                config=self.config,
+                package_config=self.package_config,
+                local_project=self.downstream_local_project,
+            )
         return self._dg
 
     @property
