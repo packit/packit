@@ -277,7 +277,7 @@ def bodhi_response():
     ),
 )
 def test_basic_bodhi_update(
-    cwd_upstream_or_distgit,
+    cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
     branch,
@@ -309,6 +309,7 @@ def test_basic_bodhi_update(
         },
         save=lambda **kwargs: bodhi_response,
     )
+
     api.create_update(
         dist_git_branch=branch,
         update_type=update_type,
