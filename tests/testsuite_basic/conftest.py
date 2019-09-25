@@ -405,7 +405,7 @@ def cwd_upstream_or_distgit(
     request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
 ):
     """
-    Run the code once from upstream and once from distgit directory.
+    Run the code from upstream, downstream and ogr-distgit.
 
     When using be careful to
         - specify this fixture in the right place
@@ -420,3 +420,19 @@ def cwd_upstream_or_distgit(
 
     with cwd(cwd_path):
         yield cwd_path
+
+
+@pytest.fixture(params=["upstream", "ogr-distgit"])
+def upstream_or_distgit_path(
+    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+):
+    """
+    Parametrize the test to upstream, downstream [currently skipped] and ogr distgit
+    """
+    cwd_path = {
+        "upstream": upstream_and_remote[0],
+        "distgit": distgit_and_remote[0],
+        "ogr-distgit": ogr_distgit_and_remote[0],
+    }[request.param]
+
+    return cwd_path
