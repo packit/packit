@@ -27,8 +27,7 @@ from pathlib import Path
 
 import pytest
 
-from packit.api import PackitAPI
-from packit.config import get_local_package_config
+from packit.cli.utils import get_packit_api
 from packit.local_project import LocalProject
 from packit.utils import cwd
 from tests.testsuite_basic.spellbook import (
@@ -37,24 +36,31 @@ from tests.testsuite_basic.spellbook import (
     build_srpm,
     UP_SNAPD,
     UP_OSBUILD,
+    DG_OGR,
 )
 
 
-@pytest.fixture(params=[(UP_SNAPD, "2.41"), (UP_OSBUILD, "2")])
-def example_upstream(request, tmpdir):
-    example_path, tag = request.param
+@pytest.fixture(
+    params=[
+        (UP_SNAPD, "2.41", "https://github.com/snapcore/snapd"),
+        (UP_OSBUILD, "2", "https://github.com/osbuild/osbuild"),
+        (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
+    ]
+)
+def example_repo(request, tmpdir):
+    example_path, tag, remote = request.param
     t = Path(str(tmpdir))
     u = t / "up"
-    initiate_git_repo(u, tag=tag, copy_from=example_path)
+    initiate_git_repo(u, tag=tag, copy_from=example_path, upstream_remote=remote)
     return u
 
 
-def test_srpm_on_example(example_upstream):
-    pc = get_local_package_config(str(example_upstream))
-    up_lp = LocalProject(working_dir=str(example_upstream))
+def test_srpm_on_example(example_repo):
     c = get_test_config()
-    api = PackitAPI(c, pc, up_lp)
-    with cwd(example_upstream):
+    api = get_packit_api(
+        config=c, local_project=LocalProject(working_dir=str(example_repo))
+    )
+    with cwd(example_repo):
         path = api.create_srpm()
     assert path.exists()
     build_srpm(path)

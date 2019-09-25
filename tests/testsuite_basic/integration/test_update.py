@@ -53,7 +53,7 @@ def github_release_webhook():
 
 
 def test_basic_local_update(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
 
@@ -72,7 +72,7 @@ def test_basic_local_update(
 
 
 def test_basic_local_update_using_distgit(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d, api = api_instance
@@ -90,10 +90,7 @@ def test_basic_local_update_using_distgit(
 
 
 def test_basic_local_update_direct_push(
-    cwd_upstream_or_distgit,
-    api_instance,
-    distgit_and_remote,
-    mock_remote_functionality_upstream,
+    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d, api = api_instance
@@ -113,7 +110,7 @@ def test_basic_local_update_direct_push(
 
 
 def test_basic_local_update_from_downstream(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
     flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
     u, d, api = api_instance

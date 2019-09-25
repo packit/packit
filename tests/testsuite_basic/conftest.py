@@ -24,7 +24,7 @@ import datetime
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Iterator
 
 import pytest
 from flexmock import flexmock
@@ -52,6 +52,7 @@ from tests.testsuite_basic.spellbook import (
     UPSTREAM,
     initiate_git_repo,
     DISTGIT,
+    DG_OGR,
 )
 from tests.testsuite_basic.utils import remove_gpg_key_pair
 
@@ -184,9 +185,16 @@ def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
 
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
-    initiate_git_repo(u, tag="0.1.0")
+    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
 
     return u, u_remote_path
+
+
+@pytest.fixture()
+def cwd_upstream(upstream_and_remote) -> Iterator[Path]:
+    upstream, _ = upstream_and_remote
+    with cwd(str(upstream)):
+        yield upstream
 
 
 @pytest.fixture()
@@ -199,6 +207,22 @@ def distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
+    initiate_git_repo(d, push=True, upstream_remote=str(d_remote_path))
+    prepare_dist_git_repo(d)
+
+    return d, d_remote_path
+
+
+@pytest.fixture()
+def ogr_distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
+    temp_dir = Path(str(tmpdir))
+
+    d_remote_path = temp_dir / "ogr_dist_git_remote"
+    d_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
+
+    d = temp_dir / "ogr_dist_git"
+    shutil.copytree(DG_OGR, d)
     initiate_git_repo(d, push=True, upstream_remote=str(d_remote_path))
     prepare_dist_git_repo(d)
 
@@ -376,8 +400,10 @@ def upstream_without_config(tmpdir):
     return u_remote
 
 
-@pytest.fixture(params=["upstream", "distgit"])
-def cwd_upstream_or_distgit(request, upstream_and_remote, distgit_and_remote):
+@pytest.fixture(params=["upstream", "distgit", "ogr-distgit"])
+def cwd_upstream_or_distgit(
+    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+):
     """
     Run the code once from upstream and once from distgit directory.
 
@@ -386,9 +412,11 @@ def cwd_upstream_or_distgit(request, upstream_and_remote, distgit_and_remote):
         (the order of the parameters means order of the execution)
         - to not overwrite the cwd in the other fixture or in the test itself
     """
-    cwd_path = {"upstream": upstream_and_remote[0], "distgit": distgit_and_remote[0]}[
-        request.param
-    ]
+    cwd_path = {
+        "upstream": upstream_and_remote[0],
+        "distgit": distgit_and_remote[0],
+        "ogr-distgit": ogr_distgit_and_remote[0],
+    }[request.param]
 
     with cwd(cwd_path):
         yield cwd_path

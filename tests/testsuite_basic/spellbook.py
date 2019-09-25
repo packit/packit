@@ -44,6 +44,7 @@ UP_SNAPD = DATA_DIR / "snapd"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"
 SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
 SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
+DG_OGR = DATA_DIR / "dg-ogr"
 
 
 def git_set_user_email(directory):
@@ -102,7 +103,7 @@ def initiate_git_repo(
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
         subprocess.check_call(
-            ["git", "push", "-u", "origin", "master:master"], cwd=directory
+            ["git", "push", "--tags", "-u", "origin", "master:master"], cwd=directory
         )
 
 
