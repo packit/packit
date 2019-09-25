@@ -28,8 +28,8 @@ from typing import Optional, Union, Iterable
 import git
 
 from ogr.abstract import GitProject, GitService
+from ogr.parsing import parse_git_repo
 from packit.exceptions import PackitException
-from packit import utils
 from packit.utils import is_git_repo, get_repo, is_a_git_ref
 
 logger = logging.getLogger(__name__)
@@ -282,10 +282,16 @@ class LocalProject:
 
     def _parse_namespace_from_git_url(self):
         if self.git_url and (not self.namespace or not self.repo_name):
-            namespace, repo_name = utils.get_namespace_and_repo_name(self.git_url)
-            if namespace == self.namespace and repo_name == self.repo_name:
+            parsed_repo_url = parse_git_repo(potential_url=self.git_url)
+            if (
+                parsed_repo_url.namespace == self.namespace
+                and parsed_repo_url.repo == self.repo_name
+            ):
                 return False
-            self.namespace, self.repo_name = namespace, repo_name
+            self.namespace, self.repo_name = (
+                parsed_repo_url.namespace,
+                parsed_repo_url.repo,
+            )
             logger.debug(
                 f"Parsed namespace and repo name from url: {self.namespace}/{self.repo_name}"
             )
