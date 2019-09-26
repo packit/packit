@@ -68,7 +68,7 @@ synced_files:
     - .packit.yaml
 
 # name in upstream package repository/registry (e.g. in PyPI)
-upstream_project_name: {upstream_project_name}
+upstream_package_name: {upstream_package_name}
 # downstream (Fedora) RPM package name
 downstream_package_name: {downstream_package_name}
 """

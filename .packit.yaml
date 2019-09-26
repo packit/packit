@@ -6,7 +6,7 @@ synced_files:
   - src: fedora-tests/
     dest: tests/
 # packit was already taken on PyPI
-upstream_project_name: packitos
+upstream_package_name: packitos
 downstream_package_name: packit
 current_version_command: ["python3", "setup.py", "--version"]
 create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
