@@ -63,7 +63,7 @@ def generate(path_or_url, force):
         config_path = working_dir / ".packit.yaml"
 
     template_data = {
-        "upstream_project_name": path_or_url.repo_name,
+        "upstream_package_name": path_or_url.repo_name,
         "downstream_package_name": path_or_url.repo_name,
     }
 
@@ -90,14 +90,14 @@ def generate_config(
     :param write_to_file: bool, write to config_file? False by default
     :param template_data: dict, example:
     {
-        "upstream_project_name": "packitos",
+        "upstream_package_name": "packitos",
         "downstream_package_name": "packit",
     }
     :return: str, generated config
     """
     output_config = PACKIT_CONFIG_TEMPLATE.format(
         downstream_package_name=template_data["downstream_package_name"],
-        upstream_project_name=template_data["upstream_project_name"],
+        upstream_package_name=template_data["upstream_package_name"],
     )
 
     if write_to_file:

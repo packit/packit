@@ -43,7 +43,7 @@ PACKAGE_CONFIG_SCHEMA = {
     "properties": {
         "specfile_path": {"type": "string"},
         "downstream_package_name": {"type": "string"},
-        "upstream_project_name": {"type": "string"},
+        "upstream_package_name": {"type": "string"},
         "upstream_ref": {"type": "string"},
         "create_tarball_command": {"type": "array", "items": {"type": "string"}},
         "current_version_command": {"type": "array", "items": {"type": "string"}},

@@ -64,7 +64,7 @@ TL;DR
 specfile_path: packit.spec
 synced_files:
   - packit.spec
-upstream_project_name: packit
+upstream_package_name: packitos
 downstream_package_name: packit
 ```
 
