@@ -269,15 +269,23 @@ class LocalProject:
 
     def _parse_git_url_from_git_repo(self):
         if self.git_repo and not self.git_url:
-            old_git_url = self.git_url
             if self.remote:
                 self.git_url = next(self.git_repo.remote(self.remote).urls)
+            elif self.git_repo.remotes:
+                for remote in self.git_repo.remotes:
+                    if remote.name == "origin":
+                        # origin as a default
+                        self.git_url = next(self.git_repo.remote().urls)
+                        break
+                else:
+                    # or use first one
+                    self.git_url = next(self.git_repo.remotes[0].urls)
+
             else:
-                # TODO: let's just default to origin
-                self.git_url = next(self.git_repo.remote().urls)
+                # Repo has no remotes
+                return False
             logger.debug(f"remote url of the repo is {self.git_url}")
-            # trigger refresh if they are different
-            return not (bool(old_git_url) == bool(self.git_url))
+            return True
         return False
 
     def _parse_namespace_from_git_url(self):

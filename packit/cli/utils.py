@@ -23,10 +23,12 @@
 import functools
 import logging
 import sys
+from typing import Optional, List
 
 import click
 from github import GithubException
 
+from ogr.parsing import parse_git_repo
 from packit.api import PackitAPI
 from packit.config import get_local_package_config, Config
 from packit.exceptions import PackitException
@@ -109,34 +111,50 @@ def get_packit_api(
         local_project.working_dir, try_local_dir_last=True
     )
 
-    remote_urls = local_project.git_repo.remote().urls
+    remote_urls: List[str] = []
+    for remote in local_project.git_repo.remotes:
+        remote_urls += remote.urls
 
     lp_upstream = None
     lp_downstream = None
+
+    upstream_hostname = (
+        get_hostname_or_none(url=package_config.upstream_project_url)
+        if package_config.upstream_project_url
+        else None
+    )
+
     for url in remote_urls:
-        if package_config.upstream_project_url:
-            if package_config.upstream_project_url in url:
-                lp_upstream = local_project
-                logger.info("Input directory is an upstream repository.")
-            else:
-                lp_downstream = local_project
-                logger.info(
-                    "Input directory is a downstream repository "
-                    "(upstream url does not match git remote)."
-                )
+        remote_hostname = get_hostname_or_none(url=url)
+        if not remote_hostname:
+            continue
+
+        if upstream_hostname and remote_hostname == upstream_hostname:
+            lp_upstream = local_project
+            logger.info("Input directory is an upstream repository.")
             break
 
-        if package_config.dist_git_base_url in url:
+        if (
+            package_config.dist_git_base_url
+            and remote_hostname in package_config.dist_git_base_url
+        ):
             lp_downstream = local_project
             logger.info("Input directory is a downstream repository.")
             break
     else:
-        logger.warning(
-            "We cannot determine, "
-            "if the input is upstream or downstream. "
-            "Using upstream as a default."
-        )
-        lp_upstream = local_project
+        if package_config.upstream_project_url and remote_urls:
+            lp_downstream = local_project
+            logger.info(
+                "Input directory is a downstream repository "
+                "(upstream url does not match any git remote)."
+            )
+        else:
+            logger.warning(
+                "We cannot determine, "
+                "if the input is upstream or downstream. "
+                "Using upstream as a default."
+            )
+            lp_upstream = local_project
 
     if dist_git_path:
         package_config.dist_git_clone_path = dist_git_path
@@ -148,3 +166,10 @@ def get_packit_api(
         downstream_local_project=lp_downstream,
     )
     return api
+
+
+def get_hostname_or_none(url: str) -> Optional[str]:
+    parsed_url = parse_git_repo(potential_url=url)
+    if parsed_url:
+        return parsed_url.hostname
+    return None
