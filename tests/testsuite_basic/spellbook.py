@@ -74,16 +74,21 @@ def initiate_git_repo(
     upstream_remote="https://lol.wat",
     push=False,
     copy_from: str = None,
+    remotes=None,
 ):
     """
     Initiate a git repo for testing.
 
     :param directory: path to the git repo
     :param tag: if set, tag the latest commit with this tag
-    :param upstream_remote: name of the origin - upstream remote
+    :param upstream_remote: name of the origin - upstream remote (not used when remotes are set)
+    :param remotes: provide list of tuples (name, remote_url)
     :param push: push to the remote?
     :param copy_from: source tree to copy to the newly created git repo
     """
+    if remotes is None:
+        remotes = [("origin", upstream_remote)]
+
     if copy_from:
         shutil.copytree(copy_from, directory)
     subprocess.check_call(["git", "init", "."], cwd=directory)
@@ -95,9 +100,10 @@ def initiate_git_repo(
         subprocess.check_call(
             ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag], cwd=directory
         )
-    subprocess.check_call(
-        ["git", "remote", "add", "origin", upstream_remote], cwd=directory
-    )
+
+    for name, url in remotes:
+        subprocess.check_call(["git", "remote", "add", name, url], cwd=directory)
+
     if push:
         subprocess.check_call(["git", "fetch", "origin"], cwd=directory)
         # tox strips some env vars so your user gitconfig is not picked up
