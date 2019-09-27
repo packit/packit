@@ -49,7 +49,7 @@ class FedPKG:
         if not Path(self.directory).is_dir():
             raise Exception("Cannot access fedpkg repository:")
 
-        return utils.run_command(
+        return utils.run_command_remote(
             cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
             error_message=f"Adding new sources failed:",
@@ -69,7 +69,7 @@ class FedPKG:
             cmd.append("--nowait")
         if koji_target:
             cmd += ["--target", koji_target]
-        utils.run_command(
+        utils.run_command_remote(
             cmd=cmd,
             cwd=self.directory,
             error_message="Submission of build to koji failed.",
@@ -106,6 +106,6 @@ class FedPKG:
         else:
             # there is no keytab, but user still might have active ticket - try to renew it
             cmd = ["kinit", "-R", f"{self.fas_username}@FEDORAPROJECT.ORG"]
-        return utils.run_command(
+        return utils.run_command_remote(
             cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
         )
