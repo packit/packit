@@ -1,12 +1,15 @@
 import inspect
 import os
 import unittest
+import shutil
 from subprocess import check_output, CalledProcessError
 
 import packit.distgit
 import packit.upstream
 from ogr import GithubService, PagureService
-from ogr.persistent_storage import PersistentObjectStorage
+
+from requre.storage import PersistentObjectStorage
+from requre.helpers.tempfile import TempFile
 
 from packit.config import Config
 from packit.config import get_package_config_from_repo
@@ -19,6 +22,8 @@ PERSISTENT_DATA_PREFIX = os.path.join(
 
 
 class PackitUnittestOgr(unittest.TestCase):
+    variant = "master"
+
     @staticmethod
     def get_test_config():
         conf = Config()
@@ -37,7 +42,7 @@ class PackitUnittestOgr(unittest.TestCase):
         test_file_name = os.path.basename(inspect.getfile(self.__class__)).rsplit(
             ".", 1
         )[0]
-        test_class_name = f"{self.id()}.{suffix}"
+        test_class_name = f"{self.id()}.{self.variant}.{suffix}"
         testdata_dirname = os.path.join(prefix, test_file_name)
         os.makedirs(testdata_dirname, mode=0o777, exist_ok=True)
         return os.path.join(testdata_dirname, test_class_name)
@@ -56,7 +61,9 @@ class PackitUnittestOgr(unittest.TestCase):
         response_file = self.get_datafile_filename()
         PersistentObjectStorage().storage_file = response_file
         PersistentObjectStorage().dump_after_store = True
-
+        self.static_tmp = "/tmp/packit_tmp"
+        os.makedirs(self.static_tmp, exist_ok=True)
+        TempFile.root = self.static_tmp
         self.project_ogr = self.conf.get_project(
             url="https://github.com/packit-service/ogr"
         )
@@ -74,3 +81,4 @@ class PackitUnittestOgr(unittest.TestCase):
 
     def tearDown(self):
         PersistentObjectStorage().dump()
+        shutil.rmtree(self.static_tmp)

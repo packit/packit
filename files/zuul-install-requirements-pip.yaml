@@ -4,6 +4,7 @@
   tasks:
   - include_tasks: tasks/generic-dnf-requirements.yaml
   - include_tasks: tasks/python-compile-deps.yaml
+  - include_tasks: tasks/requre-master.yaml
   - name: Install deps from PyPI
     pip:
       name: '{{ item }}'

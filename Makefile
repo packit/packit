@@ -15,7 +15,7 @@ install:
 
 check:
 	find . -name "*.pyc" -exec rm {} \;
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals --cov=packit --cov-report=term-missing $(TESTS_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals $(TESTS_TARGET)
 
 check_in_container: tests_image
 	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .; make check TESTS_TARGET=$(TESTS_TARGET)"
