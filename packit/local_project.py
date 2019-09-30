@@ -275,7 +275,7 @@ class LocalProject:
                 for remote in self.git_repo.remotes:
                     if remote.name == "origin":
                         # origin as a default
-                        self.git_url = next(self.git_repo.remote().urls)
+                        self.git_url = remote.url
                         break
                 else:
                     # or use first one

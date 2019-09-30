@@ -28,11 +28,11 @@ import subprocess
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from pkg_resources import get_distribution, DistributionNotFound
 from typing import Tuple, Any, Optional, Dict
 from urllib.parse import urlparse
 
 import git
+from pkg_resources import get_distribution, DistributionNotFound
 
 from packit.exceptions import PackitException
 
