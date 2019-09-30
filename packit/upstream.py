@@ -429,8 +429,8 @@ class Upstream(PackitRepositoryBase):
         """
         version = version or self.get_current_version()
 
-        if self.package_config.upstream_project_name:
-            dir_name = f"{self.package_config.upstream_project_name}-{version}"
+        if self.package_config.upstream_package_name:
+            dir_name = f"{self.package_config.upstream_package_name}-{version}"
         else:
             dir_name = f"{self.package_config.downstream_package_name}-{version}"
         logger.debug("name + version = %s", dir_name)
@@ -539,11 +539,11 @@ class Upstream(PackitRepositoryBase):
             new_setup_line += args_match.group(2)
         else:
             new_setup_line += m[2]
-        if not self.package_config.upstream_project_name:
+        if not self.package_config.upstream_package_name:
             raise PackitException(
-                f'"upstream_project_name" is not set: unable to fix the spec file; please set it.'
+                f'"upstream_package_name" is not set: unable to fix the spec file; please set it.'
             )
-        new_setup_line += f" -n {self.package_config.upstream_project_name}-{version}"
+        new_setup_line += f" -n {self.package_config.upstream_package_name}-{version}"
 
         logger.debug(
             f"new {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
