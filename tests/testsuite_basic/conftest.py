@@ -207,7 +207,14 @@ def distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
-    initiate_git_repo(d, push=True, upstream_remote=str(d_remote_path))
+    initiate_git_repo(
+        d,
+        push=True,
+        remotes=[
+            ("origin", str(d_remote_path)),
+            ("i_am_distgit", "https://src.fedoraproject.org/rpms/python-ogr"),
+        ],
+    )
     prepare_dist_git_repo(d)
 
     return d, d_remote_path
@@ -223,9 +230,15 @@ def ogr_distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
 
     d = temp_dir / "ogr_dist_git"
     shutil.copytree(DG_OGR, d)
-    initiate_git_repo(d, push=True, upstream_remote=str(d_remote_path))
+    initiate_git_repo(
+        d,
+        push=True,
+        remotes=[
+            ("origin", str(d_remote_path)),
+            ("i_am_distgit", "https://src.fedoraproject.org/rpms/python-ogr"),
+        ],
+    )
     prepare_dist_git_repo(d)
-
     return d, d_remote_path
 
 

@@ -23,7 +23,7 @@
 import functools
 import logging
 import sys
-from typing import Optional, List
+from typing import List, Optional
 
 import click
 from github import GithubException
@@ -111,12 +111,20 @@ def get_packit_api(
         local_project.working_dir, try_local_dir_last=True
     )
 
+    if dist_git_path:
+        package_config.dist_git_clone_path = dist_git_path
+
+    if dist_git_path and dist_git_path == local_project.working_dir:
+        PackitAPI(
+            config=config,
+            package_config=package_config,
+            upstream_local_project=None,
+            downstream_local_project=local_project,
+        )
+
     remote_urls: List[str] = []
     for remote in local_project.git_repo.remotes:
         remote_urls += remote.urls
-
-    lp_upstream = None
-    lp_downstream = None
 
     upstream_hostname = (
         get_hostname_or_none(url=package_config.upstream_project_url)
@@ -124,15 +132,22 @@ def get_packit_api(
         else None
     )
 
+    lp_upstream = None
+    lp_downstream = None
+
+    upstream_compared = False
+
     for url in remote_urls:
         remote_hostname = get_hostname_or_none(url=url)
         if not remote_hostname:
             continue
 
-        if upstream_hostname and remote_hostname == upstream_hostname:
-            lp_upstream = local_project
-            logger.info("Input directory is an upstream repository.")
-            break
+        if upstream_hostname:
+            upstream_compared = True
+            if remote_hostname == upstream_hostname:
+                lp_upstream = local_project
+                logger.info("Input directory is an upstream repository.")
+                break
 
         if (
             package_config.dist_git_base_url
@@ -142,7 +157,7 @@ def get_packit_api(
             logger.info("Input directory is a downstream repository.")
             break
     else:
-        if package_config.upstream_project_url and remote_urls:
+        if upstream_compared:
             lp_downstream = local_project
             logger.info(
                 "Input directory is a downstream repository "
@@ -155,9 +170,6 @@ def get_packit_api(
                 "Using upstream as a default."
             )
             lp_upstream = local_project
-
-    if dist_git_path:
-        package_config.dist_git_clone_path = dist_git_path
 
     api = PackitAPI(
         config=config,
