@@ -398,6 +398,7 @@ class PackageConfig(BaseConfig):
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = False,
         spec_source_id: str = "Source0",
+        upstream_tag_template: str = "{version}",
     ):
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
@@ -428,6 +429,8 @@ class PackageConfig(BaseConfig):
             "--match",
             "*",
         ]
+        # template to create an upstream tag name (upstream may use different tagging scheme)
+        self.upstream_tag_template = upstream_tag_template
 
     @property
     def downstream_package_name(self) -> str:
@@ -462,6 +465,7 @@ class PackageConfig(BaseConfig):
             and self.allowed_gpg_keys == other.allowed_gpg_keys
             and self.create_pr == other.create_pr
             and self.spec_source_id == other.spec_source_id
+            and self.upstream_tag_template == other.upstream_tag_template
         )
 
     @property
@@ -510,6 +514,7 @@ class PackageConfig(BaseConfig):
 
         allowed_gpg_keys = raw_dict.get("allowed_gpg_keys", None)
         create_pr = raw_dict.get("create_pr", False)
+        upstream_tag_template = raw_dict.get("upstream_tag_template", "{version}")
 
         # it can be int as well
         spec_source_id = raw_dict.get("spec_source_id", "Source0")
@@ -540,6 +545,7 @@ class PackageConfig(BaseConfig):
             allowed_gpg_keys=allowed_gpg_keys,
             create_pr=create_pr,
             spec_source_id=spec_source_id,
+            upstream_tag_template=upstream_tag_template,
         )
         return pc
 
