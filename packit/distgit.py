@@ -106,6 +106,11 @@ class DistGit(PackitRepositoryBase):
                 )
                 self._local_project.working_dir_temporary = True
             self._local_project.refresh_the_arguments()
+        elif not self._local_project.git_project:
+            self._local_project.git_project = self.config.get_project(
+                url=self.package_config.dist_git_package_url
+            )
+            self._local_project.refresh_the_arguments()
         return self._local_project
 
     @property
