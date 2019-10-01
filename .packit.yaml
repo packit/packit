@@ -8,7 +8,7 @@ synced_files:
 # packit was already taken on PyPI
 upstream_package_name: packitos
 downstream_package_name: packit
-upstream_project_url: "https://github.com/packit-service/packit"
+upstream_project_url: https://github.com/packit-service/packit
 current_version_command: ["python3", "setup.py", "--version"]
 create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
 create_pr: false
