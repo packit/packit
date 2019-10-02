@@ -252,10 +252,7 @@ class DistGit(PackitRepositoryBase):
         try:
             f.new_sources(sources=archive_path)
         except Exception as ex:
-            logger.error(
-                f"`fedpkg new-sources` failed for some reason. "
-                f"Either Fedora kerberos is invalid or there could be network outage."
-            )
+            logger.error(f"'fedpkg new-sources' failed for the following reason: {ex}")
             raise PackitException(ex)
 
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
