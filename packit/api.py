@@ -181,6 +181,7 @@ class PackitAPI:
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
         full_version = version or self.up.get_version()
+
         if not full_version:
             raise PackitException(
                 "Could not figure out version of latest upstream release."
@@ -190,10 +191,11 @@ class PackitAPI:
             # TODO: this is problematic, since we may overwrite stuff in the repo
             #       but the thing is that we need to do it
             #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
-            # TODO: this is also naive, upstream may use different tagging scheme, e.g.
-            #       release = 232, tag = v232
+            upstream_tag = self.up.package_config.upstream_tag_template.format(
+                version=full_version
+            )
             if not use_local_content:
-                self.up.local_project.checkout_release(full_version)
+                self.up.local_project.checkout_release(upstream_tag)
 
             self.dg.check_last_commit()
 
@@ -215,7 +217,7 @@ class PackitAPI:
                 self.dg.checkout_branch(local_pr_branch)
 
             description = (
-                f"Upstream tag: {full_version}\n"
+                f"Upstream tag: {upstream_tag}\n"
                 f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
             )
 

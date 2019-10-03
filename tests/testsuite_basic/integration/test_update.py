@@ -25,6 +25,8 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 
+from packit.api import PackitAPI, Config
+from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
 from tests.testsuite_basic.spellbook import TARBALL_NAME
 from tests.testsuite_basic.utils import get_specfile
@@ -121,3 +123,22 @@ def test_basic_local_update_from_downstream(
     assert (new_upstream / "beer.spec").is_file()
     spec = get_specfile(str(new_upstream / "beer.spec"))
     assert spec.get_version() == "0.0.0"
+
+
+def test_local_update_with_specified_tag_template():
+    c = Config()
+    pc = parse_loaded_config(
+        {
+            "specfile_path": "beer.spec",
+            "synced_files": ["beer.spec"],
+            "upstream_project_name": "beerware",
+            "downstream_package_name": "beer",
+            "upstream_tag_template": "v{version}",
+            "create_pr": False,
+        }
+    )
+    api = PackitAPI(c, pc)
+
+    assert (
+        api.up.package_config.upstream_tag_template.format(version="0.1.0") == "v0.1.0"
+    )

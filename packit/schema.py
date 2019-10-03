@@ -60,6 +60,7 @@ PACKAGE_CONFIG_SCHEMA = {
         },
         "create_pr": {"type": "boolean"},
         "spec_source_id": {"type": ["string", "integer"]},
+        "upstream_tag_template": {"type": "string"},
     },
     "required": ["specfile_path"],
 }
