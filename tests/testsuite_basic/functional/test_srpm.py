@@ -23,49 +23,62 @@
 """
 Functional tests for srpm comand
 """
+from pathlib import Path
 
 from tests.testsuite_basic.spellbook import call_real_packit, build_srpm
 
 
-def test_srpm_command(upstream_instance):
-    u, ups = upstream_instance
-    call_real_packit(parameters=["--debug", "srpm"], cwd=u)
-    srpm_path = list(u.glob("*.src.rpm"))[0]
+def test_srpm_command_for_path(upstream_or_distgit_path):
+    call_real_packit(parameters=["--debug", "srpm", str(upstream_or_distgit_path)])
+    srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
 
-def test_srpm_custom_path(upstream_instance):
-    u, ups = upstream_instance
+def test_srpm_command(cwd_upstream_or_distgit):
+    call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
+    srpm_path = list(cwd_upstream_or_distgit.glob("*.src.rpm"))[0]
+    assert srpm_path.exists()
+    build_srpm(srpm_path)
+
+
+def test_srpm_custom_path(cwd_upstream_or_distgit):
     custom_path = "sooooorc.rpm"
-    call_real_packit(parameters=["--debug", "srpm", "--output", custom_path], cwd=u)
-    srpm_path = u.joinpath(custom_path)
+    call_real_packit(
+        parameters=["--debug", "srpm", "--output", custom_path],
+        cwd=cwd_upstream_or_distgit,
+    )
+    srpm_path = cwd_upstream_or_distgit.joinpath(custom_path)
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
 
-def test_srpm_twice_with_custom_name(upstream_instance):
-    u, ups = upstream_instance
+def test_srpm_twice_with_custom_name(cwd_upstream_or_distgit):
     custom_path = "sooooorc.rpm"
-    call_real_packit(parameters=["--debug", "srpm", "--output", custom_path], cwd=u)
-    srpm_path1 = u.joinpath(custom_path)
+    call_real_packit(
+        parameters=["--debug", "srpm", "--output", custom_path],
+        cwd=cwd_upstream_or_distgit,
+    )
+    srpm_path1 = cwd_upstream_or_distgit.joinpath(custom_path)
     assert srpm_path1.is_file()
     build_srpm(srpm_path1)
 
     custom_path2 = "sooooorc2.rpm"
-    call_real_packit(parameters=["--debug", "srpm", "--output", custom_path2], cwd=u)
-    srpm_path2 = u.joinpath(custom_path2)
+    call_real_packit(
+        parameters=["--debug", "srpm", "--output", custom_path2],
+        cwd=cwd_upstream_or_distgit,
+    )
+    srpm_path2 = cwd_upstream_or_distgit.joinpath(custom_path2)
     assert srpm_path2.is_file()
     build_srpm(srpm_path2)
 
 
-def test_srpm_twice(upstream_instance):
-    u, ups = upstream_instance
-    call_real_packit(parameters=["--debug", "srpm"], cwd=u)
-    call_real_packit(parameters=["--debug", "srpm"], cwd=u)
+def test_srpm_twice(cwd_upstream_or_distgit):
+    call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
+    call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
 
     # since we build from the 0.1.0, we would get the same SRPM because of '--new 0.1.0'
-    srpm_files = list(u.glob("*.src.rpm"))
+    srpm_files = list(cwd_upstream_or_distgit.glob("*.src.rpm"))
 
     assert srpm_files[0].exists()
 

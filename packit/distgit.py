@@ -58,10 +58,15 @@ class DistGit(PackitRepositoryBase):
     and methods of this class interact with the local copy.
     """
 
-    def __init__(self, config: Config, package_config: PackageConfig):
+    def __init__(
+        self,
+        config: Config,
+        package_config: PackageConfig,
+        local_project: LocalProject = None,
+    ):
         super().__init__(config=config, package_config=package_config)
 
-        self._local_project = None
+        self._local_project = local_project
 
         self.fas_user = self.config.fas_user
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
@@ -100,6 +105,11 @@ class DistGit(PackitRepositoryBase):
                     git_project=dist_git_project,
                 )
                 self._local_project.working_dir_temporary = True
+            self._local_project.refresh_the_arguments()
+        elif not self._local_project.git_project:
+            self._local_project.git_project = self.config.get_project(
+                url=self.package_config.dist_git_package_url
+            )
             self._local_project.refresh_the_arguments()
         return self._local_project
 

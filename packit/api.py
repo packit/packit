@@ -56,11 +56,13 @@ class PackitAPI:
         self,
         config: Config,
         package_config: PackageConfig,
-        upstream_local_project: LocalProject,
+        upstream_local_project: LocalProject = None,
+        downstream_local_project: LocalProject = None,
     ) -> None:
         self.config = config
         self.package_config = package_config
         self.upstream_local_project = upstream_local_project
+        self.downstream_local_project = downstream_local_project
 
         self._up = None
         self._dg = None
@@ -79,7 +81,11 @@ class PackitAPI:
     @property
     def dg(self):
         if self._dg is None:
-            self._dg = DistGit(config=self.config, package_config=self.package_config)
+            self._dg = DistGit(
+                config=self.config,
+                package_config=self.package_config,
+                local_project=self.downstream_local_project,
+            )
         return self._dg
 
     @property
@@ -488,9 +494,12 @@ class PackitAPI:
                 self.up.fix_spec(
                     archive=archive, version=current_git_describe_version, commit=commit
                 )
-            source_dir = Path(self.up.local_project.working_dir).relative_to(
-                relative_to
-            )
+            if self.up.local_project.working_dir.startswith(str(relative_to)):
+                source_dir = Path(self.up.local_project.working_dir).relative_to(
+                    relative_to
+                )
+            else:
+                source_dir = Path(self.up.local_project.working_dir)
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
         )

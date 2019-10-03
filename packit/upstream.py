@@ -28,8 +28,9 @@ from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
-from packit.utils import is_a_git_ref, run_command
 from rebasehelper.exceptions import RebaseHelperError
+
+from packit.utils import is_a_git_ref, run_command
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -66,6 +67,11 @@ class Upstream(PackitRepositoryBase):
 
     @property
     def local_project(self):
+        if not self._local_project:
+            self._local_project = LocalProject(
+                git_url=self.package_config.upstream_project_url,
+                repo_name=self.package_config.upstream_package_name,
+            )
         if self._local_project.git_project is None:
             if not self.package_config.upstream_project_url:
                 raise PackitException(

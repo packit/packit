@@ -23,13 +23,11 @@
 """
 E2E tests which utilize cockpit projects
 """
-import shutil
 from pathlib import Path
 
 import pytest
 
-from packit.api import PackitAPI
-from packit.config import get_local_package_config
+from packit.cli.utils import get_packit_api
 from packit.local_project import LocalProject
 from packit.utils import cwd
 from tests.testsuite_basic.spellbook import (
@@ -37,24 +35,32 @@ from tests.testsuite_basic.spellbook import (
     get_test_config,
     build_srpm,
     UP_SNAPD,
+    UP_OSBUILD,
+    DG_OGR,
 )
 
 
-@pytest.fixture()
-def snapd(tmpdir):
+@pytest.fixture(
+    params=[
+        (UP_SNAPD, "2.41", "https://github.com/snapcore/snapd"),
+        (UP_OSBUILD, "2", "https://github.com/osbuild/osbuild"),
+        (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
+    ]
+)
+def example_repo(request, tmpdir):
+    example_path, tag, remote = request.param
     t = Path(str(tmpdir))
     u = t / "up"
-    shutil.copytree(UP_SNAPD, u)
-    initiate_git_repo(u, tag="2.41")
+    initiate_git_repo(u, tag=tag, copy_from=example_path, upstream_remote=remote)
     return u
 
 
-def test_srpm_snapd(snapd):
-    pc = get_local_package_config(str(snapd))
-    up_lp = LocalProject(working_dir=str(snapd))
+def test_srpm_on_example(example_repo):
     c = get_test_config()
-    api = PackitAPI(c, pc, up_lp)
-    with cwd(snapd):
+    api = get_packit_api(
+        config=c, local_project=LocalProject(working_dir=str(example_repo))
+    )
+    with cwd(example_repo):
         path = api.create_srpm()
     assert path.exists()
     build_srpm(path)

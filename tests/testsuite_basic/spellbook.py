@@ -28,10 +28,10 @@ import subprocess
 from pathlib import Path
 
 from click.testing import CliRunner
-from packit.utils import run_command
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
+from packit.utils import run_command
 
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
@@ -44,6 +44,7 @@ UP_SNAPD = DATA_DIR / "snapd"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"
 SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
 SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
+DG_OGR = DATA_DIR / "dg-ogr"
 
 
 def git_set_user_email(directory):
@@ -73,16 +74,21 @@ def initiate_git_repo(
     upstream_remote="https://lol.wat",
     push=False,
     copy_from: str = None,
+    remotes=None,
 ):
     """
     Initiate a git repo for testing.
 
     :param directory: path to the git repo
     :param tag: if set, tag the latest commit with this tag
-    :param upstream_remote: name of the origin - upstream remote
+    :param upstream_remote: name of the origin - upstream remote (not used when remotes are set)
+    :param remotes: provide list of tuples (name, remote_url)
     :param push: push to the remote?
     :param copy_from: source tree to copy to the newly created git repo
     """
+    if remotes is None:
+        remotes = [("origin", upstream_remote)]
+
     if copy_from:
         shutil.copytree(copy_from, directory)
     subprocess.check_call(["git", "init", "."], cwd=directory)
@@ -94,15 +100,16 @@ def initiate_git_repo(
         subprocess.check_call(
             ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag], cwd=directory
         )
-    subprocess.check_call(
-        ["git", "remote", "add", "origin", upstream_remote], cwd=directory
-    )
+
+    for name, url in remotes:
+        subprocess.check_call(["git", "remote", "add", name, url], cwd=directory)
+
     if push:
         subprocess.check_call(["git", "fetch", "origin"], cwd=directory)
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
         subprocess.check_call(
-            ["git", "push", "-u", "origin", "master:master"], cwd=directory
+            ["git", "push", "--tags", "-u", "origin", "master:master"], cwd=directory
         )
 
 
@@ -134,6 +141,12 @@ def call_real_packit(parameters=None, envs=None, cwd=None):
     """ invoke packit in a subprocess """
     cmd = ["python3", "-m", "packit.cli.packit_base"] + parameters
     return subprocess.check_call(cmd, env=envs, cwd=cwd)
+
+
+def call_real_packit_and_return_exit_code(parameters=None, envs=None, cwd=None):
+    """ invoke packit in a subprocess and return exit code"""
+    cmd = ["python3", "-m", "packit.cli.packit_base"] + parameters
+    return subprocess.call(cmd, env=envs, cwd=cwd)
 
 
 def does_bumpspec_know_new():

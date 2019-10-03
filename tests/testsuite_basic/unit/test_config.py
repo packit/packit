@@ -500,7 +500,9 @@ def test_dist_git_package_url():
     ],
 )
 def test_get_package_config_from_repo(content):
-    flexmock(GitProject).should_receive("get_file_content").and_return(content)
+    gp = flexmock(GitProject)
+    gp.should_receive("full_repo_name").and_return("a/b")
+    gp.should_receive("get_file_content").and_return(content)
     git_project = GitProject(repo="", service=GitService(), namespace="")
     config = get_package_config_from_repo(sourcegit_project=git_project, ref="")
     assert isinstance(config, PackageConfig)

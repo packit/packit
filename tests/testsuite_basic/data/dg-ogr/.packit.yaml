@@ -1,0 +1,33 @@
+---
+# docs: https://github.com/packit-service/packit/blob/master/docs/configuration.md
+specfile_path: python-ogr.spec
+synced_files:
+  - python-ogr.spec
+upstream_package_name: ogr
+downstream_package_name: python-ogr
+upstream_project_url: "https://github.com/packit-service/ogr"
+# the version is different than with basic git describe
+create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
+current_version_command: ["python3", "setup.py", "--version"]
+jobs:
+- job: sync_from_downstream
+  trigger: commit
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist-git-branch: master
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist-git-branch: f30
+- job: propose_downstream
+  trigger: release
+  metadata:
+    dist-git-branch: f29
+- job: copr_build
+  trigger: pull_request
+  metadata:
+    targets:
+    - fedora-29-x86_64
+    - fedora-rawhide-x86_64
+    - fedora-30-x86_64
