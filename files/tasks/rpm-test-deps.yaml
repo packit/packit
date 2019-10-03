@@ -5,5 +5,7 @@
     - python3-flexmock
     - python3-pytest
     - python3-pytest-cov
+    - python3-setuptools_scm_git_archive
+    - python3-setuptools_scm
     state: present
   become: true

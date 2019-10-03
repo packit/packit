@@ -1,7 +1,10 @@
-from os import chdir
 import unittest
+from os import chdir
 
-from tests.testsuite_basic.spellbook import call_packit
+from tests.testsuite_basic.spellbook import (
+    call_packit,
+    call_real_packit_and_return_exit_code,
+)
 
 
 # TODO: fix the test
@@ -20,11 +23,9 @@ def test_generate_pass(upstream_without_config):
     assert (u / ".packit.yaml").is_file()
 
 
-def test_generate_fail(upstream_n_distgit):
-    u, d = upstream_n_distgit
-    chdir(u)
+def test_generate_fail(cwd_upstream_or_distgit):
+    result = call_real_packit_and_return_exit_code(
+        parameters=["generate"], cwd=str(cwd_upstream_or_distgit)
+    )
 
-    # This test requires packit on pythonpath
-    result = call_packit(parameters=["generate"])
-
-    assert result.exit_code == 2  # packit config already exists --force needed
+    assert result == 2  # packit config already exists --force needed

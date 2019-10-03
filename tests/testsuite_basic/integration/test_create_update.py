@@ -24,11 +24,7 @@ import pytest
 from flexmock import flexmock
 from munch import Munch
 
-from packit.api import PackitAPI
-from packit.config import get_local_package_config
-from packit.local_project import LocalProject
-from tests.testsuite_basic.spellbook import get_test_config, can_a_module_be_imported
-from packit.utils import cwd
+from tests.testsuite_basic.spellbook import can_a_module_be_imported
 
 
 @pytest.fixture()
@@ -281,7 +277,8 @@ def bodhi_response():
     ),
 )
 def test_basic_bodhi_update(
-    upstream_n_distgit,
+    cwd_upstream,
+    api_instance,
     mock_remote_functionality_upstream,
     branch,
     update_type,
@@ -292,38 +289,30 @@ def test_basic_bodhi_update(
     # https://github.com/fedora-infra/bodhi/issues/3058
     from bodhi.client.bindings import BodhiClient
 
-    u, d = upstream_n_distgit
-    with cwd(u):
-        c = get_test_config()
+    u, d, api = api_instance
 
-        pc = get_local_package_config(str(u))
-        pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
-        up_lp = LocalProject(working_dir=u)
+    flexmock(
+        BodhiClient,
+        latest_builds=lambda package: {
+            "f29-override": "sen-0.6.0-3.fc29",
+            "f29-updates": "sen-0.6.0-3.fc29",
+            "f29-updates-candidate": "sen-0.6.0-3.fc29",
+            "f29-updates-pending": "sen-0.6.0-3.fc29",
+            "f29-updates-testing": "sen-0.6.0-3.fc29",
+            "f29-updates-testing-pending": "sen-0.6.0-3.fc29",
+            "f30-override": "sen-0.6.0-4.fc30",
+            "f30-updates": "sen-0.6.0-4.fc30",
+            "f30-updates-candidate": "sen-0.6.1-1.fc30",
+            "f30-updates-pending": "sen-0.6.0-4.fc30",
+            "f30-updates-testing": "sen-0.6.0-4.fc30",
+            "f30-updates-testing-pending": "sen-0.6.0-4.fc30",
+        },
+        save=lambda **kwargs: bodhi_response,
+    )
 
-        api = PackitAPI(c, pc, up_lp)
-
-        flexmock(
-            BodhiClient,
-            latest_builds=lambda package: {
-                "f29-override": "sen-0.6.0-3.fc29",
-                "f29-updates": "sen-0.6.0-3.fc29",
-                "f29-updates-candidate": "sen-0.6.0-3.fc29",
-                "f29-updates-pending": "sen-0.6.0-3.fc29",
-                "f29-updates-testing": "sen-0.6.0-3.fc29",
-                "f29-updates-testing-pending": "sen-0.6.0-3.fc29",
-                "f30-override": "sen-0.6.0-4.fc30",
-                "f30-updates": "sen-0.6.0-4.fc30",
-                "f30-updates-candidate": "sen-0.6.1-1.fc30",
-                "f30-updates-pending": "sen-0.6.0-4.fc30",
-                "f30-updates-testing": "sen-0.6.0-4.fc30",
-                "f30-updates-testing-pending": "sen-0.6.0-4.fc30",
-            },
-            save=lambda **kwargs: bodhi_response,
-        )
-        api.create_update(
-            dist_git_branch=branch,
-            update_type=update_type,
-            update_notes=update_notes,
-            koji_builds=koji_builds,
-        )
+    api.create_update(
+        dist_git_branch=branch,
+        update_type=update_type,
+        update_notes=update_notes,
+        koji_builds=koji_builds,
+    )

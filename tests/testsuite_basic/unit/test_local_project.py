@@ -184,11 +184,9 @@ def test_parse_namespace_from_git_project():
 
 def test_parse_git_url_from_git_repo():
     project = LocalProject(
-        git_repo=flexmock().should_receive("remote")
-        # must be a generator
-        .replace_with(lambda: flexmock(urls=(x for x in ["git@github.com:org/name"])))
-        .once()
-        .mock(),
+        git_repo=flexmock(
+            remotes=[flexmock(name="origin", url="git@github.com:org/name")]
+        ),
         refresh=False,
     )
 
@@ -340,17 +338,14 @@ def test_working_dir():
         path="./local/directory/to/git"
     ).and_return(
         flexmock(
-            active_branch=flexmock(name="branch"), head=flexmock(is_detached=False)
+            active_branch=flexmock(name="branch"),
+            head=flexmock(is_detached=False),
+            remotes=[
+                flexmock(
+                    name="origin", url="https://server.git/my_namespace/package_name"
+                )
+            ],
         )
-        .should_receive("remote")
-        # must be a generator
-        .replace_with(
-            lambda: flexmock(
-                urls=(x for x in ["https://server.git/my_namespace/package_name"])
-            )
-        )
-        .once()
-        .mock()
     )
 
     project = LocalProject(working_dir="./local/directory/to/git")

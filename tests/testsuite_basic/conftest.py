@@ -21,22 +21,21 @@
 # SOFTWARE.
 
 import datetime
-import os
 import shutil
 import subprocess
-from os import chdir
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Iterator
 
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
+from rebasehelper.specfile import SpecFile
+
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService
-from rebasehelper.specfile import SpecFile
-
 from packit.api import PackitAPI
+from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
@@ -53,6 +52,7 @@ from tests.testsuite_basic.spellbook import (
     UPSTREAM,
     initiate_git_repo,
     DISTGIT,
+    DG_OGR,
 )
 from tests.testsuite_basic.utils import remove_gpg_key_pair
 
@@ -81,15 +81,17 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
 
 
 @pytest.fixture()
-def mock_remote_functionality_upstream(upstream_n_distgit):
-    u, d = upstream_n_distgit
+def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
     return mock_remote_functionality(d, u)
 
 
 @pytest.fixture()
-def mock_remote_functionality_sourcegit(sourcegit_n_distgit):
-    u, d = sourcegit_n_distgit
-    return mock_remote_functionality(d, u)
+def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote):
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+    return mock_remote_functionality(upstream=sourcegit, distgit=distgit)
 
 
 def mock_spec_download_remote_s(path: Path):
@@ -174,34 +176,74 @@ def mock_patching():
 
 
 @pytest.fixture()
-def upstream_distgit_remote(tmpdir) -> Tuple[Path, Path, Path]:
+def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
     t = Path(str(tmpdir))
 
     u_remote_path = t / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
-
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
 
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
-    initiate_git_repo(u, tag="0.1.0")
+    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
+
+    return u, u_remote_path
+
+
+@pytest.fixture()
+def cwd_upstream(upstream_and_remote) -> Iterator[Path]:
+    upstream, _ = upstream_and_remote
+    with cwd(str(upstream)):
+        yield upstream
+
+
+@pytest.fixture()
+def distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
+    t = Path(str(tmpdir))
+
+    d_remote_path = t / "dist_git_remote"
+    d_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
 
     d = t / "dist_git"
     shutil.copytree(DISTGIT, d)
-    initiate_git_repo(d, push=True, upstream_remote=str(u_remote_path))
+    initiate_git_repo(
+        d,
+        push=True,
+        remotes=[
+            ("origin", str(d_remote_path)),
+            ("i_am_distgit", "https://src.fedoraproject.org/rpms/python-ogr"),
+        ],
+    )
     prepare_dist_git_repo(d)
 
-    return u, d, u_remote_path
+    return d, d_remote_path
 
 
 @pytest.fixture()
-def upstream_n_distgit(upstream_distgit_remote):
-    upstream, distgit, _ = upstream_distgit_remote
-    return upstream, distgit
+def ogr_distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
+    temp_dir = Path(str(tmpdir))
+
+    d_remote_path = temp_dir / "ogr_dist_git_remote"
+    d_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
+
+    d = temp_dir / "ogr_dist_git"
+    shutil.copytree(DG_OGR, d)
+    initiate_git_repo(
+        d,
+        push=True,
+        remotes=[
+            ("origin", str(d_remote_path)),
+            ("i_am_distgit", "https://src.fedoraproject.org/rpms/python-ogr"),
+        ],
+    )
+    prepare_dist_git_repo(d)
+    return d, d_remote_path
 
 
 @pytest.fixture()
-def sourcegit_n_distgit(tmpdir):
+def sourcegit_and_remote(tmpdir):
     temp_dir = Path(str(tmpdir))
 
     sourcegit_remote = temp_dir / "source_git_remote"
@@ -216,12 +258,7 @@ def sourcegit_n_distgit(tmpdir):
     )
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
-    distgit_dir = temp_dir / "dist_git"
-    shutil.copytree(DISTGIT, distgit_dir)
-    initiate_git_repo(distgit_dir, push=True, upstream_remote=str(sourcegit_remote))
-    prepare_dist_git_repo(distgit_dir)
-
-    return sourcegit_dir, distgit_dir
+    return sourcegit_dir, sourcegit_remote
 
 
 @pytest.fixture()
@@ -244,9 +281,10 @@ def downstream_n_distgit(tmpdir):
 
 
 @pytest.fixture()
-def upstream_instance(upstream_n_distgit, tmpdir):
+def upstream_instance(upstream_and_remote, distgit_and_remote, tmpdir):
     with cwd(tmpdir):
-        u, d = upstream_n_distgit
+        u, _ = upstream_and_remote
+        d, _ = distgit_and_remote
         c = get_test_config()
 
         pc = get_local_package_config(str(u))
@@ -268,8 +306,11 @@ def upstream_instance_with_two_commits(upstream_instance):
 
 
 @pytest.fixture()
-def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
-    u, d = upstream_n_distgit
+def distgit_instance(
+    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
     c = get_test_config()
     pc = get_local_package_config(str(u))
     pc.dist_git_clone_path = str(d)
@@ -279,27 +320,21 @@ def distgit_instance(upstream_n_distgit, mock_remote_functionality_upstream):
 
 
 @pytest.fixture()
-def api_instance(upstream_n_distgit):
-    u, d = upstream_n_distgit
+def api_instance(upstream_and_remote, distgit_and_remote):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
 
-    # we need to chdir(u) because when PackageConfig is created,
-    # it already expects it's in the correct directory
-    old_cwd = os.getcwd()
-    chdir(str(u))
     c = get_test_config()
-
-    pc = get_local_package_config(str(u))
-    pc.upstream_project_url = str(u)
-    up_lp = LocalProject(working_dir=str(u))
-
-    api = PackitAPI(c, pc, up_lp)
-    yield u, d, api
-    chdir(old_cwd)
+    api = get_packit_api(
+        config=c, local_project=LocalProject(working_dir=str(Path.cwd()))
+    )
+    return u, d, api
 
 
 @pytest.fixture()
-def api_instance_source_git(sourcegit_n_distgit):
-    sourcegit, distgit = sourcegit_n_distgit
+def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
     with cwd(sourcegit):
         c = get_test_config()
         pc = get_local_package_config(str(sourcegit))
@@ -376,3 +411,41 @@ def upstream_without_config(tmpdir):
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote)
 
     return u_remote
+
+
+@pytest.fixture(params=["upstream", "distgit", "ogr-distgit"])
+def cwd_upstream_or_distgit(
+    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+):
+    """
+    Run the code from upstream, downstream and ogr-distgit.
+
+    When using be careful to
+        - specify this fixture in the right place
+        (the order of the parameters means order of the execution)
+        - to not overwrite the cwd in the other fixture or in the test itself
+    """
+    cwd_path = {
+        "upstream": upstream_and_remote[0],
+        "distgit": distgit_and_remote[0],
+        "ogr-distgit": ogr_distgit_and_remote[0],
+    }[request.param]
+
+    with cwd(cwd_path):
+        yield cwd_path
+
+
+@pytest.fixture(params=["upstream", "ogr-distgit"])
+def upstream_or_distgit_path(
+    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+):
+    """
+    Parametrize the test to upstream, downstream [currently skipped] and ogr distgit
+    """
+    cwd_path = {
+        "upstream": upstream_and_remote[0],
+        "distgit": distgit_and_remote[0],
+        "ogr-distgit": ogr_distgit_and_remote[0],
+    }[request.param]
+
+    return cwd_path
