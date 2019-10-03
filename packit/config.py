@@ -257,6 +257,7 @@ class JobType(Enum):
     report_test_results = "report_test_results"
     pull_request_action = "pull_request_action"
     copr_build_finished = "copr_build_finished"
+    copr_build_started = "copr_build_started"
 
 
 class JobTriggerType(Enum):
