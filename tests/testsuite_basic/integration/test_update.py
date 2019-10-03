@@ -125,10 +125,10 @@ def test_basic_local_update_from_downstream(
     assert spec.get_version() == "0.0.0"
 
 
-def test_local_update_with_specified_tag_template(
-):
+def test_local_update_with_specified_tag_template():
     c = Config()
-    pc = parse_loaded_config({
+    pc = parse_loaded_config(
+        {
             "specfile_path": "beer.spec",
             "synced_files": ["beer.spec"],
             "upstream_project_name": "beerware",
@@ -140,6 +140,5 @@ def test_local_update_with_specified_tag_template(
     api = PackitAPI(c, pc)
 
     assert (
-        api.up.package_config.upstream_tag_template.format(version="0.1.0")
-        == "v0.1.0"
+        api.up.package_config.upstream_tag_template.format(version="0.1.0") == "v0.1.0"
     )
