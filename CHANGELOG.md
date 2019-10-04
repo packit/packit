@@ -1,3 +1,31 @@
+# 0.7.0
+
+See our [website](https://packit.dev) for up-to-date documentation.
+
+## Deprecation changes
+
+* Rename `upstream_project_name` option to `upstream_package_name`.
+   * The old one is now deprecated and will be ignored in the future.
+
+## Features
+
+* Packit is now able to be used from a distgit repository.
+  * You need to specify `upstream_project_url` to make it work.
+* The configuration of the authentication was reworked.
+  * Support for multiple git services/instances.
+
+## Fixes
+
+* Packit verifies the output of the `create-archive` action.
+* Added support for `Source` in the spec-file.
+
+## Minor
+
+* New option (`upstream_tag_template`) was added to the configuration file
+ to support more version schemes.
+
+
+
 # 0.6.1
 
 This patch release contains only few bug-fixes on top of 0.6.0.
