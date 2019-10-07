@@ -58,7 +58,6 @@ def test_basic_local_update(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
-
     u, d, api = api_instance
 
     api.sync_release("master", "0.1.0")
@@ -131,7 +130,7 @@ def test_local_update_with_specified_tag_template():
         {
             "specfile_path": "beer.spec",
             "synced_files": ["beer.spec"],
-            "upstream_project_name": "beerware",
+            "upstream_package_name": "beerware",
             "downstream_package_name": "beer",
             "upstream_tag_template": "v{version}",
             "create_pr": False,
