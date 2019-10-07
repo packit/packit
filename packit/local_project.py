@@ -75,7 +75,7 @@ class LocalProject:
 
         :param git_repo: git.Repo
         :param working_dir: str (working directory for the project)
-        :param ref: str (git ref (branch/tag/commit) if set, then checkouted)
+        :param ref: str (git ref (branch/tag/commit) if set, then checked out)
         :param git_project: ogr.GitProject (remote API for project)
         :param git_service: ogr.GitService (tokens for remote API)
         :param git_url: str (remote url used for cloning)
@@ -318,7 +318,6 @@ class LocalProject:
                 else:
                     # or use first one
                     self.git_url = next(self.git_repo.remotes[0].urls)
-
             else:
                 # Repo has no remotes
                 return False

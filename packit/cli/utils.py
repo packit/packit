@@ -135,41 +135,28 @@ def get_packit_api(
     lp_upstream = None
     lp_downstream = None
 
-    upstream_compared = False
-
     for url in remote_urls:
         remote_hostname = get_hostname_or_none(url=url)
         if not remote_hostname:
             continue
 
         if upstream_hostname:
-            upstream_compared = True
             if remote_hostname == upstream_hostname:
                 lp_upstream = local_project
                 logger.info("Input directory is an upstream repository.")
                 break
 
-        if (
-            package_config.dist_git_base_url
-            and remote_hostname in package_config.dist_git_base_url
+        if package_config.dist_git_base_url and (
+            remote_hostname in package_config.dist_git_base_url
+            or remote_hostname in "pkgs.fedoraproject.org"
         ):
             lp_downstream = local_project
             logger.info("Input directory is a downstream repository.")
             break
     else:
-        if upstream_compared:
-            lp_downstream = local_project
-            logger.info(
-                "Input directory is a downstream repository "
-                "(upstream url does not match any git remote)."
-            )
-        else:
-            logger.warning(
-                "We cannot determine, "
-                "if the input is upstream or downstream. "
-                "Using upstream as a default."
-            )
-            lp_upstream = local_project
+        lp_upstream = local_project
+        # fallback, this is the past behavior
+        logger.info("Input directory is an upstream repository.")
 
     api = PackitAPI(
         config=config,

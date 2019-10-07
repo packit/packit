@@ -27,7 +27,7 @@ from flexmock import flexmock
 from packit.exceptions import PackitException
 from packit.utils import (
     get_namespace_and_repo_name,
-    is_str_url,
+    git_remote_url_to_https_url,
     run_command,
     get_packit_version,
 )
@@ -59,15 +59,21 @@ def test_get_ns_repo_exc():
 @pytest.mark.parametrize(
     "inp,ok",
     [
-        ("/", False),
-        (None, False),
-        ("https://github.com/packit-service/packit", True),
-        ("git@github.com:packit-service/ogr", True),
-        ("ssh://ttomecek@pkgs.fedoraproject.org/rpms/alot.git", True),
+        ("/", ""),
+        (None, ""),
+        (
+            "https://github.com/packit-service/packit",
+            "https://github.com/packit-service/packit",
+        ),
+        ("git@github.com:packit-service/ogr", "https://github.com/packit-service/ogr"),
+        (
+            "ssh://ttomecek@pkgs.fedoraproject.org/rpms/alot.git",
+            "https://pkgs.fedoraproject.org/rpms/alot.git",
+        ),
     ],
 )
-def test_is_str_url(inp, ok):
-    assert is_str_url(inp) == ok
+def test_remote_to_https(inp, ok):
+    assert git_remote_url_to_https_url(inp) == ok
 
 
 def test_run_command_w_env():
