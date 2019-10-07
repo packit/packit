@@ -5,6 +5,7 @@ Thanks for your interest in contributing to `packit`.
 The following is a set of guidelines for contributing to `packit`.
 Use your best judgement, and feel free to propose changes to this document in a pull request.
 
+By contributing to this project you agree to the Developer Certificate of Origin (DCO). This document is a simple statement that you, as a contributor, have the legal right to submit the contribution. See the [DCO](DCO) file for details.
 
 ## Reporting Bugs
 Before creating bug reports, please check a [list of known issues](https://github.com/packit-service/packit/issues) to see
