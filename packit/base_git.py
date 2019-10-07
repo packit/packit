@@ -371,7 +371,13 @@ class PackitRepositoryBase:
         self.specfile.set_version(this_version)
         self.specfile.save()
         rpmdev_bumpspec(self.absolute_specfile_path, comment=comment, version=version)
-        self.specfile._update_data()  # refresh the spec after we changed it
+        # refresh the spec after we changed it
+        if hasattr(self.specfile, "update"):
+            # new rebase-helper
+            self.specfile.update()
+        else:
+            # old rebase-helper
+            self.specfile._update_data()
 
     def is_dirty(self) -> bool:
         """ is the git repo dirty? """
