@@ -30,7 +30,7 @@ import git
 from packaging import version
 from rebasehelper.exceptions import RebaseHelperError
 
-from packit.utils import is_a_git_ref, run_command
+from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -74,8 +74,8 @@ class Upstream(PackitRepositoryBase):
             )
         if self._local_project.git_project is None:
             if not self.package_config.upstream_project_url:
-                raise PackitException(
-                    "Please, set 'upstream_project_url' in your config file."
+                self.package_config.upstream_project_url = git_remote_url_to_https_url(
+                    self._local_project.git_url
                 )
 
             self._local_project.git_project = self.config.get_project(
