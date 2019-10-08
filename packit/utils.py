@@ -121,9 +121,13 @@ def run_command_remote(
     env: Optional[Dict] = None,
 ):
     """
-    wrapper for run_command indicating that it will run some remote interaction
-    no local changes of Filesystem
-    eg. submit something to some server, and check how server reply
+    wrapper for run_command method
+    Indicating that this command run some action without local effect,
+    or the effect is not important.
+
+    eg.
+        submit something to some server, and check how server reply
+        call kinit of some ticket
     """
     return run_command(cmd, error_message, cwd, fail, output, env)
 
