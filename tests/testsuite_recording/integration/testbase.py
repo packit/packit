@@ -22,6 +22,8 @@ PERSISTENT_DATA_PREFIX = os.path.join(
 
 
 class PackitUnittestOgr(unittest.TestCase):
+    # variable VARIANT is important to split test data file based on different
+    # feataures of ogr or another dependencies
     variant = "master"
 
     @staticmethod

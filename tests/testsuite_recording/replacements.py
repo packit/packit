@@ -6,6 +6,11 @@ from requre.helpers.function_output import store_function_output
 from requre.helpers.files import StoreFiles
 from requre.replacements import ogr
 
+"""
+Replacements based on requre import format
+for more details see project https://github.com/packit-service/requre
+"""
+
 session_send = {
     "Session.send": [
         ReplaceType.DECORATOR,
