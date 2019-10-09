@@ -22,4 +22,4 @@
 
 import os
 
-os.environ["RECORD_REQUESTS"] = "TRUE"
+os.environ["C"] = "TRUE"
