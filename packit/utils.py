@@ -112,6 +112,26 @@ def run_command(
     return shell.stdout
 
 
+def run_command_remote(
+    cmd,
+    error_message=None,
+    cwd=None,
+    fail=True,
+    output=False,
+    env: Optional[Dict] = None,
+):
+    """
+    wrapper for run_command method
+    Indicating that this command run some action without local effect,
+    or the effect is not important.
+
+    eg.
+        submit something to some server, and check how server reply
+        call kinit of some ticket
+    """
+    return run_command(cmd, error_message, cwd, fail, output, env)
+
+
 class PackitFormatter(logging.Formatter):
     def format(self, record):
         if record.levelno == logging.INFO:

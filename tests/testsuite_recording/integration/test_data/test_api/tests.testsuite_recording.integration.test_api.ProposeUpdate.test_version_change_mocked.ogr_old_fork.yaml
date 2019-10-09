@@ -1,0 +1,1988 @@
+packit.fedpkg:
+  clone:
+  - null
+unittest.case:
+  tests.testsuite_recording.integration.test_api:
+    packit.api:
+      packit.distgit:
+        ogr.read_only:
+          ogr.services.pagure:
+            requests.sessions:
+              requre.objects:
+                requests.sessions:
+                  send:
+                  - __store_indicator: 2
+                    _content:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jscotka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1552663634'
+                      date_modified: '1552663634'
+                      description: The python-ogr package
+                      fullname: forks/jscotka/rpms/python-ogr
+                      id: 34987
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - packit
+                          - usercont
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jscotka/rpms/python-ogr
+                      user:
+                        fullname: "Jan \u0160\u010Dotka"
+                        name: jscotka
+                    _next: null
+                    elapsed: 0.368867
+                    encoding: null
+                    headers:
+                      AppTime: D=203831
+                      Connection: Keep-Alive
+                      Content-Length: '1469'
+                      Content-Security-Policy: default-src 'self';script-src 'self'
+                        'nonce-pQLzqlzaAMZJBJqdKyS4ulWsa' https://apps.fedoraproject.org;
+                        style-src 'self' 'nonce-pQLzqlzaAMZJBJqdKyS4ulWsa'; object-src
+                        'none';base-uri 'self';img-src 'self' https:;
+                      Content-Type: application/json
+                      Date: Mon, 07 Oct 2019 12:18:25 GMT
+                      Keep-Alive: timeout=15, max=490
+                      Referrer-Policy: same-origin
+                      Server: Apache
+                      Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-kQ.8z7lLJfb-GNCQ0XT41OQWmPWBMA;
+                        Expires=Thu, 07-Nov-2019 12:18:25 GMT; Secure; HttpOnly; Path=/
+                      Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                        preload
+                      X-Content-Type-Options: nosniff
+                      X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                      X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                      X-Fedora-RequestID: XZstETlCK4iqkCojr03UQgAACEw
+                      X-Frame-Options: SAMEORIGIN
+                      X-Xss-Protection: 1; mode=block
+                    raw: !!binary ""
+                    reason: OK
+                    status_code: 200
+                  - __store_indicator: 2
+                    _content:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jscotka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1552663634'
+                      date_modified: '1552663634'
+                      description: The python-ogr package
+                      fullname: forks/jscotka/rpms/python-ogr
+                      id: 34987
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - packit
+                          - usercont
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jscotka/rpms/python-ogr
+                      user:
+                        fullname: "Jan \u0160\u010Dotka"
+                        name: jscotka
+                    _next: null
+                    elapsed: 0.267019
+                    encoding: null
+                    headers:
+                      AppTime: D=103790
+                      Connection: Keep-Alive
+                      Content-Length: '1469'
+                      Content-Security-Policy: default-src 'self';script-src 'self'
+                        'nonce-G7RDKcpaUMO4fbvqiJwiXpAuM' https://apps.fedoraproject.org;
+                        style-src 'self' 'nonce-G7RDKcpaUMO4fbvqiJwiXpAuM'; object-src
+                        'none';base-uri 'self';img-src 'self' https:;
+                      Content-Type: application/json
+                      Date: Mon, 07 Oct 2019 12:18:26 GMT
+                      Keep-Alive: timeout=15, max=489
+                      Referrer-Policy: same-origin
+                      Server: Apache
+                      Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-kg.KhmOzt-288oGyi1KMqAdMhFxEL0;
+                        Expires=Thu, 07-Nov-2019 12:18:26 GMT; Secure; HttpOnly; Path=/
+                      Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                        preload
+                      X-Content-Type-Options: nosniff
+                      X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                      X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                      X-Fedora-RequestID: XZstEjlCK4iqkCojr03USAAACFg
+                      X-Frame-Options: SAMEORIGIN
+                      X-Xss-Protection: 1; mode=block
+                    raw: !!binary ""
+                    reason: OK
+                    status_code: 200
+                  - __store_indicator: 2
+                    _content:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jscotka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1552663634'
+                      date_modified: '1552663634'
+                      description: The python-ogr package
+                      fullname: forks/jscotka/rpms/python-ogr
+                      id: 34987
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - packit
+                          - usercont
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jscotka/rpms/python-ogr
+                      user:
+                        fullname: "Jan \u0160\u010Dotka"
+                        name: jscotka
+                    _next: null
+                    elapsed: 0.315926
+                    encoding: null
+                    headers:
+                      AppTime: D=150568
+                      Connection: Keep-Alive
+                      Content-Length: '1469'
+                      Content-Security-Policy: default-src 'self';script-src 'self'
+                        'nonce-djQm4eaz5oQqH74er9uhOb3eY' https://apps.fedoraproject.org;
+                        style-src 'self' 'nonce-djQm4eaz5oQqH74er9uhOb3eY'; object-src
+                        'none';base-uri 'self';img-src 'self' https:;
+                      Content-Type: application/json
+                      Date: Mon, 07 Oct 2019 12:18:26 GMT
+                      Keep-Alive: timeout=15, max=488
+                      Referrer-Policy: same-origin
+                      Server: Apache
+                      Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-kg.KhmOzt-288oGyi1KMqAdMhFxEL0;
+                        Expires=Thu, 07-Nov-2019 12:18:26 GMT; Secure; HttpOnly; Path=/
+                      Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                        preload
+                      X-Content-Type-Options: nosniff
+                      X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                      X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                      X-Fedora-RequestID: XZstEjlCK4iqkCojr03UVgAACEg
+                      X-Frame-Options: SAMEORIGIN
+                      X-Xss-Protection: 1; mode=block
+                    raw: !!binary ""
+                    reason: OK
+                    status_code: 200
+                  - __store_indicator: 2
+                    _content:
+                      assignee: null
+                      branch: master
+                      branch_from: 0.9.0-master-update
+                      cached_merge_status: unknown
+                      closed_at: null
+                      closed_by: null
+                      comments: []
+                      commit_start: abbe3a0d9689d9a90445de3e17f2c651ce00ce67
+                      commit_stop: abbe3a0d9689d9a90445de3e17f2c651ce00ce67
+                      date_created: '1570450706'
+                      id: 120
+                      initial_comment: 'Upstream tag: 0.9.0
+
+                        Upstream commit: 4580b908ccd3dc17131898ad6ef33a05ac04580a'
+                      last_updated: '1570450706'
+                      project:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      remote_git: null
+                      repo_from:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin: []
+                          commit: []
+                          owner:
+                          - jscotka
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1552663634'
+                        date_modified: '1552663634'
+                        description: The python-ogr package
+                        fullname: forks/jscotka/rpms/python-ogr
+                        id: 34987
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent:
+                          access_groups:
+                            admin: []
+                            commit: []
+                            ticket: []
+                          access_users:
+                            admin:
+                            - jpopelka
+                            - phracek
+                            - rpitonak
+                            - lachmanfrantisek
+                            commit:
+                            - usercont
+                            - packit
+                            owner:
+                            - ttomecek
+                            ticket: []
+                          close_status: []
+                          custom_keys: []
+                          date_created: '1551453513'
+                          date_modified: '1564649660'
+                          description: The python-ogr package
+                          fullname: rpms/python-ogr
+                          id: 34476
+                          milestones: {}
+                          name: python-ogr
+                          namespace: rpms
+                          parent: null
+                          priorities: {}
+                          tags: []
+                          url_path: rpms/python-ogr
+                          user:
+                            fullname: Tomas Tomecek
+                            name: ttomecek
+                        priorities: {}
+                        tags: []
+                        url_path: fork/jscotka/rpms/python-ogr
+                        user:
+                          fullname: "Jan \u0160\u010Dotka"
+                          name: jscotka
+                      status: Open
+                      tags: []
+                      threshold_reached: null
+                      title: Update to upstream release 0.9.0
+                      uid: 028db5a32ec0426dba883ecb4f2d4554
+                      updated_on: '1570450706'
+                      user:
+                        fullname: "Jan \u0160\u010Dotka"
+                        name: jscotka
+                    _next: null
+                    elapsed: 1.445525
+                    encoding: null
+                    headers:
+                      AppTime: D=1280572
+                      Connection: Keep-Alive
+                      Content-Length: '3235'
+                      Content-Security-Policy: default-src 'self';script-src 'self'
+                        'nonce-wLj4jupyJ0C5nzNdyNz180ekK' https://apps.fedoraproject.org;
+                        style-src 'self' 'nonce-wLj4jupyJ0C5nzNdyNz180ekK'; object-src
+                        'none';base-uri 'self';img-src 'self' https:;
+                      Content-Type: application/json
+                      Date: Mon, 07 Oct 2019 12:18:26 GMT
+                      Keep-Alive: timeout=15, max=487
+                      Referrer-Policy: same-origin
+                      Server: Apache
+                      Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-lA.ndRt9hebU7opG1VbEFvQMLfXgD8;
+                        Expires=Thu, 07-Nov-2019 12:18:28 GMT; Secure; HttpOnly; Path=/
+                      Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                        preload
+                      X-Content-Type-Options: nosniff
+                      X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                      X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                      X-Fedora-RequestID: XZstEjlCK4iqkCojr03UaAAACFg
+                      X-Frame-Options: SAMEORIGIN
+                      X-Xss-Protection: 1; mode=block
+                    raw: !!binary ""
+                    reason: OK
+                    status_code: 200
+        ogr.services.pagure:
+          requests.sessions:
+            requre.objects:
+              requests.sessions:
+                send:
+                - __store_indicator: 2
+                  _content:
+                    access_groups:
+                      admin: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - jpopelka
+                      - phracek
+                      - rpitonak
+                      - lachmanfrantisek
+                      commit:
+                      - packit
+                      - usercont
+                      owner:
+                      - ttomecek
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1551453513'
+                    date_modified: '1564649660'
+                    description: The python-ogr package
+                    fullname: rpms/python-ogr
+                    id: 34476
+                    milestones: {}
+                    name: python-ogr
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-ogr
+                    user:
+                      fullname: Tomas Tomecek
+                      name: ttomecek
+                  _next: null
+                  elapsed: 0.681158
+                  encoding: null
+                  headers:
+                    AppTime: D=95396
+                    Connection: Keep-Alive
+                    Content-Length: '741'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-WFwZ7kKzBnBdMqWSlu9X91QNc' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-WFwZ7kKzBnBdMqWSlu9X91QNc'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:14 GMT
+                    Keep-Alive: timeout=15, max=500
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-hw.7DQuMbJfVdr-8l9tCgqUch9OEHA;
+                      Expires=Thu, 07-Nov-2019 12:18:15 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstBjlCK4iqkCojr03TOwAACFU
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    args:
+                      fork: true
+                      namespace: null
+                      owner: null
+                      page: 1
+                      pattern: python-ogr
+                      per_page: 20
+                      short: false
+                      tags: []
+                      username: null
+                    pagination:
+                      first: https://src.fedoraproject.org/api/0/projects?fork=True&pattern=python-ogr&page=1&per_page=20
+                      last: https://src.fedoraproject.org/api/0/projects?fork=True&pattern=python-ogr&page=1&per_page=20
+                      next: null
+                      page: 1
+                      pages: 1
+                      per_page: 20
+                      prev: null
+                    projects:
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jpopelka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1557829602'
+                      date_modified: '1557829602'
+                      description: The python-ogr package
+                      fullname: forks/jpopelka/rpms/python-ogr
+                      id: 36002
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jpopelka/rpms/python-ogr
+                      user:
+                        fullname: "Ji\u0159\xED Popelka"
+                        name: jpopelka
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jscotka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1552663634'
+                      date_modified: '1552663634'
+                      description: The python-ogr package
+                      fullname: forks/jscotka/rpms/python-ogr
+                      id: 34987
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jscotka/rpms/python-ogr
+                      user:
+                        fullname: "Jan \u0160\u010Dotka"
+                        name: jscotka
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - lachmanfrantisek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1561715875'
+                      date_modified: '1561715875'
+                      description: The python-ogr package
+                      fullname: forks/lachmanfrantisek/rpms/python-ogr
+                      id: 37273
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/lachmanfrantisek/rpms/python-ogr
+                      user:
+                        fullname: "Franti\u0161ek Lachman"
+                        name: lachmanfrantisek
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - ttomecek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1551460503'
+                      date_modified: '1551460503'
+                      description: The python-ogr package
+                      fullname: forks/ttomecek/rpms/python-ogr
+                      id: 34478
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/ttomecek/rpms/python-ogr
+                      user:
+                        fullname: Tomas Tomecek
+                        name: ttomecek
+                    total_projects: 4
+                  _next: null
+                  elapsed: 0.334111
+                  encoding: null
+                  headers:
+                    AppTime: D=169471
+                    Connection: Keep-Alive
+                    Content-Length: '7662'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-bUh1OLMwqrknTG0PD7JqsNojS' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-bUh1OLMwqrknTG0PD7JqsNojS'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:15 GMT
+                    Keep-Alive: timeout=15, max=499
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-hw.7DQuMbJfVdr-8l9tCgqUch9OEHA;
+                      Expires=Thu, 07-Nov-2019 12:18:15 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstBzlCK4iqkCojr03TPgAACEc
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    access_groups:
+                      admin: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      commit: []
+                      owner:
+                      - jpopelka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1557829602'
+                    date_modified: '1557829602'
+                    description: The python-ogr package
+                    fullname: forks/jpopelka/rpms/python-ogr
+                    id: 36002
+                    milestones: {}
+                    name: python-ogr
+                    namespace: rpms
+                    parent:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin:
+                        - jpopelka
+                        - phracek
+                        - rpitonak
+                        - lachmanfrantisek
+                        commit:
+                        - packit
+                        - usercont
+                        owner:
+                        - ttomecek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1551453513'
+                      date_modified: '1564649660'
+                      description: The python-ogr package
+                      fullname: rpms/python-ogr
+                      id: 34476
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent: null
+                      priorities: {}
+                      tags: []
+                      url_path: rpms/python-ogr
+                      user:
+                        fullname: Tomas Tomecek
+                        name: ttomecek
+                    priorities: {}
+                    tags: []
+                    url_path: fork/jpopelka/rpms/python-ogr
+                    user:
+                      fullname: "Ji\u0159\xED Popelka"
+                      name: jpopelka
+                  _next: null
+                  elapsed: 0.297838
+                  encoding: null
+                  headers:
+                    AppTime: D=126696
+                    Connection: Keep-Alive
+                    Content-Length: '1475'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-FBMJcRmOqyb70tk6i4lwPV7p4' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-FBMJcRmOqyb70tk6i4lwPV7p4'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:15 GMT
+                    Keep-Alive: timeout=15, max=498
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-hw.7DQuMbJfVdr-8l9tCgqUch9OEHA;
+                      Expires=Thu, 07-Nov-2019 12:18:15 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstBzlCK4iqkCojr03TRwAACFg
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    username: jscotka
+                  _next: null
+                  elapsed: 0.253626
+                  encoding: null
+                  headers:
+                    AppTime: D=88547
+                    Connection: Keep-Alive
+                    Content-Length: '27'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-R1Z65dcs97YFh9nNnFrvihtfe' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-R1Z65dcs97YFh9nNnFrvihtfe'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:16 GMT
+                    Keep-Alive: timeout=15, max=497
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-iA.x51Xn2lme4oY520fb2ugE57ktsA;
+                      Expires=Thu, 07-Nov-2019 12:18:16 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstCDlCK4iqkCojr03TTwAACEE
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    access_groups:
+                      admin: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1552663634'
+                    date_modified: '1552663634'
+                    description: The python-ogr package
+                    fullname: forks/jscotka/rpms/python-ogr
+                    id: 34987
+                    milestones: {}
+                    name: python-ogr
+                    namespace: rpms
+                    parent:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin:
+                        - jpopelka
+                        - phracek
+                        - rpitonak
+                        - lachmanfrantisek
+                        commit:
+                        - usercont
+                        - packit
+                        owner:
+                        - ttomecek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1551453513'
+                      date_modified: '1564649660'
+                      description: The python-ogr package
+                      fullname: rpms/python-ogr
+                      id: 34476
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent: null
+                      priorities: {}
+                      tags: []
+                      url_path: rpms/python-ogr
+                      user:
+                        fullname: Tomas Tomecek
+                        name: ttomecek
+                    priorities: {}
+                    tags: []
+                    url_path: fork/jscotka/rpms/python-ogr
+                    user:
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                  _next: null
+                  elapsed: 0.292539
+                  encoding: null
+                  headers:
+                    AppTime: D=127244
+                    Connection: Keep-Alive
+                    Content-Length: '1469'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-mrtpgOg1Obi8HNMIHfuapuj4o' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-mrtpgOg1Obi8HNMIHfuapuj4o'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:16 GMT
+                    Keep-Alive: timeout=15, max=496
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-iA.x51Xn2lme4oY520fb2ugE57ktsA;
+                      Expires=Thu, 07-Nov-2019 12:18:16 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstCDlCK4iqkCojr03TUAAACEI
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    total_urls: 2
+                    urls:
+                      git: https://src.fedoraproject.org/forks/jscotka/rpms/python-ogr.git
+                      ssh: ssh://jscotka@pkgs.fedoraproject.org/forks/jscotka/rpms/python-ogr.git
+                  _next: null
+                  elapsed: 0.270925
+                  encoding: null
+                  headers:
+                    AppTime: D=106935
+                    Connection: Keep-Alive
+                    Content-Length: '200'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-UYnUinbZ5JHo6GOJlNKwQnaLR' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-UYnUinbZ5JHo6GOJlNKwQnaLR'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:16 GMT
+                    Keep-Alive: timeout=15, max=495
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-iA.x51Xn2lme4oY520fb2ugE57ktsA;
+                      Expires=Thu, 07-Nov-2019 12:18:16 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstCDlCK4iqkCojr03TUQAACFI
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    access_groups:
+                      admin: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - jpopelka
+                      - phracek
+                      - rpitonak
+                      - lachmanfrantisek
+                      commit:
+                      - packit
+                      - usercont
+                      owner:
+                      - ttomecek
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1551453513'
+                    date_modified: '1564649660'
+                    description: The python-ogr package
+                    fullname: rpms/python-ogr
+                    id: 34476
+                    milestones: {}
+                    name: python-ogr
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-ogr
+                    user:
+                      fullname: Tomas Tomecek
+                      name: ttomecek
+                  _next: null
+                  elapsed: 0.279143
+                  encoding: null
+                  headers:
+                    AppTime: D=114353
+                    Connection: Keep-Alive
+                    Content-Length: '741'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-wqpScIoZ40lnj0sO3RF7yE0Wm' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-wqpScIoZ40lnj0sO3RF7yE0Wm'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:23 GMT
+                    Keep-Alive: timeout=15, max=494
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-jw.rN__Tpq_GfzPK-L5z_t4ilPIhTI;
+                      Expires=Thu, 07-Nov-2019 12:18:23 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstDzlCK4iqkCojr03UIgAACEA
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    args:
+                      fork: true
+                      namespace: null
+                      owner: null
+                      page: 1
+                      pattern: python-ogr
+                      per_page: 20
+                      short: false
+                      tags: []
+                      username: null
+                    pagination:
+                      first: https://src.fedoraproject.org/api/0/projects?fork=True&pattern=python-ogr&page=1&per_page=20
+                      last: https://src.fedoraproject.org/api/0/projects?fork=True&pattern=python-ogr&page=1&per_page=20
+                      next: null
+                      page: 1
+                      pages: 1
+                      per_page: 20
+                      prev: null
+                    projects:
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jpopelka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1557829602'
+                      date_modified: '1557829602'
+                      description: The python-ogr package
+                      fullname: forks/jpopelka/rpms/python-ogr
+                      id: 36002
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jpopelka/rpms/python-ogr
+                      user:
+                        fullname: "Ji\u0159\xED Popelka"
+                        name: jpopelka
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - jscotka
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1552663634'
+                      date_modified: '1552663634'
+                      description: The python-ogr package
+                      fullname: forks/jscotka/rpms/python-ogr
+                      id: 34987
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/jscotka/rpms/python-ogr
+                      user:
+                        fullname: "Jan \u0160\u010Dotka"
+                        name: jscotka
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - lachmanfrantisek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1561715875'
+                      date_modified: '1561715875'
+                      description: The python-ogr package
+                      fullname: forks/lachmanfrantisek/rpms/python-ogr
+                      id: 37273
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/lachmanfrantisek/rpms/python-ogr
+                      user:
+                        fullname: "Franti\u0161ek Lachman"
+                        name: lachmanfrantisek
+                    - access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin: []
+                        commit: []
+                        owner:
+                        - ttomecek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1551460503'
+                      date_modified: '1551460503'
+                      description: The python-ogr package
+                      fullname: forks/ttomecek/rpms/python-ogr
+                      id: 34478
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent:
+                        access_groups:
+                          admin: []
+                          commit: []
+                          ticket: []
+                        access_users:
+                          admin:
+                          - jpopelka
+                          - phracek
+                          - rpitonak
+                          - lachmanfrantisek
+                          commit:
+                          - usercont
+                          - packit
+                          owner:
+                          - ttomecek
+                          ticket: []
+                        close_status: []
+                        custom_keys: []
+                        date_created: '1551453513'
+                        date_modified: '1564649660'
+                        description: The python-ogr package
+                        fullname: rpms/python-ogr
+                        id: 34476
+                        milestones: {}
+                        name: python-ogr
+                        namespace: rpms
+                        parent: null
+                        priorities: {}
+                        tags: []
+                        url_path: rpms/python-ogr
+                        user:
+                          fullname: Tomas Tomecek
+                          name: ttomecek
+                      priorities: {}
+                      tags: []
+                      url_path: fork/ttomecek/rpms/python-ogr
+                      user:
+                        fullname: Tomas Tomecek
+                        name: ttomecek
+                    total_projects: 4
+                  _next: null
+                  elapsed: 0.365168
+                  encoding: null
+                  headers:
+                    AppTime: D=200428
+                    Connection: Keep-Alive
+                    Content-Length: '7662'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-cJmMPafloeSDQEWnjIXhTUz2A' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-cJmMPafloeSDQEWnjIXhTUz2A'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:24 GMT
+                    Keep-Alive: timeout=15, max=493
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-kA.tsO0UHrk67TAGghVACud2MUa2AA;
+                      Expires=Thu, 07-Nov-2019 12:18:24 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstEDlCK4iqkCojr03UKgAACEs
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    access_groups:
+                      admin: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      commit: []
+                      owner:
+                      - jpopelka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1557829602'
+                    date_modified: '1557829602'
+                    description: The python-ogr package
+                    fullname: forks/jpopelka/rpms/python-ogr
+                    id: 36002
+                    milestones: {}
+                    name: python-ogr
+                    namespace: rpms
+                    parent:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin:
+                        - jpopelka
+                        - phracek
+                        - rpitonak
+                        - lachmanfrantisek
+                        commit:
+                        - usercont
+                        - packit
+                        owner:
+                        - ttomecek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1551453513'
+                      date_modified: '1564649660'
+                      description: The python-ogr package
+                      fullname: rpms/python-ogr
+                      id: 34476
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent: null
+                      priorities: {}
+                      tags: []
+                      url_path: rpms/python-ogr
+                      user:
+                        fullname: Tomas Tomecek
+                        name: ttomecek
+                    priorities: {}
+                    tags: []
+                    url_path: fork/jpopelka/rpms/python-ogr
+                    user:
+                      fullname: "Ji\u0159\xED Popelka"
+                      name: jpopelka
+                  _next: null
+                  elapsed: 0.274329
+                  encoding: null
+                  headers:
+                    AppTime: D=109899
+                    Connection: Keep-Alive
+                    Content-Length: '1475'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-xVRinUqTcJmYCQlI0bwQNpvNk' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-xVRinUqTcJmYCQlI0bwQNpvNk'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:24 GMT
+                    Keep-Alive: timeout=15, max=492
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-kA.tsO0UHrk67TAGghVACud2MUa2AA;
+                      Expires=Thu, 07-Nov-2019 12:18:24 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstEDlCK4iqkCojr03UNAAACEE
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                - __store_indicator: 2
+                  _content:
+                    access_groups:
+                      admin: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1552663634'
+                    date_modified: '1552663634'
+                    description: The python-ogr package
+                    fullname: forks/jscotka/rpms/python-ogr
+                    id: 34987
+                    milestones: {}
+                    name: python-ogr
+                    namespace: rpms
+                    parent:
+                      access_groups:
+                        admin: []
+                        commit: []
+                        ticket: []
+                      access_users:
+                        admin:
+                        - jpopelka
+                        - phracek
+                        - rpitonak
+                        - lachmanfrantisek
+                        commit:
+                        - packit
+                        - usercont
+                        owner:
+                        - ttomecek
+                        ticket: []
+                      close_status: []
+                      custom_keys: []
+                      date_created: '1551453513'
+                      date_modified: '1564649660'
+                      description: The python-ogr package
+                      fullname: rpms/python-ogr
+                      id: 34476
+                      milestones: {}
+                      name: python-ogr
+                      namespace: rpms
+                      parent: null
+                      priorities: {}
+                      tags: []
+                      url_path: rpms/python-ogr
+                      user:
+                        fullname: Tomas Tomecek
+                        name: ttomecek
+                    priorities: {}
+                    tags: []
+                    url_path: fork/jscotka/rpms/python-ogr
+                    user:
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                  _next: null
+                  elapsed: 0.352933
+                  encoding: null
+                  headers:
+                    AppTime: D=188907
+                    Connection: Keep-Alive
+                    Content-Length: '1469'
+                    Content-Security-Policy: default-src 'self';script-src 'self'
+                      'nonce-9A987tMgX59wGlovQu0IhEPhj' https://apps.fedoraproject.org;
+                      style-src 'self' 'nonce-9A987tMgX59wGlovQu0IhEPhj'; object-src
+                      'none';base-uri 'self';img-src 'self' https:;
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:25 GMT
+                    Keep-Alive: timeout=15, max=491
+                    Referrer-Policy: same-origin
+                    Server: Apache
+                    Set-Cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmIjp7IiBiIjoiWVRRMFlXVmlNV1psTnpZeE9UTTBPREUxTVdJMk9UazVZekk0TVRnME9XUXhZMlEwTWpKbE9RPT0ifX0.EHy-kQ.8z7lLJfb-GNCQ0XT41OQWmPWBMA;
+                      Expires=Thu, 07-Nov-2019 12:18:25 GMT; Secure; HttpOnly; Path=/
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-AppServer: pkgs02.phx2.fedoraproject.org
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstETlCK4iqkCojr03UOQAACEA
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+        packit.base_git:
+          packit.local_project:
+            requre.objects:
+              git.remote:
+                push:
+                - - _old_commit_sha: 44431d1
+                    flags: 128
+                    local_ref:
+                    - /tmp/packit_tmp/tests.testsuite_recording.integration.test_api.ProposeUpdate.test_version_change_mocked.ogr_old_fork.yaml/packit-dist-git_2/.git
+                    - refs/heads/0.9.0-master-update
+                    remote_ref_string: refs/heads/0.9.0-master-update
+                    summary: '44431d1...abbe3a0 (forced update)
+
+                      '
+      packit.upstream:
+        rebasehelper.plugins.versioneers:
+          rebasehelper.plugins.versioneers.anitya:
+            requre.objects:
+              rebasehelper.helpers.download_helper:
+                request:
+                - __store_indicator: 2
+                  _content:
+                    backend: PyPI
+                    created_on: 1551460948.0
+                    ecosystem: https://github.com/packit-service/ogr
+                    homepage: https://github.com/packit-service/ogr
+                    id: 18832
+                    name: ogr
+                    packages:
+                    - distro: Fedora
+                      package_name: python-ogr
+                    regex: null
+                    updated_on: 1570450425.0
+                    version: 0.8.0
+                    version_url: null
+                    versions:
+                    - 0.8.0
+                    - 0.7.0
+                    - 0.6.0
+                    - 0.5.0
+                    - 0.4.0
+                    - 0.3.1
+                    - 0.3.0
+                    - 0.2.0
+                    - 0.1.0
+                    - 0.0.3
+                    - 0.0.2
+                    - 0.0.1
+                  _next: null
+                  elapsed: 0.573311
+                  encoding: null
+                  headers:
+                    AppTime: D=34415
+                    Cache-control: private
+                    Connection: Keep-Alive
+                    Content-Length: '418'
+                    Content-Type: application/json
+                    Date: Mon, 07 Oct 2019 12:18:11 GMT
+                    Keep-Alive: timeout=15, max=500
+                    Referrer-Policy: same-origin
+                    Server: Apache/2.4.41 (Fedora) mod_wsgi/4.6.4 Python/3.7
+                    Set-Cookie: c7f2af7958ac7bdd3fe2e687de986bfb=12d7d19b974232936f73b4014f796412;
+                      path=/; HttpOnly; Secure
+                    Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                      preload
+                    X-Content-Type-Options: nosniff
+                    X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                    X-Fedora-RequestID: XZstA7ev5FVU20BcvN13BAAACQo
+                    X-Frame-Options: SAMEORIGIN
+                    X-Xss-Protection: 1; mode=block
+                  raw: !!binary ""
+                  reason: OK
+                  status_code: 200
+                requests.sessions:
+                  requre.objects:
+                    requests.sessions:
+                      send:
+                      - __store_indicator: 2
+                        _content:
+                          backend: PyPI
+                          created_on: 1551460948.0
+                          ecosystem: https://github.com/packit-service/ogr
+                          homepage: https://github.com/packit-service/ogr
+                          id: 18832
+                          name: ogr
+                          packages:
+                          - distro: Fedora
+                            package_name: python-ogr
+                          regex: null
+                          updated_on: 1570450425.0
+                          version: 0.8.0
+                          version_url: null
+                          versions:
+                          - 0.8.0
+                          - 0.7.0
+                          - 0.6.0
+                          - 0.5.0
+                          - 0.4.0
+                          - 0.3.1
+                          - 0.3.0
+                          - 0.2.0
+                          - 0.1.0
+                          - 0.0.3
+                          - 0.0.2
+                          - 0.0.1
+                        _next: null
+                        elapsed: 0.573311
+                        encoding: null
+                        headers:
+                          AppTime: D=34415
+                          Cache-control: private
+                          Connection: Keep-Alive
+                          Content-Length: '418'
+                          Content-Type: application/json
+                          Date: Mon, 07 Oct 2019 12:18:11 GMT
+                          Keep-Alive: timeout=15, max=500
+                          Referrer-Policy: same-origin
+                          Server: Apache/2.4.41 (Fedora) mod_wsgi/4.6.4 Python/3.7
+                          Set-Cookie: c7f2af7958ac7bdd3fe2e687de986bfb=12d7d19b974232936f73b4014f796412;
+                            path=/; HttpOnly; Secure
+                          Strict-Transport-Security: max-age=31536000; includeSubDomains;
+                            preload
+                          X-Content-Type-Options: nosniff
+                          X-Fedora-ProxyServer: proxy10.phx2.fedoraproject.org
+                          X-Fedora-RequestID: XZstA7ev5FVU20BcvN13BAAACQo
+                          X-Frame-Options: SAMEORIGIN
+                          X-Xss-Protection: 1; mode=block
+                        raw: !!binary ""
+                        reason: OK
+                        status_code: 200
+    tests.testsuite_recording.integration.testbase:
+      packit.config:
+        ogr.services.github:
+          github.MainClass:
+            github.Requester:
+              requests.sessions:
+                requre.objects:
+                  requests.sessions:
+                    send:
+                    - __store_indicator: 2
+                      _content:
+                        allow_merge_commit: true
+                        allow_rebase_merge: true
+                        allow_squash_merge: true
+                        archive_url: https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}
+                        archived: false
+                        assignees_url: https://api.github.com/repos/packit-service/ogr/assignees{/user}
+                        blobs_url: https://api.github.com/repos/packit-service/ogr/git/blobs{/sha}
+                        branches_url: https://api.github.com/repos/packit-service/ogr/branches{/branch}
+                        clone_url: https://github.com/packit-service/ogr.git
+                        collaborators_url: https://api.github.com/repos/packit-service/ogr/collaborators{/collaborator}
+                        comments_url: https://api.github.com/repos/packit-service/ogr/comments{/number}
+                        commits_url: https://api.github.com/repos/packit-service/ogr/commits{/sha}
+                        compare_url: https://api.github.com/repos/packit-service/ogr/compare/{base}...{head}
+                        contents_url: https://api.github.com/repos/packit-service/ogr/contents/{+path}
+                        contributors_url: https://api.github.com/repos/packit-service/ogr/contributors
+                        created_at: '2018-12-13T12:33:52Z'
+                        default_branch: master
+                        deployments_url: https://api.github.com/repos/packit-service/ogr/deployments
+                        description: One Git library to Rule -- one API for many git
+                          forges
+                        disabled: false
+                        downloads_url: https://api.github.com/repos/packit-service/ogr/downloads
+                        events_url: https://api.github.com/repos/packit-service/ogr/events
+                        fork: false
+                        forks: 17
+                        forks_count: 17
+                        forks_url: https://api.github.com/repos/packit-service/ogr/forks
+                        full_name: packit-service/ogr
+                        git_commits_url: https://api.github.com/repos/packit-service/ogr/git/commits{/sha}
+                        git_refs_url: https://api.github.com/repos/packit-service/ogr/git/refs{/sha}
+                        git_tags_url: https://api.github.com/repos/packit-service/ogr/git/tags{/sha}
+                        git_url: git://github.com/packit-service/ogr.git
+                        has_downloads: true
+                        has_issues: true
+                        has_pages: false
+                        has_projects: true
+                        has_wiki: true
+                        homepage: ''
+                        hooks_url: https://api.github.com/repos/packit-service/ogr/hooks
+                        html_url: https://github.com/packit-service/ogr
+                        id: 161636700
+                        issue_comment_url: https://api.github.com/repos/packit-service/ogr/issues/comments{/number}
+                        issue_events_url: https://api.github.com/repos/packit-service/ogr/issues/events{/number}
+                        issues_url: https://api.github.com/repos/packit-service/ogr/issues{/number}
+                        keys_url: https://api.github.com/repos/packit-service/ogr/keys{/key_id}
+                        labels_url: https://api.github.com/repos/packit-service/ogr/labels{/name}
+                        language: Python
+                        languages_url: https://api.github.com/repos/packit-service/ogr/languages
+                        license:
+                          key: mit
+                          name: MIT License
+                          node_id: MDc6TGljZW5zZTEz
+                          spdx_id: MIT
+                          url: https://api.github.com/licenses/mit
+                        merges_url: https://api.github.com/repos/packit-service/ogr/merges
+                        milestones_url: https://api.github.com/repos/packit-service/ogr/milestones{/number}
+                        mirror_url: null
+                        name: ogr
+                        network_count: 17
+                        node_id: MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=
+                        notifications_url: https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}
+                        open_issues: 30
+                        open_issues_count: 30
+                        organization:
+                          avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
+                          events_url: https://api.github.com/users/packit-service/events{/privacy}
+                          followers_url: https://api.github.com/users/packit-service/followers
+                          following_url: https://api.github.com/users/packit-service/following{/other_user}
+                          gists_url: https://api.github.com/users/packit-service/gists{/gist_id}
+                          gravatar_id: ''
+                          html_url: https://github.com/packit-service
+                          id: 46870917
+                          login: packit-service
+                          node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                          organizations_url: https://api.github.com/users/packit-service/orgs
+                          received_events_url: https://api.github.com/users/packit-service/received_events
+                          repos_url: https://api.github.com/users/packit-service/repos
+                          site_admin: false
+                          starred_url: https://api.github.com/users/packit-service/starred{/owner}{/repo}
+                          subscriptions_url: https://api.github.com/users/packit-service/subscriptions
+                          type: Organization
+                          url: https://api.github.com/users/packit-service
+                        owner:
+                          avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
+                          events_url: https://api.github.com/users/packit-service/events{/privacy}
+                          followers_url: https://api.github.com/users/packit-service/followers
+                          following_url: https://api.github.com/users/packit-service/following{/other_user}
+                          gists_url: https://api.github.com/users/packit-service/gists{/gist_id}
+                          gravatar_id: ''
+                          html_url: https://github.com/packit-service
+                          id: 46870917
+                          login: packit-service
+                          node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                          organizations_url: https://api.github.com/users/packit-service/orgs
+                          received_events_url: https://api.github.com/users/packit-service/received_events
+                          repos_url: https://api.github.com/users/packit-service/repos
+                          site_admin: false
+                          starred_url: https://api.github.com/users/packit-service/starred{/owner}{/repo}
+                          subscriptions_url: https://api.github.com/users/packit-service/subscriptions
+                          type: Organization
+                          url: https://api.github.com/users/packit-service
+                        permissions:
+                          admin: true
+                          pull: true
+                          push: true
+                        private: false
+                        pulls_url: https://api.github.com/repos/packit-service/ogr/pulls{/number}
+                        pushed_at: '2019-10-07T11:19:31Z'
+                        releases_url: https://api.github.com/repos/packit-service/ogr/releases{/id}
+                        size: 3518
+                        ssh_url: git@github.com:packit-service/ogr.git
+                        stargazers_count: 17
+                        stargazers_url: https://api.github.com/repos/packit-service/ogr/stargazers
+                        statuses_url: https://api.github.com/repos/packit-service/ogr/statuses/{sha}
+                        subscribers_count: 8
+                        subscribers_url: https://api.github.com/repos/packit-service/ogr/subscribers
+                        subscription_url: https://api.github.com/repos/packit-service/ogr/subscription
+                        svn_url: https://github.com/packit-service/ogr
+                        tags_url: https://api.github.com/repos/packit-service/ogr/tags
+                        teams_url: https://api.github.com/repos/packit-service/ogr/teams
+                        trees_url: https://api.github.com/repos/packit-service/ogr/git/trees{/sha}
+                        updated_at: '2019-10-07T11:02:40Z'
+                        url: https://api.github.com/repos/packit-service/ogr
+                        watchers: 17
+                        watchers_count: 17
+                      _next: null
+                      elapsed: 0.992067
+                      encoding: utf-8
+                      headers:
+                        Access-Control-Allow-Origin: '*'
+                        Access-Control-Expose-Headers: ETag, Link, Location, Retry-After,
+                          X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+                          X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
+                          X-Poll-Interval, X-GitHub-Media-Type
+                        Cache-Control: private, max-age=60, s-maxage=60
+                        Content-Encoding: gzip
+                        Content-Security-Policy: default-src 'none'
+                        Content-Type: application/json; charset=utf-8
+                        Date: Mon, 07 Oct 2019 12:18:04 GMT
+                        ETag: W/"ce4370185077b3ca0129615c864a261b"
+                        Last-Modified: Mon, 07 Oct 2019 11:02:40 GMT
+                        Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+                        Server: GitHub.com
+                        Status: 200 OK
+                        Strict-Transport-Security: max-age=31536000; includeSubdomains;
+                          preload
+                        Transfer-Encoding: chunked
+                        Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
+                        X-Accepted-OAuth-Scopes: repo
+                        X-Content-Type-Options: nosniff
+                        X-Frame-Options: deny
+                        X-GitHub-Media-Type: github.v3; format=json
+                        X-GitHub-Request-Id: 582F:181F6:48FB483:58973B0:5D9B2CFB
+                        X-OAuth-Scopes: admin:org, gist, notifications, repo, user,
+                          write:discussion
+                        X-RateLimit-Limit: '5000'
+                        X-RateLimit-Remaining: '4997'
+                        X-RateLimit-Reset: '1570454257'
+                        X-XSS-Protection: 1; mode=block
+                      raw: !!binary ""
+                      reason: OK
+                      status_code: 200
+          github.Repository:
+            github.Requester:
+              requests.sessions:
+                requre.objects:
+                  requests.sessions:
+                    send:
+                    - __store_indicator: 2
+                      _content:
+                        _links:
+                          git: https://api.github.com/repos/packit-service/ogr/git/blobs/6276a41bc0caace390795e5457cddee4590ad7ec
+                          html: https://github.com/packit-service/ogr/blob/master/.packit.yaml
+                          self: https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master
+                        content: 'LS0tCiMgZG9jczogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl
+
+                          L3BhY2tpdC9ibG9iL21hc3Rlci9kb2NzL2NvbmZpZ3VyYXRpb24ubWQKc3Bl
+
+                          Y2ZpbGVfcGF0aDogcHl0aG9uLW9nci5zcGVjCnN5bmNlZF9maWxlczoKICAt
+
+                          IHB5dGhvbi1vZ3Iuc3BlYwp1cHN0cmVhbV9wcm9qZWN0X25hbWU6IG9ncgpk
+
+                          b3duc3RyZWFtX3BhY2thZ2VfbmFtZTogcHl0aG9uLW9ncgp1cHN0cmVhbV9w
+
+                          cm9qZWN0X3VybDogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl
+
+                          L29ncgojIHRoZSB2ZXJzaW9uIGlzIGRpZmZlcmVudCB0aGFuIHdpdGggYmFz
+
+                          aWMgZ2l0IGRlc2NyaWJlCmNyZWF0ZV90YXJiYWxsX2NvbW1hbmQ6IFsicHl0
+
+                          aG9uMyIsICJzZXR1cC5weSIsICJzZGlzdCIsICItLWRpc3QtZGlyIiwgIi4i
+
+                          XQpjdXJyZW50X3ZlcnNpb25fY29tbWFuZDogWyJweXRob24zIiwgInNldHVw
+
+                          LnB5IiwgIi0tdmVyc2lvbiJdCmpvYnM6Ci0gam9iOiBzeW5jX2Zyb21fZG93
+
+                          bnN0cmVhbQogIHRyaWdnZXI6IGNvbW1pdAotIGpvYjogcHJvcG9zZV9kb3du
+
+                          c3RyZWFtCiAgdHJpZ2dlcjogcmVsZWFzZQogIG1ldGFkYXRhOgogICAgZGlz
+
+                          dC1naXQtYnJhbmNoOiBtYXN0ZXIKLSBqb2I6IHByb3Bvc2VfZG93bnN0cmVh
+
+                          bQogIHRyaWdnZXI6IHJlbGVhc2UKICBtZXRhZGF0YToKICAgIGRpc3QtZ2l0
+
+                          LWJyYW5jaDogZjMwCi0gam9iOiBwcm9wb3NlX2Rvd25zdHJlYW0KICB0cmln
+
+                          Z2VyOiByZWxlYXNlCiAgbWV0YWRhdGE6CiAgICBkaXN0LWdpdC1icmFuY2g6
+
+                          IGYyOQotIGpvYjogY29wcl9idWlsZAogIHRyaWdnZXI6IHB1bGxfcmVxdWVz
+
+                          dAogIG1ldGFkYXRhOgogICAgdGFyZ2V0czoKICAgIC0gZmVkb3JhLTI5LXg4
+
+                          Nl82NAogICAgLSBmZWRvcmEtcmF3aGlkZS14ODZfNjQKICAgIC0gZmVkb3Jh
+
+                          LTMwLXg4Nl82NAo=
+
+                          '
+                        download_url: https://raw.githubusercontent.com/packit-service/ogr/master/.packit.yaml
+                        encoding: base64
+                        git_url: https://api.github.com/repos/packit-service/ogr/git/blobs/6276a41bc0caace390795e5457cddee4590ad7ec
+                        html_url: https://github.com/packit-service/ogr/blob/master/.packit.yaml
+                        name: .packit.yaml
+                        path: .packit.yaml
+                        sha: 6276a41bc0caace390795e5457cddee4590ad7ec
+                        size: 911
+                        type: file
+                        url: https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master
+                      _next: null
+                      elapsed: 0.190319
+                      encoding: utf-8
+                      headers:
+                        Access-Control-Allow-Origin: '*'
+                        Access-Control-Expose-Headers: ETag, Link, Location, Retry-After,
+                          X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+                          X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
+                          X-Poll-Interval, X-GitHub-Media-Type
+                        Cache-Control: private, max-age=60, s-maxage=60
+                        Content-Encoding: gzip
+                        Content-Security-Policy: default-src 'none'
+                        Content-Type: application/json; charset=utf-8
+                        Date: Mon, 07 Oct 2019 12:18:04 GMT
+                        ETag: W/"6276a41bc0caace390795e5457cddee4590ad7ec"
+                        Last-Modified: Mon, 07 Oct 2019 11:02:37 GMT
+                        Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+                        Server: GitHub.com
+                        Status: 200 OK
+                        Strict-Transport-Security: max-age=31536000; includeSubdomains;
+                          preload
+                        Transfer-Encoding: chunked
+                        Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
+                        X-Accepted-OAuth-Scopes: ''
+                        X-Content-Type-Options: nosniff
+                        X-Frame-Options: deny
+                        X-GitHub-Media-Type: github.v3; format=json
+                        X-GitHub-Request-Id: 582F:181F6:48FB588:58974CE:5D9B2CFC
+                        X-OAuth-Scopes: admin:org, gist, notifications, repo, user,
+                          write:discussion
+                        X-RateLimit-Limit: '5000'
+                        X-RateLimit-Remaining: '4996'
+                        X-RateLimit-Reset: '1570454257'
+                        X-XSS-Protection: 1; mode=block
+                      raw: !!binary ""
+                      reason: OK
+                      status_code: 200

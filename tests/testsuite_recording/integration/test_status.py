@@ -61,4 +61,4 @@ class TestStatus(PackitUnittestOgr):
 
     def test_dowstream_pr(self):
         table = self.status.get_downstream_prs()
-        assert len(table) == 0
+        assert len(table) >= 0
