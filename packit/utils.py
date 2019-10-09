@@ -23,6 +23,7 @@
 import json
 import logging
 import os
+import re
 import shlex
 import subprocess
 import tempfile
@@ -303,20 +304,36 @@ def rpmdev_bumpspec(
     run_command(cmd)
 
 
-def is_str_url(inp: str) -> bool:
-    """ is provided string a URL? """
+# TODO: merge this function into parse_git_repo in ogr
+# https://github.com/packit-service/packit/pull/555#discussion_r332871418
+def git_remote_url_to_https_url(inp: str) -> str:
+    """
+    turn provided git remote URL to https URL:
+    returns empty string if the input can't be processed
+    """
     if not inp:
-        return False
+        return ""
     parsed = urlparse(inp)
-    if parsed.scheme:
-        logger.debug(f"Provided input {inp} is an url, scheme: {parsed.scheme}")
-        return True
-    elif inp.startswith("git@"):
-        url = urlparse(inp.replace(":", "/", 1).replace("git@", "git+ssh://", 1))
-        logger.debug(f"SSH style url {url} found.")
-        return True
+    if parsed.scheme and parsed.scheme in ["http", "https"]:
+        logger.debug(f"Provided input {inp} is an url.")
+        return inp
+    elif "@" in inp:
+        url_str = inp.replace("ssh://", "")
+        # now we can sub the colon (:) with slash (/)
+        url_str = url_str.replace(":", "/")
+        # and finally, get rid of the git@ junk
+        url_str = re.sub(r"\w+@", "https://", url_str)
+        # let's verify it's good
+        try:
+            urlparse(url_str)
+        except Exception:
+            logger.error(f"unable to process {inp}")
+            raise PackitException(f"Unable to process {inp}.")
+        else:
+            logger.debug(f"SSH style URL {inp} turned into HTTPS {url_str}")
+            return url_str
     logger.warning(f"{inp} is not an URL we recognize")
-    return False
+    return ""
 
 
 def get_packit_version() -> str:

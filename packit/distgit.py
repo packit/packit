@@ -246,6 +246,10 @@ class DistGit(PackitRepositoryBase):
         with cwd(self.local_project.working_dir):
             self.specfile.download_remote_sources()
         archive = self.absolute_specfile_dir / self.upstream_archive_name
+        if not archive.exists():
+            raise PackitException(
+                "Upstream archive was not downloaded, something is wrong."
+            )
         logger.info(f"Downloaded archive: {archive}")
         return archive
 

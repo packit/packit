@@ -1,18 +1,17 @@
 import inspect
 import os
-import unittest
 import shutil
+import unittest
 from subprocess import check_output, CalledProcessError
+
+from requre.helpers.tempfile import TempFile
+from requre.storage import PersistentObjectStorage
 
 import packit.distgit
 import packit.upstream
-from ogr import GithubService, PagureService
-
-from requre.storage import PersistentObjectStorage
-from requre.helpers.tempfile import TempFile
-
 from packit.config import Config
 from packit.config import get_package_config_from_repo
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
 DATA_DIR = "test_data"
@@ -28,14 +27,10 @@ class PackitUnittestOgr(unittest.TestCase):
 
     @staticmethod
     def get_test_config():
-        conf = Config()
-        pagure_user_token = os.environ.get("PAGURE_TOKEN", "test")
-        github_token = os.environ.get("GITHUB_TOKEN", "test")
-        conf.services = {
-            PagureService(token=pagure_user_token),
-            GithubService(token=github_token),
-        }
-
+        try:
+            conf = Config.get_user_config()
+        except PackitException:
+            conf = Config()
         conf.dry_run = True
         return conf
 

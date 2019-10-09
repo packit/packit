@@ -87,11 +87,12 @@ class ProposeUpdate(PackitUnittestOgr):
         """
         self.assertRaises(RebaseHelperError, self.check_version_increase)
 
-    @unittest.skipUnless(
-        hasattr(rebasehelper, "VERSION")
-        and int(rebasehelper.VERSION.split(".")[1]) >= 19,
-        "New version of rebasehelper works without raised exception",
-    )
+    # @unittest.skipUnless(
+    #     hasattr(rebasehelper, "VERSION")
+    #     and int(rebasehelper.VERSION.split(".")[1]) >= 19,
+    #     "New version of rebasehelper works without raised exception",
+    # )
+    @unittest.skip(reason="https://github.com/packit-service/packit/issues/558")
     def test_version_change_new_rebaseheler(self):
         """
         check if it not raises exception, because sources are not uploaded in distgit

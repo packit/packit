@@ -41,7 +41,15 @@ GH2FED_RELEASE_TOPIC = "org.fedoraproject.prod.github.release"
 
 DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
-PROD_DISTGIT_URL = "https://src.fedoraproject.org/"
+PROD_DISTGIT_HOSTNAME = "src.fedoraproject.org"
+PROD_DISTGIT_URL = f"https://{PROD_DISTGIT_HOSTNAME}/"
+ALTERNATIVE_PROD_DG_HOSTNAME = "pkgs.fedoraproject.org"
+DIST_GIT_HOSTNAME_CANDIDATES = (
+    PROD_DISTGIT_HOSTNAME,
+    ALTERNATIVE_PROD_DG_HOSTNAME,
+    "pkgs.stg.fedoraproject.org",
+    "src.stg.fedoraproject.org",
+)
 
 COPR2GITHUB_STATE = {
     "running": ("pending", "The RPM build was triggered."),
