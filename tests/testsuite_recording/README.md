@@ -10,7 +10,7 @@ Please add your code to [replacements](https://github.com/packit-service/packit/
 
 ## Regenerate data for tests
 
-There were trouble that different version of ``ogr`` or ``rebasehelper``
+There were troubles that different version of ``ogr`` or ``rebasehelper``
 contained different behaviour, so that we had to generate these response
 files with various versions of these tools.
 
