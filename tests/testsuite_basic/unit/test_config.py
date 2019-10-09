@@ -402,7 +402,7 @@ def test_package_config_parse_error(raw):
                 "jobs": [get_job_config_dict_full()],
                 "something": "stupid",
                 "upstream_project_url": "https://github.com/asd/qwe",
-                "upstream_project_name": "qwe",
+                "upstream_package_name": "qwe",
                 "dist_git_base_url": "https://something.wicked",
                 "downstream_package_name": "package",
             },

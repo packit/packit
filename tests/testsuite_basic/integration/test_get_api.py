@@ -59,7 +59,7 @@ def test_url_is_upstream():
         (
             [("origin", "https://github.com/packit-service/ogr.git")],
             flexmock(upstream_project_url="some-url", dist_git_base_url=None),
-            False,
+            True,
         ),
         (
             [("origin", "https://github.com/packit-service/ogr.git")],

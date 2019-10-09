@@ -188,9 +188,6 @@ class PackitAPI:
             )
         current_up_branch = self.up.active_branch
         try:
-            # TODO: this is problematic, since we may overwrite stuff in the repo
-            #       but the thing is that we need to do it
-            #       I feel like the ideal thing to do would be to clone the repo and work in tmpdir
             upstream_tag = self.up.package_config.upstream_tag_template.format(
                 version=full_version
             )

@@ -33,7 +33,7 @@ from rebasehelper.specfile import SpecFile
 
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
-from ogr.services.pagure import PagureProject, PagureService
+from ogr.services.pagure import PagureProject, PagureService, PagureUser
 from packit.api import PackitAPI
 from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
@@ -142,6 +142,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         get_git_urls=lambda: {"git": UPSTREAM_PROJECT_URL},
         fork_create=lambda: None,
     )
+    flexmock(PagureUser, get_username=lambda: "packito")
 
     mock_spec_download_remote_s(distgit)
 

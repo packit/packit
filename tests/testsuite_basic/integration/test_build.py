@@ -28,7 +28,7 @@ def test_basic_build(
     cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
 ):
     u, d, api = api_instance
-    flexmock(utils).should_receive("run_command").with_args(
+    flexmock(utils).should_receive("run_command_remote").with_args(
         cmd=["fedpkg", "build", "--scratch", "--nowait", "--target", "asdqwe"],
         cwd=api.dg.local_project.working_dir,
         error_message="Submission of build to koji failed.",
