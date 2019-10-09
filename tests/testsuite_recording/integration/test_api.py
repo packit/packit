@@ -1,19 +1,20 @@
-import os
-import inspect
-import importlib
-from packit.api import PackitAPI
-from subprocess import check_output
-from rebasehelper.exceptions import RebaseHelperError
-from flexmock import flexmock
-from tests.testsuite_recording.integration.testbase import PackitUnittestOgr
-import rebasehelper
-import unittest
-
 """
 Tests of packit APIs
 to generate all tests, please run it twice with different ogr versions
 until ogr will not have _feature_id in rpm or pypi
 """
+
+import importlib
+import inspect
+import os
+import unittest
+from subprocess import check_output
+
+from flexmock import flexmock
+from rebasehelper.exceptions import RebaseHelperError
+
+from packit.api import PackitAPI
+from tests.testsuite_recording.integration.testbase import PackitUnittestOgr
 
 
 class ProposeUpdate(PackitUnittestOgr):
@@ -59,6 +60,9 @@ class ProposeUpdate(PackitUnittestOgr):
         )
         self.api.sync_release("master")
 
+    @unittest.skip(
+        reason="https://github.com/packit-service/packit/issues/562 and #561"
+    )
     def test_comment_in_spec(self):
         """
         change specfile little bit to have there some change, do not increase version
@@ -75,10 +79,13 @@ class ProposeUpdate(PackitUnittestOgr):
         )
         self.api.sync_release("master")
 
-    @unittest.skipIf(
-        hasattr(rebasehelper, "VERSION")
-        and int(rebasehelper.VERSION.split(".")[1]) >= 19,
-        "Older version of rebasehelper raised exception",
+    # @unittest.skipIf(
+    #     hasattr(rebasehelper, "VERSION")
+    #     and int(rebasehelper.VERSION.split(".")[1]) >= 19,
+    #     "Older version of rebasehelper raised exception",
+    # )
+    @unittest.skip(
+        reason="https://github.com/packit-service/packit/issues/562 and #561"
     )
     def test_version_change_exception(self):
         """
@@ -99,6 +106,9 @@ class ProposeUpdate(PackitUnittestOgr):
         """
         self.check_version_increase()
 
+    @unittest.skip(
+        reason="https://github.com/packit-service/packit/issues/562 and #561"
+    )
     def test_version_change_mocked(self):
         """
         version is not not uploaded, so skip in this test
