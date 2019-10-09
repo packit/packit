@@ -4,9 +4,9 @@
   tasks:
   - include_tasks: tasks/zuul-project-setup.yaml
   - include_tasks: tasks/rpm-test-deps.yaml
-  - include_tasks: tasks/sandcastle-master.yaml
   - include_tasks: tasks/install-packit.yaml
   - include_tasks: tasks/configure-git.yaml
+  - include_tasks: tasks/sandcastle-master.yaml
   - name: Run testsuite_basic tests
     command: make check TESTS_TARGET=tests/testsuite_basic
     args:
