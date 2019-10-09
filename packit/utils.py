@@ -304,6 +304,8 @@ def rpmdev_bumpspec(
     run_command(cmd)
 
 
+# TODO: merge this function into parse_git_repo in ogr
+# https://github.com/packit-service/packit/pull/555#discussion_r332871418
 def git_remote_url_to_https_url(inp: str) -> str:
     """
     turn provided git remote URL to https URL:
