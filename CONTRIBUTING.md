@@ -61,7 +61,20 @@ When you are contributing to changelog, please follow these suggestions:
 
 ### Testing
 
-Tests are stored in [tests](/tests) directory.
+Tests are stored in [tests](/tests) directory:
+
+- `tests/unit`
+    - testing small units/parts of the code
+    - strictly offline
+- `tests/integration`
+    - testing bigger parts of codebase (integration between multiple units, packit python API)
+    - use [requre](https://github.com/packit-service/requre)
+      for remote communication => offline in the CI
+    - prefer [requre](https://github.com/packit-service/requre) instead of mocking
+- `tests/functional`
+    - testing packit as a CLI
+    - be careful what you run -- no requre, no mocking
+
 We use [Tox](https://pypi.org/project/tox) with configuration in [tox.ini](tox.ini).
 
 Running tests locally:
