@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import unittest
-
 from packit.status import Status
 from tests.testsuite_recording.integration.testbase import PackitUnittestOgr
 
@@ -31,31 +29,19 @@ class TestStatus(PackitUnittestOgr):
         super().setUp()
         self.status = Status(self.conf, self.pc, self.upstream, self.dg)
 
-    @unittest.skip(
-        reason="https://github.com/packit-service/packit/issues/562 and #561"
-    )
     def test_status(self):
         assert self.status
 
-    @unittest.skip(
-        reason="https://github.com/packit-service/packit/issues/562 and #561"
-    )
     def test_distgen_versions(self):
         table = self.status.get_dg_versions()
         assert table
         assert len(table) >= 3
 
-    @unittest.skip(
-        reason="https://github.com/packit-service/packit/issues/562 and #561"
-    )
     def test_builds(self):
         table = self.status.get_builds()
         assert table
         assert len(table) >= 2
 
-    @unittest.skip(
-        reason="https://github.com/packit-service/packit/issues/562 and #561"
-    )
     def test_updates(self):
         table = self.status.get_updates()
         assert table
@@ -69,16 +55,10 @@ class TestStatus(PackitUnittestOgr):
                 stable_branches.append(branch)
         assert len(set(stable_branches)) == len(stable_branches)
 
-    @unittest.skip(
-        reason="https://github.com/packit-service/packit/issues/562 and #561"
-    )
     def test_up_releases(self):
         table = self.status.get_up_releases()
         assert len(table) >= 5
 
-    @unittest.skip(
-        reason="https://github.com/packit-service/packit/issues/562 and #561"
-    )
     def test_dowstream_pr(self):
         table = self.status.get_downstream_prs()
         assert len(table) >= 0
