@@ -1,3 +1,14 @@
+# 0.7.1
+
+## Minor
+
+* The "Developer Certificate of Origin" was added to the git repository.
+
+## Fixes
+
+* Packit will determine `upstream_project_url` from git remote if not specified in the config.
+
+
 # 0.7.0
 
 See our [website](https://packit.dev) for up-to-date documentation on how to
