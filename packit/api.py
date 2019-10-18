@@ -554,21 +554,25 @@ class PackitAPI:
             logger.error(f"Failed when getting Bodhi updates: {exc}")
             return []
 
+    @staticmethod
+    async def status_main(status):
+        """
+        Schedule repository data retrieval calls concurrently.
+        :param status:
+        :return: awaitable tasks
+        """
+        res = await asyncio.gather(
+            PackitAPI.status_get_downstream_prs(status),
+            PackitAPI.status_get_dg_versions(status),
+            PackitAPI.status_get_up_releases(status),
+            PackitAPI.status_get_builds(status),
+            PackitAPI.status_get_updates(status),
+        )
+        return res
+
     def status(self):
         status = Status(self.config, self.package_config, self.up, self.dg)
-        loop = asyncio.get_event_loop()
-        try:
-            res = loop.run_until_complete(
-                asyncio.gather(
-                    self.status_get_downstream_prs(status),
-                    self.status_get_dg_versions(status),
-                    self.status_get_up_releases(status),
-                    self.status_get_builds(status),
-                    self.status_get_updates(status),
-                )
-            )
-        finally:
-            loop.close()
+        res = asyncio.run(self.status_main(status))
         (ds_prs, dg_versions, up_releases, builds, updates) = res
 
         if ds_prs:
