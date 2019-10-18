@@ -28,3 +28,9 @@ repos:
     hooks:
     -   id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
+-   repo: https://github.com/packit-service/pre-commit-hooks
+    rev: master
+    hooks:
+    -   id: check-rebase
+        args:
+        - git://github.com/packit-service/packit.git
