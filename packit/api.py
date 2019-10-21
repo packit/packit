@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import asyncio
 import logging
 import os
+import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -555,10 +556,10 @@ class PackitAPI:
             return []
 
     @staticmethod
-    async def status_main(status):
+    async def status_main(status: Status) -> List:
         """
         Schedule repository data retrieval calls concurrently.
-        :param status:
+        :param status: status of the package
         :return: awaitable tasks
         """
         res = await asyncio.gather(
@@ -570,9 +571,28 @@ class PackitAPI:
         )
         return res
 
-    def status(self):
+    def status(self) -> None:
         status = Status(self.config, self.package_config, self.up, self.dg)
-        res = asyncio.run(self.status_main(status))
+        if sys.version_info >= (3,7,0):
+            res = asyncio.run(self.status_main(status))
+        else:
+            # backward compatibility for Python 3.6
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                res = loop.run_until_complete(
+                    asyncio.gather(
+                        self.status_get_downstream_prs(status),
+                        self.status_get_dg_versions(status),
+                        self.status_get_up_releases(status),
+                        self.status_get_builds(status),
+                        self.status_get_updates(status),
+                    )
+                )
+            finally:
+                asyncio.set_event_loop(None)
+                loop.close()
+
         (ds_prs, dg_versions, up_releases, builds, updates) = res
 
         if ds_prs:
