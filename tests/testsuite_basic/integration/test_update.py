@@ -27,9 +27,9 @@ from flexmock import flexmock
 
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
+from packit.helper import Specfile
 from packit.local_project import LocalProject
 from tests.testsuite_basic.spellbook import TARBALL_NAME
-from tests.testsuite_basic.utils import get_specfile
 
 
 @pytest.fixture()
@@ -63,7 +63,7 @@ def test_basic_local_update(
     api.sync_release("master", "0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
-    spec = get_specfile(str(d / "beer.spec"))
+    spec = Specfile(str(d / "beer.spec"))
     assert spec.get_version() == "0.1.0"
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
@@ -81,7 +81,7 @@ def test_basic_local_update_using_distgit(
     api.sync_release("master", "0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
-    spec = get_specfile(str(d / "beer.spec"))
+    spec = Specfile(str(d / "beer.spec"))
     assert spec.get_version() == "0.1.0"
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
@@ -105,7 +105,7 @@ def test_basic_local_update_direct_push(
         cwd=str(remote_dir_clone.parent),
     )
 
-    spec = get_specfile(str(remote_dir_clone / "beer.spec"))
+    spec = Specfile(str(remote_dir_clone / "beer.spec"))
     assert spec.get_version() == "0.1.0"
     assert (remote_dir_clone / "README.packit").is_file()
 
@@ -120,7 +120,7 @@ def test_basic_local_update_from_downstream(
 
     new_upstream = Path(api.up.local_project.working_dir)
     assert (new_upstream / "beer.spec").is_file()
-    spec = get_specfile(str(new_upstream / "beer.spec"))
+    spec = Specfile(str(new_upstream / "beer.spec"))
     assert spec.get_version() == "0.0.0"
 
 

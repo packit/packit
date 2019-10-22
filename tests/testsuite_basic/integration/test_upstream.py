@@ -27,20 +27,17 @@ import os
 import re
 import shutil
 import subprocess
+
 from pathlib import Path
 
 import pytest
 from flexmock import flexmock
 
 from ogr import GithubService
+from packit.helper import Specfile
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd
-
-try:
-    from rebasehelper.plugins.plugin_manager import plugin_manager
-except ImportError:
-    from rebasehelper.versioneer import versioneers_runner
 
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitException
@@ -75,10 +72,7 @@ def test_get_current_version(upstream_instance):
 )
 def test_get_version(upstream_instance, m_v, exp):
     u, ups = upstream_instance
-    try:
-        flexmock(plugin_manager.versioneers, run=lambda **kw: m_v)
-    except NameError:
-        flexmock(versioneers_runner, run=lambda **kw: m_v)
+    flexmock(Specfile, _get_version=lambda **kw: m_v)
 
     assert ups.get_version() == exp
 
