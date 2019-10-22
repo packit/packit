@@ -556,7 +556,7 @@ class PackitAPI:
             return []
 
     @staticmethod
-    async def status_main(status: Status) -> List:
+    async def status_main(status: Status) -> Tuple:
         """
         Schedule repository data retrieval calls concurrently.
         :param status: status of the package
@@ -573,7 +573,7 @@ class PackitAPI:
 
     def status(self) -> None:
         status = Status(self.config, self.package_config, self.up, self.dg)
-        if sys.version_info >= (3,7,0):
+        if sys.version_info >= (3, 7, 0):
             res = asyncio.run(self.status_main(status))
         else:
             # backward compatibility for Python 3.6
