@@ -28,20 +28,16 @@ from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
+
 from rebasehelper.exceptions import RebaseHelperError
 
 from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
-
-try:
-    from rebasehelper.plugins.plugin_manager import plugin_manager
-except ImportError:
-    from rebasehelper.versioneer import versioneers_runner
-
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
+from packit.helper import Specfile
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -286,12 +282,8 @@ class Upstream(PackitRepositoryBase):
 
         :return: the version string (e.g. "1.0.0")
         """
-        try:
-            get_version = plugin_manager.versioneers.run
-        except NameError:
-            get_version = versioneers_runner.run
 
-        version = get_version(
+        version = Specfile._get_version(
             versioneer=None,
             package_name=self.package_config.downstream_package_name,
             category=None,
@@ -398,16 +390,7 @@ class Upstream(PackitRepositoryBase):
                 )
                 return
 
-            if hasattr(self.specfile, "update_changelog"):
-                # new rebase helper
-                self.specfile.update_changelog(changelog_entry)
-            else:
-                # old rebase helper
-                self.specfile.changelog_entry = changelog_entry
-                new_log = self.specfile.get_new_log()
-                new_log.extend(self.specfile.spec_content.sections["%changelog"])
-                self.specfile.spec_content.sections["%changelog"] = new_log
-                self.specfile.save()
+            self.specfile.update_changelog_in_spec(changelog_entry)
 
         except RebaseHelperError as ex:
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
