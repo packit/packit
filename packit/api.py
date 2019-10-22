@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import asyncio
 import logging
 import os
+import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -554,21 +555,44 @@ class PackitAPI:
             logger.error(f"Failed when getting Bodhi updates: {exc}")
             return []
 
-    def status(self):
+    @staticmethod
+    async def status_main(status: Status) -> Tuple:
+        """
+        Schedule repository data retrieval calls concurrently.
+        :param status: status of the package
+        :return: awaitable tasks
+        """
+        res = await asyncio.gather(
+            PackitAPI.status_get_downstream_prs(status),
+            PackitAPI.status_get_dg_versions(status),
+            PackitAPI.status_get_up_releases(status),
+            PackitAPI.status_get_builds(status),
+            PackitAPI.status_get_updates(status),
+        )
+        return res
+
+    def status(self) -> None:
         status = Status(self.config, self.package_config, self.up, self.dg)
-        loop = asyncio.get_event_loop()
-        try:
-            res = loop.run_until_complete(
-                asyncio.gather(
-                    self.status_get_downstream_prs(status),
-                    self.status_get_dg_versions(status),
-                    self.status_get_up_releases(status),
-                    self.status_get_builds(status),
-                    self.status_get_updates(status),
+        if sys.version_info >= (3, 7, 0):
+            res = asyncio.run(self.status_main(status))
+        else:
+            # backward compatibility for Python 3.6
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                res = loop.run_until_complete(
+                    asyncio.gather(
+                        self.status_get_downstream_prs(status),
+                        self.status_get_dg_versions(status),
+                        self.status_get_up_releases(status),
+                        self.status_get_builds(status),
+                        self.status_get_updates(status),
+                    )
                 )
-            )
-        finally:
-            loop.close()
+            finally:
+                asyncio.set_event_loop(None)
+                loop.close()
+
         (ds_prs, dg_versions, up_releases, builds, updates) = res
 
         if ds_prs:
