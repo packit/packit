@@ -4,7 +4,7 @@ from tests.spellbook import call_packit
 
 
 def test_generate_pass(upstream_without_config):
-    with cwd(str(upstream_without_config)):
+    with cwd(upstream_without_config):
         assert not (upstream_without_config / ".packit.yaml").is_file()
 
         # This test requires packit on pythonpath

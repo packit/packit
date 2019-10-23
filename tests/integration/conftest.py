@@ -177,7 +177,7 @@ def mock_patching():
 @pytest.fixture()
 def cwd_upstream(upstream_and_remote) -> Iterator[Path]:
     upstream, _ = upstream_and_remote
-    with cwd(str(upstream)):
+    with cwd(upstream):
         yield upstream
 
 
