@@ -25,7 +25,7 @@ Push Bodhi updates from testing to stable.
 """
 
 import logging
-from os import getcwd
+import os
 
 import click
 
@@ -39,7 +39,7 @@ logger = logging.getLogger(__file__)
 
 @click.command("push-updates", context_settings=get_context_settings())
 @click.option("--update-alias", help="For example FEDORA-2019-ee5674e22c", default=None)
-@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
+@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
 def push_updates(update_alias, config, path_or_url):

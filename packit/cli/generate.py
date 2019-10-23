@@ -25,7 +25,7 @@ Generate initial configuration for packit
 """
 
 import logging
-from os import getcwd
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.command("generate", context_settings=get_context_settings())
-@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
+@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @click.option(
     "-f", "--force", is_flag=True, help="Reset config to default if already exists."
 )

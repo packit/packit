@@ -25,15 +25,15 @@ import logging
 import click
 from pkg_resources import get_distribution
 
-from packit.cli.copr_build import copr_build
 from packit.cli.build import build
+from packit.cli.copr_build import copr_build
 from packit.cli.create_update import create_update
+from packit.cli.generate import generate
 from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.update import update
-from packit.cli.generate import generate
 from packit.config import Config, get_context_settings
 from packit.utils import set_logging
 
