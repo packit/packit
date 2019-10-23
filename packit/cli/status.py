@@ -25,7 +25,7 @@ Display status
 """
 
 import logging
-from os import getcwd
+import os
 
 import click
 
@@ -38,7 +38,7 @@ logger = logging.getLogger(__file__)
 
 
 @click.command("status", context_settings=get_context_settings())
-@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
+@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
 def status(config, path_or_url):
