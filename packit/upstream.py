@@ -452,10 +452,20 @@ class Upstream(PackitRepositoryBase):
             if not outputs:
                 raise PackitException("No output from create-archive action.")
             # one of the returned strings has to contain existing archive name
-            for archive_name in reversed(outputs):
-                if Path(archive_name.strip()).is_file():
-                    logger.info(f"Created archive: {archive_name.strip()}")
-                    return archive_name
+            for output in reversed(outputs):
+                for archive_name in reversed(output.splitlines()):
+                    try:
+                        if Path(archive_name.strip()).is_file():
+                            logger.info(f"Created archive: {archive_name.strip()}")
+                            return archive_name
+                    except OSError as ex:
+                        # File too long
+                        if ex.errno == 36:
+                            logger.error(
+                                f"Skipping long output command output while getting archive name"
+                            )
+                            continue
+                        raise ex
             else:
                 raise PackitException(
                     "No existing file in create-archive action output."
