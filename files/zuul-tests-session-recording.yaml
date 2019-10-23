@@ -8,6 +8,6 @@
   - include_tasks: tasks/configure-git.yaml
   - include_tasks: tasks/sandcastle-master.yaml
   - name: Run session recorded tests
-    command: make check TESTS_TARGET=tests/testsuite_recording
+    command: make check TESTS_TARGET=tests/integration_recording
     args:
       chdir: '{{ project_dir }}'

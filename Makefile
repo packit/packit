@@ -1,7 +1,7 @@
 TESTS_IMAGE=packit-tests
-TESTS_INTEGRATION_PATH=tests/integration
+TESTS_RECORDING_PATH=tests/integration_recording
 TESTS_CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=disable $(TESTS_IMAGE)
-TESTS_TARGET := ./tests/testsuite_basic
+TESTS_TARGET := ./tests/unit ./tests/integration ./tests/functional
 
 tests_image:
 	podman build --tag $(TESTS_IMAGE) -f Dockerfile.tests .
@@ -22,4 +22,4 @@ check_in_container: tests_image
 
 
 check_in_container_regenerate_data: tests_image
-	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .;make check TESTS_TARGET=$(TESTS_INTEGRATION_PATH) GITHUB_TOKEN=${GITHUB_TOKEN} PAGURE_TOKEN=${PAGURE_TOKEN}"
+	$(TESTS_CONTAINER_RUN) bash -c "pip3 install .;make check TESTS_TARGET=$(TESTS_RECORDING_PATH) GITHUB_TOKEN=${GITHUB_TOKEN} PAGURE_TOKEN=${PAGURE_TOKEN}"
