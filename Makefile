@@ -1,5 +1,5 @@
 TESTS_IMAGE=packit-tests
-TESTS_RECORDING_PATH=tests/integration_recording
+TESTS_RECORDING_PATH=tests_recording
 TESTS_CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --security-opt label=disable $(TESTS_IMAGE)
 TESTS_TARGET := ./tests/unit ./tests/integration ./tests/functional
 

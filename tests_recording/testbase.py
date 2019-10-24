@@ -21,10 +21,6 @@ PERSISTENT_DATA_PREFIX = os.path.join(
 
 
 class PackitUnittestOgr(unittest.TestCase):
-    # variable VARIANT is important to split test data file based on different
-    # feataures of ogr or another dependencies
-    variant = "master"
-
     @staticmethod
     def get_test_config():
         try:
@@ -39,7 +35,7 @@ class PackitUnittestOgr(unittest.TestCase):
         test_file_name = os.path.basename(inspect.getfile(self.__class__)).rsplit(
             ".", 1
         )[0]
-        test_class_name = f"{self.id()}.{self.variant}.{suffix}"
+        test_class_name = f"{self.id()}.{suffix}"
         testdata_dirname = os.path.join(prefix, test_file_name)
         os.makedirs(testdata_dirname, mode=0o777, exist_ok=True)
         return os.path.join(testdata_dirname, test_class_name)

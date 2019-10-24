@@ -1,32 +1,28 @@
 import os
-import inspect
-import importlib
-from packit.api import PackitAPI
-from subprocess import check_output
-from rebasehelper.exceptions import RebaseHelperError
-from flexmock import flexmock
-from tests.integration_recording.integration.testbase import PackitUnittestOgr
-import rebasehelper
 import unittest
+from subprocess import check_output
 
-"""
-Tests of packit APIs
-to generate all tests, please run it twice with different ogr versions
-until ogr will not have _feature_id in rpm or pypi
-"""
+import rebasehelper
+from rebasehelper.exceptions import RebaseHelperError
+
+from flexmock import flexmock
+from packit.api import PackitAPI
+from requre.storage import DataMiner, DataTypes
+from tests_recording.testbase import PackitUnittestOgr
 
 
+@unittest.skip
 class ProposeUpdate(PackitUnittestOgr):
-    @classmethod
-    def _feature_id(cls):
-        ogr_module = importlib.import_module("ogr")
-        if "parent" in inspect.getsource(
-            ogr_module.services.pagure.PagureProject.is_fork.fget
-        ):
-            cls.variant = "ogr_old_fork"
-
     def setUp(self):
-        self._feature_id()
+        if (
+            hasattr(rebasehelper, "VERSION")
+            and int(rebasehelper.VERSION.split(".")[1]) >= 19
+        ):
+            DataMiner.key = "rebase-helper>=0.19"
+        else:
+            DataMiner.key = "rebase-helper<0.19"
+        DataMiner.data_type = DataTypes.Dict
+
         super().setUp()
         self.api = PackitAPI(
             config=self.conf, package_config=self.pc, upstream_local_project=self.lp
