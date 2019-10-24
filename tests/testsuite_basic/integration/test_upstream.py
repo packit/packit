@@ -42,7 +42,6 @@ from packit.utils import cwd
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitException
 from tests.testsuite_basic.spellbook import (
-    does_bumpspec_know_new,
     build_srpm,
     get_test_config,
     initiate_git_repo,
@@ -84,24 +83,11 @@ def test_get_version(upstream_instance, m_v, exp):
     assert re.match(r"0\.1\.0\.1\.\w{8}", ups.get_current_version())
 
 
-@pytest.mark.skipif(
-    not does_bumpspec_know_new(),
-    reason="Current version of rpmdev-bumpspec doesn't understand --new option.",
-)
-def test_bumpspec(upstream_instance):
-    u, ups = upstream_instance
-
-    new_ver = "1.2.3"
-    ups.bump_spec(version=new_ver, changelog_entry="asdqwe")
-
-    assert ups.get_specfile_version() == new_ver
-
-
 def test_set_spec_ver(upstream_instance):
     u, ups = upstream_instance
 
     new_ver = "1.2.3"
-    ups.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
@@ -129,7 +115,7 @@ def test_set_spec_ver_empty_changelog(tmpdir):
         ups = Upstream(c, pc, lp)
 
     new_ver = "1.2.3"
-    ups.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert "%changelog" not in u.joinpath("beer.spec").read_text()
