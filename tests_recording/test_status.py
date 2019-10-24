@@ -45,7 +45,7 @@ class TestStatus(PackitUnittestOgr):
         assert len(table) >= 3
 
     def test_builds(self):
-        table = self.status.get_builds()
+        table = self.status.get_koji_builds()
         assert table
         assert len(table) >= 2
 

@@ -50,6 +50,7 @@ def status(config, path_or_url):
     - versions from all downstream branches
     - latest upstream releases
     - latest builds in Koji
+    - latest builds in Copr
     - latest updates in Bodhi
     """
 

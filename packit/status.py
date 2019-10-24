@@ -23,6 +23,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Set
 
+from copr.v3 import Client as CoprClient
 from koji import ClientSession, BUILD_STATES
 from ogr.abstract import Release
 from packit.config import Config, PackageConfig
@@ -112,7 +113,7 @@ class Status:
 
         return latest_releases[:number_of_releases]
 
-    def get_builds(self,) -> Dict:
+    def get_koji_builds(self,) -> Dict:
         """
         Get latest koji builds as a dict of branch: latest build in that branch.
         """
@@ -135,6 +136,29 @@ class Status:
         # -> {'fc29': 'python-ogr-0.6.0-1.fc29'}
         builds = {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
         return builds
+
+    def get_copr_builds(self) -> List:
+        """
+        Get the copr builds of this project done by packit.
+        :return: list of builds
+        """
+        client = CoprClient.create_from_config_file()
+        package_name = self.package_config.downstream_package_name
+
+        projects = [
+            project.name
+            for project in reversed(client.project_proxy.get_list(ownername="packit"))
+            if package_name in project.name
+        ][:5]
+
+        builds: List = []
+        for project in projects:
+            builds += client.build_proxy.get_list(
+                ownername="packit", projectname=project, packagename=package_name
+            )
+
+        logger.debug("Copr builds fetched.")
+        return [(build.id, build.projectname, build.state) for build in builds]
 
     def get_updates(self, number_of_updates: int = 3) -> List:
         """
