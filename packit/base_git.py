@@ -34,7 +34,7 @@ from packit.exceptions import PackitException
 from packit.helper import Specfile
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
-from packit.utils import cwd, rpmdev_bumpspec
+from packit.utils import cwd
 
 logger = logging.getLogger(__name__)
 
@@ -345,8 +345,7 @@ class PackitRepositoryBase:
 
     def set_specfile_content(self, specfile: Specfile, version: str, comment: str):
         """
-        update this specfile using provided specfile + rpmdev-bumpsec
-        preserve changelog in this spec
+        update this specfile using provided specfile
 
         :param specfile: specfile to get changes from (we update self.specfile)
         :param version: version to set in self.specfile
@@ -356,12 +355,9 @@ class PackitRepositoryBase:
         this_version = self.specfile.get_version()
         self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
         self.specfile.spec_content.replace_section("%changelog", this_changelog)
-        # if version is equal, rpmdev bumpspec won't do anything
         self.specfile.set_version(this_version)
         self.specfile.save()
-        rpmdev_bumpspec(self.absolute_specfile_path, comment=comment, version=version)
-        # refresh the spec after we changed it
-        self.specfile.update_spec()
+        self.specfile.set_spec_version(version=version, changelog_entry=comment)
 
     def is_dirty(self) -> bool:
         """ is the git repo dirty? """

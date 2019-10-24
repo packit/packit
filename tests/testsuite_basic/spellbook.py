@@ -149,11 +149,5 @@ def call_real_packit_and_return_exit_code(parameters=None, envs=None, cwd=None):
     return subprocess.call(cmd, env=envs, cwd=cwd)
 
 
-def does_bumpspec_know_new():
-    """ does rpmdev-bumpspec know --new? """
-    h = subprocess.check_output(["rpmdev-bumpspec", "--help"])
-    return b"--new" in h
-
-
 def build_srpm(path: Path):
     run_command(["rpmbuild", "--rebuild", str(path)])

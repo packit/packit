@@ -484,7 +484,7 @@ class PackitAPI:
                 new_release = old_release
             release_to_update = f"{new_release}.g{commit}"
             msg = f"Downstream changes ({commit})"
-            self.up.set_spec_version(
+            self.up.specfile.set_spec_version(
                 release=release_to_update, changelog_entry=f"- {msg}"
             )
         else:

@@ -1,11 +1,16 @@
 import inspect
+import logging
 
-from rebasehelper.specfile import SpecFile
+from rebasehelper.specfile import SpecFile, RebaseHelperError
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
 except ImportError:
     from rebasehelper.versioneer import versioneers_runner
+
+from packit.exceptions import PackitException
+
+logger = logging.getLogger(__name__)
 
 
 class Specfile(SpecFile):
@@ -35,6 +40,40 @@ class Specfile(SpecFile):
             new_log.extend(self.spec_content.sections["%changelog"])
             self.spec_content.sections["%changelog"] = new_log
             self.save()
+
+    def set_spec_version(
+        self, version: str = None, release: str = None, changelog_entry: str = None
+    ):
+        """
+        Set version in spec, release and add a changelog_entry (if they are presented).
+
+        :param version: new version
+        :param release: new release
+        :param changelog_entry: accompanying changelog entry
+        """
+        try:
+            if version:
+                # also this code adds 3 rpmbuild dirs into the upstream repo,
+                # we should ask rebase-helper not to do that
+                self.set_version(version=version)
+
+            if release:
+                self.set_release_number(release=release)
+
+            if not changelog_entry:
+                return
+
+            if not self.spec_content.section("%changelog"):
+                logger.debug(
+                    "The specfile doesn't have any %changelog, will not set it."
+                )
+                return
+
+            self.update_changelog_in_spec(changelog_entry)
+
+        except RebaseHelperError as ex:
+            logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
+            raise PackitException("rebase-helper didn't do the job")
 
     @staticmethod
     def _get_version(versioneer, package_name, category):
