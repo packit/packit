@@ -137,28 +137,31 @@ class Status:
         builds = {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
         return builds
 
-    def get_copr_builds(self) -> List:
+    def get_copr_builds(self, number_of_builds: int = 5) -> List:
         """
         Get the copr builds of this project done by packit.
         :return: list of builds
         """
         client = CoprClient.create_from_config_file()
-        package_name = self.package_config.downstream_package_name
 
         projects = [
             project.name
             for project in reversed(client.project_proxy.get_list(ownername="packit"))
-            if package_name in project.name
+            if project.name.startswith(
+                f"{self.up.local_project.namespace}-{self.up.local_project.repo_name}-"
+            )
         ][:5]
 
         builds: List = []
         for project in projects:
             builds += client.build_proxy.get_list(
-                ownername="packit", projectname=project, packagename=package_name
+                ownername="packit", projectname=project
             )
 
         logger.debug("Copr builds fetched.")
-        return [(build.id, build.projectname, build.state) for build in builds]
+        return [(build.id, build.projectname, build.state) for build in builds][
+            :number_of_builds
+        ]
 
     def get_updates(self, number_of_updates: int = 3) -> List:
         """
