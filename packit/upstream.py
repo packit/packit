@@ -455,7 +455,10 @@ class Upstream(PackitRepositoryBase):
             for output in reversed(outputs):
                 for archive_name in reversed(output.splitlines()):
                     try:
-                        if Path(archive_name.strip()).is_file():
+                        archive_path = Path(
+                            self._local_project.working_dir, archive_name.strip()
+                        )
+                        if archive_path.is_file():
                             logger.info(f"Created archive: {archive_name.strip()}")
                             return archive_name
                     except OSError as ex:
