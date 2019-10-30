@@ -98,3 +98,15 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
             force_new_sources=False,
             create_pr=True,
         )
+
+
+def test_srpm_on_cockpit_ostree(cockpit_ostree):
+    upstream_path, dist_git_path = cockpit_ostree
+
+    pc = get_local_package_config(str(upstream_path))
+    up_lp = LocalProject(working_dir=str(upstream_path))
+    c = get_test_config()
+    api = PackitAPI(c, pc, up_lp)
+
+    with cwd(upstream_path):
+        api.create_srpm()
