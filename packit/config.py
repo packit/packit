@@ -627,6 +627,10 @@ def get_package_config_from_repo(
 
         return parse_loaded_config(loaded_config=loaded_config)
 
+    logger.warning(
+        f"No config file found on ref '{ref}' "
+        f"of the {sourcegit_project.full_repo_name} repository."
+    )
     return None
 
 
