@@ -348,7 +348,7 @@ class DistGit(PackitRepositoryBase):
             except KeyError:
                 raise PackitException(
                     f"There is no build for {self.package_config.downstream_package_name} "
-                    "in koji tag {koji_tag}"
+                    f"in koji tag {koji_tag}"
                 )
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
