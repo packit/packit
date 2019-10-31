@@ -52,7 +52,6 @@ from packit.schema import (
     SYNCED_FILES_SCHEMA,
 )
 from packit.sync import RawSyncFilesItem, SyncFilesItem, get_raw_files
-from packit.utils import nested_get
 
 logger = logging.getLogger(__name__)
 
@@ -508,11 +507,11 @@ class PackageConfig(BaseConfig):
                 # guess it?
                 logger.warning("Path to spec file is not set.")
 
-        dist_git_base_url = raw_dict.get("dist_git_base_url", None)
-        dist_git_namespace = raw_dict.get("dist_git_namespace", None)
-        upstream_ref = nested_get(raw_dict, "upstream_ref")
+        dist_git_base_url = raw_dict.get("dist_git_base_url")
+        dist_git_namespace = raw_dict.get("dist_git_namespace")
+        upstream_ref = raw_dict.get("upstream_ref")
 
-        allowed_gpg_keys = raw_dict.get("allowed_gpg_keys", None)
+        allowed_gpg_keys = raw_dict.get("allowed_gpg_keys")
         create_pr = raw_dict.get("create_pr", False)
         upstream_tag_template = raw_dict.get("upstream_tag_template", "{version}")
 
@@ -627,6 +626,10 @@ def get_package_config_from_repo(
 
         return parse_loaded_config(loaded_config=loaded_config)
 
+    logger.warning(
+        f"No config file found on ref '{ref}' "
+        f"of the {sourcegit_project.full_repo_name} repository."
+    )
     return None
 
 
