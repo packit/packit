@@ -34,7 +34,7 @@ import pytest
 from flexmock import flexmock
 
 from ogr import GithubService
-from packit.helper import Specfile
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd
@@ -71,7 +71,7 @@ def test_get_current_version(upstream_instance):
 )
 def test_get_version(upstream_instance, m_v, exp):
     u, ups = upstream_instance
-    flexmock(Specfile, _get_version=lambda **kw: m_v)
+    flexmock(Specfile, get_upstream_version=lambda **kw: m_v)
 
     assert ups.get_version() == exp
 

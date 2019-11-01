@@ -76,7 +76,15 @@ class Specfile(SpecFile):
             raise PackitException("rebase-helper didn't do the job")
 
     @staticmethod
-    def _get_version(versioneer, package_name, category):
+    def get_upstream_version(versioneer, package_name, category):
+        """
+        Call the method of rebase-helper (due to the version of rebase-helper)
+        to get the latest upstream version of a package.
+        :param versioneer:
+        :param package_name: str
+        :param category:
+        :return: str version
+        """
         try:
             get_version = plugin_manager.versioneers.run
         except NameError:

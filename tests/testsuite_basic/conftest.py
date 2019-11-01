@@ -38,7 +38,7 @@ from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
-from packit.helper import Specfile
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd

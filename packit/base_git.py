@@ -31,7 +31,7 @@ from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
-from packit.helper import Specfile
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
 from packit.utils import cwd

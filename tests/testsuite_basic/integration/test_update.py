@@ -27,7 +27,7 @@ from flexmock import flexmock
 
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
-from packit.helper import Specfile
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from tests.testsuite_basic.spellbook import TARBALL_NAME
 

@@ -36,7 +36,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
-from packit.helper import Specfile
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -282,7 +282,7 @@ class Upstream(PackitRepositoryBase):
         :return: the version string (e.g. "1.0.0")
         """
 
-        version = Specfile._get_version(
+        version = Specfile.get_upstream_version(
             versioneer=None,
             package_name=self.package_config.downstream_package_name,
             category=None,
