@@ -23,7 +23,7 @@ import subprocess
 from pathlib import Path
 
 from packit.utils import cwd
-from packit.helper import Specfile
+from packit.specfile import Specfile
 from tests.testsuite_basic.conftest import mock_spec_download_remote_s
 from tests.testsuite_basic.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
 
