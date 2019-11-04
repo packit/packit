@@ -83,6 +83,22 @@ def test_get_version(upstream_instance, m_v, exp):
     assert re.match(r"0\.1\.0\.1\.\w{8}", ups.get_current_version())
 
 
+def test_get_version_macro(upstream_instance):
+    u, ups = upstream_instance
+
+    data = "import setuptools \nsetuptools.setup(version='1')"
+    setup_path = u.joinpath("setup.py")
+    with open(u.joinpath("setup.py"), "w+") as setup:
+        setup.write(data)
+
+    data = u.joinpath("beer.spec").read_text()
+    data = data.replace("0.1.0", "%(python3 %{S:" + str(setup_path) + "} --version)")
+    with open(u.joinpath("beer.spec"), "w") as f:
+        f.write(data)
+
+    assert ups.get_specfile_version() == "1"
+
+
 def test_set_spec_ver(upstream_instance):
     u, ups = upstream_instance
 
