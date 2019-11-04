@@ -454,13 +454,12 @@ class PackitAPI:
 
         current_git_describe_version = self.up.get_current_version()
         upstream_ref = upstream_ref or self.package_config.upstream_ref
-        try:
+
+        if self.up.local_project.git_repo.head.is_detached:
+            commit = self.up.local_project.git_repo.head.commit.hexsha[:8]
+        else:
             commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
-        except TypeError as e:
-            if "detached symbolic reference" in str(e):
-                commit = str(e).split("'")[-2][:8]
-            else:
-                raise PackitException(f"There was an error while creating a SRPM: {e}")
+
         if self.up.running_in_service():
             relative_to = Path(self.config.command_handler_work_dir)
         else:
