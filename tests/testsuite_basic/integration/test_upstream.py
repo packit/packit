@@ -27,25 +27,21 @@ import os
 import re
 import shutil
 import subprocess
+
 from pathlib import Path
 
 import pytest
 from flexmock import flexmock
 
 from ogr import GithubService
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd
 
-try:
-    from rebasehelper.plugins.plugin_manager import plugin_manager
-except ImportError:
-    from rebasehelper.versioneer import versioneers_runner
-
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitException
 from tests.testsuite_basic.spellbook import (
-    does_bumpspec_know_new,
     build_srpm,
     get_test_config,
     initiate_git_repo,
@@ -75,10 +71,7 @@ def test_get_current_version(upstream_instance):
 )
 def test_get_version(upstream_instance, m_v, exp):
     u, ups = upstream_instance
-    try:
-        flexmock(plugin_manager.versioneers, run=lambda **kw: m_v)
-    except NameError:
-        flexmock(versioneers_runner, run=lambda **kw: m_v)
+    flexmock(Specfile, get_upstream_version=lambda **kw: m_v)
 
     assert ups.get_version() == exp
 
@@ -90,24 +83,27 @@ def test_get_version(upstream_instance, m_v, exp):
     assert re.match(r"0\.1\.0\.1\.\w{8}", ups.get_current_version())
 
 
-@pytest.mark.skipif(
-    not does_bumpspec_know_new(),
-    reason="Current version of rpmdev-bumpspec doesn't understand --new option.",
-)
-def test_bumpspec(upstream_instance):
+def test_get_version_macro(upstream_instance):
     u, ups = upstream_instance
 
-    new_ver = "1.2.3"
-    ups.bump_spec(version=new_ver, changelog_entry="asdqwe")
+    data = "import setuptools \nsetuptools.setup(version='1')"
+    setup_path = u.joinpath("setup.py")
+    with open(u.joinpath("setup.py"), "w+") as setup:
+        setup.write(data)
 
-    assert ups.get_specfile_version() == new_ver
+    data = u.joinpath("beer.spec").read_text()
+    data = data.replace("0.1.0", "%(python3 %{S:" + str(setup_path) + "} --version)")
+    with open(u.joinpath("beer.spec"), "w") as f:
+        f.write(data)
+
+    assert ups.get_specfile_version() == "1"
 
 
 def test_set_spec_ver(upstream_instance):
     u, ups = upstream_instance
 
     new_ver = "1.2.3"
-    ups.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
@@ -135,7 +131,7 @@ def test_set_spec_ver_empty_changelog(tmpdir):
         ups = Upstream(c, pc, lp)
 
     new_ver = "1.2.3"
-    ups.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert "%changelog" not in u.joinpath("beer.spec").read_text()

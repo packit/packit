@@ -23,9 +23,9 @@ import subprocess
 from pathlib import Path
 
 from packit.utils import cwd
+from packit.specfile import Specfile
 from tests.testsuite_basic.conftest import mock_spec_download_remote_s
 from tests.testsuite_basic.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
-from tests.testsuite_basic.utils import get_specfile
 
 
 def test_basic_local_update_without_patching(
@@ -43,7 +43,7 @@ def test_basic_local_update_without_patching(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = get_specfile(str(distgit / "beer.spec"))
+    spec = Specfile(str(distgit / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
 
@@ -56,7 +56,7 @@ def test_basic_local_update_empty_patch(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = get_specfile(str(distgit / "beer.spec"))
+    spec = Specfile(str(distgit / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
     spec_package_section = ""
@@ -85,7 +85,7 @@ def test_basic_local_update_patch_content(
 
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
-    spec = get_specfile(str(distgit / "beer.spec"))
+    spec = Specfile(str(distgit / "beer.spec"))
 
     spec_package_section = ""
     for section in spec.spec_content.sections:

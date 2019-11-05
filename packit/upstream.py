@@ -28,20 +28,15 @@ from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
-from rebasehelper.exceptions import RebaseHelperError
+
 
 from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
-
-try:
-    from rebasehelper.plugins.plugin_manager import plugin_manager
-except ImportError:
-    from rebasehelper.versioneer import versioneers_runner
-
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -286,12 +281,8 @@ class Upstream(PackitRepositoryBase):
 
         :return: the version string (e.g. "1.0.0")
         """
-        try:
-            get_version = plugin_manager.versioneers.run
-        except NameError:
-            get_version = versioneers_runner.run
 
-        version = get_version(
+        version = Specfile.get_upstream_version(
             versioneer=None,
             package_name=self.package_config.downstream_package_name,
             category=None,
@@ -344,74 +335,6 @@ class Upstream(PackitRepositoryBase):
         ver = ver.replace("-", ".")
         logger.debug("sanitized version = %s", ver)
         return ver
-
-    def bump_spec(
-        self,
-        version: str = None,
-        changelog_entry: str = None,
-        bump_release: bool = False,
-    ):
-        """
-        Run rpmdev-bumpspec on the upstream spec file: it enables
-        changing version and adding a changelog entry
-
-        :param version: new version which should be present in the spec
-        :param changelog_entry: new changelog entry (just the comment)
-        :param bump_release: "bump trailing .<DIGIT> component if found, append .1 if not"
-                             from the rpmdev-bumpspec --help
-        """
-        cmd = ["rpmdev-bumpspec"]
-        if version:
-            # 1.2.3-4 means, version = 1.2.3, release = 4
-            cmd += ["--new", version]
-        if changelog_entry:
-            cmd += ["--comment", changelog_entry]
-        if bump_release:
-            cmd += ["-r"]
-        cmd.append(str(self.absolute_specfile_path))
-        run_command(cmd)
-
-    def set_spec_version(
-        self, version: str = None, release: str = None, changelog_entry: str = None
-    ):
-        """
-        Set version in spec and add a changelog_entry.
-
-        :param version: new version
-        :param changelog_entry: accompanying changelog entry
-        """
-        try:
-            if version:
-                # also this code adds 3 rpmbuild dirs into the upstream repo,
-                # we should ask rebase-helper not to do that
-                self.specfile.set_version(version=version)
-
-            if release:
-                self.specfile.set_release_number(release=release)
-
-            if not changelog_entry:
-                return
-
-            if not self.specfile.spec_content.section("%changelog"):
-                logger.debug(
-                    "The specfile doesn't have any %changelog, will not set it."
-                )
-                return
-
-            if hasattr(self.specfile, "update_changelog"):
-                # new rebase helper
-                self.specfile.update_changelog(changelog_entry)
-            else:
-                # old rebase helper
-                self.specfile.changelog_entry = changelog_entry
-                new_log = self.specfile.get_new_log()
-                new_log.extend(self.specfile.spec_content.sections["%changelog"])
-                self.specfile.spec_content.sections["%changelog"] = new_log
-                self.specfile.save()
-
-        except RebaseHelperError as ex:
-            logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
-            raise PackitException("rebase-helper didn't do the job")
 
     def get_archive_extension(self, archive_basename: str, version: str) -> str:
         """
@@ -573,7 +496,7 @@ class Upstream(PackitRepositoryBase):
         self.specfile._write_spec_content()
 
         msg = f"Development snapshot ({commit})"
-        self.bump_spec(version=f"{version}", changelog_entry=msg, bump_release=True)
+        self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)
 
     def create_srpm(
         self,

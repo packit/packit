@@ -29,7 +29,6 @@ from typing import Tuple, Iterator
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
-from rebasehelper.specfile import SpecFile
 
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
@@ -39,6 +38,7 @@ from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from packit.utils import cwd
@@ -105,7 +105,7 @@ def mock_spec_download_remote_s(path: Path):
             ["tar", "-cf", str(tarball_path), hops_filename], cwd=path
         )
 
-    flexmock(SpecFile, download_remote_sources=mock_download_remote_sources)
+    flexmock(Specfile, download_remote_sources=mock_download_remote_sources)
 
 
 def mock_remote_functionality(distgit: Path, upstream: Path):
