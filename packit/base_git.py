@@ -19,7 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import inspect
 import logging
 import shlex
 from pathlib import Path
@@ -27,15 +26,15 @@ from typing import Optional, Callable, List, Tuple, Iterable, Dict
 
 import git
 from git import PushInfo
-from rebasehelper.specfile import SpecFile
 
 from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
+from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
-from packit.utils import cwd, rpmdev_bumpspec
+from packit.utils import cwd
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ class PackitRepositoryBase:
         self.config = config
         self.package_config = package_config
         self._specfile_path: Optional[Path] = None
-        self._specfile: Optional[SpecFile] = None
+        self._specfile: Optional[Specfile] = None
         self.allowed_gpg_keys: Optional[List[str]] = None
 
         logger.debug("command handler = %s", self.config.command_handler)
@@ -99,21 +98,11 @@ class PackitRepositoryBase:
         return self._specfile_path
 
     @property
-    def specfile(self) -> SpecFile:
+    def specfile(self) -> Specfile:
         if self._specfile is None:
-            # changing API is fun, where else could we use inspect?
-            s = inspect.signature(SpecFile)
-            if "changelog_entry" in s.parameters:
-                self._specfile = SpecFile(
-                    path=self.absolute_specfile_path,
-                    sources_location=str(self.absolute_specfile_dir),
-                    changelog_entry="",
-                )
-            else:
-                self._specfile = SpecFile(
-                    path=self.absolute_specfile_path,
-                    sources_location=str(self.absolute_specfile_dir),
-                )
+            self._specfile = Specfile(
+                self.absolute_specfile_path, self.absolute_specfile_dir
+            )
         return self._specfile
 
     def create_branch(
@@ -354,10 +343,9 @@ class PackitRepositoryBase:
         with cwd(self.absolute_specfile_dir):
             self.specfile.download_remote_sources()
 
-    def set_specfile_content(self, specfile: SpecFile, version: str, comment: str):
+    def set_specfile_content(self, specfile: Specfile, version: str, comment: str):
         """
-        update this specfile using provided specfile + rpmdev-bumpsec
-        preserve changelog in this spec
+        update this specfile using provided specfile
 
         :param specfile: specfile to get changes from (we update self.specfile)
         :param version: version to set in self.specfile
@@ -367,17 +355,9 @@ class PackitRepositoryBase:
         this_version = self.specfile.get_version()
         self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
         self.specfile.spec_content.replace_section("%changelog", this_changelog)
-        # if version is equal, rpmdev bumpspec won't do anything
         self.specfile.set_version(this_version)
         self.specfile.save()
-        rpmdev_bumpspec(self.absolute_specfile_path, comment=comment, version=version)
-        # refresh the spec after we changed it
-        if hasattr(self.specfile, "update"):
-            # new rebase-helper
-            self.specfile.update()
-        else:
-            # old rebase-helper
-            self.specfile._update_data()
+        self.specfile.set_spec_version(version=version, changelog_entry=comment)
 
     def is_dirty(self) -> bool:
         """ is the git repo dirty? """

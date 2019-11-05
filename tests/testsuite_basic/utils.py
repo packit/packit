@@ -20,19 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import inspect
-
-from rebasehelper.specfile import SpecFile
-
 from packit.utils import run_command
-
-
-def get_specfile(path: str) -> SpecFile:
-    s = inspect.signature(SpecFile)
-    if "changelog_entry" in s.parameters:
-        return SpecFile(path=path, changelog_entry=None)
-    else:
-        return SpecFile(path=path)
 
 
 def remove_gpg_key_pair(gpg_binary: str, fingerprint: str):
