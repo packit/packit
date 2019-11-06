@@ -75,6 +75,12 @@ class Specfile(SpecFile):
             logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
             raise PackitException("rebase-helper didn't do the job")
 
+    def write_spec_content(self):
+        if hasattr(self, "_write_spec_content"):
+            self._write_spec_content()
+        else:
+            self._write_spec_file_to_disc()
+
     @staticmethod
     def get_upstream_version(versioneer, package_name, category):
         """
