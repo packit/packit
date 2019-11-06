@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 """
-Functional tests for srpm comand
+Functional tests for srpm command
 """
 from pathlib import Path
 
@@ -39,6 +39,15 @@ def test_srpm_command_for_path(upstream_or_distgit_path):
 def test_srpm_command(cwd_upstream_or_distgit):
     call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
     srpm_path = list(cwd_upstream_or_distgit.glob("*.src.rpm"))[0]
+    assert srpm_path.exists()
+    build_srpm(srpm_path)
+
+
+def test_srpm_spec_not_in_root(upstream_spec_not_in_root):
+    call_real_packit(
+        parameters=["--debug", "srpm"], cwd=upstream_spec_not_in_root
+    )
+    srpm_path = list(upstream_spec_not_in_root.glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
