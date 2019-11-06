@@ -6,12 +6,20 @@ daysUntilClose: 14
 exemptLabels:
   - pinned
   - security
+  - bug
+  - EPIC
 # Label to use when marking an issue as stale
-staleLabel: wontfix
+staleLabel: stale
 # Comment to post when marking an issue as stale. Set to `false` to disable
 markComment: >
   This issue has been automatically marked as stale because it has not had
-  recent activity. It will be closed if no further activity occurs. Thank you
-  for your contributions.
+  recent activity. It will be closed if no further activity occurs.
+
+  Thank you for your contributions.
+
+  We are doing this to be sure that the issue is still relevant.
+  Anyone can comment to remove the stale state.
+  (The issues marked with `pinned`, `security`, `bug` or `EPIC` label
+   are not closed by stale-bot.)
 # Comment to post when closing a stale issue. Set to `false` to disable
 closeComment: false
