@@ -81,22 +81,23 @@ def run_command(
     if env:
         cmd_env.update(env)
 
-    shell = subprocess.run(
+    shell = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         shell=False,
         cwd=cwd,
         universal_newlines=True,
         env=cmd_env,
     )
 
-    stdout = shell.stdout.strip()
-    stderr = shell.stderr.strip()
-    if stdout:
-        logger.debug("STDOUT: %s", stdout)
-    if stderr:
-        logger.info("STDERR: %s", stderr)
+    stdout = []
+    while True:
+        line = shell.stdout.readline().rstrip()
+        if line == "" and shell.poll() is not None:
+            break
+        logger.debug(line)
+        stdout.append(line + "\n")
 
     if shell.returncode != 0:
         logger.error("Command %s failed", shell.args)
@@ -110,7 +111,7 @@ def run_command(
     if not output:
         return success
 
-    return shell.stdout
+    return "".join(stdout)
 
 
 def run_command_remote(
