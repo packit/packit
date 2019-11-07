@@ -25,7 +25,8 @@ from typing import List, Tuple, Dict, Set
 
 from koji import ClientSession, BUILD_STATES
 from ogr.abstract import Release
-from packit.config import Config, PackageConfig
+from packit.config.config import Config
+from packit.config.package_config import PackageConfig
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream

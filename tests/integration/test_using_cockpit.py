@@ -30,7 +30,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.api import PackitAPI
-from packit.config import get_local_package_config
+from packit.config.package_config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject

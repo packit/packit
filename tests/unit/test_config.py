@@ -29,17 +29,10 @@ from flexmock import flexmock
 from ogr import GithubService, PagureService
 from ogr.abstract import GitProject, GitService
 from packit.actions import ActionName
-from packit.config import (
-    JobConfig,
-    PackageConfig,
-    JobTriggerType,
-    SyncFilesConfig,
-    SyncFilesItem,
-    get_package_config_from_repo,
-    Config,
-    JobType,
-    JobNotifyType,
-)
+from packit.config.config import Config
+from packit.config.job_config import JobConfig, JobTriggerType, JobNotifyType, JobType
+from packit.config.package_config import PackageConfig, get_package_config_from_repo
+from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
 from packit.exceptions import PackitInvalidConfigException
 
 

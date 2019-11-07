@@ -26,7 +26,7 @@ import pytest
 
 from flexmock import flexmock
 from packit.api import PackitAPI, Config
-from packit.config import parse_loaded_config
+from packit.config.package_config import parse_loaded_config
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from tests.spellbook import TARBALL_NAME

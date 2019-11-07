@@ -20,38 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""
-Display status
-"""
-
 import logging
-import os
+from pprint import pformat
+from jsonschema import Draft4Validator, ValidationError
 
-import click
+from packit.exceptions import PackitInvalidConfigException
 
-from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception
-from packit.cli.utils import get_packit_api
-from packit.config.config import pass_config, get_context_settings
-
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
-@click.command("status", context_settings=get_context_settings())
-@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
-@pass_config
-@cover_packit_exception
-def status(config, path_or_url):
-    """
-    Display status.
+class BaseConfig:
+    """ common ancestor for all the config classes, the boring stuff """
 
-    \b
-    - latest downstream pull requests
-    - versions from all downstream branches
-    - latest upstream releases
-    - latest builds in Koji
-    - latest updates in Bodhi
-    """
+    SCHEMA: dict
 
-    api = get_packit_api(config=config, local_project=path_or_url)
-    api.status()
+    @classmethod
+    def validate(cls, raw_dict: dict) -> None:
+        try:
+            Draft4Validator(cls.SCHEMA).validate(raw_dict)
+        except ValidationError as ex:
+            logger.debug(f"{pformat(raw_dict)}")
+            raise PackitInvalidConfigException(
+                f"Provided configuration is not valid: {ex}."
+            )

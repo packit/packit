@@ -4,8 +4,9 @@ from git import PushInfo
 from flexmock import flexmock
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.config import PackageConfig, Config, RunCommandType
 from packit.exceptions import PackitException
+from packit.config.config import Config, RunCommandType
+from packit.config.package_config import PackageConfig
 from packit.local_project import LocalProject
 from tests.spellbook import can_a_module_be_imported
 

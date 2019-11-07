@@ -34,7 +34,7 @@ from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.update import update
-from packit.config import Config, get_context_settings
+from packit.config.config import Config, get_context_settings
 from packit.utils import set_logging
 
 logger = logging.getLogger("packit")

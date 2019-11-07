@@ -32,7 +32,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception
 from packit.cli.utils import get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.config.config import pass_config, get_context_settings
 
 logger = logging.getLogger(__file__)
 
