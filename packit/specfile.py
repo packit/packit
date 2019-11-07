@@ -77,8 +77,10 @@ class Specfile(SpecFile):
 
     def write_spec_content(self):
         if hasattr(self, "_write_spec_content"):
+            # new rebase-helper
             self._write_spec_content()
         else:
+            # old rebase-helper
             self._write_spec_file_to_disc()
 
     @staticmethod
