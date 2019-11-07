@@ -493,7 +493,7 @@ class Upstream(PackitRepositoryBase):
         )
         prep[idx] = new_setup_line
         self.specfile.spec_content.replace_section("%prep", prep)
-        self.specfile._write_spec_content()
+        self.specfile.write_spec_content()
 
         msg = f"Development snapshot ({commit})"
         self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)

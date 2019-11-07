@@ -45,6 +45,7 @@ TARBALL_NAME = "beerware-0.1.0.tar.gz"
 SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
 SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
 DG_OGR = DATA_DIR / "dg-ogr"
+SPECFILE = DATA_DIR / "upstream_git/beer.spec"
 
 
 def git_set_user_email(directory):
