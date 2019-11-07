@@ -30,7 +30,8 @@ from github import GithubException
 
 from ogr.parsing import parse_git_repo
 from packit.api import PackitAPI
-from packit.config import get_local_package_config, Config
+from packit.config.config import Config
+from packit.config.package_config import get_local_package_config
 from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject

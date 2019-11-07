@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Type, List, Optional
 
 from packit import utils
-from packit.config import RunCommandType, Config
+from packit.config.config import RunCommandType, Config
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)

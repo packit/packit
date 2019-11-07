@@ -27,7 +27,7 @@ import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.config.config import pass_config, get_context_settings
 
 
 @click.command("copr-build", context_settings=get_context_settings())
