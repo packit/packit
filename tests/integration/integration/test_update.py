@@ -23,14 +23,13 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from flexmock import flexmock
 
+from flexmock import flexmock
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
-from packit.specfile import Specfile
 from packit.local_project import LocalProject
+from packit.specfile import Specfile
 from tests.spellbook import TARBALL_NAME
-from tests.integration.utils import get_specfile
 
 
 @pytest.fixture()

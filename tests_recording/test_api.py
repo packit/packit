@@ -11,7 +11,7 @@ from requre.storage import DataMiner, DataTypes
 from tests_recording.testbase import PackitUnittestOgr
 
 
-@unittest.skip
+@unittest.skip("Not working yet")
 class ProposeUpdate(PackitUnittestOgr):
     def setUp(self):
         if (
