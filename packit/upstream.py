@@ -84,7 +84,7 @@ class Upstream(PackitRepositoryBase):
         return self.local_project.ref
 
     def get_commits_to_upstream(
-        self, upstream: str, add_usptream_head_commit=False
+        self, upstream: str, add_upstream_head_commit=False
     ) -> List[git.Commit]:
         """
         Return the list of different commits between current branch and upstream rev/tag.
@@ -93,7 +93,7 @@ class Upstream(PackitRepositoryBase):
         It contains merge-commits from the master and commits on top of the master.
         (e.g. commits from PR)
 
-        :param add_usptream_head_commit: bool
+        :param add_upstream_head_commit: bool
         :param upstream: str -- git branch or tag
         :return: list of commits (last commit on the current branch.).
         """
@@ -114,7 +114,7 @@ class Upstream(PackitRepositoryBase):
                 first_parent=True,
             )
         )
-        if add_usptream_head_commit:
+        if add_upstream_head_commit:
             commits.insert(0, self.local_project.git_repo.commit(upstream_ref))
 
         logger.debug(
@@ -226,7 +226,7 @@ class Upstream(PackitRepositoryBase):
         """
 
         upstream = upstream or self.get_specfile_version()
-        commits = self.get_commits_to_upstream(upstream, add_usptream_head_commit=True)
+        commits = self.get_commits_to_upstream(upstream, add_upstream_head_commit=True)
 
         destination = destination or self.local_project.working_dir
 
