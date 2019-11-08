@@ -33,10 +33,10 @@ from packit.utils import cwd
 from tests.spellbook import (
     initiate_git_repo,
     get_test_config,
-    build_srpm,
     UP_SNAPD,
     UP_OSBUILD,
     DG_OGR,
+    build_srpm,
 )
 
 

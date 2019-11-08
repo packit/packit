@@ -26,7 +26,6 @@ from packit.utils import cwd
 from packit.specfile import Specfile
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
-from tests.integration.utils import get_specfile
 
 
 def test_basic_local_update_without_patching(
@@ -44,7 +43,7 @@ def test_basic_local_update_without_patching(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = get_specfile(str(distgit / "beer.spec"))
+    spec = Specfile(str(distgit / "beer.spec"))
     assert spec.get_version() == "0.1.0"
 
 

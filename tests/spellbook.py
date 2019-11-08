@@ -32,8 +32,7 @@ from click.testing import CliRunner
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
-from packit.utils import cwd
-from packit.utils import run_command
+from packit.utils import cwd, run_command
 
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
@@ -131,3 +130,16 @@ def call_packit(fnc=None, parameters=None, envs=None, working_dir=None):
     # catch exceptions enables debugger
     with cwd(working_dir):
         return runner.invoke(fnc, args=parameters, env=envs, catch_exceptions=False)
+
+
+def build_srpm(path: Path):
+    run_command(["rpmbuild", "--rebuild", str(path)])
+
+
+def can_a_module_be_imported(module_name):
+    """ can a module be imported? """
+    try:
+        __import__(module_name)
+        return True
+    except ImportError:
+        return False

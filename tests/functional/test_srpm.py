@@ -25,7 +25,8 @@ Functional tests for srpm comand
 """
 from pathlib import Path
 
-from tests.functional.spellbook import call_real_packit, build_srpm
+from tests.functional.spellbook import call_real_packit
+from tests.spellbook import build_srpm
 
 
 def test_srpm_command_for_path(upstream_or_distgit_path):

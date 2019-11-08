@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 import pytest
-from flexmock import flexmock
 from munch import Munch
 
+from flexmock import flexmock
 from tests.spellbook import can_a_module_be_imported
 
 
