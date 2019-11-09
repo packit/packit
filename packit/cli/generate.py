@@ -33,7 +33,7 @@ import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception
-from packit.config.config import get_context_settings
+from packit.config import get_context_settings
 from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
 

@@ -33,9 +33,7 @@ from packaging import version
 from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.config.config import Config
-from packit.config.package_config import PackageConfig
-from packit.config.sync_files_config import SyncFilesConfig
+from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
 from packit.specfile import Specfile

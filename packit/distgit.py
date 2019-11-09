@@ -31,8 +31,7 @@ import requests
 
 from packit.base_git import PackitRepositoryBase
 from packit.config.config import Config
-from packit.config.package_config import PackageConfig, get_local_package_config
-from packit.config.sync_files_config import SyncFilesConfig
+from packit.config import PackageConfig, SyncFilesConfig, get_local_package_config
 from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject

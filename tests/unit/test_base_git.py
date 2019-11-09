@@ -5,8 +5,7 @@ from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
-from packit.config.config import Config, RunCommandType
-from packit.config.package_config import PackageConfig
+from packit.config import Config, RunCommandType, PackageConfig
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
 from packit.upstream import Upstream

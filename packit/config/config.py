@@ -37,7 +37,7 @@ from ogr import GithubService, get_instances_from_dict, PagureService, get_proje
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import OgrException
 from packit.constants import CONFIG_FILE_NAMES, SANDCASTLE_WORK_DIR
-from packit.config.base_config import BaseConfig
+from packit.config import BaseConfig
 from packit.exceptions import PackitConfigException, PackitException
 from packit.schema import USER_CONFIG_SCHEMA
 

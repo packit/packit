@@ -29,8 +29,7 @@ from git import PushInfo
 
 from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
-from packit.config.config import Config, RunCommandType
-from packit.config.package_config import PackageConfig
+from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
 from packit.specfile import Specfile
 from packit.local_project import LocalProject

@@ -22,8 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from packit.config.package_config import PackageConfig
-from packit.config.sync_files_config import SyncFilesItem, SyncFilesConfig
+from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
 from packit.sync import RawSyncFilesItem
 from packit.utils import cwd
 from tests.spellbook import DATA_DIR

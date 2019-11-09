@@ -39,8 +39,7 @@ from munch import Munch
 from tabulate import tabulate
 
 from packit.actions import ActionName
-from packit.config.config import Config
-from packit.config.package_config import PackageConfig
+from packit.config import Config, PackageConfig
 from packit.constants import COPR2GITHUB_STATE, SYNCING_NOTE
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, PackitInvalidConfigException
