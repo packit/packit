@@ -5,8 +5,7 @@ from flexmock import flexmock
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.exceptions import PackitException
-from packit.config.config import Config, RunCommandType
-from packit.config.package_config import PackageConfig
+from packit.config import Config, PackageConfig, RunCommandType
 from packit.local_project import LocalProject
 from tests.spellbook import can_a_module_be_imported
 

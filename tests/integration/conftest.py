@@ -35,7 +35,7 @@ from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
 from packit.api import PackitAPI
 from packit.cli.utils import get_packit_api
-from packit.config.package_config import get_local_package_config
+from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.specfile import Specfile

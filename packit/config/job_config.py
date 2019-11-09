@@ -24,7 +24,7 @@ import logging
 from enum import Enum
 from typing import List
 
-from packit.config.base_config import BaseConfig
+from packit.config import BaseConfig
 from packit.exceptions import PackitConfigException
 from packit.schema import JOB_CONFIG_SCHEMA
 

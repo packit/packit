@@ -27,7 +27,7 @@ import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
-from packit.config.config import pass_config, get_context_settings
+from packit.config import pass_config, get_context_settings
 from packit.constants import DEFAULT_BODHI_NOTE
 
 logger = logging.getLogger(__file__)
