@@ -30,8 +30,12 @@ import git
 import requests
 
 from packit.base_git import PackitRepositoryBase
-from packit.config.config import Config
-from packit.config import PackageConfig, SyncFilesConfig, get_local_package_config
+from packit.config import (
+    Config,
+    PackageConfig,
+    SyncFilesConfig,
+    get_local_package_config,
+)
 from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject

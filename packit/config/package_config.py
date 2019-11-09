@@ -30,7 +30,9 @@ from yaml import safe_load
 from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
-from packit.config import BaseConfig, JobConfig, SyncFilesConfig
+from packit.config.base_config import BaseConfig
+from packit.config.job_config import JobConfig
+from packit.config.sync_files_config import SyncFilesConfig
 from packit.exceptions import PackitConfigException, PackitException
 from packit.schema import PACKAGE_CONFIG_SCHEMA
 

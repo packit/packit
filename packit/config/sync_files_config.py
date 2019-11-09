@@ -24,7 +24,7 @@ import logging
 from pathlib import Path
 from typing import List
 
-from packit.config import BaseConfig
+from packit.config.base_config import BaseConfig
 from packit.schema import SYNCED_FILES_SCHEMA
 from packit.sync import RawSyncFilesItem, SyncFilesItem, get_raw_files
 
