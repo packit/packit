@@ -27,6 +27,7 @@ import re
 import shlex
 import subprocess
 import tempfile
+import threading
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Tuple, Any, Optional, Dict, Union
@@ -60,6 +61,23 @@ def get_rev_list_kwargs(opt_list):
     return result
 
 
+class StreamLogger(threading.Thread):
+    def __init__(self, stream, log_level=logging.DEBUG):
+        super().__init__(daemon=True)
+        self.stream = stream
+        self.output = []
+        self.log_level = log_level
+
+    def run(self):
+        for line in self.stream:
+            line = line.strip()
+            self.output.append(line + "\n")
+            logger.log(self.log_level, line)
+
+    def get_output(self):
+        return "".join(self.output)
+
+
 def run_command(
     cmd,
     error_message=None,
@@ -84,20 +102,21 @@ def run_command(
     shell = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.PIPE,
         shell=False,
         cwd=cwd,
         universal_newlines=True,
         env=cmd_env,
     )
 
-    stdout = []
-    while True:
-        line = shell.stdout.readline().rstrip()
-        if line == "" and shell.poll() is not None:
-            break
-        logger.debug(line)
-        stdout.append(line + "\n")
+    stdout = StreamLogger(shell.stdout, log_level=logging.DEBUG)
+    stderr = StreamLogger(shell.stderr, log_level=logging.INFO)
+
+    stdout.start()
+    stderr.start()
+    shell.wait()
+    stdout.join()
+    stderr.join()
 
     if shell.returncode != 0:
         logger.error("Command %s failed", shell.args)
@@ -111,7 +130,7 @@ def run_command(
     if not output:
         return success
 
-    return "".join(stdout)
+    return stdout.get_output()
 
 
 def run_command_remote(
