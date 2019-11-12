@@ -1,26 +1,20 @@
-import unittest
-from os import chdir
+import yaml
 
-from tests.testsuite_basic.spellbook import (
-    call_packit,
-    call_real_packit_and_return_exit_code,
-)
+from tests.testsuite_basic.spellbook import call_real_packit_and_return_exit_code
 
 
-# TODO: fix the test
-@unittest.skip("test fails in zuul, we have to investigate WHY")
 def test_generate_pass(upstream_without_config):
-    u = upstream_without_config
-    chdir(u)
-
-    assert not (u / ".packit.yaml").is_file()
+    packit_yaml_path = upstream_without_config / ".packit.yaml"
+    assert not packit_yaml_path.is_file()
 
     # This test requires packit on pythonpath
-    result = call_packit(parameters=["generate"])
+    result = call_real_packit_and_return_exit_code(
+        parameters=["generate"], cwd=str(upstream_without_config)
+    )
+    assert result == 0
 
-    assert result.exit_code == 0
-
-    assert (u / ".packit.yaml").is_file()
+    assert packit_yaml_path.is_file()
+    yaml.safe_load(packit_yaml_path.read_text())
 
 
 def test_generate_fail(cwd_upstream_or_distgit):
