@@ -11,6 +11,8 @@ By contributing to this project you agree to the Developer Certificate of Origin
 Before creating bug reports, please check a [list of known issues](https://github.com/packit-service/packit/issues) to see
 if the problem has already been reported (or fixed in a master branch).
 
+We have also a [roadmap document](/ROADMAP.md) with our short-term priorities and ideas for future.
+
 If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/packit-service/packit/issues/new).
 Be sure to include a **descriptive title and a clear description**. Ideally, please provide:
  * version of packit you are using (`rpm -q packit` or `pip3 freeze | grep packitos`)
@@ -19,7 +21,7 @@ Be sure to include a **descriptive title and a clear description**. Ideally, ple
 If possible, add a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
 
 **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
-You can also comment on the closed issue to indicate that upstream should provide a new release with a fix.
+You can also comment on the closed issue to indicate that we should provide a new release with the fix.
 
 ### Suggesting Enhancements
 
