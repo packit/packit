@@ -27,7 +27,6 @@ import click
 from packit.local_project import LocalProject
 from packit.utils import git_remote_url_to_https_url
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -62,9 +61,10 @@ class LocalProjectParameter(click.ParamType):
             remote_name = ctx.params.get(self.remote_param_name, None)
 
             if os.path.isdir(value):
-                logger.info(f"Input is a directory: {value}")
+                absolute_path = os.path.abspath(value)
+                logger.info(f"Input is a directory: {absolute_path}")
                 local_project = LocalProject(
-                    working_dir=value, ref=branch_name, remote=remote_name
+                    working_dir=absolute_path, ref=branch_name, remote=remote_name
                 )
             elif git_remote_url_to_https_url(value):
                 logger.info(f"Input is a URL to a git repo: {value}")
