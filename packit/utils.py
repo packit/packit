@@ -29,7 +29,7 @@ import subprocess
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Tuple, Any, Optional, Dict
+from typing import Tuple, Any, Optional, Dict, Union
 from urllib.parse import urlparse
 
 import git
@@ -272,7 +272,7 @@ def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
 
 
 @contextmanager
-def cwd(target):
+def cwd(target: Union[str, Path]):
     """
     Manage cwd in a pushd/popd fashion.
 

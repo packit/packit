@@ -21,32 +21,46 @@
 # SOFTWARE.
 
 """
-Push Bodhi updates from testing to stable.
+E2E tests which utilize cockpit projects
 """
+from pathlib import Path
 
-import logging
-import os
+import pytest
 
-import click
-
-from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception
 from packit.cli.utils import get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.local_project import LocalProject
+from packit.utils import cwd
+from tests.spellbook import (
+    initiate_git_repo,
+    get_test_config,
+    UP_SNAPD,
+    UP_OSBUILD,
+    DG_OGR,
+    build_srpm,
+)
 
-logger = logging.getLogger(__file__)
+
+@pytest.fixture(
+    params=[
+        (UP_SNAPD, "2.41", "https://github.com/snapcore/snapd"),
+        (UP_OSBUILD, "2", "https://github.com/osbuild/osbuild"),
+        (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
+    ]
+)
+def example_repo(request, tmpdir):
+    example_path, tag, remote = request.param
+    t = Path(str(tmpdir))
+    u = t / "up"
+    initiate_git_repo(u, tag=tag, copy_from=example_path, upstream_remote=remote)
+    return u
 
 
-@click.command("push-updates", context_settings=get_context_settings())
-@click.option("--update-alias", help="For example FEDORA-2019-ee5674e22c", default=None)
-@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
-@pass_config
-@cover_packit_exception
-def push_updates(update_alias, config, path_or_url):
-    """
-    Find all Bodhi updates that have been in testing for more than 'Stable days' (7 by default)
-    and push them to stable.
-
-    """
-    api = get_packit_api(config=config, local_project=path_or_url)
-    api.push_updates(update_alias)
+def test_srpm_on_example(example_repo):
+    c = get_test_config()
+    api = get_packit_api(
+        config=c, local_project=LocalProject(working_dir=str(example_repo))
+    )
+    with cwd(example_repo):
+        path = api.create_srpm()
+    assert path.exists()
+    build_srpm(path)

@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 
-from os import getcwd
+import os
 
 import click
 
@@ -54,7 +54,7 @@ from packit.config import pass_config, get_context_settings
     help="Installation instructions for the project to build in.",
     default=None,
 )
-@click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
+@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
 def copr_build(
