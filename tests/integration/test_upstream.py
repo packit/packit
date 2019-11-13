@@ -33,12 +33,12 @@ import pytest
 
 from flexmock import flexmock
 from ogr import GithubService
-from packit.config import Config, get_local_package_config
-from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils import cwd
+from packit.config import Config, get_local_package_config
+from packit.exceptions import PackitException
 from tests.spellbook import (
     EMPTY_CHANGELOG,
     initiate_git_repo,

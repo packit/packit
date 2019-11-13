@@ -9,8 +9,7 @@ from requre.storage import PersistentObjectStorage
 
 import packit.distgit
 import packit.upstream
-from packit.config import Config
-from packit.config import get_package_config_from_repo
+from packit.config import Config, get_package_config_from_repo
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
