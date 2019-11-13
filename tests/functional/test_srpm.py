@@ -44,9 +44,7 @@ def test_srpm_command(cwd_upstream_or_distgit):
 
 
 def test_srpm_spec_not_in_root(upstream_spec_not_in_root):
-    call_real_packit(
-        parameters=["--debug", "srpm"], cwd=upstream_spec_not_in_root
-    )
+    call_real_packit(parameters=["--debug", "srpm"], cwd=upstream_spec_not_in_root)
     srpm_path = list(upstream_spec_not_in_root.glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)

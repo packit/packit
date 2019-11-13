@@ -12,7 +12,7 @@ from tests.spellbook import (
     prepare_dist_git_repo,
     DISTGIT,
     DG_OGR,
-    UPSTREAM_SPEC_NOT_IN_ROOT
+    UPSTREAM_SPEC_NOT_IN_ROOT,
 )
 
 
