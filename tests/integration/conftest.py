@@ -173,6 +173,7 @@ def mock_patching():
     flexmock(Upstream).should_receive("create_patches").and_return(["patches"])
     flexmock(DistGit).should_receive("add_patches_to_specfile").with_args(["patches"])
 
+
 @pytest.fixture()
 def cwd_upstream(upstream_and_remote) -> Iterator[Path]:
     upstream, _ = upstream_and_remote
