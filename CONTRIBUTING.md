@@ -68,12 +68,15 @@ Tests are stored in [tests](/tests) directory:
     - strictly offline
 - `tests/integration`
     - testing bigger parts of codebase (integration between multiple units, packit python API)
-    - use [requre](https://github.com/packit-service/requre)
-      for remote communication => offline in the CI
-    - prefer [requre](https://github.com/packit-service/requre) instead of mocking
+    - mocking with [flexmock](https://github.com/bkabrda/flexmock/) instead of using [requre](https://github.com/packit-service/requre)
 - `tests/functional`
     - testing packit as a CLI
     - be careful what you run -- no requre, no mocking
+- `tests_recording`
+    - testing bigger parts of codebase (integration between multiple units, packit python API)
+    - use [requre](https://github.com/packit-service/requre)
+      for remote communication => offline in the CI
+    - prefer [requre](https://github.com/packit-service/requre) instead of mocking
 
 We use [Tox](https://pypi.org/project/tox) with configuration in [tox.ini](tox.ini).
 
