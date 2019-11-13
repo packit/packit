@@ -30,15 +30,15 @@ from ogr import GithubService, PagureService
 from ogr.abstract import GitProject, GitService
 from packit.actions import ActionName
 from packit.config import (
+    Config,
     JobConfig,
-    PackageConfig,
     JobTriggerType,
+    JobNotifyType,
+    JobType,
+    PackageConfig,
+    get_package_config_from_repo,
     SyncFilesConfig,
     SyncFilesItem,
-    get_package_config_from_repo,
-    Config,
-    JobType,
-    JobNotifyType,
 )
 from packit.exceptions import PackitInvalidConfigException
 
