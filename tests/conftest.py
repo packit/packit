@@ -12,6 +12,7 @@ from tests.spellbook import (
     prepare_dist_git_repo,
     DISTGIT,
     DG_OGR,
+    UPSTREAM_SPEC_NOT_IN_ROOT,
 )
 
 
@@ -28,6 +29,21 @@ def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
     initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
 
     return u, u_remote_path
+
+
+@pytest.fixture()
+def upstream_spec_not_in_root(tmpdir) -> Path:
+    t = Path(str(tmpdir))
+
+    u_remote_path = t / "upstream_remote"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+
+    u = t / "upstream_git"
+    shutil.copytree(UPSTREAM_SPEC_NOT_IN_ROOT, u)
+    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
+
+    return u
 
 
 @pytest.fixture()
