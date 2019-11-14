@@ -279,10 +279,8 @@ def get_local_package_config(
                         f"Cannot load package config '{config_file_name_full}'."
                     )
                     raise Exception(f"Cannot load package config: {ex}.")
-
                 return parse_loaded_config(
-                    loaded_config=loaded_config,
-                    config_file_path=str(config_file_name_full),
+                    loaded_config=loaded_config, config_file_path=str(config_file_name)
                 )
 
             logger.debug(f"The local config file '{config_file_name_full}' not found.")
@@ -316,7 +314,6 @@ def get_package_config_from_repo(
         except Exception as ex:
             logger.error(f"Cannot load package config '{config_file_name}'.")
             raise PackitException(f"Cannot load package config: {ex}.")
-
         return parse_loaded_config(
             loaded_config=loaded_config, config_file_path=config_file_name
         )
