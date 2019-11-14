@@ -578,3 +578,56 @@ def test_user_config_fork_token(tmpdir, recwarn):
     Config.get_user_config()
     w = recwarn.pop(UserWarning)
     assert "pagure_fork_token" in str(w.message)
+
+
+@pytest.mark.parametrize(
+    "package_config, all_synced_files",
+    [
+        (
+            PackageConfig(
+                config_file_path="packit.yaml",
+                specfile_path="file.spec",
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[SyncFilesItem(src="file.spec", dest="file.spec")]
+                ),
+            ),
+            SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="file.spec", dest="file.spec"),
+                    SyncFilesItem(src="packit.yaml", dest="packit.yaml"),
+                ]
+            ),
+        ),
+        (
+            PackageConfig(
+                config_file_path="packit.yaml",
+                specfile_path="file.spec",
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[SyncFilesItem(src="file.txt", dest="file.txt")]
+                ),
+            ),
+            SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="file.txt", dest="file.txt"),
+                    SyncFilesItem(src="file.spec", dest="file.spec"),
+                    SyncFilesItem(src="packit.yaml", dest="packit.yaml"),
+                ]
+            ),
+        ),
+        (
+            PackageConfig(
+                config_file_path="packit.yaml",
+                specfile_path="file.spec",
+                synced_files=SyncFilesConfig([]),
+            ),
+            SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="file.spec", dest="file.spec"),
+                    SyncFilesItem(src="packit.yaml", dest="packit.yaml"),
+                ]
+            ),
+        ),
+    ],
+)
+def test_get_all_files_to_sync(package_config, all_synced_files):
+    assert package_config.get_all_files_to_sync() == all_synced_files

@@ -32,7 +32,7 @@ from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.config.base_config import BaseConfig
 from packit.config.job_config import JobConfig
-from packit.config.sync_files_config import SyncFilesConfig
+from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
 from packit.exceptions import PackitConfigException, PackitException
 from packit.schema import PACKAGE_CONFIG_SCHEMA
 
@@ -49,6 +49,7 @@ class PackageConfig(BaseConfig):
 
     def __init__(
         self,
+        config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
         synced_files: Optional[SyncFilesConfig] = None,
         jobs: Optional[List[JobConfig]] = None,
@@ -67,6 +68,7 @@ class PackageConfig(BaseConfig):
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
     ):
+        self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
         self.jobs: List[JobConfig] = jobs or []
@@ -143,7 +145,9 @@ class PackageConfig(BaseConfig):
         )
 
     @classmethod
-    def get_from_dict(cls, raw_dict: dict, validate=True) -> "PackageConfig":
+    def get_from_dict(
+        cls, raw_dict: dict, config_file_path: str = None, validate=True
+    ) -> "PackageConfig":
         if validate:
             cls.validate(raw_dict)
 
@@ -195,6 +199,7 @@ class PackageConfig(BaseConfig):
             spec_source_id = f"Source{spec_source_id}"
 
         pc = PackageConfig(
+            config_file_path=config_file_path,
             specfile_path=specfile_path,
             synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
             actions={ActionName(a): cmd for a, cmd in actions.items()},
@@ -230,6 +235,23 @@ class PackageConfig(BaseConfig):
             r = old
         return r
 
+    def get_all_files_to_sync(self):
+        """
+        Adds the default files (config file, spec file) to synced files when doing propose-update.
+        :return: SyncFilesConfig with default files
+        """
+        files = self.synced_files.files_to_sync
+
+        if self.specfile_path not in (item[0] for item in files):
+            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
+
+        if self.config_file_path not in (item[0] for item in files):
+            files.append(
+                SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
+            )
+
+        return SyncFilesConfig(files)
+
 
 def get_local_package_config(
     *directory, try_local_dir_first=False, try_local_dir_last=False
@@ -258,7 +280,10 @@ def get_local_package_config(
                     )
                     raise Exception(f"Cannot load package config: {ex}.")
 
-                return parse_loaded_config(loaded_config=loaded_config)
+                return parse_loaded_config(
+                    loaded_config=loaded_config,
+                    config_file_path=str(config_file_name_full),
+                )
 
             logger.debug(f"The local config file '{config_file_name_full}' not found.")
     raise PackitConfigException("No packit config found.")
@@ -292,7 +317,9 @@ def get_package_config_from_repo(
             logger.error(f"Cannot load package config '{config_file_name}'.")
             raise PackitException(f"Cannot load package config: {ex}.")
 
-        return parse_loaded_config(loaded_config=loaded_config)
+        return parse_loaded_config(
+            loaded_config=loaded_config, config_file_path=config_file_name
+        )
 
     logger.warning(
         f"No config file found on ref '{ref}' "
@@ -301,13 +328,15 @@ def get_package_config_from_repo(
     return None
 
 
-def parse_loaded_config(loaded_config: dict) -> PackageConfig:
+def parse_loaded_config(
+    loaded_config: dict, config_file_path: str = None
+) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
 
     try:
         package_config = PackageConfig.get_from_dict(
-            raw_dict=loaded_config, validate=True
+            raw_dict=loaded_config, config_file_path=config_file_path, validate=True
         )
         return package_config
     except Exception as ex:

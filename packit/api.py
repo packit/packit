@@ -224,8 +224,10 @@ class PackitAPI:
             with open(path, "w") as f:
                 f.write(SYNCING_NOTE.format(packit_version=get_packit_version()))
 
+            files_to_sync = self.package_config.get_all_files_to_sync()
+
             if self.up.with_action(action=ActionName.prepare_files):
-                raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+                raw_sync_files = files_to_sync.get_raw_files_to_sync(
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
                 )
@@ -253,7 +255,7 @@ class PackitAPI:
 
             # when the action is defined, we still need to copy the files
             if self.up.has_action(action=ActionName.prepare_files):
-                raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
+                raw_sync_files = files_to_sync.get_raw_files_to_sync(
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
                 )
