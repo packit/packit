@@ -117,18 +117,6 @@ Options:
 ...
 ```
 
-## Already on-boarded
-
- Package name      | Contacts                  | Link to packit configuration file
--------------------|---------------------------|----------------------------------------------------------------------
- rebase-helper     | @nforro                   | [.packit.yaml](https://github.com/rebase-helper/rebase-helper/blob/master/.packit.yml)
- pykickstart       | @dcantrell @larskarlitski | [packit.yaml](https://github.com/dcantrell/pykickstart/blob/master/packit.yaml)
- packit            |                           | [.packit.yaml](https://github.com/packit-service/packit/blob/master/.packit.yaml)
- colin             |                           | [.packit.yaml](https://github.com/user-cont/colin/blob/master/.packit.yaml)
- conu              |                           | [.packit.yaml](https://github.com/user-cont/conu/blob/master/.packit.yaml)
- sen               | @TomasTomecek             | [.packit.yaml](https://github.com/TomasTomecek/sen/blob/master/.packit.yaml)
- ogr               | @lachmanfrantisek         | [.packit.yaml](https://github.com/packit-service/ogr/blob/master/.packit.yaml)
- rear              | @gdha                     | [PR2145](https://github.com/rear/rear/pull/2145)
 
 ## Who is interested
 
@@ -145,15 +133,4 @@ Options:
 * cockpit (@martinpitt)
 * iptables (@jsynacek)
 
-## Currently on-boarding
-
- Package name       | Contacts                  | Links (Bugzillas, PRs, etc.)
---------------------|---------------------------|----------------------------------------------------------------------
- anaconda           | @jkonecny12               | [BZ1697339](https://bugzilla.redhat.com/show_bug.cgi?id=1697339)
- [standard-test-roles](https://pagure.io/standard-test-roles)|                           | [PR325](https://pagure.io/standard-test-roles/pull-request/325)
-
-## Resources
-
- * An excellent document by Colin Walters which describes a modern way of
-   developing a distribution:
-   * https://github.com/projectatomic/rpmdistro-gitoverlay/blob/master/doc/reworking-fedora-releng.md
+For the up to date list of projects which are using packit, [click here](https://github.com/packit-service/research/blob/master/onboard/status.md).
