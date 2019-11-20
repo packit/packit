@@ -242,10 +242,10 @@ class PackageConfig(BaseConfig):
         """
         files = self.synced_files.files_to_sync
 
-        if self.specfile_path not in (item[0] for item in files):
+        if self.specfile_path not in (item.src for item in files):
             files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
 
-        if self.config_file_path not in (item[0] for item in files):
+        if self.config_file_path not in (item.src for item in files):
             files.append(
                 SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
             )
