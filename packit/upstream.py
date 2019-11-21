@@ -195,18 +195,13 @@ class Upstream(PackitRepositoryBase):
         """
         project = self.local_project.git_project
 
-        if self.local_project.git_project.is_fork:
-            source_branch = f"{project.namespace}:{source_branch}"
-            project = self.local_project.git_project.parent
-        elif fork_username:
-            source_branch = f"{fork_username}:{source_branch}"
-
         try:
             upstream_pr = project.pr_create(
                 title=pr_title,
                 body=pr_description,
                 source_branch=source_branch,
                 target_branch=target_branch,
+                fork_username=fork_username,
             )
         except Exception as ex:
             logger.error("there was an error while create a PR: %r", ex)
