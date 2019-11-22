@@ -12,6 +12,7 @@ repos:
     rev: v2.2.3
     hooks:
     - id: check-added-large-files
+      exclude: tests_recording/test_data
     - id: check-ast
     - id: check-merge-conflict
     - id: check-yaml

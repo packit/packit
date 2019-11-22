@@ -5,7 +5,7 @@ unittest.case:
   tests_recording.test_status:
     tests_recording.testbase:
       packit.config.package_config:
-        ogr.services.github:
+        ogr.services.github.project:
           github.MainClass:
             github.Requester:
               requests.sessions:
@@ -14,13 +14,10 @@ unittest.case:
                     send:
                       ogr-0.7:
                       - metadata:
-                          latency: 0.7021563053131104
+                          latency: 0.26329708099365234
                         output:
                           __store_indicator: 2
                           _content:
-                            allow_merge_commit: true
-                            allow_rebase_merge: true
-                            allow_squash_merge: true
                             archive_url: https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}
                             archived: false
                             assignees_url: https://api.github.com/repos/packit-service/ogr/assignees{/user}
@@ -42,8 +39,8 @@ unittest.case:
                             downloads_url: https://api.github.com/repos/packit-service/ogr/downloads
                             events_url: https://api.github.com/repos/packit-service/ogr/events
                             fork: false
-                            forks: 27
-                            forks_count: 27
+                            forks: 28
+                            forks_count: 28
                             forks_url: https://api.github.com/repos/packit-service/ogr/forks
                             full_name: packit-service/ogr
                             git_commits_url: https://api.github.com/repos/packit-service/ogr/git/commits{/sha}
@@ -76,11 +73,11 @@ unittest.case:
                             milestones_url: https://api.github.com/repos/packit-service/ogr/milestones{/number}
                             mirror_url: null
                             name: ogr
-                            network_count: 27
+                            network_count: 28
                             node_id: MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=
                             notifications_url: https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}
-                            open_issues: 41
-                            open_issues_count: 41
+                            open_issues: 39
+                            open_issues_count: 39
                             organization:
                               avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
                               events_url: https://api.github.com/users/packit-service/events{/privacy}
@@ -119,32 +116,28 @@ unittest.case:
                               subscriptions_url: https://api.github.com/users/packit-service/subscriptions
                               type: Organization
                               url: https://api.github.com/users/packit-service
-                            permissions:
-                              admin: true
-                              pull: true
-                              push: true
                             private: false
                             pulls_url: https://api.github.com/repos/packit-service/ogr/pulls{/number}
-                            pushed_at: '2019-11-22T11:31:44Z'
+                            pushed_at: '2019-11-25T15:57:52Z'
                             releases_url: https://api.github.com/repos/packit-service/ogr/releases{/id}
-                            size: 4106
+                            size: 4115
                             ssh_url: git@github.com:packit-service/ogr.git
                             stargazers_count: 21
                             stargazers_url: https://api.github.com/repos/packit-service/ogr/stargazers
                             statuses_url: https://api.github.com/repos/packit-service/ogr/statuses/{sha}
-                            subscribers_count: 8
+                            subscribers_count: 9
                             subscribers_url: https://api.github.com/repos/packit-service/ogr/subscribers
                             subscription_url: https://api.github.com/repos/packit-service/ogr/subscription
                             svn_url: https://github.com/packit-service/ogr
                             tags_url: https://api.github.com/repos/packit-service/ogr/tags
                             teams_url: https://api.github.com/repos/packit-service/ogr/teams
                             trees_url: https://api.github.com/repos/packit-service/ogr/git/trees{/sha}
-                            updated_at: '2019-11-21T12:45:28Z'
+                            updated_at: '2019-11-25T12:34:03Z'
                             url: https://api.github.com/repos/packit-service/ogr
                             watchers: 21
                             watchers_count: 21
                           _next: null
-                          elapsed: 0.700785
+                          elapsed: 0.261962
                           encoding: utf-8
                           headers:
                             Access-Control-Allow-Origin: '*'
@@ -152,44 +145,37 @@ unittest.case:
                               X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
                               X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
                               X-Poll-Interval, X-GitHub-Media-Type
-                            Cache-Control: private, max-age=60, s-maxage=60
+                            Cache-Control: public, max-age=60, s-maxage=60
                             Content-Encoding: gzip
                             Content-Security-Policy: default-src 'none'
                             Content-Type: application/json; charset=utf-8
-                            Date: Fri, 22 Nov 2019 11:54:32 GMT
-                            ETag: W/"b0d1d810ae420f90e202ca3a81de35e2"
-                            Last-Modified: Thu, 21 Nov 2019 12:45:28 GMT
+                            Date: Tue, 26 Nov 2019 08:08:52 GMT
+                            ETag: W/"1e1777c2e817c31f24ac3e9e73d9f3f3"
+                            Last-Modified: Mon, 25 Nov 2019 12:34:03 GMT
                             Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
                             Server: GitHub.com
                             Status: 200 OK
                             Strict-Transport-Security: max-age=31536000; includeSubdomains;
                               preload
                             Transfer-Encoding: chunked
-                            Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
-                            X-Accepted-OAuth-Scopes: repo
+                            Vary: Accept, Accept-Encoding
                             X-Content-Type-Options: nosniff
                             X-Frame-Options: deny
                             X-GitHub-Media-Type: github.v3; format=json
-                            X-GitHub-Request-Id: CCB2:2FD8C:6C233AB:80FD986:5DD7CC77
-                            X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook,
-                              admin:public_key, admin:repo_hook, delete_repo, gist,
-                              notifications, repo, user, write:discussion
-                            X-RateLimit-Limit: '5000'
-                            X-RateLimit-Remaining: '4948'
-                            X-RateLimit-Reset: '1574427233'
+                            X-GitHub-Request-Id: 5D60:11CCC:49B294:56B48A:5DDCDD94
+                            X-RateLimit-Limit: '60'
+                            X-RateLimit-Remaining: '8'
+                            X-RateLimit-Reset: '1574759246'
                             X-XSS-Protection: 1; mode=block
                           raw: !!binary ""
                           reason: OK
                           status_code: 200
                       ogr-0.8:
                       - metadata:
-                          latency: 0.5716831684112549
+                          latency: 0.3097960948944092
                         output:
                           __store_indicator: 2
                           _content:
-                            allow_merge_commit: true
-                            allow_rebase_merge: true
-                            allow_squash_merge: true
                             archive_url: https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}
                             archived: false
                             assignees_url: https://api.github.com/repos/packit-service/ogr/assignees{/user}
@@ -211,8 +197,8 @@ unittest.case:
                             downloads_url: https://api.github.com/repos/packit-service/ogr/downloads
                             events_url: https://api.github.com/repos/packit-service/ogr/events
                             fork: false
-                            forks: 27
-                            forks_count: 27
+                            forks: 28
+                            forks_count: 28
                             forks_url: https://api.github.com/repos/packit-service/ogr/forks
                             full_name: packit-service/ogr
                             git_commits_url: https://api.github.com/repos/packit-service/ogr/git/commits{/sha}
@@ -245,11 +231,11 @@ unittest.case:
                             milestones_url: https://api.github.com/repos/packit-service/ogr/milestones{/number}
                             mirror_url: null
                             name: ogr
-                            network_count: 27
+                            network_count: 28
                             node_id: MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=
                             notifications_url: https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}
-                            open_issues: 41
-                            open_issues_count: 41
+                            open_issues: 39
+                            open_issues_count: 39
                             organization:
                               avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
                               events_url: https://api.github.com/users/packit-service/events{/privacy}
@@ -288,32 +274,28 @@ unittest.case:
                               subscriptions_url: https://api.github.com/users/packit-service/subscriptions
                               type: Organization
                               url: https://api.github.com/users/packit-service
-                            permissions:
-                              admin: true
-                              pull: true
-                              push: true
                             private: false
                             pulls_url: https://api.github.com/repos/packit-service/ogr/pulls{/number}
-                            pushed_at: '2019-11-22T11:31:44Z'
+                            pushed_at: '2019-11-25T15:57:52Z'
                             releases_url: https://api.github.com/repos/packit-service/ogr/releases{/id}
-                            size: 4106
+                            size: 4115
                             ssh_url: git@github.com:packit-service/ogr.git
                             stargazers_count: 21
                             stargazers_url: https://api.github.com/repos/packit-service/ogr/stargazers
                             statuses_url: https://api.github.com/repos/packit-service/ogr/statuses/{sha}
-                            subscribers_count: 8
+                            subscribers_count: 9
                             subscribers_url: https://api.github.com/repos/packit-service/ogr/subscribers
                             subscription_url: https://api.github.com/repos/packit-service/ogr/subscription
                             svn_url: https://github.com/packit-service/ogr
                             tags_url: https://api.github.com/repos/packit-service/ogr/tags
                             teams_url: https://api.github.com/repos/packit-service/ogr/teams
                             trees_url: https://api.github.com/repos/packit-service/ogr/git/trees{/sha}
-                            updated_at: '2019-11-21T12:45:28Z'
+                            updated_at: '2019-11-25T12:34:03Z'
                             url: https://api.github.com/repos/packit-service/ogr
                             watchers: 21
                             watchers_count: 21
                           _next: null
-                          elapsed: 0.571408
+                          elapsed: 0.308861
                           encoding: utf-8
                           headers:
                             Access-Control-Allow-Origin: '*'
@@ -321,31 +303,27 @@ unittest.case:
                               X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
                               X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
                               X-Poll-Interval, X-GitHub-Media-Type
-                            Cache-Control: private, max-age=60, s-maxage=60
+                            Cache-Control: public, max-age=60, s-maxage=60
                             Content-Encoding: gzip
                             Content-Security-Policy: default-src 'none'
                             Content-Type: application/json; charset=utf-8
-                            Date: Fri, 22 Nov 2019 11:55:52 GMT
-                            ETag: W/"b0d1d810ae420f90e202ca3a81de35e2"
-                            Last-Modified: Thu, 21 Nov 2019 12:45:28 GMT
+                            Date: Tue, 26 Nov 2019 08:07:16 GMT
+                            ETag: W/"1e1777c2e817c31f24ac3e9e73d9f3f3"
+                            Last-Modified: Mon, 25 Nov 2019 12:34:03 GMT
                             Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
                             Server: GitHub.com
                             Status: 200 OK
                             Strict-Transport-Security: max-age=31536000; includeSubdomains;
                               preload
                             Transfer-Encoding: chunked
-                            Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
-                            X-Accepted-OAuth-Scopes: repo
+                            Vary: Accept, Accept-Encoding
                             X-Content-Type-Options: nosniff
                             X-Frame-Options: deny
                             X-GitHub-Media-Type: github.v3; format=json
-                            X-GitHub-Request-Id: CD42:2FD8C:6C2C423:8108756:5DD7CCC7
-                            X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook,
-                              admin:public_key, admin:repo_hook, delete_repo, gist,
-                              notifications, repo, user, write:discussion
-                            X-RateLimit-Limit: '5000'
-                            X-RateLimit-Remaining: '4937'
-                            X-RateLimit-Reset: '1574427233'
+                            X-GitHub-Request-Id: 3F66:3D52A:615B0:73939:5DDCDD33
+                            X-RateLimit-Limit: '60'
+                            X-RateLimit-Remaining: '18'
+                            X-RateLimit-Reset: '1574758114'
                             X-XSS-Protection: 1; mode=block
                           raw: !!binary ""
                           reason: OK
@@ -358,7 +336,7 @@ unittest.case:
                     send:
                       ogr-0.7:
                       - metadata:
-                          latency: 0.33482813835144043
+                          latency: 0.5097973346710205
                         output:
                           __store_indicator: 2
                           _content:
@@ -420,7 +398,7 @@ unittest.case:
                             type: file
                             url: https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master
                           _next: null
-                          elapsed: 0.33453
+                          elapsed: 0.509254
                           encoding: utf-8
                           headers:
                             Access-Control-Allow-Origin: '*'
@@ -428,38 +406,34 @@ unittest.case:
                               X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
                               X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
                               X-Poll-Interval, X-GitHub-Media-Type
-                            Cache-Control: private, max-age=60, s-maxage=60
+                            Cache-Control: public, max-age=60, s-maxage=60
                             Content-Encoding: gzip
                             Content-Security-Policy: default-src 'none'
                             Content-Type: application/json; charset=utf-8
-                            Date: Fri, 22 Nov 2019 11:54:32 GMT
+                            Date: Tue, 26 Nov 2019 08:08:53 GMT
                             ETag: W/"6276a41bc0caace390795e5457cddee4590ad7ec"
-                            Last-Modified: Wed, 20 Nov 2019 14:23:46 GMT
+                            Last-Modified: Mon, 25 Nov 2019 12:33:58 GMT
                             Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
                             Server: GitHub.com
                             Status: 200 OK
                             Strict-Transport-Security: max-age=31536000; includeSubdomains;
                               preload
                             Transfer-Encoding: chunked
-                            Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
-                            X-Accepted-OAuth-Scopes: ''
+                            Vary: Accept, Accept-Encoding
                             X-Content-Type-Options: nosniff
                             X-Frame-Options: deny
                             X-GitHub-Media-Type: github.v3; format=json
-                            X-GitHub-Request-Id: CCB2:2FD8C:6C23444:80FDA54:5DD7CC78
-                            X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook,
-                              admin:public_key, admin:repo_hook, delete_repo, gist,
-                              notifications, repo, user, write:discussion
-                            X-RateLimit-Limit: '5000'
-                            X-RateLimit-Remaining: '4947'
-                            X-RateLimit-Reset: '1574427233'
+                            X-GitHub-Request-Id: 5D60:11CCC:49B2F8:56B4D2:5DDCDD94
+                            X-RateLimit-Limit: '60'
+                            X-RateLimit-Remaining: '7'
+                            X-RateLimit-Reset: '1574759246'
                             X-XSS-Protection: 1; mode=block
                           raw: !!binary ""
                           reason: OK
                           status_code: 200
                       ogr-0.8:
                       - metadata:
-                          latency: 0.30623626708984375
+                          latency: 0.1857471466064453
                         output:
                           __store_indicator: 2
                           _content:
@@ -521,7 +495,7 @@ unittest.case:
                             type: file
                             url: https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master
                           _next: null
-                          elapsed: 0.305495
+                          elapsed: 0.184216
                           encoding: utf-8
                           headers:
                             Access-Control-Allow-Origin: '*'
@@ -529,31 +503,27 @@ unittest.case:
                               X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
                               X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
                               X-Poll-Interval, X-GitHub-Media-Type
-                            Cache-Control: private, max-age=60, s-maxage=60
+                            Cache-Control: public, max-age=60, s-maxage=60
                             Content-Encoding: gzip
                             Content-Security-Policy: default-src 'none'
                             Content-Type: application/json; charset=utf-8
-                            Date: Fri, 22 Nov 2019 11:55:52 GMT
+                            Date: Tue, 26 Nov 2019 08:07:16 GMT
                             ETag: W/"6276a41bc0caace390795e5457cddee4590ad7ec"
-                            Last-Modified: Wed, 20 Nov 2019 14:23:46 GMT
+                            Last-Modified: Mon, 25 Nov 2019 12:33:58 GMT
                             Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
                             Server: GitHub.com
                             Status: 200 OK
                             Strict-Transport-Security: max-age=31536000; includeSubdomains;
                               preload
                             Transfer-Encoding: chunked
-                            Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding
-                            X-Accepted-OAuth-Scopes: ''
+                            Vary: Accept, Accept-Encoding
                             X-Content-Type-Options: nosniff
                             X-Frame-Options: deny
                             X-GitHub-Media-Type: github.v3; format=json
-                            X-GitHub-Request-Id: CD42:2FD8C:6C2C4C8:81087CD:5DD7CCC8
-                            X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook,
-                              admin:public_key, admin:repo_hook, delete_repo, gist,
-                              notifications, repo, user, write:discussion
-                            X-RateLimit-Limit: '5000'
-                            X-RateLimit-Remaining: '4936'
-                            X-RateLimit-Reset: '1574427233'
+                            X-GitHub-Request-Id: 3F66:3D52A:615C3:73948:5DDCDD34
+                            X-RateLimit-Limit: '60'
+                            X-RateLimit-Remaining: '17'
+                            X-RateLimit-Reset: '1574758114'
                             X-XSS-Protection: 1; mode=block
                           raw: !!binary ""
                           reason: OK

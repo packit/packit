@@ -11,17 +11,16 @@ from requre.storage import DataMiner, DataTypes
 from tests_recording.testbase import PackitUnittestOgr
 
 
-@unittest.skip("Not working yet")
 class ProposeUpdate(PackitUnittestOgr):
     def setUp(self):
         if (
             hasattr(rebasehelper, "VERSION")
             and int(rebasehelper.VERSION.split(".")[1]) >= 19
         ):
-            DataMiner.key = "rebase-helper>=0.19"
+            DataMiner().key = "rebase-helper>=0.19"
         else:
-            DataMiner.key = "rebase-helper<0.19"
-        DataMiner.data_type = DataTypes.Dict
+            DataMiner().key = "rebase-helper<0.19"
+        DataMiner().data_type = DataTypes.DictWithList
 
         super().setUp()
         self.api = PackitAPI(
@@ -88,6 +87,7 @@ class ProposeUpdate(PackitUnittestOgr):
         and int(rebasehelper.VERSION.split(".")[1]) >= 19,
         "New version of rebasehelper works without raised exception",
     )
+    @unittest.skip("not working yet")
     def test_version_change_new_rebaseheler(self):
         """
         check if it not raises exception, because sources are not uploaded in distgit

@@ -4,14 +4,14 @@ import shutil
 import unittest
 from subprocess import check_output, CalledProcessError
 
-from requre.helpers.tempfile import TempFile
-from requre.storage import PersistentObjectStorage
-
 import packit.distgit
 import packit.upstream
+from ogr import GithubService, PagureService
 from packit.config import Config, get_package_config_from_repo
-from packit.exceptions import PackitException
 from packit.local_project import LocalProject
+from requre.helpers.tempfile import TempFile
+from requre.storage import PersistentObjectStorage
+from requre.utils import StorageMode
 
 DATA_DIR = "test_data"
 PERSISTENT_DATA_PREFIX = os.path.join(
@@ -22,10 +22,15 @@ PERSISTENT_DATA_PREFIX = os.path.join(
 class PackitUnittestOgr(unittest.TestCase):
     @staticmethod
     def get_test_config():
-        try:
-            conf = Config.get_user_config()
-        except PackitException:
-            conf = Config()
+        conf = Config()
+        if PersistentObjectStorage().mode != StorageMode.read:
+            conf.services = {
+                GithubService(token=os.environ.get("GITHUB_TOKEN")),
+                PagureService(
+                    token=os.environ.get("PAGURE_TOKEN", None),
+                    instance_url="https://src.fedoraproject.org",
+                ),
+            }
         conf.dry_run = True
         return conf
 
@@ -49,13 +54,14 @@ class PackitUnittestOgr(unittest.TestCase):
             check_output(["git", "config", "--global", "user.name", "Tester"])
 
     def setUp(self):
-        self.conf = self.get_test_config()
         response_file = self.get_datafile_filename()
         PersistentObjectStorage().storage_file = response_file
         PersistentObjectStorage().dump_after_store = True
         self.static_tmp = "/tmp/packit_tmp"
         os.makedirs(self.static_tmp, exist_ok=True)
         TempFile.root = self.static_tmp
+
+        self.conf = self.get_test_config()
         self.project_ogr = self.conf.get_project(
             url="https://github.com/packit-service/ogr"
         )
