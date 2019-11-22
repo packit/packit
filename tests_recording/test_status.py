@@ -28,11 +28,11 @@ from requre.storage import DataMiner, DataTypes
 from tests_recording.testbase import PackitUnittestOgr
 
 
-@unittest.skip("Not working yet")
 class TestStatus(PackitUnittestOgr):
     def setUp(self):
-        DataMiner.key = f'github-{pkg_resources.get_distribution("PyGithub").version}'
-        DataMiner.data_type = DataTypes.Dict
+        major, minor, *_ = pkg_resources.get_distribution("ogr").version.split(".")
+        DataMiner().key = f"ogr-{major}.{minor}"
+        DataMiner().data_type = DataTypes.DictWithList
         super().setUp()
         self.status = Status(self.conf, self.pc, self.upstream, self.dg)
 
