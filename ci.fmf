@@ -1,0 +1,27 @@
+/test/build:
+    /smoke:
+      execute:
+        how: shell
+        script:
+        - packit --version
+        - packit --help
+        - packit status https://github.com/packit-service/packit
+        - packit status https://src.fedoraproject.org/rpms/packit
+    /full:
+      prepare:
+        how: ansible
+        playbooks:
+        - files/packit-testing-farm-prepare.yaml
+      execute:
+        how: shell
+        script:
+        - pwd; cd ~/git-source && pwd && make check
+    /session-recording:
+      prepare:
+        how: ansible
+        playbooks:
+        - files/packit-testing-farm-prepare-session-recording.yaml
+      execute:
+        how: shell
+        script:
+        - pwd; cd ~/git-source && pwd && make check TESTS_TARGET=tests_recording
