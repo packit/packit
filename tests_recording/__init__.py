@@ -34,6 +34,12 @@ upgraded_import_system = (
     .decorate(
         where="git",
         who_name="local_project",
+        what="remote.Remote.fetch",
+        decorator=StoreFiles.arg_references(files_params={"target_path": 2}),
+    )
+    .decorate(
+        where="git",
+        who_name="local_project",
         what="remote.Remote.push",
         decorator=PushInfoStorageList.decorator(item_list=[]),
     )
