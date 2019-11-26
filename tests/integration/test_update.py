@@ -22,36 +22,12 @@
 import subprocess
 from pathlib import Path
 
-import pytest
-
 from flexmock import flexmock
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from tests.spellbook import TARBALL_NAME
-
-
-@pytest.fixture()
-def github_release_webhook():
-    return {
-        "repository": {
-            "full_name": "brewery/beer",
-            "owner": {"login": "brewery"},
-            "name": "beer",
-            "html_url": "https://github.com/brewery/beer",
-        },
-        "release": {
-            "body": "Changelog content will be here",
-            "tag_name": "0.1.0",
-            "created_at": "2019-02-28T18:48:27Z",
-            "published_at": "2019-02-28T18:51:10Z",
-            "draft": False,
-            "prerelease": False,
-            "name": "Beer 0.1.0 is gooooood",
-        },
-        "action": "published",
-    }
 
 
 def test_basic_local_update(
