@@ -30,10 +30,11 @@ import tempfile
 import threading
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Tuple, Any, Optional, Dict, Union
+from typing import Tuple, Any, Optional, Dict, Union, List
 from urllib.parse import urlparse
 
 import git
+import sys
 from pkg_resources import get_distribution, DistributionNotFound
 
 from packit.exceptions import PackitException
@@ -70,22 +71,35 @@ class StreamLogger(threading.Thread):
 
     def run(self):
         for line in self.stream:
-            line = line.strip()
-            self.output.append(line + "\n")
-            logger.log(self.log_level, line)
+            # not doing strip here on purpose so we get real output
+            # and we are saving bytes b/c the output can contain chars which can't be decoded
+            self.output.append(line)
+            logger.log(self.log_level, line.rstrip(b"\n"))
 
     def get_output(self):
-        return "".join(self.output)
+        return b"".join(self.output)
 
 
 def run_command(
-    cmd,
-    error_message=None,
-    cwd=None,
-    fail=True,
-    output=False,
+    cmd: Union[List[str], str],
+    error_message: str = None,
+    cwd: str = None,
+    fail: bool = True,
+    output: bool = False,
     env: Optional[Dict] = None,
+    decode=True,
 ):
+    """
+    run provided command in a new subprocess
+
+    :param cmd: 'duh
+    :param error_message: if the command fails, output this error message
+    :param cwd: run the command in
+    :param fail: raise an exception when the command fails
+    :param output: if True, return command's stdout & stderr
+    :param env: set these env vars in the subprocess
+    :param decode: decode stdout from utf8 to string
+    """
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
 
@@ -99,13 +113,15 @@ def run_command(
     if env:
         cmd_env.update(env)
 
+    # we can't use universal newlines here b/c the output from the command can be encoded
+    # in something alien and we would "can't decode this using utf-8" errors
+    # https://github.com/packit-service/systemd-rhel8-flock/pull/9#issuecomment-550184016
     shell = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         shell=False,
         cwd=cwd,
-        universal_newlines=True,
         env=cmd_env,
     )
 
@@ -130,7 +146,11 @@ def run_command(
     if not output:
         return success
 
-    return stdout.get_output()
+    o = stdout.get_output()
+    if decode:
+        return o.decode(sys.getdefaultencoding())
+    else:
+        return o
 
 
 def run_command_remote(
