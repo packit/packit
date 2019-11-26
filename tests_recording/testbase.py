@@ -54,6 +54,7 @@ class PackitUnittestOgr(unittest.TestCase):
             check_output(["git", "config", "--global", "user.name", "Tester"])
 
     def setUp(self):
+        PersistentObjectStorage().mode = StorageMode.default
         response_file = self.get_datafile_filename()
         PersistentObjectStorage().storage_file = response_file
         PersistentObjectStorage().dump_after_store = True

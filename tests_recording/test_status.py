@@ -21,8 +21,6 @@
 # SOFTWARE.
 import unittest
 
-import pkg_resources
-
 from packit.status import Status
 from requre.storage import DataMiner, DataTypes
 from tests_recording.testbase import PackitUnittestOgr
@@ -30,9 +28,7 @@ from tests_recording.testbase import PackitUnittestOgr
 
 class TestStatus(PackitUnittestOgr):
     def setUp(self):
-        major, minor, *_ = pkg_resources.get_distribution("ogr").version.split(".")
-        DataMiner().key = f"ogr-{major}.{minor}"
-        DataMiner().data_type = DataTypes.DictWithList
+        DataMiner().data_type = DataTypes.List
         super().setUp()
         self.status = Status(self.conf, self.pc, self.upstream, self.dg)
 
