@@ -11,7 +11,8 @@ import git
 import packit.distgit
 import packit.upstream
 from ogr import GithubService, PagureService
-from packit.config import Config
+from packit.base_git import PackitRepositoryBase
+from packit.config import Config, PackageConfig
 from packit.config import get_package_config_from_repo
 from packit.local_project import LocalProject
 from requre.helpers.tempfile import TempFile
@@ -113,6 +114,17 @@ class DistGitForTest(unittest.TestCase):
             ],
         )
         prepare_dist_git_repo(self.distgit)
+
+    @property
+    def repository_base(self) -> PackitRepositoryBase:
+        packit_repo_base = PackitRepositoryBase(
+            config=Config(), package_config=PackageConfig()
+        )
+        packit_repo_base.local_project = LocalProject(
+            working_dir=str(self.distgit),
+            git_url="https://github.com/packit-service/ogr",
+        )
+        return packit_repo_base
 
     def tearDown(self):
         shutil.rmtree(self.distgit)
