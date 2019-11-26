@@ -22,7 +22,6 @@
 
 import logging
 from enum import Enum
-from typing import List
 
 from packit.config.base_config import BaseConfig
 from packit.exceptions import PackitConfigException
@@ -56,33 +55,17 @@ class JobTriggerType(Enum):
     comment = "comment"
 
 
-class JobNotifyType(Enum):
-    pull_request_status = "pull_request_status"
-
-    @classmethod
-    def from_list(cls, li: List[str]) -> List["JobNotifyType"]:
-        return [cls[i] for i in li]
-
-
 class JobConfig(BaseConfig):
     SCHEMA = JOB_CONFIG_SCHEMA
 
-    def __init__(
-        self,
-        job: JobType,
-        notify: List[JobNotifyType],
-        trigger: JobTriggerType,
-        metadata: dict,
-    ):
+    def __init__(self, job: JobType, trigger: JobTriggerType, metadata: dict):
         self.job = job
-        self.notify = notify
         self.trigger = trigger
         self.metadata = metadata
 
     def __repr__(self):
         return (
-            f"JobConfig(job={self.job}, notify={self.notify},"
-            f" trigger={self.trigger}, meta={self.metadata})"
+            f"JobConfig(job={self.job}, trigger={self.trigger}, meta={self.metadata})"
         )
 
     @classmethod
@@ -93,7 +76,6 @@ class JobConfig(BaseConfig):
         return JobConfig(
             job=JobType[raw_dict["job"]],
             trigger=JobTriggerType[raw_dict["trigger"]],
-            notify=JobNotifyType.from_list(raw_dict.get("notify", [])),
             metadata=raw_dict.get("metadata", {}),
         )
 
@@ -102,7 +84,6 @@ class JobConfig(BaseConfig):
             raise PackitConfigException("Provided object is not a JobConfig instance.")
         return (
             self.job == other.job
-            and self.notify == other.notify
             and self.trigger == other.trigger
             and self.metadata == other.metadata
         )
