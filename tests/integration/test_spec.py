@@ -20,9 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from tests.testsuite_basic.spellbook import SPECFILE
+
 from packit.specfile import Specfile
 from rebasehelper.specfile import SpecContent
+
+from tests.spellbook import SPECFILE
 
 
 def test_write_spec_content():
