@@ -8,11 +8,11 @@ from rebasehelper.exceptions import RebaseHelperError
 from flexmock import flexmock
 from packit.api import PackitAPI
 from requre.storage import DataMiner, DataTypes
-from tests_recording.testbase import PackitUnittestOgr
+from tests_recording.testbase import PackitUnittestBase
 
 
 @unittest.skip("not working yet")
-class ProposeUpdate(PackitUnittestOgr):
+class ProposeUpdate(PackitUnittestBase):
     def setUp(self):
         if (
             hasattr(rebasehelper, "VERSION")

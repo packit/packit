@@ -1,17 +1,24 @@
 import inspect
 import os
 import shutil
+import tempfile
 import unittest
+from pathlib import Path
 from subprocess import check_output, CalledProcessError
+
+import git
 
 import packit.distgit
 import packit.upstream
 from ogr import GithubService, PagureService
-from packit.config import Config, get_package_config_from_repo
+from packit.config import Config
+from packit.config import get_package_config_from_repo
 from packit.local_project import LocalProject
 from requre.helpers.tempfile import TempFile
+from requre.storage import DataMiner, DataTypes
 from requre.storage import PersistentObjectStorage
 from requre.utils import StorageMode
+from tests.spellbook import initiate_git_repo, prepare_dist_git_repo, DISTGIT
 
 DATA_DIR = "test_data"
 PERSISTENT_DATA_PREFIX = os.path.join(
@@ -19,7 +26,7 @@ PERSISTENT_DATA_PREFIX = os.path.join(
 )
 
 
-class PackitUnittestOgr(unittest.TestCase):
+class PackitUnittestBase(unittest.TestCase):
     @staticmethod
     def get_test_config():
         conf = Config()
@@ -54,6 +61,7 @@ class PackitUnittestOgr(unittest.TestCase):
             check_output(["git", "config", "--global", "user.name", "Tester"])
 
     def setUp(self):
+        super().setUp()
         PersistentObjectStorage().mode = StorageMode.default
         response_file = self.get_datafile_filename()
         PersistentObjectStorage().storage_file = response_file
@@ -81,3 +89,31 @@ class PackitUnittestOgr(unittest.TestCase):
     def tearDown(self):
         PersistentObjectStorage().dump()
         shutil.rmtree(self.static_tmp)
+        super().tearDown()
+
+
+class DistGitForTest(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        DataMiner().data_type = DataTypes.List
+
+        self.temp_dir = Path(tempfile.mkdtemp())
+        self.distgit_remote = self.temp_dir / "dist_git_remote"
+        self.distgit_remote.mkdir(parents=True, exist_ok=True)
+        git.Repo.init(path=str(self.distgit_remote), bare=True)
+
+        self.distgit = self.temp_dir / "dist_git"
+        shutil.copytree(DISTGIT, self.distgit)
+        initiate_git_repo(
+            self.distgit,
+            push=True,
+            remotes=[
+                ("origin", str(self.distgit_remote)),
+                ("i_am_distgit", "https://src.fedoraproject.org/rpms/python-ogr"),
+            ],
+        )
+        prepare_dist_git_repo(self.distgit)
+
+    def tearDown(self):
+        shutil.rmtree(self.distgit)
+        super().tearDown()

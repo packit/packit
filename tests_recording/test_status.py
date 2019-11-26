@@ -23,10 +23,10 @@ import unittest
 
 from packit.status import Status
 from requre.storage import DataMiner, DataTypes
-from tests_recording.testbase import PackitUnittestOgr
+from tests_recording.testbase import PackitUnittestBase
 
 
-class TestStatus(PackitUnittestOgr):
+class TestStatus(PackitUnittestBase):
     def setUp(self):
         DataMiner().data_type = DataTypes.List
         super().setUp()
