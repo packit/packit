@@ -248,7 +248,10 @@ class Upstream(PackitRepositoryBase):
                 )
             ]
             diff = run_command(
-                cmd=git_diff_cmd, cwd=self.local_project.working_dir, output=True
+                cmd=git_diff_cmd,
+                cwd=self.local_project.working_dir,
+                output=True,
+                decode=False,
             )
 
             if not diff:
@@ -264,7 +267,7 @@ class Upstream(PackitRepositoryBase):
             patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
 
             logger.debug(f"Saving patch: {patch_name}\n{patch_msg}")
-            with open(patch_path, mode="w") as patch_file:
+            with open(patch_path, mode="wb") as patch_file:
                 patch_file.write(diff)
             patch_list.append((patch_name, patch_msg))
 
