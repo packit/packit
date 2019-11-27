@@ -1,5 +1,6 @@
 from requre.helpers.files import StoreFiles
 from requre.helpers.function_output import store_function_output
+from requre.helpers.git.fetchinfo import RemoteFetch
 from requre.helpers.git.pushinfo import PushInfoStorageList
 from requre.helpers.requests_response import RequestResponseHandling
 from requre.helpers.tempfile import TempFile
@@ -35,7 +36,7 @@ upgraded_import_system = (
         where="git",
         who_name="local_project",
         what="remote.Remote.fetch",
-        decorator=StoreFiles.arg_references(files_params={"target_path": 2}),
+        decorator=RemoteFetch.decorator_plain,
     )
     .decorate(
         where="git",

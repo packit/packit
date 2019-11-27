@@ -6,34 +6,24 @@ import rebasehelper
 from rebasehelper.exceptions import RebaseHelperError
 
 from flexmock import flexmock
-from packit.api import PackitAPI
 from requre.storage import DataMiner, DataTypes
-from tests_recording.testbase import PackitUnittestBase
+from tests_recording.testbase import (
+    PackitUnittestBase,
+    UpstreamForTest,
+    RebaseHelperSwitch,
+)
 
 
-@unittest.skip("not working yet")
-class ProposeUpdate(PackitUnittestBase):
+class ProposeUpdate(RebaseHelperSwitch, UpstreamForTest, PackitUnittestBase):
     def setUp(self):
-        if (
-            hasattr(rebasehelper, "VERSION")
-            and int(rebasehelper.VERSION.split(".")[1]) >= 19
-        ):
-            DataMiner().key = "rebase-helper>=0.19"
-        else:
-            DataMiner().key = "rebase-helper<0.19"
         DataMiner().data_type = DataTypes.DictWithList
-
         super().setUp()
-        self.api = PackitAPI(
-            config=self.conf, package_config=self.pc, upstream_local_project=self.lp
-        )
-        self.api._up = self.upstream
-        self.api._dg = self.dg
-        self.set_git_user()
 
     def check_version_increase(self):
         # change specfile little bit to have there some change
-        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
+        specfile_location = os.path.join(
+            self.upstream_local_project.working_dir, "python-ogr.spec"
+        )
         with open(specfile_location, "r") as myfile:
             filedata = myfile.read()
         # Patch the specfile with new version
@@ -48,28 +38,30 @@ class ProposeUpdate(PackitUnittestBase):
         with open(specfile_location, "w") as myfile:
             myfile.write(filedata)
         check_output(
-            f"cd {self.lp.working_dir};"
+            f"cd {self.upstream_local_project.working_dir};"
             f"git commit -m 'test change' python-ogr.spec;"
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release("master")
+        self.upstream_packit_api.sync_release("master")
 
     def test_comment_in_spec(self):
         """
         change specfile little bit to have there some change, do not increase version
         """
-        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
+        specfile_location = os.path.join(
+            self.upstream_local_project.working_dir, "python-ogr.spec"
+        )
         version_increase = "10.0.0"
         with open(specfile_location, "a") as myfile:
             myfile.write("\n# comment\n")
         check_output(
-            f"cd {self.lp.working_dir};"
+            f"cd {self.upstream_local_project.working_dir};"
             f"git commit -m 'test change' python-ogr.spec;"
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release("master")
+        self.upstream_packit_api.sync_release("master")
 
     @unittest.skipIf(
         hasattr(rebasehelper, "VERSION")
@@ -88,7 +80,13 @@ class ProposeUpdate(PackitUnittestBase):
         and int(rebasehelper.VERSION.split(".")[1]) >= 19,
         "New version of rebasehelper works without raised exception",
     )
-    def test_version_change_new_rebaseheler(self):
+    @unittest.skip(
+        "rebasehelper.exceptions.RebaseHelperError:"
+        "Failed to download file from URL "
+        "https://files.pythonhosted.org/packages/source/o/ogr/ogr-0.9.0.tar.gz. "
+        "Reason: 'Not Found'."
+    )
+    def test_version_change_new_rebasehelper(self):
         """
         check if it not raises exception, because sources are not uploaded in distgit
         """
@@ -98,5 +96,7 @@ class ProposeUpdate(PackitUnittestBase):
         """
         version is not not uploaded, so skip in this test
         """
-        flexmock(self.api).should_receive("_handle_sources").and_return(None)
+        flexmock(self.upstream_packit_api).should_receive("_handle_sources").and_return(
+            None
+        )
         self.check_version_increase()

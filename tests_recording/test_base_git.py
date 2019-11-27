@@ -1,10 +1,10 @@
 import pytest
 
 from packit.exceptions import PackitException
-from tests_recording.testbase import DistGitForTest, PackitUnittestBase
+from tests_recording.testbase import PackitUnittestBase, LocalDistGitForTest
 
 
-class TestBaseGit(PackitUnittestBase, DistGitForTest):
+class TestBaseGit(LocalDistGitForTest, PackitUnittestBase):
     def test_base_push_bad(self):
         with pytest.raises(PackitException) as e:
             self.repository_base.push("master")

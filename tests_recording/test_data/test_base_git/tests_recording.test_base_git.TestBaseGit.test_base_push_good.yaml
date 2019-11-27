@@ -1,272 +1,183 @@
+X:
+  file:
+    tar:
+      StoreFiles:
+        tests_recording.test_base_git.TestBaseGit.test_base_push_good.yaml:
+          default:
+          - metadata:
+              latency: 0
+            output: !!binary |
+              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
 _requre:
   key_strategy: StorageKeysInspectFull
   version_storage_file: 2
 unittest.case:
-  tests_recording.testbase:
-    packit.config.package_config:
-      ogr.services.github.project:
-        github.MainClass:
-          github.Requester:
-            requests.sessions:
-              requre.objects:
-                requests.sessions:
-                  send:
-                  - metadata:
-                      latency: 0.31446218490600586
-                    output:
-                      __store_indicator: 2
-                      _content:
-                        archive_url: https://api.github.com/repos/packit-service/ogr/{archive_format}{/ref}
-                        archived: false
-                        assignees_url: https://api.github.com/repos/packit-service/ogr/assignees{/user}
-                        blobs_url: https://api.github.com/repos/packit-service/ogr/git/blobs{/sha}
-                        branches_url: https://api.github.com/repos/packit-service/ogr/branches{/branch}
-                        clone_url: https://github.com/packit-service/ogr.git
-                        collaborators_url: https://api.github.com/repos/packit-service/ogr/collaborators{/collaborator}
-                        comments_url: https://api.github.com/repos/packit-service/ogr/comments{/number}
-                        commits_url: https://api.github.com/repos/packit-service/ogr/commits{/sha}
-                        compare_url: https://api.github.com/repos/packit-service/ogr/compare/{base}...{head}
-                        contents_url: https://api.github.com/repos/packit-service/ogr/contents/{+path}
-                        contributors_url: https://api.github.com/repos/packit-service/ogr/contributors
-                        created_at: '2018-12-13T12:33:52Z'
-                        default_branch: master
-                        deployments_url: https://api.github.com/repos/packit-service/ogr/deployments
-                        description: One Git library to Rule -- one API for many git
-                          forges
-                        disabled: false
-                        downloads_url: https://api.github.com/repos/packit-service/ogr/downloads
-                        events_url: https://api.github.com/repos/packit-service/ogr/events
-                        fork: false
-                        forks: 28
-                        forks_count: 28
-                        forks_url: https://api.github.com/repos/packit-service/ogr/forks
-                        full_name: packit-service/ogr
-                        git_commits_url: https://api.github.com/repos/packit-service/ogr/git/commits{/sha}
-                        git_refs_url: https://api.github.com/repos/packit-service/ogr/git/refs{/sha}
-                        git_tags_url: https://api.github.com/repos/packit-service/ogr/git/tags{/sha}
-                        git_url: git://github.com/packit-service/ogr.git
-                        has_downloads: true
-                        has_issues: true
-                        has_pages: false
-                        has_projects: true
-                        has_wiki: true
-                        homepage: ''
-                        hooks_url: https://api.github.com/repos/packit-service/ogr/hooks
-                        html_url: https://github.com/packit-service/ogr
-                        id: 161636700
-                        issue_comment_url: https://api.github.com/repos/packit-service/ogr/issues/comments{/number}
-                        issue_events_url: https://api.github.com/repos/packit-service/ogr/issues/events{/number}
-                        issues_url: https://api.github.com/repos/packit-service/ogr/issues{/number}
-                        keys_url: https://api.github.com/repos/packit-service/ogr/keys{/key_id}
-                        labels_url: https://api.github.com/repos/packit-service/ogr/labels{/name}
-                        language: Python
-                        languages_url: https://api.github.com/repos/packit-service/ogr/languages
-                        license:
-                          key: mit
-                          name: MIT License
-                          node_id: MDc6TGljZW5zZTEz
-                          spdx_id: MIT
-                          url: https://api.github.com/licenses/mit
-                        merges_url: https://api.github.com/repos/packit-service/ogr/merges
-                        milestones_url: https://api.github.com/repos/packit-service/ogr/milestones{/number}
-                        mirror_url: null
-                        name: ogr
-                        network_count: 28
-                        node_id: MDEwOlJlcG9zaXRvcnkxNjE2MzY3MDA=
-                        notifications_url: https://api.github.com/repos/packit-service/ogr/notifications{?since,all,participating}
-                        open_issues: 37
-                        open_issues_count: 37
-                        organization:
-                          avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
-                          events_url: https://api.github.com/users/packit-service/events{/privacy}
-                          followers_url: https://api.github.com/users/packit-service/followers
-                          following_url: https://api.github.com/users/packit-service/following{/other_user}
-                          gists_url: https://api.github.com/users/packit-service/gists{/gist_id}
-                          gravatar_id: ''
-                          html_url: https://github.com/packit-service
-                          id: 46870917
-                          login: packit-service
-                          node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
-                          organizations_url: https://api.github.com/users/packit-service/orgs
-                          received_events_url: https://api.github.com/users/packit-service/received_events
-                          repos_url: https://api.github.com/users/packit-service/repos
-                          site_admin: false
-                          starred_url: https://api.github.com/users/packit-service/starred{/owner}{/repo}
-                          subscriptions_url: https://api.github.com/users/packit-service/subscriptions
-                          type: Organization
-                          url: https://api.github.com/users/packit-service
-                        owner:
-                          avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
-                          events_url: https://api.github.com/users/packit-service/events{/privacy}
-                          followers_url: https://api.github.com/users/packit-service/followers
-                          following_url: https://api.github.com/users/packit-service/following{/other_user}
-                          gists_url: https://api.github.com/users/packit-service/gists{/gist_id}
-                          gravatar_id: ''
-                          html_url: https://github.com/packit-service
-                          id: 46870917
-                          login: packit-service
-                          node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
-                          organizations_url: https://api.github.com/users/packit-service/orgs
-                          received_events_url: https://api.github.com/users/packit-service/received_events
-                          repos_url: https://api.github.com/users/packit-service/repos
-                          site_admin: false
-                          starred_url: https://api.github.com/users/packit-service/starred{/owner}{/repo}
-                          subscriptions_url: https://api.github.com/users/packit-service/subscriptions
-                          type: Organization
-                          url: https://api.github.com/users/packit-service
-                        private: false
-                        pulls_url: https://api.github.com/repos/packit-service/ogr/pulls{/number}
-                        pushed_at: '2019-11-26T08:52:23Z'
-                        releases_url: https://api.github.com/repos/packit-service/ogr/releases{/id}
-                        size: 4519
-                        ssh_url: git@github.com:packit-service/ogr.git
-                        stargazers_count: 21
-                        stargazers_url: https://api.github.com/repos/packit-service/ogr/stargazers
-                        statuses_url: https://api.github.com/repos/packit-service/ogr/statuses/{sha}
-                        subscribers_count: 9
-                        subscribers_url: https://api.github.com/repos/packit-service/ogr/subscribers
-                        subscription_url: https://api.github.com/repos/packit-service/ogr/subscription
-                        svn_url: https://github.com/packit-service/ogr
-                        tags_url: https://api.github.com/repos/packit-service/ogr/tags
-                        teams_url: https://api.github.com/repos/packit-service/ogr/teams
-                        trees_url: https://api.github.com/repos/packit-service/ogr/git/trees{/sha}
-                        updated_at: '2019-11-26T08:52:28Z'
-                        url: https://api.github.com/repos/packit-service/ogr
-                        watchers: 21
-                        watchers_count: 21
-                      _next: null
-                      elapsed: 0.312627
-                      encoding: utf-8
-                      headers:
-                        Access-Control-Allow-Origin: '*'
-                        Access-Control-Expose-Headers: ETag, Link, Location, Retry-After,
-                          X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
-                          X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
-                          X-Poll-Interval, X-GitHub-Media-Type
-                        Cache-Control: public, max-age=60, s-maxage=60
-                        Content-Encoding: gzip
-                        Content-Security-Policy: default-src 'none'
-                        Content-Type: application/json; charset=utf-8
-                        Date: Tue, 26 Nov 2019 12:28:24 GMT
-                        ETag: W/"5a8a6424a97b0337f58b41edb87e45ad"
-                        Last-Modified: Tue, 26 Nov 2019 08:52:28 GMT
-                        Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
-                        Server: GitHub.com
-                        Status: 200 OK
-                        Strict-Transport-Security: max-age=31536000; includeSubdomains;
-                          preload
-                        Transfer-Encoding: chunked
-                        Vary: Accept, Accept-Encoding
-                        X-Content-Type-Options: nosniff
-                        X-Frame-Options: deny
-                        X-GitHub-Media-Type: github.v3; format=json
-                        X-GitHub-Request-Id: 6003:11CCE:D2E971:FAC455:5DDD1A68
-                        X-RateLimit-Limit: '60'
-                        X-RateLimit-Remaining: '17'
-                        X-RateLimit-Reset: '1574773860'
-                        X-XSS-Protection: 1; mode=block
-                      raw: !!binary ""
-                      reason: OK
-                      status_code: 200
-        github.Repository:
-          github.Requester:
-            requests.sessions:
-              requre.objects:
-                requests.sessions:
-                  send:
-                  - metadata:
-                      latency: 0.4909999370574951
-                    output:
-                      __store_indicator: 2
-                      _content:
-                        _links:
-                          git: https://api.github.com/repos/packit-service/ogr/git/blobs/6276a41bc0caace390795e5457cddee4590ad7ec
-                          html: https://github.com/packit-service/ogr/blob/master/.packit.yaml
-                          self: https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master
-                        content: 'LS0tCiMgZG9jczogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl
+  tests_recording.test_base_git:
+    packit.base_git:
+      packit.local_project:
+        requre.objects:
+          git.remote:
+            push:
+            - metadata:
+                latency: 0.01968693733215332
+              output:
+              - _old_commit_sha: 49f1f23
+                flags: 256
+                local_ref:
+                - /tmp/packit_tmp/tests_recording.test_base_git.TestBaseGit.test_base_push_good.yaml/static_tmp_1/dist_git/.git
+                - refs/heads/master
+                remote_ref_string: refs/heads/master
+                summary: '49f1f23..406dad6
 
-                          L3BhY2tpdC9ibG9iL21hc3Rlci9kb2NzL2NvbmZpZ3VyYXRpb24ubWQKc3Bl
-
-                          Y2ZpbGVfcGF0aDogcHl0aG9uLW9nci5zcGVjCnN5bmNlZF9maWxlczoKICAt
-
-                          IHB5dGhvbi1vZ3Iuc3BlYwp1cHN0cmVhbV9wcm9qZWN0X25hbWU6IG9ncgpk
-
-                          b3duc3RyZWFtX3BhY2thZ2VfbmFtZTogcHl0aG9uLW9ncgp1cHN0cmVhbV9w
-
-                          cm9qZWN0X3VybDogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC1zZXJ2aWNl
-
-                          L29ncgojIHRoZSB2ZXJzaW9uIGlzIGRpZmZlcmVudCB0aGFuIHdpdGggYmFz
-
-                          aWMgZ2l0IGRlc2NyaWJlCmNyZWF0ZV90YXJiYWxsX2NvbW1hbmQ6IFsicHl0
-
-                          aG9uMyIsICJzZXR1cC5weSIsICJzZGlzdCIsICItLWRpc3QtZGlyIiwgIi4i
-
-                          XQpjdXJyZW50X3ZlcnNpb25fY29tbWFuZDogWyJweXRob24zIiwgInNldHVw
-
-                          LnB5IiwgIi0tdmVyc2lvbiJdCmpvYnM6Ci0gam9iOiBzeW5jX2Zyb21fZG93
-
-                          bnN0cmVhbQogIHRyaWdnZXI6IGNvbW1pdAotIGpvYjogcHJvcG9zZV9kb3du
-
-                          c3RyZWFtCiAgdHJpZ2dlcjogcmVsZWFzZQogIG1ldGFkYXRhOgogICAgZGlz
-
-                          dC1naXQtYnJhbmNoOiBtYXN0ZXIKLSBqb2I6IHByb3Bvc2VfZG93bnN0cmVh
-
-                          bQogIHRyaWdnZXI6IHJlbGVhc2UKICBtZXRhZGF0YToKICAgIGRpc3QtZ2l0
-
-                          LWJyYW5jaDogZjMwCi0gam9iOiBwcm9wb3NlX2Rvd25zdHJlYW0KICB0cmln
-
-                          Z2VyOiByZWxlYXNlCiAgbWV0YWRhdGE6CiAgICBkaXN0LWdpdC1icmFuY2g6
-
-                          IGYyOQotIGpvYjogY29wcl9idWlsZAogIHRyaWdnZXI6IHB1bGxfcmVxdWVz
-
-                          dAogIG1ldGFkYXRhOgogICAgdGFyZ2V0czoKICAgIC0gZmVkb3JhLTI5LXg4
-
-                          Nl82NAogICAgLSBmZWRvcmEtcmF3aGlkZS14ODZfNjQKICAgIC0gZmVkb3Jh
-
-                          LTMwLXg4Nl82NAo=
-
-                          '
-                        download_url: https://raw.githubusercontent.com/packit-service/ogr/master/.packit.yaml
-                        encoding: base64
-                        git_url: https://api.github.com/repos/packit-service/ogr/git/blobs/6276a41bc0caace390795e5457cddee4590ad7ec
-                        html_url: https://github.com/packit-service/ogr/blob/master/.packit.yaml
-                        name: .packit.yaml
-                        path: .packit.yaml
-                        sha: 6276a41bc0caace390795e5457cddee4590ad7ec
-                        size: 911
-                        type: file
-                        url: https://api.github.com/repos/packit-service/ogr/contents/.packit.yaml?ref=master
-                      _next: null
-                      elapsed: 0.489209
-                      encoding: utf-8
-                      headers:
-                        Access-Control-Allow-Origin: '*'
-                        Access-Control-Expose-Headers: ETag, Link, Location, Retry-After,
-                          X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
-                          X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
-                          X-Poll-Interval, X-GitHub-Media-Type
-                        Cache-Control: public, max-age=60, s-maxage=60
-                        Content-Encoding: gzip
-                        Content-Security-Policy: default-src 'none'
-                        Content-Type: application/json; charset=utf-8
-                        Date: Tue, 26 Nov 2019 12:28:24 GMT
-                        ETag: W/"6276a41bc0caace390795e5457cddee4590ad7ec"
-                        Last-Modified: Tue, 26 Nov 2019 08:52:22 GMT
-                        Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
-                        Server: GitHub.com
-                        Status: 200 OK
-                        Strict-Transport-Security: max-age=31536000; includeSubdomains;
-                          preload
-                        Transfer-Encoding: chunked
-                        Vary: Accept, Accept-Encoding
-                        X-Content-Type-Options: nosniff
-                        X-Frame-Options: deny
-                        X-GitHub-Media-Type: github.v3; format=json
-                        X-GitHub-Request-Id: 6003:11CCE:D2E9FB:FAC4C4:5DDD1A68
-                        X-RateLimit-Limit: '60'
-                        X-RateLimit-Remaining: '16'
-                        X-RateLimit-Reset: '1574773860'
-                        X-XSS-Protection: 1; mode=block
-                      raw: !!binary ""
-                      reason: OK
-                      status_code: 200
+                  '

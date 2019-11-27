@@ -23,14 +23,22 @@ import unittest
 
 from packit.status import Status
 from requre.storage import DataMiner, DataTypes
-from tests_recording.testbase import PackitUnittestBase
+from tests_recording.testbase import PackitUnittestBase, UpstreamForTest, DistGitForTest
 
 
-class TestStatus(PackitUnittestBase):
+class TestStatus(UpstreamForTest, DistGitForTest, PackitUnittestBase):
     def setUp(self):
         DataMiner().data_type = DataTypes.List
         super().setUp()
-        self.status = Status(self.conf, self.pc, self.upstream, self.dg)
+
+    @property
+    def status(self):
+        return Status(
+            config=self.config,
+            package_config=self.upstream_package_config,
+            upstream=self.upstream,
+            distgit=self.distgit,
+        )
 
     def test_status(self):
         assert self.status
