@@ -32,7 +32,6 @@ JOB_CONFIG_SCHEMA = {
             ]
         },
         "trigger": {"enum": ["release", "pull_request", "commit"]},
-        "notify": {"type": "array", "items": {"enum": ["pull_request_status"]}},
         "metadata": {"type": "object"},
     },
     "required": ["trigger", "job"],
