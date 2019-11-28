@@ -33,7 +33,6 @@ from packit.config import (
     Config,
     JobConfig,
     JobTriggerType,
-    JobNotifyType,
     JobType,
     PackageConfig,
     get_package_config_from_repo,
@@ -44,29 +43,25 @@ from packit.exceptions import PackitInvalidConfigException
 
 
 def get_job_config_dict_simple():
-    return {"job": "build", "trigger": "release", "notify": []}
+    return {"job": "build", "trigger": "release"}
 
 
 def get_job_config_dict_full():
     return {
         "job": "propose_downstream",
         "trigger": "pull_request",
-        "notify": ["pull_request_status"],
         "metadata": {"a": "b"},
     }
 
 
 def get_job_config_simple():
-    return JobConfig(
-        job=JobType.build, trigger=JobTriggerType.release, notify=[], metadata={}
-    )
+    return JobConfig(job=JobType.build, trigger=JobTriggerType.release, metadata={})
 
 
 def get_job_config_full():
     return JobConfig(
         job=JobType.propose_downstream,
         trigger=JobTriggerType.pull_request,
-        notify=[JobNotifyType.pull_request_status],
         metadata={"a": "b"},
     )
 
@@ -91,7 +86,7 @@ def test_job_config_not_equal(job_config_simple, job_config_full):
 
 def test_job_config_blah():
     with pytest.raises(PackitInvalidConfigException) as ex:
-        JobConfig.get_from_dict({"job": "asdqwe", "trigger": "salt", "notify": []})
+        JobConfig.get_from_dict({"job": "asdqwe", "trigger": "salt"})
     assert "'asdqwe' is not one of " in str(ex.value)
 
 
