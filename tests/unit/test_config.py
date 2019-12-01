@@ -25,6 +25,7 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from marshmallow import ValidationError
 
 from ogr import GithubService, PagureService
 from ogr.abstract import GitProject, GitService
@@ -40,7 +41,6 @@ from packit.config import (
     SyncFilesItem,
 )
 from packit.config.aliases import get_build_targets, get_branches
-from packit.exceptions import PackitInvalidConfigException
 
 
 def get_job_config_dict_simple():
@@ -101,9 +101,10 @@ def test_job_config_not_equal(job_config_simple, job_config_full):
 
 
 def test_job_config_blah():
-    with pytest.raises(PackitInvalidConfigException) as ex:
+    with pytest.raises(ValidationError) as ex:
         JobConfig.get_from_dict({"job": "asdqwe", "trigger": "salt"})
-    assert "'asdqwe' is not one of " in str(ex.value)
+    assert "'trigger': ['Invalid enum member salt']" in str(ex.value)
+    assert "'job': ['Invalid enum member asdqwe']" in str(ex.value)
 
 
 @pytest.mark.parametrize(
@@ -120,10 +121,10 @@ def test_job_config_blah():
 )
 def test_job_config_validate(raw, is_valid):
     if is_valid:
-        JobConfig.validate(raw)
+        JobConfig.get_from_dict(raw)
     else:
-        with pytest.raises(PackitInvalidConfigException):
-            JobConfig.validate(raw)
+        with pytest.raises(ValidationError):
+            JobConfig.get_from_dict(raw)
 
 
 @pytest.mark.parametrize(
@@ -291,19 +292,21 @@ def test_package_config_not_equal(not_equal_package_config):
 )
 def test_package_config_validate(raw, is_valid):
     if not is_valid:
-        with pytest.raises(PackitInvalidConfigException):
-            PackageConfig.validate(raw)
+        with pytest.raises((ValidationError, ValueError)):
+            PackageConfig.get_from_dict(raw)
     else:
-        PackageConfig.validate(raw)
+        PackageConfig.get_from_dict(raw)
 
 
 @pytest.mark.parametrize(
     "raw",
     [
         {},
-        {"something": "different"},
-        {"synced_files": ["fedora/package.spec", "somefile"]},
-        {"jobs": [{"trigger": "release", "release_to": ["f28"]}]},
+        # {"specfile_path": "test/spec/file/path", "something": "different"},
+        {
+            "specfile_path": "test/spec/file/path",
+            "jobs": [{"trigger": "release", "release_to": ["f28"]}],
+        },
     ],
 )
 def test_package_config_parse_error(raw):
@@ -389,7 +392,6 @@ def test_package_config_parse_error(raw):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec", "somefile"],
                 "jobs": [get_job_config_dict_full()],
-                "something": "stupid",
                 "downstream_package_name": "package",
             },
             PackageConfig(
@@ -411,7 +413,6 @@ def test_package_config_parse_error(raw):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
                 "jobs": [get_job_config_dict_full()],
-                "something": "stupid",
                 "upstream_project_url": "https://github.com/asd/qwe",
                 "upstream_package_name": "qwe",
                 "dist_git_base_url": "https://something.wicked",
@@ -441,7 +442,6 @@ def test_package_config_parse_error(raw):
                     "get-current-version": "get-me-version",
                 },
                 "jobs": [],
-                "something": "stupid",
                 "upstream_project_url": "https://github.com/asd/qwe",
                 "upstream_package_name": "qwe",
                 "dist_git_base_url": "https://something.wicked",

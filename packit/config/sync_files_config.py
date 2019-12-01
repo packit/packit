@@ -24,16 +24,12 @@ import logging
 from pathlib import Path
 from typing import List
 
-from packit.config.base_config import BaseConfig
-from packit.schema import SYNCED_FILES_SCHEMA
 from packit.sync import RawSyncFilesItem, SyncFilesItem, get_raw_files
 
 logger = logging.getLogger(__name__)
 
 
-class SyncFilesConfig(BaseConfig):
-    SCHEMA = SYNCED_FILES_SCHEMA
-
+class SyncFilesConfig:
     def __init__(self, files_to_sync: List[SyncFilesItem]):
         self.files_to_sync: List[SyncFilesItem] = files_to_sync
 
@@ -52,22 +48,11 @@ class SyncFilesConfig(BaseConfig):
         return raw_files_to_sync
 
     @classmethod
-    def get_from_dict(cls, raw_dict: dict, validate=True) -> "SyncFilesConfig":
-        if validate:
-            cls.validate(raw_dict)
+    def get_from_dict(cls, raw_dict: dict) -> "SyncFilesConfig":
+        # required to avoid cyclical imports
+        from packit.schema import SyncFilesConfigSchema
 
-        files_to_sync = []
-        if isinstance(raw_dict, list):
-            for f in raw_dict:
-                if isinstance(f, dict):
-                    files_to_sync.append(SyncFilesItem(src=f["src"], dest=f["dest"]))
-                else:
-                    files_to_sync.append(SyncFilesItem(src=f, dest=f))
-        if isinstance(raw_dict, dict):
-            for f in raw_dict:
-                files_to_sync.append(SyncFilesItem(src=f["src"], dest=f["dest"]))
-
-        return SyncFilesConfig(files_to_sync=files_to_sync)
+        return SyncFilesConfigSchema(strict=True).load(raw_dict).data
 
     def __eq__(self, other: object):
         if not isinstance(other, SyncFilesConfig):
