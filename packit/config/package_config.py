@@ -30,22 +30,18 @@ from yaml import safe_load
 from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
-from packit.config.base_config import BaseConfig
-from packit.config.job_config import JobConfig, get_from_raw_jobs
+from packit.config.job_config import JobConfig, default_jobs
 from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
 from packit.exceptions import PackitConfigException, PackitException
-from packit.schema import PACKAGE_CONFIG_SCHEMA
 
 logger = logging.getLogger(__name__)
 
 
-class PackageConfig(BaseConfig):
+class PackageConfig:
     """
     Config class for upstream/downstream packages;
     this is the config people put in their repos
     """
-
-    SCHEMA = PACKAGE_CONFIG_SCHEMA
 
     def __init__(
         self,
@@ -67,6 +63,7 @@ class PackageConfig(BaseConfig):
         create_pr: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
+        **kwargs,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -101,11 +98,63 @@ class PackageConfig(BaseConfig):
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
 
+        if kwargs:
+            logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
+
     @property
     def downstream_project_url(self) -> str:
         if not self._downstream_project_url:
             self._downstream_project_url = self.dist_git_package_url
         return self._downstream_project_url
+
+    @property
+    def dist_git_package_url(self):
+        return (
+            f"{self.dist_git_base_url}{self.dist_git_namespace}/"
+            f"{self.downstream_package_name}.git"
+        )
+
+    @classmethod
+    def get_from_dict(
+        cls, raw_dict: dict, config_file_path: str = None, repo_name: str = None
+    ) -> "PackageConfig":
+        # required to avoid cyclical imports
+        from packit.schema import PackageConfigSchema
+
+        if config_file_path and not raw_dict.get("config_file_path", None):
+            raw_dict.update(config_file_path=config_file_path)
+
+        package_config = PackageConfigSchema(strict=True).load(raw_dict).data
+
+        if not getattr(package_config, "upstream_package_name", None) and repo_name:
+            package_config.upstream_package_name = repo_name
+
+        if not getattr(package_config, "downstream_package_name", None) and repo_name:
+            package_config.downstream_package_name = repo_name
+
+        if "jobs" not in raw_dict:
+            package_config.jobs = default_jobs
+
+        return package_config
+
+    def get_all_files_to_sync(self):
+        """
+        Adds the default files (config file, spec file) to synced files when doing propose-update.
+        :return: SyncFilesConfig with default files
+        """
+        files = self.synced_files.files_to_sync
+
+        if self.specfile_path not in (item.src for item in files):
+            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
+
+        if self.config_file_path and self.config_file_path not in (
+            item.src for item in files
+        ):
+            files.append(
+                SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
+            )
+
+        return SyncFilesConfig(files)
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
@@ -130,135 +179,6 @@ class PackageConfig(BaseConfig):
             and self.spec_source_id == other.spec_source_id
             and self.upstream_tag_template == other.upstream_tag_template
         )
-
-    @property
-    def dist_git_package_url(self):
-        return (
-            f"{self.dist_git_base_url}{self.dist_git_namespace}/"
-            f"{self.downstream_package_name}.git"
-        )
-
-    @classmethod
-    def get_from_dict(
-        cls,
-        raw_dict: dict,
-        config_file_path: str = None,
-        repo_name: str = None,
-        validate=True,
-    ) -> "PackageConfig":
-        if validate:
-            cls.validate(raw_dict)
-
-        synced_files = raw_dict.get("synced_files", None)
-        actions = raw_dict.get("actions", {})
-
-        raw_jobs = raw_dict.get("jobs", None)
-        jobs = get_from_raw_jobs(raw_jobs)
-
-        create_tarball_command = raw_dict.get("create_tarball_command", None)
-        current_version_command = raw_dict.get("current_version_command", None)
-
-        upstream_package_name = (
-            cls.get_deprecated_key(
-                raw_dict, "upstream_package_name", "upstream_project_name"
-            )
-            or cls.get_deprecated_key(
-                raw_dict, "upstream_package_name", "upstream_name"
-            )
-            or repo_name
-        )
-
-        upstream_project_url = raw_dict.get("upstream_project_url", None)
-
-        if raw_dict.get("dist_git_url", None):
-            logger.warning(
-                "dist_git_url is no longer being processed, "
-                "it is generated from dist_git_base_url and downstream_package_name"
-            )
-        downstream_package_name = (
-            cls.get_deprecated_key(raw_dict, "downstream_package_name", "package_name")
-            or repo_name
-        )
-
-        specfile_path = raw_dict.get("specfile_path", None)
-        if not specfile_path:
-            if downstream_package_name:
-                specfile_path = f"{downstream_package_name}.spec"
-                logger.info(f"We guess that spec file is at {specfile_path}")
-            else:
-                # guess it?
-                logger.warning("Path to spec file is not set.")
-
-        dist_git_base_url = raw_dict.get("dist_git_base_url")
-        dist_git_namespace = raw_dict.get("dist_git_namespace")
-        upstream_ref = raw_dict.get("upstream_ref")
-
-        allowed_gpg_keys = raw_dict.get("allowed_gpg_keys")
-        create_pr = raw_dict.get("create_pr", True)
-        upstream_tag_template = raw_dict.get("upstream_tag_template", "{version}")
-
-        # it can be int as well
-        spec_source_id = raw_dict.get("spec_source_id", "Source0")
-        try:
-            spec_source_id = int(spec_source_id)
-        except ValueError:
-            # not a number
-            pass
-        else:
-            # is a number!
-            spec_source_id = f"Source{spec_source_id}"
-
-        pc = PackageConfig(
-            config_file_path=config_file_path,
-            specfile_path=specfile_path,
-            synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
-            actions={ActionName(a): cmd for a, cmd in actions.items()},
-            jobs=jobs,
-            upstream_package_name=upstream_package_name,
-            downstream_package_name=downstream_package_name,
-            upstream_project_url=upstream_project_url,
-            dist_git_base_url=dist_git_base_url,
-            dist_git_namespace=dist_git_namespace,
-            create_tarball_command=create_tarball_command,
-            current_version_command=current_version_command,
-            upstream_ref=upstream_ref,
-            allowed_gpg_keys=allowed_gpg_keys,
-            create_pr=create_pr,
-            spec_source_id=spec_source_id,
-            upstream_tag_template=upstream_tag_template,
-        )
-        return pc
-
-    @staticmethod
-    def get_deprecated_key(raw_dict: dict, new_key_name: str, old_key_name: str):
-        old = raw_dict.get(old_key_name, None)
-        if old:
-            logger.warning(
-                f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
-                f" please update your configuration file"
-            )
-        r = raw_dict.get(new_key_name, None)
-        if not r:
-            # prio: new > old
-            r = old
-        return r
-
-    def get_all_files_to_sync(self):
-        """
-        Adds the default files (config file, spec file) to synced files when doing propose-update.
-        :return: SyncFilesConfig with default files
-        """
-        files = self.synced_files.files_to_sync
-
-        if self.specfile_path not in (item.src for item in files):
-            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
-
-        if self.config_file_path not in (item.src for item in files):
-            files.append(
-                SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
-            )
-
-        return SyncFilesConfig(files)
 
 
 def get_local_package_config(
@@ -351,7 +271,6 @@ def parse_loaded_config(
             raw_dict=loaded_config,
             config_file_path=config_file_path,
             repo_name=repo_name,
-            validate=True,
         )
         return package_config
     except Exception as ex:
