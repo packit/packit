@@ -25,7 +25,7 @@ A book with our finest spells
 """
 
 import shutil
-import subprocess
+import git
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -51,12 +51,9 @@ UPSTREAM_SPEC_NOT_IN_ROOT = DATA_DIR / "spec_not_in_root/upstream"
 
 
 def git_set_user_email(directory):
-    subprocess.check_call(
-        ["git", "config", "user.email", "test@example.com"], cwd=directory
-    )
-    subprocess.check_call(
-        ["git", "config", "user.name", "Packit Test Suite"], cwd=directory
-    )
+    repo = git.Repo(directory)
+    repo.config_writer().set_value("user", "email", "test@example.com").release()
+    repo.config_writer().set_value("user", "name", "Packit Test Suite").release()
 
 
 def get_test_config():
@@ -67,8 +64,13 @@ def get_test_config():
 
 
 def git_add_and_commit(directory, message):
-    subprocess.check_call(["git", "add", "."], cwd=directory)
-    subprocess.check_call(["git", "commit", "-m", message], cwd=directory)
+    repo = git.Repo(directory)
+    repo.git.add(".")
+    try:
+        repo.git.commit("-m", message)
+    except git.exc.GitCommandError:
+        pass
+        # nothing to commit
 
 
 def initiate_git_repo(
@@ -89,37 +91,59 @@ def initiate_git_repo(
     :param push: push to the remote?
     :param copy_from: source tree to copy to the newly created git repo
     """
+
     if remotes is None:
         remotes = [("origin", upstream_remote)]
 
     if copy_from:
         shutil.copytree(copy_from, directory)
-    subprocess.check_call(["git", "init", "."], cwd=directory)
+
+    repo = git.Repo.init(directory)
+
     Path(directory).joinpath("README").write_text("Best upstream project ever!")
     git_set_user_email(directory)
-    subprocess.check_call(["git", "add", "."], cwd=directory)
-    subprocess.check_call(["git", "commit", "-m", "initial commit"], cwd=directory)
+    repo.git.add(".")
+    repo.git.commit("-m", "initial commit")
     if tag:
-        subprocess.check_call(
-            ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag], cwd=directory
-        )
+        repo.create_tag(tag)
 
     for name, url in remotes:
-        subprocess.check_call(["git", "remote", "add", name, url], cwd=directory)
+        try:
+            repo.create_remote(name, url=url)
+        except git.exc.GitCommandError:
+            pass
+            # remote already added
 
-    if push:
-        subprocess.check_call(["git", "fetch", "origin"], cwd=directory)
+    if push and tag:
+        remotes = repo.remotes
+        for remote in remotes:
+            try:
+                remote.fetch()
+            except git.exc.GitCommandError:
+                pass
+                # can't resoleve remote url
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
-        subprocess.check_call(
-            ["git", "push", "--tags", "-u", "origin", "master:master"], cwd=directory
-        )
+        for remote in remotes:
+            if remote.name == "origin":
+                try:
+                    remote.push(repo.tags)
+                except git.exc.GitCommandError:
+                    pass
+                    # con't resolve url
+                    # or tag
+                break
 
 
 def prepare_dist_git_repo(directory, push=True):
-    subprocess.check_call(["git", "branch", "f30"], cwd=directory)
+    repo = git.Repo(directory)
+    branch = repo.create_head("f30")
+    branch.checkout()
     if push:
-        subprocess.check_call(["git", "push", "-u", "origin", "f30:f30"], cwd=directory)
+        for remote in repo.remotes:
+            if remote.name == "origin":
+                remote.push("f30:f30")
+                break
 
 
 def call_packit(fnc=None, parameters=None, envs=None, working_dir=None):
