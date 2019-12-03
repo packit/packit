@@ -26,6 +26,7 @@ from packit.exceptions import PackitException
 ALIASES: Dict[str, List[str]] = {
     "fedora-development": ["fedora-rawhide", "fedora-32"],
     "fedora-stable": ["fedora-30", "fedora-31"],
+    "fedora-all": ["fedora-rawhide", "fedora-32", "fedora-30", "fedora-31"],
 }
 ARCHITECTURE_LIST: List[str] = [
     "aarch64",
