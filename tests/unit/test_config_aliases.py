@@ -13,6 +13,7 @@ from packit.config.aliases import get_versions, get_build_targets, get_branches
         ("opensuse-leap-15.0", {"opensuse-leap-15.0"}),
         ("fedora-stable", {"fedora-30", "fedora-31"}),
         ("fedora-development", {"fedora-rawhide", "fedora-32"}),
+        ("fedora-all", {"fedora-rawhide", "fedora-30", "fedora-31", "fedora-32"}),
         ("centos-stream", {"centos-stream"}),
     ],
 )
@@ -48,6 +49,15 @@ def test_get_versions_from_multiple_values(names, versions):
         ("fedora-29-i386", {"fedora-29-i386"}),
         ("fedora-stable-aarch64", {"fedora-30-aarch64", "fedora-31-aarch64"}),
         ("fedora-development-aarch64", {"fedora-rawhide-aarch64", "fedora-32-aarch64"}),
+        (
+            "fedora-all",
+            {
+                "fedora-rawhide-x86_64",
+                "fedora-30-x86_64",
+                "fedora-31-x86_64",
+                "fedora-32-x86_64",
+            },
+        ),
     ],
 )
 def test_get_build_targets(name, targets):
@@ -82,6 +92,7 @@ def test_get_build_targets_from_multiple_values(names, versions):
         ("epel7", {"epel7"}),
         ("el6", {"el6"}),
         ("epel-6", {"el6"}),
+        ("fedora-all", {"master", "f30", "f31", "f32"}),
     ],
 )
 def test_get_branches(name, branches):
