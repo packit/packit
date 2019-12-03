@@ -71,7 +71,6 @@ def build(
     )
 
     branches_to_build = get_branches(*dist_git_branch.split(","), default="master")
-
     click.echo(f"Building for the following branches: {', '.join(branches_to_build)}")
 
     for branch in branches_to_build:
