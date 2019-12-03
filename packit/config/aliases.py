@@ -53,9 +53,12 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     for one_name in names:
         name_split = one_name.rsplit("-", maxsplit=2)
         if len(name_split) < 2:
-            raise PackitException(f"Cannot get build target from '{one_name}'.")
+            if "rawhide" in one_name:
+                sys_name, version, architecture = "fedora", "rawhide", "x86_64"
+            else:
+                raise PackitException(f"Cannot get build target from '{one_name}'.")
 
-        if len(name_split) == 2:
+        elif len(name_split) == 2:
             sys_name, version = name_split
             architecture = "x86_64"  # use the x86_64 as a default
         else:
