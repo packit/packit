@@ -544,13 +544,22 @@ class PackitAPI:
             return []
 
     @staticmethod
-    async def status_get_builds(status) -> Dict:
+    async def status_get_koji_builds(status) -> Dict:
         try:
             await asyncio.sleep(0)
-            return status.get_builds()
+            return status.get_koji_builds()
         except Exception as exc:
             logger.error(f"Failed when getting Koji builds: {exc}")
             return {}
+
+    @staticmethod
+    async def status_get_copr_builds(status) -> List:
+        try:
+            await asyncio.sleep(0)
+            return status.get_copr_builds()
+        except Exception as exc:
+            logger.error(f"Failed when getting Copr builds: {exc}")
+            return []
 
     @staticmethod
     async def status_get_updates(status) -> List:
@@ -572,7 +581,8 @@ class PackitAPI:
             PackitAPI.status_get_downstream_prs(status),
             PackitAPI.status_get_dg_versions(status),
             PackitAPI.status_get_up_releases(status),
-            PackitAPI.status_get_builds(status),
+            PackitAPI.status_get_koji_builds(status),
+            PackitAPI.status_get_copr_builds(status),
             PackitAPI.status_get_updates(status),
         )
         return res
@@ -591,7 +601,8 @@ class PackitAPI:
                         self.status_get_downstream_prs(status),
                         self.status_get_dg_versions(status),
                         self.status_get_up_releases(status),
-                        self.status_get_builds(status),
+                        self.status_get_koji_builds(status),
+                        self.status_get_copr_builds(status),
                         self.status_get_updates(status),
                     )
                 )
@@ -599,7 +610,7 @@ class PackitAPI:
                 asyncio.set_event_loop(None)
                 loop.close()
 
-        (ds_prs, dg_versions, up_releases, builds, updates) = res
+        (ds_prs, dg_versions, up_releases, koji_builds, copr_builds, updates) = res
 
         if ds_prs:
             logger.info("\nDownstream PRs:")
@@ -629,12 +640,20 @@ class PackitAPI:
         else:
             logger.info("\nNo Bodhi updates found.")
 
-        if builds:
+        if koji_builds:
             logger.info("\nLatest Koji builds:")
-            for branch, branch_builds in builds.items():
+            for branch, branch_builds in koji_builds.items():
                 logger.info(f"{branch}: {branch_builds}")
         else:
-            logger.info("No Koji builds found.")
+            logger.info("\nNo Koji builds found.")
+
+        if copr_builds:
+            logger.info("\nLatest Copr builds:")
+            logger.info(
+                tabulate(copr_builds, headers=["Build ID", "Project name", "Status"])
+            )
+        else:
+            logger.info("\nNo Copr builds found.")
 
     @staticmethod
     def _copr_web_build_url(build: Munch):
