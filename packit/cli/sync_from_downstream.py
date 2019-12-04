@@ -40,7 +40,7 @@ logger = logging.getLogger(__file__)
 @click.command("sync-from-downstream", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
-    help="Comma separated list of target branches in dist-git to release into. "
+    help="Comma separated list of target branches in dist-git to sync from. "
     "(defaults to 'master')",
     default="master",
 )

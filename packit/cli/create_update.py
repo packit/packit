@@ -28,13 +28,19 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
+from packit.config.aliases import get_branches
 from packit.constants import DEFAULT_BODHI_NOTE
 
 logger = logging.getLogger(__file__)
 
 
 @click.command("create-update", context_settings=get_context_settings())
-@click.option("--dist-git-branch", help="Target branch in dist-git to release into.")
+@click.option(
+    "--dist-git-branch",
+    help="Comma separated list of target branches in dist-git to create bodhi update in. "
+    "(defaults to 'master')",
+    default="master",
+)
 @click.option(
     "--koji-build",
     help="Koji build (NVR) to add to the bodhi update (can be specified multiple times)",
@@ -69,9 +75,13 @@ def create_update(
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    api.create_update(
-        koji_builds=koji_build,
-        dist_git_branch=dist_git_branch,
-        update_notes=update_notes,
-        update_type=update_type,
-    )
+    branches_to_update = get_branches(*dist_git_branch.split(","), default="master")
+    click.echo(f"Syncing from the following branches: {', '.join(branches_to_update)}")
+
+    for branch in branches_to_update:
+        api.create_update(
+            koji_builds=koji_build,
+            dist_git_branch=branch,
+            update_notes=update_notes,
+            update_type=update_type,
+        )
