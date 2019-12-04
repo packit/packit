@@ -32,6 +32,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
+from packit.config.aliases import get_branches
 
 logger = logging.getLogger(__file__)
 
@@ -39,7 +40,8 @@ logger = logging.getLogger(__file__)
 @click.command("sync-from-downstream", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
-    help="Source branch in dist-git to sync from.",
+    help="Comma separated list of target branches in dist-git to sync from. "
+    "(defaults to 'master')",
     default="master",
 )
 @click.option(
@@ -98,12 +100,17 @@ def sync_from_downstream(
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    api.sync_from_downstream(
-        dist_git_branch,
-        upstream_branch,
-        no_pr=no_pr,
-        fork=fork,
-        remote_name=remote,
-        exclude_files=exclude,
-        force=force,
-    )
+
+    branches_to_sync = get_branches(*dist_git_branch.split(","), default="master")
+    click.echo(f"Syncing from the following branches: {', '.join(branches_to_sync)}")
+
+    for branch in branches_to_sync:
+        api.sync_from_downstream(
+            dist_git_branch=branch,
+            upstream_branch=upstream_branch,
+            no_pr=no_pr,
+            fork=fork,
+            remote_name=remote,
+            exclude_files=exclude,
+            force=force,
+        )
