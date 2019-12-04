@@ -28,6 +28,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
+from packit.config.aliases import get_branches
 
 logger = logging.getLogger(__file__)
 
@@ -35,7 +36,8 @@ logger = logging.getLogger(__file__)
 @click.command("build", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
-    help="Target branch in dist-git to release into.",
+    help="Comma separated list of target branches in dist-git to release into. "
+    "(defaults to 'master')",
     default="master",
 )
 @click.option(
@@ -67,4 +69,14 @@ def build(
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
-    api.build(dist_git_branch, scratch=scratch, nowait=nowait, koji_target=koji_target)
+
+    branches_to_build = get_branches(*dist_git_branch.split(","), default="master")
+    click.echo(f"Building for the following branches: {', '.join(branches_to_build)}")
+
+    for branch in branches_to_build:
+        api.build(
+            dist_git_branch=branch,
+            scratch=scratch,
+            nowait=nowait,
+            koji_target=koji_target,
+        )
