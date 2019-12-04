@@ -40,6 +40,13 @@ DEFAULT_VERSION = "fedora-stable"
 
 
 def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+    """
+    Expand the aliases to the name(s).
+
+    :param name: name(s) of the system and version (e.g. "fedora-30"/"fedora-stable")
+    :param default: used if no positional argument was given
+    :return: set of string containing system name and version
+    """
     names = list(name) or [default]
     versions: Set[str] = set()
     for one_name in names:
@@ -48,23 +55,35 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
 
 
 def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+    """
+    Expand the aliases to the name(s) and transfer to the build targets.
+
+    :param name: name(s) of the system and version (e.g. "fedora-30"/"fedora-stable")
+            or target name (e.g. "fedora-30-x86_64"/"fedora-stable-x86_64")
+    :param default: used if no positional argument was given
+    :return: set of build targets
+    """
     names = list(name) or [default]
     possible_sys_and_versions: Set[str] = set([])
     for one_name in names:
         name_split = one_name.rsplit("-", maxsplit=2)
-        if len(name_split) < 2:
+
+        if len(name_split) < 2:  # only one part
+            # => cannot guess anything other than rawhide
             if "rawhide" in one_name:
                 sys_name, version, architecture = "fedora", "rawhide", "x86_64"
             else:
                 raise PackitException(f"Cannot get build target from '{one_name}'.")
 
-        elif len(name_split) == 2:
+        elif len(name_split) == 2:  # "name-version"
             sys_name, version = name_split
             architecture = "x86_64"  # use the x86_64 as a default
-        else:
+
+        else:  # "name-version-architecture"
             sys_name, version, architecture = name_split
             if architecture not in ARCHITECTURE_LIST:
-                # wrong parsing => we don't know the architecture
+                # we don't know the architecture => probably wrongly parsed
+                # (e.g. "opensuse-leap-15.0")
                 sys_name, version, architecture = (
                     f"{sys_name}-{version}",
                     architecture,
@@ -81,8 +100,17 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
 
 
 def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+    """
+    Expand the aliases to the name(s) and transfer to the dist-git branch name.
+
+    :param name: name(s) of the system and version (e.g. "fedora-stable"/"fedora-30")
+            or branch name (e.g. "f30"/"epel8")
+    :param default: used if no positional argument was given
+    :return: set of dist-git branch names
+    """
     names = list(name) or [default]
     branches = set()
+
     for sys_and_version in get_versions(*names):
         if "rawhide" in sys_and_version:
             branches.add("master")
