@@ -67,15 +67,20 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     possible_sys_and_versions: Set[str] = set([])
     for one_name in names:
         name_split = one_name.rsplit("-", maxsplit=2)
+        l_name_split = len(name_split)
 
-        if len(name_split) < 2:  # only one part
+        if l_name_split < 2:  # only one part
             # => cannot guess anything other than rawhide
             if "rawhide" in one_name:
                 sys_name, version, architecture = "fedora", "rawhide", "x86_64"
             else:
-                raise PackitException(f"Cannot get build target from '{one_name}'.")
+                err_msg = (
+                    "Cannot get build target from '{one_name}'"
+                    f", packit understands values like these: '{list(ALIASES.keys())}'."
+                )
+                raise PackitException(err_msg.format(one_name=one_name))
 
-        elif len(name_split) == 2:  # "name-version"
+        elif l_name_split == 2:  # "name-version"
             sys_name, version = name_split
             architecture = "x86_64"  # use the x86_64 as a default
 
