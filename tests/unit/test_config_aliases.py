@@ -1,6 +1,7 @@
 import pytest
 
-from packit.config.aliases import get_versions, get_build_targets, get_branches
+from packit.config.aliases import get_versions, get_build_targets, get_branches, ALIASES
+from packit.exceptions import PackitException
 
 
 @pytest.mark.parametrize(
@@ -35,6 +36,7 @@ def test_get_versions_from_multiple_values(names, versions):
 @pytest.mark.parametrize(
     "name,targets",
     [
+        ("rawhide", {"fedora-rawhide-x86_64"}),
         ("fedora-29", {"fedora-29-x86_64"}),
         ("epel-8", {"epel-8-x86_64"}),
         ("fedora-rawhide", {"fedora-rawhide-x86_64"}),
@@ -62,6 +64,18 @@ def test_get_versions_from_multiple_values(names, versions):
 )
 def test_get_build_targets(name, targets):
     assert get_build_targets(name) == targets
+
+
+def test_get_build_targets_invalid_input():
+    name = "rafhajd"
+    with pytest.raises(PackitException) as ex:
+
+        get_build_targets(name)
+    err_msg = (
+        f"Cannot get build target from '{name}'"
+        f", packit understands values like these: '{list(ALIASES.keys())}'."
+    )
+    assert str(ex.value) == err_msg
 
 
 @pytest.mark.parametrize(
