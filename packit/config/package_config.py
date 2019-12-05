@@ -64,7 +64,7 @@ class PackageConfig(BaseConfig):
         actions: Dict[ActionName, Union[str, List[str]]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
-        create_pr: bool = False,
+        create_pr: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
     ):
@@ -184,7 +184,7 @@ class PackageConfig(BaseConfig):
         upstream_ref = raw_dict.get("upstream_ref")
 
         allowed_gpg_keys = raw_dict.get("allowed_gpg_keys")
-        create_pr = raw_dict.get("create_pr", False)
+        create_pr = raw_dict.get("create_pr", True)
         upstream_tag_template = raw_dict.get("upstream_tag_template", "{version}")
 
         # it can be int as well

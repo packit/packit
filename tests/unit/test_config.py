@@ -508,7 +508,7 @@ def test_get_package_config_from_repo(content):
             SyncFilesItem(src=".packit.yaml", dest=".packit2.yaml"),
         ]
     )
-    assert not config.create_pr
+    assert config.create_pr
 
 
 def test_get_user_config(tmpdir):
