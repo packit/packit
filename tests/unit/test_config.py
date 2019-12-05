@@ -452,6 +452,35 @@ def test_package_config_parse(raw, expected):
     assert package_config == expected
 
 
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/package.spec"],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        )
+                    ]
+                ),
+                downstream_package_name="package",
+                upstream_package_name="package",
+            ),
+        )
+    ],
+)
+def test_package_config_upstream_and_downstream_package_names(raw, expected):
+    package_config = PackageConfig.get_from_dict(raw_dict=raw, repo_name="package")
+    assert package_config
+    assert package_config == expected
+
+
 def test_dist_git_package_url():
     di = {
         "dist_git_base_url": "https://packit.dev/",
