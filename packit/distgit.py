@@ -118,7 +118,8 @@ class DistGit(PackitRepositoryBase):
         if not self._downstream_config:
             try:
                 self._downstream_config = get_local_package_config(
-                    self.local_project.working_dir
+                    self.local_project.working_dir,
+                    repo_name=self.local_project.repo_name,
                 )
             except PackitConfigException:
                 return None
