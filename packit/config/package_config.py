@@ -155,12 +155,15 @@ class PackageConfig(BaseConfig):
         create_tarball_command = raw_dict.get("create_tarball_command", None)
         current_version_command = raw_dict.get("current_version_command", None)
 
-        upstream_package_name = cls.get_deprecated_key(
-            raw_dict, "upstream_package_name", "upstream_project_name"
-        ) or cls.get_deprecated_key(raw_dict, "upstream_package_name", "upstream_name")
-
-        if not upstream_package_name:
-            upstream_package_name = repo_name
+        upstream_package_name = (
+            cls.get_deprecated_key(
+                raw_dict, "upstream_package_name", "upstream_project_name"
+            )
+            or cls.get_deprecated_key(
+                raw_dict, "upstream_package_name", "upstream_name"
+            )
+            or repo_name
+        )
 
         upstream_project_url = raw_dict.get("upstream_project_url", None)
 
@@ -169,11 +172,10 @@ class PackageConfig(BaseConfig):
                 "dist_git_url is no longer being processed, "
                 "it is generated from dist_git_base_url and downstream_package_name"
             )
-        downstream_package_name = cls.get_deprecated_key(
-            raw_dict, "downstream_package_name", "package_name"
+        downstream_package_name = (
+            cls.get_deprecated_key(raw_dict, "downstream_package_name", "package_name")
+            or repo_name
         )
-        if not downstream_package_name:
-            downstream_package_name = repo_name
 
         specfile_path = raw_dict.get("specfile_path", None)
         if not specfile_path:
