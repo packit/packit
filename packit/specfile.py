@@ -1,6 +1,8 @@
 import inspect
 import logging
+import re
 
+from rebasehelper.helpers.macro_helper import MacroHelper
 from rebasehelper.specfile import SpecFile, RebaseHelperError
 
 try:
@@ -98,3 +100,13 @@ class Specfile(SpecFile):
         except NameError:
             get_version = versioneers_runner.run
         return get_version(versioneer, package_name, category)
+
+    def get_release_number(self) -> str:
+        """
+        Removed in rebasehelper=0.20.0
+        """
+        release = self.header.release
+        dist = MacroHelper.expand("%{dist}")
+        if dist:
+            release = release.replace(dist, "")
+        return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
