@@ -28,21 +28,18 @@ import asyncio
 import logging
 import os
 import sys
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
-from copr.v3 import Client as CoprClient
-from copr.v3.exceptions import CoprNoResultException
-from munch import Munch
 from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
-from packit.constants import COPR2GITHUB_STATE, SYNCING_NOTE
+from packit.constants import SYNCING_NOTE
+from packit.copr import CoprHelper
 from packit.distgit import DistGit
-from packit.exceptions import PackitException, PackitInvalidConfigException
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.status import Status
 from packit.sync import sync_files
@@ -67,7 +64,7 @@ class PackitAPI:
 
         self._up = None
         self._dg = None
-        self._copr = None
+        self._copr_helper: Optional[CoprHelper] = None
 
     @property
     def up(self):
@@ -90,10 +87,12 @@ class PackitAPI:
         return self._dg
 
     @property
-    def copr(self):
-        if self._copr is None:
-            self._copr = CoprClient.create_from_config_file()
-        return self._copr
+    def copr_helper(self) -> CoprHelper:
+        if self._copr_helper is None:
+            self._copr_helper = CoprHelper(
+                upstream_local_project=self.upstream_local_project
+            )
+        return self._copr_helper
 
     def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
         assert_existence(self.dg.local_project)
@@ -656,14 +655,6 @@ class PackitAPI:
         else:
             logger.info("\nNo Copr builds found.")
 
-    @staticmethod
-    def _copr_web_build_url(build: Munch):
-        """ Construct web frontend url because build.repo_url is not much user-friendly."""
-        return (
-            "https://copr.fedorainfracloud.org/coprs/"
-            f"{build.ownername}/{build.projectname}/build/{build.id}/"
-        )
-
     def run_copr_build(
         self,
         project: str,
@@ -683,88 +674,27 @@ class PackitAPI:
         :param instructions: installation instructions for the project
         :return: id of the created build and url to the build web page
         """
-        # get info
-        configured_owner = self.copr.config.get("username")
-        owner = owner or configured_owner
-        try:
-            copr_proj = self.copr.project_proxy.get(owner, project)
-            # make sure or project has chroots set correctly
-            if set(copr_proj.chroot_repos.keys()) != set(chroots):
-                logger.info(f"Updating targets on project {owner}/{project}")
-                logger.debug(f"old = {set(copr_proj.chroot_repos.keys())}")
-                logger.debug(f"new = {set(chroots)}")
-                self.copr.project_proxy.edit(
-                    owner,
-                    project,
-                    chroots=chroots,
-                    description=description,
-                    instructions=instructions,
-                )
-        except CoprNoResultException:
-            if owner == configured_owner:
-                logger.info(f"Copr project {owner}/{project} not found. Creating new.")
-                self.copr.project_proxy.add(
-                    ownername=owner,
-                    projectname=project,
-                    chroots=chroots,
-                    description=(
-                        description
-                        or "Continuous builds initiated by packit service.\n"
-                        "For more info check out https://packit.dev/"
-                    ),
-                    contact="https://github.com/packit-service/packit/issues",
-                    # don't show project on Copr homepage
-                    unlisted_on_hp=True,
-                    # delete project after the specified period of time
-                    delete_after_days=60,
-                    instructions=instructions
-                    or "You can check out the upstream project"
-                    f"{self.upstream_local_project.git_url} to find out how to consume these"
-                    "builds. This copr project is created and handled by the packit project"
-                    "(https://packit.dev/).",
-                )
-            else:
-                raise PackitInvalidConfigException(
-                    f"Copr project {owner}/{project} not found."
-                )
+        self.copr_helper.create_copr_project_if_not_exists(
+            project=project,
+            chroots=chroots,
+            owner=owner,
+            description=description,
+            instructions=instructions,
+        )
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
         logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
-        build = self.copr.build_proxy.create_from_file(owner, project, srpm_path)
-        return build.id, self._copr_web_build_url(build)
+        build = self.copr_helper.copr_client.build_proxy.create_from_file(
+            owner, project, srpm_path
+        )
+        return build.id, self.copr_helper.copr_web_build_url(build)
 
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
     ) -> str:
         """ returns copr build state """
-        watch_end = datetime.now() + timedelta(seconds=timeout)
-        logger.debug(f"Watching copr build {build_id}")
-        state_reported = ""
-        while True:
-            build = self.copr.build_proxy.get(build_id)
-            if build.state == state_reported:
-                continue
-            state_reported = build.state
-            logger.debug(f"COPR build {build_id}, state = {state_reported}")
-            try:
-                gh_state, description = COPR2GITHUB_STATE[state_reported]
-            except KeyError as exc:
-                logger.error(f"COPR gave us an invalid state: {exc}")
-                gh_state, description = "error", "Something went wrong."
-            if report_func:
-                report_func(
-                    gh_state,
-                    description,
-                    build_id=build.id,
-                    url=self._copr_web_build_url(build),
-                )
-            if gh_state != "pending":
-                logger.debug(f"state is now {gh_state}, ending the watch")
-                return state_reported
-            if datetime.now() > watch_end:
-                logger.error(f"the build did not finish in time ({timeout}s)")
-                report_func("error", "Build watch timeout")
-                return state_reported
-            time.sleep(10)
+        return self.copr_helper.watch_copr_build(
+            build_id=build_id, timeout=timeout, report_func=report_func
+        )
 
     @staticmethod
     def push_bodhi_update(update_alias: str):

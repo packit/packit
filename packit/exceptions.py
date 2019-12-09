@@ -38,6 +38,14 @@ class PackitConfigException(PackitException):
     pass
 
 
+class PackitCoprException(PackitException):
+    pass
+
+
+class PackitCoprProjectException(PackitCoprException):
+    pass
+
+
 class PackitInvalidConfigException(PackitConfigException):
     """ provided configuration file is not valid """
 
