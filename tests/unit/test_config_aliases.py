@@ -13,8 +13,8 @@ from packit.exceptions import PackitException
         ("openmandriva-rolling", {"openmandriva-rolling"}),
         ("opensuse-leap-15.0", {"opensuse-leap-15.0"}),
         ("fedora-stable", {"fedora-30", "fedora-31"}),
-        ("fedora-development", {"fedora-rawhide", "fedora-32"}),
-        ("fedora-all", {"fedora-rawhide", "fedora-30", "fedora-31", "fedora-32"}),
+        ("fedora-development", {"fedora-rawhide"}),
+        ("fedora-all", {"fedora-rawhide", "fedora-30", "fedora-31"}),
         ("centos-stream", {"centos-stream"}),
     ],
 )
@@ -45,20 +45,15 @@ def test_get_versions_from_multiple_values(names, versions):
         ("centos-stream", {"centos-stream-x86_64"}),
         ("centos-stream-x86_64", {"centos-stream-x86_64"}),
         ("fedora-stable", {"fedora-30-x86_64", "fedora-31-x86_64"}),
-        ("fedora-development", {"fedora-rawhide-x86_64", "fedora-32-x86_64"}),
+        ("fedora-development", {"fedora-rawhide-x86_64"}),
         ("fedora-29-x86_64", {"fedora-29-x86_64"}),
         ("fedora-29-aarch64", {"fedora-29-aarch64"}),
         ("fedora-29-i386", {"fedora-29-i386"}),
         ("fedora-stable-aarch64", {"fedora-30-aarch64", "fedora-31-aarch64"}),
-        ("fedora-development-aarch64", {"fedora-rawhide-aarch64", "fedora-32-aarch64"}),
+        ("fedora-development-aarch64", {"fedora-rawhide-aarch64"}),
         (
             "fedora-all",
-            {
-                "fedora-rawhide-x86_64",
-                "fedora-30-x86_64",
-                "fedora-31-x86_64",
-                "fedora-32-x86_64",
-            },
+            {"fedora-rawhide-x86_64", "fedora-30-x86_64", "fedora-31-x86_64"},
         ),
     ],
 )
@@ -69,7 +64,6 @@ def test_get_build_targets(name, targets):
 def test_get_build_targets_invalid_input():
     name = "rafhajd"
     with pytest.raises(PackitException) as ex:
-
         get_build_targets(name)
     err_msg = (
         f"Cannot get build target from '{name}'"
@@ -100,13 +94,13 @@ def test_get_build_targets_from_multiple_values(names, versions):
         ("rawhide", {"master"}),
         ("master", {"master"}),
         ("f30", {"f30"}),
-        ("fedora-development", {"master", "f32"}),
+        ("fedora-development", {"master"}),
         ("fedora-stable", {"f30", "f31"}),
         ("epel-7", {"epel7"}),
         ("epel7", {"epel7"}),
         ("el6", {"el6"}),
         ("epel-6", {"el6"}),
-        ("fedora-all", {"master", "f30", "f31", "f32"}),
+        ("fedora-all", {"master", "f30", "f31"}),
     ],
 )
 def test_get_branches(name, branches):
