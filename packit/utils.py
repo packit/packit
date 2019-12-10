@@ -26,6 +26,7 @@ import os
 import re
 import shlex
 import subprocess
+import sys
 import tempfile
 import threading
 from contextlib import contextmanager
@@ -34,10 +35,9 @@ from typing import Tuple, Any, Optional, Dict, Union, List
 from urllib.parse import urlparse
 
 import git
-import sys
 from pkg_resources import get_distribution, DistributionNotFound
 
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, PackitCommandFailedError
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +138,11 @@ def run_command(
         logger.error("Command %s failed", shell.args)
         logger.error("%s", error_message)
         if fail:
-            raise PackitException(f"Command {shell.args!r} failed: {error_message}")
+            raise PackitCommandFailedError(
+                f"Command {shell.args!r} failed: {error_message}",
+                stdout_output=stdout.get_output(),
+                stderr_output=stderr.get_output(),
+            )
         success = False
     else:
         success = True
