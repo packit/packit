@@ -37,7 +37,7 @@ from tabulate import tabulate
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.constants import SYNCING_NOTE
-from packit.copr import CoprHelper
+from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject

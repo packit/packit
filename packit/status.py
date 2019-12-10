@@ -27,7 +27,7 @@ from koji import ClientSession, BUILD_STATES
 
 from ogr.abstract import Release
 from packit.config import Config, PackageConfig
-from packit.copr import CoprHelper
+from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
