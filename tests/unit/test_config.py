@@ -39,6 +39,7 @@ from packit.config import (
     SyncFilesConfig,
     SyncFilesItem,
 )
+from packit.config.aliases import get_build_targets, get_branches
 from packit.exceptions import PackitInvalidConfigException
 
 
@@ -71,12 +72,12 @@ def get_default_job_config():
         JobConfig(
             job=JobType.copr_build,
             trigger=JobTriggerType.pull_request,
-            metadata={"targets": {"fedora-31-x86_64", "fedora-30-x86_64"}},
+            metadata={"targets": get_build_targets("fedora-stable")},
         ),
         JobConfig(
             job=JobType.propose_downstream,
             trigger=JobTriggerType.release,
-            metadata={"dist-git-branch": {"f31", "f30", "master"}},
+            metadata={"dist-git-branch": get_branches("fedora-all")},
         ),
     ]
 
