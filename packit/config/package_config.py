@@ -31,7 +31,7 @@ from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.config.base_config import BaseConfig
-from packit.config.job_config import JobConfig
+from packit.config.job_config import JobConfig, get_from_raw_jobs
 from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
 from packit.exceptions import PackitConfigException, PackitException
 from packit.schema import PACKAGE_CONFIG_SCHEMA
@@ -151,7 +151,10 @@ class PackageConfig(BaseConfig):
 
         synced_files = raw_dict.get("synced_files", None)
         actions = raw_dict.get("actions", {})
-        raw_jobs = raw_dict.get("jobs", [])
+
+        raw_jobs = raw_dict.get("jobs", None)
+        jobs = get_from_raw_jobs(raw_jobs)
+
         create_tarball_command = raw_dict.get("create_tarball_command", None)
         current_version_command = raw_dict.get("current_version_command", None)
 
@@ -210,9 +213,7 @@ class PackageConfig(BaseConfig):
             specfile_path=specfile_path,
             synced_files=SyncFilesConfig.get_from_dict(synced_files, validate=False),
             actions={ActionName(a): cmd for a, cmd in actions.items()},
-            jobs=[
-                JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
-            ],
+            jobs=jobs,
             upstream_package_name=upstream_package_name,
             downstream_package_name=downstream_package_name,
             upstream_project_url=upstream_project_url,

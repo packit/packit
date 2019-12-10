@@ -22,8 +22,10 @@
 
 import logging
 from enum import Enum
+from typing import List
 
 from packit.config.base_config import BaseConfig
+from packit.config.aliases import get_branches, get_build_targets
 from packit.exceptions import PackitConfigException
 from packit.schema import JOB_CONFIG_SCHEMA
 
@@ -87,3 +89,24 @@ class JobConfig(BaseConfig):
             and self.trigger == other.trigger
             and self.metadata == other.metadata
         )
+
+
+def get_from_raw_jobs(raw_jobs) -> List["JobConfig"]:
+    if isinstance(raw_jobs, list):
+        return [
+            JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
+        ]
+
+    # default jobs
+    return [
+        JobConfig(
+            job=JobType.copr_build,
+            trigger=JobTriggerType.pull_request,
+            metadata={"targets": get_build_targets("fedora-stable")},
+        ),
+        JobConfig(
+            job=JobType.propose_downstream,
+            trigger=JobTriggerType.release,
+            metadata={"dist-git-branch": get_branches("fedora-all")},
+        ),
+    ]
