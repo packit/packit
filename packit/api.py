@@ -274,6 +274,7 @@ class PackitAPI:
         finally:
             if not use_local_content:
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
+            self.dg.refresh_specfile()
 
     def sync_from_downstream(
         self,
