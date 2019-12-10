@@ -23,7 +23,7 @@
 from munch import Munch
 from pytest import fixture
 
-from packit.copr import CoprHelper
+from packit.copr_helper import CoprHelper
 
 
 @fixture()
