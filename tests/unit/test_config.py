@@ -76,7 +76,7 @@ def get_default_job_config():
         JobConfig(
             job=JobType.propose_downstream,
             trigger=JobTriggerType.release,
-            metadata={"dist-git-branch": {"f31", "f32", "f30", "master"}},
+            metadata={"dist-git-branch": {"f31", "f30", "master"}},
         ),
     ]
 
@@ -482,7 +482,6 @@ def test_package_config_parse_error(raw):
 )
 def test_package_config_parse(raw, expected):
     package_config = PackageConfig.get_from_dict(raw_dict=raw)
-    print(package_config, package_config.jobs)
     assert package_config
     assert package_config == expected
 
@@ -494,6 +493,7 @@ def test_package_config_parse(raw, expected):
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
+                "jobs": [],
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
