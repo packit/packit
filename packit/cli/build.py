@@ -29,6 +29,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
+from packit.exceptions import PackitCommandFailedError
 
 logger = logging.getLogger(__file__)
 
@@ -74,9 +75,19 @@ def build(
     click.echo(f"Building for the following branches: {', '.join(branches_to_build)}")
 
     for branch in branches_to_build:
-        api.build(
-            dist_git_branch=branch,
-            scratch=scratch,
-            nowait=nowait,
-            koji_target=koji_target,
-        )
+        try:
+            api.build(
+                dist_git_branch=branch,
+                scratch=scratch,
+                nowait=nowait,
+                koji_target=koji_target,
+            )
+        except PackitCommandFailedError as ex:
+            logs_stdout = "\n>>> ".join(ex.stdout_output.decode().strip().split("\n"))
+            logs_stderr = "\n!!! ".join(ex.stderr_output.decode().strip().split("\n"))
+            click.echo(
+                f"Build for branch '{branch}' failed. \n"
+                f">>> {logs_stdout}\n"
+                f"!!! {logs_stderr}\n",
+                err=True,
+            )

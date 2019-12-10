@@ -28,8 +28,10 @@ class PackitException(Exception):
 class PackitCommandFailedError(PackitException):
     """ A command failed """
 
-    def __init__(self, output):
-        self.output = output
+    def __init__(self, *args, stdout_output=None, stderr_output=None):
+        super().__init__(*args)
+        self.stdout_output = stdout_output
+        self.stderr_output = stderr_output
 
 
 class PackitConfigException(PackitException):
