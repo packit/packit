@@ -307,7 +307,7 @@ class PackitRepositoryBase:
         logger.info(
             f"Patches ({len(patch_list)}) added to the specfile ({self.absolute_specfile_path})"
         )
-        self._specfile = None  # reload the specfile object
+        self.refresh_specfile()
         self.local_project.git_repo.index.write()
 
     def get_project_url_from_distgit_spec(self) -> Optional[str]:
@@ -358,6 +358,9 @@ class PackitRepositoryBase:
         self.specfile.set_version(this_version)
         self.specfile.save()
         self.specfile.set_spec_version(version=version, changelog_entry=comment)
+
+    def refresh_specfile(self):
+        self._specfile = None
 
     def is_dirty(self) -> bool:
         """ is the git repo dirty? """
