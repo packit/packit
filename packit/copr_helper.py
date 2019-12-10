@@ -46,15 +46,9 @@ class CoprHelper:
         instructions: str = None,
     ) -> None:
         """
-        Submit a build to copr build system using an SRPM using the current checkout.
+        Create a project in copr if it does not exists.
 
-        :param project: name of the copr project to build
-                        inside (defaults to something long and ugly)
-        :param chroots: a list of COPR chroots (targets) e.g. fedora-rawhide-x86_64
-        :param owner: defaults to username from copr config file
-        :param description: description of the project
-        :param instructions: installation instructions for the project
-        :return: id of the created build and url to the build web page
+        Raises PackitCoprException on any problems.
         """
         owner = owner or self.configured_owner
         try:
