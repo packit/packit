@@ -39,6 +39,7 @@ from packit.config import (
     SyncFilesConfig,
     SyncFilesItem,
 )
+from packit.config.aliases import get_build_targets, get_branches
 from packit.exceptions import PackitInvalidConfigException
 
 
@@ -64,6 +65,21 @@ def get_job_config_full():
         trigger=JobTriggerType.pull_request,
         metadata={"a": "b"},
     )
+
+
+def get_default_job_config():
+    return [
+        JobConfig(
+            job=JobType.copr_build,
+            trigger=JobTriggerType.pull_request,
+            metadata={"targets": get_build_targets("fedora-stable")},
+        ),
+        JobConfig(
+            job=JobType.propose_downstream,
+            trigger=JobTriggerType.release,
+            metadata={"dist-git-branch": get_branches("fedora-all")},
+        ),
+    ]
 
 
 @pytest.fixture()
@@ -444,6 +460,25 @@ def test_package_config_parse_error(raw):
                 downstream_package_name="package",
             ),
         ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "synced_files": ["fedora/package.spec"],
+                "downstream_package_name": "package",
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[
+                        SyncFilesItem(
+                            src="fedora/package.spec", dest="fedora/package.spec"
+                        )
+                    ]
+                ),
+                jobs=get_default_job_config(),
+                downstream_package_name="package",
+            ),
+        ),
     ],
 )
 def test_package_config_parse(raw, expected):
@@ -459,6 +494,7 @@ def test_package_config_parse(raw, expected):
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
+                "jobs": [],
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
@@ -502,6 +538,7 @@ def test_dist_git_package_url():
         ),
         specfile_path="fedora/package.spec",
         create_pr=False,
+        jobs=get_default_job_config(),
     )
     assert new_pc.specfile_path.endswith("fedora/package.spec")
     assert pc.specfile_path.endswith("fedora/package.spec")
