@@ -22,9 +22,12 @@
 
 import logging
 from enum import Enum
+from typing import List
 
-from packit.config.aliases import get_build_targets, get_branches
+from packit.config.base_config import BaseConfig
+from packit.config.aliases import get_branches, get_build_targets
 from packit.exceptions import PackitConfigException
+from packit.schema import JOB_CONFIG_SCHEMA
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +57,9 @@ class JobTriggerType(Enum):
     comment = "comment"
 
 
-class JobConfig:
+class JobConfig(BaseConfig):
+    SCHEMA = JOB_CONFIG_SCHEMA
+
     def __init__(self, job: JobType, trigger: JobTriggerType, metadata: dict):
         self.job = job
         self.trigger = trigger
@@ -66,11 +71,15 @@ class JobConfig:
         )
 
     @classmethod
-    def get_from_dict(cls, raw_dict: dict) -> "JobConfig":
-        # required to avoid cyclical imports
-        from packit.schema import JobConfigSchema
+    def get_from_dict(cls, raw_dict: dict, validate=True) -> "JobConfig":
+        if validate:
+            cls.validate(raw_dict)
 
-        return JobConfigSchema().load(raw_dict)
+        return JobConfig(
+            job=JobType[raw_dict["job"]],
+            trigger=JobTriggerType[raw_dict["trigger"]],
+            metadata=raw_dict.get("metadata", {}),
+        )
 
     def __eq__(self, other: object):
         if not isinstance(other, JobConfig):
@@ -82,15 +91,22 @@ class JobConfig:
         )
 
 
-default_jobs_dict = [
-    JobConfig(
-        job=JobType.copr_build,
-        trigger=JobTriggerType.pull_request,
-        metadata={"targets": get_build_targets("fedora-stable")},
-    ),
-    JobConfig(
-        job=JobType.propose_downstream,
-        trigger=JobTriggerType.release,
-        metadata={"dist-git-branch": get_branches("fedora-all")},
-    ),
-]
+def get_from_raw_jobs(raw_jobs) -> List["JobConfig"]:
+    if isinstance(raw_jobs, list):
+        return [
+            JobConfig.get_from_dict(raw_job, validate=False) for raw_job in raw_jobs
+        ]
+
+    # default jobs
+    return [
+        JobConfig(
+            job=JobType.copr_build,
+            trigger=JobTriggerType.pull_request,
+            metadata={"targets": get_build_targets("fedora-stable")},
+        ),
+        JobConfig(
+            job=JobType.propose_downstream,
+            trigger=JobTriggerType.release,
+            metadata={"dist-git-branch": get_branches("fedora-all")},
+        ),
+    ]

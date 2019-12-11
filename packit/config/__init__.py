@@ -1,3 +1,4 @@
+from packit.config.base_config import BaseConfig
 from packit.config.config import (
     Config,
     RunCommandType,
@@ -19,6 +20,7 @@ from packit.config.sync_files_config import (
 )
 
 __all__ = [
+    BaseConfig.__name__,
     Config.__name__,
     JobConfig.__name__,
     JobTriggerType.__name__,
