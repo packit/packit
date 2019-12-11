@@ -37,26 +37,23 @@ from ogr import GithubService, get_instances_from_dict, PagureService, get_proje
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import OgrException
 from packit.constants import CONFIG_FILE_NAMES, SANDCASTLE_WORK_DIR
+from packit.config.base_config import BaseConfig
 from packit.exceptions import PackitConfigException, PackitException
+from packit.schema import USER_CONFIG_SCHEMA
 
 logger = logging.getLogger(__name__)
 
 
-class Config:
-    def __init__(
-        self,
-        debug: bool = False,
-        dry_run: bool = False,
-        fas_user: Optional[str] = None,
-        keytab_path: Optional[str] = None,
-        webhook_secret: str = "",
-        **kwargs,
-    ):
-        self.debug: bool = debug
-        self.fas_user: Optional[str] = fas_user
-        self.keytab_path: Optional[str] = keytab_path
-        self.webhook_secret: str = webhook_secret
-        self.dry_run: bool = dry_run
+class Config(BaseConfig):
+    SCHEMA = USER_CONFIG_SCHEMA
+
+    def __init__(self):
+        self.debug: bool = False
+        self.fas_user: Optional[str] = None
+        self.keytab_path: Optional[str] = None
+
+        self.webhook_secret: str = ""
+        self.dry_run: bool = False
 
         self.services: Set[GitService] = set()
 
@@ -103,12 +100,20 @@ class Config:
         return Config.get_from_dict(raw_dict=loaded_config)
 
     @classmethod
-    def get_from_dict(cls, raw_dict: dict) -> "Config":
-        # required to avoid cyclical imports
-        from packit.schema import UserConfigSchema
+    def get_from_dict(cls, raw_dict: dict, validate=True) -> "Config":
+        if validate:
+            cls.validate(raw_dict)
 
-        config = UserConfigSchema().load(raw_dict)
+        config = Config()
 
+        config.debug = raw_dict.get("debug", False)
+        config.dry_run = raw_dict.get("dry_run", False)
+        config.fas_user = raw_dict.get("fas_user", None)
+        config.keytab_path = raw_dict.get("keytab_path", None)
+
+        config.webhook_secret = raw_dict.get("webhook_secret", "")
+
+        config.command_handler = RunCommandType.local
         a_h = raw_dict.get("command_handler")
         if a_h:
             config.command_handler = RunCommandType(a_h)
