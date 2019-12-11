@@ -41,6 +41,9 @@ from packit.config import (
     SyncFilesItem,
 )
 
+from packit.config.package_config import get_local_specfile_path
+from tests.spellbook import UP_OSBUILD, SYNC_FILES
+
 
 def get_job_config_dict_simple():
     return {"job": "build", "trigger": "release"}
@@ -233,7 +236,7 @@ def test_package_config_not_equal(not_equal_package_config):
 @pytest.mark.parametrize(
     "raw,is_valid",
     [
-        ({}, False),
+        ({}, True),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -241,7 +244,7 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             False,
         ),
-        ({"jobs": [{"trigger": "release", "job": "propose_downstream"}]}, False),
+        ({"jobs": [{"trigger": "release", "job": "propose_downstream"}]}, True),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -695,3 +698,8 @@ def test_user_config_fork_token(tmpdir, recwarn):
 )
 def test_get_all_files_to_sync(package_config, all_synced_files):
     assert package_config.get_all_files_to_sync() == all_synced_files
+
+
+def test_get_local_specfile_path():
+    assert get_local_specfile_path([UP_OSBUILD]) == "osbuild.spec"
+    assert not get_local_specfile_path([SYNC_FILES])

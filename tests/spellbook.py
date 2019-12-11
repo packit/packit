@@ -51,6 +51,7 @@ SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
 DG_OGR = DATA_DIR / "dg-ogr"
 SPECFILE = DATA_DIR / "upstream_git/beer.spec"
 UPSTREAM_SPEC_NOT_IN_ROOT = DATA_DIR / "spec_not_in_root/upstream"
+SYNC_FILES = DATA_DIR / "sync_files"
 
 
 def git_set_user_email(directory):
