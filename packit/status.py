@@ -23,10 +23,11 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Set
 
-from copr.v3 import Client as CoprClient
 from koji import ClientSession, BUILD_STATES
+
 from ogr.abstract import Release
 from packit.config import Config, PackageConfig
+from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
@@ -137,32 +138,6 @@ class Status:
         builds = {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
         return builds
 
-    def get_copr_builds(self, number_of_builds: int = 5) -> List:
-        """
-        Get the copr builds of this project done by packit.
-        :return: list of builds
-        """
-        client = CoprClient.create_from_config_file()
-
-        projects = [
-            project.name
-            for project in reversed(client.project_proxy.get_list(ownername="packit"))
-            if project.name.startswith(
-                f"{self.up.local_project.namespace}-{self.up.local_project.repo_name}-"
-            )
-        ][:5]
-
-        builds: List = []
-        for project in projects:
-            builds += client.build_proxy.get_list(
-                ownername="packit", projectname=project
-            )
-
-        logger.debug("Copr builds fetched.")
-        return [(build.id, build.projectname, build.state) for build in builds][
-            :number_of_builds
-        ]
-
     def get_updates(self, number_of_updates: int = 3) -> List:
         """
         Get specific number of latest updates in bodhi
@@ -198,3 +173,8 @@ class Status:
             if len(updates) == number_of_updates:
                 break
         return updates
+
+    def get_copr_builds(self, number_of_builds: int = 5) -> List:
+        return CoprHelper(upstream_local_project=self.up.local_project).get_copr_builds(
+            number_of_builds=number_of_builds
+        )
