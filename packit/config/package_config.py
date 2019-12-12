@@ -30,7 +30,7 @@ from yaml import safe_load
 from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
-from packit.config.job_config import JobConfig
+from packit.config.job_config import JobConfig, default_jobs
 from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
 from packit.exceptions import PackitConfigException, PackitException
 
@@ -78,7 +78,9 @@ class PackageConfig:
         self._downstream_project_url: str = downstream_project_url
         # path to a local git clone of the dist-git repo; None means to clone in a tmpdir
         self.dist_git_clone_path: Optional[str] = None
-        self.actions = actions or {}
+        self.actions = (
+            {ActionName(a): cmd for a, cmd in actions.items()} if actions else {}
+        )
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
         self.create_pr: bool = create_pr
@@ -145,13 +147,16 @@ class PackageConfig:
         if config_file_path and not raw_dict.get("config_file_path", None):
             raw_dict.update(config_file_path=config_file_path)
 
-        package_config = PackageConfigSchema().load(raw_dict)
+        package_config = PackageConfigSchema(strict=True).load(raw_dict).data
 
         if not getattr(package_config, "upstream_package_name", None) and repo_name:
             package_config.upstream_package_name = repo_name
 
         if not getattr(package_config, "downstream_package_name", None) and repo_name:
             package_config.downstream_package_name = repo_name
+
+        if "jobs" not in raw_dict:
+            package_config.jobs = default_jobs
 
         return package_config
 

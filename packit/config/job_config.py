@@ -70,7 +70,7 @@ class JobConfig:
         # required to avoid cyclical imports
         from packit.schema import JobConfigSchema
 
-        return JobConfigSchema().load(raw_dict)
+        return JobConfigSchema(strict=True).load(raw_dict).data
 
     def __eq__(self, other: object):
         if not isinstance(other, JobConfig):
@@ -82,7 +82,7 @@ class JobConfig:
         )
 
 
-default_jobs_dict = [
+default_jobs = [
     JobConfig(
         job=JobType.copr_build,
         trigger=JobTriggerType.pull_request,

@@ -1,17 +1,11 @@
 import logging
 import typing
 
-from marshmallow import Schema, fields, post_load, pre_load, RAISE, ValidationError
+from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
 
-from packit.actions import ActionName
 from packit.config import PackageConfig, Config, SyncFilesConfig
-from packit.config.job_config import (
-    JobType,
-    JobTriggerType,
-    JobConfig,
-    default_jobs_dict,
-)
+from packit.config.job_config import JobType, JobTriggerType, JobConfig
 from packit.sync import SyncFilesItem
 
 logger = logging.getLogger(__name__)
@@ -108,9 +102,6 @@ class JobConfigSchema(Schema):
     Schema for processing JobConfig config data.
     """
 
-    class Meta:
-        unknown = RAISE
-
     job = EnumField(JobType, required=True)
     trigger = EnumField(JobTriggerType, required=True)
     metadata = fields.Dict(missing={})
@@ -124,9 +115,6 @@ class PackageConfigSchema(Schema):
     """
     Schema for processing PackageConfig config data.
     """
-
-    class Meta:
-        unknown = RAISE
 
     config_file_path = fields.String()
     specfile_path = fields.String(required=True)
@@ -145,10 +133,8 @@ class PackageConfigSchema(Schema):
     allowed_gpg_keys = fields.List(fields.String())
     spec_source_id = fields.Method(deserialize="spec_source_id_fm")
     synced_files = fields.Nested(SyncFilesConfigSchema)
-    jobs = fields.Nested(JobConfigSchema, many=True, missing=default_jobs_dict)
-    actions = fields.Dict(
-        keys=EnumField(ActionName, by_value=True)
-    )  # add value validatation using custom field or validator
+    jobs = fields.List(fields.Nested(JobConfigSchema))
+    actions = fields.Dict()  # add value validatation using custom field or validator
     create_pr = fields.Boolean()
 
     # list of deprecated keys and their replacement (new,old)
@@ -233,9 +219,6 @@ class UserConfigSchema(Schema):
     """
     Schema for processing Config config data.
     """
-
-    class Meta:
-        unknown = RAISE
 
     debug = fields.Bool()
     dry_run = fields.Bool()

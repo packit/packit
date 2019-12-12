@@ -107,7 +107,7 @@ class Config:
         # required to avoid cyclical imports
         from packit.schema import UserConfigSchema
 
-        config = UserConfigSchema().load(raw_dict)
+        config = UserConfigSchema(strict=True).load(raw_dict).data
 
         a_h = raw_dict.get("command_handler")
         if a_h:

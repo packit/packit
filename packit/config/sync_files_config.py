@@ -52,7 +52,7 @@ class SyncFilesConfig:
         # required to avoid cyclical imports
         from packit.schema import SyncFilesConfigSchema
 
-        return SyncFilesConfigSchema().load(raw_dict)
+        return SyncFilesConfigSchema(strict=True).load(raw_dict).data
 
     def __eq__(self, other: object):
         if not isinstance(other, SyncFilesConfig):
