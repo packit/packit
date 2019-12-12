@@ -23,7 +23,7 @@
 from munch import Munch
 from pytest import fixture
 
-from packit.api import PackitAPI
+from packit.copr_helper import CoprHelper
 
 
 @fixture()
@@ -58,4 +58,4 @@ def copr_build():
 
 class TestPackitAPI:
     def test__copr_web_build_url(self, copr_build):
-        assert PackitAPI._copr_web_build_url(copr_build[0]) == copr_build[1]
+        assert CoprHelper.copr_web_build_url(copr_build[0]) == copr_build[1]
