@@ -36,7 +36,13 @@ from yaml import safe_load
 from ogr import GithubService, get_instances_from_dict, PagureService, get_project
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import OgrException
-from packit.constants import CONFIG_FILE_NAMES, SANDCASTLE_WORK_DIR
+from packit.constants import (
+    CONFIG_FILE_NAMES,
+    SANDCASTLE_WORK_DIR,
+    SANDCASTLE_PVC,
+    SANDCASTLE_DEFAULT_PROJECT,
+    SANDCASTLE_IMAGE,
+)
 from packit.exceptions import PackitConfigException, PackitException
 
 logger = logging.getLogger(__name__)
@@ -50,6 +56,11 @@ class Config:
         fas_user: Optional[str] = None,
         keytab_path: Optional[str] = None,
         webhook_secret: str = "",
+        command_handler: str = None,
+        command_handler_work_dir: str = SANDCASTLE_WORK_DIR,
+        command_handler_pvc_env_var: str = SANDCASTLE_PVC,
+        command_handler_image_reference: str = SANDCASTLE_IMAGE,
+        command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
         **kwargs,
     ):
         self.debug: bool = debug
@@ -65,15 +76,17 @@ class Config:
         # users will never set these, so let's hide those from them
 
         # name of the handler to run actions and commands, default to current env
-        self.command_handler: RunCommandType = RunCommandType.local
+        self.command_handler: RunCommandType = RunCommandType(
+            command_handler
+        ) if command_handler else RunCommandType.local
         # a dir where the PV is mounted: both in sandbox and in worker
-        self.command_handler_work_dir: str = ""
+        self.command_handler_work_dir: str = command_handler_work_dir
         # name of the PVC so that the sandbox has the same volume mounted
-        self.command_handler_pvc_env_var: str = ""  # pointer to pointer, lol
+        self.command_handler_pvc_env_var: str = command_handler_pvc_env_var  # pointer to pointer
         # name of sandbox container image
-        self.command_handler_image_reference: str = "docker.io/usercont/sandcastle"
+        self.command_handler_image_reference: str = command_handler_image_reference
         # do I really need to explain this?
-        self.command_handler_k8s_namespace: str = "myproject"
+        self.command_handler_k8s_namespace: str = command_handler_k8s_namespace
 
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users
@@ -108,23 +121,6 @@ class Config:
         from packit.schema import UserConfigSchema
 
         config = UserConfigSchema(strict=True).load(raw_dict).data
-
-        a_h = raw_dict.get("command_handler")
-        if a_h:
-            config.command_handler = RunCommandType(a_h)
-        config.command_handler_work_dir = raw_dict.get(
-            "command_handler_work_dir", SANDCASTLE_WORK_DIR
-        )
-        config.command_handler_pvc_env_var = raw_dict.get(
-            "command_handler_pvc_env_var", "SANDCASTLE_PVC"
-        )
-        config.command_handler_image_reference = raw_dict.get(
-            "command_handler_image_reference", "docker.io/usercont/sandcastle"
-        )
-        # default project for oc cluster up
-        config.command_handler_k8s_namespace = raw_dict.get(
-            "command_handler_k8s_namespace", "myproject"
-        )
 
         config.services = Config.load_authentication(raw_dict)
         return config

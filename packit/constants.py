@@ -82,6 +82,9 @@ downstream_package_name: {downstream_package_name}
 """
 
 SANDCASTLE_WORK_DIR = "/sandcastle"
+SANDCASTLE_IMAGE = "docker.io/usercont/sandcastle"
+SANDCASTLE_DEFAULT_PROJECT = "myproject"
+SANDCASTLE_PVC = "SANDCASTLE_PVC"
 
 SYNCING_NOTE = (
     "This repository is maintained by packit.\nhttps://packit.dev/\n"
