@@ -29,15 +29,14 @@ from typing import Optional, List, Tuple, Union
 import git
 from packaging import version
 
-
-from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
 from packit.exceptions import PackitException, FailedCreateSRPM
-from packit.specfile import Specfile
 from packit.local_project import LocalProject
+from packit.specfile import Specfile
+from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
 
 logger = logging.getLogger(__name__)
 
@@ -372,6 +371,7 @@ class Upstream(PackitRepositoryBase):
             )
             if not outputs:
                 raise PackitException("No output from create-archive action.")
+
             # one of the returned strings has to contain existing archive name
             for output in reversed(outputs):
                 for archive_name in reversed(output.splitlines()):
@@ -390,10 +390,7 @@ class Upstream(PackitRepositoryBase):
                             )
                             continue
                         raise ex
-            else:
-                raise PackitException(
-                    "No existing file in create-archive action output."
-                )
+            raise PackitException("No existing file in create-archive action output.")
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
