@@ -390,7 +390,10 @@ class Upstream(PackitRepositoryBase):
                             )
                             continue
                         raise ex
-            raise PackitException("No existing file in create-archive action output.")
+            raise PackitException(
+                "The create-archive action did not output a path to the generated archive. "
+                "Please make sure that an absolute path to the archive is printed."
+            )
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
