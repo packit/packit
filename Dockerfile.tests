@@ -1,7 +1,7 @@
 # Packit (test) dependencies.
 # To run tests locally via 'make check_in_container'.
 
-FROM fedora:30
+FROM fedora:31
 
 RUN dnf -y install ansible
 
