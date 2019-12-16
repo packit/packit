@@ -1,7 +1,7 @@
 # pip3 install packit from this repo.
-# To build packit image on docker hub.
+# Base image for packit-service-worker
 
-FROM fedora:30
+FROM fedora:31
 
 ENV ANSIBLE_STDOUT_CALLBACK=debug \
     WORKDIR=/src
