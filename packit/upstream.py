@@ -428,6 +428,54 @@ class Upstream(PackitRepositoryBase):
         :param version: version to set in the spec
         :param commit: commit to set in the changelog
         """
+        self._fix_spec_source(archive)
+        self._fix_spec_prep(version)
+
+        msg = f"Development snapshot ({commit})"
+        self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)
+
+    def _fix_spec_prep(self, version):
+        prep = self.specfile.spec_content.section("%prep")
+        if not prep:
+            logger.warning("this package doesn't have a %prep section")
+            return
+
+        # stolen from tito, thanks!
+        # https://github.com/dgoodwin/tito/blob/master/src/tito/common.py#L695
+        regex = re.compile(r"^(\s*%(?:auto)?setup)(.*?)$")
+        for idx, line in enumerate(prep):
+            m = regex.match(line)
+            if m:
+                break
+        else:
+            logger.error(
+                "this package is not using %(auto)setup macro in prep, "
+                "packit can't work in this environment"
+            )
+            return
+
+        new_setup_line = m[1]
+        # replace -n with our -n because it's better
+        args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
+        if args_match:
+            new_setup_line += args_match.group(1)
+            new_setup_line += args_match.group(2)
+        else:
+            new_setup_line += m[2]
+        if not self.package_config.upstream_package_name:
+            raise PackitException(
+                f'"upstream_package_name" is not set: unable to fix the spec file; please set it.'
+            )
+        new_setup_line += f" -n {self.package_config.upstream_package_name}-{version}"
+        logger.debug(
+            f"new {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
+            f" line:\n{new_setup_line}"
+        )
+        prep[idx] = new_setup_line
+        self.specfile.spec_content.replace_section("%prep", prep)
+        self.specfile.write_spec_content()
+
+    def _fix_spec_source(self, archive):
         prefix = "Source"
         regex = re.compile(r"^Source\s*:.+$")
         for line in self.specfile.spec_content.section("%package"):
@@ -452,49 +500,6 @@ class Upstream(PackitRepositoryBase):
                 f"via {self.package_config.spec_source_id} nor {prefix}."
             )
         self.specfile.set_tag(full_name, archive)
-
-        prep = self.specfile.spec_content.section("%prep")
-        if not prep:
-            logger.warning("this package doesn't have a %prep section")
-            return
-
-        # stolen from tito, thanks!
-        # https://github.com/dgoodwin/tito/blob/master/src/tito/common.py#L695
-        regex = re.compile(r"^(\s*%(?:auto)?setup)(.*?)$")
-        for idx, line in enumerate(prep):
-            m = regex.match(line)
-            if m:
-                break
-        else:
-            logger.error(
-                "this package is not using %(auto)setup macro in prep, "
-                "packit can't work in this environment"
-            )
-            return
-        new_setup_line = m[1]
-        # replace -n with our -n because it's better
-        args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
-        if args_match:
-            new_setup_line += args_match.group(1)
-            new_setup_line += args_match.group(2)
-        else:
-            new_setup_line += m[2]
-        if not self.package_config.upstream_package_name:
-            raise PackitException(
-                f'"upstream_package_name" is not set: unable to fix the spec file; please set it.'
-            )
-        new_setup_line += f" -n {self.package_config.upstream_package_name}-{version}"
-
-        logger.debug(
-            f"new {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
-            f" line:\n{new_setup_line}"
-        )
-        prep[idx] = new_setup_line
-        self.specfile.spec_content.replace_section("%prep", prep)
-        self.specfile.write_spec_content()
-
-        msg = f"Development snapshot ({commit})"
-        self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)
 
     def create_srpm(
         self,
