@@ -506,6 +506,11 @@ class PackitAPI:
                 )
             else:
                 source_dir = Path(self.up.local_project.working_dir)
+
+        # > Method that iterates over all sources and downloads ones,
+        # > which contain URL instead of just a file.
+        self.up.specfile.download_remote_sources()
+
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
         )
