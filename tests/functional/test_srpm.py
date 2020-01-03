@@ -25,6 +25,7 @@ Functional tests for srpm command
 """
 from pathlib import Path
 
+from packit.utils import cwd
 from tests.functional.spellbook import call_real_packit
 from tests.spellbook import build_srpm
 
@@ -34,6 +35,18 @@ def test_srpm_command_for_path(upstream_or_distgit_path):
     srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)
+
+
+def test_srpm_command_for_path_with_multiple_sources(
+    upstream_and_remote_with_multiple_sources,
+):
+    workdir, _ = upstream_and_remote_with_multiple_sources
+    with cwd(workdir):
+        call_real_packit(parameters=["--debug", "srpm", str(workdir)])
+        srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
+        assert srpm_path.exists()
+        assert (Path.cwd() / "python-ogr.spec").exists()
+        build_srpm(srpm_path)
 
 
 def test_srpm_command(cwd_upstream_or_distgit):
