@@ -1,6 +1,6 @@
 [![Build Status](https://zuul-ci.org/gated.svg)](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit)
 
-![Packit](design/logo-extended.png)
+![Packit](design/export/logo-extended.png)
 
 ## Elevator pitch
 
