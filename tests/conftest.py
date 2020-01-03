@@ -13,6 +13,7 @@ from tests.spellbook import (
     DISTGIT,
     DG_OGR,
     UPSTREAM_SPEC_NOT_IN_ROOT,
+    UPSTREAM_WITH_MUTLIPLE_SOURCES,
 )
 
 
@@ -26,6 +27,21 @@ def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
 
     u = t / "upstream_git"
     shutil.copytree(UPSTREAM, u)
+    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
+
+    return u, u_remote_path
+
+
+@pytest.fixture()
+def upstream_and_remote_with_multiple_sources(tmpdir) -> Tuple[Path, Path]:
+    t = Path(str(tmpdir))
+
+    u_remote_path = t / "upstream_git_with_multiple_sources_remote"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+
+    u = t / "upstream_git_with_multiple_sources"
+    shutil.copytree(UPSTREAM_WITH_MUTLIPLE_SOURCES, u)
     initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
 
     return u, u_remote_path
@@ -107,9 +123,15 @@ def upstream_or_distgit_path(
     return cwd_path
 
 
-@pytest.fixture(params=["upstream", "distgit", "ogr-distgit"])
+@pytest.fixture(
+    params=["upstream", "distgit", "ogr-distgit", "upstream-with-multiple-sources"]
+)
 def cwd_upstream_or_distgit(
-    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+    request,
+    upstream_and_remote,
+    distgit_and_remote,
+    ogr_distgit_and_remote,
+    upstream_and_remote_with_multiple_sources,
 ):
     """
     Run the code from upstream, downstream and ogr-distgit.
@@ -123,6 +145,7 @@ def cwd_upstream_or_distgit(
         "upstream": upstream_and_remote[0],
         "distgit": distgit_and_remote[0],
         "ogr-distgit": ogr_distgit_and_remote[0],
+        "upstream-with-multiple-sources": upstream_and_remote_with_multiple_sources[0],
     }[request.param]
 
     with cwd(cwd_path):

@@ -37,6 +37,7 @@ from packit.utils import cwd, run_command
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
 UPSTREAM = DATA_DIR / "upstream_git"
+UPSTREAM_WITH_MUTLIPLE_SOURCES = DATA_DIR / "upstream_git_with_multiple_sources"
 EMPTY_CHANGELOG = DATA_DIR / "empty_changelog"
 DISTGIT = DATA_DIR / "dist_git"
 UP_COCKPIT_OSTREE = DATA_DIR / "cockpit-ostree"
