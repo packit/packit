@@ -127,7 +127,7 @@ class PackitAPI:
 
         description = (
             f"Upstream pr: {pr_id}\n"
-            f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
+            f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
         )
 
         self._handle_sources(add_new_sources=True, force_new_sources=False)
@@ -215,7 +215,7 @@ class PackitAPI:
 
             description = (
                 f"Upstream tag: {upstream_tag}\n"
-                f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
+                f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
 
             path = os.path.join(self.dg.local_project.working_dir, "README.packit")
@@ -332,9 +332,7 @@ class PackitAPI:
         sync_files(reverse_raw_sync_files, fail_on_missing=False)
 
         if not no_pr:
-            description = (
-                f"Downstream commit: {self.dg.local_project.git_repo.head.commit}\n"
-            )
+            description = f"Downstream commit: {self.dg.local_project.commit_hexsha}\n"
 
             commit_msg = f"sync from downstream branch {dist_git_branch!r}"
             pr_title = f"Update from downstream branch {dist_git_branch!r}"

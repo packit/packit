@@ -611,7 +611,7 @@ class Upstream(PackitRepositoryBase):
         :param archive: path to the archive
         :param archive_version: package version of the archive
         """
-        current_commit = self.local_project.commit
+        current_commit = self.local_project.commit_hexsha
         env = {
             "PACKIT_PROJECT_VERSION": archive_version,
             "PACKIT_PROJECT_COMMIT": current_commit,
@@ -640,7 +640,7 @@ class Upstream(PackitRepositoryBase):
         except ValueError:
             new_release = str(old_release)
 
-        current_commit = self.local_project.commit
+        current_commit = self.local_project.commit_hexsha
         release_to_update = f"{new_release}.g{current_commit}"
         msg = f"Downstream changes ({current_commit})"
         self.specfile.set_spec_version(
