@@ -136,7 +136,7 @@ class LocalProject:
         return None
 
     @property
-    def commit(self) -> str:
+    def commit_hexsha(self) -> str:
         """
         Get the short commit hash for the current commit.
 
