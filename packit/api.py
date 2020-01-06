@@ -454,62 +454,9 @@ class PackitAPI:
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
-        current_git_describe_version = self.up.get_current_version()
-        upstream_ref = upstream_ref or self.package_config.upstream_ref
-
-        if self.up.local_project.git_repo.head.is_detached:
-            commit = self.up.local_project.git_repo.head.commit.hexsha[:8]
-        else:
-            commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
-
-        if self.up.running_in_service():
-            relative_to = Path(self.config.command_handler_work_dir)
-        else:
-            relative_to = Path.cwd()
-
-        if upstream_ref:
-            # source-git code: fetch the tarball and don't check out the upstream ref
-            self.up.fetch_upstream_archive()
-            source_dir = self.up.absolute_specfile_dir.relative_to(relative_to)
-            if self.up.with_action(action=ActionName.create_patches):
-                patches = self.up.create_patches(
-                    upstream=upstream_ref,
-                    destination=str(self.up.absolute_specfile_dir),
-                )
-                self.up.add_patches_to_specfile(patches)
-
-            old_release = self.up.specfile.get_release_number()
-            try:
-                old_release_int = int(old_release)
-                new_release = old_release_int + 1
-            except ValueError:
-                new_release = old_release
-            release_to_update = f"{new_release}.g{commit}"
-            msg = f"Downstream changes ({commit})"
-            self.up.specfile.set_spec_version(
-                release=release_to_update, changelog_entry=f"- {msg}"
-            )
-        else:
-            archive = self.up.create_archive(version=current_git_describe_version)
-            env = {
-                "PACKIT_PROJECT_VERSION": current_git_describe_version,
-                "PACKIT_PROJECT_COMMIT": commit,
-                "PACKIT_PROJECT_ARCHIVE": archive,
-            }
-            if self.up.with_action(action=ActionName.fix_spec, env=env):
-                self.up.fix_spec(
-                    archive=archive, version=current_git_describe_version, commit=commit
-                )
-            if self.up.local_project.working_dir.startswith(str(relative_to)):
-                source_dir = Path(self.up.local_project.working_dir).relative_to(
-                    relative_to
-                )
-            else:
-                source_dir = Path(self.up.local_project.working_dir)
-
-        # > Method that iterates over all sources and downloads ones,
-        # > which contain URL instead of just a file.
-        self.up.specfile.download_remote_sources()
+        source_dir = self.up.prepare_upstream_for_srpm_creation(
+            upstream_ref=upstream_ref
+        )
 
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
