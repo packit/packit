@@ -135,6 +135,18 @@ class LocalProject:
             return self._get_ref_from_git_repo()
         return None
 
+    @property
+    def commit(self) -> str:
+        """
+        Get the short commit hash for the current commit.
+
+        :return: first 8 characters of the current commit
+        """
+        if self.git_repo.head.is_detached:
+            return self.git_repo.head.commit.hexsha[:8]
+        else:
+            return self.git_repo.active_branch.commit.hexsha[:8]
+
     def clean(self):
         if self.working_dir_temporary:
             logger.debug(f"Cleaning: {self.working_dir}")

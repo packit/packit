@@ -563,3 +563,99 @@ class Upstream(PackitRepositoryBase):
         if self.running_in_service():
             return Path(self.local_project.working_dir).joinpath(the_srpm)
         return Path(the_srpm)
+
+    def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None) -> Path:
+        """
+        1. determine version
+        2. create an archive or download upstream and create patches for sourcegit
+        3. fix/update the specfile to use the right archive
+        4. download the remote sources
+
+        :param upstream_ref: str, needed for the sourcegit mode
+        :return: source directory where you can start the SRPM build
+        """
+        current_git_describe_version = self.get_current_version()
+        upstream_ref = upstream_ref or self.package_config.upstream_ref
+
+        if self.running_in_service():
+            relative_to = Path(self.config.command_handler_work_dir)
+        else:
+            relative_to = Path.cwd()
+
+        if upstream_ref:
+            source_dir = self.prepare_upstream_using_source_git(
+                relative_to, upstream_ref
+            )
+        else:
+            created_archive = self.create_archive(version=current_git_describe_version)
+            self.fix_specfile_to_use_local_archive(
+                archive=created_archive, archive_version=current_git_describe_version
+            )
+            if self.local_project.working_dir.startswith(str(relative_to)):
+                source_dir = Path(self.local_project.working_dir).relative_to(
+                    relative_to
+                )
+            else:
+                source_dir = Path(self.local_project.working_dir)
+
+        # > Method that iterates over all sources and downloads ones,
+        # > which contain URL instead of just a file.
+        self.specfile.download_remote_sources()
+
+        return source_dir
+
+    def fix_specfile_to_use_local_archive(self, archive, archive_version) -> None:
+        """
+        Update specfile to use the archive with the right version.
+
+        :param archive: path to the archive
+        :param archive_version: package version of the archive
+        """
+        current_commit = self.local_project.commit
+        env = {
+            "PACKIT_PROJECT_VERSION": archive_version,
+            "PACKIT_PROJECT_COMMIT": current_commit,
+            "PACKIT_PROJECT_ARCHIVE": archive,
+        }
+        if self.with_action(action=ActionName.fix_spec, env=env):
+            self.fix_spec(
+                archive=archive, version=archive_version, commit=current_commit
+            )
+
+    def prepare_upstream_using_source_git(self, relative_to, upstream_ref) -> Path:
+        """
+        Fetch the tarball and don't check out the upstream ref.
+
+        :param relative_to: for the purpose of Sandcastle
+        :param upstream_ref: the base git ref for the source git
+        :return: the source directory where we can build the SRPM
+        """
+        self.fetch_upstream_archive()
+        source_dir = self.absolute_specfile_dir.relative_to(relative_to)
+        self.create_patches_and_update_specfile(upstream_ref)
+        old_release = self.specfile.get_release_number()
+        try:
+            old_release_int = int(old_release)
+            new_release = str(old_release_int + 1)
+        except ValueError:
+            new_release = str(old_release)
+
+        current_commit = self.local_project.commit
+        release_to_update = f"{new_release}.g{current_commit}"
+        msg = f"Downstream changes ({current_commit})"
+        self.specfile.set_spec_version(
+            release=release_to_update, changelog_entry=f"- {msg}"
+        )
+        return source_dir
+
+    def create_patches_and_update_specfile(self, upstream_ref) -> None:
+        """
+        Create patches for the sourcegit and add them to the specfile.
+
+        :param upstream_ref: the base git ref for the source git
+        """
+        if self.with_action(action=ActionName.create_patches):
+            patches = self.create_patches(
+                upstream=upstream_ref, destination=str(self.absolute_specfile_dir)
+            )
+            self.add_patches_to_specfile(patches)
