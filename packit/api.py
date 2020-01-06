@@ -641,6 +641,8 @@ class PackitAPI:
         :param instructions: installation instructions for the project
         :return: id of the created build and url to the build web page
         """
+        srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
+
         self.copr_helper.create_copr_project_if_not_exists(
             project=project,
             chroots=chroots,
@@ -648,8 +650,10 @@ class PackitAPI:
             description=description,
             instructions=instructions,
         )
-        srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
-        logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
+        logger.debug(
+            f"owner={owner if owner else 'value from the config file will be used'}, "
+            f"project={project}, path={srpm_path}"
+        )
         build = self.copr_helper.copr_client.build_proxy.create_from_file(
             owner, project, srpm_path
         )

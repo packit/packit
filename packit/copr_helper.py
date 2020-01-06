@@ -8,7 +8,7 @@ from copr.v3.exceptions import CoprNoResultException, CoprException
 from munch import Munch
 
 from packit.constants import COPR2GITHUB_STATE
-from packit.exceptions import PackitCoprProjectException
+from packit.exceptions import PackitCoprProjectException, PackitCoprException
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -19,10 +19,14 @@ class CoprHelper:
         self.upstream_local_project = upstream_local_project
         self._copr_client = None
 
+    def get_copr_client(self) -> CoprClient:
+        """Not static because of the flex-mocking."""
+        return CoprClient.create_from_config_file()
+
     @property
     def copr_client(self):
         if self._copr_client is None:
-            self._copr_client = CoprClient.create_from_config_file()
+            self._copr_client = self.get_copr_client()
         return self._copr_client
 
     @property
@@ -51,8 +55,16 @@ class CoprHelper:
         Raises PackitCoprException on any problems.
         """
         owner = owner or self.configured_owner
+
+        if not owner:
+            raise PackitCoprException(
+                f"Copr owner not set. Use Copr config file or `--owner` when calling packit CLI."
+            )
+
         try:
-            copr_proj = self.copr_client.project_proxy.get(owner, project)
+            copr_proj = self.copr_client.project_proxy.get(
+                ownername=owner, projectname=project
+            )
             # make sure or project has chroots set correctly
             if set(copr_proj.chroot_repos.keys()) != set(chroots):
                 logger.info(f"Updating targets on project {owner}/{project}")
@@ -65,11 +77,11 @@ class CoprHelper:
                     description=description,
                     instructions=instructions,
                 )
-        except CoprNoResultException:
+        except CoprNoResultException as ex:
             if owner != self.configured_owner:
                 raise PackitCoprProjectException(
                     f"Copr project {owner}/{project} not found."
-                )
+                ) from ex
 
             logger.info(f"Copr project {owner}/{project} not found. Creating new.")
             self.create_copr_project(chroots, description, instructions, owner, project)
