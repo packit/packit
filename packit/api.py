@@ -127,7 +127,7 @@ class PackitAPI:
 
         description = (
             f"Upstream pr: {pr_id}\n"
-            f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
+            f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
         )
 
         self._handle_sources(add_new_sources=True, force_new_sources=False)
@@ -215,7 +215,7 @@ class PackitAPI:
 
             description = (
                 f"Upstream tag: {upstream_tag}\n"
-                f"Upstream commit: {self.up.local_project.git_repo.head.commit}\n"
+                f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
 
             path = os.path.join(self.dg.local_project.working_dir, "README.packit")
@@ -332,9 +332,7 @@ class PackitAPI:
         sync_files(reverse_raw_sync_files, fail_on_missing=False)
 
         if not no_pr:
-            description = (
-                f"Downstream commit: {self.dg.local_project.git_repo.head.commit}\n"
-            )
+            description = f"Downstream commit: {self.dg.local_project.commit_hexsha}\n"
 
             commit_msg = f"sync from downstream branch {dist_git_branch!r}"
             pr_title = f"Update from downstream branch {dist_git_branch!r}"
@@ -454,62 +452,9 @@ class PackitAPI:
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
-        current_git_describe_version = self.up.get_current_version()
-        upstream_ref = upstream_ref or self.package_config.upstream_ref
-
-        if self.up.local_project.git_repo.head.is_detached:
-            commit = self.up.local_project.git_repo.head.commit.hexsha[:8]
-        else:
-            commit = self.up.local_project.git_repo.active_branch.commit.hexsha[:8]
-
-        if self.up.running_in_service():
-            relative_to = Path(self.config.command_handler_work_dir)
-        else:
-            relative_to = Path.cwd()
-
-        if upstream_ref:
-            # source-git code: fetch the tarball and don't check out the upstream ref
-            self.up.fetch_upstream_archive()
-            source_dir = self.up.absolute_specfile_dir.relative_to(relative_to)
-            if self.up.with_action(action=ActionName.create_patches):
-                patches = self.up.create_patches(
-                    upstream=upstream_ref,
-                    destination=str(self.up.absolute_specfile_dir),
-                )
-                self.up.add_patches_to_specfile(patches)
-
-            old_release = self.up.specfile.get_release_number()
-            try:
-                old_release_int = int(old_release)
-                new_release = old_release_int + 1
-            except ValueError:
-                new_release = old_release
-            release_to_update = f"{new_release}.g{commit}"
-            msg = f"Downstream changes ({commit})"
-            self.up.specfile.set_spec_version(
-                release=release_to_update, changelog_entry=f"- {msg}"
-            )
-        else:
-            archive = self.up.create_archive(version=current_git_describe_version)
-            env = {
-                "PACKIT_PROJECT_VERSION": current_git_describe_version,
-                "PACKIT_PROJECT_COMMIT": commit,
-                "PACKIT_PROJECT_ARCHIVE": archive,
-            }
-            if self.up.with_action(action=ActionName.fix_spec, env=env):
-                self.up.fix_spec(
-                    archive=archive, version=current_git_describe_version, commit=commit
-                )
-            if self.up.local_project.working_dir.startswith(str(relative_to)):
-                source_dir = Path(self.up.local_project.working_dir).relative_to(
-                    relative_to
-                )
-            else:
-                source_dir = Path(self.up.local_project.working_dir)
-
-        # > Method that iterates over all sources and downloads ones,
-        # > which contain URL instead of just a file.
-        self.up.specfile.download_remote_sources()
+        source_dir = self.up.prepare_upstream_for_srpm_creation(
+            upstream_ref=upstream_ref
+        )
 
         srpm_path = self.up.create_srpm(
             srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
