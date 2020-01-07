@@ -384,8 +384,19 @@ class Upstream(PackitRepositoryBase):
                             self._local_project.working_dir, archive_name.strip()
                         )
                         if archive_path.is_file():
-                            logger.info(f"Created archive: {archive_name.strip()}")
-                            return archive_name
+                            logger.info(f"Created archive: {archive_path}")
+                            if (
+                                archive_path.parent.absolute()
+                                != self.absolute_specfile_dir
+                            ):
+                                archive_in_spec_dir = (
+                                    self.absolute_specfile_dir / archive_path.name
+                                )
+                                logger.info(
+                                    f"Linking to the specfile directory: {archive_in_spec_dir}"
+                                )
+                                archive_in_spec_dir.symlink_to(archive_path)
+                            return archive_path.name
                     except OSError as ex:
                         # File too long
                         if ex.errno == 36:
