@@ -33,7 +33,11 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
 from packit.constants import COMMON_ARCHIVE_EXTENSIONS
-from packit.exceptions import PackitException, FailedCreateSRPM
+from packit.exceptions import (
+    PackitException,
+    PackitSRPMNotFoundException,
+    PackitFailedToCreateSRPMException,
+)
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
@@ -548,14 +552,17 @@ class Upstream(PackitRepositoryBase):
             out = self.command_handler.run_command(cmd, return_output=True).strip()
         except PackitException as ex:
             logger.error(f"Failed to create SRPM: {ex!r}")
-            raise FailedCreateSRPM("Failed to create SRPM.")
+            raise PackitFailedToCreateSRPMException("Failed to create SRPM.")
         logger.debug(f"{out}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
         reg = r": (.+\.src\.rpm)$"
         try:
             the_srpm = re.findall(reg, out)[0]
         except IndexError:
-            raise PackitException("SRPM cannot be found, something is wrong.")
+            raise PackitSRPMNotFoundException(
+                "SRPM cannot be found, something is wrong."
+            )
+
         logger.info("SRPM is %s", the_srpm)
         if srpm_path:
             shutil.move(the_srpm, srpm_path)
