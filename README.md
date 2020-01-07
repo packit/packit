@@ -1,4 +1,6 @@
-# Pack It! [![Build Status](https://zuul-ci.org/gated.svg)](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit)
+[![Build Status](https://zuul-ci.org/gated.svg)](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit)
+
+![Packit](design/export/logo-extended.png)
 
 ## Elevator pitch
 
@@ -134,3 +136,7 @@ Options:
 * iptables (@jsynacek)
 
 For the up to date list of projects which are using packit, [click here](https://github.com/packit-service/research/blob/master/onboard/status.md).
+
+## Logo design
+
+Created by `Marián Mrva` - [@surfer19](https://github.com/surfer19)
