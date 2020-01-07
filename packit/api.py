@@ -39,7 +39,11 @@ from packit.config import Config, PackageConfig
 from packit.constants import SYNCING_NOTE
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
-from packit.exceptions import PackitException
+from packit.exceptions import (
+    PackitException,
+    PackitSRPMException,
+    PackitSRPMNotFoundException,
+)
 from packit.local_project import LocalProject
 from packit.status import Status
 from packit.sync import sync_files
@@ -452,15 +456,28 @@ class PackitAPI:
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
-        source_dir = self.up.prepare_upstream_for_srpm_creation(
-            upstream_ref=upstream_ref
-        )
+        try:
+            source_dir = self.up.prepare_upstream_for_srpm_creation(
+                upstream_ref=upstream_ref
+            )
+        except Exception as ex:
+            raise PackitSRPMException(
+                f"Preparing of the upstream to the SRPM build failed: {ex}"
+            ) from ex
 
-        srpm_path = self.up.create_srpm(
-            srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
-        )
+        try:
+            srpm_path = self.up.create_srpm(
+                srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
+            )
+        except PackitSRPMException:
+            raise
+        except Exception as ex:
+            raise PackitSRPMException(
+                f"An unexpected error occurred when creating the SRPM: {ex}"
+            ) from ex
+
         if not srpm_path.exists():
-            raise PackitException(
+            raise PackitSRPMNotFoundException(
                 f"SRPM was created successfully, but can't be found at {srpm_path}"
             )
         return srpm_path
