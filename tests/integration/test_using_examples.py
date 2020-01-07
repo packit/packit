@@ -35,6 +35,7 @@ from tests.spellbook import (
     get_test_config,
     UP_SNAPD,
     UP_OSBUILD,
+    UP_EDD,
     DG_OGR,
     build_srpm,
 )
@@ -44,6 +45,7 @@ from tests.spellbook import (
     params=[
         (UP_SNAPD, "2.41", "https://github.com/snapcore/snapd"),
         (UP_OSBUILD, "2", "https://github.com/osbuild/osbuild"),
+        (UP_EDD, "0.3", "https://github.com/psss/edd"),
         (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
     ]
 )

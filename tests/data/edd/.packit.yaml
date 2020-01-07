@@ -1,0 +1,12 @@
+specfile_path: edd.spec
+
+actions:
+  create-archive:
+  - make packit-tarball
+
+jobs:
+- job: copr_build
+  metadata:
+    targets:
+    - fedora-all
+  trigger: pull_request
