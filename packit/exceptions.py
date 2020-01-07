@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from deprecated import deprecated
 
 
 class PackitException(Exception):
@@ -50,5 +51,18 @@ class PackitInvalidConfigException(PackitConfigException):
     """ provided configuration file is not valid """
 
 
+@deprecated(reason="Use the PackitFailedToCreateSRPMException instead.")
 class FailedCreateSRPM(PackitException):
+    """ Failed to create SRPM """
+
+
+class PackitSRPMException(PackitException):
+    """ Problem with the SRPM """
+
+
+class PackitSRPMNotFoundException(PackitSRPMException):
+    """ SRPM created but not found """
+
+
+class PackitFailedToCreateSRPMException(PackitSRPMException):
     """ Failed to create SRPM """
