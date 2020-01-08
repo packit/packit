@@ -1,0 +1,15 @@
+specfile_path: Fedora/vsftpd.spec
+synced_files:
+- src: Fedora/*
+  dest: .
+
+actions:
+  get-current-version:
+    - echo "v3.0.3"
+
+jobs:
+- job: copr_build
+  metadata:
+    targets:
+    - fedora-all
+  trigger: pull_request
