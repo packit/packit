@@ -30,11 +30,12 @@ from tests.functional.spellbook import call_real_packit
 from tests.spellbook import build_srpm
 
 
-def test_srpm_command_for_path(upstream_or_distgit_path):
-    call_real_packit(parameters=["--debug", "srpm", str(upstream_or_distgit_path)])
-    srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
-    assert srpm_path.exists()
-    build_srpm(srpm_path)
+def test_srpm_command_for_path(upstream_or_distgit_path, tmpdir):
+    with cwd(tmpdir):
+        call_real_packit(parameters=["--debug", "srpm", str(upstream_or_distgit_path)])
+        srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
+        assert srpm_path.exists()
+        build_srpm(srpm_path)
 
 
 def test_srpm_command_for_path_with_multiple_sources(

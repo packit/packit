@@ -24,7 +24,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Optional, List, Tuple, Union
+from typing import Optional, List, Tuple
 
 import git
 from packaging import version
@@ -519,16 +519,10 @@ class Upstream(PackitRepositoryBase):
             )
         self.specfile.set_tag(full_name, archive)
 
-    def create_srpm(
-        self,
-        srpm_path: str = None,
-        source_dir: Union[str, Path] = None,
-        srpm_dir: str = None,
-    ) -> Path:
+    def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """
         Create SRPM from the actual content of the repo
 
-        :param source_dir: path with the source files (defaults to dir with specfile)
         :param srpm_path: path to the srpm
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
@@ -539,11 +533,14 @@ class Upstream(PackitRepositoryBase):
         else:
             srpm_dir = srpm_dir or os.getcwd()
             rpmbuild_dir = str(self.absolute_specfile_dir)
+
         cmd = [
             "rpmbuild",
             "-bs",
             "--define",
-            f"_sourcedir {source_dir or rpmbuild_dir}",
+            f"_sourcedir {rpmbuild_dir}",
+            f"--define",
+            f"_srcdir {rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
@@ -558,7 +555,7 @@ class Upstream(PackitRepositoryBase):
             f"_rpmdir {rpmbuild_dir}",
             "--define",
             f"_buildrootdir {rpmbuild_dir}",
-            self.absolute_specfile_path.name,
+            self.package_config.specfile_path,
         ]
         logger.debug(
             "SRPM build command: " + " ".join([f'"{cmd_part}"' for cmd_part in cmd])
@@ -566,9 +563,7 @@ class Upstream(PackitRepositoryBase):
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
         logger.debug("present srpms = %s", present_srpms)
         try:
-            out = self.command_handler.run_command(
-                cmd, return_output=True, cwd=self.absolute_specfile_dir
-            ).strip()
+            out = self.command_handler.run_command(cmd, return_output=True).strip()
         except PackitException as ex:
             logger.error(f"Failed to create SRPM: {ex!r}")
             raise PackitFailedToCreateSRPMException("Failed to create SRPM.")
@@ -590,7 +585,7 @@ class Upstream(PackitRepositoryBase):
             return Path(self.local_project.working_dir).joinpath(the_srpm)
         return Path(the_srpm)
 
-    def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None) -> Path:
+    def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None):
         """
         1. determine version
         2. create an archive or download upstream and create patches for sourcegit
@@ -598,37 +593,21 @@ class Upstream(PackitRepositoryBase):
         4. download the remote sources
 
         :param upstream_ref: str, needed for the sourcegit mode
-        :return: source directory where you can start the SRPM build
         """
         current_git_describe_version = self.get_current_version()
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
-        if self.running_in_service():
-            relative_to = Path(self.config.command_handler_work_dir)
-        else:
-            relative_to = Path.cwd()
-
         if upstream_ref:
-            source_dir = self.prepare_upstream_using_source_git(
-                relative_to, upstream_ref
-            )
+            self.prepare_upstream_using_source_git(upstream_ref)
         else:
             created_archive = self.create_archive(version=current_git_describe_version)
             self.fix_specfile_to_use_local_archive(
                 archive=created_archive, archive_version=current_git_describe_version
             )
-            if self.local_project.working_dir.startswith(str(relative_to)):
-                source_dir = Path(self.local_project.working_dir).relative_to(
-                    relative_to
-                )
-            else:
-                source_dir = Path(self.local_project.working_dir)
 
         # > Method that iterates over all sources and downloads ones,
         # > which contain URL instead of just a file.
         self.specfile.download_remote_sources()
-
-        return source_dir
 
     def fix_specfile_to_use_local_archive(self, archive, archive_version) -> None:
         """
@@ -648,7 +627,7 @@ class Upstream(PackitRepositoryBase):
                 archive=archive, version=archive_version, commit=current_commit
             )
 
-    def prepare_upstream_using_source_git(self, relative_to, upstream_ref) -> Path:
+    def prepare_upstream_using_source_git(self, upstream_ref):
         """
         Fetch the tarball and don't check out the upstream ref.
 
@@ -657,7 +636,6 @@ class Upstream(PackitRepositoryBase):
         :return: the source directory where we can build the SRPM
         """
         self.fetch_upstream_archive()
-        source_dir = self.absolute_specfile_dir.relative_to(relative_to)
         self.create_patches_and_update_specfile(upstream_ref)
         old_release = self.specfile.get_release_number()
         try:
@@ -672,7 +650,6 @@ class Upstream(PackitRepositoryBase):
         self.specfile.set_spec_version(
             release=release_to_update, changelog_entry=f"- {msg}"
         )
-        return source_dir
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
         """
