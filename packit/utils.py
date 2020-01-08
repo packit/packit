@@ -83,7 +83,7 @@ class StreamLogger(threading.Thread):
 def run_command(
     cmd: Union[List[str], str],
     error_message: str = None,
-    cwd: str = None,
+    cwd: Union[str, Path] = None,
     fail: bool = True,
     output: bool = False,
     env: Optional[Dict] = None,
@@ -105,7 +105,7 @@ def run_command(
 
     logger.debug("cmd = '%s'", " ".join(cmd))
 
-    cwd = cwd or str(Path.cwd())
+    cwd = str(cwd) or str(Path.cwd())
     error_message = error_message or f"Command {cmd} failed."
 
     # we need to pass complete env to Popen, otherwise we lose everything from os.environ

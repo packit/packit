@@ -1,12 +1,12 @@
 import logging
-from typing import Dict, Type, List, Optional
+from pathlib import Path
+from typing import Dict, Type, List, Optional, Union
 
 from packit import utils
 from packit.config import RunCommandType, Config
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
-
 
 RUN_COMMAND_HANDLER_MAPPING: Dict[RunCommandType, Type["CommandHandler"]] = {}
 
@@ -31,7 +31,11 @@ class CommandHandler:
         self.config = config
 
     def run_command(
-        self, command: List[str], return_output: bool = True, env: Optional[Dict] = None
+        self,
+        command: List[str],
+        return_output: bool = True,
+        env: Optional[Dict] = None,
+        cwd: Union[str, Path] = None,
     ):
         """
         exec a command
@@ -39,6 +43,7 @@ class CommandHandler:
         :param command: the command
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
+        :param cwd: working directory to run command in
         """
         raise NotImplementedError("This should be implemented")
 
@@ -52,7 +57,11 @@ class LocalCommandHandler(CommandHandler):
     name = RunCommandType.local
 
     def run_command(
-        self, command: List[str], return_output: bool = True, env: Optional[Dict] = None
+        self,
+        command: List[str],
+        return_output: bool = True,
+        env: Optional[Dict] = None,
+        cwd: Union[str, Path] = None,
     ):
         """
         exec a command
@@ -60,10 +69,11 @@ class LocalCommandHandler(CommandHandler):
         :param command: the command
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
+        :param cwd: working directory to run command in
         """
         return utils.run_command(
             cmd=command,
-            cwd=self.local_project.working_dir,
+            cwd=cwd or self.local_project.working_dir,
             output=return_output,
             env=env,
         )
@@ -74,7 +84,11 @@ class SandcastleCommandHandler(CommandHandler):
     name = RunCommandType.sandcastle
 
     def run_command(
-        self, command: List[str], return_output: bool = True, env: Optional[Dict] = None
+        self,
+        command: List[str],
+        return_output: bool = True,
+        env: Optional[Dict] = None,
+        cwd: Union[str, Path] = None,
     ):
         """
         Executes command in a sandbox provided by sandcastle.
@@ -82,13 +96,14 @@ class SandcastleCommandHandler(CommandHandler):
         :param command: the command
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
+        :param cwd: working directory to run command in
         """
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
         from sandcastle.api import Sandcastle, MappedDir
 
         md = MappedDir(
             local_dir=self.local_project.working_dir,
-            path=self.config.command_handler_work_dir,
+            path=cwd or self.config.command_handler_work_dir,
             with_interim_pvc=True,
         )
         sandcastle = Sandcastle(
