@@ -138,10 +138,15 @@ def run_command(
         logger.error("Command %s failed", shell.args)
         logger.error("%s", error_message)
         if fail:
+            stderr_output = stderr.get_output()
+            stdout_output = stdout.get_output()
+            if output:
+                logger.debug(f"Command stderr:\n{stderr_output.decode()}")
+                logger.debug(f"Command stdout:\n{stdout_output.decode()}")
             raise PackitCommandFailedError(
                 f"Command {shell.args!r} failed: {error_message}",
-                stdout_output=stdout.get_output(),
-                stderr_output=stderr.get_output(),
+                stdout_output=stdout_output,
+                stderr_output=stderr_output,
             )
         success = False
     else:

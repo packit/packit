@@ -136,7 +136,7 @@ def call_packit(fnc=None, parameters=None, envs=None, working_dir=None):
 
 
 def build_srpm(path: Path):
-    run_command(["rpmbuild", "--rebuild", str(path)])
+    run_command(["rpmbuild", "--rebuild", str(path)], output=True)
 
 
 def can_a_module_be_imported(module_name):
