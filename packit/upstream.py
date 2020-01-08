@@ -326,7 +326,7 @@ class Upstream(PackitRepositoryBase):
             action=ActionName.get_current_version
         )
         if action_output:
-            return action_output[-1]
+            return action_output[-1].strip()
 
         ver = self.command_handler.run_command(
             self.package_config.current_version_command, return_output=True
