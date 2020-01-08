@@ -418,6 +418,9 @@ class Upstream(PackitRepositoryBase):
                 "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
             )
         archive_name = f"{dir_name}{archive_extension}"
+        relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
+            self.local_project.working_dir
+        )
 
         if self.package_config.create_tarball_command:
             archive_cmd = self.package_config.create_tarball_command
@@ -426,7 +429,7 @@ class Upstream(PackitRepositoryBase):
                 "git",
                 "archive",
                 "-o",
-                archive_name,
+                str(relative_archive_path),
                 "--prefix",
                 f"{dir_name}/",
                 "HEAD",
