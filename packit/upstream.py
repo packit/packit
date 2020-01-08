@@ -558,12 +558,17 @@ class Upstream(PackitRepositoryBase):
             f"_rpmdir {rpmbuild_dir}",
             "--define",
             f"_buildrootdir {rpmbuild_dir}",
-            self.package_config.specfile_path,
+            self.absolute_specfile_path.name,
         ]
+        logger.debug(
+            "SRPM build command: " + " ".join([f'"{cmd_part}"' for cmd_part in cmd])
+        )
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
         logger.debug("present srpms = %s", present_srpms)
         try:
-            out = self.command_handler.run_command(cmd, return_output=True).strip()
+            out = self.command_handler.run_command(
+                cmd, return_output=True, cwd=self.absolute_specfile_dir
+            ).strip()
         except PackitException as ex:
             logger.error(f"Failed to create SRPM: {ex!r}")
             raise PackitFailedToCreateSRPMException("Failed to create SRPM.")
