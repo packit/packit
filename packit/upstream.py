@@ -355,7 +355,7 @@ class Upstream(PackitRepositoryBase):
     def create_archive(self, version: str = None) -> str:
         """
         Create archive, using `git archive` by default, from the content of the upstream
-        repository, only committed changes are present in the archive
+        repository, only committed changes are present in the archive.
         """
         version = version or self.get_current_version()
 
@@ -388,7 +388,13 @@ class Upstream(PackitRepositoryBase):
 
         return self._create_archive_using_default_way(dir_name, env, version)
 
-    def _create_archive_using_default_way(self, dir_name, env, version):
+    def _create_archive_using_default_way(self, dir_name, env, version) -> str:
+        """
+        Create an archive using git archive or the configured command.
+        Archive will be places in the specfile_directory.
+
+        :return: name of the archive
+        """
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
             raise PackitException(
@@ -416,12 +422,24 @@ class Upstream(PackitRepositoryBase):
         return archive_name
 
     def _add_link_to_archive_from_specdir_if_needed(self, archive_path: Path) -> None:
+        """
+        Create a relative symlink to the archive from in the specfile directory.
+
+        :param archive_path: relative path to the archive from the specfile dir
+        """
         if archive_path.parent.absolute() != self.absolute_specfile_dir:
             archive_in_spec_dir = self.absolute_specfile_dir / archive_path.name
             logger.info(f"Linking to the specfile directory: {archive_in_spec_dir}")
             archive_in_spec_dir.symlink_to(archive_path)
 
     def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
+        """
+        Parse the archive name from the output in the reverse order.
+        - Check if the line is a path and if it exists.
+
+        :param outputs: given output of the custom command
+        :return: Path to the archive if we found any.
+        """
         for output in reversed(outputs):
             for archive_name in reversed(output.splitlines()):
                 try:
