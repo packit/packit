@@ -317,12 +317,8 @@ echo 'Build'
 
 %install
 echo 'Install'
-cp ./.packit.yaml %{buildroot}/
-
 
 %files
-/.packit.yaml
-
 
 %post
 %if 0%{?rhel} == 7
