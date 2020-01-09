@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from typing import Union
+
 from deprecated import deprecated
 
 
@@ -29,10 +31,23 @@ class PackitException(Exception):
 class PackitCommandFailedError(PackitException):
     """ A command failed """
 
-    def __init__(self, *args, stdout_output=None, stderr_output=None):
+    def __init__(
+        self,
+        *args,
+        stdout_output: Union[str, bytes] = None,
+        stderr_output: Union[str, bytes] = None
+    ):
         super().__init__(*args)
-        self.stdout_output = stdout_output
-        self.stderr_output = stderr_output
+        self.stdout_output = (
+            stdout_output.decode()
+            if isinstance(stdout_output, bytes)
+            else stdout_output
+        )
+        self.stderr_output = (
+            stderr_output.decode()
+            if isinstance(stderr_output, bytes)
+            else stderr_output
+        )
 
 
 class PackitConfigException(PackitException):
