@@ -1,122 +1,42 @@
 # 0.8.0
 
-* Add docs for methods related to the archive
-* Refactor the default archive creation
-* Refactor the custom archive creation
-* Add vsftpd to the testing examples
-* Fix the snapd test directory
-* Log the stdout/stderr for failed commands
-* Fix the `cwd` argument of the `run_command` function
-* Don't handle source_dir since it's always specfile-dir
-* Run the srpm build from the spec-folder
-* Save the defaultly-created archive in the spec-dir
-* Strip the output from the get-current-version action
-* Allow setting cwd in command handlers
-* Add edd to srpm tests
-* Link the custom-created archive from the spec-directory
-* Fix the newline at the end of file
-* Update mouth of a robot
-* Add version of logo for github apps
-* Update README logo
-* Update logo design with fedora style
-* Add logo guideline
-* Update readme with logo
-* Add logo design
-* Add tests for the copr build
-* Raise an exception when there is no copr project owner
-* Catch errors when creating the SRPM
-* Update exceptions related to SRPM
-* Better name for LocalProject.commit and another usecase for it
-* Refactor the preparation of the SRPM build
-* Test on specfile with multiple sources
-* Download URL sources before srpm build
-* tidy tests
-* Do not skip version update in fix_spec step on prep update error
-* [Dockerfile.*] FROM fedora:31
-* Reword the exception when no archive found after create-archive action
-* Remove else from 'for' when no 'break' present
-* Fix the docstring for CoprHelper
-* Rename copr.py to copr_helper.py to avoid problems
-* Extract the copr related code to the dedicated class
-* Revert "Marshmallow schema implementation"
-* Marshmallow schema implementation
-* Change test
-* Remove print
-* Add default jobs
-* Catch the failed fedpkg-build and nicer build output
-* Refresh specfile after each run of the propose-update
-* Remove f32 from aliases
-* Copy get_release_number from the old rebasehelper for the compatibility
-* amend previous commit
-* Add defaults for upstream_package_name, downstream_package_name
-* Creating of the pagure pull-requests are turned-on by default
-* aliases: more helpful error message
-* Add docs to aliases.py
-* Allow aliases in the 'packit create-update'
-* Allow aliases in the 'packit propose-update'
-* Allow aliases in the 'packit sync-from-downstream'
-* Allow `rawhide` as a valid target
-* Allow aliases in the 'packit copr-build'
-* Add 'fedora-all' alias
-* Allow aliases in the 'packit build'
-* Add alias mapping to version, build-target and branch
-* Add test for get_copr_builds
-* Add number_of_builds parameter, do not use package_name
-* Packit status - show latest Copr builds
-* [make check_in_container] Don't pass TESTS_TARGET
-* Remove notify from JobConfig
-* srcgit: patches can have undecodable chars
-* Setup testing-farm
-* readme: we track onboarding elsewhere
-* update Upstream.create_pull() according ogr update, added unit tests
-* Change item[0] to item.src
-* Change the path of config file
-* Propose-update - sync config file and spec file by default
-* Process stdout, stderr in separate threads
-* Get realtime output from process
-* Replace __name__ by string representations of functions
-* Fix cyclic imports
-* Simplify imports
-* Split config.py into multiple files
-* Add pre-commit changes
-* Remove unused data folder
-* Create a test case for srpm command when spec is not in the root
-* Skip the recording tests
-* Update tests structure in the contribution guide
-* Use dict for storing responses with requre
-* Correct path to the integration tests
-* Fix after rebase
-* Use new requre format
-* Do not need to transform path to str when cwd
-* Update zuul for the new test structure
-* Restructure the tests
-* Do not run getcwd in the decorator attribute
-* Revert "skip test test_version_change_new_rebaseheler"
-* Revert "recording test data: remove git repos"
-* Clearly divide and specify test types
-* [.packit.yaml] Add F31, remove F29 (EOL 2019-11-26)
-* Fix parameter name in function
-* Add test for write_spec_content
-* Support both version methods to write spec content
-* Update .github/stale.yml
-* Tweak the stale-bot config
-* Add test case for macro in Version tag
-* Rename the file with rebase-helper methods, add docstring
-* Replace using bumpspec by rebase-helper functionality
-* Move rebase-helper code to a subclass
-* Check whether the head is detached
-* Catch an error when SRPM runs in a repo with detached head
-* Add config for stale bot
-* test long lines in create-archive
-* refactoring
-* Warn in get_package_config_from_repo() when no config found
-* Add missing f in python fstring
-* Use full path for validating archive exists
-* Split longer action output for create-archive
-* style and type annotation changes
-* Added backard compatibility for Python 3.6
-* Fixed: 'Event loop is closed' while calling status from API more that once
-* Add rebase check to pre-commit
+Packit has a [new logo](https://github.com/packit-service/packit/blob/master/design/export/logo.svg)!
+
+## Features:
+- Marshmallow object schema was implemented.
+- `config file` and `spec file` are synced by default.
+- We use testing farm for sanity tests.
+- `packit status` command shows latest copr builds.
+- Target aliases (currently fedora-development, fedora-stable, fedora-all) can now be used in the packit config file.
+- `upstream_package_name` and `downstream_package_name` are no longer required in package config. github repository name is the default value both.
+- If no jobs are defined in .packit.yaml, packit by default runs build job on fedora-stable targets and propose_downstream on fedora-all branches.
+- Image version of packit is now fedora 31
+- packit can now download URL package sources before SRPM build.
+- When doing a new update in Fedora dist-git, packit now by default creates a new pull request instead of pushing directly to dist-git.
+- Build command has nicer output.
+- `create-archive` uses fullpath for validation and splits long lines of output.
+- SRPM runs also in a repo with detached head.
+- Log output from subprocesses is in realtime.
+- Specfile is refreshed after each run of the propose-update.
+- When there is no copr project owner, exception is raised
+- While building specfile from custom specfile, the archive is linked from the spec-directory.
+- Setting cwd in command handlers is allowed.
+- SRPM build is run from the folder containing specfile.
+
+## Fixes:
+- Consecutive API call for status works.
+- rebase-helper breaking changes in new version is fixed.
+- fixed updating version on srpm build
+
+## Minor:
+- pre-commit check requires rebased branch.
+- fedora version in .packit.yaml config is updated.
+- Code related to copr id now extracted to dedicated class.
+- There is a warning in logs when there is  no packit config in repository.
+- Tests are now restructured and use new structure or `requre`, also containing tests for copr.
+- The stale bot is now set with up-to-date config.
+- The imports of packit are simplier.
+- The preparation of SRPM build has been refactored including new exceptions.
 
 # 0.7.1
 
