@@ -359,10 +359,11 @@ class Upstream(PackitRepositoryBase):
         """
         version = version or self.get_current_version()
 
-        if self.package_config.upstream_package_name:
-            dir_name = f"{self.package_config.upstream_package_name}-{version}"
-        else:
-            dir_name = f"{self.package_config.downstream_package_name}-{version}"
+        package_name = (
+            self.package_config.upstream_package_name
+            or self.package_config.downstream_package_name
+        )
+        dir_name = f"{package_name}-{version}"
         logger.debug("name + version = %s", dir_name)
 
         env = {
@@ -385,6 +386,9 @@ class Upstream(PackitRepositoryBase):
             self._add_link_to_archive_from_specdir_if_needed(archive_path)
             return archive_path.name
 
+        return self._create_archive_using_default_way(dir_name, env, version)
+
+    def _create_archive_using_default_way(self, dir_name, env, version):
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
             raise PackitException(
@@ -396,7 +400,6 @@ class Upstream(PackitRepositoryBase):
         relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
             self.local_project.working_dir
         )
-
         if self.package_config.create_tarball_command:
             archive_cmd = self.package_config.create_tarball_command
         else:
