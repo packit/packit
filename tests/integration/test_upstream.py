@@ -33,12 +33,12 @@ import pytest
 
 from flexmock import flexmock
 from ogr import GithubService
+from packit.config import Config, get_local_package_config
+from packit.exceptions import PackitException, PackitSRPMException
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils import cwd
-from packit.config import Config, get_local_package_config
-from packit.exceptions import PackitException
 from tests.spellbook import (
     EMPTY_CHANGELOG,
     initiate_git_repo,
@@ -187,9 +187,9 @@ def test_fix_spec(upstream_instance):
 def test_create_srpm(upstream_instance, tmpdir):
     u, ups = upstream_instance
 
-    with pytest.raises(PackitException) as exc:
+    with pytest.raises(PackitSRPMException) as exc:
         ups.create_srpm()
-    assert "Failed to create SRPM." == str(exc.value)
+    assert "Bad source" in str(exc.value)
 
     ups.create_archive()
     srpm = ups.create_srpm()
