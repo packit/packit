@@ -376,39 +376,14 @@ class Upstream(PackitRepositoryBase):
             if not outputs:
                 raise PackitException("No output from create-archive action.")
 
-            # one of the returned strings has to contain existing archive name
-            for output in reversed(outputs):
-                for archive_name in reversed(output.splitlines()):
-                    try:
-                        archive_path = Path(
-                            self._local_project.working_dir, archive_name.strip()
-                        )
-                        if archive_path.is_file():
-                            logger.info(f"Created archive: {archive_path}")
-                            if (
-                                archive_path.parent.absolute()
-                                != self.absolute_specfile_dir
-                            ):
-                                archive_in_spec_dir = (
-                                    self.absolute_specfile_dir / archive_path.name
-                                )
-                                logger.info(
-                                    f"Linking to the specfile directory: {archive_in_spec_dir}"
-                                )
-                                archive_in_spec_dir.symlink_to(archive_path)
-                            return archive_path.name
-                    except OSError as ex:
-                        # File too long
-                        if ex.errno == 36:
-                            logger.error(
-                                f"Skipping long output command output while getting archive name"
-                            )
-                            continue
-                        raise ex
-            raise PackitException(
-                "The create-archive action did not output a path to the generated archive. "
-                "Please make sure that an absolute path to the archive is printed."
-            )
+            archive_path = self._get_archive_path_from_output(outputs)
+            if not archive_path:
+                raise PackitException(
+                    "The create-archive action did not output a path to the generated archive. "
+                    "Please make sure that you have valid path in the single line of the output."
+                )
+            self._add_link_to_archive_from_specdir_if_needed(archive_path)
+            return archive_path.name
 
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
@@ -436,6 +411,32 @@ class Upstream(PackitRepositoryBase):
             ]
         self.command_handler.run_command(archive_cmd, return_output=True, env=env)
         return archive_name
+
+    def _add_link_to_archive_from_specdir_if_needed(self, archive_path: Path) -> None:
+        if archive_path.parent.absolute() != self.absolute_specfile_dir:
+            archive_in_spec_dir = self.absolute_specfile_dir / archive_path.name
+            logger.info(f"Linking to the specfile directory: {archive_in_spec_dir}")
+            archive_in_spec_dir.symlink_to(archive_path)
+
+    def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
+        for output in reversed(outputs):
+            for archive_name in reversed(output.splitlines()):
+                try:
+                    archive_path = Path(
+                        self._local_project.working_dir, archive_name.strip()
+                    )
+                    if archive_path.is_file():
+                        logger.info(f"Created archive: {archive_path}")
+                        return archive_path
+                except OSError as ex:
+                    # File too long
+                    if ex.errno == 36:
+                        logger.error(
+                            f"Skipping long output command output while getting archive name"
+                        )
+                        continue
+                    raise ex
+        return None
 
     def fix_spec(self, archive: str, version: str, commit: str):
         """
