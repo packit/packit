@@ -38,6 +38,7 @@ from tests.spellbook import (
     UP_EDD,
     DG_OGR,
     build_srpm,
+    UP_VSFTPD,
 )
 
 
@@ -46,6 +47,7 @@ from tests.spellbook import (
         (UP_SNAPD, "2.41", "https://github.com/snapcore/snapd"),
         (UP_OSBUILD, "2", "https://github.com/osbuild/osbuild"),
         (UP_EDD, "0.3", "https://github.com/psss/edd"),
+        (UP_VSFTPD, "3.0.3", "https://github.com/olysonek/vsftpd"),
         (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
     ]
 )

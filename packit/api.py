@@ -457,18 +457,14 @@ class PackitAPI:
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
         try:
-            source_dir = self.up.prepare_upstream_for_srpm_creation(
-                upstream_ref=upstream_ref
-            )
+            self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
         except Exception as ex:
             raise PackitSRPMException(
                 f"Preparing of the upstream to the SRPM build failed: {ex}"
             ) from ex
 
         try:
-            srpm_path = self.up.create_srpm(
-                srpm_path=output_file, srpm_dir=srpm_dir, source_dir=source_dir
-            )
+            srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
         except PackitSRPMException:
             raise
         except Exception as ex:

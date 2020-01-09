@@ -44,6 +44,7 @@ UP_COCKPIT_OSTREE = DATA_DIR / "cockpit-ostree"
 UP_OSBUILD = DATA_DIR / "osbuild"
 UP_SNAPD = DATA_DIR / "snapd"
 UP_EDD = DATA_DIR / "edd"
+UP_VSFTPD = DATA_DIR / "vsftpd"
 TARBALL_NAME = "beerware-0.1.0.tar.gz"
 SOURCEGIT_UPSTREAM = DATA_DIR / "sourcegit" / "upstream"
 SOURCEGIT_SOURCEGIT = DATA_DIR / "sourcegit" / "source_git"
@@ -136,7 +137,7 @@ def call_packit(fnc=None, parameters=None, envs=None, working_dir=None):
 
 
 def build_srpm(path: Path):
-    run_command(["rpmbuild", "--rebuild", str(path)])
+    run_command(["rpmbuild", "--rebuild", str(path)], output=True)
 
 
 def can_a_module_be_imported(module_name):

@@ -24,7 +24,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Optional, List, Tuple, Union
+from typing import Optional, List, Tuple
 
 import git
 from packaging import version
@@ -326,7 +326,7 @@ class Upstream(PackitRepositoryBase):
             action=ActionName.get_current_version
         )
         if action_output:
-            return action_output[-1]
+            return action_output[-1].strip()
 
         ver = self.command_handler.run_command(
             self.package_config.current_version_command, return_output=True
@@ -355,14 +355,15 @@ class Upstream(PackitRepositoryBase):
     def create_archive(self, version: str = None) -> str:
         """
         Create archive, using `git archive` by default, from the content of the upstream
-        repository, only committed changes are present in the archive
+        repository, only committed changes are present in the archive.
         """
         version = version or self.get_current_version()
 
-        if self.package_config.upstream_package_name:
-            dir_name = f"{self.package_config.upstream_package_name}-{version}"
-        else:
-            dir_name = f"{self.package_config.downstream_package_name}-{version}"
+        package_name = (
+            self.package_config.upstream_package_name
+            or self.package_config.downstream_package_name
+        )
+        dir_name = f"{package_name}-{version}"
         logger.debug("name + version = %s", dir_name)
 
         env = {
@@ -376,40 +377,24 @@ class Upstream(PackitRepositoryBase):
             if not outputs:
                 raise PackitException("No output from create-archive action.")
 
-            # one of the returned strings has to contain existing archive name
-            for output in reversed(outputs):
-                for archive_name in reversed(output.splitlines()):
-                    try:
-                        archive_path = Path(
-                            self._local_project.working_dir, archive_name.strip()
-                        )
-                        if archive_path.is_file():
-                            logger.info(f"Created archive: {archive_path}")
-                            if (
-                                archive_path.parent.absolute()
-                                != self.absolute_specfile_dir
-                            ):
-                                archive_in_spec_dir = (
-                                    self.absolute_specfile_dir / archive_path.name
-                                )
-                                logger.info(
-                                    f"Linking to the specfile directory: {archive_in_spec_dir}"
-                                )
-                                archive_in_spec_dir.symlink_to(archive_path)
-                            return archive_path.name
-                    except OSError as ex:
-                        # File too long
-                        if ex.errno == 36:
-                            logger.error(
-                                f"Skipping long output command output while getting archive name"
-                            )
-                            continue
-                        raise ex
-            raise PackitException(
-                "The create-archive action did not output a path to the generated archive. "
-                "Please make sure that an absolute path to the archive is printed."
-            )
+            archive_path = self._get_archive_path_from_output(outputs)
+            if not archive_path:
+                raise PackitException(
+                    "The create-archive action did not output a path to the generated archive. "
+                    "Please make sure that you have valid path in the single line of the output."
+                )
+            self._add_link_to_archive_from_specdir_if_needed(archive_path)
+            return archive_path.name
 
+        return self._create_archive_using_default_way(dir_name, env, version)
+
+    def _create_archive_using_default_way(self, dir_name, env, version) -> str:
+        """
+        Create an archive using git archive or the configured command.
+        Archive will be places in the specfile_directory.
+
+        :return: name of the archive
+        """
         archive_extension = self.get_archive_extension(dir_name, version)
         if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
             raise PackitException(
@@ -418,7 +403,9 @@ class Upstream(PackitRepositoryBase):
                 "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
             )
         archive_name = f"{dir_name}{archive_extension}"
-
+        relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
+            self.local_project.working_dir
+        )
         if self.package_config.create_tarball_command:
             archive_cmd = self.package_config.create_tarball_command
         else:
@@ -426,13 +413,51 @@ class Upstream(PackitRepositoryBase):
                 "git",
                 "archive",
                 "-o",
-                archive_name,
+                str(relative_archive_path),
                 "--prefix",
                 f"{dir_name}/",
                 "HEAD",
             ]
         self.command_handler.run_command(archive_cmd, return_output=True, env=env)
         return archive_name
+
+    def _add_link_to_archive_from_specdir_if_needed(self, archive_path: Path) -> None:
+        """
+        Create a relative symlink to the archive from in the specfile directory.
+
+        :param archive_path: relative path to the archive from the specfile dir
+        """
+        if archive_path.parent.absolute() != self.absolute_specfile_dir:
+            archive_in_spec_dir = self.absolute_specfile_dir / archive_path.name
+            logger.info(f"Linking to the specfile directory: {archive_in_spec_dir}")
+            archive_in_spec_dir.symlink_to(archive_path)
+
+    def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
+        """
+        Parse the archive name from the output in the reverse order.
+        - Check if the line is a path and if it exists.
+
+        :param outputs: given output of the custom command
+        :return: Path to the archive if we found any.
+        """
+        for output in reversed(outputs):
+            for archive_name in reversed(output.splitlines()):
+                try:
+                    archive_path = Path(
+                        self._local_project.working_dir, archive_name.strip()
+                    )
+                    if archive_path.is_file():
+                        logger.info(f"Created archive: {archive_path}")
+                        return archive_path
+                except OSError as ex:
+                    # File too long
+                    if ex.errno == 36:
+                        logger.error(
+                            f"Skipping long output command output while getting archive name"
+                        )
+                        continue
+                    raise ex
+        return None
 
     def fix_spec(self, archive: str, version: str, commit: str):
         """
@@ -516,16 +541,10 @@ class Upstream(PackitRepositoryBase):
             )
         self.specfile.set_tag(full_name, archive)
 
-    def create_srpm(
-        self,
-        srpm_path: str = None,
-        source_dir: Union[str, Path] = None,
-        srpm_dir: str = None,
-    ) -> Path:
+    def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """
         Create SRPM from the actual content of the repo
 
-        :param source_dir: path with the source files (defaults to dir with specfile)
         :param srpm_path: path to the srpm
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
@@ -536,11 +555,14 @@ class Upstream(PackitRepositoryBase):
         else:
             srpm_dir = srpm_dir or os.getcwd()
             rpmbuild_dir = str(self.absolute_specfile_dir)
+
         cmd = [
             "rpmbuild",
             "-bs",
             "--define",
-            f"_sourcedir {source_dir or rpmbuild_dir}",
+            f"_sourcedir {rpmbuild_dir}",
+            f"--define",
+            f"_srcdir {rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
@@ -557,6 +579,9 @@ class Upstream(PackitRepositoryBase):
             f"_buildrootdir {rpmbuild_dir}",
             self.package_config.specfile_path,
         ]
+        logger.debug(
+            "SRPM build command: " + " ".join([f'"{cmd_part}"' for cmd_part in cmd])
+        )
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
         logger.debug("present srpms = %s", present_srpms)
         try:
@@ -582,7 +607,7 @@ class Upstream(PackitRepositoryBase):
             return Path(self.local_project.working_dir).joinpath(the_srpm)
         return Path(the_srpm)
 
-    def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None) -> Path:
+    def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None):
         """
         1. determine version
         2. create an archive or download upstream and create patches for sourcegit
@@ -590,37 +615,21 @@ class Upstream(PackitRepositoryBase):
         4. download the remote sources
 
         :param upstream_ref: str, needed for the sourcegit mode
-        :return: source directory where you can start the SRPM build
         """
         current_git_describe_version = self.get_current_version()
         upstream_ref = upstream_ref or self.package_config.upstream_ref
 
-        if self.running_in_service():
-            relative_to = Path(self.config.command_handler_work_dir)
-        else:
-            relative_to = Path.cwd()
-
         if upstream_ref:
-            source_dir = self.prepare_upstream_using_source_git(
-                relative_to, upstream_ref
-            )
+            self.prepare_upstream_using_source_git(upstream_ref)
         else:
             created_archive = self.create_archive(version=current_git_describe_version)
             self.fix_specfile_to_use_local_archive(
                 archive=created_archive, archive_version=current_git_describe_version
             )
-            if self.local_project.working_dir.startswith(str(relative_to)):
-                source_dir = Path(self.local_project.working_dir).relative_to(
-                    relative_to
-                )
-            else:
-                source_dir = Path(self.local_project.working_dir)
 
         # > Method that iterates over all sources and downloads ones,
         # > which contain URL instead of just a file.
         self.specfile.download_remote_sources()
-
-        return source_dir
 
     def fix_specfile_to_use_local_archive(self, archive, archive_version) -> None:
         """
@@ -640,7 +649,7 @@ class Upstream(PackitRepositoryBase):
                 archive=archive, version=archive_version, commit=current_commit
             )
 
-    def prepare_upstream_using_source_git(self, relative_to, upstream_ref) -> Path:
+    def prepare_upstream_using_source_git(self, upstream_ref):
         """
         Fetch the tarball and don't check out the upstream ref.
 
@@ -649,7 +658,6 @@ class Upstream(PackitRepositoryBase):
         :return: the source directory where we can build the SRPM
         """
         self.fetch_upstream_archive()
-        source_dir = self.absolute_specfile_dir.relative_to(relative_to)
         self.create_patches_and_update_specfile(upstream_ref)
         old_release = self.specfile.get_release_number()
         try:
@@ -664,7 +672,6 @@ class Upstream(PackitRepositoryBase):
         self.specfile.set_spec_version(
             release=release_to_update, changelog_entry=f"- {msg}"
         )
-        return source_dir
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
         """

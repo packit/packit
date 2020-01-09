@@ -83,7 +83,7 @@ class StreamLogger(threading.Thread):
 def run_command(
     cmd: Union[List[str], str],
     error_message: str = None,
-    cwd: str = None,
+    cwd: Union[str, Path] = None,
     fail: bool = True,
     output: bool = False,
     env: Optional[Dict] = None,
@@ -105,7 +105,7 @@ def run_command(
 
     logger.debug("cmd = '%s'", " ".join(cmd))
 
-    cwd = cwd or str(Path.cwd())
+    cwd = str(cwd) if cwd else str(Path.cwd())
     error_message = error_message or f"Command {cmd} failed."
 
     # we need to pass complete env to Popen, otherwise we lose everything from os.environ
@@ -138,10 +138,15 @@ def run_command(
         logger.error("Command %s failed", shell.args)
         logger.error("%s", error_message)
         if fail:
+            stderr_output = stderr.get_output()
+            stdout_output = stdout.get_output()
+            if output:
+                logger.debug(f"Command stderr:\n{stderr_output.decode()}")
+                logger.debug(f"Command stdout:\n{stdout_output.decode()}")
             raise PackitCommandFailedError(
                 f"Command {shell.args!r} failed: {error_message}",
-                stdout_output=stdout.get_output(),
-                stderr_output=stderr.get_output(),
+                stdout_output=stdout_output,
+                stderr_output=stderr_output,
             )
         success = False
     else:
