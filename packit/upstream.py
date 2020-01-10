@@ -29,6 +29,7 @@ from typing import Optional, List, Tuple
 import git
 from packaging import version
 
+from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
@@ -722,3 +723,39 @@ class Upstream(PackitRepositoryBase):
                 upstream=upstream_ref, destination=str(self.absolute_specfile_dir)
             )
             self.add_patches_to_specfile(patches)
+
+    def koji_build(
+        self,
+        scratch: bool = False,
+        nowait: bool = False,
+        koji_target: Optional[str] = None,
+        srpm_path: Optional[Path] = None,
+    ):
+        """
+        Perform a `koji build` in the repository
+
+        :param scratch: should the build be a scratch build?
+        :param nowait: don't wait on build?
+        :param koji_target: koji target to pick (see `koji list-targets`)
+        :param srpm_path: use selected SRPM for build, not dist-git repo & ref
+        """
+        if not koji_target:
+            raise PackitException(
+                "koji target needs to be set when building directly from upstream"
+            )
+        # we can't use fedpkg b/c upstream repo is not dist-git
+        cmd = ["koji", "build"]
+        if scratch:
+            cmd.append("--scratch")
+        if nowait:
+            cmd.append("--nowait")
+        cmd += [koji_target, str(srpm_path)]
+        out = utils.run_command_remote(
+            cmd, cwd=self.local_project.working_dir, output=True
+        )
+        outs = out.rsplit("\n", 2)
+        if outs[2]:
+            # is usually an empty string - newline at the end of the output
+            return outs[2]
+        else:
+            return outs[1]

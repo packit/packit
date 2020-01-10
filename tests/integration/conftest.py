@@ -142,8 +142,6 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
     )
     flexmock(PagureUser, get_username=lambda: "packito")
 
-    mock_spec_download_remote_s(distgit)
-
     dglp = LocalProject(
         working_dir=str(distgit),
         git_url="https://packit.dev/rpms/beer",

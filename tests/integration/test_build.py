@@ -19,6 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from pathlib import Path
+from typing import Union, List, Optional, Dict
+
 from flexmock import flexmock
 
 from packit import utils
@@ -35,3 +38,34 @@ def test_basic_build(
         fail=True,
     ).once()
     api.build("master", scratch=True, nowait=True, koji_target="asdqwe")
+
+
+def test_build_from_upstream(
+    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+):
+    u, d, api = api_instance
+
+    def mocked_run_command(
+        cmd: Union[List[str], str],
+        error_message: str = None,
+        cwd: Union[str, Path] = None,
+        fail: bool = True,
+        output: bool = False,
+        env: Optional[Dict] = None,
+        decode=True,
+    ):
+        assert cmd[:-1] == ["koji", "build", "--scratch", "--nowait", "hadron-collider"]
+        srpm_path = cmd[-1]
+        assert Path(srpm_path).is_file()
+        assert srpm_path.endswith(".src.rpm")
+        assert cwd == api.up.local_project.working_dir
+        return "\n\nLink to koji build: https://koji...\n"
+
+    flexmock(utils, run_command_remote=mocked_run_command)
+    api.build(
+        "master",
+        scratch=True,
+        nowait=True,
+        from_upstream=True,
+        koji_target="hadron-collider",
+    )
