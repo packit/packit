@@ -66,20 +66,16 @@ class ActionField(fields.Field):
             raise ValidationError("Invalid data provided. dict required")
 
         self.validate_all_actions(actions=list(value))
-        data = {}
-        for key, val in value.items():
-            data.update({ActionName(key): val})
-
+        data = {ActionName(key): val for key, val in value.items()}
         return data
 
     def validate_all_actions(self, actions: list) -> None:
         """
         Validates all keys and raises exception with list of all invalid keys
         """
-        invalid_actions = []
-        for action in actions:
-            if not ActionName.is_valid_action(action):
-                invalid_actions.append(action)
+        invalid_actions = [
+            action for action in actions if not ActionName.is_valid_action(action)
+        ]
 
         if invalid_actions:
             raise ValidationError(f"Unknown action(s) provided: {invalid_actions}")
@@ -104,7 +100,7 @@ class NotProcessedField(fields.Field):
         **kwargs,
     ):
         logger.warning(f"{self.name} is no longer being processed.")
-        additional_message = self.metadata.get("additional_message", None)
+        additional_message = self.metadata.get("additional_message")
         if additional_message:
             logger.warning(f"{additional_message}")
 
