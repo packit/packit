@@ -89,8 +89,12 @@ class Config:
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users
         self.github_requests_log_path: str = ""
-        if kwargs:
-            logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
+
+        self.services = Config.load_authentication(kwargs)
+
+        # because of current load_authentication implementation it will generate false warnings
+        # if kwargs:
+        #     logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
 
     @classmethod
     def get_user_config(cls) -> "Config":
@@ -122,7 +126,6 @@ class Config:
 
         config = UserConfigSchema(strict=True).load(raw_dict).data
 
-        config.services = Config.load_authentication(raw_dict)
         return config
 
     @staticmethod
