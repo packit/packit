@@ -29,6 +29,7 @@ from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
+from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
 
 
@@ -59,6 +60,7 @@ def test_basic_local_update(
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d, api = api_instance
+    mock_spec_download_remote_s(d)
 
     api.sync_release("master", "0.1.0")
 
@@ -77,6 +79,7 @@ def test_basic_local_update_using_distgit(
 ):
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d, api = api_instance
+    mock_spec_download_remote_s(d)
 
     api.sync_release("master", "0.1.0")
 
@@ -96,6 +99,7 @@ def test_basic_local_update_direct_push(
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d, api = api_instance
     _, distgit_remote = distgit_and_remote
+    mock_spec_download_remote_s(d)
 
     api.sync_release("master", "0.1.0", create_pr=False)
 
