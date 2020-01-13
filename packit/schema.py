@@ -273,4 +273,5 @@ class UserConfigSchema(Schema):
 
     @post_load
     def make_instance(self, data, **kwargs):
+
         return Config(**data)
