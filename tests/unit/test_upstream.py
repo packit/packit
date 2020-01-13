@@ -1,6 +1,7 @@
 import pytest
-from flexmock import flexmock
 
+from flexmock import flexmock
+from packit.actions import ActionName
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from tests.spellbook import get_test_config
@@ -64,3 +65,37 @@ def test_create_pull(upstream_mock, upstream_pr_mock, fork_username):
         target_branch="test_target",
         fork_username=fork_username,
     )
+
+
+@pytest.mark.parametrize(
+    "action_config,result",
+    [
+        pytest.param("one cmd", [["one", "cmd"]], id="str_command"),
+        pytest.param(["one cmd"], [["one", "cmd"]], id="list_command"),
+        pytest.param([["one", "cmd"]], [["one", "cmd"]], id="list_in_list_command"),
+        pytest.param(
+            ["one cmd", "second cmd"],
+            [["one", "cmd"], ["second", "cmd"]],
+            id="two_str_commands_in_list",
+        ),
+        pytest.param(
+            [["one", "cmd"], ["second", "cmd"]],
+            [["one", "cmd"], ["second", "cmd"]],
+            id="two_list_commands_in_list",
+        ),
+        pytest.param(
+            [["one", "cmd"], "second cmd"],
+            [["one", "cmd"], ["second", "cmd"]],
+            id="one_str_and_one_list_command_in_list",
+        ),
+    ],
+)
+def test_get_commands_for_actions(action_config, result):
+    ups = Upstream(
+        package_config=flexmock(
+            actions={ActionName.create_archive: action_config}, synced_files=flexmock()
+        ),
+        config=flexmock(),
+        local_project=flexmock(),
+    )
+    assert ups.get_commands_for_actions(action=ActionName.create_archive) == result
