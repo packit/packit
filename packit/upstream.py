@@ -651,9 +651,18 @@ class Upstream(PackitRepositoryBase):
                 archive=created_archive, archive_version=current_git_describe_version
             )
 
-        # > Method that iterates over all sources and downloads ones,
-        # > which contain URL instead of just a file.
-        self.specfile.download_remote_sources()
+        # https://github.com/packit-service/packit-service/issues/314
+        if Path(self.local_project.working_dir).joinpath("sources").exists():
+            logger.warning('The upstream repo contains "sources" file or a directory.')
+            logger.warning(
+                "We are unable to download remote sources from spec-file "
+                "because the file contains links to archives in Fedora downstream."
+            )
+            logger.warning("Therefore skipping downloading of remote sources.")
+        else:
+            # > Method that iterates over all sources and downloads ones,
+            # > which contain URL instead of just a file.
+            self.specfile.download_remote_sources()
 
     def fix_specfile_to_use_local_archive(self, archive, archive_version) -> None:
         """
