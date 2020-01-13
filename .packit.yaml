@@ -31,13 +31,9 @@ jobs:
   trigger: pull_request
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    - fedora-rawhide-x86_64  # no compose for a week+, let's have ticks in our PRs
+    - fedora-all
 - job: tests
   trigger: pull_request
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    - fedora-rawhide-x86_64
+    - fedora-stable # on rawhide we have problems with the new marshmallow
