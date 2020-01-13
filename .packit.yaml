@@ -16,15 +16,7 @@ jobs:
 - job: propose_downstream
   trigger: release
   metadata:
-    dist-git-branch: master
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: f31
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: f30
+    dist-git-branch: fedora-all
 - job: sync_from_downstream
   trigger: commit
 - job: copr_build
