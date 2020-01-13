@@ -31,9 +31,9 @@ from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.exceptions import PackitException
-from packit.specfile import Specfile
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
+from packit.specfile import Specfile
 from packit.utils import cwd
 
 logger = logging.getLogger(__name__)
@@ -54,9 +54,15 @@ class PackitRepositoryBase:
         self._specfile: Optional[Specfile] = None
         self.allowed_gpg_keys: Optional[List[str]] = None
 
-        logger.debug("command handler = %s", self.config.command_handler)
-        self.handler_kls = RUN_COMMAND_HANDLER_MAPPING[self.config.command_handler]
+        self._handler_kls = None
         self._command_handler: Optional[CommandHandler] = None
+
+    @property
+    def handler_kls(self):
+        if self._handler_kls is None:
+            logger.debug("command handler = %s", self.config.command_handler)
+            self._handler_kls = RUN_COMMAND_HANDLER_MAPPING[self.config.command_handler]
+        return self._handler_kls
 
     @property
     def command_handler(self) -> CommandHandler:
@@ -210,6 +216,50 @@ class PackitRepositoryBase:
         """
         return action in self.package_config.actions
 
+    def get_commands_for_actions(self, action: ActionName) -> List[List[str]]:
+        """
+        Parse the following types of the structure and return list of commands in the form of list.
+
+        I)
+        action_name: "one cmd"
+
+        II)
+        action_name:
+          - "one cmd""
+
+        III)
+        action_name:
+          - ["one", "cmd"]
+
+
+        Returns [["one", "cmd"]] for all of them.
+
+        :param action: str or list[str] or list[list[str]]
+        :return: list[list[str]]
+        """
+        configured_action = self.package_config.actions[action]
+        if isinstance(configured_action, str):
+            configured_action = [configured_action]
+
+        if not isinstance(configured_action, list):
+            raise ValueError(
+                f"Expecting 'str' or 'list' as a command, got '{type(configured_action)}'. "
+                f"The value: {configured_action}"
+            )
+
+        parsed_commands = []
+        for cmd in configured_action:
+            if isinstance(cmd, str):
+                parsed_commands.append(shlex.split(cmd))
+            elif isinstance(cmd, list):
+                parsed_commands.append(cmd)
+            else:
+                raise ValueError(
+                    f"Expecting 'str' or 'list' as a command, got '{type(cmd)}'. "
+                    f"The value: {cmd}"
+                )
+        return parsed_commands
+
     def with_action(self, action: ActionName, env: Optional[Dict] = None) -> bool:
         """
         If the action is defined in the self.package_config.actions,
@@ -235,15 +285,10 @@ class PackitRepositoryBase:
         """
         logger.debug(f"Running {action}.")
         if action in self.package_config.actions:
-            command = self.package_config.actions[action]
-            if isinstance(command, str):
-                commands = [command]
-            else:
-                commands = command
-            logger.info(f"Using user-defined script for {action}: {commands}")
-            for cmd in commands:
-                command_l = shlex.split(cmd)
-                self.command_handler.run_command(command=command_l, env=env)
+            commands_to_run = self.get_commands_for_actions(action)
+            logger.info(f"Using user-defined script for {action}: {commands_to_run}")
+            for cmd in commands_to_run:
+                self.command_handler.run_command(command=cmd, env=env)
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True
@@ -254,18 +299,16 @@ class PackitRepositoryBase:
         """
         Run self.actions[action] command(s) and return their outputs.
         """
-        commands = self.package_config.actions.get(action)
-        if not commands:
+        if action not in self.package_config.actions:
             return None
-        if isinstance(commands, str):
-            commands = [commands]
+
+        commands_to_run = self.get_commands_for_actions(action)
 
         outputs = []
-        for command in commands:
-            command_l = shlex.split(command)
-            logger.info(f"Using user-defined script for {action}: {command_l}")
+        logger.info(f"Using user-defined script for {action}: {commands_to_run}")
+        for cmd in commands_to_run:
             outputs.append(
-                self.command_handler.run_command(command_l, return_output=True, env=env)
+                self.command_handler.run_command(cmd, return_output=True, env=env)
             )
         logger.debug(f"Action command output: {outputs}")
         return outputs
