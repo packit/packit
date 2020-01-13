@@ -48,6 +48,9 @@ A build system for OS images
 %install
 %py3_install
 
+mkdir -p %{buildroot}%{pkgdir}/sources
+install -p -m 0755 $(find sources -type f) %{buildroot}%{pkgdir}/sources
+
 %files -n     python3-%{pypi_name}
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
