@@ -9,35 +9,29 @@ synced_files:
 upstream_package_name: packitos
 downstream_package_name: packit
 upstream_project_url: https://github.com/packit-service/packit
-current_version_command: ["python3", "setup.py", "--version"]
-create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
-create_pr: false
+
+actions:
+  create-archive:
+  - "python3 setup.py sdist --dist-dir ."
+  - "sh -c 'echo packitos-$(python3 setup.py --version).tar.gz'"
+  get-current-version:
+  - "python3 setup.py --version"
+
+
 jobs:
 - job: propose_downstream
   trigger: release
   metadata:
-    dist-git-branch: master
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: f31
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: f30
+    dist-git-branch: fedora-all
 - job: sync_from_downstream
   trigger: commit
 - job: copr_build
   trigger: pull_request
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    - fedora-rawhide-x86_64  # no compose for a week+, let's have ticks in our PRs
+    - fedora-all
 - job: tests
   trigger: pull_request
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    - fedora-rawhide-x86_64
+    - fedora-stable # on rawhide we have problems with the new marshmallow
