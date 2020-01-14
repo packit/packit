@@ -1,3 +1,43 @@
+# 0.8.0
+
+Packit has a [new logo](https://github.com/packit-service/packit/blob/master/design/export/logo.svg)!
+
+## Features:
+- Marshmallow object schema was implemented.
+- `config file` and `spec file` are synced by default.
+- We use testing farm for sanity tests.
+- `packit status` command shows latest copr builds.
+- Target aliases (currently fedora-development, fedora-stable, fedora-all) can now be used in the packit config file.
+- `upstream_package_name` and `downstream_package_name` are no longer required in package config. github repository name is the default value both.
+- If no jobs are defined in .packit.yaml, packit by default runs build job on fedora-stable targets and propose_downstream on fedora-all branches.
+- Image version of packit is now fedora 31
+- packit can now download URL package sources before SRPM build.
+- When doing a new update in Fedora dist-git, packit now by default creates a new pull request instead of pushing directly to dist-git.
+- Build command has nicer output.
+- `create-archive` uses fullpath for validation and splits long lines of output.
+- SRPM runs also in a repo with detached head.
+- Log output from subprocesses is in realtime.
+- Specfile is refreshed after each run of the propose-update.
+- When there is no copr project owner, exception is raised
+- While building specfile from custom specfile, the archive is linked from the spec-directory.
+- Setting cwd in command handlers is allowed.
+- SRPM build is run from the folder containing specfile.
+
+## Fixes:
+- Consecutive API call for status works.
+- rebase-helper breaking changes in new version is fixed.
+- fixed updating version on srpm build
+
+## Minor:
+- pre-commit check requires rebased branch.
+- fedora version in .packit.yaml config is updated.
+- Code related to copr id now extracted to dedicated class.
+- There is a warning in logs when there is  no packit config in repository.
+- Tests are now restructured and use new structure or `requre`, also containing tests for copr.
+- The stale bot is now set with up-to-date config.
+- The imports of packit are simplier.
+- The preparation of SRPM build has been refactored including new exceptions.
+
 # 0.7.1
 
 ## Minor
