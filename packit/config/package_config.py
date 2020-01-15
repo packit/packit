@@ -63,11 +63,13 @@ class PackageConfig:
         create_pr: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
+        patch_generation_ignore_paths: List[str] = None,
         **kwargs,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: SyncFilesConfig = synced_files or SyncFilesConfig([])
+        self.patch_generation_ignore_paths = patch_generation_ignore_paths or []
         self.jobs: List[JobConfig] = jobs or []
         self.dist_git_namespace: str = dist_git_namespace or "rpms"
         self.upstream_project_url: Optional[str] = upstream_project_url
