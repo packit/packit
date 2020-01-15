@@ -83,6 +83,10 @@ def test_basic_local_update_patch_content(
     source_file.write_text("new changes")
     git_add_and_commit(directory=sourcegit, message="source change")
 
+    source_file = sourcegit / "ignored_file.txt"
+    source_file.write_text(" And I am sad.")
+    git_add_and_commit(directory=sourcegit, message="make a file sad")
+
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     spec = Specfile(str(distgit / "beer.spec"))
