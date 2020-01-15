@@ -150,6 +150,9 @@ def test_basic_local_update_patch_content(
         "+new changes\n" not in git_diff
     )
 
+    # ignored file should not be in the diff
+    assert "--- a/ignored_file.txt\n" not in git_diff
+
 
 def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
     # TODO: we need a better test case here which will mimic the systemd use case
