@@ -327,6 +327,10 @@ class PackitRepositoryBase:
             last_source_position = None
             line = spec_file.readline()
             while line:
+                if line.startswith("Patch"):
+                    raise PackitException(
+                        "This specfile already contains patches, please remove them."
+                    )
                 if line.startswith("Source"):
                     last_source_position = spec_file.tell()
                 line = spec_file.readline()
