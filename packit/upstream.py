@@ -560,9 +560,12 @@ class Upstream(PackitRepositoryBase):
         if self.running_in_service():
             srpm_dir = "."
             rpmbuild_dir = "."
+            src_dir = str(
+                self.absolute_specfile_dir.relative_to(self.local_project.working_dir)
+            )
         else:
             srpm_dir = srpm_dir or os.getcwd()
-            rpmbuild_dir = str(self.absolute_specfile_dir)
+            src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
 
         cmd = [
             "rpmbuild",
@@ -570,7 +573,7 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_sourcedir {rpmbuild_dir}",
             f"--define",
-            f"_srcdir {rpmbuild_dir}",
+            f"_srcdir {src_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
