@@ -171,6 +171,7 @@ class PackageConfigSchema(Schema):
     jobs = fields.Nested(JobConfigSchema, many=True, default=default_jobs)
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
+    patch_generation_ignore_paths = fields.List(fields.String())
 
     # list of deprecated keys and their replacement (new,old)
     deprecated_keys = (("upstream_package_name", "upstream_project_name"),)

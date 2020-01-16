@@ -230,6 +230,21 @@ class Upstream(PackitRepositoryBase):
         destination = destination or self.local_project.working_dir
 
         patches_to_create = []
+
+        sync_files_to_ignore = [
+            str(sf.src.relative_to(self.local_project.working_dir))
+            for sf in self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
+                Path(self.local_project.working_dir),
+                Path(
+                    # dest (downstream) is not important, we only care about src (upstream)
+                    destination
+                ),
+            )
+        ]
+        files_to_ignore = (
+            self.package_config.patch_generation_ignore_paths + sync_files_to_ignore
+        )
+
         for i, commit in enumerate(commits[1:]):
             parent = commits[i]
 
@@ -241,16 +256,7 @@ class Upstream(PackitRepositoryBase):
                 commit.hexsha,
                 "--",
                 ".",
-            ] + [
-                f":(exclude){sync_file.src}"
-                for sync_file in self.package_config.synced_files.get_raw_files_to_sync(
-                    Path(self.local_project.working_dir),
-                    Path(
-                        # this is not important, we only care about src
-                        destination
-                    ),
-                )
-            ]
+            ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
             diff = run_command(
                 cmd=git_diff_cmd,
                 cwd=self.local_project.working_dir,
