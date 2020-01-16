@@ -336,7 +336,9 @@ class PackitRepositoryBase:
                 line = spec_file.readline()
 
             if not last_source_position:
-                raise Exception("Cannot found place for patches in specfile.")
+                raise PackitException(
+                    "Cannot find a place to put patches in the specfile."
+                )
 
             spec_file.seek(last_source_position)
             rest_of_the_file = spec_file.read()
