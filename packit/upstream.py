@@ -692,7 +692,6 @@ class Upstream(PackitRepositoryBase):
         """
         Fetch the tarball and don't check out the upstream ref.
 
-        :param relative_to: for the purpose of Sandcastle
         :param upstream_ref: the base git ref for the source git
         :return: the source directory where we can build the SRPM
         """
