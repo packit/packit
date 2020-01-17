@@ -39,6 +39,7 @@ def test_basic_local_update_without_patching(
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
+    mock_spec_download_remote_s(distgit)
 
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
@@ -53,6 +54,7 @@ def test_basic_local_update_empty_patch(
     """ propose-update for sourcegit test: mock remote API, use local upstream and dist-git """
 
     distgit, _ = distgit_and_remote
+    mock_spec_download_remote_s(distgit)
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
@@ -78,6 +80,7 @@ def test_basic_local_update_patch_content(
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
+    mock_spec_download_remote_s(distgit)
 
     source_file = sourcegit / "big-source-file.txt"
     source_file.write_text("new changes")
@@ -149,6 +152,9 @@ def test_basic_local_update_patch_content(
         "-containing some text.\n"
         "+new changes\n" not in git_diff
     )
+
+    # ignored file should not be in the diff
+    assert "--- a/ignored_file.txt\n" not in git_diff
 
 
 def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):

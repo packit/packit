@@ -63,18 +63,22 @@ def get_rev_list_kwargs(opt_list):
 
 
 class StreamLogger(threading.Thread):
-    def __init__(self, stream, log_level=logging.DEBUG):
+    def __init__(self, stream, log_level=logging.DEBUG, decode=False):
         super().__init__(daemon=True)
         self.stream = stream
         self.output = []
         self.log_level = log_level
+        self.decode = decode
 
     def run(self):
         for line in self.stream:
             # not doing strip here on purpose so we get real output
             # and we are saving bytes b/c the output can contain chars which can't be decoded
             self.output.append(line)
-            logger.log(self.log_level, line.rstrip(b"\n"))
+            line = line.rstrip(b"\n")
+            if self.decode:
+                line = line.decode()
+            logger.log(self.log_level, line)
 
     def get_output(self):
         return b"".join(self.output)
@@ -87,7 +91,8 @@ def run_command(
     fail: bool = True,
     output: bool = False,
     env: Optional[Dict] = None,
-    decode=True,
+    decode: bool = True,
+    print_live: bool = False,
 ):
     """
     run provided command in a new subprocess
@@ -99,6 +104,7 @@ def run_command(
     :param output: if True, return command's stdout & stderr
     :param env: set these env vars in the subprocess
     :param decode: decode stdout from utf8 to string
+    :param print_live: print output from the command realtime to INFO log
     """
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
@@ -125,8 +131,16 @@ def run_command(
         env=cmd_env,
     )
 
-    stdout = StreamLogger(shell.stdout, log_level=logging.DEBUG)
-    stderr = StreamLogger(shell.stderr, log_level=logging.INFO)
+    stdout = StreamLogger(
+        shell.stdout,
+        log_level=logging.DEBUG if not print_live else logging.INFO,
+        decode=decode,
+    )
+    stderr = StreamLogger(
+        shell.stderr,
+        log_level=logging.DEBUG if not print_live else logging.INFO,
+        decode=decode,
+    )
 
     stdout.start()
     stderr.start()
@@ -138,11 +152,15 @@ def run_command(
         logger.error("Command %s failed", shell.args)
         logger.error("%s", error_message)
         if fail:
-            stderr_output = stderr.get_output()
-            stdout_output = stdout.get_output()
+            stderr_output = (
+                stderr.get_output().decode() if decode else stderr.get_output()
+            )
+            stdout_output = (
+                stdout.get_output().decode() if decode else stdout.get_output()
+            )
             if output:
-                logger.debug(f"Command stderr:\n{stderr_output.decode()}")
-                logger.debug(f"Command stdout:\n{stdout_output.decode()}")
+                logger.debug(f"Command stderr:\n{stderr_output}")
+                logger.debug(f"Command stdout:\n{stdout_output}")
             raise PackitCommandFailedError(
                 f"Command {shell.args!r} failed: {error_message}",
                 stdout_output=stdout_output,
@@ -169,6 +187,8 @@ def run_command_remote(
     fail=True,
     output=False,
     env: Optional[Dict] = None,
+    decode=True,
+    print_live: bool = False,
 ):
     """
     wrapper for run_command method
@@ -179,7 +199,9 @@ def run_command_remote(
         submit something to some server, and check how server reply
         call kinit of some ticket
     """
-    return run_command(cmd, error_message, cwd, fail, output, env)
+    return run_command(
+        cmd, error_message, cwd, fail, output, env, decode=decode, print_live=print_live
+    )
 
 
 class PackitFormatter(logging.Formatter):

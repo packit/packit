@@ -61,7 +61,17 @@ class FedPKG:
         scratch: bool = False,
         nowait: bool = False,
         koji_target: Optional[str] = None,
+        srpm_path: Optional[Path] = None,
     ):
+        """
+        build in koji
+
+        :param scratch: scratch (temporary) build or not?
+        :param nowait: False == wait for the build to finish
+        :param koji_target: koji target to build in (`koji list-targets`)
+        :param srpm_path: use selected SRPM for build, not dist-git repo & ref
+        :return:
+        """
         cmd = [self.fedpkg_exec, "build"]
         if scratch:
             cmd.append("--scratch")
@@ -69,6 +79,8 @@ class FedPKG:
             cmd.append("--nowait")
         if koji_target:
             cmd += ["--target", koji_target]
+        if srpm_path:
+            cmd += ["--srpm", str(srpm_path)]
         utils.run_command_remote(
             cmd=cmd,
             cwd=self.directory,

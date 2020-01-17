@@ -6,8 +6,8 @@ Release:        1%{?dist}
 Summary:        A tool to make you happy
 
 License:        Beerware
-Source0:         %{upstream_name}-%{version}.tar.gz
-Source1:         https://src.fedoraproject.org/rpms/python-ogr/blob/master/f/python-ogr.spec
+Source0:        %{upstream_name}-%{version}.tar.gz
+Source1:        https://src.fedoraproject.org/rpms/python-ogr/blob/master/f/python-ogr.spec
 BuildArch:      noarch
 
 %description

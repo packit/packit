@@ -29,7 +29,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
-from packit.exceptions import PackitCommandFailedError
+from packit.exceptions import PackitCommandFailedError, ensure_str
 
 logger = logging.getLogger(__file__)
 
@@ -47,6 +47,12 @@ logger = logging.getLogger(__file__)
     "Otherwise clone the repo in a temporary directory.",
 )
 @click.option(
+    "--from-upstream",
+    help="Build the project in koji directly from the upstream repository",
+    is_flag=True,
+    default=False,
+)
+@click.option(
     "--koji-target", help="Koji target to build inside (see `koji list-targets`)."
 )
 @click.option(
@@ -57,12 +63,21 @@ logger = logging.getLogger(__file__)
 @pass_config
 @cover_packit_exception
 def build(
-    config, dist_git_path, dist_git_branch, scratch, nowait, path_or_url, koji_target
+    config,
+    dist_git_path,
+    dist_git_branch,
+    from_upstream,
+    scratch,
+    nowait,
+    path_or_url,
+    koji_target,
 ):
     """
     Build selected upstream project in Fedora.
 
-    Packit goes to dist-git and performs `fedpkg build` for the selected branch.
+    By default, packit checks out the respective dist-git repository and performs
+    `fedpkg build` for the selected branch. With `--from-upstream`, packit creates a SRPM
+    out of the current checkout and sends it to koji.
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
@@ -76,18 +91,22 @@ def build(
 
     for branch in branches_to_build:
         try:
-            api.build(
+            out = api.build(
                 dist_git_branch=branch,
                 scratch=scratch,
                 nowait=nowait,
                 koji_target=koji_target,
+                from_upstream=from_upstream,
             )
         except PackitCommandFailedError as ex:
-            logs_stdout = "\n>>> ".join(ex.stdout_output.decode().strip().split("\n"))
-            logs_stderr = "\n!!! ".join(ex.stderr_output.decode().strip().split("\n"))
+            logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
+            logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
             click.echo(
                 f"Build for branch '{branch}' failed. \n"
                 f">>> {logs_stdout}\n"
                 f"!!! {logs_stderr}\n",
                 err=True,
             )
+        else:
+            if out:
+                print(ensure_str(out))
