@@ -327,12 +327,18 @@ class PackitRepositoryBase:
             last_source_position = None
             line = spec_file.readline()
             while line:
+                if line.startswith("Patch"):
+                    raise PackitException(
+                        "This specfile already contains patches, please remove them."
+                    )
                 if line.startswith("Source"):
                     last_source_position = spec_file.tell()
                 line = spec_file.readline()
 
             if not last_source_position:
-                raise Exception("Cannot found place for patches in specfile.")
+                raise PackitException(
+                    "Cannot find a place to put patches in the specfile."
+                )
 
             spec_file.seek(last_source_position)
             rest_of_the_file = spec_file.read()

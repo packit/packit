@@ -393,6 +393,7 @@ class PackitAPI:
         scratch: bool = False,
         nowait: bool = False,
         koji_target: Optional[str] = None,
+        from_upstream: bool = False,
     ):
         """
         Build component in Fedora infra (defaults to koji)
@@ -401,8 +402,19 @@ class PackitAPI:
         :param scratch: should the build be a scratch build?
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
+        :param from_upstream: build directly from the upstream checkout?
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
+
+        if from_upstream:
+            srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
+            out = self.up.koji_build(
+                scratch=scratch,
+                nowait=nowait,
+                koji_target=koji_target,
+                srpm_path=srpm_path,
+            )
+            return out
 
         self.dg.create_branch(
             dist_git_branch,
