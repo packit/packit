@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # MIT License
 #
 # Copyright (c) 2018-2019 Red Hat, Inc.
@@ -24,7 +25,7 @@ import pytest
 import sys
 from flexmock import flexmock
 
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, ensure_str
 from packit.utils import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
@@ -90,3 +91,12 @@ def test_get_packit_version_not_installed():
 def test_get_packit_version():
     flexmock(Distribution).should_receive("version").and_return("0.1.0")
     assert get_packit_version() == "0.1.0"
+
+
+@pytest.mark.parametrize(
+    "inp,exp",
+    (("asd", "asd"), (b"asd", "asd"), ("🍺", "🍺"), (b"\xf0\x9f\x8d\xba", "🍺")),
+    ids=("asd", "bytes-asd", "beer-str", "beer-bytes"),
+)
+def test_ensure_str(inp, exp):
+    assert ensure_str(inp) == exp

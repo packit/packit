@@ -24,6 +24,14 @@ from typing import Union
 from deprecated import deprecated
 
 
+def ensure_str(inp: Union[bytes, str]) -> str:
+    """ decode bytes on input or just return the string """
+    # yes, this func doesn't have anything to do with exceptions
+    # but it needs to be placed in a leaf module
+    # utils import from exceptions hence it can't be there
+    return inp if isinstance(inp, str) else inp.decode()
+
+
 class PackitException(Exception):
     pass
 
@@ -38,16 +46,8 @@ class PackitCommandFailedError(PackitException):
         stderr_output: Union[str, bytes] = None
     ):
         super().__init__(*args)
-        self.stdout_output = (
-            stdout_output.decode()
-            if isinstance(stdout_output, bytes)
-            else stdout_output
-        )
-        self.stderr_output = (
-            stderr_output.decode()
-            if isinstance(stderr_output, bytes)
-            else stderr_output
-        )
+        self.stdout_output = ensure_str(stdout_output)
+        self.stderr_output = ensure_str(stderr_output)
 
 
 class PackitConfigException(PackitException):

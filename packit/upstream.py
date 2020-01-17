@@ -750,12 +750,16 @@ class Upstream(PackitRepositoryBase):
         if nowait:
             cmd.append("--nowait")
         cmd += [koji_target, str(srpm_path)]
+        logger.info("Starting a koji build.")
+        if not nowait:
+            logger.info(
+                "We will be actively waiting for the build to finish, it may take some time."
+            )
         out = utils.run_command_remote(
-            cmd, cwd=self.local_project.working_dir, output=True
+            cmd,
+            cwd=self.local_project.working_dir,
+            output=True,
+            decode=True,
+            print_live=True,
         )
-        outs = out.rsplit("\n", 2)
-        if outs[2]:
-            # is usually an empty string - newline at the end of the output
-            return outs[2]
-        else:
-            return outs[1]
+        return out

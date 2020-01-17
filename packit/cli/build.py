@@ -29,7 +29,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
-from packit.exceptions import PackitCommandFailedError
+from packit.exceptions import PackitCommandFailedError, ensure_str
 
 logger = logging.getLogger(__file__)
 
@@ -99,8 +99,8 @@ def build(
                 from_upstream=from_upstream,
             )
         except PackitCommandFailedError as ex:
-            logs_stdout = "\n>>> ".join(ex.stdout_output.decode().strip().split("\n"))
-            logs_stderr = "\n!!! ".join(ex.stderr_output.decode().strip().split("\n"))
+            logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
+            logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
             click.echo(
                 f"Build for branch '{branch}' failed. \n"
                 f">>> {logs_stdout}\n"
@@ -109,4 +109,4 @@ def build(
             )
         else:
             if out:
-                print(out)
+                print(ensure_str(out))

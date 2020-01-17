@@ -53,6 +53,7 @@ def test_build_from_upstream(
         output: bool = False,
         env: Optional[Dict] = None,
         decode=True,
+        print_live=False,
     ):
         assert cmd[:-1] == ["koji", "build", "--scratch", "--nowait", "hadron-collider"]
         srpm_path = cmd[-1]
