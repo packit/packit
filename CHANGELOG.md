@@ -1,3 +1,12 @@
+# 0.8.1
+
+## Features:
+
+- Packit is able to build in [Koji](https://koji.fedoraproject.org) from upstream/source-git.
+- CLI has bash-completion.
+- Configuration can use a new option (`patch_generation_ignore_paths`) to exclude paths from patching.
+
+
 # 0.8.0
 
 Packit has a [new logo](https://github.com/packit-service/packit/blob/master/design/export/logo.svg)!
