@@ -484,6 +484,10 @@ def test_package_config_parse_error(raw):
 def test_package_config_parse(raw, expected):
     package_config = PackageConfig.get_from_dict(raw_dict=raw)
     assert package_config
+    # tests for https://github.com/packit-service/packit-service/pull/342
+    if expected.jobs:
+        for j in package_config.jobs:
+            assert j.job
     assert package_config == expected
 
 
