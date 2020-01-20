@@ -71,7 +71,8 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 %if 0%{?fedora} >= 30
 %{_mandir}/man1/packit*.1*
 %endif
-%{_datadir}/bash_completion/completions/%{real_name}
+%dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/%{real_name}
 
 %files -n python3-%{real_name}
 %license LICENSE
