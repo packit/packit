@@ -23,7 +23,6 @@
 import logging
 from enum import Enum
 
-from packit.config.aliases import get_build_targets, get_branches
 from packit.exceptions import PackitConfigException
 
 logger = logging.getLogger(__name__)
@@ -86,11 +85,11 @@ default_jobs = [
     JobConfig(
         job=JobType.copr_build,
         trigger=JobTriggerType.pull_request,
-        metadata={"targets": get_build_targets("fedora-stable")},
+        metadata={"targets": ["fedora-stable"]},
     ),
     JobConfig(
         job=JobType.propose_downstream,
         trigger=JobTriggerType.release,
-        metadata={"dist-git-branch": get_branches("fedora-all")},
+        metadata={"dist-git-branch": ["fedora-all"]},
     ),
 ]
