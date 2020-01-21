@@ -236,7 +236,6 @@ def test_package_config_not_equal(not_equal_package_config):
 @pytest.mark.parametrize(
     "raw,is_valid",
     [
-        ({}, True),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -244,7 +243,6 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             False,
         ),
-        ({"jobs": [{"trigger": "release", "job": "propose_downstream"}]}, True),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -303,12 +301,11 @@ def test_package_config_validate(raw, is_valid):
 @pytest.mark.parametrize(
     "raw",
     [
-        {},
         # {"specfile_path": "test/spec/file/path", "something": "different"},
         {
             "specfile_path": "test/spec/file/path",
             "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-        },
+        }
     ],
 )
 def test_package_config_parse_error(raw):
@@ -580,6 +577,19 @@ def test_get_package_config_from_repo(content):
             SyncFilesItem(src=".packit.yaml", dest=".packit2.yaml"),
         ]
     )
+    assert config.create_pr
+
+
+@pytest.mark.parametrize("content", ["{}"])
+def test_get_package_config_from_repo_spec_file_not_defined(content):
+    gp = flexmock(GitProject)
+    gp.should_receive("full_repo_name").and_return("a/b")
+    gp.should_receive("get_file_content").and_return(content)
+    gp.should_receive("get_files").and_return(["packit.spec"])
+    git_project = GitProject(repo="", service=GitService(), namespace="")
+    config = get_package_config_from_repo(sourcegit_project=git_project, ref="")
+    assert isinstance(config, PackageConfig)
+    assert Path(config.specfile_path).name == "packit.spec"
     assert config.create_pr
 
 

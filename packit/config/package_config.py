@@ -134,6 +134,12 @@ class PackageConfig:
 
         package_config = PackageConfigSchema(strict=True).load(raw_dict).data
 
+        if not getattr(package_config, "specfile_path", None):
+            if spec_file_path:
+                package_config.specfile_path = spec_file_path
+            else:
+                raise PackitConfigException("Spec file was not found!")
+
         if not getattr(package_config, "upstream_package_name", None) and repo_name:
             package_config.upstream_package_name = repo_name
 
@@ -293,8 +299,8 @@ def parse_loaded_config(
 
 def get_local_specfile_path(directories):
     """
-    Get path of the local specfile if present.
-    :param directories:
+    Get path of the local spec file if present.
+    :param directories: dirs to find the spec file
     :return: str path of the spec file
     """
     for dir in directories:
@@ -307,10 +313,11 @@ def get_local_specfile_path(directories):
 
 def get_specfile_path_from_repo(project: GitProject):
     """
-    Get path of the specfile in the given repo if present.
+    Get path of the spec file in the given repo if present.
     :param project: GitProject
     :return: str path of the spec file
     """
-    # TODO create a method to list files in repo to be able to find spec file
-    return None
-
+    try:
+        return project.get_files(filter_regex=".*.spec")[0]
+    except Exception:
+        return None
