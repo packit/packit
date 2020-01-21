@@ -98,7 +98,12 @@ class FedPKG:
                 "watch_tasks() got an unexpected keyword argument 'ki_handler'"
                 in ex.stderr_output
             ):
-                logger.info(ex.stdout_output)
+                logger.info(
+                    "fedpkg build command crashed which is a known issue: "
+                    "the build is submitted in koji anyway"
+                )
+                logger.debug(ex.stdout_output)
+
             else:
                 raise ex
 
