@@ -24,9 +24,9 @@ import os
 from pathlib import Path
 
 import pytest
-from flexmock import flexmock
 from marshmallow import ValidationError
 
+from flexmock import flexmock
 from ogr import GithubService, PagureService
 from ogr.abstract import GitProject, GitService
 from packit.actions import ActionName
@@ -40,7 +40,6 @@ from packit.config import (
     SyncFilesConfig,
     SyncFilesItem,
 )
-from packit.config.aliases import get_build_targets, get_branches
 
 
 def get_job_config_dict_simple():
@@ -72,12 +71,12 @@ def get_default_job_config():
         JobConfig(
             job=JobType.copr_build,
             trigger=JobTriggerType.pull_request,
-            metadata={"targets": get_build_targets("fedora-stable")},
+            metadata={"targets": ["fedora-stable"]},
         ),
         JobConfig(
             job=JobType.propose_downstream,
             trigger=JobTriggerType.release,
-            metadata={"dist-git-branch": get_branches("fedora-all")},
+            metadata={"dist-git-branch": ["fedora-all"]},
         ),
     ]
 
