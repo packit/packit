@@ -479,7 +479,7 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_source(archive)
         self._fix_spec_prep(version)
 
-        msg = f"Development snapshot ({commit})"
+        msg = f"- Development snapshot ({commit})"
         self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)
 
     def _fix_spec_prep(self, version):
