@@ -173,6 +173,11 @@ class PackitAPI:
         """
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
+        if self.dg.is_dirty():
+            raise PackitException(
+                f"The distgit repository {self.dg.local_project.working_dir} is dirty."
+                f"This is not supported."
+            )
         if not force and self.up.is_dirty() and not use_local_content:
             raise PackitException(
                 "The repository is dirty, will not discard the changes. Use --force to bypass."
