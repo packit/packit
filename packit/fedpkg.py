@@ -23,6 +23,8 @@
 from pathlib import Path
 from typing import Optional
 
+from packit.exceptions import PackitCommandFailedError
+
 from packit import utils  # so we can mock utils
 from packit.utils import logger
 
@@ -81,12 +83,29 @@ class FedPKG:
             cmd += ["--target", koji_target]
         if srpm_path:
             cmd += ["--srpm", str(srpm_path)]
-        utils.run_command_remote(
-            cmd=cmd,
-            cwd=self.directory,
-            error_message="Submission of build to koji failed.",
-            fail=True,
-        )
+
+        try:
+            utils.run_command_remote(
+                cmd=cmd,
+                cwd=self.directory,
+                error_message="Submission of build to koji failed.",
+                fail=True,
+            )
+
+        except PackitCommandFailedError as ex:
+            # fail on the fedpkg side, the build is triggered
+            if (
+                "watch_tasks() got an unexpected keyword argument 'ki_handler'"
+                in ex.stderr_output
+            ):
+                logger.info(
+                    "fedpkg build command crashed which is a known issue: "
+                    "the build is submitted in koji anyway"
+                )
+                logger.debug(ex.stdout_output)
+
+            else:
+                raise
 
     def clone(self, package_name: str, target_path: str, anonymous: bool = False):
         """
