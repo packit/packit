@@ -105,7 +105,7 @@ class FedPKG:
                 logger.debug(ex.stdout_output)
 
             else:
-                raise ex
+                raise
 
     def clone(self, package_name: str, target_path: str, anonymous: bool = False):
         """
