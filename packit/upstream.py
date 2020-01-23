@@ -557,15 +557,15 @@ class Upstream(PackitRepositoryBase):
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
         """
-        if self.running_in_service():
-            srpm_dir = "."
-            rpmbuild_dir = "."
-            src_dir = str(
-                self.absolute_specfile_dir.relative_to(self.local_project.working_dir)
-            )
+        # Path.relative_to doesn't work for paths as /a/b/c /a/d/e
+        rpmbuild_dir = os.path.relpath(
+            str(self.absolute_specfile_dir), self.local_project.working_dir
+        )
+
+        if srpm_dir:
+            srpm_dir = Path(srpm_dir)
         else:
-            srpm_dir = srpm_dir or os.getcwd()
-            src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
+            srpm_dir = "."
 
         cmd = [
             "rpmbuild",
@@ -573,12 +573,11 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_sourcedir {rpmbuild_dir}",
             f"--define",
-            f"_srcdir {src_dir}",
+            f"_srcdir {rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
             f"_srcrpmdir {srpm_dir}",
-            # no idea about this one, but tests were failing in tox w/o it
             "--define",
             f"_topdir {rpmbuild_dir}",
             # we also need these 3 so that rpmbuild won't create them
@@ -616,13 +615,11 @@ class Upstream(PackitRepositoryBase):
 
         the_srpm = self._get_srpm_from_rpmbuild_output(out)
         if srpm_path:
-            shutil.move(the_srpm, srpm_path)
+            shutil.move(str(the_srpm), srpm_path)
             return Path(srpm_path)
-        if self.running_in_service():
-            return Path(self.local_project.working_dir).joinpath(the_srpm)
-        return Path(the_srpm)
+        return Path(os.path.relpath(str(the_srpm), srpm_dir))
 
-    def _get_srpm_from_rpmbuild_output(self, output: str) -> str:
+    def _get_srpm_from_rpmbuild_output(self, output: str) -> Path:
         """
         Try to find the srpm file in the `rpmbuild -bs` command output.
 
@@ -639,7 +636,11 @@ class Upstream(PackitRepositoryBase):
                 "SRPM cannot be found, something is wrong."
             )
         logger.info("SRPM is %s", the_srpm)
-        return the_srpm
+        p = self.absolute_specfile_dir.joinpath(the_srpm).absolute()
+        if not p.exists():
+            logger.error(f"No such file or directory: {the_srpm}")
+            raise PackitException("Unable to locate the SRPM.")
+        return p
 
     def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None):
         """

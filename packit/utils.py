@@ -30,6 +30,7 @@ import sys
 import tempfile
 import threading
 from contextlib import contextmanager
+from itertools import takewhile
 from pathlib import Path
 from typing import Tuple, Any, Optional, Dict, Union, List
 from urllib.parse import urlparse
