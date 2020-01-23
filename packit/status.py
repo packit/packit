@@ -84,6 +84,7 @@ class Status:
                     branch, base=f"remotes/origin/{branch}", setup_tracking=False
                 )
                 self.dg.checkout_branch(branch)
+                self.dg.specfile.update_spec()
             except Exception as ex:
                 logger.debug(f"Branch {branch} is not present: {ex}")
                 continue
