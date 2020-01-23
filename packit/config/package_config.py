@@ -297,14 +297,16 @@ def parse_loaded_config(
         raise PackitConfigException(f"Cannot parse package config: {ex}.")
 
 
-def get_local_specfile_path(directories):
+def get_local_specfile_path(directories: Union[List[str], List[Path]]):
     """
-    Get path of the local spec file if present.
+    Get the relative path of the local spec file if present.
     :param directories: dirs to find the spec file
-    :return: str path of the spec file
+    :return: str relative path of the spec file
     """
     for dir in directories:
-        files = [os.path.basename(path) for path in glob(os.path.join(dir, "*.spec"))]
+        files = [
+            os.path.relpath(path, dir) for path in glob(os.path.join(dir, "*.spec"))
+        ]
         if len(files) > 0:
             return files[0]
 
@@ -313,7 +315,7 @@ def get_local_specfile_path(directories):
 
 def get_specfile_path_from_repo(project: GitProject):
     """
-    Get path of the spec file in the given repo if present.
+    Get the path of the spec file in the given repo if present.
     :param project: GitProject
     :return: str path of the spec file
     """
