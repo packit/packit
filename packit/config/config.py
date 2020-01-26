@@ -158,16 +158,16 @@ class Config:
                 )
             )
             pagure_user_token = raw_dict.get("pagure_user_token")
+            pagure_instance_url = raw_dict.get(
+                "pagure_instance_url", "https://src.fedoraproject.org"
+            )
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(
                     "packit no longer accepts 'pagure_fork_token'"
                     " value (https://github.com/packit-service/packit/issues/495)"
                 )
             services.add(
-                PagureService(
-                    token=pagure_user_token,
-                    instance_url="https://src.fedoraproject.org",
-                )
+                PagureService(token=pagure_user_token, instance_url=pagure_instance_url)
             )
 
         return services
