@@ -24,11 +24,12 @@ import os
 from pathlib import Path
 
 import pytest
-from marshmallow import ValidationError
-
 from flexmock import flexmock
+from marshmallow import ValidationError
 from ogr import GithubService, PagureService
 from ogr.abstract import GitProject, GitService
+from packit.constants import PROD_DISTGIT_URL
+
 from packit.actions import ActionName
 from packit.config import (
     Config,
@@ -589,6 +590,7 @@ def test_get_user_config(tmpdir):
         "keytab_path: './rambo.keytab'\n"
         "github_token: GITHUB_TOKEN\n"
         "pagure_user_token: PAGURE_TOKEN\n"
+        "pagure_instance_url: test"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
         str(tmpdir)
@@ -599,7 +601,20 @@ def test_get_user_config(tmpdir):
     assert config.keytab_path == "./rambo.keytab"
 
     assert GithubService(token="GITHUB_TOKEN") in config.services
-    assert PagureService(token="PAGURE_TOKEN") in config.services
+    assert PagureService(instance_url="test", token="PAGURE_TOKEN") in config.services
+
+
+def test_get_user_config_default_pagure_url(tmpdir):
+    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+    user_config_file_path.write_text("---\n" "pagure_user_token: PAGURE_TOKEN\n")
+    flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
+        str(tmpdir)
+    )
+    config = Config.get_user_config()
+    assert (
+        PagureService(instance_url=PROD_DISTGIT_URL, token="PAGURE_TOKEN")
+        in config.services
+    )
 
 
 def test_get_user_config_new_authentication(tmpdir):

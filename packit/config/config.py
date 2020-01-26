@@ -42,6 +42,7 @@ from packit.constants import (
     SANDCASTLE_PVC,
     SANDCASTLE_DEFAULT_PROJECT,
     SANDCASTLE_IMAGE,
+    PROD_DISTGIT_URL,
 )
 from packit.exceptions import PackitConfigException, PackitException
 
@@ -145,7 +146,7 @@ class Config:
                 "        token: GITHUB_TOKEN\n"
                 "    pagure:\n"
                 "        token: PAGURE_TOKEN\n"
-                '        instance_url: "https://src.fedoraproject.org"\n'
+                f"        instance_url: {PROD_DISTGIT_URL}\n"
             )
             github_app_id = raw_dict.get("github_app_id")
             github_app_cert_path = raw_dict.get("github_app_cert_path")
@@ -158,9 +159,7 @@ class Config:
                 )
             )
             pagure_user_token = raw_dict.get("pagure_user_token")
-            pagure_instance_url = raw_dict.get(
-                "pagure_instance_url", "https://src.fedoraproject.org"
-            )
+            pagure_instance_url = raw_dict.get("pagure_instance_url", PROD_DISTGIT_URL)
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(
                     "packit no longer accepts 'pagure_fork_token'"

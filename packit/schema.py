@@ -3,6 +3,7 @@ import typing
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
+from packit.constants import PROD_DISTGIT_URL
 
 from packit.actions import ActionName
 from packit.config import PackageConfig, Config, SyncFilesConfig
@@ -271,6 +272,7 @@ class UserConfigSchema(Schema):
     command_handler_pvc_env_var = fields.String()
     command_handler_image_reference = fields.String()
     command_handler_k8s_namespace = fields.String()
+    pagure_instance_url = fields.String(default=PROD_DISTGIT_URL)
 
     @post_load
     def make_instance(self, data, **kwargs):
