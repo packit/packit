@@ -321,5 +321,6 @@ def get_specfile_path_from_repo(project: GitProject):
     """
     try:
         return project.get_files(filter_regex=".*.spec")[0]
-    except Exception:
+    except Exception as ex:
+        logger.debug(f"Cannot find the spec file: {ex}")
         return None
