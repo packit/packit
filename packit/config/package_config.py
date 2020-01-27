@@ -235,13 +235,7 @@ def get_package_config_from_repo(
                 f"on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
             )
-        except FileNotFoundError as ex:
-            logger.debug(
-                f"The config file '{config_file_name}' "
-                f"not found on ref '{ref}' "
-                f"of the {sourcegit_project.full_repo_name} repository."
-                f"{ex!r}"
-            )
+        except FileNotFoundError:
             continue
 
         try:
@@ -256,7 +250,7 @@ def get_package_config_from_repo(
         )
 
     logger.warning(
-        f"No config file found on ref '{ref}' "
+        f"No config file ({CONFIG_FILE_NAMES}) found on ref '{ref}' "
         f"of the {sourcegit_project.full_repo_name} repository."
     )
     return None
