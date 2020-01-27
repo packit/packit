@@ -126,6 +126,13 @@ class FedPKG:
         if not keytab and not self.fas_username:
             logger.info("won't be doing kinit, no credentials provided")
             return
+
+        if not self.fas_username:
+            cmd = ["klist", "-k", keytab]
+            if not utils.run_command_remote(cmd=cmd, fail=False):
+                logger.info("won't clone the repo, invalid Kerberos ticket")
+                return
+
         if keytab and Path(keytab).is_file():
             cmd = [
                 "kinit",
