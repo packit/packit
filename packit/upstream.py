@@ -24,7 +24,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 
 import git
 from packaging import version
@@ -39,6 +39,8 @@ from packit.exceptions import (
     PackitSRPMNotFoundException,
     PackitFailedToCreateSRPMException,
     PackitCommandFailedError,
+    PackitFailedToCreateRPMException,
+    PackitRPMNotFoundException,
 )
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
@@ -766,3 +768,78 @@ class Upstream(PackitRepositoryBase):
             print_live=True,
         )
         return out
+
+    def create_rpm(self, rpm_path, rpm_dir: Union[str, Path] = None):
+        """
+        Create RPM from the actual content of the repo.
+        :param rpm_path: path to the RPM
+        :param rpm_dir: path to the directory where the rpm is meant to be placed
+        :return: path to the RPM
+        """
+        rpm_dir = rpm_dir or os.getcwd()
+        src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
+
+        cmd = [
+            "rpmbuild",
+            "-bb",
+            "--define",
+            f"_sourcedir {rpmbuild_dir}",
+            f"--define",
+            f"_srcdir {src_dir}",
+            "--define",
+            f"_specdir {rpmbuild_dir}",
+            "--define",
+            f"_topdir {rpmbuild_dir}",
+            "--define",
+            f"_builddir {rpmbuild_dir}",
+            "--define",
+            f"_rpmdir {rpm_dir}",
+            "--define",
+            f"_buildrootdir {rpmbuild_dir}",
+            self.package_config.specfile_path,
+        ]
+
+        escaped_command = " ".join([f'"{cmd_part}"' for cmd_part in cmd])
+        logger.debug(f"RPM build command: {escaped_command}")
+        try:
+            out = self.command_handler.run_command(cmd, return_output=True).strip()
+        except PackitCommandFailedError as ex:
+            logger.error(f"The `rpmbuild` command failed: {ex!r}")
+            raise PackitFailedToCreateRPMException(
+                f"reason:\n"
+                f"{ex}\n"
+                f"command:\n"
+                f"{escaped_command}\n"
+                f"stdout:\n"
+                f"{ex.stdout_output}\n"
+                f"stderr:\n"
+                f"{ex.stderr_output}"
+            ) from ex
+        except PackitException as ex:
+            logger.error(f"The `rpmbuild` command failed: {ex!r}")
+            raise PackitFailedToCreateRPMException(
+                f"The `rpmbuild` command failed:\n{ex}"
+            ) from ex
+
+        the_rpm = self._get_rpm_from_rpmbuild_output(out)
+        if rpm_path:
+            shutil.move(the_rpm, rpm_path)
+            return Path(rpm_path)
+        return Path(the_rpm)
+
+    def _get_rpm_from_rpmbuild_output(self, output: str) -> str:
+        """
+        Try to find the rpm file in the `rpmbuild -bb` command output.
+
+        :param output: output of the `rpmbuild -bb` command
+        :return: the name of the RPM file
+        """
+        logger.debug(f"{output}")
+        reg = r": (.+\.rpm)"
+        try:
+            logger.debug(re.findall(reg, output))
+            the_rpm = re.findall(reg, output)[0]
+        except IndexError:
+            raise PackitRPMNotFoundException("RPM cannot be found, something is wrong.")
+        logger.info("RPM is %s", the_rpm)
+        return the_rpm
