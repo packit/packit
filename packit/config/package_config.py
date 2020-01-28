@@ -230,36 +230,35 @@ def get_package_config_from_repo(
             config_file_content = sourcegit_project.get_file_content(
                 path=config_file_name, ref=ref
             )
+        except FileNotFoundError:
+            # do nothing
+            pass
+        else:
             logger.debug(
                 f"Found a config file '{config_file_name}' "
                 f"on ref '{ref}' "
                 f"of the {sourcegit_project.full_repo_name} repository."
             )
-        except FileNotFoundError as ex:
-            logger.debug(
-                f"The config file '{config_file_name}' "
-                f"not found on ref '{ref}' "
-                f"of the {sourcegit_project.full_repo_name} repository."
-                f"{ex!r}"
-            )
-            continue
-
-        try:
-            loaded_config = safe_load(config_file_content)
-        except Exception as ex:
-            logger.error(f"Cannot load package config '{config_file_name}'.")
-            raise PackitConfigException(f"Cannot load package config: {ex}.")
-        return parse_loaded_config(
-            loaded_config=loaded_config,
-            config_file_path=config_file_name,
-            repo_name=sourcegit_project.repo,
+            break
+    else:
+        logger.warning(
+            f"No config file ({CONFIG_FILE_NAMES}) found on ref '{ref}' "
+            f"of the {sourcegit_project.full_repo_name} repository."
         )
+        return None
 
-    logger.warning(
-        f"No config file found on ref '{ref}' "
-        f"of the {sourcegit_project.full_repo_name} repository."
+    try:
+        loaded_config = safe_load(config_file_content)
+    except Exception as ex:
+        logger.error(f"Cannot load package config {config_file_name!r}. {ex}")
+        raise PackitConfigException(
+            f"Cannot load package config {config_file_name!r}. {ex}"
+        )
+    return parse_loaded_config(
+        loaded_config=loaded_config,
+        config_file_path=config_file_name,
+        repo_name=sourcegit_project.repo,
     )
-    return None
 
 
 def parse_loaded_config(
