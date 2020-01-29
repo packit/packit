@@ -769,12 +769,11 @@ class Upstream(PackitRepositoryBase):
         )
         return out
 
-    def create_rpm(self, rpm_path, rpm_dir: Union[str, Path] = None):
+    def create_rpms(self, rpm_dir: Union[str, Path] = None) -> List[Path]:
         """
-        Create RPM from the actual content of the repo.
-        :param rpm_path: path to the RPM
-        :param rpm_dir: path to the directory where the rpm is meant to be placed
-        :return: path to the RPM
+        Create RPMs from the actual content of the repo.
+        :param rpm_dir: path to the directory where the rpms are meant to be placed
+        :return: paths to the RPMs
         """
         rpm_dir = rpm_dir or os.getcwd()
         src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
@@ -821,25 +820,25 @@ class Upstream(PackitRepositoryBase):
                 f"The `rpmbuild` command failed:\n{ex}"
             ) from ex
 
-        the_rpm = self._get_rpm_from_rpmbuild_output(out)
-        if rpm_path:
-            shutil.move(the_rpm, rpm_path)
-            return Path(rpm_path)
-        return Path(the_rpm)
+        rpms = self._get_rpms_from_rpmbuild_output(out)
+        return [Path(rpm) for rpm in rpms]
 
-    def _get_rpm_from_rpmbuild_output(self, output: str) -> str:
+    def _get_rpms_from_rpmbuild_output(self, output: str) -> List[str]:
         """
-        Try to find the rpm file in the `rpmbuild -bb` command output.
+        Try to find the rpm files in the `rpmbuild -bb` command output.
 
         :param output: output of the `rpmbuild -bb` command
-        :return: the name of the RPM file
+        :return: the names of the RPM files
         """
         logger.debug(f"{output}")
         reg = r": (.+\.rpm)"
-        try:
-            logger.debug(re.findall(reg, output))
-            the_rpm = re.findall(reg, output)[0]
-        except IndexError:
-            raise PackitRPMNotFoundException("RPM cannot be found, something is wrong.")
-        logger.info("RPM is %s", the_rpm)
-        return the_rpm
+        logger.debug(re.findall(reg, output))
+        rpms = re.findall(reg, output)
+
+        if not rpms:
+            raise PackitRPMNotFoundException(
+                "RPMs cannot be found, something is wrong."
+            )
+
+        logger.info("RPMs are %s", rpms)
+        return rpms

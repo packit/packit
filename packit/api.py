@@ -497,14 +497,11 @@ class PackitAPI:
             )
         return srpm_path
 
-    def create_rpm(
-        self, output_file: str = None, upstream_ref: str = None, rpm_dir: str = None
-    ) -> Path:
+    def create_rpms(self, upstream_ref: str = None, rpm_dir: str = None) -> List[Path]:
         """
-        Create rpm from the upstream repo
+        Create rpms from the upstream repo
 
         :param upstream_ref: git ref to upstream commit
-        :param output_file: path + filename where the rpm should be written, defaults to cwd
         :param rpm_dir: path to the directory where the rpm is meant to be placed
         :return: a path to the rpm
         """
@@ -518,19 +515,20 @@ class PackitAPI:
             ) from ex
 
         try:
-            rpm_path = self.up.create_rpm(rpm_path=output_file, rpm_dir=rpm_dir)
+            rpm_paths = self.up.create_rpms(rpm_dir=rpm_dir)
         except PackitRPMException:
             raise
         except Exception as ex:
             raise PackitRPMException(
-                f"An unexpected error occurred when creating the RPM: {ex}"
+                f"An unexpected error occurred when creating the RPMs: {ex}"
             ) from ex
 
-        if not rpm_path.exists():
-            raise PackitRPMNotFoundException(
-                f"RPM was created successfully, but can't be found at {rpm_path}"
-            )
-        return rpm_path
+        for rpm_path in rpm_paths:
+            if not rpm_path.exists():
+                raise PackitRPMNotFoundException(
+                    f"RPM was created successfully, but can't be found at {rpm_path}"
+                )
+        return rpm_paths
 
     @staticmethod
     async def status_get_downstream_prs(status) -> List[Tuple[int, str, str]]:
