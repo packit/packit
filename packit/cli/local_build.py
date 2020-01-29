@@ -34,9 +34,6 @@ logger = logging.getLogger("packit")
 
 @click.command("local-build", context_settings=get_context_settings())
 @click.option(
-    "--output", metavar="FILE", help="Write the RPM to FILE instead of current dir."
-)
-@click.option(
     "--remote",
     default=None,
     help=(
@@ -58,13 +55,13 @@ logger = logging.getLogger("packit")
 )
 @pass_config
 @cover_packit_exception
-def local_build(output, config, path_or_url, upstream_ref, remote):
+def local_build(config, path_or_url, upstream_ref, remote):
     """
-    Create RPM using content of the upstream repository.
+    Create RPMs using content of the upstream repository.
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    rpm_path = api.create_rpm(output_file=output, upstream_ref=upstream_ref)
-    logger.info(f"RPM: {rpm_path}")
+    rpm_paths = api.create_rpms(upstream_ref=upstream_ref)
+    logger.info(f"RPMs: {rpm_paths}")
