@@ -81,3 +81,15 @@ class PackitSRPMNotFoundException(PackitSRPMException):
 
 class PackitFailedToCreateSRPMException(PackitSRPMException):
     """ Failed to create SRPM """
+
+
+class PackitRPMException(PackitException):
+    """ Problem with the RPM """
+
+
+class PackitRPMNotFoundException(PackitRPMException):
+    """ RPM created but not found """
+
+
+class PackitFailedToCreateRPMException(PackitRPMException):
+    """ Failed to create RPM """
