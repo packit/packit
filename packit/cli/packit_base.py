@@ -29,6 +29,7 @@ from packit.cli.build import build
 from packit.cli.copr_build import copr_build
 from packit.cli.create_update import create_update
 from packit.cli.generate import generate
+from packit.cli.local_build import local_build
 from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
 from packit.cli.status import status
@@ -85,6 +86,7 @@ packit_base.add_command(push_updates)
 packit_base.add_command(srpm)
 packit_base.add_command(status)
 packit_base.add_command(generate)
+packit_base.add_command(local_build)
 
 if __name__ == "__main__":
     packit_base()
