@@ -840,5 +840,4 @@ class Upstream(PackitRepositoryBase):
                 "RPMs cannot be found, something is wrong."
             )
 
-        logger.info("RPMs are %s", rpms)
         return rpms

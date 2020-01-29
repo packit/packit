@@ -64,4 +64,6 @@ def local_build(config, path_or_url, upstream_ref, remote):
     """
     api = get_packit_api(config=config, local_project=path_or_url)
     rpm_paths = api.create_rpms(upstream_ref=upstream_ref)
-    logger.info(f"RPMs: {rpm_paths}")
+    logger.info("RPMs:")
+    for path in rpm_paths:
+        logger.info(f" * {path}")
