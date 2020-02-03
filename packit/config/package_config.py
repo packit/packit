@@ -22,6 +22,8 @@
 
 import json
 import logging
+import os
+from glob import glob
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
@@ -118,7 +120,11 @@ class PackageConfig:
 
     @classmethod
     def get_from_dict(
-        cls, raw_dict: dict, config_file_path: str = None, repo_name: str = None
+        cls,
+        raw_dict: dict,
+        config_file_path: str = None,
+        repo_name: str = None,
+        spec_file_path: str = None,
     ) -> "PackageConfig":
         # required to avoid cyclical imports
         from packit.schema import PackageConfigSchema
@@ -127,6 +133,12 @@ class PackageConfig:
             raw_dict.update(config_file_path=config_file_path)
 
         package_config = PackageConfigSchema(strict=True).load(raw_dict).data
+
+        if not getattr(package_config, "specfile_path", None):
+            if spec_file_path:
+                package_config.specfile_path = spec_file_path
+            else:
+                raise PackitConfigException("Spec file was not found!")
 
         if not getattr(package_config, "upstream_package_name", None) and repo_name:
             package_config.upstream_package_name = repo_name
@@ -216,6 +228,7 @@ def get_local_package_config(
                     loaded_config=loaded_config,
                     config_file_path=str(config_file_name),
                     repo_name=repo_name,
+                    spec_file_path=get_local_specfile_path(directories),
                 )
 
             logger.debug(f"The local config file '{config_file_name_full}' not found.")
@@ -258,11 +271,15 @@ def get_package_config_from_repo(
         loaded_config=loaded_config,
         config_file_path=config_file_name,
         repo_name=sourcegit_project.repo,
+        spec_file_path=get_specfile_path_from_repo(sourcegit_project),
     )
 
 
 def parse_loaded_config(
-    loaded_config: dict, config_file_path: str = None, repo_name: str = None
+    loaded_config: dict,
+    config_file_path: str = None,
+    repo_name: str = None,
+    spec_file_path: str = None,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
@@ -272,8 +289,38 @@ def parse_loaded_config(
             raw_dict=loaded_config,
             config_file_path=config_file_path,
             repo_name=repo_name,
+            spec_file_path=spec_file_path,
         )
         return package_config
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
         raise PackitConfigException(f"Cannot parse package config: {ex}.")
+
+
+def get_local_specfile_path(directories: Union[List[str], List[Path]]):
+    """
+    Get the relative path of the local spec file if present.
+    :param directories: dirs to find the spec file
+    :return: str relative path of the spec file
+    """
+    for dir in directories:
+        files = [
+            os.path.relpath(path, dir) for path in glob(os.path.join(dir, "*.spec"))
+        ]
+        if len(files) > 0:
+            return files[0]
+
+    return None
+
+
+def get_specfile_path_from_repo(project: GitProject):
+    """
+    Get the path of the spec file in the given repo if present.
+    :param project: GitProject
+    :return: str path of the spec file
+    """
+    try:
+        return project.get_files(filter_regex=".*.spec")[0]
+    except Exception as ex:
+        logger.debug(f"Cannot find the spec file: {ex}")
+        return None

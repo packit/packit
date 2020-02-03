@@ -41,6 +41,9 @@ from packit.config import (
     SyncFilesItem,
 )
 
+from packit.config.package_config import get_local_specfile_path
+from tests.spellbook import UP_OSBUILD, SYNC_FILES
+
 
 def get_job_config_dict_simple():
     return {"job": "build", "trigger": "release"}
@@ -233,7 +236,6 @@ def test_package_config_not_equal(not_equal_package_config):
 @pytest.mark.parametrize(
     "raw,is_valid",
     [
-        ({}, False),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -241,7 +243,6 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             False,
         ),
-        ({"jobs": [{"trigger": "release", "job": "propose_downstream"}]}, False),
         (
             {
                 "specfile_path": "fedora/package.spec",
@@ -300,12 +301,11 @@ def test_package_config_validate(raw, is_valid):
 @pytest.mark.parametrize(
     "raw",
     [
-        {},
         # {"specfile_path": "test/spec/file/path", "something": "different"},
         {
             "specfile_path": "test/spec/file/path",
             "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-        },
+        }
     ],
 )
 def test_package_config_parse_error(raw):
@@ -580,6 +580,19 @@ def test_get_package_config_from_repo(content):
     assert config.create_pr
 
 
+@pytest.mark.parametrize("content", ["{}"])
+def test_get_package_config_from_repo_spec_file_not_defined(content):
+    gp = flexmock(GitProject)
+    gp.should_receive("full_repo_name").and_return("a/b")
+    gp.should_receive("get_file_content").and_return(content)
+    gp.should_receive("get_files").and_return(["packit.spec"])
+    git_project = GitProject(repo="", service=GitService(), namespace="")
+    config = get_package_config_from_repo(sourcegit_project=git_project, ref="")
+    assert isinstance(config, PackageConfig)
+    assert Path(config.specfile_path).name == "packit.spec"
+    assert config.create_pr
+
+
 def test_get_user_config(tmpdir):
     user_config_file_path = Path(tmpdir) / ".packit.yaml"
     user_config_file_path.write_text(
@@ -695,3 +708,8 @@ def test_user_config_fork_token(tmpdir, recwarn):
 )
 def test_get_all_files_to_sync(package_config, all_synced_files):
     assert package_config.get_all_files_to_sync() == all_synced_files
+
+
+def test_get_local_specfile_path():
+    assert get_local_specfile_path([UP_OSBUILD]) == "osbuild.spec"
+    assert not get_local_specfile_path([SYNC_FILES])
