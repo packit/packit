@@ -152,7 +152,7 @@ class PackageConfigSchema(Schema):
     """
 
     config_file_path = fields.String()
-    specfile_path = fields.String(required=True)
+    specfile_path = fields.String()
     downstream_package_name = fields.String()
     upstream_project_url = fields.String(missing=None)
     upstream_package_name = fields.String()
@@ -274,5 +274,4 @@ class UserConfigSchema(Schema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-
         return Config(**data)
