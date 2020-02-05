@@ -12,26 +12,25 @@ upstream_project_url: https://github.com/packit-service/packit
 
 actions:
   create-archive:
-  - "python3 setup.py sdist --dist-dir ."
-  - "sh -c 'echo packitos-$(python3 setup.py --version).tar.gz'"
+    - "python3 setup.py sdist --dist-dir ."
+    - "sh -c 'echo packitos-$(python3 setup.py --version).tar.gz'"
   get-current-version:
-  - "python3 setup.py --version"
-
+    - "python3 setup.py --version"
 
 jobs:
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: fedora-all
-- job: sync_from_downstream
-  trigger: commit
-- job: copr_build
-  trigger: pull_request
-  metadata:
-    targets:
-    - fedora-all
-- job: tests
-  trigger: pull_request
-  metadata:
-    targets:
-    - fedora-stable # on rawhide we have problems with the new marshmallow
+  - job: propose_downstream
+    trigger: release
+    metadata:
+      dist-git-branch: fedora-all
+  - job: sync_from_downstream
+    trigger: commit
+  - job: copr_build
+    trigger: pull_request
+    metadata:
+      targets:
+        - fedora-all
+  - job: tests
+    trigger: pull_request
+    metadata:
+      targets:
+        - fedora-stable # on rawhide we have problems with the new marshmallow

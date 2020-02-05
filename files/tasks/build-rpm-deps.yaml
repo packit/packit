@@ -2,5 +2,5 @@
 - name: Install build RPM dependencies
   command: dnf -y builddep packit.spec
   args:
-    chdir: '{{ project_dir }}'
+    chdir: "{{ project_dir }}"
   become: true

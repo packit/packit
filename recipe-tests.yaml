@@ -11,16 +11,16 @@
           USER: ""
           HOME: ""
   tasks:
-  - name: Install all packages needed to run tests
-    dnf:
-      name:
-      - python3-tox
-      - python36
-      - krb5-devel
-      - rpm-libs
-      - redhat-rpm-config
-      # when running the tests in a rootless podman container, tox environment
-      # needed gcc and rpm-devel to compile the rpm-libs python bindings
-      # - gcc
-      # - rpm-devel
-      state: present
+    - name: Install all packages needed to run tests
+      dnf:
+        name:
+          - python3-tox
+          - python36
+          - krb5-devel
+          - rpm-libs
+          - redhat-rpm-config
+        # when running the tests in a rootless podman container, tox environment
+        # needed gcc and rpm-devel to compile the rpm-libs python bindings
+        # - gcc
+        # - rpm-devel
+        state: present
