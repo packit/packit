@@ -586,7 +586,7 @@ class PackitAPI:
             return []
 
     @staticmethod
-    async def status_main(status: Status) -> Tuple:
+    async def status_main(status: Status) -> List:
         """
         Schedule repository data retrieval calls concurrently.
         :param status: status of the package
