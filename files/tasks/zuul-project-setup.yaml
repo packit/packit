@@ -6,11 +6,11 @@
   when: zuul is defined
 - name: stat {{ project_dir }}
   stat:
-    path: '{{ project_dir }}'
+    path: "{{ project_dir }}"
   tags:
-  - no-cache
+    - no-cache
   register: src_path
 - name: Let's make sure {{ project_dir }} is present
   assert:
     that:
-    - 'src_path.stat.isdir'
+      - "src_path.stat.isdir"
