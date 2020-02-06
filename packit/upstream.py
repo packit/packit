@@ -559,15 +559,15 @@ class Upstream(PackitRepositoryBase):
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: path to the srpm
         """
+
         if self.running_in_service():
             srpm_dir = "."
-            rpmbuild_dir = "."
-            src_dir = str(
-                self.absolute_specfile_dir.relative_to(self.local_project.working_dir)
+            rpmbuild_dir = os.path.relpath(
+                str(self.absolute_specfile_dir), self.local_project.working_dir
             )
         else:
             srpm_dir = srpm_dir or os.getcwd()
-            src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
+            rpmbuild_dir = str(self.absolute_specfile_dir)
 
         cmd = [
             "rpmbuild",
@@ -575,12 +575,11 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_sourcedir {rpmbuild_dir}",
             f"--define",
-            f"_srcdir {src_dir}",
+            f"_srcdir {rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
             "--define",
             f"_srcrpmdir {srpm_dir}",
-            # no idea about this one, but tests were failing in tox w/o it
             "--define",
             f"_topdir {rpmbuild_dir}",
             # we also need these 3 so that rpmbuild won't create them

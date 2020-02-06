@@ -21,9 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import pytest
+import os
 import sys
+import pytest
+
 from flexmock import flexmock
+from pkg_resources import DistributionNotFound, Distribution
 
 from packit.exceptions import PackitException, ensure_str
 from packit.utils import (
@@ -32,7 +35,6 @@ from packit.utils import (
     run_command,
     get_packit_version,
 )
-from pkg_resources import DistributionNotFound, Distribution
 
 
 @pytest.mark.parametrize(
@@ -100,3 +102,10 @@ def test_get_packit_version():
 )
 def test_ensure_str(inp, exp):
     assert ensure_str(inp) == exp
+
+
+@pytest.mark.parametrize(
+    "to,from_,exp", (("/", "/", "."), ("/a", "/a/b", ".."), ("/a", "/c", "../a"))
+)
+def test_relative_to(to, from_, exp):
+    assert os.path.relpath(to, from_) == exp
