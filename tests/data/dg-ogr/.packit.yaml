@@ -10,24 +10,24 @@ upstream_project_url: "https://github.com/packit-service/ogr"
 create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
 current_version_command: ["python3", "setup.py", "--version"]
 jobs:
-- job: sync_from_downstream
-  trigger: commit
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: master
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: f30
-- job: propose_downstream
-  trigger: release
-  metadata:
-    dist-git-branch: f29
-- job: copr_build
-  trigger: pull_request
-  metadata:
-    targets:
-    - fedora-29-x86_64
-    - fedora-rawhide-x86_64
-    - fedora-30-x86_64
+  - job: sync_from_downstream
+    trigger: commit
+  - job: propose_downstream
+    trigger: release
+    metadata:
+      dist-git-branch: master
+  - job: propose_downstream
+    trigger: release
+    metadata:
+      dist-git-branch: f30
+  - job: propose_downstream
+    trigger: release
+    metadata:
+      dist-git-branch: f29
+  - job: copr_build
+    trigger: pull_request
+    metadata:
+      targets:
+        - fedora-29-x86_64
+        - fedora-rawhide-x86_64
+        - fedora-30-x86_64

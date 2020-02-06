@@ -8,13 +8,15 @@ Use your best judgement, and feel free to propose changes to this document in a 
 By contributing to this project you agree to the Developer Certificate of Origin (DCO). This document is a simple statement that you, as a contributor, have the legal right to submit the contribution. See the [DCO](DCO) file for details.
 
 ## Reporting Bugs
+
 Before creating bug reports, please check a [list of known issues](https://github.com/packit-service/packit/issues) to see
 if the problem has already been reported (or fixed in a master branch).
 
 If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/packit-service/packit/issues/new).
 Be sure to include a **descriptive title and a clear description**. Ideally, please provide:
- * version of packit you are using (`rpm -q packit` or `pip3 freeze | grep packitos`)
- * the command you executed and a debug output (using option `--debug`)
+
+- version of packit you are using (`rpm -q packit` or `pip3 freeze | grep packitos`)
+- the command you executed and a debug output (using option `--debug`)
 
 If possible, add a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
 
@@ -38,7 +40,8 @@ It's a quick read, and it's a great way to introduce yourself to how things work
 ### Dependencies
 
 If you are introducing a new dependency, please make sure it's added to:
- * [setup.cfg](setup.cfg)
+
+- [setup.cfg](setup.cfg)
 
 ### Documentation
 
@@ -48,13 +51,13 @@ If you want to update documentation, find corresponding file in [docs](/docs) fo
 
 When you are contributing to changelog, please follow these suggestions:
 
-* The changelog is meant to be read by everyone. Imagine that an average user
+- The changelog is meant to be read by everyone. Imagine that an average user
   will read it and should understand the changes.
-* Every line should be a complete sentence. Either tell what is the change that
+- Every line should be a complete sentence. Either tell what is the change that
   the tool is doing or describe it precisely:
-  * Bad: `Use search method in label regex`
-  * Good: `Packit now uses search method when...`
-* And finally, with the changelogs we are essentially selling our projects:
+  - Bad: `Use search method in label regex`
+  - Good: `Packit now uses search method when...`
+- And finally, with the changelogs we are essentially selling our projects:
   think about a situation that you met someone at a conference and you are
   trying to convince the person to use the project and that the changelog
   should help with that.
@@ -64,23 +67,24 @@ When you are contributing to changelog, please follow these suggestions:
 Tests are stored in [tests](/tests) directory:
 
 - `tests/unit`
-    - testing small units/parts of the code
-    - strictly offline
+  - testing small units/parts of the code
+  - strictly offline
 - `tests/integration`
-    - testing bigger parts of codebase (integration between multiple units, packit python API)
-    - mocking with [flexmock](https://github.com/bkabrda/flexmock/) instead of using [requre](https://github.com/packit-service/requre)
+  - testing bigger parts of codebase (integration between multiple units, packit python API)
+  - mocking with [flexmock](https://github.com/bkabrda/flexmock/) instead of using [requre](https://github.com/packit-service/requre)
 - `tests/functional`
-    - testing packit as a CLI
-    - be careful what you run -- no requre, no mocking
+  - testing packit as a CLI
+  - be careful what you run -- no requre, no mocking
 - `tests_recording`
-    - testing bigger parts of codebase (integration between multiple units, packit python API)
-    - use [requre](https://github.com/packit-service/requre)
-      for remote communication => offline in the CI
-    - prefer [requre](https://github.com/packit-service/requre) instead of mocking
+  - testing bigger parts of codebase (integration between multiple units, packit python API)
+  - use [requre](https://github.com/packit-service/requre)
+    for remote communication => offline in the CI
+  - prefer [requre](https://github.com/packit-service/requre) instead of mocking
 
 We use [Tox](https://pypi.org/project/tox) with configuration in [tox.ini](tox.ini).
 
 Running tests locally:
+
 ```
 make check_in_container
 ```
@@ -110,6 +114,7 @@ PersistentObjectStorage().storage_file = response_file
 
 For cases you'd like to trigger copr build in your copr project, you can configure it in
 packit configuration of your chosen package:
+
 ```
 jobs:
 - job: copr_build
@@ -131,24 +136,26 @@ jobs:
 
 ### Requirements for Pull Requests
 
-* Please create Pull Requests against the `master` branch.
-* Please make sure that your code complies with [PEP8](https://www.python.org/dev/peps/pep-0008/).
-* One line should not contain more than 100 characters.
-* Make sure that new code is covered by a test case (new or existing one).
-* We don't like [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code).
-* The tests have to pass.
+- Please create Pull Requests against the `master` branch.
+- Please make sure that your code complies with [PEP8](https://www.python.org/dev/peps/pep-0008/).
+- One line should not contain more than 100 characters.
+- Make sure that new code is covered by a test case (new or existing one).
+- We don't like [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code).
+- The tests have to pass.
 
 ### Checkers/linters/formatters & pre-commit
 
 To make sure our code is compliant with the above requirements, we use:
-* [black code formatter](https://github.com/ambv/black)
-* [Flake8 code linter](http://flake8.pycqa.org)
-* [mypy static type checker](http://mypy-lang.org)
+
+- [black code formatter](https://github.com/ambv/black)
+- [Flake8 code linter](http://flake8.pycqa.org)
+- [mypy static type checker](http://mypy-lang.org)
 
 There's a [pre-commit](https://pre-commit.com) config file in [.pre-commit-config.yaml](.pre-commit-config.yaml).
 To [utilize pre-commit](https://pre-commit.com/#usage), install pre-commit with `pip3 install pre-commit` and then either
-* `pre-commit install` - to install pre-commit into your [git hooks](https://githooks.com). pre-commit will from now on run all the checkers/linters/formatters on every commit. If you later want to commit without running it, just run `git commit` with `-n/--no-verify`.
-* Or if you want to manually run all the checkers/linters/formatters, run `pre-commit run --all-files`.
+
+- `pre-commit install` - to install pre-commit into your [git hooks](https://githooks.com). pre-commit will from now on run all the checkers/linters/formatters on every commit. If you later want to commit without running it, just run `git commit` with `-n/--no-verify`.
+- Or if you want to manually run all the checkers/linters/formatters, run `pre-commit run --all-files`.
 
 Thank you for your interest!
 packit team.
