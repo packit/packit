@@ -84,7 +84,8 @@ class CommitVerifier:
             result = self.gpg.recv_keys(self.key_server, key_fingerprint)
             if not result.fingerprints:
                 raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
-
+        except PackitException:
+            raise
         except ValueError as error:
             # python-gnupg do not recognise KEY_CONSIDERED response from gpg2
             if "KEY_CONSIDERED" not in str(error):
