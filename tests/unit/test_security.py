@@ -198,3 +198,18 @@ def test_check_signature_of_commit_key_not_found():
             possible_key_fingerprints=["a"],
         )
     assert "Cannot receive" in str(ex)
+
+
+# Don't explicitly fail if the key server is down
+@pytest.mark.xfail(raises=PackitException)
+@pytest.mark.parametrize(
+    "keyid, ok",
+    [("A3E9A812AAB73DA7", True,), ("NOTEXISTING", False,)],  # Jirka's key id
+)
+def test_download_gpg_key_if_needed(keyid, ok):
+    cf = CommitVerifier()
+    if ok:
+        assert cf.download_gpg_key_if_needed(keyid) is None
+    else:
+        with pytest.raises(PackitException):
+            cf.download_gpg_key_if_needed(keyid)
