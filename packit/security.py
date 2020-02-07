@@ -42,10 +42,17 @@ class CommitVerifier:
 
     def __init__(self, key_server: str = None) -> None:
         """
-        :param key_server: GPG key server to be used, defaults to keys.fedoraproject.org
+        :param key_server: GPG key server to be used
         """
         self._gpg: Optional[GPG] = None
-        self.key_server = key_server or "keys.fedoraproject.org"
+        if key_server:
+            self.key_servers = [key_server]
+        else:
+            self.key_servers = [
+                "keys.openpgp.org",
+                "pgp.mit.edu",
+                "keyserver.ubuntu.com",
+            ]
 
     @property
     def gpg(self) -> GPG:
@@ -66,26 +73,25 @@ class CommitVerifier:
         return self.gpg.list_keys()
 
     @property
-    def _gpg_fingerprints(self) -> str:
+    def _gpg_fingerprints(self) -> List[str]:
         """List of fingerprints of the saved keys"""
         return self._gpg_keys.fingerprints
 
-    def download_gpg_key_if_needed(self, key_fingerprint: str) -> None:
+    def download_gpg_key_if_needed(self, key_fingerprint: str) -> str:
         """
-        Download the gpg key from the self.key_server
-        if it is not present.
+        Download the gpg key from the self.key_servers if it is not present.
 
-        :param key_fingerprint: str (fingerprint of the gpg key)
+        :param key_fingerprint: fingerprint of the gpg key
         """
         if key_fingerprint in self._gpg_fingerprints:
-            return
+            return key_fingerprint
 
         try:
-            result = self.gpg.recv_keys(self.key_server, key_fingerprint)
-            if not result.fingerprints:
-                raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
-        except PackitException:
-            raise
+            for keyserver in self.key_servers:
+                logger.debug(f"Downloading {key_fingerprint} from {keyserver}")
+                result = self.gpg.recv_keys(keyserver, key_fingerprint)
+                if result.fingerprints:
+                    return result.fingerprints[0]
         except ValueError as error:
             # python-gnupg do not recognise KEY_CONSIDERED response from gpg2
             if "KEY_CONSIDERED" not in str(error):
@@ -94,6 +100,8 @@ class CommitVerifier:
                 )
         except Exception as ex:
             raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}", ex)
+
+        raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
 
     def check_signature_of_commit(
         self, commit: git.Commit, possible_key_fingerprints: List[str]
