@@ -38,8 +38,6 @@ logger = logging.getLogger(__name__)
 class CommitVerifier:
     """
     Class used for verifying git commits. Uses python-gnupg for accessing the GPG binary.
-
-    Uses `gpg2` instead of the `gpg` if it exists.
     """
 
     def __init__(self, key_server: str = None) -> None:
@@ -53,18 +51,9 @@ class CommitVerifier:
     def gpg(self) -> GPG:
         """
         gnupg.GPG instance from python-gnupg
-
-        Uses `gpg2` instead of the `gpg` if it exists.
         """
         if not self._gpg:
-            for gpg_location in ["gpg2", "gpg"]:
-                try:
-                    self._gpg = GPG(gpgbinary=gpg_location)
-                    break
-                except FileNotFoundError:
-                    continue
-            else:
-                raise PackitException("GPG binary not found.")
+            self._gpg = GPG()
         return self._gpg
 
     @property
