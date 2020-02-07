@@ -101,7 +101,7 @@ def test_check_signature_of_commit(
         flexmock(fingerprints=local_keys)
     )
     gpg_flexmock.should_receive("recv_keys").and_return(
-        flexmock(fingerprints=flexmock())
+        flexmock(fingerprints=["fingerprint"])
     ).times(download_times)
 
     repo_mock = flexmock(
@@ -154,10 +154,10 @@ def test_check_signature_of_commit_not_present_key(
     gpg_flexmock = flexmock(GPG)
     gpg_flexmock.should_receive("list_keys").and_return(
         flexmock(fingerprints=local_keys)
-    ).and_return(flexmock(fingerprints=local_keys))
+    )
 
     gpg_flexmock.should_receive("recv_keys").and_return(
-        flexmock(fingerprints=flexmock())
+        flexmock(fingerprints=["fingerprint"])
     ).times(download_times)
 
     repo_mock = flexmock(
@@ -184,9 +184,7 @@ def test_check_signature_of_commit_key_not_found():
     gpg_flexmock.should_receive("list_keys").and_return(flexmock(fingerprints=[]))
 
     # No key received
-    gpg_flexmock.should_receive("recv_keys").and_return(
-        flexmock(fingerprints=[])
-    ).once()
+    gpg_flexmock.should_receive("recv_keys").and_return(flexmock(fingerprints=[]))
 
     # Signature cannot be checked
     repo_mock = flexmock(git=flexmock().should_receive("show").and_return("E").mock())
@@ -200,8 +198,7 @@ def test_check_signature_of_commit_key_not_found():
     assert "Cannot receive" in str(ex)
 
 
-# Don't explicitly fail if the key server is down
-@pytest.mark.xfail(raises=PackitException)
+# This could possibly but unlikely fail if all the default key servers are down.
 @pytest.mark.parametrize(
     "keyid, ok",
     [("A3E9A812AAB73DA7", True,), ("NOTEXISTING", False,)],  # Jirka's key id
@@ -209,7 +206,7 @@ def test_check_signature_of_commit_key_not_found():
 def test_download_gpg_key_if_needed(keyid, ok):
     cf = CommitVerifier()
     if ok:
-        assert cf.download_gpg_key_if_needed(keyid) is None
+        assert cf.download_gpg_key_if_needed(keyid)
     else:
         with pytest.raises(PackitException):
             cf.download_gpg_key_if_needed(keyid)
