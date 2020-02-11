@@ -40,7 +40,6 @@ from packit.config import (
     SyncFilesConfig,
     SyncFilesItem,
 )
-
 from packit.config.package_config import get_local_specfile_path
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
 
@@ -72,7 +71,7 @@ def get_job_config_full():
 def get_default_job_config():
     return [
         JobConfig(
-            job=JobType.copr_build,
+            job=JobType.tests,
             trigger=JobTriggerType.pull_request,
             metadata={"targets": ["fedora-stable"]},
         ),
@@ -316,7 +315,7 @@ def test_package_config_parse_error(raw):
 @pytest.mark.parametrize(
     "raw,expected",
     [
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
@@ -337,8 +336,9 @@ def test_package_config_parse_error(raw):
                 downstream_package_name="package",
                 create_pr=False,
             ),
+            id="specfile_path+synced_files+job_config_full+downstream_package_name+create_pr",
         ),
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": [
@@ -365,8 +365,9 @@ def test_package_config_parse_error(raw):
                 jobs=[get_job_config_simple()],
                 downstream_package_name="package",
             ),
+            id="specfile_path+synced_files+job_config_dict_simple+downstream_package_name",
         ),
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
@@ -385,8 +386,9 @@ def test_package_config_parse_error(raw):
                 jobs=[get_job_config_full()],
                 downstream_package_name="package",
             ),
+            id="specfile_path+synced_files(spec_only)+job_config_full+downstream_package_name",
         ),
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec", "somefile"],
@@ -406,8 +408,9 @@ def test_package_config_parse_error(raw):
                 jobs=[get_job_config_full()],
                 downstream_package_name="package",
             ),
+            id="specfile_path+synced_files+job_config_full+downstream_package_name",
         ),
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
@@ -432,8 +435,10 @@ def test_package_config_parse_error(raw):
                 dist_git_base_url="https://something.wicked",
                 downstream_package_name="package",
             ),
+            id="specfile_path+synced_files+job_config_dict_full+upstream_project_url"
+            "+upstream_package_name+dist_git_base_url+downstream_package_name",
         ),
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "actions": {
@@ -458,8 +463,10 @@ def test_package_config_parse_error(raw):
                 dist_git_base_url="https://something.wicked",
                 downstream_package_name="package",
             ),
+            id="specfile_path+actions+empty_jobs+upstream_project_url"
+            "+upstream_package_name+dist_git_base_url+downstream_package_name",
         ),
-        (
+        pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/package.spec"],
@@ -477,6 +484,7 @@ def test_package_config_parse_error(raw):
                 jobs=get_default_job_config(),
                 downstream_package_name="package",
             ),
+            id="specfile_path+synced_files+downstream_package_name",
         ),
     ],
 )

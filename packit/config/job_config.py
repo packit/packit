@@ -83,7 +83,7 @@ class JobConfig:
 
 default_jobs = [
     JobConfig(
-        job=JobType.copr_build,
+        job=JobType.tests,
         trigger=JobTriggerType.pull_request,
         metadata={"targets": ["fedora-stable"]},
     ),
