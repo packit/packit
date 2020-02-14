@@ -45,7 +45,7 @@ If you are introducing a new dependency, please make sure it's added to:
 
 ### Documentation
 
-If you want to update documentation, find corresponding file in [docs](/docs) folder.
+If you want to update documentation, create a PR against [packit.dev](https://github.com/packit-service/packit.dev).
 
 #### Changelog
 
@@ -80,8 +80,6 @@ Tests are stored in [tests](/tests) directory:
   - use [requre](https://github.com/packit-service/requre)
     for remote communication => offline in the CI
   - prefer [requre](https://github.com/packit-service/requre) instead of mocking
-
-We use [Tox](https://pypi.org/project/tox) with configuration in [tox.ini](tox.ini).
 
 Running tests locally:
 
@@ -130,32 +128,37 @@ jobs:
 
 ### How to contribute code to packit
 
-1. Create a fork of the `packit` repository.
+1. Create a fork of this repository.
 2. Create a new branch just for the bug/feature you are working on.
 3. Once you have completed your work, create a Pull Request, ensuring that it meets the requirements listed below.
 
-### Requirements for Pull Requests
+### Requirements for Pull Requests (PR)
 
-- Please create Pull Requests against the `master` branch.
-- Please make sure that your code complies with [PEP8](https://www.python.org/dev/peps/pep-0008/).
-- One line should not contain more than 100 characters.
-- Make sure that new code is covered by a test case (new or existing one).
-- We don't like [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code).
-- The tests have to pass.
+- Use `pre-commit` (see [below](#checkerslintersformatters--pre-commit)).
+- Use common sense when creating commits, not too big, not too small. You can also squash them at the end of review. See [How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/).
+- Cover new code with a test case (new or existing one).
+- All tests have to pass.
+- Rebase against updated `master` branch before creating a PR to have linear git history.
+- Create a PR against the `master` branch.
+- The `mergit` label:
+  - Add it to instruct CI and/or reviewer that you're really done with the PR.
+  - Anyone else can add it too if they think the PR is ready to be merged.
+- Status checks SHOULD all be green.
+  - Reviewer(s) have final word and HAVE TO run tests locally if they merge a PR with a red CI.
 
 ### Checkers/linters/formatters & pre-commit
 
-To make sure our code is compliant with the above requirements, we use:
+To make sure our code is [PEP8](https://www.python.org/dev/peps/pep-0008/) compliant, we use:
 
-- [black code formatter](https://github.com/ambv/black)
+- [black code formatter](https://github.com/psf/black)
 - [Flake8 code linter](http://flake8.pycqa.org)
 - [mypy static type checker](http://mypy-lang.org)
 
 There's a [pre-commit](https://pre-commit.com) config file in [.pre-commit-config.yaml](.pre-commit-config.yaml).
-To [utilize pre-commit](https://pre-commit.com/#usage), install pre-commit with `pip3 install pre-commit` and then either
+To [utilize pre-commit](https://pre-commit.com/#usage), install pre-commit with `pip3 install pre-commit` and then either:
 
 - `pre-commit install` - to install pre-commit into your [git hooks](https://githooks.com). pre-commit will from now on run all the checkers/linters/formatters on every commit. If you later want to commit without running it, just run `git commit` with `-n/--no-verify`.
 - Or if you want to manually run all the checkers/linters/formatters, run `pre-commit run --all-files`.
 
 Thank you for your interest!
-packit team.
+Packit team.
