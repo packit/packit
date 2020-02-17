@@ -384,14 +384,21 @@ class Upstream(PackitRepositoryBase):
             outputs = self.get_output_from_action(
                 action=ActionName.create_archive, env=env
             )
-            if not outputs:
-                raise PackitException("No output from create-archive action.")
+            if self.package_config.archive_name:
+                archive_path = Path(
+                    self._local_project.working_dir,
+                    self.package_config.archive_name.format(version=version),
+                )
+            else:
+                if not outputs:
+                    raise PackitException("No output from create-archive action.")
 
-            archive_path = self._get_archive_path_from_output(outputs)
-            if not archive_path:
+                archive_path = self._get_archive_path_from_output(outputs)
+            if not archive_path or not archive_path.exists():
                 raise PackitException(
                     "The create-archive action did not output a path to the generated archive. "
-                    "Please make sure that you have valid path in the single line of the output."
+                    "Please make sure that you have valid path in the single line of the output"
+                    "or archive_name option set in packit conf."
                 )
             self._add_link_to_archive_from_specdir_if_needed(archive_path)
             return archive_path.name
@@ -405,14 +412,17 @@ class Upstream(PackitRepositoryBase):
 
         :return: name of the archive
         """
-        archive_extension = self.get_archive_extension(dir_name, version)
-        if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
-            raise PackitException(
-                "The target archive doesn't use a common extension ({}), "
-                "git archive can't be used. Please provide your own script "
-                "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
-            )
-        archive_name = f"{dir_name}{archive_extension}"
+        if self.package_config.archive_name:
+            archive_name = self.package_config.archive_name.format(version=version)
+        else:
+            archive_extension = self.get_archive_extension(dir_name, version)
+            if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
+                raise PackitException(
+                    "The target archive doesn't use a common extension ({}), "
+                    "git archive can't be used. Please provide your own script "
+                    "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
+                )
+            archive_name = f"{dir_name}{archive_extension}"
         relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
             self.local_project.working_dir
         )

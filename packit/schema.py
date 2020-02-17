@@ -156,6 +156,7 @@ class PackageConfigSchema(Schema):
     downstream_package_name = fields.String()
     upstream_project_url = fields.String(missing=None)
     upstream_package_name = fields.String()
+    archive_name = fields.String()
     upstream_ref = fields.String()
     upstream_tag_template = fields.String()
     dist_git_url = NotProcessedField(
