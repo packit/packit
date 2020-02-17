@@ -1,13 +1,9 @@
 ---
-specfile_path: packit.spec
 synced_files:
-  - packit.spec
-  - .packit.yaml
   - src: fedora-tests/
     dest: tests/
 # packit was already taken on PyPI
 upstream_package_name: packitos
-downstream_package_name: packit
 upstream_project_url: https://github.com/packit-service/packit
 
 actions:
