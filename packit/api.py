@@ -45,6 +45,7 @@ from packit.exceptions import (
     PackitSRPMNotFoundException,
     PackitRPMException,
     PackitRPMNotFoundException,
+    PackitCoprException,
 )
 from packit.local_project import LocalProject
 from packit.status import Status
@@ -691,6 +692,12 @@ class PackitAPI:
         """
         srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
 
+        owner = owner or self.copr_helper.configured_owner
+        if not owner:
+            raise PackitCoprException(
+                f"Copr owner not set. Use Copr config file or `--owner` when calling packit CLI."
+            )
+
         self.copr_helper.create_copr_project_if_not_exists(
             project=project,
             chroots=chroots,
@@ -698,12 +705,10 @@ class PackitAPI:
             description=description,
             instructions=instructions,
         )
-        logger.debug(
-            f"owner={owner if owner else 'value from the config file will be used'}, "
-            f"project={project}, path={srpm_path}"
-        )
+        logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
+
         build = self.copr_helper.copr_client.build_proxy.create_from_file(
-            owner, project, srpm_path
+            ownername=owner, projectname=project, path=srpm_path
         )
         return build.id, self.copr_helper.copr_web_build_url(build)
 
