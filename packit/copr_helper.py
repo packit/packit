@@ -8,7 +8,7 @@ from copr.v3.exceptions import CoprNoResultException, CoprException
 from munch import Munch
 
 from packit.constants import COPR2GITHUB_STATE
-from packit.exceptions import PackitCoprProjectException, PackitCoprException
+from packit.exceptions import PackitCoprProjectException
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -54,13 +54,6 @@ class CoprHelper:
 
         Raises PackitCoprException on any problems.
         """
-        owner = owner or self.configured_owner
-
-        if not owner:
-            raise PackitCoprException(
-                f"Copr owner not set. Use Copr config file or `--owner` when calling packit CLI."
-            )
-
         try:
             copr_proj = self.copr_client.project_proxy.get(
                 ownername=owner, projectname=project
