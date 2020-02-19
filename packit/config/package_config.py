@@ -205,12 +205,20 @@ def get_local_package_config(
     :return: local PackageConfig if present
     """
     directories = [Path(config_dir) for config_dir in directory]
+    cwd = Path.cwd()
+
+    if try_local_dir_first and try_local_dir_last:
+        logger.error("Ambiguous usage of try_local_dir_first and try_local_dir_last")
 
     if try_local_dir_first:
-        directories.insert(0, Path.cwd())
+        if cwd in directories:
+            directories.remove(cwd)
+        directories.insert(0, cwd)
 
     if try_local_dir_last:
-        directories.append(Path.cwd())
+        if cwd in directories:
+            directories.remove(cwd)
+        directories.append(cwd)
 
     for config_dir in directories:
         for config_file_name in CONFIG_FILE_NAMES:
