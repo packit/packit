@@ -526,30 +526,17 @@ class Upstream(PackitRepositoryBase):
         self.specfile.write_spec_content()
 
     def _fix_spec_source(self, archive):
-        prefix = "Source"
-        regex = re.compile(r"^Source\s*:.+$")
-        for line in self.specfile.spec_content.section("%package"):
-            # we are looking for Source lines
-            if line.startswith(prefix):
-                # it's a Source line!
-                if line.startswith(self.package_config.spec_source_id):
-                    # it even matches the specific Source\d+
-                    full_name = self.package_config.spec_source_id
-                elif regex.match(line):
-                    # okay, let's try the other very common default
-                    # https://github.com/packit-service/packit/issues/536#issuecomment-534074925
-                    full_name = prefix
-                else:
-                    # nope, let's continue the search
-                    continue
-                # we found it!
+        tag = None
+        for t in self.package_config.spec_source_id:
+            tag = self.specfile.tag(t)
+            if tag:
                 break
         else:
             raise PackitException(
                 "The spec file doesn't have sources set "
-                f"via {self.package_config.spec_source_id} nor {prefix}."
+                f"via {' or '.join(self.package_config.spec_source_id)}."
             )
-        self.specfile.set_tag(full_name, archive)
+        self.specfile.set_tag(tag.name, archive)
 
     def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """
