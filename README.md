@@ -38,11 +38,11 @@ For the run-down of the planned work, please see the task-list below.
   - [ ] You can release to rawhide from source-git using packit.
   - [ ] Packit can create a source-git repository.
   - [ ] Packit helps developers with their source-git repositories.
-- [ ] Packit as a service
+- [x] Packit as a service
   - [x] Packit reacts to Github webhooks.
   - [x] Have a Github app for packit.
-    - [ ] Github app is on Marketplace.
-  - [ ] Packit service is deployed and usable by anyone.
+    - [x] Github app is on Marketplace.
+  - [x] Packit service is deployed and usable by anyone.
 
 ## Workflows covered by packit
 
