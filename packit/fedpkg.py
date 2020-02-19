@@ -119,7 +119,13 @@ class FedPKG:
         if anonymous:
             cmd += ["-a"]
         cmd += [package_name, target_path]
-        utils.run_command(cmd=cmd)
+
+        error_msg = (
+            f"Packit failed to clone the repository {package_name}; please make sure that you"
+            f"authorized to clone repositories from fedora dist-git - this may require"
+            f"SSH keys set up or Kerberos ticket being active."
+        )
+        utils.run_command(cmd=cmd, error_message=error_msg)
 
     def init_ticket(self, keytab: str = None):
         # TODO: this method has nothing to do with fedpkg, pull it out
