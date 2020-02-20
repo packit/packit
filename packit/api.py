@@ -678,6 +678,7 @@ class PackitAPI:
         owner: str = None,
         description: str = None,
         instructions: str = None,
+        upstream_ref: str = None,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -688,9 +689,12 @@ class PackitAPI:
         :param owner: defaults to username from copr config file
         :param description: description of the project
         :param instructions: installation instructions for the project
+        :param upstream_ref: git ref to upstream commit
         :return: id of the created build and url to the build web page
         """
-        srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
+        srpm_path = self.create_srpm(
+            upstream_ref=upstream_ref, srpm_dir=self.up.local_project.working_dir
+        )
 
         owner = owner or self.copr_helper.configured_owner
         if not owner:
