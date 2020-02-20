@@ -129,20 +129,16 @@ class FedPKG:
 
     def init_ticket(self, keytab: str = None):
         # TODO: this method has nothing to do with fedpkg, pull it out
-        if not keytab and not self.fas_username:
+        if not self.fas_username or not keytab or not Path(keytab).is_file():
             logger.info("won't be doing kinit, no credentials provided")
             return
-        if keytab and Path(keytab).is_file():
-            cmd = [
-                "kinit",
-                f"{self.fas_username}@FEDORAPROJECT.ORG",
-                "-k",
-                "-t",
-                keytab,
-            ]
-        else:
-            # there is no keytab, but user still might have active ticket - try to renew it
-            cmd = ["kinit", "-R", f"{self.fas_username}@FEDORAPROJECT.ORG"]
+        cmd = [
+            "kinit",
+            f"{self.fas_username}@FEDORAPROJECT.ORG",
+            "-k",
+            "-t",
+            keytab,
+        ]
         return utils.run_command_remote(
             cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
         )
