@@ -55,11 +55,26 @@ from packit.config.aliases import get_build_targets
     help="Installation instructions for the project to build in.",
     default=None,
 )
+@click.option(
+    "--upstream-ref",
+    default=None,
+    help="Git ref of the last upstream commit in the current branch "
+    "from which packit should generate patches "
+    "(this option implies the repository is source-git).",
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
 def copr_build(
-    config, nowait, owner, project, targets, path_or_url, description, instructions
+    config,
+    nowait,
+    owner,
+    project,
+    targets,
+    description,
+    instructions,
+    upstream_ref,
+    path_or_url,
 ):
     """
     Build selected upstream project in COPR.
@@ -80,6 +95,7 @@ def copr_build(
         owner=owner,
         description=description,
         instructions=instructions,
+        upstream_ref=upstream_ref,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if not nowait:
