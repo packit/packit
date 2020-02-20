@@ -21,6 +21,7 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-pyyaml
 BuildRequires:  python3-tabulate
 BuildRequires:  python3-cccolutils
+BuildRequires:  python3-copr
 BuildRequires:  python3-koji
 BuildRequires:  python3-lazy-object-proxy
 BuildRequires:  rebase-helper
