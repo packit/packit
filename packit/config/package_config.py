@@ -63,7 +63,7 @@ class PackageConfig:
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = True,
-        spec_source_id: Optional[str] = None,
+        spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         patch_generation_ignore_paths: List[str] = None,
         **kwargs,
@@ -86,12 +86,7 @@ class PackageConfig:
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
         self.create_pr: bool = create_pr
-        # By default the first one of (Source0, Source) found in the spec file is used.
-        # See https://github.com/packit-service/packit/issues/536#issuecomment-534074925
-        self.spec_source_id: List[str] = [spec_source_id] if spec_source_id else [
-            "Source0",
-            "Source",
-        ]
+        self.spec_source_id: str = spec_source_id
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
