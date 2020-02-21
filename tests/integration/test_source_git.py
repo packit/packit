@@ -98,8 +98,8 @@ def test_basic_local_update_patch_content(
     for section in spec.spec_content.sections:
         if "%package" in section[0]:
             spec_package_section += "\n".join(section[1])
-    assert "Patch0001: 0001" in spec_package_section
-    assert "Patch0002: 0002" not in spec_package_section  # no empty patches
+    assert "Patch0001: 0001-source-change.patch" in spec_package_section
+    assert "Patch0002:" not in spec_package_section  # no empty patches
 
     git_diff = subprocess.check_output(
         ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
@@ -129,8 +129,12 @@ def test_basic_local_update_patch_content(
 
     # diff of the source file (not synced) has to be in the patch
     assert (
-        "patch\n"
-        "@@ -0,0 +1,9 @@\n"
+        "+Subject: [PATCH] source change\n"
+        "+\n"
+        "+---\n"
+        "+ big-source-file.txt | 3 +--\n"
+        "+ 1 file changed, 1 insertion(+), 2 deletions(-)\n"
+        "+\n"
         "+diff --git a/big-source-file.txt b/big-source-file.txt\n" in git_diff
     )
 
