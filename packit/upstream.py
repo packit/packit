@@ -232,8 +232,6 @@ class Upstream(PackitRepositoryBase):
 
         destination = destination or self.local_project.working_dir
 
-        patches_to_create = []
-
         sync_files_to_ignore = [
             str(sf.src.relative_to(self.local_project.working_dir))
             for sf in self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
@@ -248,41 +246,32 @@ class Upstream(PackitRepositoryBase):
             self.package_config.patch_generation_ignore_paths + sync_files_to_ignore
         )
 
+        patch_list = []
         for i, commit in enumerate(commits[1:]):
-            parent = commits[i]
-
             git_diff_cmd = [
                 "git",
-                "diff",
-                "--patch",
-                parent.hexsha,
-                commit.hexsha,
+                "format-patch",
+                f"{commits[i].hexsha}..{commit.hexsha}",
                 "--",
                 ".",
             ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
-            diff = run_command(
+            patch_file = run_command(
                 cmd=git_diff_cmd,
                 cwd=self.local_project.working_dir,
                 output=True,
-                decode=False,
+                decode=True,
             )
 
-            if not diff:
+            if patch_file:
+                patch_file = patch_file.strip()
+                if destination != self.local_project.working_dir:
+                    src = os.path.join(self.local_project.working_dir, patch_file)
+                    logger.debug(f"Moving patch {src} to {destination}")
+                    shutil.move(src, destination)
+                msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
+                patch_list.append((patch_file, msg))
+            else:
                 logger.info(f"No patch for commit: {commit.summary} ({commit.hexsha})")
-                continue
-
-            patches_to_create.append((commit, diff))
-
-        patch_list = []
-        for i, (commit, diff) in enumerate(patches_to_create):
-            patch_name = f"{i + 1:04d}-{commit.hexsha}.patch"
-            patch_path = os.path.join(destination, patch_name)
-            patch_msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
-
-            logger.debug(f"Saving patch: {patch_name}\n{patch_msg}")
-            with open(patch_path, mode="wb") as patch_file:
-                patch_file.write(diff)
-            patch_list.append((patch_name, patch_msg))
 
         return patch_list
 
