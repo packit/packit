@@ -5,7 +5,7 @@ synced_files:
     dest: beer.spec
   - .packit.yaml
 patch_generation_ignore_paths: ["ignored_file.txt"]
-upstream_project_name: beerware
+upstream_package_name: beerware
 downstream_package_name: beer
 jobs:
   - job: propose_downstream
