@@ -2,7 +2,7 @@ specfile_path: packaging/fedora/snapd.spec
 synced_files:
   - .packit.yaml
   - packaging/fedora/snapd.spec
-upstream_project_name: snapd
+upstream_package_name: snapd
 downstream_package_name: snapd
 upstream_project_url: "https://github.com/snapcore/snapd"
 create_tarball_command: ["packaging/fedora/pack-source", "-o", ".", "-g"]
