@@ -317,7 +317,7 @@ class PackitRepositoryBase:
         """
         Add the given list of (patch_name, msg) to the specfile.
 
-        :param patch_list: [(patch_name, msg)] if None, the patches will be generated
+        :param patch_list: [(patch_name, msg)]
         """
         logger.debug(f"About to add patches {patch_list} to specfile")
         if not patch_list:
