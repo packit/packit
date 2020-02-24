@@ -98,59 +98,86 @@ def test_basic_local_update_patch_content(
     for section in spec.spec_content.sections:
         if "%package" in section[0]:
             spec_package_section += "\n".join(section[1])
-    assert "Patch0001: 0001" in spec_package_section
-    assert "Patch0002: 0002" not in spec_package_section  # no empty patches
+    assert "Patch0001: 0001-source-change.patch" in spec_package_section
+    assert "Patch0002:" not in spec_package_section  # no empty patches
 
     git_diff = subprocess.check_output(
         ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
     ).decode()
 
-    assert "-Version:        0.0.0\n+Version:        0.1.0" in git_diff
+    assert (
+        """
+-Version:        0.0.0
++Version:        0.1.0"""
+        in git_diff
+    )
+
     assert "+# PATCHES FROM SOURCE GIT:" in git_diff
     assert (
-        " - 0.1.0-1\n"
-        "+- new upstream release: 0.1.0\n"
-        "+\n"
-        " * Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1\n"
-        " - No brewing, yet.\n" in git_diff
+        """ - 0.1.0-1
++- new upstream release: 0.1.0
++
+ * Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1
+ - No brewing, yet."""
+        in git_diff
     )
 
     # direct diff in the synced file
     assert (
-        "diff --git a/.packit.yaml b/.packit.yaml\n" "new file mode 100644" in git_diff
+        """diff --git a/.packit.yaml b/.packit.yaml
+new file mode 100644"""
+        in git_diff
     )
-    assert "--- /dev/null\n" "+++ b/.packit.yaml" in git_diff
+
+    assert (
+        """
+--- /dev/null
++++ b/.packit.yaml"""
+        in git_diff
+    )
 
     # diff of the synced file should not be in the patch
     assert (
-        "+diff --git a/.packit.yaml b/.packit.yaml\n"
-        "+new file mode 100644\n" not in git_diff
+        """
++diff --git a/.packit.yaml b/.packit.yaml
++new file mode 100644"""
+        not in git_diff
     )
 
     # diff of the source file (not synced) has to be in the patch
     assert (
-        "patch\n"
-        "@@ -0,0 +1,9 @@\n"
-        "+diff --git a/big-source-file.txt b/big-source-file.txt\n" in git_diff
+        """
++Subject: [PATCH] source change
++
++---
++ big-source-file.txt | 3 +--
++ 1 file changed, 1 insertion(+), 2 deletions(-)
++
++diff --git a/big-source-file.txt b/big-source-file.txt"""
+        in git_diff
     )
 
     assert (
-        "+--- a/big-source-file.txt\n"
-        "++++ b/big-source-file.txt\n"
-        "+@@ -1,2 +1 @@\n"
-        "+-This is a testing file\n"
-        "+-containing some text.\n"
-        "++new changes\n" in git_diff
+        """
++--- a/big-source-file.txt
+++++ b/big-source-file.txt
++@@ -1,2 +1 @@
++-This is a testing file
++-containing some text.
+++new changes"""
+        in git_diff
     )
 
     # diff of the source files (not synced) should not be directly in the git diff
     assert (
-        "--- a/big-source-file.txt\n"
-        "+++ b/big-source-file.txt\n"
-        "@@ -1,2 +1 @@\n"
-        "-This is a testing file\n"
-        "-containing some text.\n"
-        "+new changes\n" not in git_diff
+        """
+--- a/big-source-file.txt
++++ b/big-source-file.txt
+@@ -1,2 +1 @@
+-This is a testing file
+-containing some text.
++new changes"""
+        not in git_diff
     )
 
     # ignored file should not be in the diff
