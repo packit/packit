@@ -91,7 +91,7 @@ class Upstream(PackitRepositoryBase):
         return self.local_project.ref
 
     def get_commits_to_upstream(
-        self, upstream: str, add_upstream_head_commit=False
+        self, upstream: str, add_upstream_head_commit: bool = True
     ) -> List[git.Commit]:
         """
         Return the list of different commits between current branch and upstream rev/tag.
@@ -100,7 +100,7 @@ class Upstream(PackitRepositoryBase):
         It contains merge-commits from the master and commits on top of the master.
         (e.g. commits from PR)
 
-        :param add_upstream_head_commit: bool
+        :param add_upstream_head_commit: add also upstream rev/tag commit as a first value
         :param upstream: str -- git branch or tag
         :return: list of commits (last commit on the current branch.).
         """
@@ -228,9 +228,9 @@ class Upstream(PackitRepositoryBase):
         """
 
         upstream = upstream or self.get_specfile_version()
-        commits = self.get_commits_to_upstream(upstream, add_upstream_head_commit=True)
-
         destination = destination or self.local_project.working_dir
+
+        commits = self.get_commits_to_upstream(upstream, add_upstream_head_commit=True)
 
         sync_files_to_ignore = [
             str(sf.src.relative_to(self.local_project.working_dir))
@@ -247,13 +247,15 @@ class Upstream(PackitRepositoryBase):
         )
 
         patch_list = []
+        # first value is upstream ref, i.e parent for the first commit we want to create patch from
         for i, commit in enumerate(commits[1:]):
+            parent_commit = commits[i]
             git_diff_cmd = [
                 "git",
                 "format-patch",
                 "--output-directory",
                 f"{destination}",
-                f"{commits[i].hexsha}..{commit.hexsha}",
+                f"{parent_commit.hexsha}..{commit.hexsha}",
                 "--",
                 ".",
             ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
