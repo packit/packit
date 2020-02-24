@@ -68,6 +68,10 @@ upstream_package_name: packitos
 downstream_package_name: packit
 ```
 
+## User configuration file
+
+User configuration file for packit is described [here](http://packit.dev/docs/configuration/#user-configuration-file).
+
 ## Requirements
 
 Packit is written in python 3 and is supported only on 3.6 and later.
