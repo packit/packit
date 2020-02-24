@@ -146,6 +146,8 @@ class Config:
                 "    pagure:\n"
                 "        token: PAGURE_TOKEN\n"
                 '        instance_url: "https://src.fedoraproject.org"\n'
+                "See our documentation for more information "
+                "http://packit.dev/docs/configuration/#user-configuration-file. "
             )
             github_app_id = raw_dict.get("github_app_id")
             github_app_cert_path = raw_dict.get("github_app_cert_path")
