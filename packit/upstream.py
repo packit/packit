@@ -251,6 +251,8 @@ class Upstream(PackitRepositoryBase):
             git_diff_cmd = [
                 "git",
                 "format-patch",
+                "--output-directory",
+                f"{destination}",
                 f"{commits[i].hexsha}..{commit.hexsha}",
                 "--",
                 ".",
@@ -263,13 +265,8 @@ class Upstream(PackitRepositoryBase):
             )
 
             if patch_file:
-                patch_file = patch_file.strip()
-                if destination != self.local_project.working_dir:
-                    src = os.path.join(self.local_project.working_dir, patch_file)
-                    logger.debug(f"Moving patch {src} to {destination}")
-                    shutil.move(src, destination)
                 msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
-                patch_list.append((patch_file, msg))
+                patch_list.append((os.path.basename(patch_file.strip()), msg))
             else:
                 logger.info(f"No patch for commit: {commit.summary} ({commit.hexsha})")
 
