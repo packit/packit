@@ -1,8 +1,8 @@
 import inspect
-import logging
 import re
+from logging import getLogger
 from pathlib import Path
-from typing import Union
+from typing import Union, List, Tuple
 
 from rebasehelper.helpers.macro_helper import MacroHelper
 from rebasehelper.specfile import SpecFile, RebaseHelperError
@@ -14,7 +14,7 @@ except ImportError:
 
 from packit.exceptions import PackitException
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class Specfile(SpecFile):
@@ -114,3 +114,76 @@ class Specfile(SpecFile):
         if dist:
             release = release.replace(dist, "")
         return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
+
+    def add_patches(self, patch_list: List[Tuple[str, str]]) -> None:
+        """
+        Add the given list of (patch_name, msg) to the specfile.
+
+        :param patch_list: [(patch_name, msg)]
+        """
+        if not patch_list:
+            return
+
+        logger.debug(f"About to add patches {patch_list} to specfile")
+        with open(self.path, mode="r+") as spec_file:
+            last_source_position = None
+            line = spec_file.readline()
+            while line:
+                if line.startswith("Patch"):
+                    raise PackitException(
+                        "This specfile already contains patches, please remove them."
+                    )
+                if line.startswith("Source"):
+                    last_source_position = spec_file.tell()
+                line = spec_file.readline()
+
+            if not last_source_position:
+                raise PackitException(
+                    "Cannot find a place to put patches in the specfile."
+                )
+
+            spec_file.seek(last_source_position)
+            rest_of_the_file = spec_file.read()
+            spec_file.seek(last_source_position)
+
+            spec_file.write("\n# PATCHES FROM SOURCE GIT:\n")
+            for i, (patch, msg) in enumerate(patch_list):
+                commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
+                spec_file.write(commented_msg)
+                spec_file.write(f"Patch{(i+1):04d}: {patch}\n")
+
+            spec_file.write("\n")
+            spec_file.write(rest_of_the_file)
+
+        logger.info(f"{len(patch_list)} patches added to {self.path}")
+
+    def ensure_pnum(self, pnum: int = 1) -> None:
+        """
+        Make sure we use -p1 with %autosetup / %autopatch
+
+        :param pnum: use other prefix number than default 1
+        """
+        changed = False
+        logger.debug(f"Making sure we apply patches with -p{pnum}")
+        lines = Path(self.path).read_text().split("\n")
+
+        for i, line in enumerate(lines):
+            if line.startswith(("%autosetup", "%autopatch")):
+                if re.search(r"\s-p\d", line):
+                    # -px is there, replace it with -p1
+                    lines[i] = re.sub(r"-p\d", rf"-p{pnum}", line)
+                else:
+                    # -px is not there, add -p1
+                    lines[i] = re.sub(r"(%auto(setup|patch))", rf"\1 -p{pnum}", line)
+            elif line.startswith("%setup"):
+                # %setup -> %autosetup -p1
+                lines[i] = line.replace("%setup", f"%autosetup -p{pnum}")
+            elif line.startswith("%patch"):
+                # comment out old patch application macros
+                lines[i] = f"# {line}"
+            if lines[i] != line:
+                logger.debug(f"{line!r} -> {lines[i]!r}")
+                changed = True
+
+        if changed:
+            Path(self.path).write_text("\n".join(lines))

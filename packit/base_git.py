@@ -19,8 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
+
 import shlex
+from logging import getLogger
 from pathlib import Path
 from typing import Optional, Callable, List, Tuple, Iterable, Dict
 
@@ -36,7 +37,7 @@ from packit.security import CommitVerifier
 from packit.specfile import Specfile
 from packit.utils import cwd
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class PackitRepositoryBase:
@@ -322,38 +323,9 @@ class PackitRepositoryBase:
         if not patch_list:
             return
 
-        logger.debug(f"About to add patches {patch_list} to specfile")
-        with self.absolute_specfile_path.open(mode="r+") as spec_file:
-            last_source_position = None
-            line = spec_file.readline()
-            while line:
-                if line.startswith("Patch"):
-                    raise PackitException(
-                        "This specfile already contains patches, please remove them."
-                    )
-                if line.startswith("Source"):
-                    last_source_position = spec_file.tell()
-                line = spec_file.readline()
+        self.specfile.add_patches(patch_list)
+        self.specfile.ensure_pnum()
 
-            if not last_source_position:
-                raise PackitException(
-                    "Cannot find a place to put patches in the specfile."
-                )
-
-            spec_file.seek(last_source_position)
-            rest_of_the_file = spec_file.read()
-            spec_file.seek(last_source_position)
-
-            spec_file.write("\n# PATCHES FROM SOURCE GIT:\n")
-            for i, (patch, msg) in enumerate(patch_list):
-                commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
-                spec_file.write(commented_msg)
-                spec_file.write(f"Patch{(i+1):04d}: {patch}\n")
-
-            spec_file.write("\n")
-            spec_file.write(rest_of_the_file)
-
-        logger.info(f"{len(patch_list)} patches added to {self.absolute_specfile_path}")
         self.refresh_specfile()
         self.local_project.git_repo.index.write()
 

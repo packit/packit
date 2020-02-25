@@ -92,15 +92,6 @@ def test_basic_local_update_patch_content(
 
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
-    spec = Specfile(distgit / "beer.spec")
-
-    spec_package_section = ""
-    for section in spec.spec_content.sections:
-        if "%package" in section[0]:
-            spec_package_section += "\n".join(section[1])
-    assert "Patch0001: 0001-source-change.patch" in spec_package_section
-    assert "Patch0002:" not in spec_package_section  # no empty patches
-
     git_diff = subprocess.check_output(
         ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
     ).decode()
@@ -113,6 +104,20 @@ def test_basic_local_update_patch_content(
     )
 
     assert "+# PATCHES FROM SOURCE GIT:" in git_diff
+    spec_package_section = ""
+    for section in Specfile(distgit / "beer.spec").spec_content.sections:
+        if "%package" in section[0]:
+            spec_package_section += "\n".join(section[1])
+    assert "Patch0001: 0001-source-change.patch" in spec_package_section
+    assert "Patch0002:" not in spec_package_section  # no empty patches
+
+    assert (
+        """ %prep
+-%autosetup -n %{upstream_name}-%{version}
++%autosetup -p1 -n %{upstream_name}-%{version}"""
+        in git_diff
+    )
+
     assert (
         """ - 0.1.0-1
 +- new upstream release: 0.1.0
