@@ -1,6 +1,8 @@
 import inspect
 import logging
 import re
+from pathlib import Path
+from typing import Union
 
 from rebasehelper.helpers.macro_helper import MacroHelper
 from rebasehelper.specfile import SpecFile, RebaseHelperError
@@ -16,12 +18,14 @@ logger = logging.getLogger(__name__)
 
 
 class Specfile(SpecFile):
-    def __init__(self, path="", dir=None):
+    def __init__(self, path: Union[str, Path], sources_dir: Union[str, Path] = ""):
         s = inspect.signature(SpecFile)
         if "changelog_entry" in s.parameters:
-            super().__init__(path=path, sources_location=str(dir), changelog_entry="")
+            super().__init__(
+                path=str(path), sources_location=str(sources_dir), changelog_entry=""
+            )
         else:
-            super().__init__(path=path, sources_location=str(dir))
+            super().__init__(path=str(path), sources_location=str(sources_dir))
 
     def update_spec(self):
         if hasattr(self, "update"):
