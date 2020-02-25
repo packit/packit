@@ -108,7 +108,7 @@ class PackitAPI:
 
         self.up.run_action(actions=ActionName.pre_sync)
 
-        self.up.checkout_pr(pr_id=pr_id)
+        self.up.local_project.checkout_pr(pr_id=pr_id)
         self.dg.check_last_commit()
 
         local_pr_branch = f"pull-request-{pr_id}-sync"
