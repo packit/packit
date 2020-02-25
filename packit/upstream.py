@@ -714,7 +714,7 @@ class Upstream(PackitRepositoryBase):
             patches = self.create_patches(
                 upstream=upstream_ref, destination=str(self.absolute_specfile_dir)
             )
-            self.add_patches_to_specfile(patches)
+            self.specfile_add_patches(patches)
 
     def koji_build(
         self,

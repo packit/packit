@@ -313,17 +313,17 @@ class PackitRepositoryBase:
         logger.debug(f"Action command output: {outputs}")
         return outputs
 
-    def add_patches_to_specfile(self, patch_list: List[Tuple[str, str]]) -> None:
+    def specfile_add_patches(self, patch_list: List[Tuple[str, str]]) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
 
         :param patch_list: [(patch_name, msg)]
         """
-        logger.debug(f"About to add patches {patch_list} to specfile")
         if not patch_list:
             return
 
-        with open(file=str(self.absolute_specfile_path), mode="r+") as spec_file:
+        logger.debug(f"About to add patches {patch_list} to specfile")
+        with self.absolute_specfile_path.open(mode="r+") as spec_file:
             last_source_position = None
             line = spec_file.readline()
             while line:
@@ -344,18 +344,16 @@ class PackitRepositoryBase:
             rest_of_the_file = spec_file.read()
             spec_file.seek(last_source_position)
 
-            spec_file.write("\n\n# PATCHES FROM SOURCE GIT:\n")
+            spec_file.write("\n# PATCHES FROM SOURCE GIT:\n")
             for i, (patch, msg) in enumerate(patch_list):
                 commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
                 spec_file.write(commented_msg)
-                spec_file.write(f"Patch{i + 1:04d}: {patch}\n")
+                spec_file.write(f"Patch{(i+1):04d}: {patch}\n")
 
-            spec_file.write("\n\n")
+            spec_file.write("\n")
             spec_file.write(rest_of_the_file)
 
-        logger.info(
-            f"Patches ({len(patch_list)}) added to the specfile ({self.absolute_specfile_path})"
-        )
+        logger.info(f"{len(patch_list)} patches added to {self.absolute_specfile_path}")
         self.refresh_specfile()
         self.local_project.git_repo.index.write()
 
