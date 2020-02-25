@@ -28,7 +28,7 @@ from pkg_resources import get_distribution
 from packit.cli.build import build
 from packit.cli.copr_build import copr_build
 from packit.cli.create_update import create_update
-from packit.cli.generate import generate
+from packit.cli.init import init
 from packit.cli.local_build import local_build
 from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
@@ -41,7 +41,20 @@ from packit.utils import set_logging
 logger = logging.getLogger("packit")
 
 
-@click.group("packit", context_settings=get_context_settings())
+class AliasedGroup(click.Group):
+    def get_command(self, ctx, cmd_name):
+        if cmd_name == "generate":
+            click.secho(
+                "WARNING: 'packit generate' is deprecated and it "
+                "is going to be removed. Use 'packit init' instead.",
+                fg="yellow",
+            )
+            return click.Group.get_command(self, ctx, "init")
+        else:
+            return click.Group.get_command(self, ctx, cmd_name)
+
+
+@click.group("packit", cls=AliasedGroup, context_settings=get_context_settings())
 @click.option("-d", "--debug", is_flag=True, help="Enable debug logs.")
 @click.option("--fas-user", help="Fedora Account System username.")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
@@ -85,7 +98,7 @@ packit_base.add_command(create_update)
 packit_base.add_command(push_updates)
 packit_base.add_command(srpm)
 packit_base.add_command(status)
-packit_base.add_command(generate)
+packit_base.add_command(init)
 packit_base.add_command(local_build)
 
 if __name__ == "__main__":

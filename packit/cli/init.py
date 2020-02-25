@@ -40,23 +40,24 @@ from packit.exceptions import PackitException
 logger = logging.getLogger(__name__)
 
 
-@click.command("generate", context_settings=get_context_settings())
+@click.command("init", context_settings=get_context_settings())
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @click.option(
     "-f", "--force", is_flag=True, help="Reset config to default if already exists."
 )
 @cover_packit_exception
-def generate(path_or_url, force):
+def init(path_or_url, force):
     """
     Generate new packit config.
     """
+
     working_dir = Path(path_or_url.working_dir)
     config_path = get_existing_config(working_dir)
     if config_path:
         if not force:
             raise PackitException(
                 f"Packit config {config_path} already exists."
-                " If you want to regenerate it use `packit generate --force`"
+                " If you want to regenerate it use `packit init --force`"
             )
     else:
         # Use default name
