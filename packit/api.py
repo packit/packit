@@ -130,7 +130,7 @@ class PackitAPI:
                 upstream=upstream_version,
                 destination=str(self.dg.absolute_specfile_dir),
             )
-            self.dg.add_patches_to_specfile(patches)
+            self.dg.specfile_add_patches(patches)
 
         description = (
             f"Upstream pr: {pr_id}\n"
@@ -258,7 +258,7 @@ class PackitAPI:
                             upstream=upstream_ref,
                             destination=str(self.dg.absolute_specfile_dir),
                         )
-                        self.dg.add_patches_to_specfile(patches)
+                        self.dg.specfile_add_patches(patches)
 
                 self._handle_sources(
                     add_new_sources=True, force_new_sources=force_new_sources

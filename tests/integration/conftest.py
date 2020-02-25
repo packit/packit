@@ -169,7 +169,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
 @pytest.fixture()
 def mock_patching():
     flexmock(Upstream).should_receive("create_patches").and_return(["patches"])
-    flexmock(DistGit).should_receive("add_patches_to_specfile").with_args(["patches"])
+    flexmock(DistGit).should_receive("specfile_add_patches").with_args(["patches"])
 
 
 @pytest.fixture()
