@@ -44,7 +44,7 @@ def test_basic_local_update_without_patching(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = Specfile(str(distgit / "beer.spec"))
+    spec = Specfile(distgit / "beer.spec")
     assert spec.get_version() == "0.1.0"
 
 
@@ -58,7 +58,7 @@ def test_basic_local_update_empty_patch(
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
     assert (distgit / TARBALL_NAME).is_file()
-    spec = Specfile(str(distgit / "beer.spec"))
+    spec = Specfile(distgit / "beer.spec")
     assert spec.get_version() == "0.1.0"
 
     spec_package_section = ""
@@ -92,7 +92,7 @@ def test_basic_local_update_patch_content(
 
     api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
 
-    spec = Specfile(str(distgit / "beer.spec"))
+    spec = Specfile(distgit / "beer.spec")
 
     spec_package_section = ""
     for section in spec.spec_content.sections:
