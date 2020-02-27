@@ -52,6 +52,7 @@ from tests.spellbook import (
     UPSTREAM,
     initiate_git_repo,
     DISTGIT,
+    NAME_VERSION,
 )
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
@@ -95,12 +96,11 @@ def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote
 def mock_spec_download_remote_s(path: Path):
     def mock_download_remote_sources():
         """ mock download of the remote archive and place it into dist-git repo """
-        tarball_path = path / TARBALL_NAME
-        hops_filename = "hops"
-        hops_path = path / hops_filename
-        hops_path.write_text("Cascade\n")
+        beerware_dir = path / NAME_VERSION
+        beerware_dir.mkdir(exist_ok=True)
+        beerware_dir.joinpath("hops").write_text("Cascade\n")
         subprocess.check_call(
-            ["tar", "-cf", str(tarball_path), hops_filename], cwd=path
+            ["tar", "-cf", str(path / TARBALL_NAME), NAME_VERSION], cwd=path
         )
 
     flexmock(Specfile, download_remote_sources=mock_download_remote_sources)
@@ -169,7 +169,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
 @pytest.fixture()
 def mock_patching():
     flexmock(Upstream).should_receive("create_patches").and_return(["patches"])
-    flexmock(DistGit).should_receive("add_patches_to_specfile").with_args(["patches"])
+    flexmock(DistGit).should_receive("specfile_add_patches").with_args(["patches"])
 
 
 @pytest.fixture()

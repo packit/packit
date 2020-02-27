@@ -19,10 +19,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from pathlib import Path
+from shutil import copy
 
-from tests.spellbook import SPECFILE
-from packit.specfile import Specfile
+import pytest
 from rebasehelper.specfile import SpecContent
+
+from packit.specfile import Specfile
+from tests.spellbook import SPECFILE, UP_OSBUILD, UP_EDD, UP_VSFTPD
 
 
 def test_write_spec_content():
@@ -38,3 +42,17 @@ def test_write_spec_content():
         assert "new line 1" in specfile.read()
         spec.spec_content = SpecContent(content)
         spec.write_spec_content()
+
+
+@pytest.mark.parametrize(
+    "input_spec",
+    [
+        UP_VSFTPD / "Fedora" / "vsftpd.spec",
+        UP_OSBUILD / "osbuild.spec",
+        UP_EDD / "edd.spec",
+    ],
+)
+def test_ensure_pnum(tmp_path, input_spec):
+    spec = Path(copy(input_spec, tmp_path))
+    Specfile(spec).ensure_pnum()
+    assert "%autosetup -p1" in spec.read_text()
