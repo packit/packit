@@ -55,4 +55,7 @@ def test_write_spec_content():
 def test_ensure_pnum(tmp_path, input_spec):
     spec = Path(copy(input_spec, tmp_path))
     Specfile(spec).ensure_pnum()
-    assert "%autosetup -p1" in spec.read_text()
+    text = spec.read_text()
+    assert "%autosetup -p1" in text
+    # %autosetup does not accept -q
+    assert "-q" not in text

@@ -326,7 +326,6 @@ class PackitRepositoryBase:
         self.specfile.add_patches(patch_list)
         self.specfile.ensure_pnum()
 
-        self.refresh_specfile()
         self.local_project.git_repo.index.write()
 
     def get_project_url_from_distgit_spec(self) -> Optional[str]:
