@@ -156,6 +156,8 @@ class Specfile(SpecFile):
             spec_file.write(rest_of_the_file)
 
         logger.info(f"{len(patch_list)} patches added to {self.path}")
+        # Since we write directly to file
+        self.reload()
 
     def ensure_pnum(self, pnum: int = 1) -> None:
         """
@@ -163,27 +165,30 @@ class Specfile(SpecFile):
 
         :param pnum: use other prefix number than default 1
         """
-        changed = False
         logger.debug(f"Making sure we apply patches with -p{pnum}")
-        lines = Path(self.path).read_text().split("\n")
+        prep_lines = self.spec_content.section("%prep")
+        orig_lines = prep_lines.copy()
 
-        for i, line in enumerate(lines):
+        for i, line in enumerate(prep_lines):
             if line.startswith(("%autosetup", "%autopatch")):
                 if re.search(r"\s-p\d", line):
                     # -px is there, replace it with -p1
-                    lines[i] = re.sub(r"-p\d", rf"-p{pnum}", line)
+                    prep_lines[i] = re.sub(r"-p\d", rf"-p{pnum}", line)
                 else:
                     # -px is not there, add -p1
-                    lines[i] = re.sub(r"(%auto(setup|patch))", rf"\1 -p{pnum}", line)
+                    prep_lines[i] = re.sub(
+                        r"(%auto(setup|patch))", rf"\1 -p{pnum}", line
+                    )
             elif line.startswith("%setup"):
                 # %setup -> %autosetup -p1
-                lines[i] = line.replace("%setup", f"%autosetup -p{pnum}")
+                prep_lines[i] = line.replace("%setup", f"%autosetup -p{pnum}")
+                # %autosetup does not accept -q, remove it
+                prep_lines[i] = re.sub(r"\s+-q", r"", prep_lines[i])
             elif line.startswith("%patch"):
                 # comment out old patch application macros
-                lines[i] = f"# {line}"
-            if lines[i] != line:
-                logger.debug(f"{line!r} -> {lines[i]!r}")
-                changed = True
+                prep_lines[i] = f"# {line}"
+            if prep_lines[i] != line:
+                logger.debug(f"{line!r} -> {prep_lines[i]!r}")
 
-        if changed:
-            Path(self.path).write_text("\n".join(lines))
+        if prep_lines != orig_lines:
+            self.save()
