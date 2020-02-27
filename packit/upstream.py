@@ -301,17 +301,14 @@ class Upstream(PackitRepositoryBase):
         package repositories or the version in spec
         """
         ups_ver = version.parse(self.get_latest_released_version() or "")
-        logger.debug(f"Version in upstream package repositories: {ups_ver}")
         spec_ver = version.parse(self.get_specfile_version())
-        logger.debug(f"Version in spec file: {spec_ver}")
 
         if ups_ver > spec_ver:
-            logger.warning("Version in spec file is outdated")
-            logger.info(
-                "Picking version of the latest release from the upstream registry."
-            )
+            logger.warning(f"Version '{spec_ver}' in spec file is outdated")
+            logger.info(f"Picking version '{ups_ver}' from upstream registry.")
             return str(ups_ver)
-        logger.info("Picking version found in spec file.")
+
+        logger.info(f"Picking version '{spec_ver}' found in spec file.")
         return str(spec_ver)
 
     def get_current_version(self) -> str:
@@ -329,10 +326,13 @@ class Upstream(PackitRepositoryBase):
         ver = self.command_handler.run_command(
             self.package_config.current_version_command, return_output=True
         ).strip()
-        logger.debug("version = %s", ver)
-        # RPM refuses dashes in version/release
-        ver = ver.replace("-", ".")
-        logger.debug("sanitized version = %s", ver)
+        logger.debug(f"version: {ver}")
+
+        if "-" in ver:
+            # RPM refuses dashes in version/release
+            ver = ver.replace("-", ".")
+            logger.debug(f"sanitized version: {ver}")
+
         return ver
 
     def get_archive_extension(self, archive_basename: str, version: str) -> str:
@@ -410,7 +410,7 @@ class Upstream(PackitRepositoryBase):
             archive_cmd = [
                 "git",
                 "archive",
-                "-o",
+                "--output",
                 str(relative_archive_path),
                 "--prefix",
                 f"{dir_name}/",
@@ -582,7 +582,7 @@ class Upstream(PackitRepositoryBase):
         escaped_command = " ".join([f'"{cmd_part}"' for cmd_part in cmd])
         logger.debug(f"SRPM build command: {escaped_command}")
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
-        logger.debug("present srpms = %s", present_srpms)
+        logger.debug(f"present srpms: {present_srpms}")
         try:
             out = self.command_handler.run_command(cmd, return_output=True).strip()
         except PackitCommandFailedError as ex:
@@ -714,7 +714,7 @@ class Upstream(PackitRepositoryBase):
             patches = self.create_patches(
                 upstream=upstream_ref, destination=str(self.absolute_specfile_dir)
             )
-            self.add_patches_to_specfile(patches)
+            self.specfile_add_patches(patches)
 
     def koji_build(
         self,
