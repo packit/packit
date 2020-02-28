@@ -115,6 +115,15 @@ class Specfile(SpecFile):
             release = release.replace(dist, "")
         return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
 
+    def remove_applied_patches(self) -> None:
+        """
+        In prep section comment out all lines starting with %patch
+        """
+        indexes = [p.index for p in self.get_applied_patches()]
+        if indexes:
+            logger.debug(f"About to remove all %patch from %prep")
+            self._process_patches(comment_out=indexes)
+
     def add_patches(self, patch_list: List[Tuple[str, str]]) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
@@ -184,9 +193,7 @@ class Specfile(SpecFile):
                 prep_lines[i] = line.replace("%setup", f"%autosetup -p{pnum}")
                 # %autosetup does not accept -q, remove it
                 prep_lines[i] = re.sub(r"\s+-q", r"", prep_lines[i])
-            elif line.startswith("%patch"):
-                # comment out old patch application macros
-                prep_lines[i] = f"# {line}"
+
             if prep_lines[i] != line:
                 logger.debug(f"{line!r} -> {prep_lines[i]!r}")
 
