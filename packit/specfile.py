@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Union, List, Tuple
 
 from rebasehelper.helpers.macro_helper import MacroHelper
-from rebasehelper.specfile import SpecFile, RebaseHelperError
+from rebasehelper.specfile import SpecFile, RebaseHelperError, saves
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -115,6 +115,7 @@ class Specfile(SpecFile):
             release = release.replace(dist, "")
         return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
 
+    @saves
     def remove_applied_patches(self) -> None:
         """
         In prep section comment out all lines starting with %patch
@@ -168,6 +169,7 @@ class Specfile(SpecFile):
         # Since we write directly to file
         self.reload()
 
+    @saves
     def ensure_pnum(self, pnum: int = 1) -> None:
         """
         Make sure we use -p1 with %autosetup / %autopatch
@@ -176,7 +178,6 @@ class Specfile(SpecFile):
         """
         logger.debug(f"Making sure we apply patches with -p{pnum}")
         prep_lines = self.spec_content.section("%prep")
-        orig_lines = prep_lines.copy()
 
         for i, line in enumerate(prep_lines):
             if line.startswith(("%autosetup", "%autopatch")):
@@ -196,6 +197,3 @@ class Specfile(SpecFile):
 
             if prep_lines[i] != line:
                 logger.debug(f"{line!r} -> {prep_lines[i]!r}")
-
-        if prep_lines != orig_lines:
-            self.save()
