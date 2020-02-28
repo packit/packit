@@ -125,9 +125,10 @@ class Specfile(SpecFile):
             logger.debug(f"About to remove all %patch from %prep")
             self._process_patches(comment_out=indexes)
 
+    @saves
     def add_patches(self, patch_list: List[Tuple[str, str]]) -> None:
         """
-        Add the given list of (patch_name, msg) to the specfile.
+        Add given patches to the specfile.
 
         :param patch_list: [(patch_name, msg)]
         """
@@ -135,39 +136,22 @@ class Specfile(SpecFile):
             return
 
         logger.debug(f"About to add patches {patch_list} to specfile")
-        with open(self.path, mode="r+") as spec_file:
-            last_source_position = None
-            line = spec_file.readline()
-            while line:
-                if line.startswith("Patch"):
-                    raise PackitException(
-                        "This specfile already contains patches, please remove them."
-                    )
-                if line.startswith("Source"):
-                    last_source_position = spec_file.tell()
-                line = spec_file.readline()
+        if [t.name for t in self.tags.filter(name="Patch*")]:
+            raise PackitException(
+                "This specfile already contains patches, please remove them."
+            )
 
-            if not last_source_position:
-                raise PackitException(
-                    "Cannot find a place to put patches in the specfile."
-                )
+        new_content = "\n# PATCHES FROM SOURCE GIT:\n"
+        for i, (patch, msg) in enumerate(patch_list):
+            new_content += "\n# " + "\n# ".join(msg.split("\n"))
+            new_content += f"\nPatch{(i + 1):04d}: {patch}\n"
 
-            spec_file.seek(last_source_position)
-            rest_of_the_file = spec_file.read()
-            spec_file.seek(last_source_position)
-
-            spec_file.write("\n# PATCHES FROM SOURCE GIT:\n")
-            for i, (patch, msg) in enumerate(patch_list):
-                commented_msg = "\n# " + "\n# ".join(msg.split("\n")) + "\n"
-                spec_file.write(commented_msg)
-                spec_file.write(f"Patch{(i+1):04d}: {patch}\n")
-
-            spec_file.write("\n")
-            spec_file.write(rest_of_the_file)
+        last_source_tag = [t for t in self.tags.filter(name="Source*")][-1]
+        where = last_source_tag.line + 1
+        # insert new content below last Source
+        self.spec_content.section("%package")[where:where] = new_content.split("\n")
 
         logger.info(f"{len(patch_list)} patches added to {self.path}")
-        # Since we write directly to file
-        self.reload()
 
     @saves
     def ensure_pnum(self, pnum: int = 1) -> None:
