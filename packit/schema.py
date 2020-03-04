@@ -107,8 +107,6 @@ class NotProcessedField(fields.Field):
     """
     Field class to mark fields which wil not be processed, only generates warning.
     Can be passed additional message via additional_message parameter.
-
-    :param str additional_message: additional warning message to be displayed
     """
 
     def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
