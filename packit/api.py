@@ -81,6 +81,7 @@ class PackitAPI:
                 package_config=self.package_config,
                 local_project=self.upstream_local_project,
             )
+        print(self._up)
         return self._up
 
     @property
