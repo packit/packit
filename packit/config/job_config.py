@@ -36,6 +36,7 @@ class JobType(Enum):
     build = "build"
     sync_from_downstream = "sync_from_downstream"
     copr_build = "copr_build"
+    production_build = "production_build"  # koji build
     add_to_whitelist = "add_to_whitelist"
     tests = "tests"
     report_test_results = "report_test_results"
@@ -44,24 +45,21 @@ class JobType(Enum):
     copr_build_started = "copr_build_started"
 
 
-class JobTriggerType(Enum):
+class JobConfigTriggerType(Enum):
     release = "release"
     pull_request = "pull_request"
     commit = "commit"
-    installation = "installation"
-    testing_farm_results = "testing_farm_results"
-    comment = "comment"
 
 
 class JobConfig:
-    def __init__(self, job: JobType, trigger: JobTriggerType, metadata: dict):
-        self.job = job
-        self.trigger = trigger
-        self.metadata = metadata
+    def __init__(self, type: JobType, trigger: JobConfigTriggerType, metadata: dict):
+        self.type = type
+        self.trigger: JobConfigTriggerType = trigger
+        self.metadata: dict = metadata
 
     def __repr__(self):
         return (
-            f"JobConfig(job={self.job}, trigger={self.trigger}, meta={self.metadata})"
+            f"JobConfig(job={self.type}, trigger={self.trigger}, meta={self.metadata})"
         )
 
     @classmethod
@@ -75,7 +73,7 @@ class JobConfig:
         if not isinstance(other, JobConfig):
             raise PackitConfigException("Provided object is not a JobConfig instance.")
         return (
-            self.job == other.job
+            self.type == other.type
             and self.trigger == other.trigger
             and self.metadata == other.metadata
         )
@@ -83,13 +81,13 @@ class JobConfig:
 
 default_jobs = [
     JobConfig(
-        job=JobType.tests,
-        trigger=JobTriggerType.pull_request,
+        type=JobType.tests,
+        trigger=JobConfigTriggerType.pull_request,
         metadata={"targets": ["fedora-stable"]},
     ),
     JobConfig(
-        job=JobType.propose_downstream,
-        trigger=JobTriggerType.release,
+        type=JobType.propose_downstream,
+        trigger=JobConfigTriggerType.release,
         metadata={"dist-git-branch": ["fedora-all"]},
     ),
 ]
