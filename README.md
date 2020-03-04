@@ -96,7 +96,7 @@ Or
 $ pip3 install --user packitos
 ```
 
-(packit project on PyPI is NOT this packit project)
+(packt project on PyPI is NOT this packit project)
 
 You can also install packit from master branch, if you are brave enough:
 
@@ -138,4 +138,4 @@ For the up to date list of projects which are using packit, [click here](https:/
 
 ## Logo design
 
-Created by `Marián Mrva` - [@surfer19](https://github.com/surfer19)  
+Created by `Marián Mrva` - [@surfer19](https://github.com/surfer19)
