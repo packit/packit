@@ -39,6 +39,20 @@ from packit.exceptions import PackitConfigException
 logger = logging.getLogger(__name__)
 
 
+class PullRequestNotificationsConfig:
+    """ Configuration of commenting on pull requests. """
+
+    def __init__(self, successful_build: bool = True):
+        self.successful_build = successful_build
+
+
+class NotificationsConfig:
+    """ Configuration of notifications. """
+
+    def __init__(self, pull_request: PullRequestNotificationsConfig):
+        self.pull_request = pull_request
+
+
 class PackageConfig:
     """
     Config class for upstream/downstream packages;
@@ -66,6 +80,7 @@ class PackageConfig:
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         patch_generation_ignore_paths: List[str] = None,
+        notifications: Optional[NotificationsConfig] = None,
         **kwargs,
     ):
         self.config_file_path: Optional[str] = config_file_path
@@ -87,6 +102,9 @@ class PackageConfig:
         self.allowed_gpg_keys = allowed_gpg_keys
         self.create_pr: bool = create_pr
         self.spec_source_id: str = spec_source_id
+        self.notifications = notifications or NotificationsConfig(
+            pull_request=PullRequestNotificationsConfig()
+        )
 
         # command to generate a tarball from the upstream repo
         # uncommitted changes will not be present in the archive
