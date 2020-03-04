@@ -5,7 +5,11 @@ from packit.config.config import (
     get_default_map_from_file,
     pass_config,
 )
-from packit.config.job_config import JobConfig, JobTriggerType, JobType
+from packit.config.job_config import (
+    JobConfig,
+    JobConfigTriggerType,
+    JobType,
+)
 from packit.config.package_config import (
     PackageConfig,
     get_package_config_from_repo,
@@ -21,7 +25,7 @@ from packit.config.sync_files_config import (
 __all__ = [
     Config.__name__,
     JobConfig.__name__,
-    JobTriggerType.__name__,
+    JobConfigTriggerType.__name__,
     JobType.__name__,
     PackageConfig.__name__,
     RawSyncFilesItem.__name__,
