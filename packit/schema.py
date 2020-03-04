@@ -25,10 +25,11 @@ import typing
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
-
 from packit.actions import ActionName
 from packit.config import PackageConfig, Config, SyncFilesConfig
 from packit.config.job_config import JobType, JobTriggerType, JobConfig, default_jobs
+from packit.config.package_config import NotificationsConfig
+from packit.config.package_config import PullRequestNotificationsConfig
 from packit.sync import SyncFilesItem
 
 logger = logging.getLogger(__name__)
@@ -166,6 +167,26 @@ class JobConfigSchema(Schema):
         return JobConfig(**data)
 
 
+class PullRequestNotificationsSchema(Schema):
+    """ Configuration of commenting on pull requests. """
+
+    successful_build = fields.Bool(default=True)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return PullRequestNotificationsConfig(**data)
+
+
+class NotificationsSchema(Schema):
+    """ Configuration of notifications. """
+
+    pull_request = fields.Nested(PullRequestNotificationsSchema)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return NotificationsConfig(**data)
+
+
 class PackageConfigSchema(Schema):
     """
     Schema for processing PackageConfig config data.
@@ -192,6 +213,7 @@ class PackageConfigSchema(Schema):
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     patch_generation_ignore_paths = fields.List(fields.String())
+    notifications = fields.Nested(NotificationsSchema)
 
     # list of deprecated keys and their replacement (new,old)
     deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
