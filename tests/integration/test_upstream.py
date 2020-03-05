@@ -77,8 +77,7 @@ def test_get_version(upstream_instance, m_v, exp):
     subprocess.check_call(["git", "add", "."], cwd=u)
     subprocess.check_call(["git", "commit", "-m", "More awesome changes"], cwd=u)
 
-    # 0.1.0.1.ge98cee1
-    assert re.match(r"0\.1\.0\.1\.\w{8}", ups.get_current_version())
+    assert ups.get_current_version() == "0.1.0"
 
 
 def test_get_version_macro(upstream_instance):
@@ -163,7 +162,9 @@ def test_create_archive(upstream_instance, extension):
 
     ups.create_archive()
 
-    assert len(list(u.glob(f"*{extension}"))) == 2
+    # there is still only one archive - we no longer use --long git-describe
+    # by default, upstreams should handle versions themselves
+    assert len(list(u.glob(f"*{extension}"))) == 1
 
 
 def test_create_uncommon_archive(upstream_instance):
@@ -208,6 +209,20 @@ def test_create_srpm(upstream_instance, tmpdir):
         assert False, "Didn't find the correct line in the spec file."
     assert srpm.exists()
     build_srpm(srpm)
+
+
+def test_create_srpm_git_desc_release(upstream_instance, tmpdir):
+    u, ups = upstream_instance
+    u.joinpath("README").write_text("\nEven better now!\n")
+    subprocess.check_call(["git", "add", "."], cwd=u)
+    subprocess.check_call(["git", "commit", "-m", "More awesome changes"], cwd=u)
+
+    ups.create_archive()
+    ups.prepare_upstream_for_srpm_creation()
+    srpm = ups.create_srpm()
+    assert srpm.exists()
+    build_srpm(srpm)
+    assert re.match(r".+beer-0.1.0-1.\d+.fc\d{2}.src.rpm$", str(srpm))
 
 
 def test_github_app(upstream_instance, tmpdir):
