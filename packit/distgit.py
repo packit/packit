@@ -276,7 +276,7 @@ class DistGit(PackitRepositoryBase):
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
-                "https://src.fedoraproject.org/lookaside/pkgs/"
+                "https://src.stg.fedoraproject.org/lookaside/pkgs/"
                 f"{self.package_config.downstream_package_name}/{archive_name}/"
             )
             if res.ok:

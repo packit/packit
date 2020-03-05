@@ -200,8 +200,7 @@ def test_check_signature_of_commit_key_not_found():
 
 # This could possibly but unlikely fail if all the default key servers are down.
 @pytest.mark.parametrize(
-    "keyid, ok",
-    [("A3E9A812AAB73DA7", True,), ("NOTEXISTING", False,)],  # Jirka's key id
+    "keyid, ok", [("A3E9A812AAB73DA7", True), ("NOTEXISTING", False)]  # Jirka's key id
 )
 def test_download_gpg_key_if_needed(keyid, ok):
     cf = CommitVerifier()

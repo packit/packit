@@ -161,7 +161,7 @@ class Config:
             )
             pagure_user_token = raw_dict.get("pagure_user_token")
             pagure_instance_url = raw_dict.get(
-                "pagure_instance_url", "https://src.fedoraproject.org"
+                "pagure_instance_url", "https://src.stg.fedoraproject.org"
             )
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(

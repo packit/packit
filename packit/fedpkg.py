@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -36,13 +37,10 @@ class FedPKG:
     https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
     """
 
-    def __init__(
-        self, fas_username: str = None, directory: str = None, stage: bool = False
-    ):
+    def __init__(self, fas_username: str = None, directory: str = None):
         self.fas_username = fas_username
         self.directory = directory
-        self.stage = stage
-        if stage:
+        if os.getenv("DEPLOYMENT") in ["stg", "dev"]:
             self.fedpkg_exec = "fedpkg-stage"
         else:
             self.fedpkg_exec = "fedpkg"
@@ -52,7 +50,8 @@ class FedPKG:
             raise Exception("Cannot access fedpkg repository:")
 
         return utils.run_command_remote(
-            cmd=[self.fedpkg_exec, "new-sources", sources],
+            # TODO: just for the try - when it fixes the problem, do it properly
+            cmd=[self.fedpkg_exec, "--user", self.fas_username, "new-sources", sources],
             cwd=self.directory,
             error_message=f"Adding new sources failed:",
             fail=fail,
@@ -132,13 +131,7 @@ class FedPKG:
         if not self.fas_username or not keytab or not Path(keytab).is_file():
             logger.info("won't be doing kinit, no credentials provided")
             return
-        cmd = [
-            "kinit",
-            f"{self.fas_username}@FEDORAPROJECT.ORG",
-            "-k",
-            "-t",
-            keytab,
-        ]
+        cmd = ["kinit", f"{self.fas_username}@FEDORAPROJECT.ORG", "-k", "-t", keytab]
         return utils.run_command_remote(
             cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
         )

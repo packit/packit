@@ -5,11 +5,7 @@ from packit.config.config import (
     get_default_map_from_file,
     pass_config,
 )
-from packit.config.job_config import (
-    JobConfig,
-    JobConfigTriggerType,
-    JobType,
-)
+from packit.config.job_config import JobConfig, JobConfigTriggerType, JobType
 from packit.config.package_config import (
     PackageConfig,
     get_package_config_from_repo,
