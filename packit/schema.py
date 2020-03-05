@@ -1,12 +1,35 @@
+# MIT License
+#
+# Copyright (c) 2018-2019 Red Hat, Inc.
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import logging
 import typing
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
-
 from packit.actions import ActionName
 from packit.config import PackageConfig, Config, SyncFilesConfig
 from packit.config.job_config import JobType, JobTriggerType, JobConfig, default_jobs
+from packit.config.package_config import NotificationsConfig
+from packit.config.package_config import PullRequestNotificationsConfig
 from packit.sync import SyncFilesItem
 
 logger = logging.getLogger(__name__)
@@ -85,8 +108,6 @@ class NotProcessedField(fields.Field):
     """
     Field class to mark fields which wil not be processed, only generates warning.
     Can be passed additional message via additional_message parameter.
-
-    :param str additional_message: additional warning message to be displayed
     """
 
     def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
@@ -146,6 +167,26 @@ class JobConfigSchema(Schema):
         return JobConfig(**data)
 
 
+class PullRequestNotificationsSchema(Schema):
+    """ Configuration of commenting on pull requests. """
+
+    successful_build = fields.Bool(default=True)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return PullRequestNotificationsConfig(**data)
+
+
+class NotificationsSchema(Schema):
+    """ Configuration of notifications. """
+
+    pull_request = fields.Nested(PullRequestNotificationsSchema)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return NotificationsConfig(**data)
+
+
 class PackageConfigSchema(Schema):
     """
     Schema for processing PackageConfig config data.
@@ -172,6 +213,7 @@ class PackageConfigSchema(Schema):
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     patch_generation_ignore_paths = fields.List(fields.String())
+    notifications = fields.Nested(NotificationsSchema)
 
     # list of deprecated keys and their replacement (new,old)
     deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
