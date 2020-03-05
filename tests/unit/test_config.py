@@ -287,6 +287,27 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             False,
         ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "notifications": {"pull_request": {"successful_build": False}},
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "notifications": {"pull_request": {"successful_build": "nie"}},
+            },
+            False,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "notifications": {"pull_request": False},
+            },
+            False,
+        ),
     ],
 )
 def test_package_config_validate(raw, is_valid):
@@ -722,3 +743,8 @@ def test_get_all_files_to_sync(package_config, all_synced_files):
 def test_get_local_specfile_path():
     assert get_local_specfile_path([UP_OSBUILD]) == "osbuild.spec"
     assert not get_local_specfile_path([SYNC_FILES])
+
+
+def test_notifications_section():
+    pc = PackageConfig.get_from_dict({"specfile_path": "package.spec"})
+    assert pc.notifications.pull_request.successful_build
