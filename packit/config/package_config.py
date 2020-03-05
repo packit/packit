@@ -113,6 +113,7 @@ class PackageConfig:
         self.current_version_command: List[str] = current_version_command or [
             "git",
             "describe",
+            "--abbrev=0",
             "--tags",
             "--match",
             "*",
