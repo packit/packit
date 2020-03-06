@@ -33,12 +33,12 @@ from packit.actions import ActionName
 from packit.config import (
     Config,
     JobConfig,
-    JobTriggerType,
     JobType,
     PackageConfig,
     get_package_config_from_repo,
     SyncFilesConfig,
     SyncFilesItem,
+    JobConfigTriggerType,
 )
 from packit.config.package_config import get_local_specfile_path
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -57,13 +57,15 @@ def get_job_config_dict_full():
 
 
 def get_job_config_simple():
-    return JobConfig(job=JobType.build, trigger=JobTriggerType.release, metadata={})
+    return JobConfig(
+        type=JobType.build, trigger=JobConfigTriggerType.release, metadata={}
+    )
 
 
 def get_job_config_full():
     return JobConfig(
-        job=JobType.propose_downstream,
-        trigger=JobTriggerType.pull_request,
+        type=JobType.propose_downstream,
+        trigger=JobConfigTriggerType.pull_request,
         metadata={"a": "b"},
     )
 
@@ -71,13 +73,13 @@ def get_job_config_full():
 def get_default_job_config():
     return [
         JobConfig(
-            job=JobType.tests,
-            trigger=JobTriggerType.pull_request,
+            type=JobType.tests,
+            trigger=JobConfigTriggerType.pull_request,
             metadata={"targets": ["fedora-stable"]},
         ),
         JobConfig(
-            job=JobType.propose_downstream,
-            trigger=JobTriggerType.release,
+            type=JobType.propose_downstream,
+            trigger=JobConfigTriggerType.release,
             metadata={"dist-git-branch": ["fedora-all"]},
         ),
     ]
@@ -515,7 +517,7 @@ def test_package_config_parse(raw, expected):
     # tests for https://github.com/packit-service/packit-service/pull/342
     if expected.jobs:
         for j in package_config.jobs:
-            assert j.job
+            assert j.type
     assert package_config == expected
 
 
