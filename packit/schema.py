@@ -25,11 +25,19 @@ import typing
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
+
 from packit.actions import ActionName
 from packit.config import PackageConfig, Config, SyncFilesConfig
-from packit.config.job_config import JobType, JobTriggerType, JobConfig, default_jobs
-from packit.config.package_config import NotificationsConfig
-from packit.config.package_config import PullRequestNotificationsConfig
+from packit.config.job_config import (
+    JobType,
+    JobConfig,
+    default_jobs,
+    JobConfigTriggerType,
+)
+from packit.config.package_config import (
+    NotificationsConfig,
+    PullRequestNotificationsConfig,
+)
 from packit.sync import SyncFilesItem
 
 logger = logging.getLogger(__name__)
@@ -108,6 +116,8 @@ class NotProcessedField(fields.Field):
     """
     Field class to mark fields which wil not be processed, only generates warning.
     Can be passed additional message via additional_message parameter.
+
+    :param str additional_message: additional warning message to be displayed
     """
 
     def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
@@ -159,12 +169,13 @@ class JobConfigSchema(Schema):
     """
 
     job = EnumField(JobType, required=True)
-    trigger = EnumField(JobTriggerType, required=True)
+    trigger = EnumField(JobConfigTriggerType, required=True)
     metadata = fields.Dict(missing={})
 
     @post_load
-    def make_instance(self, data, **kwargs):
-        return JobConfig(**data)
+    def make_instance(self, data, **_):
+        type = data.pop("job")
+        return JobConfig(type=type, **data)
 
 
 class PullRequestNotificationsSchema(Schema):
