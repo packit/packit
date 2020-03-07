@@ -384,7 +384,7 @@ class PackitAPI:
             # btw this is really naive: the name could be the same but the hash can be different
             # TODO: we should do something when such situation happens
             if force_new_sources or not self.dg.is_archive_in_lookaside_cache(
-                self.dg.upstream_archive_name
+                Path(self.dg.upstream_archive_name)
             ):
                 make_new_sources = True
             else:
@@ -393,7 +393,7 @@ class PackitAPI:
                     make_new_sources = True
             if make_new_sources:
                 archive = self.dg.download_upstream_archive()
-                self.dg.upload_to_lookaside_cache(str(archive))
+                self.dg.upload_to_lookaside_cache(archive)
 
     def build(
         self,

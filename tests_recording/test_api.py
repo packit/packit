@@ -1,7 +1,6 @@
-import os
 import unittest
 from subprocess import check_output
-
+from pathlib import Path
 import rebasehelper
 from rebasehelper.exceptions import RebaseHelperError
 
@@ -33,8 +32,8 @@ class ProposeUpdate(PackitUnittestOgr):
 
     def check_version_increase(self):
         # change specfile little bit to have there some change
-        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
-        with open(specfile_location, "r") as myfile:
+        specfile_location = Path(self.lp_working_dir, "python-ogr.spec")
+        with open(str(specfile_location), "r") as myfile:
             filedata = myfile.read()
         # Patch the specfile with new version
         version_increase = "0.0.0"
@@ -45,7 +44,7 @@ class ProposeUpdate(PackitUnittestOgr):
                 version_increase = ".".join([v1, str(int(v2) + 1), v3])
                 filedata = filedata.replace(version, version_increase)
                 break
-        with open(specfile_location, "w") as myfile:
+        with open(str(specfile_location), "w") as myfile:
             myfile.write(filedata)
         check_output(
             f"cd {self.lp.working_dir};"
@@ -59,9 +58,9 @@ class ProposeUpdate(PackitUnittestOgr):
         """
         change specfile little bit to have there some change, do not increase version
         """
-        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
+        specfile_location = Path(self.lp_working_dir, "python-ogr.spec")
         version_increase = "10.0.0"
-        with open(specfile_location, "a") as myfile:
+        with open(str(specfile_location), "a") as myfile:
             myfile.write("\n# comment\n")
         check_output(
             f"cd {self.lp.working_dir};"

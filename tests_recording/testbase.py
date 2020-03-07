@@ -1,4 +1,5 @@
 import inspect
+from pathlib import Path
 import os
 import shutil
 import unittest
@@ -14,8 +15,8 @@ from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
 DATA_DIR = "test_data"
-PERSISTENT_DATA_PREFIX = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), DATA_DIR
+PERSISTENT_DATA_PREFIX = Path(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), DATA_DIR)
 )
 
 
@@ -30,7 +31,7 @@ class PackitUnittestOgr(unittest.TestCase):
         return conf
 
     def get_datafile_filename(self, suffix="yaml"):
-        prefix = PERSISTENT_DATA_PREFIX
+        prefix = str(PERSISTENT_DATA_PREFIX)
         test_file_name = os.path.basename(inspect.getfile(self.__class__)).rsplit(
             ".", 1
         )[0]

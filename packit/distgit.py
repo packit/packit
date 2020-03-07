@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import logging
-import os
 import tempfile
 from pathlib import Path
 from typing import Optional, Sequence, List
@@ -254,7 +253,7 @@ class DistGit(PackitRepositoryBase):
         logger.info(f"Downloaded archive: {archive}")
         return archive
 
-    def upload_to_lookaside_cache(self, archive_path: str) -> None:
+    def upload_to_lookaside_cache(self, archive_path: Path) -> None:
         """
         Upload files (archive) to the lookaside cache.
         """
@@ -265,13 +264,13 @@ class DistGit(PackitRepositoryBase):
         )
         f.init_ticket(self.config.keytab_path)
         try:
-            f.new_sources(sources=archive_path)
+            f.new_sources(sources=str(archive_path))
         except Exception as ex:
             logger.error(f"'fedpkg new-sources' failed for the following reason: {ex}")
             raise PackitException(ex)
 
-    def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
-        archive_name = os.path.basename(archive_path)
+    def is_archive_in_lookaside_cache(self, archive_path: Path) -> bool:
+        archive_name = archive_path.name
         try:
             res = requests.head(
                 "https://src.fedoraproject.org/lookaside/pkgs/"
