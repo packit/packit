@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import logging
-import typing
+from logging import getLogger
+from typing import Dict, Any, Optional, Mapping
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
@@ -40,7 +40,7 @@ from packit.config.package_config import (
 )
 from packit.sync import SyncFilesItem
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class FilesToSyncField(fields.Field):
@@ -49,14 +49,14 @@ class FilesToSyncField(fields.Field):
     Accepts str or dict  {'src': str, 'dest':str}
     """
 
-    def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
+    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs):
         raise NotImplementedError
 
     def _deserialize(
         self,
-        value: typing.Any,
-        attr: typing.Optional[str],
-        data: typing.Optional[typing.Mapping[str, typing.Any]],
+        value: Any,
+        attr: Optional[str],
+        data: Optional[Mapping[str, Any]],
         **kwargs,
     ) -> SyncFilesItem:
         if isinstance(value, dict):
@@ -83,16 +83,16 @@ class ActionField(fields.Field):
     Field class representing Action.
     """
 
-    def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
+    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs):
         raise NotImplementedError
 
     def _deserialize(
         self,
-        value: typing.Any,
-        attr: typing.Optional[str],
-        data: typing.Optional[typing.Mapping[ActionName, typing.Any]],
+        value: Any,
+        attr: Optional[str],
+        data: Optional[Mapping[ActionName, Any]],
         **kwargs,
-    ) -> typing.Dict:
+    ) -> Dict:
         if not isinstance(value, dict):
             raise ValidationError("Invalid data provided. dict required")
 
@@ -120,14 +120,14 @@ class NotProcessedField(fields.Field):
     :param str additional_message: additional warning message to be displayed
     """
 
-    def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
+    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs):
         raise NotImplementedError
 
     def _deserialize(
         self,
-        value: typing.Any,
-        attr: typing.Optional[str],
-        data: typing.Optional[typing.Mapping[str, typing.Any]],
+        value: Any,
+        attr: Optional[str],
+        data: Optional[Mapping[str, Any]],
         **kwargs,
     ):
         logger.warning(f"{self.name} is no longer being processed.")
@@ -257,10 +257,10 @@ class PackageConfigSchema(Schema):
                 del data[old_key_name]
         return data
 
-    def specfile_path_pre(self, data, **kwargs):
+    def specfile_path_pre(self, data: Dict, **kwargs):
         """
-        Method for pre-processing specfile_path value. If is None, will try to generate from,
-        donwstream_package_name, else will keep None and generate warning.
+        Method for pre-processing specfile_path value.
+        Set it to downstream_package_name if specified, else leave unset.
 
         :param data: conf dictionary to process
         :return: processed dictionary
@@ -271,10 +271,10 @@ class PackageConfigSchema(Schema):
             downstream_package_name = data.get("downstream_package_name", None)
             if downstream_package_name:
                 data["specfile_path"] = f"{downstream_package_name}.spec"
-                logger.info(f"We guess that spec file is at {specfile_path}")
+                logger.info(f"Setting specfile_path to {downstream_package_name}.spec")
             else:
                 # guess it?
-                logger.warning("Path to spec file is not set.")
+                logger.info("Neither specfile_path nor downstream_package_name set.")
         return data
 
     @post_load
