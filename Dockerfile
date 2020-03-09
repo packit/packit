@@ -19,6 +19,8 @@ RUN ansible-playbook -v -c local -i localhost, ${WORKDIR}/files/install-requirem
 
 COPY ./ ${WORKDIR}/
 RUN pip3 install ${WORKDIR}/ \
+    && cd ${WORKDIR} && git rev-parse HEAD >/.packit.git.commit.hash \
+    && git show --quiet --format=%B HEAD >/.packit.git.commit.message \
     && rm -rf ~/.cache/*
 
 RUN cd / && rm -rf ${WORKDIR}/ && mkdir ${WORKDIR}/
