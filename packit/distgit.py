@@ -28,6 +28,7 @@ from typing import Optional, Sequence, List
 import cccolutils
 import git
 import requests
+from ogr.abstract import PullRequest
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
@@ -199,7 +200,7 @@ class DistGit(PackitRepositoryBase):
 
     def create_pull(
         self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
-    ) -> None:
+    ) -> PullRequest:
         """
         Create dist-git pull request using the requested branches
         """
@@ -228,6 +229,7 @@ class DistGit(PackitRepositoryBase):
             raise
         else:
             logger.info(f"PR created: {dist_git_pr.url}")
+            return dist_git_pr
 
     @property
     def upstream_archive_name(self) -> str:
