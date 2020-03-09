@@ -1,0 +1,5 @@
+---
+- name: Install packit-service
+  pip:
+    name: "{{ reverse_dir }}"
+  become: true

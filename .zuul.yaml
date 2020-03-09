@@ -10,6 +10,7 @@
         - packit-tests-rpm-sess-rec
         - packit-tests-pip-deps-sess-rec
         - packit-tests-git-master-sess-rec
+        - reverse-dep-packit-service-tests
     gate:
       jobs:
         - packit-pre-commit
@@ -19,6 +20,7 @@
         - packit-tests-rpm-sess-rec
         - packit-tests-pip-deps-sess-rec
         - packit-tests-git-master-sess-rec
+        - reverse-dep-packit-service-tests
 
 - job:
     name: packit-pre-commit
@@ -91,3 +93,19 @@
     parent: packit-tests-git-master
     description: Run session recording tests of packit via pip installed dependencies
     run: files/zuul-tests-session-recording.yaml
+
+- job:
+    name: reverse-dep-packit-service-tests
+    parent: base
+    description: Run packit-service tests to check if we do not break packit-service
+    required-projects:
+      - github.com/packit-service/packit-service
+    pre-run: files/zuul-install-requirements-pip.yaml
+    run: files/zuul-reverse-dep-packit-service.yaml
+    extra-vars:
+      with_testing: true
+      ansible_python_interpreter: /usr/bin/python3
+    nodeset:
+      nodes:
+        - name: test-node
+          label: cloud-fedora-31
