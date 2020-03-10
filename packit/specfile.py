@@ -146,7 +146,8 @@ class Specfile(SpecFile):
             new_content += "\n# " + "\n# ".join(msg.split("\n"))
             new_content += f"\nPatch{(i + 1):04d}: {patch}\n"
 
-        last_source_tag = [t for t in self.tags.filter(name="Source*")][-1]
+        # valid=None: take any SourceX even if it's disabled
+        last_source_tag = [t for t in self.tags.filter(name="Source*", valid=None)][-1]
         where = last_source_tag.line + 1
         # insert new content below last Source
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
