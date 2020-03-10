@@ -148,7 +148,16 @@ class Specfile(SpecFile):
 
         # valid=None: take any SourceX even if it's disabled
         last_source_tag = [t for t in self.tags.filter(name="Source*", valid=None)][-1]
-        where = last_source_tag.line + 1
+        # find the first empty line after last_source_tag
+        for i, line in enumerate(
+            self.spec_content.section("%package")[last_source_tag.line:]
+        ):
+            if line.strip() == "":
+                break
+        else:
+            logger.error("Can't find where to add patches.")
+            return
+        where = last_source_tag.line + i
         # insert new content below last Source
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
 
