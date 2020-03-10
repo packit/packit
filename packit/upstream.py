@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import datetime
 import logging
 import os
 import re
@@ -466,11 +467,49 @@ class Upstream(PackitRepositoryBase):
         :param version: version to set in the spec
         :param commit: commit to set in the changelog
         """
+        # we only care about the first number in the release
+        # so that we can re-run `packit srpm`
+        original_release_number = self.specfile.get_release_number().split(".", 1)[0]
+
+        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+
+        git_des_command = [
+            "git",
+            "describe",
+            "--tags",
+            "--long",
+            "--dirty",
+            "--match",
+            "*",
+        ]
+        try:
+            git_des_out = run_command(git_des_command, output=True).strip()
+        except PackitCommandFailedError as ex:
+            logger.info(f"Exception while describing the repository: {ex}")
+            # probably no tags in the git repo
+            git_desc_suffix = ""
+        else:
+            # git adds various info in the output separated by -
+            # so let's just drop version and reuse everything else
+            g_desc_raw = git_des_out.split("-", 1)[1]
+            # release components are meanto to be separated by ".", not "-"
+            git_desc_suffix = "." + g_desc_raw.replace("-", ".")
+            # instead of changing version, we change Release field
+            # upstream projects should take care of versions
+        template = "{original_release_number}.{current_time}{git_desc_suffix}"
         self._fix_spec_source(archive)
         self._fix_spec_prep(version)
 
         msg = f"- Development snapshot ({commit})"
-        self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)
+        release = template.format(
+            original_release_number=original_release_number,
+            current_time=current_time,
+            git_desc_suffix=git_desc_suffix,
+        )
+        logger.debug(f"Setting Release in spec to {release!r}")
+        self.specfile.set_spec_version(
+            version=version, release=release, changelog_entry=msg,
+        )
 
     def _fix_spec_prep(self, version):
         prep = self.specfile.spec_content.section("%prep")
