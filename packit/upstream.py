@@ -467,18 +467,16 @@ class Upstream(PackitRepositoryBase):
         :param version: version to set in the spec
         :param commit: commit to set in the changelog
         """
+        self._fix_spec_source(archive)
+        self._fix_spec_prep(version)
+
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
-        original_release_number = self.specfile.get_release_number().split(".", 1)[0]
-
-        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
-
         git_des_command = [
             "git",
             "describe",
             "--tags",
             "--long",
-            "--dirty",
             "--match",
             "*",
         ]
@@ -491,22 +489,17 @@ class Upstream(PackitRepositoryBase):
         else:
             # git adds various info in the output separated by -
             # so let's just drop version and reuse everything else
-            g_desc_raw = git_des_out.split("-", 1)[1]
-            # release components are meanto to be separated by ".", not "-"
-            git_desc_suffix = "." + g_desc_raw.replace("-", ".")
-            # instead of changing version, we change Release field
-            # upstream projects should take care of versions
-        template = "{original_release_number}.{current_time}{git_desc_suffix}"
-        self._fix_spec_source(archive)
-        self._fix_spec_prep(version)
+            g_desc_raw = git_des_out.rsplit("-", 2)[1:]
+            # release components are meant to be separated by ".", not "-"
+            git_desc_suffix = "." + ".".join(g_desc_raw)
+        original_release_number = self.specfile.get_release_number().split(".", 1)[0]
+        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        release = f"{original_release_number}.{current_time}{git_desc_suffix}"
 
         msg = f"- Development snapshot ({commit})"
-        release = template.format(
-            original_release_number=original_release_number,
-            current_time=current_time,
-            git_desc_suffix=git_desc_suffix,
-        )
         logger.debug(f"Setting Release in spec to {release!r}")
+        # instead of changing version, we change Release field
+        # upstream projects should take care of versions
         self.specfile.set_spec_version(
             version=version, release=release, changelog_entry=msg,
         )
