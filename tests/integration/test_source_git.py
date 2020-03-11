@@ -103,13 +103,20 @@ def test_basic_local_update_patch_content(
         in git_diff
     )
 
-    assert "+# PATCHES FROM SOURCE GIT:" in git_diff
-    spec_package_section = ""
-    for section in Specfile(distgit / "beer.spec").spec_content.sections:
-        if "%package" in section[0]:
-            spec_package_section += "\n".join(section[1])
-    assert "Patch0001: 0001-source-change.patch" in spec_package_section
-    assert "Patch0002:" not in spec_package_section  # no empty patches
+    assert (
+        """
++# PATCHES FROM SOURCE GIT:
++
++# source change
++# Author: Packit Test Suite <test@example.com>
++Patch0001: 0001-source-change.patch
++
++
+ %description
+"""
+        in git_diff
+    )
+    assert "Patch0002:" not in git_diff  # no empty patches
 
     assert (
         """ %prep

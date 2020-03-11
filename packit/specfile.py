@@ -146,8 +146,20 @@ class Specfile(SpecFile):
             new_content += "\n# " + "\n# ".join(msg.split("\n"))
             new_content += f"\nPatch{(i + 1):04d}: {patch}\n"
 
-        last_source_tag = [t for t in self.tags.filter(name="Source*")][-1]
-        where = last_source_tag.line + 1
+        # valid=None: take any SourceX even if it's disabled
+        last_source_tag_line = [
+            t.line for t in self.tags.filter(name="Source*", valid=None)
+        ][-1]
+        # find the first empty line after last_source_tag
+        for i, line in enumerate(
+            self.spec_content.section("%package")[last_source_tag_line:]
+        ):
+            if line.strip() == "":
+                break
+        else:
+            logger.error("Can't find where to add patches.")
+            return
+        where = last_source_tag_line + i
         # insert new content below last Source
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
 
