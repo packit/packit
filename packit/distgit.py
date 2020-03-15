@@ -27,6 +27,7 @@ from typing import Optional, Sequence, List
 import cccolutils
 import git
 import requests
+from ogr.abstract import PullRequest
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
@@ -167,8 +168,8 @@ class DistGit(PackitRepositoryBase):
         :param force: push forcefully?
         """
         logger.debug(
-            f"About to {'force ' if force else ''}push changes to branch {branch_name} "
-            f"of a fork {fork_remote_name} of the dist-git repo"
+            f"About to {'force ' if force else ''}push changes to branch {branch_name!r} "
+            f"of a fork {fork_remote_name!r} of the dist-git repo."
         )
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
@@ -191,14 +192,14 @@ class DistGit(PackitRepositoryBase):
             self.push(refspec=branch_name, remote_name=fork_remote_name, force=force)
         except git.GitError as ex:
             msg = (
-                f"Unable to push to remote {fork_remote_name} using branch {branch_name}, "
+                f"Unable to push to remote fork {fork_remote_name!r} using branch {branch_name!r}, "
                 f"the error is:\n{ex}"
             )
             raise PackitException(msg)
 
     def create_pull(
         self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
-    ) -> None:
+    ) -> PullRequest:
         """
         Create dist-git pull request using the requested branches
         """
@@ -227,6 +228,7 @@ class DistGit(PackitRepositoryBase):
             raise
         else:
             logger.info(f"PR created: {dist_git_pr.url}")
+            return dist_git_pr
 
     @property
     def upstream_archive_name(self) -> str:

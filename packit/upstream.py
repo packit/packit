@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import datetime
 import logging
 import os
 import re
@@ -469,8 +470,39 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_source(archive)
         self._fix_spec_prep(version)
 
+        # we only care about the first number in the release
+        # so that we can re-run `packit srpm`
+        git_des_command = [
+            "git",
+            "describe",
+            "--tags",
+            "--long",
+            "--match",
+            "*",
+        ]
+        try:
+            git_des_out = run_command(git_des_command, output=True).strip()
+        except PackitCommandFailedError as ex:
+            logger.info(f"Exception while describing the repository: {ex}")
+            # probably no tags in the git repo
+            git_desc_suffix = ""
+        else:
+            # git adds various info in the output separated by -
+            # so let's just drop version and reuse everything else
+            g_desc_raw = git_des_out.rsplit("-", 2)[1:]
+            # release components are meant to be separated by ".", not "-"
+            git_desc_suffix = "." + ".".join(g_desc_raw)
+        original_release_number = self.specfile.get_release_number().split(".", 1)[0]
+        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        release = f"{original_release_number}.{current_time}{git_desc_suffix}"
+
         msg = f"- Development snapshot ({commit})"
-        self.specfile.set_spec_version(version=f"{version}", changelog_entry=msg)
+        logger.debug(f"Setting Release in spec to {release!r}")
+        # instead of changing version, we change Release field
+        # upstream projects should take care of versions
+        self.specfile.set_spec_version(
+            version=version, release=release, changelog_entry=msg,
+        )
 
     def _fix_spec_prep(self, version):
         prep = self.specfile.spec_content.section("%prep")

@@ -31,6 +31,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
+from ogr.abstract import PullRequest
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -161,7 +162,7 @@ class PackitAPI:
         upstream_ref: str = None,
         create_pr: bool = True,
         force: bool = False,
-    ):
+    ) -> Optional[PullRequest]:
         """
         Update given package in Fedora
 
@@ -172,6 +173,8 @@ class PackitAPI:
         :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
         :param create_pr: create a pull request if set to True
         :param force: ignore changes in the git index
+
+        :return created PullRequest if create_pr is True, else None
         """
         assert_existence(self.up.local_project)
         assert_existence(self.dg.local_project)
@@ -272,8 +275,9 @@ class PackitAPI:
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
 
+            new_pr = None
             if create_pr:
-                self.push_and_create_pr(
+                new_pr = self.push_and_create_pr(
                     pr_title=f"Update to upstream release {full_version}",
                     pr_description=description,
                     dist_git_branch=dist_git_branch,
@@ -284,6 +288,8 @@ class PackitAPI:
             if not use_local_content:
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
             self.dg.refresh_specfile()
+
+        return new_pr
 
     def sync_from_downstream(
         self,
@@ -366,10 +372,10 @@ class PackitAPI:
 
     def push_and_create_pr(
         self, pr_title: str, pr_description: str, dist_git_branch: str
-    ):
+    ) -> PullRequest:
         # the branch may already be up, let's push forcefully
         self.dg.push_to_fork(self.dg.local_project.ref, force=True)
-        self.dg.create_pull(
+        return self.dg.create_pull(
             pr_title,
             pr_description,
             source_branch=self.dg.local_project.ref,
