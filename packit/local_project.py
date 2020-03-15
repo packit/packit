@@ -24,6 +24,7 @@ import logging
 import shutil
 from contextlib import contextmanager
 from typing import Optional, Union, Iterable
+from pathlib import Path
 
 import git
 
@@ -89,7 +90,7 @@ class LocalProject:
         """
         self.working_dir_temporary = False
         self.git_repo: git.Repo = git_repo
-        self.working_dir: str = working_dir
+        self.working_dir: Path = Path(working_dir)
         self._ref = ref
         self.git_project = git_project
         self.git_service = git_service

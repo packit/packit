@@ -258,21 +258,21 @@ def commits_to_nice_str(commits):
     )
 
 
-def is_git_repo(directory: str) -> bool:
+def is_git_repo(directory: Path) -> bool:
     """
     Test, if the directory is a git repo.
     (Has .git subdirectory?)
     """
-    return Path(directory).joinpath(".git").is_dir()
+    return directory.joinpath(".git").is_dir()
 
 
-def get_repo(url: str, directory: str = None) -> git.Repo:
+def get_repo(url: str, directory: Path = None) -> git.Repo:
     """
     Use directory as a git repo or clone repo to the tempdir.
     """
     if not directory:
         tempdir = tempfile.mkdtemp()
-        directory = tempdir
+        directory = Path(tempdir)
 
     # TODO: optimize cloning: single branch and last n commits?
     if is_git_repo(directory=directory):

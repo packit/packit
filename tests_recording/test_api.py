@@ -32,9 +32,8 @@ class ProposeUpdate(PackitUnittestOgr):
 
     def check_version_increase(self):
         # change specfile little bit to have there some change
-        specfile_location = Path(self.lp_working_dir, "python-ogr.spec")
-        with open(str(specfile_location), "r") as myfile:
-            filedata = myfile.read()
+        specfile_location = Path(self.lp.working_dir, "python-ogr.spec")
+        filedata = specfile_location.read_text()
         # Patch the specfile with new version
         version_increase = "0.0.0"
         for line in filedata.splitlines():
@@ -44,8 +43,7 @@ class ProposeUpdate(PackitUnittestOgr):
                 version_increase = ".".join([v1, str(int(v2) + 1), v3])
                 filedata = filedata.replace(version, version_increase)
                 break
-        with open(str(specfile_location), "w") as myfile:
-            myfile.write(filedata)
+        specfile_location.write_text(filedata)
         check_output(
             f"cd {self.lp.working_dir};"
             f"git commit -m 'test change' python-ogr.spec;"
@@ -58,10 +56,9 @@ class ProposeUpdate(PackitUnittestOgr):
         """
         change specfile little bit to have there some change, do not increase version
         """
-        specfile_location = Path(self.lp_working_dir, "python-ogr.spec")
+        specfile_location = Path(self.lp.working_dir, "python-ogr.spec")
         version_increase = "10.0.0"
-        with open(str(specfile_location), "a") as myfile:
-            myfile.write("\n# comment\n")
+        specfile_location.open("a").write_text("\n# comment\n")
         check_output(
             f"cd {self.lp.working_dir};"
             f"git commit -m 'test change' python-ogr.spec;"

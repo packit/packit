@@ -15,9 +15,8 @@ from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
 DATA_DIR = "test_data"
-PERSISTENT_DATA_PREFIX = Path(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)), DATA_DIR)
-)
+
+PERSISTENT_DATA_PREFIX = Path(__file__).parent / DATA_DIR
 
 
 class PackitUnittestOgr(unittest.TestCase):
@@ -31,14 +30,14 @@ class PackitUnittestOgr(unittest.TestCase):
         return conf
 
     def get_datafile_filename(self, suffix="yaml"):
-        prefix = str(PERSISTENT_DATA_PREFIX)
+        prefix = PERSISTENT_DATA_PREFIX
         test_file_name = os.path.basename(inspect.getfile(self.__class__)).rsplit(
             ".", 1
         )[0]
         test_class_name = f"{self.id()}.{suffix}"
-        testdata_dirname = os.path.join(prefix, test_file_name)
+        testdata_dirname = Path(prefix, test_file_name)
         os.makedirs(testdata_dirname, mode=0o777, exist_ok=True)
-        return os.path.join(testdata_dirname, test_class_name)
+        return Path(testdata_dirname, test_class_name)
 
     def set_git_user(self):
         try:

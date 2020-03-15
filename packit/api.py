@@ -26,7 +26,6 @@ This is the official python interface for packit.
 
 import asyncio
 import logging
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -230,10 +229,9 @@ class PackitAPI:
                 f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
 
-            path = os.path.join(self.dg.local_project.working_dir, "README.packit")
+            path = Path(self.dg.local_project.working_dir, "README.packit")
             logger.debug(f"Path of README {path}")
-            with open(path, "w") as f:
-                f.write(SYNCING_NOTE.format(packit_version=get_packit_version()))
+            path.write_text(SYNCING_NOTE.format(packit_version=get_packit_version()))
 
             files_to_sync = self.package_config.get_all_files_to_sync()
 

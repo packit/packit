@@ -253,7 +253,7 @@ class DistGit(PackitRepositoryBase):
         logger.info(f"Downloaded archive: {archive}")
         return archive
 
-    def upload_to_lookaside_cache(self, archive_path: Path) -> None:
+    def upload_to_lookaside_cache(self, archive: Path) -> None:
         """
         Upload files (archive) to the lookaside cache.
         """
@@ -264,27 +264,26 @@ class DistGit(PackitRepositoryBase):
         )
         f.init_ticket(self.config.keytab_path)
         try:
-            f.new_sources(sources=str(archive_path))
+            f.new_sources(sources=str(archive))
         except Exception as ex:
             logger.error(f"'fedpkg new-sources' failed for the following reason: {ex}")
             raise PackitException(ex)
 
-    def is_archive_in_lookaside_cache(self, archive_path: Path) -> bool:
-        archive_name = archive_path.name
+    def is_archive_in_lookaside_cache(self, archive: Path) -> bool:
         try:
             res = requests.head(
                 "https://src.fedoraproject.org/lookaside/pkgs/"
-                f"{self.package_config.downstream_package_name}/{archive_name}/"
+                f"{self.package_config.downstream_package_name}/{archive.name}/"
             )
             if res.ok:
                 logger.info(
-                    f"Archive {archive_name} found in lookaside cache (skipping upload)."
+                    f"Archive {archive.name} found in lookaside cache (skipping upload)."
                 )
                 return True
-            logger.debug(f"Archive {archive_name} not found in the lookaside cache.")
+            logger.debug(f"Archive {archive.name} not found in the lookaside cache.")
         except requests.exceptions.BaseHTTPError:
             logger.warning(
-                f"Error trying to find {archive_name} in the lookaside cache."
+                f"Error trying to find {archive.name} in the lookaside cache."
             )
         return False
 
