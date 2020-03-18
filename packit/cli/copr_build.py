@@ -27,7 +27,7 @@ import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
-from packit.config import pass_config, get_context_settings, JobType
+from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_build_targets
 
 
@@ -40,7 +40,8 @@ from packit.config.aliases import get_build_targets
 @click.option(
     "--project",
     help="Project name to build in. Will be created if does not exist. "
-    "(defaults to project value in the config file or 'packit-cli-{repo_name}-{branch/commit}')",
+    "(defaults to the first found project value in the config file or "
+    "'packit-cli-{repo_name}-{branch/commit}')",
 )
 @click.option(
     "--targets",
@@ -83,15 +84,9 @@ def copr_build(
     it defaults to the current working directory.
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    config_project_value = [
-        job.metadata.get("project")
-        for job in api.package_config.jobs
-        if job.type == JobType.copr_build and job.metadata.get("project")
-    ]
+    default_project_name = api.package_config.get_copr_build_project_value()
 
-    if config_project_value:
-        default_project_name = config_project_value[0]
-    else:
+    if not default_project_name:
         default_project_name = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
 
     targets_to_build = get_build_targets(
