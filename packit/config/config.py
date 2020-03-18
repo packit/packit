@@ -131,9 +131,17 @@ class Config:
     @staticmethod
     def load_authentication(raw_dict):
         services = set()
+        deprecated_keys = [
+            "github_app_id",
+            "github_app_cert_path",
+            "github_token",
+            "pagure_user_token",
+            "pagure_instance_url",
+            "pagure_fork_token",
+        ]
         if "authentication" in raw_dict:
             services = get_instances_from_dict(instances=raw_dict["authentication"])
-        else:
+        elif any(key in raw_dict for key in deprecated_keys):
             logger.warning(
                 "Please, "
                 "use 'authentication' key in the user configuration "
