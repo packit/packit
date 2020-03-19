@@ -100,7 +100,10 @@ def initiate_git_repo(
     if copy_from:
         shutil.copytree(copy_from, directory)
     subprocess.check_call(["git", "init", "."], cwd=directory)
-    Path(directory).joinpath("README").write_text("Best upstream project ever!")
+    directory_path = Path(directory)
+    directory_path.joinpath("README").write_text("Best upstream project ever!")
+    # this file is in the tarball
+    directory_path.joinpath("hops").write_text("Cascade\n")
     git_set_user_email(directory)
     subprocess.check_call(["git", "add", "."], cwd=directory)
     subprocess.check_call(["git", "commit", "-m", "initial commit"], cwd=directory)
@@ -119,6 +122,19 @@ def initiate_git_repo(
         subprocess.check_call(
             ["git", "push", "--tags", "-u", "origin", "master:master"], cwd=directory
         )
+
+
+def create_merge_commit_in_source_git(sg: Path):
+    hops = sg.joinpath("hops")
+    subprocess.check_call(["git", "checkout", "-B", "new-changes"], cwd=sg)
+    hops.write_text("Amarillo\n")
+    git_add_and_commit(directory=sg, message="switching to amarillo hops")
+    hops.write_text("Citra\n")
+    git_add_and_commit(directory=sg, message="actually, let's do citra")
+    subprocess.check_call(["git", "checkout", "master"], cwd=sg)
+    subprocess.check_call(
+        ["git", "merge", "--no-ff", "-m", "MERGE COMMIT!", "new-changes"], cwd=sg,
+    )
 
 
 def prepare_dist_git_repo(directory, push=True):
