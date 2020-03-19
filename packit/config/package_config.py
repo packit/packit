@@ -190,14 +190,21 @@ class PackageConfig:
         return SyncFilesConfig(files)
 
     def get_copr_build_project_value(self) -> Optional[str]:
-        project_list = [
+        projects_list = [
             job.metadata.get("project")
             for job in self.jobs
             if job.type == JobType.copr_build and job.metadata.get("project")
         ]
-        if not project_list:
+        if not projects_list:
             return None
-        return project_list[0]
+
+        if len(set(projects_list)) > 1:
+            logger.warning(
+                f"You have defined multiple copr projects to build in, we are going "
+                f"to pick the first one: {projects_list[0]}, reorder the job definitions"
+                f" if this is not the one you want."
+            )
+        return projects_list[0]
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
