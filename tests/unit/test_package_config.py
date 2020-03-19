@@ -46,6 +46,24 @@ def test_get_specfile_path_from_repo(files, expected):
             ),
             "example",
         ),
+        (
+            PackageConfig(
+                specfile_path="xxx",
+                jobs=[
+                    JobConfig(
+                        type=JobType.copr_build,
+                        trigger=JobConfigTriggerType.release,
+                        metadata={"project": "example1"},
+                    ),
+                    JobConfig(
+                        type=JobType.copr_build,
+                        trigger=JobConfigTriggerType.pull_request,
+                        metadata={"project": "example2"},
+                    ),
+                ],
+            ),
+            "example1",
+        ),
     ],
 )
 def test_project_from_copr_build_job(package_config, project):
