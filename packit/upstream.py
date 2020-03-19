@@ -24,6 +24,7 @@ import logging
 import os
 import re
 import shutil
+from math import log10, floor
 from pathlib import Path
 from typing import Optional, List, Tuple, Union
 
@@ -219,13 +220,13 @@ class Upstream(PackitRepositoryBase):
 
     def create_patches(
         self, upstream: str = None, destination: str = None
-    ) -> List[Tuple[str, str]]:
+    ) -> List[Tuple[Path, str]]:
         """
         Create patches from downstream commits.
 
         :param destination: str
         :param upstream: str -- git branch or tag
-        :return: [(patch_name, msg)] list of created patches (tuple of the file name and commit msg)
+        :return: [(patch_path, msg)] list of created patches (tuple of the file path and commit msg)
         """
 
         upstream = upstream or self.get_specfile_version()
@@ -248,6 +249,12 @@ class Upstream(PackitRepositoryBase):
         )
 
         patch_list = []
+        # we need to prefix patches so we can order them properly
+        # this is needed for merge commits - git orders every instance of `format-patch` call
+        commits_count = len(commits)
+        # how many digits does commits_count have?
+        order = floor(log10(commits_count)) + 1
+        patch_counter = 0  # prefix for patches so they are nicely ordered
         # first value is upstream ref, i.e parent for the first commit we want to create patch from
         for i, commit in enumerate(commits[1:]):
             parent_commit = commits[i]
@@ -260,16 +267,27 @@ class Upstream(PackitRepositoryBase):
                 "--",
                 ".",
             ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
-            patch_file = run_command(
+            git_format_patch_out = run_command(
                 cmd=git_diff_cmd,
                 cwd=self.local_project.working_dir,
                 output=True,
                 decode=True,
             )
 
-            if patch_file:
-                msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
-                patch_list.append((os.path.basename(patch_file.strip()), msg))
+            # there can be multiple patches in a merge request
+            # so `git format-patch` can contain multiple files in the output
+            if git_format_patch_out:
+                for patch_file_str in git_format_patch_out.split("\n"):
+                    if not patch_file_str:
+                        continue
+                    prefix = format(patch_counter, f"0{order}")
+                    patch_file = Path(patch_file_str)
+                    patch_name = f"{prefix}-{patch_file.name}"
+                    patch_target_path = Path(destination).joinpath(patch_name)
+                    patch_file.replace(patch_target_path)
+                    msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
+                    patch_list.append((patch_target_path, msg))
+                    patch_counter += 1
             else:
                 logger.info(f"No patch for commit: {commit.summary} ({commit.hexsha})")
 
