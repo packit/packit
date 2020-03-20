@@ -25,7 +25,12 @@ from pathlib import Path
 from packit.utils import cwd
 from packit.specfile import Specfile
 from tests.integration.conftest import mock_spec_download_remote_s
-from tests.spellbook import TARBALL_NAME, git_add_and_commit, build_srpm
+from tests.spellbook import (
+    TARBALL_NAME,
+    git_add_and_commit,
+    build_srpm,
+    create_merge_commit_in_source_git,
+)
 
 
 def test_basic_local_update_without_patching(
@@ -82,6 +87,8 @@ def test_basic_local_update_patch_content(
     distgit, _ = distgit_and_remote
     mock_spec_download_remote_s(distgit)
 
+    create_merge_commit_in_source_git(sourcegit)
+
     source_file = sourcegit / "big-source-file.txt"
     source_file.write_text("new changes")
     git_add_and_commit(directory=sourcegit, message="source change")
@@ -107,16 +114,24 @@ def test_basic_local_update_patch_content(
         """
 +# PATCHES FROM SOURCE GIT:
 +
++# MERGE COMMIT!
++# Author: Packit Test Suite <test@example.com>
++Patch0001: 0-0001-switching-to-amarillo-hops.patch
++
++# MERGE COMMIT!
++# Author: Packit Test Suite <test@example.com>
++Patch0002: 1-0002-actually-let-s-do-citra.patch
++
 +# source change
 +# Author: Packit Test Suite <test@example.com>
-+Patch0001: 0001-source-change.patch
++Patch0003: 2-0001-source-change.patch
 +
 +
  %description
 """
         in git_diff
     )
-    assert "Patch0002:" not in git_diff  # no empty patches
+    assert "Patch0004:" not in git_diff
 
     assert (
         """ %prep
@@ -170,6 +185,14 @@ new file mode 100644"""
     )
 
     assert (
+        "+Subject: [PATCH 2/2] actually, let's do citra\n"
+        "+\n"
+        "+---\n"
+        "+ hops | 2 +-\n"
+        "+ 1 file changed, 1 insertion(+), 1 deletion(-)\n"
+    ) in git_diff
+
+    assert (
         """
 +--- a/big-source-file.txt
 ++++ b/big-source-file.txt
@@ -197,9 +220,9 @@ new file mode 100644"""
 
 
 def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
-    # TODO: we need a better test case here which will mimic the systemd use case
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path / "fedora")
+    create_merge_commit_in_source_git(sg_path)
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref="0.1.0")
     srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
