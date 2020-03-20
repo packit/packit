@@ -40,7 +40,8 @@ from packit.config.aliases import get_build_targets
 @click.option(
     "--project",
     help="Project name to build in. Will be created if does not exist. "
-    "(defaults to 'packit-cli-{repo_name}-{branch/commit}')",
+    "(defaults to the first found project value in the config file or "
+    "'packit-cli-{repo_name}-{branch/commit}')",
 )
 @click.option(
     "--targets",
@@ -83,7 +84,10 @@ def copr_build(
     it defaults to the current working directory.
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    default_project_name = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
+    default_project_name = api.package_config.get_copr_build_project_value()
+
+    if not default_project_name:
+        default_project_name = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
 
     targets_to_build = get_build_targets(
         *targets.split(","), default="fedora-rawhide-x86_64"
