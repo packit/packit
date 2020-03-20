@@ -32,7 +32,7 @@ from yaml import safe_load
 from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
-from packit.config.job_config import JobConfig, default_jobs
+from packit.config.job_config import JobConfig, default_jobs, JobType
 from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
 from packit.exceptions import PackitConfigException
 
@@ -188,6 +188,23 @@ class PackageConfig:
             )
 
         return SyncFilesConfig(files)
+
+    def get_copr_build_project_value(self) -> Optional[str]:
+        projects_list = [
+            job.metadata.get("project")
+            for job in self.jobs
+            if job.type == JobType.copr_build and job.metadata.get("project")
+        ]
+        if not projects_list:
+            return None
+
+        if len(set(projects_list)) > 1:
+            logger.warning(
+                f"You have defined multiple copr projects to build in, we are going "
+                f"to pick the first one: {projects_list[0]}, reorder the job definitions"
+                f" if this is not the one you want."
+            )
+        return projects_list[0]
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
