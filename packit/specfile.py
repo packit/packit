@@ -126,7 +126,7 @@ class Specfile(SpecFile):
             self._process_patches(comment_out=indexes)
 
     @saves
-    def add_patches(self, patch_list: List[Tuple[str, str]]) -> None:
+    def add_patches(self, patch_list: List[Tuple[Path, str]]) -> None:
         """
         Add given patches to the specfile.
 
@@ -144,7 +144,7 @@ class Specfile(SpecFile):
         new_content = "\n# PATCHES FROM SOURCE GIT:\n"
         for i, (patch, msg) in enumerate(patch_list):
             new_content += "\n# " + "\n# ".join(msg.split("\n"))
-            new_content += f"\nPatch{(i + 1):04d}: {patch}\n"
+            new_content += f"\nPatch{(i + 1):04d}: {patch.name}\n"
 
         # valid=None: take any SourceX even if it's disabled
         last_source_tag_line = [

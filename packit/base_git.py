@@ -314,7 +314,7 @@ class PackitRepositoryBase:
         logger.debug(f"Action command output: {outputs}")
         return outputs
 
-    def specfile_add_patches(self, patch_list: List[Tuple[str, str]]) -> None:
+    def specfile_add_patches(self, patch_list: List[Tuple[Path, str]]) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
 
