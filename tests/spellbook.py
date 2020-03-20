@@ -101,13 +101,18 @@ def initiate_git_repo(
     if copy_from:
         shutil.copytree(copy_from, directory)
     subprocess.check_call(["git", "init", "."], cwd=directory)
+    for i in range(3):
+        subprocess.check_call(
+            ["git", "commit", "--allow-empty", "-m", f"empty commit #{i}"],
+            cwd=directory,
+        )
     directory_path = Path(directory)
     directory_path.joinpath("README").write_text("Best upstream project ever!")
     # this file is in the tarball
     directory_path.joinpath("hops").write_text("Cascade\n")
     git_set_user_email(directory)
     subprocess.check_call(["git", "add", "."], cwd=directory)
-    subprocess.check_call(["git", "commit", "-m", "initial commit"], cwd=directory)
+    subprocess.check_call(["git", "commit", "-m", "commit with data"], cwd=directory)
     if tag:
         subprocess.check_call(
             ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag], cwd=directory
@@ -125,7 +130,13 @@ def initiate_git_repo(
         )
 
 
-def create_merge_commit_in_source_git(sg: Path):
+def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
+    """
+    create merge commit in the provided source-git repo
+
+    :param sg: the repo
+    :param go_nuts: if True, create such merge that Franta won't be able to sleep
+    """
     hops = sg.joinpath("hops")
     subprocess.check_call(["git", "checkout", "-B", "new-changes"], cwd=sg)
     hops.write_text("Amarillo\n")
@@ -136,6 +147,44 @@ def create_merge_commit_in_source_git(sg: Path):
     subprocess.check_call(
         ["git", "merge", "--no-ff", "-m", "MERGE COMMIT!", "new-changes"], cwd=sg,
     )
+    if go_nuts:
+        malt = sg.joinpath("malt")
+        subprocess.check_call(["git", "checkout", "-B", "ugly-merge", "0.1.0^"], cwd=sg)
+        malt.write_text("Munich\n")
+        git_add_and_commit(directory=sg, message="let's start with the Munich malt")
+        subprocess.check_call(["git", "checkout", "master"], cwd=sg)
+        subprocess.check_call(
+            ["git", "merge", "--no-ff", "-m", "ugly merge commit", "ugly-merge"],
+            cwd=sg,
+        )
+        subprocess.check_call(
+            ["git", "checkout", "-B", "ugly-merge2", "HEAD~2"], cwd=sg
+        )
+        malt.write_text("Pilsen\n")
+        git_add_and_commit(directory=sg, message="let's try Pilsen instead")
+        subprocess.check_call(["git", "checkout", "master"], cwd=sg)
+        subprocess.check_call(
+            [
+                "git",
+                "merge",
+                "-Xours",
+                "--no-ff",
+                "-m",
+                "ugly merge commit #2",
+                "ugly-merge2",
+            ],
+            cwd=sg,
+        )
+        # M─┐ [master] ugly merge commit #2
+        # │ o [ugly-merge2] let's try Pilsen instead
+        # M─│─┐ ugly merge commit
+        # │ │ o [ugly-merge] let's start with the Munich malt
+        # M─│─│─┐ MERGE COMMIT!
+        # │ │ │ o [new-changes] actually, let's do citra
+        # │ │ │ o switching to amarillo hops
+        # o─┴─│─┘ sourcegit content
+        # o ┌─┘ <0.1.0> commit with data
+        # o─┘ empty commit #2
 
 
 def prepare_dist_git_repo(directory, push=True):
