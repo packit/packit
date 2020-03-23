@@ -315,7 +315,7 @@ def get_package_config_from_repo(
         loaded_config=loaded_config,
         config_file_path=config_file_name,
         repo_name=sourcegit_project.repo,
-        spec_file_path=get_specfile_path_from_repo(sourcegit_project),
+        spec_file_path=get_specfile_path_from_repo(sourcegit_project, ref),
     )
 
 
@@ -357,13 +357,16 @@ def get_local_specfile_path(directories: Union[List[str], List[Path]]) -> Option
     return None
 
 
-def get_specfile_path_from_repo(project: GitProject) -> Optional[str]:
+def get_specfile_path_from_repo(
+    project: GitProject, ref: str = "master"
+) -> Optional[str]:
     """
     Get the path of the spec file in the given repo if present.
     :param project: GitProject
+    :param ref: git ref
     :return: str path of the spec file or None
     """
-    spec_files = project.get_files(filter_regex=r".+\.spec$")
+    spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
     if not spec_files:
         logger.debug(f"No spec file found in {project.full_repo_name}")
         return None
