@@ -339,11 +339,12 @@ def parse_loaded_config(
         raise PackitConfigException(f"Cannot parse package config: {ex}.")
 
 
-def get_local_specfile_path(dir: Path) -> Optional[Path]:
+def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Path]:
     """
     Get the path (relative to dir) of the local spec file if present.
     If the spec is not found in dir directly, try to search it recursively (rglob)
     :param dir: to find the spec file in
+    :param exclude: don't include files found in these dirs (default "tests")
     :return: path (relative to dir) of the first found spec file
     """
     files = [path.relative_to(dir) for path in dir.glob("*.spec")] or [
@@ -351,6 +352,10 @@ def get_local_specfile_path(dir: Path) -> Optional[Path]:
     ]
 
     if len(files) > 0:
+        # Don't take files found in exclude
+        sexclude = set(exclude) if exclude else {"tests"}
+        files = [f for f in files if f.parts[0] not in sexclude]
+
         logger.debug(f"Local spec files found: {files}. Taking: {files[0]}")
         return files[0]
 
