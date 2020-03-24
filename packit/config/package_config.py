@@ -22,8 +22,6 @@
 
 import json
 import logging
-import os
-from glob import glob
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
@@ -31,9 +29,9 @@ from yaml import safe_load
 
 from ogr.abstract import GitProject
 from packit.actions import ActionName
-from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.config.job_config import JobConfig, default_jobs, JobType
 from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
+from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.exceptions import PackitConfigException
 
 logger = logging.getLogger(__name__)
@@ -348,11 +346,9 @@ def get_local_specfile_path(directories: Union[List[str], List[Path]]) -> Option
     :return: str relative path of the spec file
     """
     for dir in directories:
-        files = [
-            os.path.relpath(path, dir) for path in glob(os.path.join(dir, "*.spec"))
-        ]
+        files = [path.relative_to(dir) for path in Path(dir).glob("*.spec")]
         if len(files) > 0:
-            return files[0]
+            return str(files[0])
 
     return None
 
