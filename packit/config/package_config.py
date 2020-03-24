@@ -343,10 +343,13 @@ def get_local_specfile_path(directories: Union[List[str], List[Path]]) -> Option
     """
     Get the relative path of the local spec file if present.
     :param directories: dirs to find the spec file
-    :return: str relative path of the spec file
+    :return: path (relative to dir) of the first found spec file
     """
     for dir in directories:
-        files = [path.relative_to(dir) for path in Path(dir).glob("*.spec")]
+        # If the spec is not found in dir, try to search it recursively (rglob)
+        files = [path.relative_to(dir) for path in Path(dir).glob("*.spec")] or [
+            path.relative_to(dir) for path in Path(dir).rglob("*.spec")
+        ]
         if len(files) > 0:
             return str(files[0])
 
