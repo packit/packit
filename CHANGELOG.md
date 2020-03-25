@@ -1,3 +1,24 @@
+# 0.9.0
+
+## Features
+
+- CLI has a new `local-build` command.
+- Packit learned how to look for RPM spec files on its own, so specifying `specfile_path` in the configuration is not mandatory anymore.
+- Default configuration has `tests` job enabled from now on. You still need to use `fmf` to create some tests, otherwise testing-farm only tests the success of the installation.
+- We don't touch `Version` in spec files and change `Release` only by default.
+
+## Minor changes and fixes
+
+- Improved documentation (README & CONTRIBUTING).
+- `copr-build` CLI command has new `--upstrem-ref` option.
+- As a result of `keys.fedoraproject.org` being turned off, Packit now tries a list of GPG keyservers when downloading keys to check commit signatures.
+- `generate` CLI command is now deprecated in favor of the `init` command.
+- When executing `copr-build` command, you don't need to set project name if this value is defined in `copr_build` job in configuration file.
+- When loading authentication in the config file - users are warned only if deprecated keys are used, no more confusing messages when you do not have authentication key in the configuration.
+- Several `source-git` related fixes & improvements are applied.
+- A bug which was causing SRPM-build failures in Packit Service for projects which had their spec files stored in a subdirectory is fixed.
+- We handle `git-describe` output better: it should help when tags contain dashes.
+
 # 0.8.1
 
 ## Features:
