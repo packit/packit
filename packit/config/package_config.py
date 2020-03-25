@@ -22,8 +22,6 @@
 
 import json
 import logging
-import os
-from glob import glob
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
@@ -31,9 +29,9 @@ from yaml import safe_load
 
 from ogr.abstract import GitProject
 from packit.actions import ActionName
-from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.config.job_config import JobConfig, default_jobs, JobType
 from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
+from packit.constants import CONFIG_FILE_NAMES, PROD_DISTGIT_URL
 from packit.exceptions import PackitConfigException
 
 logger = logging.getLogger(__name__)
@@ -272,7 +270,7 @@ def get_local_package_config(
                     loaded_config=loaded_config,
                     config_file_path=str(config_file_name),
                     repo_name=repo_name,
-                    spec_file_path=get_local_specfile_path(directories),
+                    spec_file_path=str(get_local_specfile_path(config_dir)),
                 )
 
             logger.debug(f"The local config file '{config_file_name_full}' not found.")
@@ -341,18 +339,25 @@ def parse_loaded_config(
         raise PackitConfigException(f"Cannot parse package config: {ex}.")
 
 
-def get_local_specfile_path(directories: Union[List[str], List[Path]]) -> Optional[str]:
+def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Path]:
     """
-    Get the relative path of the local spec file if present.
-    :param directories: dirs to find the spec file
-    :return: str relative path of the spec file
+    Get the path (relative to dir) of the local spec file if present.
+    If the spec is not found in dir directly, try to search it recursively (rglob)
+    :param dir: to find the spec file in
+    :param exclude: don't include files found in these dirs (default "tests")
+    :return: path (relative to dir) of the first found spec file
     """
-    for dir in directories:
-        files = [
-            os.path.relpath(path, dir) for path in glob(os.path.join(dir, "*.spec"))
-        ]
-        if len(files) > 0:
-            return files[0]
+    files = [path.relative_to(dir) for path in dir.glob("*.spec")] or [
+        path.relative_to(dir) for path in dir.rglob("*.spec")
+    ]
+
+    if len(files) > 0:
+        # Don't take files found in exclude
+        sexclude = set(exclude) if exclude else {"tests"}
+        files = [f for f in files if f.parts[0] not in sexclude]
+
+        logger.debug(f"Local spec files found: {files}. Taking: {files[0]}")
+        return files[0]
 
     return None
 
