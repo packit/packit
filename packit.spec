@@ -2,7 +2,7 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.8.1
+Version:        0.9.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -37,8 +37,6 @@ Requires:       python3-koji
 Requires:       python3-bodhi-client
 Requires:       python3-%{real_name} = %{version}-%{release}
 
-%?python_enable_dependency_generator
-
 %description
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
@@ -62,9 +60,7 @@ rm -rf %{pypi_name}.egg-info
 
 %install
 %py3_install
-%if 0%{?fedora} >= 30
 python3 setup.py --command-packages=click_man.commands man_pages --target %{buildroot}%{_mandir}/man1
-%endif
 
 # FIXME: workaround for setuptools installing it into bash_completion/ instead of bash-completion/
 install -d -m 755 %{buildroot}%{_datadir}/bash-completion/completions
@@ -73,9 +69,7 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 %files
 %license LICENSE
 %{_bindir}/packit
-%if 0%{?fedora} >= 30
 %{_mandir}/man1/packit*.1*
-%endif
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/%{real_name}
 
@@ -85,6 +79,9 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 25 2020 Jiri Popelka <jpopelka@redhat.com> - 0.9.0-1
+- new upstream release 0.9.0
+
 * Mon Jan 20 2020 Jiri Popelka <jpopelka@redhat.com> - 0.8.1-1
 - new upstream release 0.8.1
 
