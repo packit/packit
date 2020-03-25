@@ -743,8 +743,8 @@ def test_get_all_files_to_sync(package_config, all_synced_files):
 
 
 def test_get_local_specfile_path():
-    assert get_local_specfile_path([UP_OSBUILD]) == "osbuild.spec"
-    assert not get_local_specfile_path([SYNC_FILES])
+    assert str(get_local_specfile_path(UP_OSBUILD)) == "osbuild.spec"
+    assert not get_local_specfile_path(SYNC_FILES)
 
 
 def test_notifications_section():
