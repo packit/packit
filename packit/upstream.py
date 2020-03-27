@@ -409,6 +409,10 @@ class Upstream(PackitRepositoryBase):
                     raise ex
         return None
 
+    def _get_last_tag(self):
+        last_tag = run_command(["git", "describe", "--tags", "--abbrev=0"], output=True).strip()
+        return last_tag
+
     def fix_spec(self, archive: str, version: str, commit: str):
         """
         In order to create a SRPM from current git checkout, we need to have the spec reference
@@ -456,7 +460,9 @@ class Upstream(PackitRepositoryBase):
             f"{sanitized_current_branch}{git_desc_suffix}"
         )
 
-        msg = f"- Development snapshot ({commit})"
+        last_tag = self._get_last_tag()
+        cmd = ["git", "log", "--pretty=format:- %s (%an)", f"{last_tag}..HEAD"]
+        msg = run_command(cmd, output=True).strip()
         logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
