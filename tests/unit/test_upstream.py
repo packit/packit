@@ -5,6 +5,9 @@ from packit.actions import ActionName
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from tests.spellbook import get_test_config
+from packit.command_handler import LocalCommandHandler
+import packit.upstream as upstream_module
+import datetime
 
 
 @pytest.fixture
@@ -99,3 +102,38 @@ def test_get_commands_for_actions(action_config, result):
         local_project=flexmock(),
     )
     assert ups.get_commands_for_actions(action=ActionName.create_archive) == result
+
+
+def test__get_last_tag(upstream_mock):
+    flexmock(upstream_module)\
+        .should_receive("run_command")\
+        .once()\
+        .with_args(["git", "describe", "--tags", "--abbrev=0"], output=True)\
+        .and_return("1.5")
+    last_tag = upstream_mock._get_last_tag()
+    assert last_tag == "1.5"
+
+
+def test_fix_spec_changelog_message_should_be_actual_commits():
+    flexmock(upstream_module).should_receive("run_command")\
+        .times(2)\
+        .and_return("v1.5.0-14-g241472")\
+        .and_return("actual commit")
+    version = "random-version"
+    commit = "61fad52477f511eab9ba"
+    specfile = flexmock()
+    specfile.should_receive("get_release_number").and_return("1.5.aerd")
+    specfile.should_receive("set_spec_version")
+    upstream = Upstream(
+        package_config=flexmock(
+            actions={ActionName.fix_spec: flexmock()}, synced_files=flexmock()
+        ),
+        config=flexmock(),
+        local_project=flexmock(),
+    )
+    flexmock(upstream)
+    upstream.should_receive("_fix_spec_source").with_args("archive")
+    upstream.should_receive("_fix_spec_prep").with_args(version)
+    upstream.should_receive("_get_last_tag").and_return("1.5")
+    upstream.should_receive("specfile").and_return(specfile)
+    upstream.fix_spec("archive", version, commit)
