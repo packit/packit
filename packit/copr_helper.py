@@ -33,13 +33,14 @@ class CoprHelper:
     def configured_owner(self):
         return self.copr_client.config.get("username")
 
-    @staticmethod
-    def copr_web_build_url(build: Munch):
+    def copr_web_build_url(self, build: Munch) -> str:
         """ Construct web frontend url because build.repo_url is not much user-friendly."""
-        return (
-            "https://copr.fedorainfracloud.org/coprs/"
-            f"{build.ownername}/{build.projectname}/build/{build.id}/"
-        )
+        copr_url = self.copr_client.config.get("copr_url")
+        ownername = build.ownername
+        if ownername.startswith("@"):
+            # the owner is a group, so the URL is slightly different
+            ownername = ownername.replace("@", "g/", 1)
+        return f"{copr_url}/coprs/{ownername}/{build.projectname}/build/{build.id}/"
 
     def create_copr_project_if_not_exists(
         self,
