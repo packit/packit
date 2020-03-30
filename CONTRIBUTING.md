@@ -87,6 +87,13 @@ Running tests locally:
 make check_in_container
 ```
 
+To select a subset of the whole test suite, set `TESTS_TARGET`. For example to
+run only the unit tests use:
+
+```
+TESTS_TARGET=tests/unit make check_in_container
+```
+
 As a CI we use [Zuul](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit) with a configuration in [.zuul.yaml](.zuul.yaml).
 If you want to re-run CI/tests in a pull request, just include `recheck` in a comment.
 
