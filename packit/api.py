@@ -27,6 +27,7 @@ This is the official python interface for packit.
 import asyncio
 import logging
 import os
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -241,6 +242,22 @@ class PackitAPI:
             files_to_sync = self.package_config.get_all_files_to_sync()
 
             if self.up.with_action(action=ActionName.prepare_files):
+                comment = f"- new upstream release: {full_version}"
+                try:
+                    self.dg.set_specfile_content(
+                        self.up.specfile, full_version, comment
+                    )
+                except FileNotFoundError as ex:
+                    # no downstream spec file: this is either a mistake or
+                    # there is no spec file in dist-git yet, hence warning
+                    logger.warning(
+                        f"There is not spec file downstream: {ex}, copying the one from upstream."
+                    )
+                    shutil.copy2(
+                        self.up.absolute_specfile_path,
+                        self.dg.get_absolute_specfile_path(),
+                    )
+
                 raw_sync_files = files_to_sync.get_raw_files_to_sync(
                     Path(self.up.local_project.working_dir),
                     Path(self.dg.local_project.working_dir),
@@ -250,9 +267,6 @@ class PackitAPI:
                 raw_sync_files = [
                     x for x in raw_sync_files if x.src != self.up.absolute_specfile_path
                 ]
-
-                comment = f"- new upstream release: {full_version}"
-                self.dg.set_specfile_content(self.up.specfile, full_version, comment)
 
                 sync_files(raw_sync_files)
                 if upstream_ref:

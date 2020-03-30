@@ -89,7 +89,7 @@ class PackitRepositoryBase:
                 self.package_config.specfile_path
             )
             if not self._specfile_path.exists():
-                raise PackitException(f"Specfile {self._specfile_path} not found.")
+                raise FileNotFoundError(f"Specfile {self._specfile_path} not found.")
 
         return self._specfile_path
 

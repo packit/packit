@@ -126,15 +126,19 @@ class DistGit(PackitRepositoryBase):
                 return None
         return self._downstream_config
 
+    def get_absolute_specfile_path(self) -> Path:
+        """ provide the path, don't check it """
+        return (
+            Path(self.local_project.working_dir)
+            / f"{self.package_config.downstream_package_name}.spec"
+        )
+
     @property
     def absolute_specfile_path(self) -> Path:
         if not self._specfile_path:
-            self._specfile_path = (
-                Path(self.local_project.working_dir)
-                / f"{self.package_config.downstream_package_name}.spec"
-            )
+            self._specfile_path = self.get_absolute_specfile_path()
             if not self._specfile_path.exists():
-                raise PackitException(f"Specfile {self._specfile_path} not found.")
+                raise FileNotFoundError(f"Specfile {self._specfile_path} not found.")
         return self._specfile_path
 
     def update_branch(self, branch_name: str):
