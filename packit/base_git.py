@@ -85,17 +85,6 @@ class PackitRepositoryBase:
     @property
     def absolute_specfile_path(self) -> Path:
         if not self._specfile_path:
-            # TODO: we should probably have a "discovery" phase before
-            #  creating Upstream, DistGit objects
-            #       when things which we don't know are discovered
-            # possible_paths = [
-            #     Path(self.local_project.working_dir)
-            #     / f"{self.package_config.downstream_package_name}.spec",
-            # ]
-            # for path in possible_paths:
-            #     if path.exists():
-            #         self._specfile_path = str(path)
-            #         break
             self._specfile_path = Path(self.local_project.working_dir).joinpath(
                 self.package_config.specfile_path
             )
