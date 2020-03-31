@@ -182,17 +182,20 @@ class Config:
 
         return services
 
-    def _get_project(self, url: str) -> GitProject:
+    def _get_project(self, url: str, get_project_kwargs: dict = None) -> GitProject:
+        get_project_kwargs = get_project_kwargs or {}
         try:
-            project = get_project(url=url, custom_instances=self.services)
+            project = get_project(
+                url=url, custom_instances=self.services, **get_project_kwargs
+            )
         except OgrException as ex:
             msg = f"Authentication for url '{url}' is missing in the config."
             logger.warning(msg)
             raise PackitConfigException(msg, ex)
         return project
 
-    def get_project(self, url: str) -> GitProject:
-        return Proxy(partial(self._get_project, url))
+    def get_project(self, url: str, get_project_kwargs: dict = None) -> GitProject:
+        return Proxy(partial(self._get_project, url, get_project_kwargs))
 
 
 pass_config = click.make_pass_decorator(Config)
