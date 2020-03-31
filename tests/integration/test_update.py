@@ -114,6 +114,30 @@ def test_basic_local_update_direct_push(
     assert (remote_dir_clone / "README.packit").is_file()
 
 
+def test_basic_local_update_direct_push_no_dg_spec(
+    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
+):
+    u, d, api = api_instance
+    d.joinpath("beer.spec").unlink()
+    subprocess.check_call(
+        ["git", "commit", "-m", "remove spec", "-a"], cwd=str(d),
+    )
+    _, distgit_remote = distgit_and_remote
+    mock_spec_download_remote_s(d)
+
+    api.sync_release("master", "0.1.0", create_pr=False)
+
+    remote_dir_clone = Path(f"{distgit_remote}-clone")
+    subprocess.check_call(
+        ["git", "clone", distgit_remote, str(remote_dir_clone)],
+        cwd=str(remote_dir_clone.parent),
+    )
+
+    spec = Specfile(remote_dir_clone / "beer.spec")
+    assert spec.get_version() == "0.1.0"
+    assert (remote_dir_clone / "README.packit").is_file()
+
+
 def test_basic_local_update_from_downstream(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
