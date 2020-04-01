@@ -2,10 +2,12 @@ import inspect
 import re
 from logging import getLogger
 from pathlib import Path
-from typing import Union, List, Tuple
+from typing import Union, List, Tuple, Optional
 
 from rebasehelper.helpers.macro_helper import MacroHelper
 from rebasehelper.specfile import SpecFile, RebaseHelperError, saves
+
+from packit.constants import SPEC_PACKAGE_SECTION
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -193,3 +195,31 @@ class Specfile(SpecFile):
 
             if prep_lines[i] != line:
                 logger.debug(f"{line!r} -> {prep_lines[i]!r}")
+
+    def get_source(self, source_name: str) -> Optional[Tuple[int, str, str]]:
+        """
+        get specific Source from spec
+
+        :param source_name: precise name of the Source, e.g. Source1, or Source
+        :return: index within the section, real name of the source, whole source line
+        """
+        prefix = "Source"
+        self.get_main_source()
+        regex = re.compile(r"^Source\s*:.+$")
+        spec_section = self.spec_content.section(SPEC_PACKAGE_SECTION)
+        for idx, line in enumerate(spec_section):
+            # we are looking for Source lines
+            if line.startswith(prefix):
+                # it's a Source line!
+                if line.startswith(source_name):
+                    # it even matches the specific Source\d+
+                    full_name = source_name
+                elif regex.match(line):
+                    # okay, let's try the other very common default
+                    # https://github.com/packit-service/packit/issues/536#issuecomment-534074925
+                    full_name = prefix
+                else:
+                    # nope, let's continue the search
+                    continue
+                return idx, full_name, line
+        return None

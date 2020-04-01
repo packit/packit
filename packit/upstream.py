@@ -35,7 +35,7 @@ from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
-from packit.constants import COMMON_ARCHIVE_EXTENSIONS
+from packit.constants import SPEC_PACKAGE_SECTION, DEFAULT_ARCHIVE_EXT
 from packit.exceptions import (
     PackitException,
     PackitSRPMNotFoundException,
@@ -564,30 +564,17 @@ class Upstream(PackitRepositoryBase):
         self.specfile.write_spec_content()
 
     def _fix_spec_source(self, archive):
-        prefix = "Source"
-        regex = re.compile(r"^Source\s*:.+$")
-        for line in self.specfile.spec_content.section("%package"):
-            # we are looking for Source lines
-            if line.startswith(prefix):
-                # it's a Source line!
-                if line.startswith(self.package_config.spec_source_id):
-                    # it even matches the specific Source\d+
-                    full_name = self.package_config.spec_source_id
-                elif regex.match(line):
-                    # okay, let's try the other very common default
-                    # https://github.com/packit-service/packit/issues/536#issuecomment-534074925
-                    full_name = prefix
-                else:
-                    # nope, let's continue the search
-                    continue
-                # we found it!
-                break
+        response = self.specfile.get_source(self.package_config.spec_source_id)
+        if response:
+            idx, source_name, _ = response
+            self.specfile.spec_content.section(SPEC_PACKAGE_SECTION)[
+                idx
+            ] = f"{source_name}: {archive}"
         else:
             raise PackitException(
                 "The spec file doesn't have sources set "
-                f"via {self.package_config.spec_source_id} nor {prefix}."
+                f"via {self.package_config.spec_source_id} nor Source."
             )
-        self.specfile.set_tag(full_name, archive)
 
     def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """
