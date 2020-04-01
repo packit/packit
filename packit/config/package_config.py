@@ -173,7 +173,7 @@ class PackageConfig:
         if config_file_path and not raw_dict.get("config_file_path", None):
             raw_dict.update(config_file_path=config_file_path)
 
-        package_config = PackageConfigSchema(strict=True).load(raw_dict).data
+        package_config = PackageConfigSchema().load(raw_dict)
 
         if not getattr(package_config, "specfile_path", None):
             if spec_file_path:
@@ -190,6 +190,7 @@ class PackageConfig:
         if "jobs" not in raw_dict:
             package_config.jobs = default_jobs
 
+        logger.debug(package_config)
         return package_config
 
     def get_all_files_to_sync(self):
