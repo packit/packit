@@ -31,7 +31,8 @@ CONFIG_FILE_NAMES = [
     "packit.json",
 ]
 
-COMMON_ARCHIVE_EXTENSIONS = [".tar.gz", ".tar.bz2", ".tar.xz", ".zip"]
+# we create .tar.gz archives
+DEFAULT_ARCHIVE_EXT = ".tar.gz"
 
 # fedmsg topics
 URM_NEW_RELEASE_TOPIC = "org.release-monitoring.prod.anitya.project.version.update"
@@ -90,3 +91,5 @@ SYNCING_NOTE = (
     "This repository is maintained by packit.\nhttps://packit.dev/\n"
     "The file was generated using packit {packit_version}.\n"
 )
+
+SPEC_PACKAGE_SECTION = "%package"

@@ -162,17 +162,16 @@ def test_create_archive(upstream_instance, extension):
 
     ups.create_archive()
 
-    # there is still only one archive - we no longer use --long git-describe
-    # by default, upstreams should handle versions themselves
-    assert len(list(u.glob(f"*{extension}"))) == 1
+    # we enforce .tar.gz now
+    assert len(list(u.glob("*.tar.gz"))) == 1
 
 
 def test_create_uncommon_archive(upstream_instance):
     u, ups = upstream_instance
     change_source_ext(ups, ".cpio")
-
-    with pytest.raises(PackitException):
-        ups.create_archive()
+    ups.create_archive()
+    # we enforce .tar.gz now
+    assert len(list(u.glob("*.tar.gz"))) == 1
 
 
 def test_fix_spec(upstream_instance):
