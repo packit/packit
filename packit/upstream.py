@@ -354,21 +354,6 @@ class Upstream(PackitRepositoryBase):
 
         return ver
 
-    def get_archive_extension(self, archive_basename: str, version: str) -> str:
-        """
-        Obtains archive extension from SpecFile based on basename of the archive.
-        Defaults to .tar.gz if no Source corresponds to the basename.
-        """
-        for source in self.specfile.get_sources():
-            base = os.path.basename(source)
-            # Version in archive_basename could contain hash, the version
-            # can be different from Spec version. Replace it to ensure proper match.
-            base = base.replace(self.specfile.get_version(), version)
-            if base.startswith(archive_basename):
-                archive_basename_len = len(archive_basename)
-                return base[archive_basename_len:]
-        return ".tar.gz"
-
     def create_archive(self, version: str = None) -> str:
         """
         Create archive, using `git archive` by default, from the content of the upstream
@@ -412,14 +397,7 @@ class Upstream(PackitRepositoryBase):
 
         :return: name of the archive
         """
-        archive_extension = self.get_archive_extension(dir_name, version)
-        if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
-            raise PackitException(
-                "The target archive doesn't use a common extension ({}), "
-                "git archive can't be used. Please provide your own script "
-                "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
-            )
-        archive_name = f"{dir_name}{archive_extension}"
+        archive_name = f"{dir_name}{DEFAULT_ARCHIVE_EXT}"
         relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
             self.local_project.working_dir
         )

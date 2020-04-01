@@ -4,5 +4,5 @@
   "upstream_package_name": "beerware",
   "downstream_package_name": "beer",
   "create_pr": false,
-  "upstream_project_url": "../upstream_remote"
+  "upstream_project_url": "../upstream_remote-upstream_git"
 }
