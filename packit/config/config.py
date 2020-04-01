@@ -96,6 +96,19 @@ class Config:
         # if kwargs:
         #     logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
 
+    def __repr__(self):
+        return (
+            "Config("
+            f"debug='{self.debug}', "
+            f"fas_user='{self.fas_user}', "
+            f"keytab_path='{self.keytab_path}', "
+            f"command_handler='{self.command_handler}', "
+            f"command_handler_work_dir='{self.command_handler_work_dir}', "
+            f"command_handler_pvc_env_var='{self.command_handler_pvc_env_var}', "
+            f"command_handler_image_reference='{self.command_handler_image_reference}', "
+            f"command_handler_k8s_namespace='{self.command_handler_k8s_namespace}')"
+        )
+
     @classmethod
     def get_user_config(cls) -> "Config":
         xdg_config_home = os.getenv("XDG_CONFIG_HOME")
