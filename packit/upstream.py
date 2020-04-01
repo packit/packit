@@ -35,7 +35,7 @@ from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
-from packit.constants import COMMON_ARCHIVE_EXTENSIONS
+from packit.constants import SPEC_PACKAGE_SECTION, DEFAULT_ARCHIVE_EXT
 from packit.exceptions import (
     PackitException,
     PackitSRPMNotFoundException,
@@ -354,21 +354,6 @@ class Upstream(PackitRepositoryBase):
 
         return ver
 
-    def get_archive_extension(self, archive_basename: str, version: str) -> str:
-        """
-        Obtains archive extension from SpecFile based on basename of the archive.
-        Defaults to .tar.gz if no Source corresponds to the basename.
-        """
-        for source in self.specfile.get_sources():
-            base = os.path.basename(source)
-            # Version in archive_basename could contain hash, the version
-            # can be different from Spec version. Replace it to ensure proper match.
-            base = base.replace(self.specfile.get_version(), version)
-            if base.startswith(archive_basename):
-                archive_basename_len = len(archive_basename)
-                return base[archive_basename_len:]
-        return ".tar.gz"
-
     def create_archive(self, version: str = None) -> str:
         """
         Create archive, using `git archive` by default, from the content of the upstream
@@ -412,14 +397,7 @@ class Upstream(PackitRepositoryBase):
 
         :return: name of the archive
         """
-        archive_extension = self.get_archive_extension(dir_name, version)
-        if archive_extension not in COMMON_ARCHIVE_EXTENSIONS:
-            raise PackitException(
-                "The target archive doesn't use a common extension ({}), "
-                "git archive can't be used. Please provide your own script "
-                "for archive creation.".format(", ".join(COMMON_ARCHIVE_EXTENSIONS))
-            )
-        archive_name = f"{dir_name}{archive_extension}"
+        archive_name = f"{dir_name}{DEFAULT_ARCHIVE_EXT}"
         relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
             self.local_project.working_dir
         )
@@ -564,30 +542,17 @@ class Upstream(PackitRepositoryBase):
         self.specfile.write_spec_content()
 
     def _fix_spec_source(self, archive):
-        prefix = "Source"
-        regex = re.compile(r"^Source\s*:.+$")
-        for line in self.specfile.spec_content.section("%package"):
-            # we are looking for Source lines
-            if line.startswith(prefix):
-                # it's a Source line!
-                if line.startswith(self.package_config.spec_source_id):
-                    # it even matches the specific Source\d+
-                    full_name = self.package_config.spec_source_id
-                elif regex.match(line):
-                    # okay, let's try the other very common default
-                    # https://github.com/packit-service/packit/issues/536#issuecomment-534074925
-                    full_name = prefix
-                else:
-                    # nope, let's continue the search
-                    continue
-                # we found it!
-                break
+        response = self.specfile.get_source(self.package_config.spec_source_id)
+        if response:
+            idx, source_name, _ = response
+            self.specfile.spec_content.section(SPEC_PACKAGE_SECTION)[
+                idx
+            ] = f"{source_name}: {archive}"
         else:
             raise PackitException(
                 "The spec file doesn't have sources set "
-                f"via {self.package_config.spec_source_id} nor {prefix}."
+                f"via {self.package_config.spec_source_id} nor Source."
             )
-        self.specfile.set_tag(full_name, archive)
 
     def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
         """

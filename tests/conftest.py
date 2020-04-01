@@ -14,52 +14,46 @@ from tests.spellbook import (
     DG_OGR,
     UPSTREAM_SPEC_NOT_IN_ROOT,
     UPSTREAM_WITH_MUTLIPLE_SOURCES,
+    UPSTREAM_WEIRD_SOURCES,
 )
+
+
+def get_git_repo_and_remote(
+    target_dir: Path, repo_template_path: Path
+) -> Tuple[Path, Path]:
+    """
+    :param target_dir: tmpdir from pytest - we'll work here
+    :param repo_template_path: git repo template from tests/data/
+    """
+    u_remote_path = target_dir / f"upstream_remote-{repo_template_path.name}"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+
+    u = target_dir / f"local_clone-{repo_template_path.name}"
+    shutil.copytree(repo_template_path, u)
+    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
+
+    return u, u_remote_path
 
 
 @pytest.fixture()
 def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
-    t = Path(str(tmpdir))
-
-    u_remote_path = t / "upstream_remote"
-    u_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
-
-    u = t / "upstream_git"
-    shutil.copytree(UPSTREAM, u)
-    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
-
-    return u, u_remote_path
+    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM)
 
 
 @pytest.fixture()
 def upstream_and_remote_with_multiple_sources(tmpdir) -> Tuple[Path, Path]:
-    t = Path(str(tmpdir))
-
-    u_remote_path = t / "upstream_git_with_multiple_sources_remote"
-    u_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
-
-    u = t / "upstream_git_with_multiple_sources"
-    shutil.copytree(UPSTREAM_WITH_MUTLIPLE_SOURCES, u)
-    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
-
-    return u, u_remote_path
+    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM_WITH_MUTLIPLE_SOURCES)
 
 
 @pytest.fixture()
-def upstream_spec_not_in_root(tmpdir) -> Path:
-    t = Path(str(tmpdir))
+def upstream_and_remote_weird_sources(tmpdir) -> Tuple[Path, Path]:
+    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM_WEIRD_SOURCES)
 
-    u_remote_path = t / "upstream_remote"
-    u_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
 
-    u = t / "upstream_git"
-    shutil.copytree(UPSTREAM_SPEC_NOT_IN_ROOT, u)
-    initiate_git_repo(u, tag="0.1.0", push=True, upstream_remote=str(u_remote_path))
-
-    return u
+@pytest.fixture()
+def upstream_spec_not_in_root(tmpdir) -> Tuple[Path, Path]:
+    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM_SPEC_NOT_IN_ROOT)
 
 
 @pytest.fixture()
