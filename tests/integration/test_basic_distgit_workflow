@@ -1,0 +1,735 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      User-Agent:
+      - python-requests/2.22.0
+    method: POST
+    uri: https://src.stg.fedoraproject.org//api/0/-/whoami
+  response:
+    body:
+      string: "{\n  \"username\": \"ttomecek\"\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:14:47 GMT
+      Keep-Alive:
+      - timeout=15, max=500
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=186400
+      content-length:
+      - '28'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      User-Agent:
+      - python-requests/2.22.0
+    method: POST
+    uri: https://src.stg.fedoraproject.org//api/0/-/whoami
+  response:
+    body:
+      string: "{\n  \"username\": \"ttomecek\"\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:14:49 GMT
+      Keep-Alive:
+      - timeout=15, max=499
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=169119
+      content-length:
+      - '28'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.22.0
+    method: GET
+    uri: https://src.stg.fedoraproject.org//api/0/projects?fork=True&pattern=tmux-top
+  response:
+    body:
+      string: "{\n  \"args\": {\n    \"fork\": true, \n    \"namespace\": null, \n
+        \   \"owner\": null, \n    \"page\": 1, \n    \"pattern\": \"tmux-top\", \n
+        \   \"per_page\": 20, \n    \"short\": false, \n    \"tags\": [], \n    \"username\":
+        null\n  }, \n  \"pagination\": {\n    \"first\": \"https://src.stg.fedoraproject.org/api/0/projects?fork=True&pattern=tmux-top&page=1&per_page=20\",
+        \n    \"last\": \"https://src.stg.fedoraproject.org/api/0/projects?fork=True&pattern=tmux-top&page=1&per_page=20\",
+        \n    \"next\": null, \n    \"page\": 1, \n    \"pages\": 1, \n    \"per_page\":
+        20, \n    \"prev\": null\n  }, \n  \"projects\": [\n    {\n      \"access_groups\":
+        {\n        \"admin\": [], \n        \"commit\": [], \n        \"ticket\":
+        []\n      }, \n      \"access_users\": {\n        \"admin\": [], \n        \"commit\":
+        [], \n        \"owner\": [\n          \"ttomecek\"\n        ], \n        \"ticket\":
+        []\n      }, \n      \"close_status\": [], \n      \"custom_keys\": [], \n
+        \     \"date_created\": \"1586191050\", \n      \"date_modified\": \"1586191050\",
+        \n      \"description\": \"The tmux-top rpms\", \n      \"fullname\": \"forks/ttomecek/rpms/tmux-top\",
+        \n      \"id\": 40032, \n      \"milestones\": {}, \n      \"name\": \"tmux-top\",
+        \n      \"namespace\": \"rpms\", \n      \"parent\": {\n        \"access_groups\":
+        {\n          \"admin\": [], \n          \"commit\": [], \n          \"ticket\":
+        []\n        }, \n        \"access_users\": {\n          \"admin\": [], \n
+        \         \"commit\": [], \n          \"owner\": [\n            \"ttomecek\"\n
+        \         ], \n          \"ticket\": []\n        }, \n        \"close_status\":
+        [], \n        \"custom_keys\": [], \n        \"date_created\": \"1501875088\",
+        \n        \"date_modified\": \"1501875088\", \n        \"description\": \"The
+        tmux-top rpms\", \n        \"fullname\": \"rpms/tmux-top\", \n        \"id\":
+        22342, \n        \"milestones\": {}, \n        \"name\": \"tmux-top\", \n
+        \       \"namespace\": \"rpms\", \n        \"parent\": null, \n        \"priorities\":
+        {}, \n        \"tags\": [], \n        \"url_path\": \"rpms/tmux-top\", \n
+        \       \"user\": {\n          \"fullname\": \"Tomas Tomecek\", \n          \"name\":
+        \"ttomecek\"\n        }\n      }, \n      \"priorities\": {}, \n      \"tags\":
+        [], \n      \"url_path\": \"fork/ttomecek/rpms/tmux-top\", \n      \"user\":
+        {\n        \"fullname\": \"Tomas Tomecek\", \n        \"name\": \"ttomecek\"\n
+        \     }\n    }, \n    {\n      \"access_groups\": {\n        \"admin\": [],
+        \n        \"commit\": [], \n        \"ticket\": []\n      }, \n      \"access_users\":
+        {\n        \"admin\": [], \n        \"commit\": [], \n        \"owner\": [\n
+        \         \"packit\"\n        ], \n        \"ticket\": []\n      }, \n      \"close_status\":
+        [], \n      \"custom_keys\": [], \n      \"date_created\": \"1554360887\",
+        \n      \"date_modified\": \"1554360887\", \n      \"description\": \"The
+        tmux-top rpms\", \n      \"fullname\": \"forks/packit/rpms/tmux-top\", \n
+        \     \"id\": 35251, \n      \"milestones\": {}, \n      \"name\": \"tmux-top\",
+        \n      \"namespace\": \"rpms\", \n      \"parent\": {\n        \"access_groups\":
+        {\n          \"admin\": [], \n          \"commit\": [], \n          \"ticket\":
+        []\n        }, \n        \"access_users\": {\n          \"admin\": [], \n
+        \         \"commit\": [], \n          \"owner\": [\n            \"ttomecek\"\n
+        \         ], \n          \"ticket\": []\n        }, \n        \"close_status\":
+        [], \n        \"custom_keys\": [], \n        \"date_created\": \"1501875088\",
+        \n        \"date_modified\": \"1501875088\", \n        \"description\": \"The
+        tmux-top rpms\", \n        \"fullname\": \"rpms/tmux-top\", \n        \"id\":
+        22342, \n        \"milestones\": {}, \n        \"name\": \"tmux-top\", \n
+        \       \"namespace\": \"rpms\", \n        \"parent\": null, \n        \"priorities\":
+        {}, \n        \"tags\": [], \n        \"url_path\": \"rpms/tmux-top\", \n
+        \       \"user\": {\n          \"fullname\": \"Tomas Tomecek\", \n          \"name\":
+        \"ttomecek\"\n        }\n      }, \n      \"priorities\": {}, \n      \"tags\":
+        [], \n      \"url_path\": \"fork/packit/rpms/tmux-top\", \n      \"user\":
+        {\n        \"fullname\": \"Packit Bot\", \n        \"name\": \"packit\"\n
+        \     }\n    }\n  ], \n  \"total_projects\": 2\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:14:50 GMT
+      Keep-Alive:
+      - timeout=15, max=498
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=364386
+      content-length:
+      - '3804'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.22.0
+    method: GET
+    uri: https://src.stg.fedoraproject.org//api/0/fork/ttomecek/rpms/tmux-top
+  response:
+    body:
+      string: "{\n  \"access_groups\": {\n    \"admin\": [], \n    \"commit\": [],
+        \n    \"ticket\": []\n  }, \n  \"access_users\": {\n    \"admin\": [], \n
+        \   \"commit\": [], \n    \"owner\": [\n      \"ttomecek\"\n    ], \n    \"ticket\":
+        []\n  }, \n  \"close_status\": [], \n  \"custom_keys\": [], \n  \"date_created\":
+        \"1586191050\", \n  \"date_modified\": \"1586191050\", \n  \"description\":
+        \"The tmux-top rpms\", \n  \"fullname\": \"forks/ttomecek/rpms/tmux-top\",
+        \n  \"id\": 40032, \n  \"milestones\": {}, \n  \"name\": \"tmux-top\", \n
+        \ \"namespace\": \"rpms\", \n  \"parent\": {\n    \"access_groups\": {\n      \"admin\":
+        [], \n      \"commit\": [], \n      \"ticket\": []\n    }, \n    \"access_users\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"owner\": [\n        \"ttomecek\"\n
+        \     ], \n      \"ticket\": []\n    }, \n    \"close_status\": [], \n    \"custom_keys\":
+        [], \n    \"date_created\": \"1501875088\", \n    \"date_modified\": \"1501875088\",
+        \n    \"description\": \"The tmux-top rpms\", \n    \"fullname\": \"rpms/tmux-top\",
+        \n    \"id\": 22342, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\",
+        \n    \"namespace\": \"rpms\", \n    \"parent\": null, \n    \"priorities\":
+        {}, \n    \"tags\": [], \n    \"url_path\": \"rpms/tmux-top\", \n    \"user\":
+        {\n      \"fullname\": \"Tomas Tomecek\", \n      \"name\": \"ttomecek\"\n
+        \   }\n  }, \n  \"priorities\": {}, \n  \"tags\": [], \n  \"url_path\": \"fork/ttomecek/rpms/tmux-top\",
+        \n  \"user\": {\n    \"fullname\": \"Tomas Tomecek\", \n    \"name\": \"ttomecek\"\n
+        \ }\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:14:50 GMT
+      Keep-Alive:
+      - timeout=15, max=497
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=278127
+      content-length:
+      - '1351'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.22.0
+    method: GET
+    uri: https://src.stg.fedoraproject.org//api/0/fork/ttomecek/rpms/tmux-top/git/urls
+  response:
+    body:
+      string: "{\n  \"total_urls\": 2, \n  \"urls\": {\n    \"git\": \"https://src.stg.fedoraproject.org/forks/ttomecek/rpms/tmux-top.git\",
+        \n    \"ssh\": \"ssh://ttomecek@pkgs.stg.fedoraproject.org/forks/ttomecek/rpms/tmux-top.git\"\n
+        \ }\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:14:51 GMT
+      Keep-Alive:
+      - timeout=15, max=496
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=173519
+      content-length:
+      - '209'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.22.0
+    method: GET
+    uri: https://src.stg.fedoraproject.org//api/0/fork/ttomecek/rpms/tmux-top
+  response:
+    body:
+      string: "{\n  \"access_groups\": {\n    \"admin\": [], \n    \"commit\": [],
+        \n    \"ticket\": []\n  }, \n  \"access_users\": {\n    \"admin\": [], \n
+        \   \"commit\": [], \n    \"owner\": [\n      \"ttomecek\"\n    ], \n    \"ticket\":
+        []\n  }, \n  \"close_status\": [], \n  \"custom_keys\": [], \n  \"date_created\":
+        \"1586191050\", \n  \"date_modified\": \"1586191050\", \n  \"description\":
+        \"The tmux-top rpms\", \n  \"fullname\": \"forks/ttomecek/rpms/tmux-top\",
+        \n  \"id\": 40032, \n  \"milestones\": {}, \n  \"name\": \"tmux-top\", \n
+        \ \"namespace\": \"rpms\", \n  \"parent\": {\n    \"access_groups\": {\n      \"admin\":
+        [], \n      \"commit\": [], \n      \"ticket\": []\n    }, \n    \"access_users\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"owner\": [\n        \"ttomecek\"\n
+        \     ], \n      \"ticket\": []\n    }, \n    \"close_status\": [], \n    \"custom_keys\":
+        [], \n    \"date_created\": \"1501875088\", \n    \"date_modified\": \"1501875088\",
+        \n    \"description\": \"The tmux-top rpms\", \n    \"fullname\": \"rpms/tmux-top\",
+        \n    \"id\": 22342, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\",
+        \n    \"namespace\": \"rpms\", \n    \"parent\": null, \n    \"priorities\":
+        {}, \n    \"tags\": [], \n    \"url_path\": \"rpms/tmux-top\", \n    \"user\":
+        {\n      \"fullname\": \"Tomas Tomecek\", \n      \"name\": \"ttomecek\"\n
+        \   }\n  }, \n  \"priorities\": {}, \n  \"tags\": [], \n  \"url_path\": \"fork/ttomecek/rpms/tmux-top\",
+        \n  \"user\": {\n    \"fullname\": \"Tomas Tomecek\", \n    \"name\": \"ttomecek\"\n
+        \ }\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:15:13 GMT
+      Keep-Alive:
+      - timeout=15, max=500
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=257924
+      content-length:
+      - '1351'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.22.0
+    method: GET
+    uri: https://src.stg.fedoraproject.org//api/0/fork/ttomecek/rpms/tmux-top
+  response:
+    body:
+      string: "{\n  \"access_groups\": {\n    \"admin\": [], \n    \"commit\": [],
+        \n    \"ticket\": []\n  }, \n  \"access_users\": {\n    \"admin\": [], \n
+        \   \"commit\": [], \n    \"owner\": [\n      \"ttomecek\"\n    ], \n    \"ticket\":
+        []\n  }, \n  \"close_status\": [], \n  \"custom_keys\": [], \n  \"date_created\":
+        \"1586191050\", \n  \"date_modified\": \"1586191050\", \n  \"description\":
+        \"The tmux-top rpms\", \n  \"fullname\": \"forks/ttomecek/rpms/tmux-top\",
+        \n  \"id\": 40032, \n  \"milestones\": {}, \n  \"name\": \"tmux-top\", \n
+        \ \"namespace\": \"rpms\", \n  \"parent\": {\n    \"access_groups\": {\n      \"admin\":
+        [], \n      \"commit\": [], \n      \"ticket\": []\n    }, \n    \"access_users\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"owner\": [\n        \"ttomecek\"\n
+        \     ], \n      \"ticket\": []\n    }, \n    \"close_status\": [], \n    \"custom_keys\":
+        [], \n    \"date_created\": \"1501875088\", \n    \"date_modified\": \"1501875088\",
+        \n    \"description\": \"The tmux-top rpms\", \n    \"fullname\": \"rpms/tmux-top\",
+        \n    \"id\": 22342, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\",
+        \n    \"namespace\": \"rpms\", \n    \"parent\": null, \n    \"priorities\":
+        {}, \n    \"tags\": [], \n    \"url_path\": \"rpms/tmux-top\", \n    \"user\":
+        {\n      \"fullname\": \"Tomas Tomecek\", \n      \"name\": \"ttomecek\"\n
+        \   }\n  }, \n  \"priorities\": {}, \n  \"tags\": [], \n  \"url_path\": \"fork/ttomecek/rpms/tmux-top\",
+        \n  \"user\": {\n    \"fullname\": \"Tomas Tomecek\", \n    \"name\": \"ttomecek\"\n
+        \ }\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:15:13 GMT
+      Keep-Alive:
+      - timeout=15, max=499
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=277116
+      content-length:
+      - '1351'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: title=testing+PR&branch_to=master&branch_from=cookie&initial_comment=serious+description&repo_from=tmux-top&repo_from_username=ttomecek&repo_from_namespace=rpms
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '160'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.22.0
+    method: POST
+    uri: https://src.stg.fedoraproject.org//api/0/rpms/tmux-top/pull-request/new
+  response:
+    body:
+      string: "{\n  \"assignee\": null, \n  \"branch\": \"master\", \n  \"branch_from\":
+        \"cookie\", \n  \"cached_merge_status\": \"unknown\", \n  \"closed_at\": null,
+        \n  \"closed_by\": null, \n  \"comments\": [], \n  \"commit_start\": \"8c8ba1a4f9316a87aa335182ef7da4fed34c1db1\",
+        \n  \"commit_stop\": \"61ce3bcbc551c75e80d8d065e949c6750c235cff\", \n  \"date_created\":
+        \"1586193314\", \n  \"id\": 7, \n  \"initial_comment\": \"serious description\",
+        \n  \"last_updated\": \"1586193314\", \n  \"project\": {\n    \"access_groups\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"ticket\": []\n    },
+        \n    \"access_users\": {\n      \"admin\": [], \n      \"commit\": [], \n
+        \     \"owner\": [\n        \"ttomecek\"\n      ], \n      \"ticket\": []\n
+        \   }, \n    \"close_status\": [], \n    \"custom_keys\": [], \n    \"date_created\":
+        \"1501875088\", \n    \"date_modified\": \"1501875088\", \n    \"description\":
+        \"The tmux-top rpms\", \n    \"fullname\": \"rpms/tmux-top\", \n    \"id\":
+        22342, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\", \n    \"namespace\":
+        \"rpms\", \n    \"parent\": null, \n    \"priorities\": {}, \n    \"tags\":
+        [], \n    \"url_path\": \"rpms/tmux-top\", \n    \"user\": {\n      \"fullname\":
+        \"Tomas Tomecek\", \n      \"name\": \"ttomecek\"\n    }\n  }, \n  \"remote_git\":
+        null, \n  \"repo_from\": {\n    \"access_groups\": {\n      \"admin\": [],
+        \n      \"commit\": [], \n      \"ticket\": []\n    }, \n    \"access_users\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"owner\": [\n        \"ttomecek\"\n
+        \     ], \n      \"ticket\": []\n    }, \n    \"close_status\": [], \n    \"custom_keys\":
+        [], \n    \"date_created\": \"1586191050\", \n    \"date_modified\": \"1586191050\",
+        \n    \"description\": \"The tmux-top rpms\", \n    \"fullname\": \"forks/ttomecek/rpms/tmux-top\",
+        \n    \"id\": 40032, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\",
+        \n    \"namespace\": \"rpms\", \n    \"parent\": {\n      \"access_groups\":
+        {\n        \"admin\": [], \n        \"commit\": [], \n        \"ticket\":
+        []\n      }, \n      \"access_users\": {\n        \"admin\": [], \n        \"commit\":
+        [], \n        \"owner\": [\n          \"ttomecek\"\n        ], \n        \"ticket\":
+        []\n      }, \n      \"close_status\": [], \n      \"custom_keys\": [], \n
+        \     \"date_created\": \"1501875088\", \n      \"date_modified\": \"1501875088\",
+        \n      \"description\": \"The tmux-top rpms\", \n      \"fullname\": \"rpms/tmux-top\",
+        \n      \"id\": 22342, \n      \"milestones\": {}, \n      \"name\": \"tmux-top\",
+        \n      \"namespace\": \"rpms\", \n      \"parent\": null, \n      \"priorities\":
+        {}, \n      \"tags\": [], \n      \"url_path\": \"rpms/tmux-top\", \n      \"user\":
+        {\n        \"fullname\": \"Tomas Tomecek\", \n        \"name\": \"ttomecek\"\n
+        \     }\n    }, \n    \"priorities\": {}, \n    \"tags\": [], \n    \"url_path\":
+        \"fork/ttomecek/rpms/tmux-top\", \n    \"user\": {\n      \"fullname\": \"Tomas
+        Tomecek\", \n      \"name\": \"ttomecek\"\n    }\n  }, \n  \"status\": \"Open\",
+        \n  \"tags\": [], \n  \"threshold_reached\": null, \n  \"title\": \"testing
+        PR\", \n  \"uid\": \"babc4aa365c54f699858f36726724e48\", \n  \"updated_on\":
+        \"1586193314\", \n  \"user\": {\n    \"fullname\": \"Tomas Tomecek\", \n    \"name\":
+        \"ttomecek\"\n  }\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:15:14 GMT
+      Keep-Alive:
+      - timeout=15, max=498
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=1143192
+      content-length:
+      - '2896'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.22.0
+    method: GET
+    uri: https://src.stg.fedoraproject.org//api/0/rpms/tmux-top/pull-request/7
+  response:
+    body:
+      string: "{\n  \"assignee\": null, \n  \"branch\": \"master\", \n  \"branch_from\":
+        \"cookie\", \n  \"cached_merge_status\": \"unknown\", \n  \"closed_at\": null,
+        \n  \"closed_by\": null, \n  \"comments\": [], \n  \"commit_start\": \"8c8ba1a4f9316a87aa335182ef7da4fed34c1db1\",
+        \n  \"commit_stop\": \"61ce3bcbc551c75e80d8d065e949c6750c235cff\", \n  \"date_created\":
+        \"1586193314\", \n  \"id\": 7, \n  \"initial_comment\": \"serious description\",
+        \n  \"last_updated\": \"1586193314\", \n  \"project\": {\n    \"access_groups\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"ticket\": []\n    },
+        \n    \"access_users\": {\n      \"admin\": [], \n      \"commit\": [], \n
+        \     \"owner\": [\n        \"ttomecek\"\n      ], \n      \"ticket\": []\n
+        \   }, \n    \"close_status\": [], \n    \"custom_keys\": [], \n    \"date_created\":
+        \"1501875088\", \n    \"date_modified\": \"1501875088\", \n    \"description\":
+        \"The tmux-top rpms\", \n    \"fullname\": \"rpms/tmux-top\", \n    \"id\":
+        22342, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\", \n    \"namespace\":
+        \"rpms\", \n    \"parent\": null, \n    \"priorities\": {}, \n    \"tags\":
+        [], \n    \"url_path\": \"rpms/tmux-top\", \n    \"user\": {\n      \"fullname\":
+        \"Tomas Tomecek\", \n      \"name\": \"ttomecek\"\n    }\n  }, \n  \"remote_git\":
+        null, \n  \"repo_from\": {\n    \"access_groups\": {\n      \"admin\": [],
+        \n      \"commit\": [], \n      \"ticket\": []\n    }, \n    \"access_users\":
+        {\n      \"admin\": [], \n      \"commit\": [], \n      \"owner\": [\n        \"ttomecek\"\n
+        \     ], \n      \"ticket\": []\n    }, \n    \"close_status\": [], \n    \"custom_keys\":
+        [], \n    \"date_created\": \"1586191050\", \n    \"date_modified\": \"1586191050\",
+        \n    \"description\": \"The tmux-top rpms\", \n    \"fullname\": \"forks/ttomecek/rpms/tmux-top\",
+        \n    \"id\": 40032, \n    \"milestones\": {}, \n    \"name\": \"tmux-top\",
+        \n    \"namespace\": \"rpms\", \n    \"parent\": {\n      \"access_groups\":
+        {\n        \"admin\": [], \n        \"commit\": [], \n        \"ticket\":
+        []\n      }, \n      \"access_users\": {\n        \"admin\": [], \n        \"commit\":
+        [], \n        \"owner\": [\n          \"ttomecek\"\n        ], \n        \"ticket\":
+        []\n      }, \n      \"close_status\": [], \n      \"custom_keys\": [], \n
+        \     \"date_created\": \"1501875088\", \n      \"date_modified\": \"1501875088\",
+        \n      \"description\": \"The tmux-top rpms\", \n      \"fullname\": \"rpms/tmux-top\",
+        \n      \"id\": 22342, \n      \"milestones\": {}, \n      \"name\": \"tmux-top\",
+        \n      \"namespace\": \"rpms\", \n      \"parent\": null, \n      \"priorities\":
+        {}, \n      \"tags\": [], \n      \"url_path\": \"rpms/tmux-top\", \n      \"user\":
+        {\n        \"fullname\": \"Tomas Tomecek\", \n        \"name\": \"ttomecek\"\n
+        \     }\n    }, \n    \"priorities\": {}, \n    \"tags\": [], \n    \"url_path\":
+        \"fork/ttomecek/rpms/tmux-top\", \n    \"user\": {\n      \"fullname\": \"Tomas
+        Tomecek\", \n      \"name\": \"ttomecek\"\n    }\n  }, \n  \"status\": \"Open\",
+        \n  \"tags\": [], \n  \"threshold_reached\": null, \n  \"title\": \"testing
+        PR\", \n  \"uid\": \"babc4aa365c54f699858f36726724e48\", \n  \"updated_on\":
+        \"1586193314\", \n  \"user\": {\n    \"fullname\": \"Tomas Tomecek\", \n    \"name\":
+        \"ttomecek\"\n  }\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:15:15 GMT
+      Keep-Alive:
+      - timeout=15, max=497
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=266000
+      content-length:
+      - '2896'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: comment=howdy%21
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '16'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.22.0
+    method: POST
+    uri: https://src.stg.fedoraproject.org//api/0/rpms/tmux-top/pull-request/7/comment
+  response:
+    body:
+      string: "{\n  \"message\": \"Comment added\"\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:15:16 GMT
+      Keep-Alive:
+      - timeout=15, max=496
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=651514
+      content-length:
+      - '32'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      User-Agent:
+      - python-requests/2.22.0
+    method: POST
+    uri: https://src.stg.fedoraproject.org//api/0/-/whoami
+  response:
+    body:
+      string: "{\n  \"username\": \"ttomecek\"\n}"
+    headers:
+      Connection:
+      - Keep-Alive
+      Date:
+      - Mon, 06 Apr 2020 17:15:17 GMT
+      Keep-Alive:
+      - timeout=15, max=495
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Fedora-ProxyServer:
+      - proxy01.stg.phx2.fedoraproject.org
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      apptime:
+      - D=143941
+      content-length:
+      - '28'
+      content-type:
+      - application/json
+      x-fedora-appserver:
+      - pkgs01.stg.phx2.fedoraproject.org
+    status:
+      code: 200
+      message: OK
+version: 1
