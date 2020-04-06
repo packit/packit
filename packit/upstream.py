@@ -476,10 +476,9 @@ class Upstream(PackitRepositoryBase):
                     raise ex
         return None
 
-    def _get_commit_count_since_last_tag(self):
-        desc_output = run_command(["git", "describe", "--tags", "--abbrev=0"], output=True).strip()
-        log_output = run_command(["git", "log", "%s..HEAD" % desc_output, "--oneline"]).split("\n")
-        return len(log_output) - 1 # This excludes the empty string
+    def _get_last_tag(self):
+        last_tag = run_command(["git", "describe", "--tags", "--abbrev=0"], output=True).strip()
+        return last_tag
 
     def fix_spec(self, archive: str, version: str, commit: str):
         """
@@ -519,7 +518,8 @@ class Upstream(PackitRepositoryBase):
         current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
         release = f"{original_release_number}.{current_time}{git_desc_suffix}"
 
-        cmd = ["git", "log", "--pretty=format:- %s (%an)", "HEAD~%s..HEAD" % self._get_commit_count_since_last_tag()]
+        last_tag = self._get_last_tag()
+        cmd = ["git", "log", "--pretty=format:- %s (%an)", f"{last_tag}..HEAD"]
         msg = run_command(cmd, output=True).strip()
         logger.debug(f"Setting Release in spec to {release!r}")
         # instead of changing version, we change Release field
