@@ -34,47 +34,15 @@ from packit.config import (
     JobType,
     JobConfigTriggerType,
 )
+from packit.config.job_config import JobMetadataConfig
 
 
 def get_job_config_dict_simple():
     return {"job": "build", "trigger": "release"}
 
 
-def get_job_config_dict_full():
-    return {
-        "job": "propose_downstream",
-        "trigger": "pull_request",
-        "metadata": {"a": "b"},
-    }
-
-
 def get_job_config_simple():
-    return JobConfig(
-        type=JobType.build, trigger=JobConfigTriggerType.release, metadata={}
-    )
-
-
-def get_job_config_full():
-    return JobConfig(
-        type=JobType.propose_downstream,
-        trigger=JobConfigTriggerType.pull_request,
-        metadata={"a": "b"},
-    )
-
-
-def get_default_job_config():
-    return [
-        JobConfig(
-            type=JobType.tests,
-            trigger=JobConfigTriggerType.pull_request,
-            metadata={"targets": ["fedora-stable"]},
-        ),
-        JobConfig(
-            type=JobType.propose_downstream,
-            trigger=JobConfigTriggerType.release,
-            metadata={"dist-git-branch": ["fedora-all"]},
-        ),
-    ]
+    return JobConfig(type=JobType.build, trigger=JobConfigTriggerType.release,)
 
 
 @pytest.fixture()
@@ -82,9 +50,40 @@ def job_config_simple():
     return get_job_config_simple()
 
 
+def get_job_config_dict_full():
+    return {
+        "job": "propose_downstream",
+        "trigger": "pull_request",
+        "metadata": {"dist-git-branch": "master"},
+    }
+
+
+def get_job_config_full():
+    return JobConfig(
+        type=JobType.propose_downstream,
+        trigger=JobConfigTriggerType.pull_request,
+        metadata=JobMetadataConfig(dist_git_branch="master"),
+    )
+
+
 @pytest.fixture()
 def job_config_full():
     return get_job_config_full()
+
+
+def get_default_job_config():
+    return [
+        JobConfig(
+            type=JobType.tests,
+            trigger=JobConfigTriggerType.pull_request,
+            metadata=JobMetadataConfig(targets=["fedora-stable"]),
+        ),
+        JobConfig(
+            type=JobType.propose_downstream,
+            trigger=JobConfigTriggerType.release,
+            metadata=JobMetadataConfig(dist_git_branch="fedora-all"),
+        ),
+    ]
 
 
 def test_job_config_equal(job_config_simple):
