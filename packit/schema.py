@@ -46,6 +46,7 @@ from packit.config.job_config import (
     JobConfig,
     default_jobs,
     JobConfigTriggerType,
+    JobMetadataConfig,
 )
 from packit.config.package_config import (
     NotificationsConfig,
@@ -197,6 +198,33 @@ class SyncFilesConfigSchema(Schema):
             return data
 
 
+class JobMetadataSchema(Schema):
+    """ Jobs metadata. """
+
+    targets = fields.List(fields.String())
+    timeout = fields.Integer()
+    owner = fields.String()
+    project = fields.String()
+    dist_git_branch = fields.String()
+
+    @pre_load
+    def ordered_preprocess(self, data, **_):
+        if "dist-git-branch" in data:
+            logger.warning(
+                f"Job metadata key 'dist-git-branch' has been renamed to 'dist_git_branch', "
+                f"please update your configuration file."
+            )
+            data["dist_git_branch"] = data.pop("dist-git-branch")
+        if isinstance(data.get("targets"), str):
+            # allow "targets" being specified as string
+            data["targets"] = [data.pop("targets")]
+        return data
+
+    @post_load
+    def make_instance(self, data, **_):
+        return JobMetadataConfig(**data)
+
+
 # TODO: inherit from MM23Schema
 class JobConfigSchema(Schema):
     """
@@ -205,7 +233,7 @@ class JobConfigSchema(Schema):
 
     job = EnumField(JobType, required=True)
     trigger = EnumField(JobConfigTriggerType, required=True)
-    metadata = fields.Dict(missing={})
+    metadata = fields.Nested(JobMetadataSchema)
 
     @post_load
     def make_instance(self, data, **_):

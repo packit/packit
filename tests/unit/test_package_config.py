@@ -21,12 +21,19 @@ from packit.config import (
     get_package_config_from_repo,
     SyncFilesConfig,
 )
+from packit.config.job_config import JobMetadataConfig
 from packit.config.package_config import (
     get_specfile_path_from_repo,
     PackageConfig,
     get_local_specfile_path,
 )
+from packit.schema import MM3
 from packit.sync import SyncFilesItem
+
+
+@pytest.fixture()
+def job_config_simple():
+    return get_job_config_simple()
 
 
 @pytest.mark.parametrize(
@@ -50,7 +57,6 @@ def test_get_specfile_path_from_repo(files, expected):
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata={},
                     )
                 ],
             ),
@@ -63,7 +69,7 @@ def test_get_specfile_path_from_repo(files, expected):
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata={"project": "example"},
+                        metadata=JobMetadataConfig(project="example"),
                     )
                 ],
             ),
@@ -76,12 +82,12 @@ def test_get_specfile_path_from_repo(files, expected):
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.release,
-                        metadata={"project": "example1"},
+                        metadata=JobMetadataConfig(project="example1"),
                     ),
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata={"project": "example2"},
+                        metadata=JobMetadataConfig(project="example2"),
                     ),
                 ],
             ),
@@ -153,37 +159,23 @@ def test_package_config_equal(job_config_simple):
                 ]
             ),
             jobs=[get_job_config_full()],
-        ),
-        PackageConfig(
-            specfile_path="fedora/package.spec",
-            synced_files=SyncFilesConfig(
-                files_to_sync=[
-                    SyncFilesItem(src="c", dest="c"),
-                    SyncFilesItem(src="d", dest="d"),
-                ]
-            ),
-            jobs=[get_job_config_full()],
             create_pr=False,
         ),
     ],
 )
 def test_package_config_not_equal(not_equal_package_config):
-    j = get_job_config_full()
-    j.metadata["b"] = "c"
-    assert (
-        not PackageConfig(
-            specfile_path="fedora/package.spec",
-            synced_files=SyncFilesConfig(
-                files_to_sync=[
-                    SyncFilesItem(src="c", dest="c"),
-                    SyncFilesItem(src="d", dest="d"),
-                ]
-            ),
-            jobs=[j],
-            create_pr=True,
-        )
-        == not_equal_package_config
+    config = PackageConfig(
+        specfile_path="fedora/package.spec",
+        synced_files=SyncFilesConfig(
+            files_to_sync=[
+                SyncFilesItem(src="c", dest="c"),
+                SyncFilesItem(src="d", dest="d"),
+            ]
+        ),
+        jobs=[get_job_config_full()],
+        create_pr=True,
     )
+    assert config != not_equal_package_config
 
 
 @pytest.mark.parametrize(
@@ -208,6 +200,50 @@ def test_package_config_not_equal(not_equal_package_config):
                 "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/foobar.spec", "somefile", "somedirectory"],
                 "jobs": [],
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "metadata": {"dist-git-branch": "fedora-all"},
+                    }
+                ],
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "metadata": {"targets": "fedora-stable"},
+                    }
+                ],
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "metadata": {
+                            "targets": ["f31", "f32"],
+                            "timeout": 123,
+                            "owner": "santa",
+                            "project": "gifts",
+                        },
+                    }
+                ],
             },
             True,
         ),
@@ -265,6 +301,46 @@ def test_package_config_not_equal(not_equal_package_config):
     ],
 )
 def test_package_config_validate(raw, is_valid):
+    if not is_valid:
+        with pytest.raises((ValidationError, ValueError)):
+            PackageConfig.get_from_dict(raw)
+    else:
+        PackageConfig.get_from_dict(raw)
+
+
+@pytest.mark.xfail(not MM3, reason="Marshmallow v2 doesn't raise when unknown field")
+@pytest.mark.parametrize(
+    "raw,is_valid",
+    [
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "unknown": "key",
+                    }
+                ],
+            },
+            False,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "metadata": {"unknown": "key"},
+                    }
+                ],
+            },
+            False,
+        ),
+    ],
+)
+def test_package_config_validate_unknown_key(raw, is_valid):
     if not is_valid:
         with pytest.raises((ValidationError, ValueError)):
             PackageConfig.get_from_dict(raw)
