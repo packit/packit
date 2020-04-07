@@ -24,7 +24,6 @@ import logging
 import os
 import re
 import shutil
-from math import log10, floor
 from pathlib import Path
 from typing import Optional, List, Tuple, Union
 
@@ -35,7 +34,7 @@ from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, SyncFilesConfig
-from packit.constants import SPEC_PACKAGE_SECTION, DEFAULT_ARCHIVE_EXT
+from packit.constants import SPEC_PACKAGE_SECTION, DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
 from packit.exceptions import (
     PackitException,
     PackitSRPMNotFoundException,
@@ -45,8 +44,9 @@ from packit.exceptions import (
     PackitRPMNotFoundException,
 )
 from packit.local_project import LocalProject
+from packit.patches import PatchGenerator
 from packit.specfile import Specfile
-from packit.utils import is_a_git_ref, run_command, git_remote_url_to_https_url
+from packit.utils import run_command, git_remote_url_to_https_url
 
 logger = logging.getLogger(__name__)
 
@@ -91,45 +91,6 @@ class Upstream(PackitRepositoryBase):
     @property
     def active_branch(self) -> str:
         return self.local_project.ref
-
-    def get_commits_to_upstream(
-        self, upstream: str, add_upstream_head_commit: bool = True
-    ) -> List[git.Commit]:
-        """
-        Return the list of different commits between current branch and upstream rev/tag.
-
-        Always choosing the first-parent, so we have a line/path of the commits.
-        It contains merge-commits from the master and commits on top of the master.
-        (e.g. commits from PR)
-
-        :param add_upstream_head_commit: add also upstream rev/tag commit as a first value
-        :param upstream: str -- git branch or tag
-        :return: list of commits (last commit on the current branch.).
-        """
-
-        if is_a_git_ref(repo=self.local_project.git_repo, ref=upstream):
-            upstream_ref = upstream
-        else:
-            upstream_ref = f"origin/{upstream}"
-            if upstream_ref not in self.local_project.git_repo.refs:
-                raise Exception(
-                    f"Upstream {upstream_ref} branch nor {upstream} tag not found."
-                )
-
-        commits = list(
-            self.local_project.git_repo.iter_commits(
-                rev=f"{upstream_ref}..{self.local_project.ref}",
-                reverse=True,
-                first_parent=True,
-            )
-        )
-        if add_upstream_head_commit:
-            commits.insert(0, self.local_project.git_repo.commit(upstream_ref))
-
-        logger.debug(
-            f"Delta ({upstream_ref}..{self.local_project.ref}): {len(commits)}"
-        )
-        return commits
 
     def push_to_fork(
         self,
@@ -228,11 +189,8 @@ class Upstream(PackitRepositoryBase):
         :param upstream: str -- git branch or tag
         :return: [(patch_path, msg)] list of created patches (tuple of the file path and commit msg)
         """
-
         upstream = upstream or self.get_specfile_version()
         destination = destination or self.local_project.working_dir
-
-        commits = self.get_commits_to_upstream(upstream, add_upstream_head_commit=True)
 
         sync_files_to_ignore = [
             str(sf.src.relative_to(self.local_project.working_dir))
@@ -248,50 +206,8 @@ class Upstream(PackitRepositoryBase):
             self.package_config.patch_generation_ignore_paths + sync_files_to_ignore
         )
 
-        patch_list = []
-        # we need to prefix patches so we can order them properly
-        # this is needed for merge commits - git orders every instance of `format-patch` call
-        commits_count = len(commits)
-        # how many digits does commits_count have?
-        order = floor(log10(commits_count)) + 1
-        patch_counter = 0  # prefix for patches so they are nicely ordered
-        # first value is upstream ref, i.e parent for the first commit we want to create patch from
-        for i, commit in enumerate(commits[1:]):
-            parent_commit = commits[i]
-            git_diff_cmd = [
-                "git",
-                "format-patch",
-                "--output-directory",
-                f"{destination}",
-                f"{parent_commit.hexsha}..{commit.hexsha}",
-                "--",
-                ".",
-            ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
-            git_format_patch_out = run_command(
-                cmd=git_diff_cmd,
-                cwd=self.local_project.working_dir,
-                output=True,
-                decode=True,
-            )
-
-            # there can be multiple patches in a merge request
-            # so `git format-patch` can contain multiple files in the output
-            if git_format_patch_out:
-                for patch_file_str in git_format_patch_out.split("\n"):
-                    if not patch_file_str:
-                        continue
-                    prefix = format(patch_counter, f"0{order}")
-                    patch_file = Path(patch_file_str)
-                    patch_name = f"{prefix}-{patch_file.name}"
-                    patch_target_path = Path(destination).joinpath(patch_name)
-                    patch_file.replace(patch_target_path)
-                    msg = f"{commit.summary}\nAuthor: {commit.author.name} <{commit.author.email}>"
-                    patch_list.append((patch_target_path, msg))
-                    patch_counter += 1
-            else:
-                logger.info(f"No patch for commit: {commit.summary} ({commit.hexsha})")
-
-        return patch_list
+        pg = PatchGenerator(self.local_project)
+        return pg.create_patches(upstream, destination, files_to_ignore=files_to_ignore)
 
     def get_latest_released_version(self) -> str:
         """
@@ -489,7 +405,7 @@ class Upstream(PackitRepositoryBase):
             # release components are meant to be separated by ".", not "-"
             git_desc_suffix = "." + ".".join(g_desc_raw)
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
-        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         release = f"{original_release_number}.{current_time}{git_desc_suffix}"
 
         msg = f"- Development snapshot ({commit})"

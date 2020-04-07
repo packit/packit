@@ -31,6 +31,8 @@ CONFIG_FILE_NAMES = [
     "packit.json",
 ]
 
+DATETIME_FORMAT = "%Y%m%d%H%M%S%f"
+
 # we create .tar.gz archives
 DEFAULT_ARCHIVE_EXT = ".tar.gz"
 
