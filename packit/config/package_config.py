@@ -122,6 +122,30 @@ class PackageConfig:
         if kwargs:
             logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
 
+    def __repr__(self):
+        return (
+            "PackageConfig("
+            f"config_file_path='{self.config_file_path}', "
+            f"specfile_path='{self.specfile_path}', "
+            f"synced_files='{self.synced_files}', "
+            f"jobs='{self.jobs}', "
+            f"dist_git_namespace='{self.dist_git_namespace}', "
+            f"upstream_project_url='{self.upstream_project_url}', "
+            f"upstream_package_name='{self.upstream_package_name}', "
+            f"downstream_project_url='{self.downstream_project_url}', "
+            f"downstream_package_name='{self.downstream_package_name}', "
+            f"dist_git_base_url='{self.dist_git_base_url}', "
+            f"create_tarball_command='{self.create_tarball_command}', "
+            f"current_version_command='{self.current_version_command}', "
+            f"actions='{self.actions}', "
+            f"upstream_ref='{self.upstream_ref}', "
+            f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
+            f"create_pr='{self.create_pr}', "
+            f"spec_source_id='{self.spec_source_id}', "
+            f"upstream_tag_template='{self.upstream_tag_template}', "
+            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}')"
+        )
+
     @property
     def downstream_project_url(self) -> str:
         if not self._downstream_project_url:
@@ -149,7 +173,7 @@ class PackageConfig:
         if config_file_path and not raw_dict.get("config_file_path", None):
             raw_dict.update(config_file_path=config_file_path)
 
-        package_config = PackageConfigSchema(strict=True).load(raw_dict).data
+        package_config = PackageConfigSchema().load(raw_dict)
 
         if not getattr(package_config, "specfile_path", None):
             if spec_file_path:
@@ -166,6 +190,7 @@ class PackageConfig:
         if "jobs" not in raw_dict:
             package_config.jobs = default_jobs
 
+        logger.debug(package_config)
         return package_config
 
     def get_all_files_to_sync(self):
