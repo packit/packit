@@ -50,9 +50,15 @@ class SyncFilesConfig:
     @classmethod
     def get_from_dict(cls, raw_dict: dict) -> "SyncFilesConfig":
         # required to avoid cyclical imports
-        from packit.schema import SyncFilesConfigSchema
+        from packit.schema import SyncFilesConfigSchema, MM3
 
-        return SyncFilesConfigSchema(strict=True).load(raw_dict).data
+        if MM3:
+            config = SyncFilesConfigSchema().load(raw_dict)
+        else:  # v2
+            config = SyncFilesConfigSchema(strict=True).load(raw_dict).data
+        logger.debug(config)
+
+        return config
 
     def __eq__(self, other: object):
         if not isinstance(other, SyncFilesConfig):

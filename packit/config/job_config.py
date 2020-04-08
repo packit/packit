@@ -65,9 +65,15 @@ class JobConfig:
     @classmethod
     def get_from_dict(cls, raw_dict: dict) -> "JobConfig":
         # required to avoid cyclical imports
-        from packit.schema import JobConfigSchema
+        from packit.schema import JobConfigSchema, MM3
 
-        return JobConfigSchema(strict=True).load(raw_dict).data
+        if MM3:
+            config = JobConfigSchema().load(raw_dict)
+        else:  # v2
+            config = JobConfigSchema(strict=True).load(raw_dict).data
+        logger.debug(config)
+
+        return config
 
     def __eq__(self, other: object):
         if not isinstance(other, JobConfig):

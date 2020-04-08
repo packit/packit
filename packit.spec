@@ -24,6 +24,8 @@ BuildRequires:  python3-cccolutils
 BuildRequires:  python3-copr
 BuildRequires:  python3-koji
 BuildRequires:  python3-lazy-object-proxy
+BuildRequires:  python3-marshmallow
+BuildRequires:  python3-marshmallow-enum
 BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)

@@ -23,7 +23,20 @@
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping
 
-from marshmallow import Schema, fields, post_load, pre_load, ValidationError
+from marshmallow import (
+    Schema,
+    fields,
+    post_load,
+    pre_load,
+    ValidationError,
+)
+
+try:
+    from marshmallow import __version_info__
+
+    MM3 = __version_info__[0] >= 3
+except ImportError:
+    MM3 = False
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
@@ -136,6 +149,27 @@ class NotProcessedField(fields.Field):
             logger.warning(f"{additional_message}")
 
 
+class MM23Schema(Schema):
+    """
+    Schema compatible with Marshmallow v2 and v3.
+    Remove this once we don't need v2 (when F31 is EOL) and inherit directly from Schema.
+    """
+
+    def __init__(self, **kwargs):
+        if MM3:
+            super().__init__(**kwargs)
+        else:  # v2
+            super().__init__(strict=True, **kwargs)
+
+    def load(self, *args, **kwargs):
+        if MM3:
+            result = super().load(*args, **kwargs)
+        else:  # v2
+            result = super().load(*args, **kwargs).data
+        return result
+
+
+# TODO: inherit from MM23Schema
 class SyncFilesConfigSchema(Schema):
     """
     Schema for processing SyncFilesConfig config data.
@@ -163,6 +197,7 @@ class SyncFilesConfigSchema(Schema):
             return data
 
 
+# TODO: inherit from MM23Schema
 class JobConfigSchema(Schema):
     """
     Schema for processing JobConfig config data.
@@ -198,7 +233,7 @@ class NotificationsSchema(Schema):
         return NotificationsConfig(**data)
 
 
-class PackageConfigSchema(Schema):
+class PackageConfigSchema(MM23Schema):
     """
     Schema for processing PackageConfig config data.
     """
@@ -303,7 +338,7 @@ class PackageConfigSchema(Schema):
         return value
 
 
-class UserConfigSchema(Schema):
+class UserConfigSchema(MM23Schema):
     """
     Schema for processing Config config data.
     """
