@@ -214,9 +214,9 @@ class PackageConfig:
 
     def get_copr_build_project_value(self) -> Optional[str]:
         projects_list = [
-            job.metadata.get("project")
+            job.metadata.project
             for job in self.jobs
-            if job.type == JobType.copr_build and job.metadata.get("project")
+            if job.type == JobType.copr_build and job.metadata.project
         ]
         if not projects_list:
             return None
