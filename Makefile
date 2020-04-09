@@ -1,19 +1,22 @@
 IMAGE=docker.io/usercont/packit
 TESTS_IMAGE=packit-tests
+
+CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
+TESTS_CONTAINER_RUN=$(CONTAINER_ENGINE) run --rm -ti -v $(CURDIR):/src --env TESTS_TARGET --security-opt label=disable $(TESTS_IMAGE)
 TESTS_RECORDING_PATH=tests_recording
-TESTS_CONTAINER_RUN=podman run --rm -ti -v $(CURDIR):/src --env TESTS_TARGET --security-opt label=disable $(TESTS_IMAGE)
 TESTS_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
+
 
 # To build base image for packit-service-worker
 image:
-	docker build --rm -t $(IMAGE) .
+	$(CONTAINER_ENGINE) build --rm -t $(IMAGE) .
 
 tests_image:
-	podman build --tag $(TESTS_IMAGE) -f Dockerfile.tests .
+	$(CONTAINER_ENGINE) build --tag $(TESTS_IMAGE) -f Dockerfile.tests .
 	sleep 2
 
 tests_image_remove:
-	podman rmi $(TESTS_IMAGE)
+	$(CONTAINER_ENGINE) rmi $(TESTS_IMAGE)
 
 install:
 	pip3 install --user .
