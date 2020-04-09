@@ -22,6 +22,7 @@
 
 import logging
 from enum import Enum
+from typing import List
 
 from packit.exceptions import PackitConfigException
 
@@ -51,11 +52,61 @@ class JobConfigTriggerType(Enum):
     commit = "commit"
 
 
+class JobMetadataConfig:
+    def __init__(
+        self,
+        targets: List[str] = None,
+        timeout: int = 7200,
+        owner: str = None,
+        project: str = None,
+        dist_git_branch: str = None,
+    ):
+        """
+        :param targets: copr_build job, mock chroots where to build
+        :param timeout: copr_build, give up watching a build after timeout, defaults to 7200s
+        :param owner: copr_build, a namespace in COPR where the build should happen
+        :param project: copr_build, a name of the copr project
+        :param dist_git_branch: propose_downstream, a branch in dist-git where packit should work
+        """
+        self.targets = targets or []
+        self.timeout: int = timeout
+        self.owner: str = owner
+        self.project: str = project
+        self.dist_git_branch: str = dist_git_branch
+
+    def __repr__(self):
+        return (
+            f"JobMetadataConfig(targets={self.targets}, "
+            f"timeout={self.timeout}, "
+            f"owner={self.owner}, "
+            f"project={self.project}, "
+            f"dist_git_branch={self.dist_git_branch})"
+        )
+
+    def __eq__(self, other: object):
+        if not isinstance(other, JobMetadataConfig):
+            raise PackitConfigException(
+                "Provided object is not a JobMetadataConfig instance."
+            )
+        return (
+            self.targets == other.targets
+            and self.timeout == other.timeout
+            and self.owner == other.owner
+            and self.project == other.project
+            and self.dist_git_branch == other.dist_git_branch
+        )
+
+
 class JobConfig:
-    def __init__(self, type: JobType, trigger: JobConfigTriggerType, metadata: dict):
-        self.type = type
+    def __init__(
+        self,
+        type: JobType,
+        trigger: JobConfigTriggerType,
+        metadata: JobMetadataConfig = None,
+    ):
+        self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
-        self.metadata: dict = metadata
+        self.metadata: JobMetadataConfig = metadata or JobMetadataConfig()
 
     def __repr__(self):
         return (
@@ -89,11 +140,11 @@ default_jobs = [
     JobConfig(
         type=JobType.tests,
         trigger=JobConfigTriggerType.pull_request,
-        metadata={"targets": ["fedora-stable"]},
+        metadata=JobMetadataConfig(targets=["fedora-stable"]),
     ),
     JobConfig(
         type=JobType.propose_downstream,
         trigger=JobConfigTriggerType.release,
-        metadata={"dist-git-branch": ["fedora-all"]},
+        metadata=JobMetadataConfig(dist_git_branch="fedora-all"),
     ),
 ]
