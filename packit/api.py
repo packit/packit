@@ -103,58 +103,6 @@ class PackitAPI:
             )
         return self._copr_helper
 
-    def sync_pr(self, pr_id, dist_git_branch: str, upstream_version: str = None):
-        assert_existence(self.dg.local_project)
-        # do not add anything between distgit clone and saving gpg keys!
-        self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
-
-        self.up.run_action(actions=ActionName.pre_sync)
-
-        self.up.local_project.checkout_pr(pr_id=pr_id)
-        self.dg.check_last_commit()
-
-        local_pr_branch = f"pull-request-{pr_id}-sync"
-        # fetch and reset --hard upstream/$branch?
-        self.dg.create_branch(
-            dist_git_branch,
-            base=f"remotes/origin/{dist_git_branch}",
-            setup_tracking=True,
-        )
-
-        self.dg.update_branch(dist_git_branch)
-        self.dg.checkout_branch(dist_git_branch)
-
-        self.dg.create_branch(local_pr_branch)
-        self.dg.checkout_branch(local_pr_branch)
-
-        if self.up.with_action(action=ActionName.create_patches):
-            patches = self.up.create_patches(
-                upstream=upstream_version,
-                destination=str(self.dg.absolute_specfile_dir),
-            )
-            self.dg.specfile_add_patches(patches)
-
-        description = (
-            f"Upstream pr: {pr_id}\n"
-            f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
-        )
-
-        self._handle_sources(add_new_sources=True, force_new_sources=False)
-
-        raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
-            Path(self.up.local_project.working_dir),
-            Path(self.dg.local_project.working_dir),
-        )
-        sync_files(raw_sync_files)
-
-        self.dg.commit(title=f"Sync upstream pr: {pr_id}", msg=description)
-
-        self.push_and_create_pr(
-            pr_title=f"Upstream pr: {pr_id}",
-            pr_description=description,
-            dist_git_branch="master",
-        )
-
     def sync_release(
         self,
         dist_git_branch: str,
