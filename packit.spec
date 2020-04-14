@@ -2,7 +2,7 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.9.0
+Version:        0.10.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -34,9 +34,6 @@ BuildRequires:  python3dist(setuptools-scm-git-archive)
 Requires:       fedpkg
 # bumpspec
 Requires:       rpmdevtools
-# doesn't have the python3dist provide
-Requires:       python3-koji
-Requires:       python3-bodhi-client
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %description
@@ -45,6 +42,9 @@ projects into Fedora operating system.
 
 %package -n     python3-%{real_name}
 Summary:        %{summary}
+# See setup.cfg for details
+Requires:       python3-koji
+Requires:       python3-bodhi-client
 %{?python_provide:%python_provide python3-%{real_name}}
 
 %description -n python3-%{real_name}
@@ -81,6 +81,9 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 %{python3_sitelib}/*
 
 %changelog
+* Fri Apr 10 2020 Jiri Popelka <jpopelka@redhat.com> - 0.10.0-1
+- new upstream release 0.10.0
+
 * Wed Mar 25 2020 Jiri Popelka <jpopelka@redhat.com> - 0.9.0-1
 - new upstream release 0.9.0
 

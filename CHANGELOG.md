@@ -1,3 +1,20 @@
+# 0.10.0
+
+## Features
+
+- We are able to linearize (and create patches from) extremely complex source-git repos.
+- Job metadata in `.packit.yaml` are now being validated.
+  - `dist-git-branch` key has been renamed to `dist_git_branch`
+
+## Minor changes and fixes
+
+- We no longer inspect archive extension set in `Source` and create `.tar.gz` by default.
+  - This should be more flexible and prevent issues for “non-standard” archive names.
+- `propose-update` creates downstream spec if it’s not there
+  - This used to happen when using packit on a newly created package in Fedora which did not have spec file added yet.
+- Fix for web URLs for Copr builds owned by groups.
+- Marshmallow v3 is now supported as well.
+
 # 0.9.0
 
 ## Features
