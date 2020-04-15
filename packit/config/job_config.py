@@ -60,6 +60,7 @@ class JobMetadataConfig:
         project: str = None,
         dist_git_branch: str = None,
         branch: str = None,
+        scratch: bool = False,
     ):
         """
         :param targets: copr_build job, mock chroots where to build
@@ -68,6 +69,7 @@ class JobMetadataConfig:
         :param project: copr_build, a name of the copr project
         :param dist_git_branch: propose_downstream, a branch in dist-git where packit should work
         :param branch: for `commit` trigger to specify the branch name
+        :param scratch: if we want to run scratch build in koji
         """
         self.targets = targets or []
         self.timeout: int = timeout
@@ -75,6 +77,7 @@ class JobMetadataConfig:
         self.project: str = project
         self.dist_git_branch: str = dist_git_branch
         self.branch: str = branch
+        self.scratch: bool = scratch
 
     def __repr__(self):
         return (
@@ -83,7 +86,8 @@ class JobMetadataConfig:
             f"owner={self.owner}, "
             f"project={self.project}, "
             f"dist_git_branch={self.dist_git_branch},"
-            f"branch={self.branch})"
+            f"branch={self.branch},"
+            f"scratch={self.scratch})"
         )
 
     def __eq__(self, other: object):
@@ -98,6 +102,7 @@ class JobMetadataConfig:
             and self.project == other.project
             and self.dist_git_branch == other.dist_git_branch
             and self.branch == other.branch
+            and self.scratch == other.scratch
         )
 
 
