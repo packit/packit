@@ -14,13 +14,6 @@
     gate:
       jobs:
         - packit-pre-commit
-        - packit-tests-rpm
-        - packit-tests-pip-deps
-        - packit-tests-git-master
-        - packit-tests-rpm-sess-rec
-        - packit-tests-pip-deps-sess-rec
-        - packit-tests-git-master-sess-rec
-        - reverse-dep-packit-service-tests
 
 - job:
     name: packit-pre-commit
