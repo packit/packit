@@ -206,6 +206,7 @@ class JobMetadataSchema(Schema):
     owner = fields.String()
     project = fields.String()
     dist_git_branch = fields.String()
+    branch = fields.String()
 
     @pre_load
     def ordered_preprocess(self, data, **_):

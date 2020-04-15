@@ -59,6 +59,7 @@ class JobMetadataConfig:
         owner: str = None,
         project: str = None,
         dist_git_branch: str = None,
+        branch: str = None,
     ):
         """
         :param targets: copr_build job, mock chroots where to build
@@ -66,12 +67,14 @@ class JobMetadataConfig:
         :param owner: copr_build, a namespace in COPR where the build should happen
         :param project: copr_build, a name of the copr project
         :param dist_git_branch: propose_downstream, a branch in dist-git where packit should work
+        :param branch: for `commit` trigger to specify the branch name
         """
         self.targets = targets or []
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
         self.dist_git_branch: str = dist_git_branch
+        self.branch: str = branch
 
     def __repr__(self):
         return (
@@ -79,7 +82,8 @@ class JobMetadataConfig:
             f"timeout={self.timeout}, "
             f"owner={self.owner}, "
             f"project={self.project}, "
-            f"dist_git_branch={self.dist_git_branch})"
+            f"dist_git_branch={self.dist_git_branch},"
+            f"branch={self.branch})"
         )
 
     def __eq__(self, other: object):
@@ -93,6 +97,7 @@ class JobMetadataConfig:
             and self.owner == other.owner
             and self.project == other.project
             and self.dist_git_branch == other.dist_git_branch
+            and self.branch == other.branch
         )
 
 

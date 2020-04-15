@@ -71,6 +71,22 @@ def job_config_full():
     return get_job_config_full()
 
 
+def get_job_config_dict_build_for_branch():
+    return {
+        "job": "copr_build",
+        "trigger": "commit",
+        "metadata": {"branch": "build-branch"},
+    }
+
+
+def get_job_config_build_for_branch():
+    return JobConfig(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.commit,
+        metadata=JobMetadataConfig(branch="build-branch"),
+    )
+
+
 def get_default_job_config():
     return [
         JobConfig(
