@@ -75,7 +75,7 @@ def get_job_config_dict_build_for_branch():
     return {
         "job": "copr_build",
         "trigger": "commit",
-        "metadata": {"branch": "build-branch"},
+        "metadata": {"branch": "build-branch", "scratch": True},
     }
 
 
@@ -83,7 +83,7 @@ def get_job_config_build_for_branch():
     return JobConfig(
         type=JobType.copr_build,
         trigger=JobConfigTriggerType.commit,
-        metadata=JobMetadataConfig(branch="build-branch"),
+        metadata=JobMetadataConfig(branch="build-branch", scratch=True),
     )
 
 

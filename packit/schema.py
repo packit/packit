@@ -207,6 +207,7 @@ class JobMetadataSchema(Schema):
     project = fields.String()
     dist_git_branch = fields.String()
     branch = fields.String()
+    scratch = fields.Boolean()
 
     @pre_load
     def ordered_preprocess(self, data, **_):
