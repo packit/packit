@@ -62,7 +62,7 @@ def get_job_config_full():
     return JobConfig(
         type=JobType.propose_downstream,
         trigger=JobConfigTriggerType.pull_request,
-        metadata=JobMetadataConfig(dist_git_branch="master"),
+        metadata=JobMetadataConfig(dist_git_branches=["master"]),
     )
 
 
@@ -97,7 +97,7 @@ def get_default_job_config():
         JobConfig(
             type=JobType.propose_downstream,
             trigger=JobConfigTriggerType.release,
-            metadata=JobMetadataConfig(dist_git_branch="fedora-all"),
+            metadata=JobMetadataConfig(dist_git_branches=["fedora-all"]),
         ),
     ]
 

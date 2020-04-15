@@ -22,7 +22,7 @@
 
 import logging
 from enum import Enum
-from typing import List
+from typing import List, Set
 
 from packit.exceptions import PackitConfigException
 
@@ -58,7 +58,7 @@ class JobMetadataConfig:
         timeout: int = 7200,
         owner: str = None,
         project: str = None,
-        dist_git_branch: str = None,
+        dist_git_branches: List[str] = None,
         branch: str = None,
         scratch: bool = False,
     ):
@@ -67,25 +67,28 @@ class JobMetadataConfig:
         :param timeout: copr_build, give up watching a build after timeout, defaults to 7200s
         :param owner: copr_build, a namespace in COPR where the build should happen
         :param project: copr_build, a name of the copr project
-        :param dist_git_branch: propose_downstream, a branch in dist-git where packit should work
+        :param dist_git_branches: propose_downstream, branches in dist-git where packit should work
         :param branch: for `commit` trigger to specify the branch name
         :param scratch: if we want to run scratch build in koji
         """
-        self.targets = targets or []
+        self.targets: List[str] = targets or []
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
-        self.dist_git_branch: str = dist_git_branch
+        self.dist_git_branches: Set[str] = set(
+            dist_git_branches
+        ) if dist_git_branches else set()
         self.branch: str = branch
         self.scratch: bool = scratch
 
     def __repr__(self):
         return (
-            f"JobMetadataConfig(targets={self.targets}, "
+            f"JobMetadataConfig("
+            f"targets={self.targets}, "
             f"timeout={self.timeout}, "
             f"owner={self.owner}, "
             f"project={self.project}, "
-            f"dist_git_branch={self.dist_git_branch},"
+            f"dist_git_branches={self.dist_git_branches},"
             f"branch={self.branch},"
             f"scratch={self.scratch})"
         )
@@ -100,7 +103,7 @@ class JobMetadataConfig:
             and self.timeout == other.timeout
             and self.owner == other.owner
             and self.project == other.project
-            and self.dist_git_branch == other.dist_git_branch
+            and self.dist_git_branches == other.dist_git_branches
             and self.branch == other.branch
             and self.scratch == other.scratch
         )
@@ -154,6 +157,6 @@ default_jobs = [
     JobConfig(
         type=JobType.propose_downstream,
         trigger=JobConfigTriggerType.release,
-        metadata=JobMetadataConfig(dist_git_branch="fedora-all"),
+        metadata=JobMetadataConfig(dist_git_branches=["fedora-all"]),
     ),
 ]
