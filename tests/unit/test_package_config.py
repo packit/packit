@@ -3,14 +3,6 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 from marshmallow import ValidationError
-from tests.spellbook import UP_OSBUILD, SYNC_FILES
-from tests.unit.test_config import (
-    get_job_config_dict_full,
-    get_job_config_dict_simple,
-    get_job_config_simple,
-    get_job_config_full,
-    get_default_job_config,
-)
 
 from ogr.abstract import GitProject, GitService
 from packit.actions import ActionName
@@ -29,6 +21,16 @@ from packit.config.package_config import (
 )
 from packit.schema import MM3
 from packit.sync import SyncFilesItem
+from tests.spellbook import UP_OSBUILD, SYNC_FILES
+from tests.unit.test_config import (
+    get_job_config_dict_full,
+    get_job_config_dict_simple,
+    get_job_config_simple,
+    get_job_config_full,
+    get_default_job_config,
+    get_job_config_dict_build_for_branch,
+    get_job_config_build_for_branch,
+)
 
 
 @pytest.fixture()
@@ -536,6 +538,17 @@ def test_package_config_parse_error(raw):
                 downstream_package_name="package",
             ),
             id="specfile_path+synced_files+downstream_package_name",
+        ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [get_job_config_dict_build_for_branch()],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                jobs=[get_job_config_build_for_branch()],
+            ),
+            id="specfile_path+get_job_config_dict_build_for_branch",
         ),
     ],
 )
