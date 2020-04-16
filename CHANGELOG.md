@@ -1,3 +1,10 @@
+# 0.10.1
+
+A patch release, which fixes/improves some job metadata fields:
+
+- `dist_git_branch` (see `0.10.0`) has been renamed to `dist_git_branches` and it accepts also a list of values.
+- New `scratch` and `branch` keys.
+
 # 0.10.0
 
 ## Features
