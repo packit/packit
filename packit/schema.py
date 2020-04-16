@@ -205,21 +205,23 @@ class JobMetadataSchema(Schema):
     timeout = fields.Integer()
     owner = fields.String()
     project = fields.String()
-    dist_git_branch = fields.String()
+    dist_git_branches = fields.List(fields.String())
     branch = fields.String()
     scratch = fields.Boolean()
 
     @pre_load
     def ordered_preprocess(self, data, **_):
-        if "dist-git-branch" in data:
-            logger.warning(
-                f"Job metadata key 'dist-git-branch' has been renamed to 'dist_git_branch', "
-                f"please update your configuration file."
-            )
-            data["dist_git_branch"] = data.pop("dist-git-branch")
-        if isinstance(data.get("targets"), str):
-            # allow "targets" being specified as string
-            data["targets"] = [data.pop("targets")]
+        for key in ("dist-git-branch", "dist_git_branch"):
+            if key in data:
+                logger.warning(
+                    f"Job metadata key {key!r} has been renamed to 'dist_git_branches', "
+                    f"please update your configuration file."
+                )
+                data["dist_git_branches"] = data.pop(key)
+        for key in ("targets", "dist_git_branches"):
+            if isinstance(data.get(key), str):
+                # allow key value being specified as string, convert to list
+                data[key] = [data.pop(key)]
         return data
 
     @post_load
