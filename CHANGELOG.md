@@ -2,8 +2,9 @@
 
 A patch release, which fixes/improves some job metadata fields:
 
-- `dist_git_branch` (see `0.10.0`) has been renamed to `dist_git_branches` and it accepts also a list of values.
-- New `scratch` and `branch` keys.
+- `dist_git_branch` (see [0.10.0](#0100)) has been renamed to `dist_git_branches` and it accepts also a list of values.
+- New `scratch` option that will be used for Koji builds.
+- New `branch` option that will be used for specifying a branch for which we want to run builds.
 
 # 0.10.0
 
