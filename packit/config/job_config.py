@@ -20,13 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import logging
+
 from enum import Enum
+from logging import getLogger
 from typing import List, Set
 
 from packit.exceptions import PackitConfigException
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class JobType(Enum):
@@ -71,7 +72,7 @@ class JobMetadataConfig:
         :param branch: for `commit` trigger to specify the branch name
         :param scratch: if we want to run scratch build in koji
         """
-        self.targets: List[str] = targets or []
+        self.targets: Set[str] = set(targets) if targets else set()
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project

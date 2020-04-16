@@ -249,6 +249,21 @@ def test_package_config_not_equal(not_equal_package_config):
                 "specfile_path": "fedora/package.spec",
                 "jobs": [
                     {
+                        "job": "copr_build",
+                        "trigger": "release",
+                        "metadata": {
+                            "targets": ["fedora-stable", "fedora-development"]
+                        },
+                    }
+                ],
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
                         "job": "propose_downstream",
                         "trigger": "release",
                         "metadata": {
