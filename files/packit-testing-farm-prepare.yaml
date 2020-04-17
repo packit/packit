@@ -5,3 +5,4 @@
     - include_tasks: tasks/generic-dnf-requirements.yaml
     - include_tasks: tasks/python-compile-deps.yaml
     - include_tasks: tasks/rpm-test-deps.yaml
+    - include_tasks: tasks/configure-git.yaml
