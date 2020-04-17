@@ -18,4 +18,8 @@ git clone $GITHUB $WHERETOUNPACK
 cp -rf $WHERETOUNPACK/tests tests
 rm -rf $WHERETOUNPACK
 
+# Some tests call Git commands which need an identity configured
+git config --global user.name "Packit Test Suite"
+git config --global user.email "test@example.com"
+
 PYTHONPATH="$PYTHONPATH:." pytest-3 -v tests
