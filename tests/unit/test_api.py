@@ -27,8 +27,8 @@ import flexmock
 from packit.copr_helper import CoprHelper
 
 
-def build_dict(owner, copr_url):
-    """Create a build object which uses 'owner' and 'copr_url'."""
+def build_dict(copr_url, id):
+    """Create a build object which uses 'copr_url' and 'id'."""
     # copr_client.build_proxy.get(build_id) response
     return Munch(
         {
@@ -38,8 +38,8 @@ def build_dict(owner, copr_url):
                 "fedora-rawhide-x86_64",
             ],
             "ended_on": 1566377991,
-            "id": 1010428,
-            "ownername": f"{owner}",
+            "id": str(id),
+            "ownername": "packit",
             "project_dirname": "packit-service-ogr-160",
             "projectname": "packit-service-ogr-160",
             "repo_url": f"{copr_url}/results/packit/packit-service-ogr-160",
@@ -68,21 +68,18 @@ def copr_helper(copr_url):
 testdata = [
     pytest.param(
         copr_helper("https://supr.copr"),
-        build_dict("packit", "https://supr.copr"),
-        "https://supr.copr/coprs/packit/packit-service-ogr-160/build/1010428/",
+        build_dict("https://supr.copr", 1010428),
+        "https://supr.copr/coprs/build/1010428/",
         id="user",
     ),
+    # The name "group" bellow is kept for historical reasons.
+    # These Copr permalinks have no information in them regarding who
+    # the owner of the build is (although they will have, once they redirect).
     pytest.param(
         copr_helper("https://group.copr"),
-        build_dict("@oamg", "https://group.copr"),
-        "https://group.copr/coprs/g/oamg/packit-service-ogr-160/build/1010428/",
+        build_dict("https://group.copr", 1010430),
+        "https://group.copr/coprs/build/1010430/",
         id="group",
-    ),
-    pytest.param(
-        copr_helper("https://mean.copr"),
-        build_dict("me@n", "https://mean.copr"),
-        "https://mean.copr/coprs/me@n/packit-service-ogr-160/build/1010428/",
-        id="mean_user",
     ),
 ]
 

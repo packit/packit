@@ -52,10 +52,7 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
     )
 
     assert build_id == "1"
-    assert url == (
-        "https://copr.fedorainfracloud.org/coprs/"
-        f"{build.ownername}/{build.projectname}/build/{build.id}/"
-    )
+    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
 
 
 def test_copr_build_non_existing_project(cwd_upstream_or_distgit, api_instance):
@@ -86,10 +83,7 @@ def test_copr_build_non_existing_project(cwd_upstream_or_distgit, api_instance):
     )
 
     assert build_id == "1"
-    assert url == (
-        "https://copr.fedorainfracloud.org/coprs/"
-        f"{build.ownername}/{build.projectname}/build/{build.id}/"
-    )
+    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
 
 
 def test_copr_build_no_owner(cwd_upstream_or_distgit, api_instance):
