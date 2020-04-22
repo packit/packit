@@ -25,6 +25,7 @@ import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
+import requests
 from yaml import safe_load
 
 from ogr.abstract import GitProject
@@ -251,6 +252,55 @@ class PackageConfig:
             and self.create_pr == other.create_pr
             and self.spec_source_id == other.spec_source_id
             and self.upstream_tag_template == other.upstream_tag_template
+        )
+
+
+class PackageConfigValidationValues:
+    def __init__(self, package_config: PackageConfig):
+        self.specfile_path = package_config.specfile_path
+        self.downstream_package_name = package_config.downstream_package_name
+        self.synced_files = package_config.synced_files
+
+    def get_specfile_path_error_str(self):
+        validation_errors = ""
+        if self.specfile_path and not Path(self.specfile_path).is_file():
+            validation_errors += (
+                f"* specfile_path: {self.specfile_path} does not exist\n"
+            )
+
+        return validation_errors
+
+    def get_synced_files_error_str(self):
+        validation_errors = ".packit.yaml is valid and ready to be used"
+        for synced_file in self.synced_files.files_to_sync:
+            if not Path(synced_file.dest).is_file():
+                validation_errors += (
+                    f"* synced_files: {synced_file.dest} does not exist"
+                )
+
+        return validation_errors
+
+    def get_downstream_package_name_error_str(self):
+        validation_errors = ""
+        full_downstream_url = "https://src.fedoraproject.org/rpms/{0}/raw/master/f/{0}.spec".format(
+            self.downstream_package_name
+        )
+        if not requests.head(full_downstream_url):
+            validation_errors += "* there is no such downstream package - {}".format(
+                self.downstream_package_name
+            )
+
+        return validation_errors
+
+    def __repr__(self):
+        validation_errors = self.get_specfile_path_error_str()
+        validation_errors += self.get_synced_files_error_str()
+        validation_errors += self.get_downstream_package_name_error_str()
+        if not validation_errors:
+            return ""
+        return (
+            f".packit.yaml is valid but some of the fields seem to be filled incorrectly\n"
+            f"{validation_errors}"
         )
 
 
