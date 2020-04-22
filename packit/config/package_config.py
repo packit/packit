@@ -25,6 +25,7 @@ import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
+import requests
 from yaml import safe_load
 
 from ogr.abstract import GitProject
@@ -251,6 +252,65 @@ class PackageConfig:
             and self.create_pr == other.create_pr
             and self.spec_source_id == other.spec_source_id
             and self.upstream_tag_template == other.upstream_tag_template
+        )
+
+
+class PackageConfigValidation:
+    def __init__(self, package_config: PackageConfig):
+        from packit.schema import PackageConfigSchema
+
+        self.schema_validation_errors: Dict = {}
+        self.validation_errors: Dict = {}
+
+        config_dict = vars(package_config)
+        del config_dict["_downstream_project_url"]
+        del config_dict["dist_git_clone_path"]
+        for field_name, errors in PackageConfigSchema().validate(config_dict).items():
+            if isinstance(errors, dict) and errors.get("_schema"):
+                self.schema_validation_errors[field_name] = errors["_schema"]
+            else:
+                self.validation_errors[field_name] = errors
+
+        if (
+            package_config.specfile_path
+            and not Path(package_config.specfile_path).is_file()
+        ):
+            self.validation_errors.setdefault("specfile_path", []).append(
+                f"{package_config.specfile_path} file does not exist"
+            )
+
+        for file_path in package_config.synced_files.files_to_sync:
+            if not Path(file_path.dest).is_file():
+                self.validation_errors.setdefault("synced_files", []).append(
+                    f"{file_path} file does not exist"
+                )
+
+        full_downstream_url = "https://src.fedoraproject.org/rpms/{0}/raw/master/f/{0}.spec".format(
+            package_config.downstream_package_name
+        )
+        if not requests.head(full_downstream_url):
+            self.validation_errors.setdefault("downstream_package_name", []).append(
+                f"Downstream package {package_config.downstream_package_name} does not exist"
+            )
+
+    def __repr__(self) -> str:
+        schema_validation_errors = ""
+        validation_errors = ""
+        for property_name, validation_output in self.schema_validation_errors.items():
+            if validation_output:
+                schema_validation_errors += (
+                    f"'{property_name} schema errors: {validation_output}', "
+                )
+        for property_name, validation_output in self.validation_errors.items():
+            if validation_output:
+                validation_errors += (
+                    f"'{property_name} validation errors: {validation_output}', "
+                )
+
+        return (
+            "PackageConfigValidation("
+            f"Schema Validation Errors({schema_validation_errors})"
+            f"Validation Errors({validation_errors}))"
         )
 
 
