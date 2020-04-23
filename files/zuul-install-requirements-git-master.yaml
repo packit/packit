@@ -6,3 +6,4 @@
     - include_tasks: tasks/python-compile-deps.yaml
     - include_tasks: tasks/ogr-from-master.yaml
     - include_tasks: tasks/requre-master.yaml
+    - include_tasks: tasks/sandcastle-master.yaml
