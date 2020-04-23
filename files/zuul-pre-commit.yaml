@@ -8,21 +8,17 @@
         name:
           - git-core
           - python36
-      become: true
-    - name: Install pre-commit PyPI package
-      pip:
-        name: pre-commit
+          - pre-commit
       become: true
       tags:
         - stop-layering
 
-    - name: Install pre-commit for the repo
+    - name: Run 'pre-commit install' to set up git hook scripts
       command: pre-commit install
       args:
         chdir: "{{ project_dir }}"
-      become: true
 
-    - name: Run it
+    - name: Run pre-commit
       command: pre-commit run --all-files
       args:
         chdir: "{{ project_dir }}"
