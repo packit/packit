@@ -1,5 +1,5 @@
 ---
-- name: Install dependencies for packit.
+- name: pip install packit deps with ogr & requre from master
   hosts: all
   tasks:
     - include_tasks: tasks/generic-dnf-requirements.yaml
