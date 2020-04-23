@@ -1,5 +1,5 @@
 ---
-- name: Install dependencies for packit tests.
+- name: Install dependencies for packit tests
   hosts: all
   vars:
     project_dir: "{{ playbook_dir }}/.."

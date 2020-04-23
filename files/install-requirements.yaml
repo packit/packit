@@ -1,5 +1,5 @@
 ---
-- name: Install dependencies for packit.
+- name: Install RPM dependencies for packit
   hosts: all
   vars:
     project_dir: "{{ playbook_dir }}/.."

@@ -1,5 +1,5 @@
 ---
-- name: Install dependencies for PIP packit.
+- name: pip install packit dependencies
   hosts: all
   tasks:
     - include_tasks: tasks/generic-dnf-requirements.yaml
