@@ -258,8 +258,30 @@ class Upstream(PackitRepositoryBase):
         if action_output:
             return action_output[-1].strip()
 
+        logger.debug(
+            f"We're about to git-describe the upstream repository: {self.local_project.working_dir}"
+        )
+        logger.debug(f"Content: {os.listdir(self.local_project.working_dir)}")
+
+        # let's inspect tags in the repo and log our findings
+        cmd = ["git", "--no-pager", "tag", "--list"]
+        tags = self.command_handler.run_command(
+            cmd, return_output=True, cwd=self.local_project.working_dir
+        ).strip()
+        if tags:
+            tag_list = tags.split("\n")
+            logger.debug(
+                f"The repo has {len(tag_list)} tags and the latest is {tag_list[-1]}"
+            )
+        else:
+            logger.warning(
+                "There are no tags in the repo, `git describe` will very likely fail."
+            )
+
         ver = self.command_handler.run_command(
-            self.package_config.current_version_command, return_output=True
+            self.package_config.current_version_command,
+            return_output=True,
+            cwd=self.local_project.working_dir,
         ).strip()
         logger.debug(f"version: {ver}")
 
