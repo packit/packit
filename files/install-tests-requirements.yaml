@@ -8,6 +8,6 @@
     - include_tasks: tasks/configure-git.yaml
     - include_tasks: tasks/ogr-from-master.yaml
     - include_tasks: tasks/sandcastle-master.yaml
-    - name: Pip install pre-commit
-      pip:
+    - name: Install pre-commit
+      dnf:
         name: pre-commit
