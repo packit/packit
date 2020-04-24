@@ -12,9 +12,9 @@ WORKDIR ${WORKDIR}
 RUN dnf -y install ansible
 
 COPY files/tasks/*.yaml ${WORKDIR}/files/tasks/
-COPY files/install-requirements.yaml ${WORKDIR}/files/
+COPY files/install-build-deps.yaml ${WORKDIR}/files/
 COPY *.spec ${WORKDIR}/
-RUN ansible-playbook -v -c local -i localhost, ${WORKDIR}/files/install-requirements.yaml \
+RUN ansible-playbook -v -c local -i localhost, ${WORKDIR}/files/install-build-deps.yaml \
     && dnf clean all
 
 COPY ./ ${WORKDIR}/
