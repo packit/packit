@@ -78,6 +78,7 @@ class PatchGenerator:
                 if parent_commit not in commits:
                     logger.info(f"Commit {commit} has a parent behind {git_ref}.")
                     return False
+        logger.debug(f"All commits are contained on top of {git_ref}.")
         return True
 
     @staticmethod
