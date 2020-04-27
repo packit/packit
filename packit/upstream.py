@@ -580,7 +580,6 @@ class Upstream(PackitRepositoryBase):
             raise PackitSRPMNotFoundException(
                 "SRPM cannot be found, something is wrong."
             )
-        logger.info("SRPM is %s", the_srpm)
         return the_srpm
 
     def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None):
