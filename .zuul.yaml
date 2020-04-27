@@ -16,89 +16,65 @@
         - packit-pre-commit
 
 - job:
-    name: packit-pre-commit
+    name: packit-base
     parent: base
-    description: Check precommit
-    run: files/zuul-pre-commit.yaml
     extra-vars:
+      with_testing: true
       ansible_python_interpreter: /usr/bin/python3
     nodeset:
       nodes:
         - name: test-node
           label: cloud-fedora-31
+
+- job:
+    name: packit-pre-commit
+    parent: packit-base
+    description: Run pre-commit
+    run: files/zuul-pre-commit.yaml
 
 - job:
     name: packit-tests-rpm
-    parent: base
-    description: Run tests of packit via rpms
+    parent: packit-base
+    description: Run tests with dependencies installed as RPMs
     pre-run: files/zuul-install-requirements-rpms.yaml
     run: files/zuul-tests.yaml
-    extra-vars:
-      with_testing: true
-      ansible_python_interpreter: /usr/bin/python3
-    nodeset:
-      nodes:
-        - name: test-node
-          label: cloud-fedora-31
 
 - job:
     name: packit-tests-pip-deps
-    parent: base
-    description: Run tests of packit via pip installed dependencies
+    parent: packit-base
+    description: Run tests with dependencies installed from PyPI
     pre-run: files/zuul-install-requirements-pip.yaml
     run: files/zuul-tests.yaml
-    extra-vars:
-      with_testing: true
-      ansible_python_interpreter: /usr/bin/python3
-    nodeset:
-      nodes:
-        - name: test-node
-          label: cloud-fedora-31
 
 - job:
     name: packit-tests-git-master
-    parent: base
-    description: Run tests of packit via pip installed dependencies
+    parent: packit-base
+    description: Run tests with dependencies installed from git master & PyPI
     pre-run: files/zuul-install-requirements-git-master.yaml
     run: files/zuul-tests.yaml
-    extra-vars:
-      with_testing: true
-      ansible_python_interpreter: /usr/bin/python3
-    nodeset:
-      nodes:
-        - name: test-node
-          label: cloud-fedora-31
 
 - job:
     name: packit-tests-rpm-sess-rec
     parent: packit-tests-rpm
-    description: Run session recording tests of packit via rpms
+    description: Run session recording tests of packit with RPM deps
     run: files/zuul-tests-session-recording.yaml
 
 - job:
     name: packit-tests-pip-deps-sess-rec
     parent: packit-tests-pip-deps
-    description: Run session recording tests of packit via pip installed dependencies
+    description: Run session recording tests of packit with deps from PyPI
     run: files/zuul-tests-session-recording.yaml
 
 - job:
     name: packit-tests-git-master-sess-rec
     parent: packit-tests-git-master
-    description: Run session recording tests of packit via pip installed dependencies
+    description: Run session recording tests of packit with deps from git master & PyPI
     run: files/zuul-tests-session-recording.yaml
 
 - job:
     name: reverse-dep-packit-service-tests
-    parent: base
-    description: Run packit-service tests to check if we do not break packit-service
+    parent: packit-tests-pip-deps
+    description: Run packit-service tests to check we don't break it
     required-projects:
       - github.com/packit-service/packit-service
-    pre-run: files/zuul-install-requirements-pip.yaml
     run: files/zuul-reverse-dep-packit-service.yaml
-    extra-vars:
-      with_testing: true
-      ansible_python_interpreter: /usr/bin/python3
-    nodeset:
-      nodes:
-        - name: test-node
-          label: cloud-fedora-31

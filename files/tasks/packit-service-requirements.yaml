@@ -1,17 +1,24 @@
 ---
-- name: Install packit-service dependencies via ansible playbooks
+- name: Install ansible
+  dnf:
+    name:
+      - ansible
+    state: present
+  become: true
+
+- name: Install packit-service dependencies
   command: ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -v -c local -i localhost, files/install-deps.yaml
   args:
     chdir: "{{ reverse_dir }}"
   become: true
 
-- name: Install packit-service dependencies via ansible playbooks
+- name: Install packit-service test dependencies
   command: ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -v -c local -i localhost, files/recipe-tests.yaml
   args:
     chdir: "{{ reverse_dir }}"
   become: true
 
-- name: Create a config directory
+- name: Create a .config directory
   file:
     path: "{{ ansible_user_dir }}/.config"
     state: directory
