@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import pytest
 from flexmock import flexmock
@@ -652,26 +653,47 @@ def test_dist_git_package_url():
 
 
 @pytest.mark.parametrize(
-    "content",
+    "content,project,mock_spec_search,spec_path_option,spec_path",
     [
-        "---\nspecfile_path: packit.spec\n"
-        "synced_files:\n"
-        "  - packit.spec\n"
-        "  - src: .packit.yaml\n"
-        "    dest: .packit2.yaml",
-        '{"specfile_path": "packit.spec", "synced_files": ["packit.spec", '
-        '{"src": ".packit.yaml", "dest": ".packit2.yaml"}]}',
+        (
+            "synced_files:\n"
+            "  - packit.spec\n"
+            "  - src: .packit.yaml\n"
+            "    dest: .packit2.yaml",
+            GitProject(repo="", service=GitService(), namespace=""),
+            True,
+            None,
+            "packit.spec",
+        ),
+        (
+            "synced_files:\n"
+            "  - packit.spec\n"
+            "  - src: .packit.yaml\n"
+            "    dest: .packit2.yaml",
+            GitProject(repo="", service=GitService(), namespace=""),
+            False,
+            "packit.spec",
+            "packit.spec",
+        ),
     ],
 )
-def test_get_package_config_from_repo(content):
+def test_get_package_config_from_repo(
+    content,
+    project: GitProject,
+    mock_spec_search: bool,
+    spec_path: Optional[str],
+    spec_path_option: Optional[str],
+):
     gp = flexmock(GitProject)
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
-    gp.should_receive("get_files").and_return(["packit.spec"])
-    git_project = GitProject(repo="", service=GitService(), namespace="")
-    config = get_package_config_from_repo(sourcegit_project=git_project, ref="")
+    if mock_spec_search:
+        gp.should_receive("get_files").and_return(["packit.spec"]).once()
+    config = get_package_config_from_repo(
+        project=project, ref="", spec_file_path=spec_path_option
+    )
     assert isinstance(config, PackageConfig)
-    assert Path(config.specfile_path).name == "packit.spec"
+    assert config.specfile_path == spec_path
     assert config.synced_files == SyncFilesConfig(
         files_to_sync=[
             SyncFilesItem(src="packit.spec", dest="packit.spec"),
@@ -688,7 +710,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
     gp.should_receive("get_file_content").and_return(content)
     gp.should_receive("get_files").and_return(["packit.spec"])
     git_project = GitProject(repo="", service=GitService(), namespace="")
-    config = get_package_config_from_repo(sourcegit_project=git_project, ref="")
+    config = get_package_config_from_repo(project=git_project, ref="")
     assert isinstance(config, PackageConfig)
     assert Path(config.specfile_path).name == "packit.spec"
     assert config.create_pr
