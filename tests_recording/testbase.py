@@ -60,9 +60,7 @@ class PackitUnittestOgr(unittest.TestCase):
             url="https://github.com/packit-service/ogr"
         )
 
-        self.pc = get_package_config_from_repo(
-            sourcegit_project=self.project_ogr, ref="master"
-        )
+        self.pc = get_package_config_from_repo(project=self.project_ogr, ref="master")
         if not self.pc:
             raise RuntimeError("Package config not found.")
         self.dg = packit.distgit.DistGit(self.conf, self.pc)

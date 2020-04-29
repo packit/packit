@@ -303,11 +303,11 @@ def get_local_package_config(
 
 
 def get_package_config_from_repo(
-    sourcegit_project: GitProject, ref: str
+    project: GitProject, ref: str, spec_file_path: Optional[str] = None
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
-            config_file_content = sourcegit_project.get_file_content(
+            config_file_content = project.get_file_content(
                 path=config_file_name, ref=ref
             )
         except FileNotFoundError:
@@ -317,13 +317,13 @@ def get_package_config_from_repo(
             logger.debug(
                 f"Found a config file '{config_file_name}' "
                 f"on ref '{ref}' "
-                f"of the {sourcegit_project.full_repo_name} repository."
+                f"of the {project.full_repo_name} repository."
             )
             break
     else:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref '{ref}' "
-            f"of the {sourcegit_project.full_repo_name} repository."
+            f"of the {project.full_repo_name} repository."
         )
         return None
 
@@ -334,19 +334,22 @@ def get_package_config_from_repo(
         raise PackitConfigException(
             f"Cannot load package config {config_file_name!r}. {ex}"
         )
+    if not spec_file_path:
+        spec_file_path = get_specfile_path_from_repo(project=project, ref=ref)
+
     return parse_loaded_config(
         loaded_config=loaded_config,
         config_file_path=config_file_name,
-        repo_name=sourcegit_project.repo,
-        spec_file_path=get_specfile_path_from_repo(sourcegit_project, ref),
+        repo_name=project.repo,
+        spec_file_path=spec_file_path,
     )
 
 
 def parse_loaded_config(
     loaded_config: dict,
-    config_file_path: str = None,
-    repo_name: str = None,
-    spec_file_path: str = None,
+    config_file_path: Optional[str] = None,
+    repo_name: Optional[str] = None,
+    spec_file_path: Optional[str] = None,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
@@ -397,6 +400,7 @@ def get_specfile_path_from_repo(
     :return: str path of the spec file or None
     """
     spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
+
     if not spec_files:
         logger.debug(f"No spec file found in {project.full_repo_name}")
         return None
