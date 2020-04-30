@@ -1,3 +1,23 @@
+# 0.10.2
+
+* Allow avoiding the remote search for specfile
+* Rm files/tasks/install-ansible.yaml
+* Rename install-requirements.yaml to install-build-deps.yaml
+* Remove python-compile-deps.yaml from install-requirements.yaml
+* Rename install-tests-requirements.yaml to local-tests-requirements.yaml
+* Rename ogr-from-master to ogr-master
+* 'Test with deps from master' should install sandcastle from master as well
+* Pre-commit updates
+* [.zuul.yaml] Create & inherit from packit-base job
+* drop dupe log 'SRPM is ...'
+* source-git: log when commits are contained
+* upstream,get_version: log info about the git repo
+* Configure Git when preparing the Testing Farm host
+* Configure Git when running tests in Fedora
+* let tests pass in TFT
+* Simplify URLs pointing to Copr builds
+* [CHANGELOG.md] Update 0.10.1 description
+
 # 0.10.1
 
 A patch release, which fixes/improves some job metadata fields:
