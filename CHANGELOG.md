@@ -1,3 +1,9 @@
+# 0.10.2
+
+## Minor changes and fixes
+
+- Fixed test error caused by missing git configuration #794
+
 # 0.10.1
 
 A patch release, which fixes/improves some job metadata fields:
