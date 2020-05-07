@@ -109,10 +109,12 @@ def run_command(
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
 
-    logger.debug("cmd = '%s'", " ".join(cmd))
+    escaped_command = " ".join(cmd)
+
+    logger.debug(f"Command: {escaped_command}")
 
     cwd = str(cwd) if cwd else str(Path.cwd())
-    error_message = error_message or f"Command {cmd} failed."
+    error_message = error_message or f"Command {escaped_command!r} failed."
 
     # we need to pass complete env to Popen, otherwise we lose everything from os.environ
     cmd_env = os.environ
@@ -149,8 +151,7 @@ def run_command(
     stderr.join()
 
     if shell.returncode != 0:
-        logger.error("Command %s failed", shell.args)
-        logger.error("%s", error_message)
+        logger.error(f"{error_message}")
         if fail:
             stderr_output = (
                 stderr.get_output().decode() if decode else stderr.get_output()
@@ -159,10 +160,10 @@ def run_command(
                 stdout.get_output().decode() if decode else stdout.get_output()
             )
             if output:
-                logger.debug(f"Command stderr:\n{stderr_output}")
-                logger.debug(f"Command stdout:\n{stdout_output}")
+                logger.debug(f"Command stderr: {stderr_output}")
+                logger.debug(f"Command stdout: {stdout_output}")
             raise PackitCommandFailedError(
-                f"Command {shell.args!r} failed: {error_message}",
+                f"{error_message}",
                 stdout_output=stdout_output,
                 stderr_output=stderr_output,
             )
@@ -236,7 +237,7 @@ def set_logging(
     if level != logging.NOTSET:
         logger = logging.getLogger(logger_name)
         logger.setLevel(level)
-        logger.debug(f"logging set to {logging.getLevelName(level)}")
+        logger.debug(f"Logging set to {logging.getLevelName(level)}")
 
         # do not readd handlers if they are already present
         if not [x for x in logger.handlers if isinstance(x, handler_class)]:
@@ -276,10 +277,10 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
 
     # TODO: optimize cloning: single branch and last n commits?
     if is_git_repo(directory=directory):
-        logger.debug(f"Repo already exists in {directory}")
+        logger.debug(f"Repo already exists in {directory}.")
         repo = git.repo.Repo(directory)
     else:
-        logger.debug(f"Cloning repo: {url} -> {directory}")
+        logger.debug(f"Cloning repo {url} -> {directory}")
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
@@ -371,7 +372,7 @@ def git_remote_url_to_https_url(inp: str) -> str:
         return ""
     parsed = urlparse(inp)
     if parsed.scheme and parsed.scheme in ["http", "https"]:
-        logger.debug(f"Provided input {inp} is an url.")
+        logger.debug(f"Provided input {inp!r} is an url.")
         return inp
     elif "@" in inp:
         url_str = inp.replace("ssh://", "")
@@ -383,12 +384,12 @@ def git_remote_url_to_https_url(inp: str) -> str:
         try:
             urlparse(url_str)
         except Exception:
-            logger.error(f"unable to process {inp}")
+            logger.error(f"Unable to process {inp!r}.")
             raise PackitException(f"Unable to process {inp}.")
         else:
-            logger.debug(f"SSH style URL {inp} turned into HTTPS {url_str}")
+            logger.debug(f"SSH style URL {inp!r} turned into HTTPS {url_str!r}")
             return url_str
-    logger.warning(f"{inp} is not an URL we recognize")
+    logger.warning(f"{inp!r} is not an URL we recognize.")
     return ""
 
 

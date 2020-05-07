@@ -267,7 +267,9 @@ def get_local_package_config(
     cwd = Path.cwd()
 
     if try_local_dir_first and try_local_dir_last:
-        logger.error("Ambiguous usage of try_local_dir_first and try_local_dir_last")
+        logger.error(
+            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'."
+        )
 
     if try_local_dir_first:
         if cwd in directories:
@@ -288,9 +290,9 @@ def get_local_package_config(
                     loaded_config = safe_load(open(config_file_name_full))
                 except Exception as ex:
                     logger.error(
-                        f"Cannot load package config '{config_file_name_full}'."
+                        f"Cannot load package config {config_file_name_full!r}."
                     )
-                    raise PackitConfigException(f"Cannot load package config: {ex}.")
+                    raise PackitConfigException(f"Cannot load package config: {ex!r}.")
                 return parse_loaded_config(
                     loaded_config=loaded_config,
                     config_file_path=str(config_file_name),
@@ -298,7 +300,7 @@ def get_local_package_config(
                     spec_file_path=str(get_local_specfile_path(config_dir)),
                 )
 
-            logger.debug(f"The local config file '{config_file_name_full}' not found.")
+            logger.debug(f"The local config file {config_file_name_full!r} not found.")
     raise PackitConfigException("No packit config found.")
 
 
@@ -315,15 +317,15 @@ def get_package_config_from_repo(
             pass
         else:
             logger.debug(
-                f"Found a config file '{config_file_name}' "
-                f"on ref '{ref}' "
-                f"of the {project.full_repo_name} repository."
+                f"Found a config file {config_file_name!r} "
+                f"on ref {ref!r} "
+                f"of the {project.full_repo_name!r} repository."
             )
             break
     else:
         logger.warning(
-            f"No config file ({CONFIG_FILE_NAMES}) found on ref '{ref}' "
-            f"of the {project.full_repo_name} repository."
+            f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
+            f"of the {project.full_repo_name!r} repository."
         )
         return None
 
@@ -364,7 +366,7 @@ def parse_loaded_config(
         return package_config
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
-        raise PackitConfigException(f"Cannot parse package config: {ex}.")
+        raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
 
 
 def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Path]:
@@ -402,6 +404,6 @@ def get_specfile_path_from_repo(
     spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
 
     if not spec_files:
-        logger.debug(f"No spec file found in {project.full_repo_name}")
+        logger.debug(f"No spec file found in {project.full_repo_name!r}")
         return None
     return spec_files[0]
