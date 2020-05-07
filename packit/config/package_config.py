@@ -268,7 +268,7 @@ def get_local_package_config(
 
     if try_local_dir_first and try_local_dir_last:
         logger.error(
-            "Ambiguous usage of `try_local_dir_first` and `try_local_dir_last`."
+            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'."
         )
 
     if try_local_dir_first:

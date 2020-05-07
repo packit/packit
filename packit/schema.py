@@ -87,7 +87,7 @@ class FilesToSyncField(fields.Field):
             file_to_sync = SyncFilesItem(src=value, dest=value)
 
         else:
-            raise ValidationError("Invalid data provided (type str/dict required).")
+            raise ValidationError(f"'dict' or 'str' required, got {type(value)!r}.")
 
         return file_to_sync
 
@@ -108,7 +108,7 @@ class ActionField(fields.Field):
         **kwargs,
     ) -> Dict:
         if not isinstance(value, dict):
-            raise ValidationError("Invalid data provided (type dict required).")
+            raise ValidationError(f"'dict' required, got {type(value)!r}.")
 
         self.validate_all_actions(actions=list(value))
         data = {ActionName(key): val for key, val in value.items()}

@@ -99,7 +99,7 @@ class FedPKG:
                 in ex.stderr_output
             ):
                 logger.info(
-                    "The `fedpkg build` command crashed which is a known issue: "
+                    "The 'fedpkg build' command crashed which is a known issue: "
                     "the build is submitted in koji anyway."
                 )
                 logger.debug(ex.stdout_output)

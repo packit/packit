@@ -398,7 +398,7 @@ class PackitRepositoryBase:
                 )
             ]
             if any(push_failed):
-                logger.debug(f"The `push_info` flags: {pi.flags}")
+                logger.debug(f"Push flags: {pi.flags}")
                 raise PackitException(
                     f"We were unable to push to dist-git: {pi.summary}."
                 )
