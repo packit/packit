@@ -274,7 +274,7 @@ class DistGit(PackitRepositoryBase):
             f.new_sources(sources=archive_path)
         except Exception as ex:
             logger.error(
-                f"The `fedpkg new-sources` command failed for the following reason: {ex!r}"
+                f"The 'fedpkg new-sources' command failed for the following reason: {ex!r}"
             )
             raise PackitException(ex)
 

@@ -176,7 +176,7 @@ class Upstream(PackitRepositoryBase):
                 fork_username=fork_username,
             )
         except Exception as ex:
-            logger.error("There was an error while creating a PR: %r", ex)
+            logger.error(f"There was an error while creating a PR: {ex!r}")
             raise
         else:
             logger.info(f"PR created: {upstream_pr.url}")
