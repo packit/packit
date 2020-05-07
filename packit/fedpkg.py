@@ -99,8 +99,8 @@ class FedPKG:
                 in ex.stderr_output
             ):
                 logger.info(
-                    "fedpkg build command crashed which is a known issue: "
-                    "the build is submitted in koji anyway"
+                    "The `fedpkg build` command crashed which is a known issue: "
+                    "the build is submitted in koji anyway."
                 )
                 logger.debug(ex.stdout_output)
 
@@ -130,7 +130,7 @@ class FedPKG:
     def init_ticket(self, keytab: str = None):
         # TODO: this method has nothing to do with fedpkg, pull it out
         if not self.fas_username or not keytab or not Path(keytab).is_file():
-            logger.info("won't be doing kinit, no credentials provided")
+            logger.info("Won't be doing kinit, no credentials provided.")
             return
         cmd = [
             "kinit",

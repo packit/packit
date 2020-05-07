@@ -86,12 +86,12 @@ class Status:
                 self.dg.checkout_branch(branch)
                 self.dg.specfile.update_spec()
             except Exception as ex:
-                logger.debug(f"Branch {branch} is not present: {ex}")
+                logger.debug(f"Branch {branch!r} is not present: {ex!r}.")
                 continue
             try:
                 dg_versions[branch] = self.dg.specfile.get_version()
             except PackitException:
-                logger.debug(f"Can't figure out the version of branch: {branch}")
+                logger.debug(f"Can't figure out the version of branch: {branch}.")
         self.dg.checkout_branch("master")
 
         return dg_versions
@@ -111,7 +111,7 @@ class Status:
             latest_releases = self.up.local_project.git_project.get_releases()
             logger.debug("Upstream releases fetched.")
         except PackitException as e:
-            logger.debug("Failed to fetch upstream releases: %s", e)
+            logger.debug(f"Failed to fetch upstream releases: {e}")
 
         return latest_releases[:number_of_releases]
 

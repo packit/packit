@@ -135,7 +135,7 @@ class JobConfig:
             config = JobConfigSchema().load(raw_dict)
         else:  # v2
             config = JobConfigSchema(strict=True).load(raw_dict).data
-        logger.debug(config)
+        logger.debug(f"Loaded config: {config}")
 
         return config
 

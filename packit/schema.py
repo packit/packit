@@ -76,9 +76,9 @@ class FilesToSyncField(fields.Field):
         if isinstance(value, dict):
             try:
                 if not isinstance(value["src"], str):
-                    raise ValidationError("src have to be str")
+                    raise ValidationError("Field `src` should have type str.")
                 if not isinstance(value["dest"], str):
-                    raise ValidationError("dest have to be str")
+                    raise ValidationError("Field `dest` should have type str.")
                 file_to_sync = SyncFilesItem(src=value["src"], dest=value["dest"])
             except KeyError as e:
                 raise ValidationError(e.__repr__())
@@ -87,7 +87,7 @@ class FilesToSyncField(fields.Field):
             file_to_sync = SyncFilesItem(src=value, dest=value)
 
         else:
-            raise ValidationError("Invalid data provided. str/dict required")
+            raise ValidationError("Invalid data provided (type str/dict required).")
 
         return file_to_sync
 
@@ -108,7 +108,7 @@ class ActionField(fields.Field):
         **kwargs,
     ) -> Dict:
         if not isinstance(value, dict):
-            raise ValidationError("Invalid data provided. dict required")
+            raise ValidationError("Invalid data provided (type dict required).")
 
         self.validate_all_actions(actions=list(value))
         data = {ActionName(key): val for key, val in value.items()}
@@ -144,7 +144,7 @@ class NotProcessedField(fields.Field):
         data: Optional[Mapping[str, Any]],
         **kwargs,
     ):
-        logger.warning(f"{self.name} is no longer being processed.")
+        logger.warning(f"{self.name!r} is no longer being processed.")
         additional_message = self.metadata.get("additional_message")
         if additional_message:
             logger.warning(f"{additional_message}")
@@ -315,7 +315,7 @@ class PackageConfigSchema(MM23Schema):
             if old_key_value:
                 logger.warning(
                     f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
-                    f" please update your configuration file"
+                    f" please update your configuration file."
                 )
                 new_key_value = data.get(new_key_name, None)
                 if not new_key_value:
@@ -338,10 +338,14 @@ class PackageConfigSchema(MM23Schema):
             downstream_package_name = data.get("downstream_package_name", None)
             if downstream_package_name:
                 data["specfile_path"] = f"{downstream_package_name}.spec"
-                logger.info(f"Setting specfile_path to {downstream_package_name}.spec")
+                logger.info(
+                    f"Setting `specfile_path` to {downstream_package_name}.spec."
+                )
             else:
                 # guess it?
-                logger.info("Neither specfile_path nor downstream_package_name set.")
+                logger.info(
+                    "Neither `specfile_path` nor `downstream_package_name` set."
+                )
         return data
 
     @post_load
