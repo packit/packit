@@ -110,7 +110,7 @@ class Upstream(PackitRepositoryBase):
         :return: name of the branch where we pushed
         """
         logger.debug(
-            f"About to {'force ' if force else ''}push changes to branch {branch_name}."
+            f"About to {'force ' if force else ''}push changes to branch {branch_name!r}."
         )
         fork_username = None
 
@@ -130,23 +130,25 @@ class Upstream(PackitRepositoryBase):
                 for remote in self.local_project.git_repo.remotes:
                     pushurl = next(remote.urls)  # afaik this is what git does as well
                     if ssh_url.startswith(pushurl):
-                        logger.info(f"Will use remote {remote} using URL {pushurl}.")
+                        logger.info(
+                            f"Will use remote {remote!r} using URL {pushurl!r}."
+                        )
                         remote_name = str(remote)
                         break
                 else:
-                    logger.info(f"Creating remote fork-ssh with URL {ssh_url}.")
+                    logger.info(f"Creating remote fork-ssh with URL {ssh_url!r}.")
                     self.local_project.git_repo.create_remote(
                         name="fork-ssh", url=ssh_url
                     )
             else:
                 # push to origin and hope for the best
                 remote_name = "origin"
-        logger.info(f"Pushing to remote {remote_name} using branch {branch_name}.")
+        logger.info(f"Pushing to remote {remote_name!r} using branch {branch_name!r}.")
         try:
             self.push(refspec=branch_name, force=force, remote_name=remote_name)
         except git.GitError as ex:
             msg = (
-                f"Unable to push to remote {remote_name} using branch {branch_name}, "
+                f"Unable to push to remote {remote_name!r} using branch {branch_name!r}, "
                 f"the error is:\n{ex}"
             )
             raise PackitException(msg)
@@ -174,7 +176,7 @@ class Upstream(PackitRepositoryBase):
                 fork_username=fork_username,
             )
         except Exception as ex:
-            logger.error("there was an error while create a PR: %r", ex)
+            logger.error(f"There was an error while creating a PR: {ex!r}")
             raise
         else:
             logger.info(f"PR created: {upstream_pr.url}")
@@ -239,11 +241,11 @@ class Upstream(PackitRepositoryBase):
         spec_ver = version.parse(self.get_specfile_version())
 
         if ups_ver > spec_ver:
-            logger.warning(f"Version '{spec_ver}' in spec file is outdated")
-            logger.info(f"Picking version '{ups_ver}' from upstream registry.")
+            logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
+            logger.info(f"Picking version {ups_ver!r} from upstream registry.")
             return str(ups_ver)
 
-        logger.info(f"Picking version '{spec_ver}' found in spec file.")
+        logger.info(f"Picking version {spec_ver!r} found in spec file.")
         return str(spec_ver)
 
     def get_current_version(self) -> str:
@@ -259,7 +261,8 @@ class Upstream(PackitRepositoryBase):
             return action_output[-1].strip()
 
         logger.debug(
-            f"We're about to git-describe the upstream repository: {self.local_project.working_dir}"
+            f"We're about to `git-describe` the upstream repository "
+            f"{self.local_project.working_dir}."
         )
         logger.debug(f"Content: {os.listdir(self.local_project.working_dir)}")
 
@@ -271,7 +274,7 @@ class Upstream(PackitRepositoryBase):
         if tags:
             tag_list = tags.split("\n")
             logger.debug(
-                f"The repo has {len(tag_list)} tags and the latest is {tag_list[-1]}"
+                f"The repo has {len(tag_list)} tags and the latest is {tag_list[-1]!r}"
             )
         else:
             logger.warning(
@@ -283,12 +286,12 @@ class Upstream(PackitRepositoryBase):
             return_output=True,
             cwd=self.local_project.working_dir,
         ).strip()
-        logger.debug(f"version: {ver}")
+        logger.debug(f"Version: {ver}")
 
         if "-" in ver:
             # RPM refuses dashes in version/release
             ver = ver.replace("-", ".")
-            logger.debug(f"sanitized version: {ver}")
+            logger.debug(f"Sanitized version: {ver}")
 
         return ver
 
@@ -304,7 +307,7 @@ class Upstream(PackitRepositoryBase):
             or self.package_config.downstream_package_name
         )
         dir_name = f"{package_name}-{version}"
-        logger.debug("name + version = %s", dir_name)
+        logger.debug(f"Name + version = {dir_name}")
 
         env = {
             "PACKIT_PROJECT_VERSION": version,
@@ -386,7 +389,7 @@ class Upstream(PackitRepositoryBase):
                     # File too long
                     if ex.errno == 36:
                         logger.error(
-                            f"Skipping long output command output while getting archive name"
+                            f"Skipping long output command output while getting archive name."
                         )
                         continue
                     raise ex
@@ -417,7 +420,7 @@ class Upstream(PackitRepositoryBase):
         try:
             git_des_out = run_command(git_des_command, output=True).strip()
         except PackitCommandFailedError as ex:
-            logger.info(f"Exception while describing the repository: {ex}")
+            logger.info(f"Exception while describing the repository: {ex!r}")
             # probably no tags in the git repo
             git_desc_suffix = ""
         else:
@@ -431,7 +434,7 @@ class Upstream(PackitRepositoryBase):
         release = f"{original_release_number}.{current_time}{git_desc_suffix}"
 
         msg = f"- Development snapshot ({commit})"
-        logger.debug(f"Setting Release in spec to {release!r}")
+        logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
         self.specfile.set_spec_version(
@@ -441,7 +444,7 @@ class Upstream(PackitRepositoryBase):
     def _fix_spec_prep(self, version):
         prep = self.specfile.spec_content.section("%prep")
         if not prep:
-            logger.warning("this package doesn't have a %prep section")
+            logger.warning("This package doesn't have a %prep section.")
             return
 
         # stolen from tito, thanks!
@@ -453,8 +456,8 @@ class Upstream(PackitRepositoryBase):
                 break
         else:
             logger.error(
-                "this package is not using %(auto)setup macro in prep, "
-                "packit can't work in this environment"
+                "This package is not using %(auto)setup macro in prep, "
+                "packit can't work in this environment."
             )
             return
 
@@ -472,7 +475,7 @@ class Upstream(PackitRepositoryBase):
             )
         new_setup_line += f" -n {self.package_config.upstream_package_name}-{version}"
         logger.debug(
-            f"new {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
+            f"New {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
             f" line:\n{new_setup_line}"
         )
         prep[idx] = new_setup_line
@@ -532,10 +535,10 @@ class Upstream(PackitRepositoryBase):
             f"_buildrootdir {rpmbuild_dir}",
             self.package_config.specfile_path,
         ]
-        escaped_command = " ".join([f'"{cmd_part}"' for cmd_part in cmd])
+        escaped_command = " ".join(cmd)
         logger.debug(f"SRPM build command: {escaped_command}")
         present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
-        logger.debug(f"present srpms: {present_srpms}")
+        logger.debug(f"Present SRPMs: {present_srpms}")
         try:
             out = self.command_handler.run_command(cmd, return_output=True).strip()
         except PackitCommandFailedError as ex:
@@ -571,7 +574,7 @@ class Upstream(PackitRepositoryBase):
         :param output: output of the `rpmbuild -bs` command
         :return: the name of the SRPM file
         """
-        logger.debug(f"{output}")
+        logger.debug(f"The `rpmbuild` command output: {output}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
         reg = r": (.+\.src\.rpm)$"
         try:
@@ -737,7 +740,7 @@ class Upstream(PackitRepositoryBase):
             self.package_config.specfile_path,
         ]
 
-        escaped_command = " ".join([f'"{cmd_part}"' for cmd_part in cmd])
+        escaped_command = " ".join(cmd)
         logger.debug(f"RPM build command: {escaped_command}")
         try:
             out = self.command_handler.run_command(cmd, return_output=True).strip()
@@ -769,7 +772,7 @@ class Upstream(PackitRepositoryBase):
         :param output: output of the `rpmbuild -bb` command
         :return: the names of the RPM files
         """
-        logger.debug(f"{output}")
+        logger.debug(f"The `rpmbuild` command output: {output}")
         reg = r": (.+\.rpm)"
         logger.debug(re.findall(reg, output))
         rpms = re.findall(reg, output)

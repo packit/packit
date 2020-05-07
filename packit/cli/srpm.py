@@ -73,4 +73,4 @@ def srpm(
     """
     api = get_packit_api(config=config, local_project=path_or_url)
     srpm_path = api.create_srpm(output_file=output, upstream_ref=upstream_ref)
-    logger.info("SRPM: %s", srpm_path)
+    logger.info(f"SRPM: {srpm_path}")

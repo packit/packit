@@ -57,7 +57,7 @@ class CoprHelper:
             )
             # make sure or project has chroots set correctly
             if set(copr_proj.chroot_repos.keys()) != set(chroots):
-                logger.info(f"Updating targets on project {owner}/{project}")
+                logger.info(f"Updating targets on project '{owner}/{project}'")
                 logger.debug(f"old = {set(copr_proj.chroot_repos.keys())}")
                 logger.debug(f"new = {set(chroots)}")
                 self.copr_client.project_proxy.edit(
@@ -73,7 +73,7 @@ class CoprHelper:
                     f"Copr project {owner}/{project} not found."
                 ) from ex
 
-            logger.info(f"Copr project {owner}/{project} not found. Creating new.")
+            logger.info(f"Copr project '{owner}/{project}' not found. Creating new.")
             self.create_copr_project(chroots, description, instructions, owner, project)
 
     def create_copr_project(self, chroots, description, instructions, owner, project):
@@ -112,7 +112,7 @@ class CoprHelper:
     ) -> str:
         """ returns copr build state """
         watch_end = datetime.now() + timedelta(seconds=timeout)
-        logger.debug(f"Watching copr build {build_id}")
+        logger.debug(f"Watching copr build {build_id}.")
         state_reported = ""
         while True:
             build = self.copr_client.build_proxy.get(build_id)
@@ -133,10 +133,10 @@ class CoprHelper:
                     url=self.copr_web_build_url(build),
                 )
             if gh_state != "pending":
-                logger.debug(f"state is now {gh_state}, ending the watch")
+                logger.debug(f"State is now {gh_state}, ending the watch.")
                 return state_reported
             if datetime.now() > watch_end:
-                logger.error(f"the build did not finish in time ({timeout}s)")
+                logger.error(f"The build did not finish in time ({timeout}s).")
                 report_func("error", "Build watch timeout")
                 return state_reported
             time.sleep(10)

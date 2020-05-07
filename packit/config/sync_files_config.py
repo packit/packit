@@ -56,7 +56,7 @@ class SyncFilesConfig:
             config = SyncFilesConfigSchema().load(raw_dict)
         else:  # v2
             config = SyncFilesConfigSchema(strict=True).load(raw_dict).data
-        logger.debug(config)
+        logger.debug(f"Loaded config: {config}")
 
         return config
 

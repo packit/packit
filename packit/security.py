@@ -88,7 +88,7 @@ class CommitVerifier:
 
         try:
             for keyserver in self.key_servers:
-                logger.debug(f"Downloading {key_fingerprint} from {keyserver}")
+                logger.debug(f"Downloading {key_fingerprint!r} from {keyserver!r}.")
                 result = self.gpg.recv_keys(keyserver, key_fingerprint)
                 if result.fingerprints:
                     return result.fingerprints[0]
@@ -127,7 +127,7 @@ class CommitVerifier:
 
         is_valid = self.is_commit_signature_valid(commit)
         if not is_valid:
-            logger.warning("Commit {commit.hexsha!r} signature is not valid.")
+            logger.warning(f"Commit {commit.hexsha!r} signature is not valid.")
         return is_valid
 
     def is_commit_signature_valid(self, commit: git.Commit) -> bool:
@@ -137,10 +137,10 @@ class CommitVerifier:
         """
         commit_status = self.get_commit_signature_status(commit)
         if commit_status in VALID_SIGNATURE_STATUSES:
-            logger.debug(f"Commit '{commit.hexsha}' signature is valid.")
+            logger.debug(f"Commit {commit.hexsha!r} signature is valid.")
             return True
 
-        logger.warning(f"Commit '{commit.hexsha}' signature is not valid.")
+        logger.warning(f"Commit {commit.hexsha!r} signature is not valid.")
         return False
 
     @staticmethod

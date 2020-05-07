@@ -147,13 +147,13 @@ class DistGit(PackitRepositoryBase):
 
         :param branch_name: name of the branch to check out and fetch
         """
-        logger.debug(f"About to update branch {branch_name!r}")
+        logger.debug(f"About to update branch {branch_name!r}.")
         origin = self.local_project.git_repo.remote("origin")
         origin.fetch()
         try:
             head = self.local_project.git_repo.heads[branch_name]
         except IndexError:
-            raise PackitException(f"Branch {branch_name} does not exist")
+            raise PackitException(f"Branch {branch_name!r} does not exist.")
         try:
             remote_ref = origin.refs[branch_name]
         except IndexError:
@@ -210,7 +210,7 @@ class DistGit(PackitRepositoryBase):
         """
         logger.debug(
             "About to create dist-git pull request "
-            f"from {source_branch} to {target_branch}"
+            f"from {source_branch!r} to {target_branch!r}."
         )
         project = self.local_project.git_project
 
@@ -241,7 +241,7 @@ class DistGit(PackitRepositoryBase):
         :return: name of the archive, e.g. sen-0.6.1.tar.gz
         """
         archive_name = self.specfile.get_archive()
-        logger.debug(f"Upstream archive name is {archive_name!r}")
+        logger.debug(f"Upstream archive name: {archive_name}")
         return archive_name
 
     def download_upstream_archive(self) -> Path:
@@ -265,7 +265,7 @@ class DistGit(PackitRepositoryBase):
         Upload files (archive) to the lookaside cache.
         """
         # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
-        logger.info("About to upload to lookaside cache")
+        logger.info("About to upload to lookaside cache.")
         f = FedPKG(
             fas_username=self.config.fas_user, directory=self.local_project.working_dir
         )
@@ -273,7 +273,9 @@ class DistGit(PackitRepositoryBase):
         try:
             f.new_sources(sources=archive_path)
         except Exception as ex:
-            logger.error(f"'fedpkg new-sources' failed for the following reason: {ex}")
+            logger.error(
+                f"The 'fedpkg new-sources' command failed for the following reason: {ex!r}"
+            )
             raise PackitException(ex)
 
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
@@ -285,13 +287,13 @@ class DistGit(PackitRepositoryBase):
             )
             if res.ok:
                 logger.info(
-                    f"Archive {archive_name} found in lookaside cache (skipping upload)."
+                    f"Archive {archive_name!r} found in lookaside cache (skipping upload)."
                 )
                 return True
-            logger.debug(f"Archive {archive_name} not found in the lookaside cache.")
+            logger.debug(f"Archive {archive_name!r} not found in the lookaside cache.")
         except requests.exceptions.BaseHTTPError:
             logger.warning(
-                f"Error trying to find {archive_name} in the lookaside cache."
+                f"Error trying to find {archive_name!r} in the lookaside cache."
             )
         return False
 
@@ -326,7 +328,7 @@ class DistGit(PackitRepositoryBase):
         koji_builds: Sequence[str] = None,
     ):
         logger.debug(
-            f"About to create a Bodhi update of type {update_type} from {dist_git_branch}"
+            f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
         # https://github.com/fedora-infra/bodhi/issues/3058
         from bodhi.client.bindings import BodhiClient, BodhiClientException
@@ -340,7 +342,7 @@ class DistGit(PackitRepositoryBase):
             builds_str = "\n".join(f" - {b}" for b in builds_d)
             logger.debug(
                 "Koji builds for package "
-                f"{self.package_config.downstream_package_name}: \n{builds_str}"
+                f"{self.package_config.downstream_package_name!r}: \n{builds_str}"
             )
 
             koji_tag = f"{dist_git_branch}-updates-candidate"
@@ -349,12 +351,12 @@ class DistGit(PackitRepositoryBase):
                 koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
                 logger.info(
                     "Koji builds for package "
-                    f"{self.package_config.downstream_package_name} and koji tag {koji_tag}:"
+                    f"{self.package_config.downstream_package_name!r} and koji tag {koji_tag}:"
                     f"\n{koji_builds_str}"
                 )
             except KeyError:
                 raise PackitException(
-                    f"There is no build for {self.package_config.downstream_package_name} "
+                    f"There is no build for {self.package_config.downstream_package_name!r} "
                     f"in koji tag {koji_tag}"
                 )
         # I was thinking of verifying that the build is valid for a new bodhi update

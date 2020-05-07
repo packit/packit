@@ -80,8 +80,8 @@ class Specfile(SpecFile):
             self.update_changelog_in_spec(changelog_entry)
 
         except RebaseHelperError as ex:
-            logger.error(f"rebase-helper failed to change the spec file: {ex!r}")
-            raise PackitException("rebase-helper didn't do the job")
+            logger.error(f"Rebase-helper failed to change the spec file: {ex!r}")
+            raise PackitException("Rebase-helper didn't do the job.")
 
     def write_spec_content(self):
         if hasattr(self, "_write_spec_content"):
@@ -124,7 +124,7 @@ class Specfile(SpecFile):
         """
         indexes = [p.index for p in self.get_applied_patches()]
         if indexes:
-            logger.debug(f"About to remove all %patch from %prep")
+            logger.debug(f"About to remove all %patch from %prep.")
             self._process_patches(comment_out=indexes)
 
     @saves
@@ -137,7 +137,7 @@ class Specfile(SpecFile):
         if not patch_list:
             return
 
-        logger.debug(f"About to add patches {patch_list} to specfile")
+        logger.debug(f"About to add patches {patch_list} to specfile.")
         if [t.name for t in self.tags.filter(name="Patch*")]:
             raise PackitException(
                 "This specfile already contains patches, please remove them."
@@ -165,7 +165,7 @@ class Specfile(SpecFile):
         # insert new content below last Source
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
 
-        logger.info(f"{len(patch_list)} patches added to {self.path}")
+        logger.info(f"{len(patch_list)} patches added to {self.path!r}.")
 
     @saves
     def ensure_pnum(self, pnum: int = 1) -> None:
@@ -174,7 +174,7 @@ class Specfile(SpecFile):
 
         :param pnum: use other prefix number than default 1
         """
-        logger.debug(f"Making sure we apply patches with -p{pnum}")
+        logger.debug(f"Making sure we apply patches with -p{pnum}.")
         prep_lines = self.spec_content.section("%prep")
 
         for i, line in enumerate(prep_lines):
