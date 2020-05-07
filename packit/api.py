@@ -168,7 +168,7 @@ class PackitAPI:
             )
 
             # fetch and reset --hard upstream/$branch?
-            logger.info(f"Using {dist_git_branch!r} dist-git branch")
+            logger.info(f"Using {dist_git_branch!r} dist-git branch.")
             self.dg.update_branch(dist_git_branch)
             self.dg.checkout_branch(dist_git_branch)
 
@@ -183,7 +183,7 @@ class PackitAPI:
             )
 
             path = os.path.join(self.dg.local_project.working_dir, "README.packit")
-            logger.debug(f"Path of README {path}")
+            logger.debug(f"Path of README: {path}")
             with open(path, "w") as f:
                 f.write(SYNCING_NOTE.format(packit_version=get_packit_version()))
 
@@ -281,7 +281,7 @@ class PackitAPI:
             raise PackitException("Dist-git branch is not set.")
         if not upstream_branch:
             raise PackitException("Upstream branch is not set.")
-        logger.info(f"upstream active branch {self.up.active_branch}")
+        logger.info(f"Upstream active branch: {self.up.active_branch}")
 
         if not force and self.up.is_dirty():
             raise PackitException(
@@ -290,7 +290,7 @@ class PackitAPI:
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
 
-        logger.info(f'using "{dist_git_branch}" dist-git branch')
+        logger.info(f"Using {dist_git_branch!r} dist-git branch.")
 
         if no_pr:
             self.up.checkout_branch(upstream_branch)
@@ -314,7 +314,7 @@ class PackitAPI:
         if not no_pr:
             description = f"Downstream commit: {self.dg.local_project.commit_hexsha}\n"
 
-            commit_msg = f"sync from downstream branch {dist_git_branch!r}"
+            commit_msg = f"Sync from downstream branch {dist_git_branch!r}"
             pr_title = f"Update from downstream branch {dist_git_branch!r}"
 
             self.up.commit(title=commit_msg, msg=description)
@@ -419,10 +419,8 @@ class PackitAPI:
         :param koji_builds: list of koji builds or None (and pick latest)
         """
         logger.debug(
-            "create bodhi update, builds=%s, dg_branch=%s, type=%s",
-            koji_builds,
-            dist_git_branch,
-            update_type,
+            f"Create bodhi update, "
+            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}"
         )
         self.dg.create_bodhi_update(
             koji_builds=koji_builds,
@@ -676,7 +674,10 @@ class PackitAPI:
             description=description,
             instructions=instructions,
         )
-        logger.debug(f"owner={owner}, project={project}, path={srpm_path}")
+        logger.debug(
+            f"Submitting a build to copr build system,"
+            f"owner={owner}, project={project}, path={srpm_path}"
+        )
 
         build = self.copr_helper.copr_client.build_proxy.create_from_file(
             ownername=owner, projectname=project, path=srpm_path

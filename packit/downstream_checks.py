@@ -78,5 +78,5 @@ def get_check_by_name(name: str) -> DownstreamCheck:
     try:
         return checks[name]()
     except KeyError:
-        logger.error("no such check %s", name)
-        raise RuntimeError("There is no such downstream check: %s", name)
+        logger.error(f"No such check: {name}")
+        raise RuntimeError(f"There is no such downstream check: {name}")

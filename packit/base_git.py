@@ -61,7 +61,7 @@ class PackitRepositoryBase:
     @property
     def handler_kls(self):
         if self._handler_kls is None:
-            logger.debug("command handler = %s", self.config.command_handler)
+            logger.debug(f"Command handler: {self.config.command_handler}")
             self._handler_kls = RUN_COMMAND_HANDLER_MAPPING[self.config.command_handler]
         return self._handler_kls
 
@@ -117,7 +117,7 @@ class PackitRepositoryBase:
         origin = self.local_project.git_repo.remote("origin")
         if branch_name in self.local_project.git_repo.branches:
             logger.debug(
-                f"It seems that branch {branch_name} already exists, checking it out."
+                f"It seems that branch {branch_name!r} already exists, checking it out."
             )
             head = self.local_project.git_repo.branches[branch_name]
         else:
@@ -127,7 +127,9 @@ class PackitRepositoryBase:
             if branch_name in origin.refs:
                 remote_ref = origin.refs[branch_name]
             else:
-                raise PackitException("Remote origin doesn't have ref %s" % branch_name)
+                raise PackitException(
+                    f"Remote origin doesn't have ref {branch_name!r}."
+                )
             # this is important to fedpkg: build can't find the tracking branch otherwise
             head.set_tracking_branch(remote_ref)
 
@@ -149,7 +151,7 @@ class PackitRepositoryBase:
         """
         Perform `git add -A` and `git commit`
         """
-        logger.debug("About to add all & commit")
+        logger.debug("About to add all & commit.")
         main_msg = f"{prefix}{title}"
         # add files to index in case some are untracked
         # untracked files don't make a git repo dirty, unless they are staged
@@ -328,7 +330,7 @@ class PackitRepositoryBase:
         for s in package_section:
             if s.startswith("URL:"):
                 url = s[4:].strip()
-                logger.debug(f"Upstream project URL = {url}")
+                logger.debug(f"Upstream project URL: {url}")
                 return url
         return None
 
@@ -343,7 +345,7 @@ class PackitRepositoryBase:
             commit=last_commit, possible_key_fingerprints=self.allowed_gpg_keys
         )
         if not valid:
-            msg = f"Last commit '{last_commit.hexsha}' not signed by the authorized gpg key."
+            msg = f"Last commit {last_commit.hexsha!r} not signed by the authorized gpg key."
             logger.warning(msg)
             raise PackitException(msg)
 
@@ -376,12 +378,14 @@ class PackitRepositoryBase:
 
     def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
         """ push selected refspec to a git remote """
-        logger.info(f"pushing changes to remote {remote_name} using refspec {refspec}")
+        logger.info(
+            f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}."
+        )
         push_infos_list: Iterable[PushInfo] = self.local_project.push(
             refspec, remote_name=remote_name, force=force
         )
         for pi in push_infos_list:
-            logger.info(f"push summary: {pi.summary}")
+            logger.info(f"Push summary: {pi.summary}")
             push_failed = [
                 bool(x & pi.flags)
                 for x in (
@@ -394,7 +398,7 @@ class PackitRepositoryBase:
                 )
             ]
             if any(push_failed):
-                logger.debug(f"push_info flags: {pi.flags}")
+                logger.debug(f"The `push_info` flags: {pi.flags}")
                 raise PackitException(
                     f"We were unable to push to dist-git: {pi.summary}."
                 )

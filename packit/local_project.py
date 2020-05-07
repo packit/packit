@@ -180,19 +180,19 @@ class LocalProject:
         current_head = self._get_ref_from_git_repo()
         if ref:
             logger.debug(
-                f"Leaving old ref: '{current_head}' and checkout new ref: '{ref}'"
+                f"Leaving old ref {current_head!r} and checkout new ref {ref!r}"
             )
             if ref not in self.git_repo.refs:
                 if not is_a_git_ref(self.git_repo, ref):
                     raise PackitException(
-                        f"Git ref '{ref}' not found, cannot checkout."
+                        f"Git ref {ref!r} not found, cannot checkout."
                     )
                 ref = self.git_repo.commit(ref).hexsha
             self.git_repo.git.checkout(ref)
         yield
         if ref:
             logger.debug(
-                f"Leaving new ref: '{ref}' and checkout old ref: '{current_head}'"
+                f"Leaving new ref {ref!r} and checkout old ref {current_head!r}"
             )
             self.git_repo.git.checkout(current_head)
 
@@ -209,7 +209,7 @@ class LocalProject:
             change = True
 
         if change:
-            logger.debug(f"Parsed full repo name {self.namespace}/{self.repo_name}.")
+            logger.debug(f"Parsed full repo name '{self.namespace}/{self.repo_name}'.")
         return change
 
     def _parse_git_repo_from_working_dir(self) -> bool:
@@ -217,17 +217,19 @@ class LocalProject:
         Get the repo from the self.working_dir (clone self.git_url if it is not a git repo)
         """
         if self.working_dir and not self.git_repo:
-            logger.debug("working_dir is set and git_repo is not: let's discover...")
+            logger.debug(
+                "`working_dir` is set and `git_repo` is not: let's discover..."
+            )
             if is_git_repo(directory=self.working_dir):
                 logger.debug("It's a git repo!")
                 self.git_repo = git.Repo(path=self.working_dir)
                 return True
 
             elif self.git_url and not self.offline:
+                self.git_repo = get_repo(url=self.git_url, directory=self.working_dir)
                 logger.debug(
                     f"We just cloned git repo {self.git_url} to {self.working_dir}."
                 )
-                self.git_repo = get_repo(url=self.git_url, directory=self.working_dir)
                 return True
 
         return False
@@ -244,7 +246,7 @@ class LocalProject:
             self.git_project = self.git_service.get_project(
                 repo=self.repo_name, namespace=self.namespace
             )
-            logger.debug(f"Parsed project {self.namespace}/{self.repo_name}.")
+            logger.debug(f"Parsed project '{self.namespace}/{self.repo_name}'.")
             return True
         return False
 
@@ -260,7 +262,7 @@ class LocalProject:
     def _parse_ref_from_git_repo(self):
         if self.git_repo and not self._ref:
             self._ref = self._get_ref_from_git_repo()
-            logger.debug(f"Parsed ref {self._ref} from the repo {self.git_repo}.")
+            logger.debug(f"Parsed ref {self._ref!r} from the repo {self.git_repo}.")
             return bool(self._ref)
         return False
 
@@ -282,7 +284,7 @@ class LocalProject:
         ):
             self.git_repo = get_repo(url=self.git_url)
             self.working_dir_temporary = True
-            logger.debug(f"Parsed repo {self.git_repo} from url {self.git_url}.")
+            logger.debug(f"Parsed repo {self.git_repo} from url {self.git_url!r}.")
             return True
         return False
 
@@ -290,7 +292,7 @@ class LocalProject:
         if self.git_project and not self.git_url and not self.offline:
             self.git_url = self.git_project.get_git_urls()["git"]
             logger.debug(
-                f"Parsed remote url {self.git_url} from the project {self.git_project}."
+                f"Parsed remote url {self.git_url!r} from the project {self.git_project}."
             )
             return True
         return False
@@ -303,7 +305,7 @@ class LocalProject:
                     "Repo name should have been set but isn't, this is bug!"
                 )
             logger.debug(
-                f"Parsed repo name {self.repo_name} from the git project {self.git_project}."
+                f"Parsed repo name {self.repo_name!r} from the git project {self.git_project}."
             )
             return True
         return False
@@ -312,7 +314,7 @@ class LocalProject:
         if self.git_project and not self.namespace:
             self.namespace = self.git_project.namespace
             logger.debug(
-                f"Parsed namespace {self.namespace} from the project {self.git_project}."
+                f"Parsed namespace {self.namespace!r} from the project {self.git_project}."
             )
             return True
         return False
@@ -334,7 +336,7 @@ class LocalProject:
                 # Repo has no remotes
                 return False
             logger.debug(
-                f"Parsed remote url {self.git_url} from the repo {self.git_repo}."
+                f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}."
             )
             return True
         return False
@@ -353,7 +355,7 @@ class LocalProject:
             )
             logger.debug(
                 f"Parsed namespace and repo name ({self.namespace}, {self.repo_name}) "
-                f"from url {self.git_url}."
+                f"from url {self.git_url!r}."
             )
             return True
         return False
@@ -391,7 +393,7 @@ class LocalProject:
         try:
             self.git_repo.git.checkout(version)
         except Exception as ex:
-            raise PackitException(f"Cannot checkout release tag: {ex}.")
+            raise PackitException(f"Cannot checkout release tag: {ex!r}.")
 
     def push(
         self, refspec: str, remote_name: str = "origin", force: bool = False

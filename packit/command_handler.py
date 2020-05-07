@@ -49,7 +49,7 @@ class CommandHandler:
 
     def clean(self):
         """ clean up the mess after we're done """
-        logger.info("nothing to clean")
+        logger.info("Nothing to clean.")
 
 
 @add_run_command
@@ -114,7 +114,7 @@ class SandcastleCommandHandler(CommandHandler):
         )
         sandcastle.run()
         try:
-            logger.info("running command: %s", command)
+            logger.info(f"Running command: {' '.join(command)}")
             out = sandcastle.exec(command=command)
             if return_output:
                 return out

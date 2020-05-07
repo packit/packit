@@ -76,9 +76,9 @@ class PatchGenerator:
         for commit in islice(commits, 1, None):  # 0 = upstream, don't check that one
             for parent_commit in commit.parents:
                 if parent_commit not in commits:
-                    logger.info(f"Commit {commit} has a parent behind {git_ref}.")
+                    logger.info(f"Commit {commit!r} has a parent behind {git_ref!r}.")
                     return False
-        logger.debug(f"All commits are contained on top of {git_ref}.")
+        logger.debug(f"All commits are contained on top of {git_ref!r}.")
         return True
 
     @staticmethod
@@ -106,10 +106,10 @@ class PatchGenerator:
         )
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         target_branch = f"packit-patches-{current_time}"
-        logger.info(f"Switch branch to {target_branch}")
+        logger.info(f"Switch branch to {target_branch!r}.")
         run_command(["git", "checkout", "-B", target_branch])
         target = f"{git_ref}..HEAD"
-        logger.debug(f"Linearize history {target}")
+        logger.debug(f"Linearize history {target}.")
         # https://stackoverflow.com/a/17994534/909579
         # With this command we will rewrite git history of our newly created branch
         # by dropping the merge commits and setting parent commits to those from target branch
@@ -187,7 +187,7 @@ class PatchGenerator:
                             patch_list.append((Path(patch_name), msg))
                             break
             else:
-                logger.warning(f"No patches between {git_ref} and {self.lp.ref}")
+                logger.warning(f"No patches between {git_ref!r} and {self.lp.ref!r}")
 
             return patch_list
         finally:
@@ -218,7 +218,7 @@ class PatchGenerator:
             upstream_ref = f"origin/{git_ref}"
             if upstream_ref not in self.lp.git_repo.refs:
                 raise Exception(
-                    f"Upstream {upstream_ref} branch nor {git_ref} tag not found."
+                    f"Upstream {upstream_ref!r} branch nor {git_ref!r} tag not found."
                 )
 
         commits = list(

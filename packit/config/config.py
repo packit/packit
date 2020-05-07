@@ -127,8 +127,8 @@ class Config:
                 try:
                     loaded_config = safe_load(open(config_file_name_full))
                 except Exception as ex:
-                    logger.error(f"Cannot load user config '{config_file_name_full}'.")
-                    raise PackitException(f"Cannot load user config: {ex}.")
+                    logger.error(f"Cannot load user config {config_file_name_full!r}.")
+                    raise PackitException(f"Cannot load user config: {ex!r}.")
                 break
         return Config.get_from_dict(raw_dict=loaded_config)
 
@@ -138,7 +138,7 @@ class Config:
         from packit.schema import UserConfigSchema
 
         config = UserConfigSchema().load(raw_dict)
-        logger.debug(config)
+        logger.debug(f"Loaded config: {config}")
 
         return config
 
@@ -203,7 +203,7 @@ class Config:
                 url=url, custom_instances=self.services, **get_project_kwargs
             )
         except OgrException as ex:
-            msg = f"Authentication for url '{url}' is missing in the config."
+            msg = f"Authentication for url {url!r} is missing in the config."
             logger.warning(msg)
             raise PackitConfigException(msg, ex)
         return project
