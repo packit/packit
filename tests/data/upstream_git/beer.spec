@@ -1,5 +1,7 @@
 %global upstream_name beerware
 
+# some change
+
 Name:           beer
 Version:        0.1.0
 Release:        1%{?dist}
