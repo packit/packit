@@ -364,6 +364,7 @@ class PackitRepositoryBase:
         this_changelog = self.specfile.spec_content.section("%changelog")
         this_version = self.specfile.get_version()
         self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
+        self.specfile.save()
         self.specfile.spec_content.replace_section("%changelog", this_changelog)
         self.specfile.set_version(this_version)
         self.specfile.save()
