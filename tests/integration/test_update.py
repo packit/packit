@@ -23,8 +23,8 @@ import subprocess
 from pathlib import Path
 
 import pytest
-
 from flexmock import flexmock
+
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
@@ -86,6 +86,15 @@ def test_basic_local_update_using_distgit(
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
     assert spec.get_version() == "0.1.0"
+
+    package_section = spec.spec_content.section("%package")
+
+    assert package_section[2] == "# some change"
+    assert package_section[4] == "Name:           beer"
+    assert package_section[5] == "Version:        0.1.0"
+    assert package_section[6] == "Release:        1%{?dist}"
+    assert package_section[7] == "Summary:        A tool to make you happy"
+
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
     changelog = "\n".join(spec.spec_content.section("%changelog"))
