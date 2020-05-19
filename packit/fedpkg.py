@@ -25,8 +25,8 @@ from typing import Optional
 
 from packit.exceptions import PackitCommandFailedError
 
-from packit import utils  # so we can mock utils
-from packit.utils import logger
+from packit.utils import commands  # so we can mock utils
+from packit.utils.logging import logger
 
 
 class FedPKG:
@@ -56,7 +56,7 @@ class FedPKG:
         if not Path(self.directory).is_dir():
             raise Exception("Cannot access fedpkg repository:")
 
-        return utils.run_command_remote(
+        return commands.run_command_remote(
             cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
             error_message="Adding new sources failed:",
@@ -90,7 +90,7 @@ class FedPKG:
             cmd += ["--srpm", str(srpm_path)]
 
         try:
-            utils.run_command_remote(
+            commands.run_command_remote(
                 cmd=cmd,
                 cwd=self.directory,
                 error_message="Submission of build to koji failed.",
@@ -131,4 +131,4 @@ class FedPKG:
             "from Fedora dist-git - this may require SSH keys set up or "
             "Kerberos ticket being active."
         )
-        utils.run_command(cmd=cmd, error_message=error_msg)
+        commands.run_command(cmd=cmd, error_message=error_msg)

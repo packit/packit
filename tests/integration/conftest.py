@@ -41,7 +41,7 @@ from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.integration.utils import remove_gpg_key_pair
 from tests.spellbook import (
     get_test_config,

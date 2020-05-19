@@ -25,7 +25,7 @@ Functional tests for srpm command
 """
 from pathlib import Path
 
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit
 from tests.spellbook import build_srpm
 

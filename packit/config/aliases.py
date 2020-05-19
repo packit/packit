@@ -23,7 +23,7 @@
 from typing import Dict, List, Set
 
 from packit.exceptions import PackitException
-from packit.utils import run_command
+from packit.utils.commands import run_command
 
 ALIASES: Dict[str, List[str]] = {
     "fedora-development": ["fedora-rawhide"],

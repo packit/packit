@@ -29,12 +29,12 @@ from flexmock import flexmock
 from pkg_resources import DistributionNotFound, Distribution
 
 from packit.exceptions import PackitException, ensure_str
-from packit.utils import (
+from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
-    run_command,
-    get_packit_version,
 )
+from packit.utils.commands import run_command
+from packit.utils.version import get_packit_version
 
 
 @pytest.mark.parametrize(

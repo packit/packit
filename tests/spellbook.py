@@ -32,7 +32,7 @@ from click.testing import CliRunner
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
-from packit.utils import cwd, run_command
+from packit.utils.commands import cwd, run_command
 
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"

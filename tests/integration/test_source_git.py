@@ -24,7 +24,7 @@ import subprocess
 from pathlib import Path
 
 from packit.specfile import Specfile
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import (
     TARBALL_NAME,

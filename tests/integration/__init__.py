@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from packit.utils import set_logging
+from packit.utils.logging import set_logging
 
 # debug logs from packit while testing
 set_logging(level=10)
