@@ -4,6 +4,8 @@
 
 ## Elevator pitch
 
+test
+
 Packit is a CLI tool that helps developers auto-package upstream projects
 into Fedora operating system.
 You can use packit to continously build your upstream project in Fedora.
