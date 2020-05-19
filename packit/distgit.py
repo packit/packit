@@ -28,8 +28,8 @@ from typing import Optional, Sequence, List
 import cccolutils
 import git
 import requests
-from ogr.abstract import PullRequest
 
+from ogr.abstract import PullRequest
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
@@ -269,7 +269,6 @@ class DistGit(PackitRepositoryBase):
         f = FedPKG(
             fas_username=self.config.fas_user, directory=self.local_project.working_dir
         )
-        f.init_ticket(self.config.keytab_path)
         try:
             f.new_sources(sources=archive_path)
         except Exception as ex:
@@ -317,7 +316,6 @@ class DistGit(PackitRepositoryBase):
         fpkg = FedPKG(
             fas_username=self.fas_user, directory=self.local_project.working_dir
         )
-        fpkg.init_ticket(self.config.keytab_path)
         fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_bodhi_update(

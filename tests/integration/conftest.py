@@ -27,9 +27,9 @@ from pathlib import Path
 from typing import Iterator
 
 import pytest
+from flexmock import flexmock
 from gnupg import GPG
 
-from flexmock import flexmock
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
@@ -38,8 +38,8 @@ from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
-from packit.specfile import Specfile
 from packit.local_project import LocalProject
+from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils import cwd
 from tests.integration.utils import remove_gpg_key_pair
@@ -159,7 +159,8 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         if not Path(sources).is_file():
             raise RuntimeError("archive does not exist")
 
-    flexmock(FedPKG, init_ticket=lambda x=None: None, new_sources=mocked_new_sources)
+    flexmock(FedPKG, new_sources=mocked_new_sources)
+    flexmock(PackitAPI, init_kerberos_ticket=lambda: None)
     pc = get_local_package_config(str(upstream))
     pc.dist_git_clone_path = str(distgit)
     pc.upstream_project_url = str(upstream)
