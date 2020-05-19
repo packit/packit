@@ -37,7 +37,7 @@ from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.update import update
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
-from packit.utils import set_logging
+from packit.utils.logging import set_logging
 
 logger = logging.getLogger("packit")
 

@@ -35,7 +35,7 @@ from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.spellbook import UP_COCKPIT_OSTREE, initiate_git_repo, get_test_config
 
 

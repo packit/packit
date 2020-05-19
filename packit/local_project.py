@@ -30,7 +30,7 @@ import git
 from ogr.abstract import GitProject, GitService
 from ogr.parsing import parse_git_repo
 from packit.exceptions import PackitException
-from packit.utils import is_git_repo, get_repo, is_a_git_ref
+from packit.utils.repo import is_git_repo, get_repo, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 

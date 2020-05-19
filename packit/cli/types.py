@@ -26,7 +26,7 @@ import os
 import click
 
 from packit.local_project import LocalProject
-from packit.utils import git_remote_url_to_https_url
+from packit.utils.repo import git_remote_url_to_https_url
 
 logger = logging.getLogger(__name__)
 

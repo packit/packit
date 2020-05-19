@@ -42,7 +42,7 @@ from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
-from packit.utils import cwd
+from packit.utils.commands import cwd
 
 logger = logging.getLogger(__name__)
 

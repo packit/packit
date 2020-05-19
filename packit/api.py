@@ -36,7 +36,6 @@ from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 from tabulate import tabulate
 
 from ogr.abstract import PullRequest
-from packit import utils
 from packit.actions import ActionName
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
@@ -57,7 +56,9 @@ from packit.local_project import LocalProject
 from packit.status import Status
 from packit.sync import sync_files
 from packit.upstream import Upstream
-from packit.utils import assert_existence, get_packit_version
+from packit.utils import commands
+from packit.utils.extensions import assert_existence
+from packit.utils.version import get_packit_version
 
 logger = logging.getLogger(__name__)
 
@@ -811,7 +812,7 @@ class PackitAPI:
             self.config.keytab_path,
         ]
 
-        utils.run_command_remote(
+        commands.run_command_remote(
             cmd=cmd,
             error_message="Failed to init kerberos ticket:",
             fail=True,

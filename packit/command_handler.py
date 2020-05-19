@@ -24,7 +24,7 @@ import logging
 from pathlib import Path
 from typing import Dict, Type, List, Optional, Union
 
-from packit import utils
+from packit.utils import commands
 from packit.config import RunCommandType, Config
 from packit.local_project import LocalProject
 
@@ -93,7 +93,7 @@ class LocalCommandHandler(CommandHandler):
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
         """
-        return utils.run_command(
+        return commands.run_command(
             cmd=command,
             cwd=cwd or self.local_project.working_dir,
             output=return_output,
