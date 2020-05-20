@@ -126,19 +126,3 @@ class FedPKG:
             f"SSH keys set up or Kerberos ticket being active."
         )
         utils.run_command(cmd=cmd, error_message=error_msg)
-
-    def init_ticket(self, keytab: str = None):
-        # TODO: this method has nothing to do with fedpkg, pull it out
-        if not self.fas_username or not keytab or not Path(keytab).is_file():
-            logger.info("Won't be doing kinit, no credentials provided.")
-            return
-        cmd = [
-            "kinit",
-            f"{self.fas_username}@FEDORAPROJECT.ORG",
-            "-k",
-            "-t",
-            keytab,
-        ]
-        return utils.run_command_remote(
-            cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
-        )

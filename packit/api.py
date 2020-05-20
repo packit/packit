@@ -28,14 +28,15 @@ import asyncio
 import logging
 import os
 import shutil
-import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
-from ogr.abstract import PullRequest
+import sys
 from tabulate import tabulate
 
+from ogr.abstract import PullRequest
+from packit import utils
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig
 from packit.constants import SYNCING_NOTE
@@ -361,6 +362,7 @@ class PackitAPI:
                     make_new_sources = True
             if make_new_sources:
                 archive = self.dg.download_upstream_archive()
+                self.init_kerberos_ticket()
                 self.dg.upload_to_lookaside_cache(str(archive))
 
     def build(
@@ -381,6 +383,7 @@ class PackitAPI:
         :param from_upstream: build directly from the upstream checkout?
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
+        self.init_kerberos_ticket()
 
         if from_upstream:
             srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
@@ -741,6 +744,30 @@ class PackitAPI:
                 self.push_bodhi_update(update["alias"])
             else:
                 logger.debug(f"{update['alias']} is not ready to be pushed to stable")
+
+    def init_kerberos_ticket(self) -> None:
+        """
+        Initialize the kerberos ticket if we have fas_user and keytab_path configured.
+        """
+        if (
+            not self.config.fas_user
+            or not self.config.keytab_path
+            or not Path(self.config.keytab_path).is_file()
+        ):
+            logger.info("Won't be doing kinit, no credentials provided.")
+            return
+
+        cmd = [
+            "kinit",
+            f"{self.config.fas_user}@FEDORAPROJECT.ORG",
+            "-k",
+            "-t",
+            self.config.keytab_path,
+        ]
+
+        utils.run_command_remote(
+            cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
+        )
 
     def clean(self):
         """ clean up stuff once all the work is done """

@@ -29,13 +29,13 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 
+from packit import utils
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
 from packit.utils import cwd
-from packit import utils
 from tests.spellbook import UP_COCKPIT_OSTREE, initiate_git_repo, get_test_config
 
 
@@ -65,7 +65,8 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         if not Path(sources).is_file():
             raise RuntimeError("archive does not exist")
 
-    flexmock(FedPKG, init_ticket=lambda x=None: None, new_sources=mocked_new_sources)
+    flexmock(FedPKG, new_sources=mocked_new_sources)
+    flexmock(PackitAPI, init_kerberos_ticket=lambda: None)
 
     flexmock(
         DistGit,
