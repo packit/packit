@@ -24,8 +24,8 @@ from typing import Dict, List, Set
 from packit.exceptions import PackitException
 
 ALIASES: Dict[str, List[str]] = {
-    "fedora-development": ["fedora-rawhide", "fedora-32"],
-    "fedora-stable": ["fedora-30", "fedora-31"],
+    "fedora-development": ["fedora-rawhide"],
+    "fedora-stable": ["fedora-30", "fedora-31", "fedora-32"],
     "fedora-all": ["fedora-rawhide", "fedora-30", "fedora-31", "fedora-32"],
 }
 ARCHITECTURE_LIST: List[str] = [
