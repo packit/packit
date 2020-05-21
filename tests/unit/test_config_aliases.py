@@ -12,9 +12,9 @@ from packit.exceptions import PackitException
         ("fedora-rawhide", {"fedora-rawhide"}),
         ("openmandriva-rolling", {"openmandriva-rolling"}),
         ("opensuse-leap-15.0", {"opensuse-leap-15.0"}),
-        ("fedora-stable", {"fedora-30", "fedora-31"}),
-        ("fedora-development", {"fedora-rawhide", "fedora-32"}),
-        ("fedora-all", {"fedora-rawhide", "fedora-30", "fedora-31", "fedora-32"}),
+        ("fedora-stable", {"fedora-31", "fedora-32"}),
+        ("fedora-development", {"fedora-rawhide"}),
+        ("fedora-all", {"fedora-rawhide", "fedora-31", "fedora-32"}),
         ("centos-stream", {"centos-stream"}),
     ],
 )
@@ -25,8 +25,8 @@ def test_get_versions(name, versions):
 @pytest.mark.parametrize(
     "names,versions",
     [
-        (["fedora-29", "fedora-stable"], {"fedora-29", "fedora-30", "fedora-31"}),
-        (["fedora-30", "fedora-stable"], {"fedora-30", "fedora-31"}),
+        (["fedora-30", "fedora-stable"], {"fedora-30", "fedora-31", "fedora-32"},),
+        (["fedora-31", "fedora-stable"], {"fedora-31", "fedora-32"}),
     ],
 )
 def test_get_versions_from_multiple_values(names, versions):
@@ -44,21 +44,16 @@ def test_get_versions_from_multiple_values(names, versions):
         ("opensuse-leap-15.0", {"opensuse-leap-15.0-x86_64"}),
         ("centos-stream", {"centos-stream-x86_64"}),
         ("centos-stream-x86_64", {"centos-stream-x86_64"}),
-        ("fedora-stable", {"fedora-30-x86_64", "fedora-31-x86_64"}),
-        ("fedora-development", {"fedora-rawhide-x86_64", "fedora-32-x86_64"}),
+        ("fedora-stable", {"fedora-31-x86_64", "fedora-32-x86_64"}),
+        ("fedora-development", {"fedora-rawhide-x86_64"}),
         ("fedora-29-x86_64", {"fedora-29-x86_64"}),
         ("fedora-29-aarch64", {"fedora-29-aarch64"}),
         ("fedora-29-i386", {"fedora-29-i386"}),
-        ("fedora-stable-aarch64", {"fedora-30-aarch64", "fedora-31-aarch64"}),
-        ("fedora-development-aarch64", {"fedora-rawhide-aarch64", "fedora-32-aarch64"}),
+        ("fedora-stable-aarch64", {"fedora-31-aarch64", "fedora-32-aarch64"},),
+        ("fedora-development-aarch64", {"fedora-rawhide-aarch64"}),
         (
             "fedora-all",
-            {
-                "fedora-rawhide-x86_64",
-                "fedora-30-x86_64",
-                "fedora-31-x86_64",
-                "fedora-32-x86_64",
-            },
+            {"fedora-rawhide-x86_64", "fedora-31-x86_64", "fedora-32-x86_64"},
         ),
     ],
 )
@@ -81,10 +76,10 @@ def test_get_build_targets_invalid_input():
     "names,versions",
     [
         (
-            ["fedora-29", "fedora-stable"],
-            {"fedora-29-x86_64", "fedora-30-x86_64", "fedora-31-x86_64"},
+            ["fedora-30", "fedora-stable"],
+            {"fedora-30-x86_64", "fedora-31-x86_64", "fedora-32-x86_64"},
         ),
-        (["fedora-30", "fedora-stable"], {"fedora-30-x86_64", "fedora-31-x86_64"}),
+        (["fedora-31", "fedora-stable"], {"fedora-31-x86_64", "fedora-32-x86_64"},),
     ],
 )
 def test_get_build_targets_from_multiple_values(names, versions):
@@ -99,13 +94,13 @@ def test_get_build_targets_from_multiple_values(names, versions):
         ("rawhide", {"master"}),
         ("master", {"master"}),
         ("f30", {"f30"}),
-        ("fedora-development", {"master", "f32"}),
-        ("fedora-stable", {"f30", "f31"}),
+        ("fedora-development", {"master"}),
+        ("fedora-stable", {"f31", "f32"}),
         ("epel-7", {"epel7"}),
         ("epel7", {"epel7"}),
         ("el6", {"el6"}),
         ("epel-6", {"el6"}),
-        ("fedora-all", {"master", "f30", "f31", "f32"}),
+        ("fedora-all", {"master", "f31", "f32"}),
     ],
 )
 def test_get_branches(name, branches):
@@ -115,8 +110,8 @@ def test_get_branches(name, branches):
 @pytest.mark.parametrize(
     "names,versions",
     [
-        (["fedora-29", "fedora-stable"], {"f29", "f30", "f31"}),
-        (["fedora-30", "fedora-stable"], {"f30", "f31"}),
+        (["fedora-30", "fedora-stable"], {"f30", "f31", "f32"}),
+        (["fedora-31", "fedora-stable"], {"f31", "f32"}),
     ],
 )
 def test_get_branches_from_multiple_values(names, versions):
