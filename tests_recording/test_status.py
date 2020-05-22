@@ -24,16 +24,18 @@ import unittest
 import pkg_resources
 
 from packit.status import Status
-from requre.storage import DataMiner, DataTypes
+from requre.cassette import DataTypes
 from tests_recording.testbase import PackitUnittestOgr
 
 
 @unittest.skip("Not working yet")
 class TestStatus(PackitUnittestOgr):
     def setUp(self):
-        DataMiner.key = f'github-{pkg_resources.get_distribution("PyGithub").version}'
-        DataMiner.data_type = DataTypes.Dict
         super().setUp()
+        self.cassette.data_miner.key = (
+            f'github-{pkg_resources.get_distribution("PyGithub").version}'
+        )
+        self.cassette.data_miner.data_type = DataTypes.Dict
         self.status = Status(self.conf, self.pc, self.upstream, self.dg)
 
     def test_status(self):
