@@ -22,6 +22,7 @@
 from typing import Dict, List, Set
 
 from packit.exceptions import PackitException
+from packit.utils import run_command
 
 ALIASES: Dict[str, List[str]] = {
     "fedora-development": ["fedora-rawhide"],
@@ -48,6 +49,9 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     :param default: used if no positional argument was given
     :return: set of string containing system name and version
     """
+    if not default and not name:
+        return set()
+
     names = list(name) or [default]
     versions: Set[str] = set()
     for one_name in names:
@@ -64,6 +68,9 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     :param default: used if no positional argument was given
     :return: set of build targets
     """
+    if not default and not name:
+        return set()
+
     names = list(name) or [default]
     possible_sys_and_versions: Set[str] = set([])
     for one_name in names:
@@ -114,6 +121,9 @@ def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     :param default: used if no positional argument was given
     :return: set of dist-git branch names
     """
+    if not default and not name:
+        return set()
+
     names = list(name) or [default]
     branches = set()
 
@@ -138,3 +148,37 @@ def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
             branches.add(sys_and_version)
 
     return branches
+
+
+def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+    if not default and not name:
+        return set()
+
+    names = list(name) or [default]
+    targets = set()
+
+    for sys_and_version in get_versions(*names):
+        if sys_and_version == "fedora-rawhide":
+            targets.add("rawhide")
+        elif sys_and_version.startswith("fedora"):
+            sys, version = sys_and_version.rsplit("-", maxsplit=1)
+            targets.add(f"f{version}")
+        elif sys_and_version.startswith("el") and sys_and_version[2:].isnumeric():
+            targets.add(f"epel{sys_and_version[2:]}")
+        elif sys_and_version.startswith("epel"):
+            split = sys_and_version.rsplit("-", maxsplit=1)
+            if len(split) == 2:
+                sys, version = split
+                if version.isnumeric():
+                    targets.add(f"epel{version}")
+                    continue
+            targets.add(sys_and_version)
+        else:
+            # We don't know, let's leave the original name.
+            targets.add(sys_and_version)
+
+    return targets
+
+
+def get_all_koji_targets() -> List[str]:
+    return run_command(["koji", "list-targets", "--quiet"], output=True).split()
