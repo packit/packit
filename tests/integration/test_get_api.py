@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 
+from packit.api import PackitAPI
 from packit.cli import utils
 from packit.cli.utils import get_packit_api
 from packit.local_project import LocalProject
@@ -54,11 +55,29 @@ def test_url_is_upstream():
 @pytest.mark.parametrize(
     "remotes,package_config,is_upstream",
     [
-        ([], flexmock(upstream_project_url=None, dist_git_base_url=None), True),
-        ([], flexmock(upstream_project_url="some-url", dist_git_base_url=None), True),
+        (
+            [],
+            flexmock(
+                upstream_project_url=None, dist_git_base_url=None, synced_files=None
+            ),
+            True,
+        ),
+        (
+            [],
+            flexmock(
+                upstream_project_url="some-url",
+                dist_git_base_url=None,
+                synced_files=None,
+            ),
+            True,
+        ),
         (
             [("origin", "https://github.com/packit-service/ogr.git")],
-            flexmock(upstream_project_url="some-url", dist_git_base_url=None),
+            flexmock(
+                upstream_project_url="some-url",
+                dist_git_base_url=None,
+                synced_files=None,
+            ),
             True,
         ),
         (
@@ -66,6 +85,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url=None,
+                synced_files=None,
             ),
             True,
         ),
@@ -74,6 +94,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url=None,
+                synced_files=None,
             ),
             True,
         ),
@@ -82,6 +103,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
+                synced_files=None,
             ),
             False,
         ),
@@ -90,6 +112,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url="src.fedoraproject.org",
+                synced_files=None,
             ),
             False,
         ),
@@ -98,6 +121,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url=None,
                 dist_git_base_url="https://src.fedoraproject.org",
+                synced_files=None,
             ),
             False,
         ),
@@ -106,6 +130,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url=None,
                 dist_git_base_url="https://src.fedoraproject.org",
+                synced_files=None,
             ),
             False,
         ),
@@ -114,6 +139,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
+                synced_files=None,
             ),
             True,
         ),
@@ -125,6 +151,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
+                synced_files=None,
             ),
             True,
         ),
@@ -147,4 +174,6 @@ def test_get_api(tmpdir, remotes, package_config, is_upstream):
     if is_upstream:
         assert api.upstream_local_project
     else:
+        flexmock(PackitAPI).should_receive("_run_kinit").once()
         assert api.downstream_local_project
+        assert api.dg

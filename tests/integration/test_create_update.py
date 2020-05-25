@@ -290,6 +290,7 @@ def test_basic_bodhi_update(
     from bodhi.client.bindings import BodhiClient
 
     u, d, api = api_instance
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(
         BodhiClient,
