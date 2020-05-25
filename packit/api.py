@@ -75,6 +75,7 @@ class PackitAPI:
         self._up = None
         self._dg = None
         self._copr_helper: Optional[CoprHelper] = None
+        self._kerberos_initialized = False
 
     @property
     def up(self):
@@ -89,6 +90,7 @@ class PackitAPI:
     @property
     def dg(self):
         if self._dg is None:
+            self.init_kerberos_ticket()
             self._dg = DistGit(
                 config=self.config,
                 package_config=self.package_config,
@@ -748,6 +750,17 @@ class PackitAPI:
     def init_kerberos_ticket(self) -> None:
         """
         Initialize the kerberos ticket if we have fas_user and keytab_path configured.
+
+        The `kinit` command is run only once when called multiple times.
+        """
+        if self._kerberos_initialized:
+            return
+        self._run_kinit()
+        self._kerberos_initialized = True
+
+    def _run_kinit(self) -> None:
+        """
+        Run `kinit` if we have fas_user and keytab_path configured.
         """
         if (
             not self.config.fas_user
