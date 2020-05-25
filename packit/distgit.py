@@ -1,7 +1,6 @@
 # MIT License
 #
 # Copyright (c) 2018-2019 Red Hat, Inc.
-
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -19,15 +18,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
-import os
-import tempfile
-from pathlib import Path
-from typing import Optional, Sequence, List
 
 import cccolutils
 import git
+import logging
+import os
 import requests
+import tempfile
+from pathlib import Path
+from typing import Optional, Sequence, List
 
 from ogr.abstract import PullRequest
 from packit.base_git import PackitRepositoryBase
@@ -92,7 +91,6 @@ class DistGit(PackitRepositoryBase):
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
                 f = FedPKG(fas_username=self.fas_user, directory=tmpdir)
-                f.init_ticket(self.config.keytab_path)
                 f.clone(
                     self.package_config.downstream_package_name,
                     tmpdir,

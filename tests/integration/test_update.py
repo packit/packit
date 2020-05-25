@@ -61,6 +61,7 @@ def test_basic_local_update(
     """ basic propose-update test: mock remote API, use local upstream and dist-git """
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     api.sync_release("master", "0.1.0")
 
