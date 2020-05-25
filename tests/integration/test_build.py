@@ -31,12 +31,14 @@ def test_basic_build(
     cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
 ):
     u, d, api = api_instance
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     flexmock(utils).should_receive("run_command_remote").with_args(
         cmd=["fedpkg", "build", "--scratch", "--nowait", "--target", "asdqwe"],
         cwd=api.dg.local_project.working_dir,
         error_message="Submission of build to koji failed.",
         fail=True,
     ).once()
+
     api.build("master", scratch=True, nowait=True, koji_target="asdqwe")
 
 
