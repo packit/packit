@@ -1,7 +1,15 @@
 import pytest
 
-from packit.config.aliases import get_versions, get_build_targets, get_branches, ALIASES
+from packit.config.aliases import (
+    get_versions,
+    get_build_targets,
+    get_branches,
+    ALIASES,
+    get_koji_targets,
+    get_all_koji_targets,
+)
 from packit.exceptions import PackitException
+from tests.spellbook import ALL_KOJI_TARGETS_SNAPSHOT
 
 
 @pytest.mark.parametrize(
@@ -27,10 +35,15 @@ def test_get_versions(name, versions):
     [
         (["fedora-30", "fedora-stable"], {"fedora-30", "fedora-31", "fedora-32"},),
         (["fedora-31", "fedora-stable"], {"fedora-31", "fedora-32"}),
+        ([], {"fedora-31", "fedora-32"}),
     ],
 )
 def test_get_versions_from_multiple_values(names, versions):
     assert get_versions(*names) == versions
+
+
+def test_get_versions_empty_without_default():
+    assert get_versions(default=None) == set()
 
 
 @pytest.mark.parametrize(
@@ -70,6 +83,10 @@ def test_get_build_targets_invalid_input():
         f", packit understands values like these: '{list(ALIASES.keys())}'."
     )
     assert str(ex.value) == err_msg
+
+
+def test_get_build_targets_without_default():
+    assert get_build_targets(default=None) == set()
 
 
 @pytest.mark.parametrize(
@@ -116,3 +133,53 @@ def test_get_branches(name, branches):
 )
 def test_get_branches_from_multiple_values(names, versions):
     assert get_branches(*names) == versions
+
+
+def test_get_branches_without_default():
+    assert get_branches(default=None) == set()
+
+
+@pytest.mark.parametrize("target", ALL_KOJI_TARGETS_SNAPSHOT)
+def test_preserve_koji_targets_single(target):
+    assert {target} == get_koji_targets(target)
+
+
+def test_preserve_all_koji_targets_together():
+    assert set(ALL_KOJI_TARGETS_SNAPSHOT) == get_koji_targets(
+        *ALL_KOJI_TARGETS_SNAPSHOT
+    )
+
+
+@pytest.mark.parametrize(
+    "name,targets",
+    [
+        ("fedora-29", {"f29"}),
+        ("fedora-rawhide", {"rawhide"}),
+        ("rawhide", {"rawhide"}),
+        ("master", {"master"}),
+        ("f30", {"f30"}),
+        ("fedora-development", {"rawhide"}),
+        ("fedora-stable", {"f31", "f32"}),
+        ("epel-7", {"epel7"}),
+        ("epel7", {"epel7"}),
+        ("el6", {"epel6"}),
+        ("epel-6", {"epel6"}),
+        ("fedora-all", {"rawhide", "f31", "f32"}),
+        ("epel-all", {"epel6", "epel7", "epel8"}),
+    ],
+)
+def test_get_koji_targets(name, targets):
+    assert get_koji_targets(name) == targets
+
+
+def test_get_koji_targets_without_default():
+    assert get_koji_targets(default=None) == set()
+
+
+def test_get_all_koji_targets():
+    targets = get_all_koji_targets()
+    assert targets
+    assert "Name" not in targets
+    assert "rawhide" in targets
+    assert "epel8" in targets
+    assert all(isinstance(target, str) for target in targets)
