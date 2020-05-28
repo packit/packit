@@ -1,3 +1,16 @@
+# 0.11.0
+
+## Features
+
+- Fedora 32 is now part of the `fedora-stable` alias and Fedora 30 is no longer included in the stable variant.
+- There is an `epel-all` alias available.
+
+## Minor changes and fixes
+
+- The logs which packit produces are now more consistent and have unified format.
+- When doing `propose-update` while upstream and downstream spec files differ, it could happen that the downstream spec would not be processed correctly. This is now fixed, for more info see [packit#828](https://github.com/packit-service/packit/issues/828).
+- Kerberos-related code was re-organized for sake of the upcoming koji work - this shouldn't affect any functionality.
+
 # 0.10.2
 
 ## Minor changes and fixes
