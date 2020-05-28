@@ -44,6 +44,7 @@ class JobType(Enum):
     pull_request_action = "pull_request_action"
     copr_build_finished = "copr_build_finished"
     copr_build_started = "copr_build_started"
+    create_bugzilla = "create_bugzilla"
 
 
 class JobConfigTriggerType(Enum):
