@@ -10,6 +10,7 @@
         - python3-tox
         - python3-pytest
         - python3-flexmock
+        - python3-setuptools_scm
         - make
         - krb5-devel
         - rpm-libs
