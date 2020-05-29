@@ -22,6 +22,7 @@
 
 import json
 import logging
+from copy import deepcopy
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
@@ -118,6 +119,8 @@ class PackageConfig:
         ]
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
+        # so we can reuse it for job.overrides
+        self.raw_dict: Optional[Dict] = None
 
         if kwargs:
             logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
@@ -145,6 +148,11 @@ class PackageConfig:
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}')"
         )
+
+    def set_job_overrides(self, job: JobConfig):
+        d = deepcopy(self.raw_dict)
+        d.update(job.overrides)
+        self.__dict__ = PackageConfig.get_from_dict(d).__dict__
 
     @property
     def downstream_project_url(self) -> str:
@@ -190,6 +198,7 @@ class PackageConfig:
         if "jobs" not in raw_dict:
             package_config.jobs = default_jobs
 
+        package_config.raw_dict = raw_dict
         logger.debug(package_config)
         return package_config
 
