@@ -121,8 +121,9 @@ class FedPKG:
         cmd += [package_name, target_path]
 
         error_msg = (
-            f"Packit failed to clone the repository {package_name}; please make sure that you"
-            f"authorized to clone repositories from fedora dist-git - this may require"
-            f"SSH keys set up or Kerberos ticket being active."
+            f"Packit failed to clone the repository {package_name}; "
+            "please make sure that you are authorized to clone repositories "
+            "from Fedora dist-git - this may require SSH keys set up or "
+            "Kerberos ticket being active."
         )
         utils.run_command(cmd=cmd, error_message=error_msg)
