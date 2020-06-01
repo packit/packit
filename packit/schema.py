@@ -238,6 +238,7 @@ class JobConfigSchema(Schema):
     job = EnumField(JobType, required=True)
     trigger = EnumField(JobConfigTriggerType, required=True)
     metadata = fields.Nested(JobMetadataSchema)
+    overrides = fields.Dict()
 
     @post_load
     def make_instance(self, data, **_):
