@@ -101,6 +101,13 @@ $ pip3 install --user packitos
 You can also install packit from master branch, if you are brave enough:
 
 ```
+$ dnf copr enable packit/packit-master
+$ dnf install packit
+```
+
+Or
+
+```
 $ pip3 install --user git+https://github.com/packit-service/packit.git
 ```
 
