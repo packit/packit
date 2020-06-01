@@ -101,9 +101,9 @@ class CoprHelper:
                 # delete project after the specified period of time
                 delete_after_days=60,
                 instructions=instructions
-                or "You can check out the upstream project"
-                f"{self.upstream_local_project.git_url} to find out how to consume these"
-                "builds. This copr project is created and handled by the packit project"
+                or "You can check out the upstream project "
+                f"{self.upstream_local_project.git_url} to find out how to consume these builds. "
+                f"This copr project is created and handled by the packit project "
                 "(https://packit.dev/).",
             )
         except CoprException as ex:
