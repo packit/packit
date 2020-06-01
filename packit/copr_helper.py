@@ -1,8 +1,8 @@
 import logging
-import time
 from datetime import datetime, timedelta
-from typing import Callable, List
+from typing import Callable, List, Optional
 
+import time
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException, CoprException
 from munch import Munch
@@ -24,13 +24,13 @@ class CoprHelper:
         return CoprClient.create_from_config_file()
 
     @property
-    def copr_client(self):
+    def copr_client(self) -> CoprClient:
         if self._copr_client is None:
             self._copr_client = self.get_copr_client()
         return self._copr_client
 
     @property
-    def configured_owner(self):
+    def configured_owner(self) -> Optional[str]:
         return self.copr_client.config.get("username")
 
     def copr_web_build_url(self, build: Munch) -> str:
@@ -76,7 +76,14 @@ class CoprHelper:
             logger.info(f"Copr project '{owner}/{project}' not found. Creating new.")
             self.create_copr_project(chroots, description, instructions, owner, project)
 
-    def create_copr_project(self, chroots, description, instructions, owner, project):
+    def create_copr_project(
+        self,
+        chroots: List[str],
+        description: str,
+        instructions: str,
+        owner: str,
+        project: str,
+    ) -> None:
 
         try:
             self.copr_client.project_proxy.add(
