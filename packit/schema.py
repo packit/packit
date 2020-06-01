@@ -19,17 +19,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping
 
-from marshmallow import (
-    Schema,
-    fields,
-    post_load,
-    pre_load,
-    ValidationError,
-)
+from marshmallow import Schema, fields, post_load, pre_load, ValidationError, post_dump
 
 try:
     from marshmallow import __version_info__
@@ -64,7 +57,7 @@ class FilesToSyncField(fields.Field):
     """
 
     def _serialize(self, value: Any, attr: str, obj: Any, **kwargs):
-        raise NotImplementedError
+        return {"src": value.src, "dest": value.dest}
 
     def _deserialize(
         self,
@@ -98,7 +91,7 @@ class ActionField(fields.Field):
     """
 
     def _serialize(self, value: Any, attr: str, obj: Any, **kwargs):
-        raise NotImplementedError
+        return {action_name.value: val for action_name, val in value.items()}
 
     def _deserialize(
         self,
@@ -128,7 +121,7 @@ class ActionField(fields.Field):
 
 class NotProcessedField(fields.Field):
     """
-    Field class to mark fields which wil not be processed, only generates warning.
+    Field class to mark fields which will not be processed, only generates warning.
     Can be passed additional message via additional_message parameter.
 
     :param str additional_message: additional warning message to be displayed
@@ -168,6 +161,17 @@ class MM23Schema(Schema):
         else:  # v2
             result = super().load(*args, **kwargs).data
         return result
+
+    def dump(self, *args, **kwargs):
+        if MM3:
+            result = super().dump(*args, **kwargs)
+        else:  # v2
+            result = super().dump(*args, **kwargs).data
+        return result
+
+    @post_dump
+    def remove_none_values(self, data, **kwargs):
+        return {key: value for key, value in data.items() if value is not None}
 
 
 # TODO: inherit from MM23Schema
@@ -228,6 +232,10 @@ class JobMetadataSchema(Schema):
     def make_instance(self, data, **_):
         return JobMetadataConfig(**data)
 
+    @post_dump
+    def remove_none_values(self, data, **kwargs):
+        return {key: value for key, value in data.items() if value is not None}
+
 
 # TODO: inherit from MM23Schema
 class JobConfigSchema(Schema):
@@ -235,15 +243,14 @@ class JobConfigSchema(Schema):
     Schema for processing JobConfig config data.
     """
 
-    job = EnumField(JobType, required=True)
+    job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
     metadata = fields.Nested(JobMetadataSchema)
     overrides = fields.Dict()
 
     @post_load
     def make_instance(self, data, **_):
-        type = data.pop("job")
-        return JobConfig(type=type, **data)
+        return JobConfig(**data)
 
 
 class PullRequestNotificationsSchema(Schema):
@@ -279,7 +286,8 @@ class PackageConfigSchema(MM23Schema):
     upstream_ref = fields.String()
     upstream_tag_template = fields.String()
     dist_git_url = NotProcessedField(
-        additional_message="it is generated from dist_git_base_url and downstream_package_name"
+        additional_message="it is generated from dist_git_base_url and downstream_package_name",
+        load_only=True,
     )
     dist_git_base_url = fields.String()
     dist_git_namespace = fields.String()
