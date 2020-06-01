@@ -30,3 +30,10 @@ jobs:
     metadata:
       targets:
         - fedora-stable # on rawhide we have problems with the new marshmallow
+  - job: copr_build
+    trigger: commit
+    metadata:
+      branch: master
+      targets:
+        - fedora-stable
+      project: packit-master
