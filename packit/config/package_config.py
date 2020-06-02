@@ -150,9 +150,12 @@ class PackageConfig:
         )
 
     def set_job_overrides(self, job: JobConfig):
-        d = deepcopy(self.raw_dict)
-        d.update(job.overrides)
-        self.__dict__ = PackageConfig.get_from_dict(d).__dict__
+        """ get job.overrides and overlay them over the current package_config """
+        if job.overrides:
+            # this is actually pretty expensive to do, so let's do it only when really needed
+            d = deepcopy(self.raw_dict)
+            d.update(job.overrides)
+            self.__dict__ = PackageConfig.get_from_dict(d).__dict__
 
     @property
     def downstream_project_url(self) -> str:
