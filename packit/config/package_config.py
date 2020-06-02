@@ -184,7 +184,7 @@ class PackageConfig:
         if config_file_path and not raw_dict.get("config_file_path", None):
             raw_dict.update(config_file_path=config_file_path)
 
-        package_config = PackageConfigSchema().load(raw_dict)
+        package_config = PackageConfigSchema().load_config(raw_dict)
 
         if not getattr(package_config, "specfile_path", None):
             if spec_file_path:

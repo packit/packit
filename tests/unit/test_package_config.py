@@ -929,6 +929,6 @@ def test_get_local_specfile_path():
 )
 def test_serialize_and_deserialize(package_config):
     schema = PackageConfigSchema()
-    serialized = schema.dump(package_config)
-    new_package_config = schema.load(serialized)
+    serialized = schema.dump_config(package_config)
+    new_package_config = schema.load_config(serialized)
     assert package_config == new_package_config
