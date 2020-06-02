@@ -155,14 +155,14 @@ class MM23Schema(Schema):
         else:  # v2
             super().__init__(strict=True, **kwargs)
 
-    def load(self, *args, **kwargs):
+    def load_config(self, *args, **kwargs):
         if MM3:
             result = super().load(*args, **kwargs)
         else:  # v2
             result = super().load(*args, **kwargs).data
         return result
 
-    def dump(self, *args, **kwargs):
+    def dump_config(self, *args, **kwargs):
         if MM3:
             result = super().dump(*args, **kwargs)
         else:  # v2
@@ -174,8 +174,7 @@ class MM23Schema(Schema):
         return {key: value for key, value in data.items() if value is not None}
 
 
-# TODO: inherit from MM23Schema
-class SyncFilesConfigSchema(Schema):
+class SyncFilesConfigSchema(MM23Schema):
     """
     Schema for processing SyncFilesConfig config data.
     """
@@ -202,7 +201,7 @@ class SyncFilesConfigSchema(Schema):
             return data
 
 
-class JobMetadataSchema(Schema):
+class JobMetadataSchema(MM23Schema):
     """ Jobs metadata. """
 
     targets = fields.List(fields.String())
@@ -232,13 +231,8 @@ class JobMetadataSchema(Schema):
     def make_instance(self, data, **_):
         return JobMetadataConfig(**data)
 
-    @post_dump
-    def remove_none_values(self, data, **kwargs):
-        return {key: value for key, value in data.items() if value is not None}
 
-
-# TODO: inherit from MM23Schema
-class JobConfigSchema(Schema):
+class JobConfigSchema(MM23Schema):
     """
     Schema for processing JobConfig config data.
     """
@@ -253,7 +247,7 @@ class JobConfigSchema(Schema):
         return JobConfig(**data)
 
 
-class PullRequestNotificationsSchema(Schema):
+class PullRequestNotificationsSchema(MM23Schema):
     """ Configuration of commenting on pull requests. """
 
     successful_build = fields.Bool(default=True)
@@ -263,7 +257,7 @@ class PullRequestNotificationsSchema(Schema):
         return PullRequestNotificationsConfig(**data)
 
 
-class NotificationsSchema(Schema):
+class NotificationsSchema(MM23Schema):
     """ Configuration of notifications. """
 
     pull_request = fields.Nested(PullRequestNotificationsSchema)
