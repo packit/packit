@@ -20,7 +20,7 @@ from packit.config.package_config import (
     PackageConfig,
     get_local_specfile_path,
 )
-from packit.schema import MM3
+from packit.schema import MM3, PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
 from tests.unit.test_config import (
@@ -888,3 +888,47 @@ def test_notifications_section():
 def test_get_local_specfile_path():
     assert str(get_local_specfile_path(UP_OSBUILD)) == "osbuild.spec"
     assert not get_local_specfile_path(SYNC_FILES)
+
+
+@pytest.mark.parametrize(
+    "package_config",
+    [
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="fedora/package.spec", dest="fedora/package.spec")
+                ]
+            ),
+            downstream_package_name="package",
+            upstream_package_name="package",
+        ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            synced_files=SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="fedora/package.spec", dest="fedora/package.spec")
+                ]
+            ),
+            jobs=[get_job_config_full()],
+            downstream_package_name="package",
+        ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            actions={
+                ActionName.pre_sync: "some/pre-sync/command --option",
+                ActionName.get_current_version: "get-me-version",
+            },
+            jobs=[],
+            upstream_project_url="https://github.com/asd/qwe",
+            upstream_package_name="qwe",
+            dist_git_base_url="https://something.wicked",
+            downstream_package_name="package",
+        ),
+    ],
+)
+def test_serialize_and_deserialize(package_config):
+    schema = PackageConfigSchema()
+    serialized = schema.dump(package_config)
+    new_package_config = schema.load(serialized)
+    assert package_config == new_package_config
