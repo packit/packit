@@ -35,6 +35,7 @@ from packit.config import (
     JobConfigTriggerType,
 )
 from packit.config.job_config import JobMetadataConfig
+from packit.schema import JobConfigSchema
 
 
 def get_job_config_dict_simple():
@@ -211,3 +212,13 @@ def test_user_config_fork_token(tmpdir, recwarn):
     Config.get_user_config()
     w = recwarn.pop(UserWarning)
     assert "pagure_fork_token" in str(w.message)
+
+
+@pytest.mark.parametrize(
+    "config", [get_job_config_simple(), get_job_config_full()],
+)
+def test_serialize_and_deserialize_job_config(config):
+    schema = JobConfigSchema()
+    serialized = schema.dump_config(config)
+    new_config = schema.load_config(serialized)
+    assert new_config == config

@@ -50,12 +50,9 @@ class SyncFilesConfig:
     @classmethod
     def get_from_dict(cls, raw_dict: dict) -> "SyncFilesConfig":
         # required to avoid cyclical imports
-        from packit.schema import SyncFilesConfigSchema, MM3
+        from packit.schema import SyncFilesConfigSchema
 
-        if MM3:
-            config = SyncFilesConfigSchema().load(raw_dict)
-        else:  # v2
-            config = SyncFilesConfigSchema(strict=True).load(raw_dict).data
+        config = SyncFilesConfigSchema().load_config(raw_dict)
         logger.debug(f"Loaded config: {config}")
 
         return config
