@@ -132,12 +132,9 @@ class JobConfig:
     @classmethod
     def get_from_dict(cls, raw_dict: dict) -> "JobConfig":
         # required to avoid cyclical imports
-        from packit.schema import JobConfigSchema, MM3
+        from packit.schema import JobConfigSchema
 
-        if MM3:
-            config = JobConfigSchema().load(raw_dict)
-        else:  # v2
-            config = JobConfigSchema(strict=True).load(raw_dict).data
+        config = JobConfigSchema().load_config(raw_dict)
         logger.debug(f"Loaded config: {config}")
 
         return config
