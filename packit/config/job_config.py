@@ -23,7 +23,7 @@
 
 from enum import Enum
 from logging import getLogger
-from typing import List, Set, Dict
+from typing import List, Set
 
 from packit.exceptions import PackitConfigException
 
@@ -117,12 +117,10 @@ class JobConfig:
         type: JobType,
         trigger: JobConfigTriggerType,
         metadata: JobMetadataConfig = None,
-        overrides: Dict = None,
     ):
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
         self.metadata: JobMetadataConfig = metadata or JobMetadataConfig()
-        self.overrides: Dict = overrides or {}
 
     def __repr__(self):
         return (
