@@ -62,12 +62,12 @@ class LocalProjectParameter(click.ParamType):
 
             if os.path.isdir(value):
                 absolute_path = os.path.abspath(value)
-                logger.info(f"Input is a directory: {absolute_path}")
+                logger.debug(f"Input is a directory: {absolute_path}")
                 local_project = LocalProject(
                     working_dir=absolute_path, ref=branch_name, remote=remote_name
                 )
             elif git_remote_url_to_https_url(value):
-                logger.info(f"Input is a URL to a git repo: {value}")
+                logger.debug(f"Input is a URL to a git repo: {value}")
                 local_project = LocalProject(
                     git_url=value, ref=branch_name, remote=remote_name
                 )

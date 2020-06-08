@@ -87,7 +87,7 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run):
         set_logging(level=logging.INFO)
 
     packit_version = get_distribution("packitos").version
-    logger.info(f"Packit {packit_version} is being used.")
+    logger.debug(f"Packit {packit_version} is being used.")
 
 
 packit_base.add_command(update)

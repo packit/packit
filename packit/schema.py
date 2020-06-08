@@ -340,12 +340,12 @@ class PackageConfigSchema(MM23Schema):
             downstream_package_name = data.get("downstream_package_name", None)
             if downstream_package_name:
                 data["specfile_path"] = f"{downstream_package_name}.spec"
-                logger.info(
-                    f"Setting `specfile_path` to {downstream_package_name}.spec."
+                logger.debug(
+                    f'Setting `specfile_path` to "./{downstream_package_name}.spec".'
                 )
             else:
                 # guess it?
-                logger.info(
+                logger.debug(
                     "Neither `specfile_path` nor `downstream_package_name` set."
                 )
         return data
