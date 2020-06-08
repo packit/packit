@@ -31,7 +31,7 @@ from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
 from packit.constants import DEFAULT_BODHI_NOTE
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 @click.command("create-update", context_settings=get_context_settings())
