@@ -34,7 +34,7 @@ from packit.cli.utils import cover_packit_exception
 from packit.cli.utils import get_packit_api
 from packit.config import pass_config, get_context_settings
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 @click.command("status", context_settings=get_context_settings())
