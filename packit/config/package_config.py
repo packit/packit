@@ -79,7 +79,6 @@ class PackageConfig:
         upstream_tag_template: str = "{version}",
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
-        **kwargs,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -118,9 +117,6 @@ class PackageConfig:
         ]
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
-
-        if kwargs:
-            logger.warning(f"Following kwargs were not processed:" f"{kwargs}")
 
     def __repr__(self):
         return (
