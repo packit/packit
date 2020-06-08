@@ -31,7 +31,7 @@ from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
 from packit.exceptions import PackitCommandFailedError, ensure_str
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 @click.command("build", context_settings=get_context_settings())
