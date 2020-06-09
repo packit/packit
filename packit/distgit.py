@@ -19,16 +19,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import cccolutils
-import git
 import logging
 import os
-import requests
 import tempfile
 from pathlib import Path
 from typing import Optional, Sequence, List
 
+import cccolutils
+import git
+import requests
 from ogr.abstract import PullRequest
+
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
@@ -36,6 +37,7 @@ from packit.config import (
     SyncFilesConfig,
     get_local_package_config,
 )
+from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
@@ -61,7 +63,7 @@ class DistGit(PackitRepositoryBase):
     def __init__(
         self,
         config: Config,
-        package_config: PackageConfig,
+        package_config: CommonPackageConfig,
         local_project: LocalProject = None,
     ):
         super().__init__(config=config, package_config=package_config)

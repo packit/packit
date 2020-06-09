@@ -30,7 +30,8 @@ from git import PushInfo
 
 from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
-from packit.config import Config, PackageConfig, RunCommandType
+from packit.config import Config, RunCommandType
+from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.security import CommitVerifier
@@ -44,7 +45,7 @@ class PackitRepositoryBase:
     # mypy complains when this is a property
     local_project: LocalProject
 
-    def __init__(self, config: Config, package_config: PackageConfig) -> None:
+    def __init__(self, config: Config, package_config: CommonPackageConfig) -> None:
         """
         :param config: global configuration
         :param package_config: configuration of the upstream project
