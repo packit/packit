@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from logging import getLogger
-from typing import Dict, Any, Optional, Mapping
+from typing import Dict, Any, Optional, Mapping, Union
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError, post_dump
 
@@ -37,14 +37,11 @@ from packit.config import PackageConfig, Config, SyncFilesConfig
 from packit.config.job_config import (
     JobType,
     JobConfig,
-    default_jobs,
     JobConfigTriggerType,
     JobMetadataConfig,
 )
-from packit.config.package_config import (
-    NotificationsConfig,
-    PullRequestNotificationsConfig,
-)
+from packit.config.package_config import NotificationsConfig
+from packit.config.notifications import PullRequestNotificationsConfig
 from packit.sync import SyncFilesItem
 
 logger = getLogger(__name__)
@@ -174,6 +171,26 @@ class MM23Schema(Schema):
         return {key: value for key, value in data.items() if value is not None}
 
 
+class PullRequestNotificationsSchema(MM23Schema):
+    """ Configuration of commenting on pull requests. """
+
+    successful_build = fields.Bool(default=True)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return PullRequestNotificationsConfig(**data)
+
+
+class NotificationsSchema(MM23Schema):
+    """ Configuration of notifications. """
+
+    pull_request = fields.Nested(PullRequestNotificationsSchema)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return NotificationsConfig(**data)
+
+
 class SyncFilesConfigSchema(MM23Schema):
     """
     Schema for processing SyncFilesConfig config data.
@@ -232,43 +249,9 @@ class JobMetadataSchema(MM23Schema):
         return JobMetadataConfig(**data)
 
 
-class JobConfigSchema(MM23Schema):
+class CommonConfigSchema(MM23Schema):
     """
-    Schema for processing JobConfig config data.
-    """
-
-    job = EnumField(JobType, required=True, attribute="type")
-    trigger = EnumField(JobConfigTriggerType, required=True)
-    metadata = fields.Nested(JobMetadataSchema)
-
-    @post_load
-    def make_instance(self, data, **_):
-        return JobConfig(**data)
-
-
-class PullRequestNotificationsSchema(MM23Schema):
-    """ Configuration of commenting on pull requests. """
-
-    successful_build = fields.Bool(default=True)
-
-    @post_load
-    def make_instance(self, data, **kwargs):
-        return PullRequestNotificationsConfig(**data)
-
-
-class NotificationsSchema(MM23Schema):
-    """ Configuration of notifications. """
-
-    pull_request = fields.Nested(PullRequestNotificationsSchema)
-
-    @post_load
-    def make_instance(self, data, **kwargs):
-        return NotificationsConfig(**data)
-
-
-class PackageConfigSchema(MM23Schema):
-    """
-    Schema for processing PackageConfig config data.
+    Common methods for JobConfigSchema and PackageConfigSchema
     """
 
     config_file_path = fields.String()
@@ -287,13 +270,62 @@ class PackageConfigSchema(MM23Schema):
     create_tarball_command = fields.List(fields.String())
     current_version_command = fields.List(fields.String())
     allowed_gpg_keys = fields.List(fields.String())
-    spec_source_id = fields.Method(deserialize="spec_source_id_fm")
+    spec_source_id = fields.Method(
+        deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
+    )
     synced_files = fields.Nested(SyncFilesConfigSchema)
-    jobs = fields.Nested(JobConfigSchema, many=True, default=default_jobs)
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     patch_generation_ignore_paths = fields.List(fields.String())
     notifications = fields.Nested(NotificationsSchema)
+
+    @staticmethod
+    def spec_source_id_serialize(value: PackageConfig):
+        return value.spec_source_id
+
+    @staticmethod
+    def spec_source_id_fm(value: Union[str, int]):
+        """
+        method used in spec_source_id field.Method
+        If value is int, it is transformed int -> "Source" + str(int)
+
+        ex.
+        1 -> "Source1"
+
+        :return str: prepends "Source" in case input value is int
+        """
+        if value:
+            try:
+                value = int(value)
+            except ValueError:
+                # not a number
+                pass
+            else:
+                # is a number!
+                value = f"Source{value}"
+        return value
+
+
+class JobConfigSchema(CommonConfigSchema):
+    """
+    Schema for processing JobConfig config data.
+    """
+
+    job = EnumField(JobType, required=True, attribute="type")
+    trigger = EnumField(JobConfigTriggerType, required=True)
+    metadata = fields.Nested(JobMetadataSchema)
+
+    @post_load
+    def make_instance(self, data, **_):
+        return JobConfig(**data)
+
+
+class PackageConfigSchema(CommonConfigSchema):
+    """
+    Schema for processing PackageConfig config data.
+    """
+
+    jobs = fields.Nested(JobConfigSchema, many=True)
 
     # list of deprecated keys and their replacement (new,old)
     deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
@@ -302,6 +334,20 @@ class PackageConfigSchema(MM23Schema):
     def ordered_preprocess(self, data, **kwargs):
         data = self.rename_deprecated_keys(data, **kwargs)
         data = self.specfile_path_pre(data, **kwargs)
+        data = self.add_defaults_for_jobs(data, **kwargs)
+        return data
+
+    @staticmethod
+    def add_defaults_for_jobs(data, **_):
+        """
+        add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
+        """
+        for job in data.get("jobs", []):
+            for k, v in data.items():
+                if k == "jobs":
+                    # overriding jobs doesn't make any sense
+                    continue
+                job.setdefault(k, v)
         return data
 
     def rename_deprecated_keys(self, data, **kwargs):
@@ -353,27 +399,6 @@ class PackageConfigSchema(MM23Schema):
     @post_load
     def make_instance(self, data, **kwargs):
         return PackageConfig(**data)
-
-    def spec_source_id_fm(self, value):
-        """
-        method used in spec_source_id field.Method
-        If value is int, it is transformed int -> "Source" + str(int)
-
-        ex.
-        1 -> "Source1"
-
-        :return str: prepends "Source" in case input value is int
-        """
-        if value:
-            try:
-                value = int(value)
-            except ValueError:
-                # not a number
-                pass
-            else:
-                # is a number!
-                value = f"Source{value}"
-        return value
 
 
 class UserConfigSchema(MM23Schema):
