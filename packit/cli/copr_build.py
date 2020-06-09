@@ -19,16 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-
+import logging
 import os
 
 import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.config import pass_config, get_context_settings, PackageConfig
 from packit.config.aliases import get_build_targets
+
+logger = logging.getLogger(__name__)
 
 
 @click.command("copr-build", context_settings=get_context_settings())
@@ -84,17 +85,19 @@ def copr_build(
     it defaults to the current working directory.
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    default_project_name = api.package_config.get_copr_build_project_value()
-
-    if not default_project_name:
-        default_project_name = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
+    if not project:
+        logger.debug("COPR project name was not passed via CLI.")
+        project = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
+        if isinstance(api.package_config, PackageConfig):
+            project = api.package_config.get_copr_build_project_value()
+            logger.info(f"Using COPR project name = {project}")
 
     targets_to_build = get_build_targets(
         *targets.split(","), default="fedora-rawhide-x86_64"
     )
 
     build_id, repo_url = api.run_copr_build(
-        project=project or default_project_name,
+        project=project,
         chroots=list(targets_to_build),
         owner=owner,
         description=description,
