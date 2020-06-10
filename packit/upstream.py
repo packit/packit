@@ -33,7 +33,8 @@ from packaging import version
 from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.config import Config, PackageConfig, SyncFilesConfig
+from packit.config import Config, SyncFilesConfig
+from packit.config.common_package_config import CommonPackageConfig
 from packit.constants import SPEC_PACKAGE_SECTION, DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
 from packit.exceptions import (
     PackitException,
@@ -55,7 +56,10 @@ class Upstream(PackitRepositoryBase):
     """ interact with upstream project """
 
     def __init__(
-        self, config: Config, package_config: PackageConfig, local_project: LocalProject
+        self,
+        config: Config,
+        package_config: CommonPackageConfig,
+        local_project: LocalProject,
     ):
         """
         :param config: global configuration

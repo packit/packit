@@ -25,14 +25,14 @@ import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
+from ogr.abstract import GitProject
 from yaml import safe_load
 
-from ogr.abstract import GitProject
 from packit.actions import ActionName
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.job_config import JobConfig, get_default_jobs, JobType
 from packit.config.notifications import NotificationsConfig
-from packit.config.sync_files_config import SyncFilesConfig, SyncFilesItem
+from packit.config.sync_files_config import SyncFilesConfig
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 
@@ -150,26 +150,11 @@ class PackageConfig(CommonPackageConfig):
         logger.debug(package_config)
         return package_config
 
-    def get_all_files_to_sync(self):
-        """
-        Adds the default files (config file, spec file) to synced files when doing propose-update.
-        :return: SyncFilesConfig with default files
-        """
-        files = self.synced_files.files_to_sync
-
-        if self.specfile_path not in (item.src for item in files):
-            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
-
-        if self.config_file_path and self.config_file_path not in (
-            item.src for item in files
-        ):
-            files.append(
-                SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
-            )
-
-        return SyncFilesConfig(files)
-
     def get_copr_build_project_value(self) -> Optional[str]:
+        """
+        get copr project name from this first copr job
+        this is only used when invoking copr builds from CLI
+        """
         projects_list = [
             job.metadata.project
             for job in self.jobs

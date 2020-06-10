@@ -2,10 +2,12 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from packit.config.job_config import JobType, JobConfigTriggerType
 
 from packit.api import PackitAPI
 from packit.cli import utils
 from packit.cli.utils import get_packit_api
+from packit.config import JobConfig
 from packit.local_project import LocalProject
 from tests.spellbook import get_test_config, initiate_git_repo
 
@@ -152,6 +154,18 @@ def test_url_is_upstream():
                 upstream_project_url="https://github.com/packit-service/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
                 synced_files=None,
+            ),
+            True,
+        ),
+        (
+            [
+                ("remote", "https://some.remote/ur/l.git"),
+                ("origin", "git@github.com:user/ogr.git"),
+            ],
+            JobConfig(
+                type=JobType.build,
+                trigger=JobConfigTriggerType.pull_request,
+                upstream_project_url="https://github.com/packit-service/ogr",
             ),
             True,
         ),
