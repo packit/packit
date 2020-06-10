@@ -24,6 +24,8 @@ Common package config attributes so they can be imported both in PackageConfig a
 """
 from typing import Optional, List, Union, Dict
 
+from packit.sync import SyncFilesItem
+
 from packit.actions import ActionName
 from packit.config.sync_files_config import SyncFilesConfig
 from packit.config.notifications import (
@@ -139,3 +141,22 @@ class CommonPackageConfig:
             f"{self.dist_git_base_url}{self.dist_git_namespace}/"
             f"{self.downstream_package_name}.git"
         )
+
+    def get_all_files_to_sync(self):
+        """
+        Adds the default files (config file, spec file) to synced files when doing propose-update.
+        :return: SyncFilesConfig with default files
+        """
+        files = self.synced_files.files_to_sync
+
+        if self.specfile_path not in (item.src for item in files):
+            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
+
+        if self.config_file_path and self.config_file_path not in (
+            item.src for item in files
+        ):
+            files.append(
+                SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
+            )
+
+        return SyncFilesConfig(files)

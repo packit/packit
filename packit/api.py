@@ -28,17 +28,18 @@ import asyncio
 import logging
 import os
 import shutil
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
-import sys
+from ogr.abstract import PullRequest
 from tabulate import tabulate
 
-from ogr.abstract import PullRequest
 from packit import utils
 from packit.actions import ActionName
-from packit.config import Config, PackageConfig
+from packit.config import Config
+from packit.config.common_package_config import CommonPackageConfig
 from packit.constants import SYNCING_NOTE
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
@@ -63,12 +64,12 @@ class PackitAPI:
     def __init__(
         self,
         config: Config,
-        package_config: PackageConfig,
+        package_config: CommonPackageConfig,
         upstream_local_project: LocalProject = None,
         downstream_local_project: LocalProject = None,
     ) -> None:
         self.config = config
-        self.package_config = package_config
+        self.package_config: CommonPackageConfig = package_config
         self.upstream_local_project = upstream_local_project
         self.downstream_local_project = downstream_local_project
 

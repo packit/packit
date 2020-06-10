@@ -24,9 +24,10 @@ from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Set
 
 from koji import ClientSession, BUILD_STATES
-
 from ogr.abstract import Release
-from packit.config import Config, PackageConfig
+
+from packit.config import Config
+from packit.config.common_package_config import CommonPackageConfig
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -43,7 +44,7 @@ class Status:
     def __init__(
         self,
         config: Config,
-        package_config: PackageConfig,
+        package_config: CommonPackageConfig,
         upstream: Upstream,
         distgit: DistGit,
     ):
