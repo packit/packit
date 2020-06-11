@@ -1,3 +1,10 @@
+# 0.11.1
+
+## Minor changes and fixes
+
+- Enabled copr build against master branch. For more details please check [readme](https://github.com/packit-service/packit#installation).
+- Error and log messages improvements.
+
 # 0.11.0
 
 ## Features
