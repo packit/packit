@@ -1,3 +1,23 @@
+# 0.11.1
+
+* Improve the message when marking issues as stale
+* accept JobConfig and PackageConfig equally
+* enable overriding package config per job
+* PackageCfg: stop eating those kwargs!
+* logging: turn common statements to debug logs
+* cli/*: use __name__ to construct a logger
+* Revert "enable overriding package config from job.overrides"
+* Allow inheriting from MM23Schema for each config schema
+* pc.set_job_overrides: do heavy lifting only when needed
+* Allow dumping of the package config
+* Add missing spaces to the installation instructions for the copr repo
+* Add copr builds for master commits
+* Add type annotations for CoprHelper
+* enable overriding package config from job.overrides
+* fix tests in Fedora CI by installing setuptools_scm
+* Rewrap the "failed to clone" error message
+* New JobType.create_bugzilla
+
 # 0.11.0
 
 ## Features
