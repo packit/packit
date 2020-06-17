@@ -434,15 +434,12 @@ class Upstream(PackitRepositoryBase):
             # release components are meant to be separated by ".", not "-"
             git_desc_suffix = "." + ".".join(g_desc_raw)
         try:
-            all_pr_list = self.local_project.git_service.get_project().get_pr_list()
-            current_branch = self._local_project.git_repo.active_branch
-            pr_id = [p.id for p in all_pr_list if p.source_branch == current_branch]
+            current_branch = self.local_project.ref
         except Exception as pr_id_error:
-            logger.info(f"Exception while detecting pull request if for current brand: {pr_id_error}")
-            pr_id = ""
+            current_branch = ""
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-        release = f"{original_release_number}.{current_time}{git_desc_suffix}{pr_id}"
+        release = f"{original_release_number}.{current_branch}.{current_time}{git_desc_suffix}"
 
         msg = f"- Development snapshot ({commit})"
         logger.debug(f"Setting Release in spec to {release!r}.")
