@@ -80,7 +80,7 @@ class Specfile(SpecFile):
             self.update_changelog_in_spec(changelog_entry)
 
         except RebaseHelperError as ex:
-            logger.error(f"Rebase-helper failed to change the spec file: {ex!r}")
+            logger.error(f"Rebase-helper failed to change the spec file: {ex}")
             raise PackitException("Rebase-helper didn't do the job.")
 
     def write_spec_content(self):
