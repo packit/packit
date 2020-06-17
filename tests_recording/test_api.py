@@ -7,7 +7,7 @@ from rebasehelper.exceptions import RebaseHelperError
 
 from flexmock import flexmock
 from packit.api import PackitAPI
-from requre.storage import DataMiner, DataTypes
+from requre.cassette import DataTypes
 from tests_recording.testbase import PackitUnittestOgr
 
 
@@ -18,10 +18,10 @@ class ProposeUpdate(PackitUnittestOgr):
             hasattr(rebasehelper, "VERSION")
             and int(rebasehelper.VERSION.split(".")[1]) >= 19
         ):
-            DataMiner.key = "rebase-helper>=0.19"
+            self.cassette.data_miner.key = "rebase-helper>=0.19"
         else:
-            DataMiner.key = "rebase-helper<0.19"
-        DataMiner.data_type = DataTypes.Dict
+            self.cassette.data_miner.key = "rebase-helper<0.19"
+        self.cassette.data_miner.data_type = DataTypes.Dict
 
         super().setUp()
         self.api = PackitAPI(
