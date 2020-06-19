@@ -23,7 +23,7 @@
 import shlex
 from logging import getLogger
 from pathlib import Path
-from typing import Optional, Callable, List, Tuple, Iterable, Dict
+from typing import Optional, Callable, List, Iterable, Dict
 
 import git
 from git import PushInfo
@@ -34,6 +34,7 @@ from packit.config import Config, RunCommandType
 from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
+from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
 from packit.specfile import Specfile
 from packit.utils import cwd
@@ -308,7 +309,7 @@ class PackitRepositoryBase:
         logger.debug(f"Action command output: {outputs}")
         return outputs
 
-    def specfile_add_patches(self, patch_list: List[Tuple[Path, str]]) -> None:
+    def specfile_add_patches(self, patch_list: List[PatchMetadata]) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
 
