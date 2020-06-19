@@ -1,8 +1,8 @@
 import logging
+import time
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional
 
-import time
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import CoprNoResultException, CoprException
 from munch import Munch
@@ -45,6 +45,10 @@ class CoprHelper:
         owner: str = None,
         description: str = None,
         instructions: str = None,
+        list_on_homepage: bool = False,
+        preserve_project: bool = False,
+        additional_packages: List[str] = None,
+        additional_repos: List[str] = None,
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -56,17 +60,23 @@ class CoprHelper:
                 ownername=owner, projectname=project
             )
             # make sure or project has chroots set correctly
+            # we can also update other settings
             if set(copr_proj.chroot_repos.keys()) != set(chroots):
-                logger.info(f"Updating targets on project '{owner}/{project}'")
-                logger.debug(f"old = {set(copr_proj.chroot_repos.keys())}")
-                logger.debug(f"new = {set(chroots)}")
+                logger.info(f"Updating copr project '{owner}/{project}'")
+                logger.debug(f"old targets = {set(copr_proj.chroot_repos.keys())}")
+                logger.debug(f"new targets = {set(chroots)}")
                 self.copr_client.project_proxy.edit(
-                    owner,
-                    project,
+                    ownername=owner,
+                    projectname=project,
                     chroots=chroots,
                     description=description,
                     instructions=instructions,
+                    unlisted_on_hp=not list_on_homepage,
+                    additional_repos=additional_repos,
+                    delete_after_days=60 if not preserve_project else None,
                 )
+                # TODO: disable removal when temporary=False
+                # TODO: additional_packages
         except CoprNoResultException as ex:
             if owner != self.configured_owner:
                 raise PackitCoprProjectException(
@@ -74,7 +84,17 @@ class CoprHelper:
                 ) from ex
 
             logger.info(f"Copr project '{owner}/{project}' not found. Creating new.")
-            self.create_copr_project(chroots, description, instructions, owner, project)
+            self.create_copr_project(
+                chroots=chroots,
+                description=description,
+                instructions=instructions,
+                owner=owner,
+                project=project,
+                list_on_homepage=list_on_homepage,
+                preserve_project=preserve_project,
+                additional_packages=additional_packages,
+                additional_repos=additional_repos,
+            )
 
     def create_copr_project(
         self,
@@ -83,6 +103,10 @@ class CoprHelper:
         instructions: str,
         owner: str,
         project: str,
+        list_on_homepage: bool = False,
+        preserve_project: bool = False,
+        additional_packages: List[str] = None,
+        additional_repos: List[str] = None,
     ) -> None:
 
         try:
@@ -96,16 +120,18 @@ class CoprHelper:
                     "For more info check out https://packit.dev/"
                 ),
                 contact="https://github.com/packit-service/packit/issues",
-                # don't show project on Copr homepage
-                unlisted_on_hp=True,
+                # don't show project on Copr homepage by default
+                unlisted_on_hp=not list_on_homepage,
                 # delete project after the specified period of time
-                delete_after_days=60,
+                delete_after_days=60 if not preserve_project else None,
+                additional_repos=additional_repos,
                 instructions=instructions
                 or "You can check out the upstream project "
                 f"{self.upstream_local_project.git_url} to find out how to consume these builds. "
                 f"This copr project is created and handled by the packit project "
                 "(https://packit.dev/).",
             )
+            # TODO: additional_packages
         except CoprException as ex:
             error = (
                 f"Cannot create a new Copr project "
