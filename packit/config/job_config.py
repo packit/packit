@@ -66,6 +66,10 @@ class JobMetadataConfig:
         dist_git_branches: List[str] = None,
         branch: str = None,
         scratch: bool = False,
+        list_on_homepage: bool = False,
+        preserve_project: bool = False,
+        additional_packages: List[str] = None,
+        additional_repos: List[str] = None,
     ):
         """
         :param targets: copr_build job, mock chroots where to build
@@ -75,6 +79,10 @@ class JobMetadataConfig:
         :param dist_git_branches: propose_downstream, branches in dist-git where packit should work
         :param branch: for `commit` trigger to specify the branch name
         :param scratch: if we want to run scratch build in koji
+        :param list_on_homepage: if set, created copr project will be visible on copr's home-page
+        :param preserve_project: if set, project will not be created as temporary
+        :param list additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
+        :param list additional_repos: buildroot additional additional_repos
         """
         self.targets: Set[str] = set(targets) if targets else set()
         self.timeout: int = timeout
@@ -85,6 +93,10 @@ class JobMetadataConfig:
         ) if dist_git_branches else set()
         self.branch: str = branch
         self.scratch: bool = scratch
+        self.list_on_homepage: bool = list_on_homepage
+        self.preserve_project: bool = preserve_project
+        self.additional_packages: List[str] = additional_packages or []
+        self.additional_repos: List[str] = additional_repos or []
 
     def __repr__(self):
         return (
@@ -93,9 +105,13 @@ class JobMetadataConfig:
             f"timeout={self.timeout}, "
             f"owner={self.owner}, "
             f"project={self.project}, "
-            f"dist_git_branches={self.dist_git_branches},"
-            f"branch={self.branch},"
-            f"scratch={self.scratch})"
+            f"dist_git_branches={self.dist_git_branches}, "
+            f"branch={self.branch}, "
+            f"scratch={self.scratch}, "
+            f"list_on_homepage={self.list_on_homepage}, "
+            f"preserve_project={self.preserve_project}, "
+            f"additional_packages={self.additional_packages}, "
+            f"additional_repos={self.additional_repos})"
         )
 
     def __eq__(self, other: object):
@@ -111,6 +127,10 @@ class JobMetadataConfig:
             and self.dist_git_branches == other.dist_git_branches
             and self.branch == other.branch
             and self.scratch == other.scratch
+            and self.list_on_homepage == other.list_on_homepage
+            and self.preserve_project == other.preserve_project
+            and self.additional_packages == other.additional_packages
+            and self.additional_repos == other.additional_repos
         )
 
 
