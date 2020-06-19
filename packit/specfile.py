@@ -8,6 +8,7 @@ from rebasehelper.helpers.macro_helper import MacroHelper
 from rebasehelper.specfile import SpecFile, RebaseHelperError, saves
 
 from packit.constants import SPEC_PACKAGE_SECTION
+from packit.patches import PatchMetadata
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -128,25 +129,42 @@ class Specfile(SpecFile):
             self._process_patches(comment_out=indexes)
 
     @saves
-    def add_patches(self, patch_list: List[Tuple[Path, str]]) -> None:
+    def add_patches(self, patch_list: List[PatchMetadata]) -> None:
         """
         Add given patches to the specfile.
 
-        :param patch_list: [(patch_name, msg)]
+        :param patch_list: [PatchMetadata]
         """
         if not patch_list:
             return
 
         logger.debug(f"About to add patches {patch_list} to specfile.")
         if [t.name for t in self.tags.filter(name="Patch*")]:
-            raise PackitException(
-                "This specfile already contains patches, please remove them."
-            )
+            logger.debug("This specfile already contains patches.")
 
+        source_git_patches: List[PatchMetadata] = []
+        original_patches: List[PatchMetadata] = []
+        for patch in patch_list:
+            if patch.present_in_specfile:
+                original_patches.append(patch)
+            else:
+                source_git_patches.append(patch)
+
+        logger.debug(
+            f"Original patches ({len(original_patches)}) "
+            "has to be already in the spec-file. "
+            "Following patches will not be added to the spec-file:\n - "
+            + "\n - ".join(f"{patch.name} ({patch.path})" for patch in original_patches)
+            + "\n"
+        )
+
+        logger.debug(f"Adding source-git patches ({len(source_git_patches)})")
         new_content = "\n# PATCHES FROM SOURCE GIT:\n"
-        for i, (patch, msg) in enumerate(patch_list):
-            new_content += "\n# " + "\n# ".join(msg.split("\n"))
-            new_content += f"\nPatch{(i + 1):04d}: {patch.name}\n"
+        for i, patch_metadata in enumerate(source_git_patches):
+            new_content += "\n# " + "\n# ".join(
+                patch_metadata.specfile_comment.split("\n")
+            )
+            new_content += f"\nPatch{(i + 1):04d}: {patch_metadata.name}\n"
 
         # valid=None: take any SourceX even if it's disabled
         last_source_tag_line = [

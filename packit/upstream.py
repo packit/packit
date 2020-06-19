@@ -45,7 +45,7 @@ from packit.exceptions import (
     PackitRPMNotFoundException,
 )
 from packit.local_project import LocalProject
-from packit.patches import PatchGenerator
+from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
 from packit.utils import run_command, git_remote_url_to_https_url
 
@@ -197,7 +197,7 @@ class Upstream(PackitRepositoryBase):
 
     def create_patches(
         self, upstream: str = None, destination: str = None
-    ) -> List[Tuple[Path, str]]:
+    ) -> List[PatchMetadata]:
         """
         Create patches from downstream commits.
 
