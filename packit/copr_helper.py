@@ -49,6 +49,7 @@ class CoprHelper:
         preserve_project: bool = False,
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
+        update_additional_values: bool = True,
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -65,17 +66,26 @@ class CoprHelper:
                 logger.info(f"Updating copr project '{owner}/{project}'")
                 logger.debug(f"old targets = {set(copr_proj.chroot_repos.keys())}")
                 logger.debug(f"new targets = {set(chroots)}")
+
+                if not update_additional_values:
+                    delete_after_days = None
+                elif preserve_project:
+                    delete_after_days = -1
+                else:
+                    delete_after_days = 60
+
                 self.copr_client.project_proxy.edit(
                     ownername=owner,
                     projectname=project,
                     chroots=chroots,
                     description=description,
                     instructions=instructions,
-                    unlisted_on_hp=not list_on_homepage,
+                    unlisted_on_hp=not list_on_homepage
+                    if update_additional_values
+                    else None,
                     additional_repos=additional_repos,
-                    delete_after_days=60 if not preserve_project else None,
+                    delete_after_days=delete_after_days,
                 )
-                # TODO: disable removal when temporary=False
                 # TODO: additional_packages
         except CoprNoResultException as ex:
             if owner != self.configured_owner:
