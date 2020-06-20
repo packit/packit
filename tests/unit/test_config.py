@@ -38,8 +38,10 @@ from packit.config.job_config import JobMetadataConfig
 from packit.schema import JobConfigSchema
 
 
-def get_job_config_dict_simple():
-    return {"job": "build", "trigger": "release"}
+def get_job_config_dict_simple(**update):
+    result = {"job": "build", "trigger": "release"}
+    result.update(update)
+    return result
 
 
 def get_job_config_simple(**kwargs):
@@ -151,6 +153,18 @@ def test_job_config_validate(raw, is_valid):
     [
         (get_job_config_dict_simple(), get_job_config_simple()),
         (get_job_config_dict_full(), get_job_config_full()),
+        (
+            get_job_config_dict_simple(),
+            get_job_config_simple(metadata=JobMetadataConfig(preserve_project=False)),
+        ),
+        (
+            get_job_config_dict_simple(metadata={"preserve_project": False}),
+            get_job_config_simple(metadata=JobMetadataConfig(preserve_project=False)),
+        ),
+        (
+            get_job_config_dict_simple(metadata={"preserve_project": True}),
+            get_job_config_simple(metadata=JobMetadataConfig(preserve_project=True)),
+        ),
     ],
 )
 def test_job_config_parse(raw, expected_config):

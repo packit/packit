@@ -228,6 +228,10 @@ class JobMetadataSchema(MM23Schema):
     dist_git_branches = fields.List(fields.String())
     branch = fields.String()
     scratch = fields.Boolean()
+    list_on_homepage = fields.Boolean()
+    preserve_project = fields.Boolean()
+    additional_packages = fields.List(fields.String())
+    additional_repos = fields.List(fields.String())
 
     @pre_load
     def ordered_preprocess(self, data, **_):
