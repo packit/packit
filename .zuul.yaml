@@ -3,7 +3,7 @@
     name: packit-service/packit
     check:
       jobs:
-        - packit-pre-commit
+        - pre-commit
         - packit-tests-rpm
         - packit-tests-pip-deps
         - packit-tests-git-master
@@ -13,42 +13,25 @@
         - reverse-dep-packit-service-tests
     gate:
       jobs:
-        - packit-pre-commit
-
-- job:
-    name: packit-base
-    parent: base
-    extra-vars:
-      with_testing: true
-      ansible_python_interpreter: /usr/bin/python3
-    nodeset:
-      nodes:
-        - name: test-node
-          label: cloud-fedora-31
-
-- job:
-    name: packit-pre-commit
-    parent: packit-base
-    description: Run pre-commit
-    run: files/zuul-pre-commit.yaml
+        - pre-commit
 
 - job:
     name: packit-tests-rpm
-    parent: packit-base
+    parent: base
     description: Run tests with dependencies installed as RPMs
     pre-run: files/zuul-install-requirements-rpms.yaml
     run: files/zuul-tests.yaml
 
 - job:
     name: packit-tests-pip-deps
-    parent: packit-base
+    parent: base
     description: Run tests with dependencies installed from PyPI
     pre-run: files/zuul-install-requirements-pip.yaml
     run: files/zuul-tests.yaml
 
 - job:
     name: packit-tests-git-master
-    parent: packit-base
+    parent: base
     description: Run tests with dependencies installed from git master & PyPI
     pre-run: files/zuul-install-requirements-git-master.yaml
     run: files/zuul-tests.yaml

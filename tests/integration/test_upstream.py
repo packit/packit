@@ -201,8 +201,8 @@ def test_create_srpm(upstream_instance, tmpdir):
     ups.prepare_upstream_for_srpm_creation()
     srpm = ups.create_srpm(srpm_path=srpm_path)
     r = re.compile(r"^- Development snapshot \(\w{8}\)$")
-    for l in ups.specfile.spec_content.section("%changelog"):
-        if r.match(l):
+    for line in ups.specfile.spec_content.section("%changelog"):
+        if r.match(line):
             break
     else:
         assert False, "Didn't find the correct line in the spec file."
