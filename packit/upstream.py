@@ -424,8 +424,8 @@ class Upstream(PackitRepositoryBase):
         try:
             git_des_out = run_command(git_des_command, output=True).strip()
         except PackitCommandFailedError as ex:
-            logger.info(f"Exception while describing the repository: {ex!r}")
             # probably no tags in the git repo
+            logger.info(f"Exception while describing the repository: {ex!r}")
             git_desc_suffix = ""
         else:
             # git adds various info in the output separated by -
@@ -433,13 +433,18 @@ class Upstream(PackitRepositoryBase):
             g_desc_raw = git_des_out.rsplit("-", 2)[1:]
             # release components are meant to be separated by ".", not "-"
             git_desc_suffix = "." + ".".join(g_desc_raw)
-        try:
-            current_branch = self.local_project.ref
-        except Exception as pr_id_error:
-            current_branch = ""
+            # the leading dot is put here b/c git_desc_suffix can be empty
+            # and we could have two subsequent dots - rpm errors in such a case
+        current_branch = self.local_project.ref
+        # rpm is picky about release: hates "/" - it's an error
+        # also prints a warning for "-"
+        sanitized_current_branch = current_branch.replace("/", "").replace("-", ".")
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-        release = f"{original_release_number}.{current_branch}.{current_time}{git_desc_suffix}"
+        release = (
+            f"{original_release_number}.{current_time}."
+            f"{sanitized_current_branch}{git_desc_suffix}"
+        )
 
         msg = f"- Development snapshot ({commit})"
         logger.debug(f"Setting Release in spec to {release!r}.")
