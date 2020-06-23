@@ -54,7 +54,7 @@ class FedPKG:
         return utils.run_command_remote(
             cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
-            error_message=f"Adding new sources failed:",
+            error_message="Adding new sources failed:",
             fail=fail,
         )
 
