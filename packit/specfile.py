@@ -124,7 +124,7 @@ class Specfile(SpecFile):
         """
         indexes = [p.index for p in self.get_applied_patches()]
         if indexes:
-            logger.debug(f"About to remove all %patch from %prep.")
+            logger.debug("About to remove all %patch from %prep.")
             self._process_patches(comment_out=indexes)
 
     @saves

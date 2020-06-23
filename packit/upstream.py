@@ -393,7 +393,7 @@ class Upstream(PackitRepositoryBase):
                     # File too long
                     if ex.errno == 36:
                         logger.error(
-                            f"Skipping long output command output while getting archive name."
+                            "Skipping long output command output while getting archive name."
                         )
                         continue
                     raise ex
@@ -475,7 +475,7 @@ class Upstream(PackitRepositoryBase):
             new_setup_line += m[2]
         if not self.package_config.upstream_package_name:
             raise PackitException(
-                f'"upstream_package_name" is not set: unable to fix the spec file; please set it.'
+                '"upstream_package_name" is not set: unable to fix the spec file; please set it.'
             )
         new_setup_line += f" -n {self.package_config.upstream_package_name}-{version}"
         logger.debug(
@@ -522,7 +522,7 @@ class Upstream(PackitRepositoryBase):
             "-bs",
             "--define",
             f"_sourcedir {rpmbuild_dir}",
-            f"--define",
+            "--define",
             f"_srcdir {rpmbuild_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
@@ -729,7 +729,7 @@ class Upstream(PackitRepositoryBase):
             "-bb",
             "--define",
             f"_sourcedir {rpmbuild_dir}",
-            f"--define",
+            "--define",
             f"_srcdir {src_dir}",
             "--define",
             f"_specdir {rpmbuild_dir}",
