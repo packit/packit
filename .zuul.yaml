@@ -3,7 +3,7 @@
     name: packit-service/packit
     check:
       jobs:
-        - packit-pre-commit
+        - pre-commit
         - packit-tests-rpm
         - packit-tests-pip-deps
         - packit-tests-git-master
@@ -13,7 +13,7 @@
         - reverse-dep-packit-service-tests
     gate:
       jobs:
-        - packit-pre-commit
+        - pre-commit
 
 - job:
     name: packit-base
@@ -25,12 +25,6 @@
       nodes:
         - name: test-node
           label: cloud-fedora-31
-
-- job:
-    name: packit-pre-commit
-    parent: packit-base
-    description: Run pre-commit
-    run: files/zuul-pre-commit.yaml
 
 - job:
     name: packit-tests-rpm
