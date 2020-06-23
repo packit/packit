@@ -36,6 +36,7 @@ class CommandHandler:
         return_output: bool = True,
         env: Optional[Dict] = None,
         cwd: Union[str, Path] = None,
+        shell: bool = False,
     ):
         """
         exec a command
@@ -44,6 +45,7 @@ class CommandHandler:
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
+        :param shell: invoke in shell? (aka bash -c $cmd)
         """
         raise NotImplementedError("This should be implemented")
 
@@ -62,6 +64,7 @@ class LocalCommandHandler(CommandHandler):
         return_output: bool = True,
         env: Optional[Dict] = None,
         cwd: Union[str, Path] = None,
+        shell: bool = False,
     ):
         """
         exec a command
@@ -70,12 +73,14 @@ class LocalCommandHandler(CommandHandler):
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
+        :param shell: invoke in shell? (aka bash -c $cmd)
         """
         return utils.run_command(
             cmd=command,
             cwd=cwd or self.local_project.working_dir,
             output=return_output,
             env=env,
+            shell=shell,
         )
 
 
@@ -89,6 +94,7 @@ class SandcastleCommandHandler(CommandHandler):
         return_output: bool = True,
         env: Optional[Dict] = None,
         cwd: Union[str, Path] = None,
+        shell: bool = True,
     ):
         """
         Executes command in a sandbox provided by sandcastle.
@@ -97,6 +103,7 @@ class SandcastleCommandHandler(CommandHandler):
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
+        :param shell: sandcastle invokes everything in shell, this is no-op
         """
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
         from sandcastle.api import Sandcastle, MappedDir

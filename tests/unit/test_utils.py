@@ -80,7 +80,12 @@ def test_remote_to_https(inp, ok):
 
 
 def test_run_command_w_env():
-    run_command(["bash", "-c", "env | grep PATH"], env={"X": "Y"})
+    run_command("env | grep PATH", env={"X": "Y"}, shell=True)
+
+
+def test_run_command_shell():
+    # make sure the `ls` succeeds - shell expands the star, not ls
+    run_command(["ls", "/etc/*wd"], shell=True)
 
 
 def test_get_packit_version_not_installed():
