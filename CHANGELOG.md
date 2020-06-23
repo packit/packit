@@ -1,12 +1,13 @@
 # 0.12.0
 
-* Allow to specify if we want to update copr-project settings
-* Be able to set copr-project options via CLI
-* Allow set/edit additional copr project options
-* Add new fields for metadata about copr-builds
-* Remove 'jsonschema' as a dependency
-* fix the tests according to new version of requre
-* Log str(ex) when a RebaseHelperError is encountered
+## Features
+
+- Users are now able to set some additional properties for COPR projects created via `copr-build` command,
+  e.g. visibility on the Copr homepage and persistence.
+
+## Minor changes and fixes
+
+- Log RebaseHelper error messages.
 
 # 0.11.1
 
