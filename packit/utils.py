@@ -24,7 +24,6 @@ import json
 import logging
 import os
 import re
-import shlex
 import subprocess
 import sys
 import tempfile
@@ -93,6 +92,7 @@ def run_command(
     env: Optional[Dict] = None,
     decode: bool = True,
     print_live: bool = False,
+    shell: bool = False,
 ):
     """
     run provided command in a new subprocess
@@ -105,16 +105,19 @@ def run_command(
     :param env: set these env vars in the subprocess
     :param decode: decode stdout from utf8 to string
     :param print_live: print output from the command realtime to INFO log
+    :param shell: invoke in shell? (aka bash -c $cmd)
     """
-    if not isinstance(cmd, list):
-        cmd = shlex.split(cmd)
+    if shell and isinstance(cmd, list):  # we are running a user defined action
+        # Popen( accepts cmd as a string, not list when shell=True - freaky
+        cmd = " ".join(cmd)
 
-    escaped_command = " ".join(cmd)
+    cmd_str = cmd
+    if isinstance(cmd, list):
+        cmd_str = " ".join(cmd)
 
-    logger.debug(f"Command: {escaped_command}")
+    logger.debug(f"Command: {cmd_str}")
 
     cwd = str(cwd) if cwd else str(Path.cwd())
-    error_message = error_message or f"Command {escaped_command!r} failed."
 
     # we need to pass complete env to Popen, otherwise we lose everything from os.environ
     cmd_env = os.environ
@@ -124,33 +127,38 @@ def run_command(
     # we can't use universal newlines here b/c the output from the command can be encoded
     # in something alien and we would "can't decode this using utf-8" errors
     # https://github.com/packit-service/systemd-rhel8-flock/pull/9#issuecomment-550184016
-    shell = subprocess.Popen(
+    popen_proc = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=False,
+        # we know what we are doing here:
+        #  * we already run commands defined by users - it's gonna be more convenient for them
+        #    to do `ls *.tar.gz` instead of `bash -c "ls *.tar.gz"`
+        #  * and we have the sandbox to minimize the damage
+        shell=shell,
         cwd=cwd,
         env=cmd_env,
     )
 
     stdout = StreamLogger(
-        shell.stdout,
+        popen_proc.stdout,
         log_level=logging.DEBUG if not print_live else logging.INFO,
         decode=decode,
     )
     stderr = StreamLogger(
-        shell.stderr,
+        popen_proc.stderr,
         log_level=logging.DEBUG if not print_live else logging.INFO,
         decode=decode,
     )
 
     stdout.start()
     stderr.start()
-    shell.wait()
+    popen_proc.wait()
     stdout.join()
     stderr.join()
 
-    if shell.returncode != 0:
+    if popen_proc.returncode != 0:
+        error_message = error_message or f"Command {cmd_str!r} failed."
         logger.error(f"{error_message}")
         if fail:
             stderr_output = (
