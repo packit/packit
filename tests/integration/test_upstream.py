@@ -221,7 +221,7 @@ def test_create_srpm_git_desc_release(upstream_instance, tmpdir):
     srpm = ups.create_srpm()
     assert srpm.exists()
     build_srpm(srpm)
-    assert re.match(r".+beer-0.1.0-1.\d+.fc\d{2}.src.rpm$", str(srpm))
+    assert re.match(r".+beer-0.1.0-1\.\d+\.\w+\.fc\d{2}.src.rpm$", str(srpm))
 
 
 def test_github_app(upstream_instance, tmpdir):
