@@ -21,13 +21,12 @@
 # SOFTWARE.
 
 import os
-from pathlib import Path
 
 import pytest
 from flexmock import flexmock
 from marshmallow import ValidationError
-
 from ogr import GithubService, PagureService
+
 from packit.config import (
     Config,
     JobConfig,
@@ -172,8 +171,8 @@ def test_job_config_parse(raw, expected_config):
     assert job_config == expected_config
 
 
-def test_get_user_config(tmpdir):
-    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+def test_get_user_config(tmp_path):
+    user_config_file_path = tmp_path / ".packit.yaml"
     user_config_file_path.write_text(
         "---\n"
         "debug: true\n"
@@ -183,7 +182,7 @@ def test_get_user_config(tmpdir):
         "pagure_user_token: PAGURE_TOKEN\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmpdir)
+        str(tmp_path)
     )
     config = Config.get_user_config()
     assert config.debug and isinstance(config.debug, bool)
@@ -194,8 +193,8 @@ def test_get_user_config(tmpdir):
     assert PagureService(token="PAGURE_TOKEN") in config.services
 
 
-def test_get_user_config_new_authentication(tmpdir):
-    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+def test_get_user_config_new_authentication(tmp_path):
+    user_config_file_path = tmp_path / ".packit.yaml"
     user_config_file_path.write_text(
         "---\n"
         "debug: true\n"
@@ -209,7 +208,7 @@ def test_get_user_config_new_authentication(tmpdir):
         '        instance_url: "https://my.pagure.org"\n'
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmpdir)
+        str(tmp_path)
     )
     config = Config.get_user_config()
     assert config.debug and isinstance(config.debug, bool)
@@ -223,13 +222,13 @@ def test_get_user_config_new_authentication(tmpdir):
     )
 
 
-def test_user_config_fork_token(tmpdir, recwarn):
-    user_config_file_path = Path(tmpdir) / ".packit.yaml"
+def test_user_config_fork_token(tmp_path, recwarn):
+    user_config_file_path = tmp_path / ".packit.yaml"
     user_config_file_path.write_text(
         "---\n" "pagure_fork_token: yes-is-true-in-yaml-are-you-kidding-me?\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmpdir)
+        str(tmp_path)
     )
     Config.get_user_config()
     w = recwarn.pop(UserWarning)
