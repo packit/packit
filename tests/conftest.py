@@ -37,34 +37,32 @@ def get_git_repo_and_remote(
 
 
 @pytest.fixture()
-def upstream_and_remote(tmpdir) -> Tuple[Path, Path]:
-    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM)
+def upstream_and_remote(tmp_path) -> Tuple[Path, Path]:
+    return get_git_repo_and_remote(tmp_path, UPSTREAM)
 
 
 @pytest.fixture()
-def upstream_and_remote_with_multiple_sources(tmpdir) -> Tuple[Path, Path]:
-    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM_WITH_MUTLIPLE_SOURCES)
+def upstream_and_remote_with_multiple_sources(tmp_path) -> Tuple[Path, Path]:
+    return get_git_repo_and_remote(tmp_path, UPSTREAM_WITH_MUTLIPLE_SOURCES)
 
 
 @pytest.fixture()
-def upstream_and_remote_weird_sources(tmpdir) -> Tuple[Path, Path]:
-    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM_WEIRD_SOURCES)
+def upstream_and_remote_weird_sources(tmp_path) -> Tuple[Path, Path]:
+    return get_git_repo_and_remote(tmp_path, UPSTREAM_WEIRD_SOURCES)
 
 
 @pytest.fixture()
-def upstream_spec_not_in_root(tmpdir) -> Tuple[Path, Path]:
-    return get_git_repo_and_remote(Path(tmpdir), UPSTREAM_SPEC_NOT_IN_ROOT)
+def upstream_spec_not_in_root(tmp_path) -> Tuple[Path, Path]:
+    return get_git_repo_and_remote(tmp_path, UPSTREAM_SPEC_NOT_IN_ROOT)
 
 
 @pytest.fixture()
-def distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
-    t = Path(str(tmpdir))
-
-    d_remote_path = t / "dist_git_remote"
+def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
+    d_remote_path = tmp_path / "dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
 
-    d = t / "dist_git"
+    d = tmp_path / "dist_git"
     shutil.copytree(DISTGIT, d)
     initiate_git_repo(
         d,
@@ -80,14 +78,12 @@ def distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
 
 
 @pytest.fixture()
-def ogr_distgit_and_remote(tmpdir) -> Tuple[Path, Path]:
-    temp_dir = Path(str(tmpdir))
-
-    d_remote_path = temp_dir / "ogr_dist_git_remote"
+def ogr_distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
+    d_remote_path = tmp_path / "ogr_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
 
-    d = temp_dir / "ogr_dist_git"
+    d = tmp_path / "ogr_dist_git"
     shutil.copytree(DG_OGR, d)
     initiate_git_repo(
         d,

@@ -40,14 +40,12 @@ from tests.spellbook import UP_COCKPIT_OSTREE, initiate_git_repo, get_test_confi
 
 
 @pytest.fixture()
-def cockpit_ostree(tmpdir, upstream_without_config):
-    t = Path(str(tmpdir))
-
-    u = t / "up"
+def cockpit_ostree(tmp_path, upstream_without_config):
+    u = tmp_path / "up"
     initiate_git_repo(u, tag="179", copy_from=UP_COCKPIT_OSTREE)
 
     flexmock(utils, get_namespace_and_repo_name=lambda url: ("asd", "qwe"))
-    d = t / "dg"
+    d = tmp_path / "dg"
     d.mkdir()
     initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)
 

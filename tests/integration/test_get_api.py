@@ -1,13 +1,11 @@
-from pathlib import Path
-
 import pytest
 from flexmock import flexmock
-from packit.config.job_config import JobType, JobConfigTriggerType
 
 from packit.api import PackitAPI
 from packit.cli import utils
 from packit.cli.utils import get_packit_api
 from packit.config import JobConfig
+from packit.config.job_config import JobType, JobConfigTriggerType
 from packit.local_project import LocalProject
 from tests.spellbook import get_test_config, initiate_git_repo
 
@@ -171,10 +169,8 @@ def test_url_is_upstream():
         ),
     ],
 )
-def test_get_api(tmpdir, remotes, package_config, is_upstream):
-    t = Path(str(tmpdir))
-
-    repo = t / "project_repo"
+def test_get_api(tmp_path, remotes, package_config, is_upstream):
+    repo = tmp_path / "project_repo"
     repo.mkdir(parents=True, exist_ok=True)
     initiate_git_repo(repo, remotes=remotes)
 
