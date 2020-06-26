@@ -73,6 +73,16 @@ class Upstream(PackitRepositoryBase):
 
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
 
+    def __repr__(self):
+        return (
+            "Upstream("
+            f"config='{self.config}', "
+            f"package_config='{self.package_config}', "
+            f"local_project='{self.local_project}', "
+            f"files_to_sync='{self.files_to_sync}', "
+            f"active_branch='{self.active_branch}')"
+        )
+
     @property
     def local_project(self):
         if not self._local_project:
