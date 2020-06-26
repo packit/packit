@@ -29,10 +29,10 @@ from typing import Iterator
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
-
 from ogr.abstract import PullRequest, PRStatus
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
+
 from packit.api import PackitAPI
 from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
@@ -181,18 +181,16 @@ def cwd_upstream(upstream_and_remote) -> Iterator[Path]:
 
 
 @pytest.fixture()
-def sourcegit_and_remote(tmpdir):
-    temp_dir = Path(str(tmpdir))
-
-    sourcegit_remote = temp_dir / "source_git_remote"
+def sourcegit_and_remote(tmp_path):
+    sourcegit_remote = tmp_path / "source_git_remote"
     sourcegit_remote.mkdir()
     subprocess.check_call(["git", "init", "--bare", "."], cwd=sourcegit_remote)
 
-    sourcegit_dir = temp_dir / "source_git"
+    sourcegit_dir = tmp_path / "source_git"
     shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
     initiate_git_repo(sourcegit_dir, tag="0.1.0")
     subprocess.check_call(
-        ["cp", "-R", SOURCEGIT_SOURCEGIT, temp_dir], cwd=sourcegit_remote
+        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path], cwd=sourcegit_remote
     )
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
@@ -200,18 +198,16 @@ def sourcegit_and_remote(tmpdir):
 
 
 @pytest.fixture()
-def downstream_n_distgit(tmpdir):
-    t = Path(str(tmpdir))
-
-    d_remote = t / "downstream_remote"
+def downstream_n_distgit(tmp_path):
+    d_remote = tmp_path / "downstream_remote"
     d_remote.mkdir()
     subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote)
 
-    d = t / "dist_git"
+    d = tmp_path / "dist_git"
     shutil.copytree(DISTGIT, d)
     initiate_git_repo(d, tag="0.0.0")
 
-    u = t / "upstream_git"
+    u = tmp_path / "upstream_git"
     shutil.copytree(UPSTREAM, u)
     initiate_git_repo(u, push=False, upstream_remote=str(d_remote))
 
@@ -219,8 +215,8 @@ def downstream_n_distgit(tmpdir):
 
 
 @pytest.fixture()
-def upstream_instance(upstream_and_remote, distgit_and_remote, tmpdir):
-    with cwd(tmpdir):
+def upstream_instance(upstream_and_remote, distgit_and_remote, tmp_path):
+    with cwd(tmp_path):
         u, _ = upstream_and_remote
         d, _ = distgit_and_remote
         c = get_test_config()
@@ -341,10 +337,8 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
 
 
 @pytest.fixture()
-def upstream_without_config(tmpdir):
-    t = Path(str(tmpdir))
-
-    u_remote = t / "upstream_remote"
+def upstream_without_config(tmp_path):
+    u_remote = tmp_path / "upstream_remote"
     u_remote.mkdir()
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote)
 

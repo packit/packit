@@ -22,7 +22,6 @@
 
 import os
 import subprocess
-from pathlib import Path
 
 import pytest
 from ogr.services.pagure import PagureService
@@ -33,7 +32,7 @@ from tests.spellbook import git_set_user_email
 @pytest.mark.skipif(
     condition=True, reason="Don't interact with a real pagure instance by default"
 )
-def test_basic_distgit_workflow(tmpdir):
+def test_basic_distgit_workflow(tmp_path):
     pagure_token = os.getenv("PAGURE_TOKEN")
 
     pag = PagureService(
@@ -50,8 +49,7 @@ def test_basic_distgit_workflow(tmpdir):
     fork = proj.get_fork(create=True)
     clone_url = fork.get_git_urls()["ssh"]
 
-    t = Path(tmpdir)
-    repo = t.joinpath("repo")
+    repo = tmp_path.joinpath("repo")
 
     branch_name = "cookie"
 

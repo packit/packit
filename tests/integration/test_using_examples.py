@@ -23,7 +23,6 @@
 """
 E2E tests which utilize cockpit projects
 """
-from pathlib import Path
 
 import pytest
 
@@ -51,10 +50,9 @@ from tests.spellbook import (
         (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
     ]
 )
-def example_repo(request, tmpdir):
+def example_repo(request, tmp_path):
     example_path, tag, remote = request.param
-    t = Path(str(tmpdir))
-    u = t / "up"
+    u = tmp_path / "up"
     initiate_git_repo(u, tag=tag, copy_from=example_path, upstream_remote=remote)
     return u
 
