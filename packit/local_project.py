@@ -125,6 +125,24 @@ class LocalProject:
         if pr_id:
             self.checkout_pr(pr_id)
 
+    def __repr__(self):
+        return (
+            "LocalProject("
+            f"working_dir_temporary='{self.working_dir_temporary}', "
+            f"git_repo='{self.git_repo}', "
+            f"working_dir='{self.working_dir}', "
+            f"ref='{self.ref}', "
+            f"git_project='{self.git_project}', "
+            f"git_service='{self.git_service}', "
+            f"git_url='{self.git_url}', "
+            f"full_name='{self.full_name}', "
+            f"repo_name='{self.repo_name}', "
+            f"namespace='{self.namespace}', "
+            f"offline='{self.offline}', "
+            f"remote='{self.remote}', "
+            f"commit_hexsha='{self.commit_hexsha}')"
+        )
+
     @property
     def ref(self) -> Optional[str]:
         """
