@@ -19,6 +19,13 @@ class CoprHelper:
         self.upstream_local_project = upstream_local_project
         self._copr_client = None
 
+    def __repr__(self):
+        return (
+            "CoprHelper("
+            f"upstream_local_project='{self.upstream_local_project}', "
+            f"copr_client='{self.copr_client}')"
+        )
+
     def get_copr_client(self) -> CoprClient:
         """Not static because of the flex-mocking."""
         return CoprClient.create_from_config_file()
