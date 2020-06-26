@@ -87,10 +87,18 @@ sudo dnf install -y fedpkg
 On Fedora:
 
 ```
-$ dnf install --enablerepo=updates-testing packit
+$ dnf install packit
 ```
 
-Or
+You can also use our [`packit-releases` Copr repository](https://copr.fedorainfracloud.org/coprs/packit/packit-releases/)
+(contains also released versions of [OGR](https://github.com/packit-service/ogr)):
+
+```
+$ dnf copr enable packit/packit-releases
+$ dnf install packit
+```
+
+Or from PyPI:
 
 ```
 $ pip3 install --user packitos
@@ -98,7 +106,10 @@ $ pip3 install --user packitos
 
 (packit project on PyPI is NOT this packit project)
 
-You can also install packit from master branch, if you are brave enough:
+You can also install packit from `master` branch, if you are brave enough:
+
+You can use our [`packit-master` Copr repository](https://copr.fedorainfracloud.org/coprs/packit/packit-master/)
+(contains `master` version of [OGR](https://github.com/packit-service/ogr)):
 
 ```
 $ dnf copr enable packit/packit-master
