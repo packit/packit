@@ -47,6 +47,14 @@ class FedPKG:
         else:
             self.fedpkg_exec = "fedpkg"
 
+    def __repr__(self):
+        return (
+            "FedPKG("
+            f"fas_username='{self.fas_username}', "
+            f"directory='{self.directory}', "
+            f"stage='{self.stage}')"
+        )
+
     def new_sources(self, sources="", fail=True):
         if not Path(self.directory).is_dir():
             raise Exception("Cannot access fedpkg repository:")

@@ -74,6 +74,16 @@ class DistGit(PackitRepositoryBase):
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self._downstream_config: Optional[PackageConfig] = None
 
+    def __repr__(self):
+        return (
+            "DistGit("
+            f"config='{self.config}', "
+            f"package_config='{self.package_config}', "
+            f"local_project='{self.local_project}', "
+            f"downstream_config='{self.downstream_config}', "
+            f"absolute_specfile_path='{self.absolute_specfile_path}')"
+        )
+
     @property
     def local_project(self):
         """ return an instance of LocalProject """

@@ -78,6 +78,18 @@ class PackitAPI:
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
 
+    def __repr__(self):
+        return (
+            "PackitAPI("
+            f"config='{self.config}', "
+            f"package_config='{self.package_config}', "
+            f"upstream_local_project='{self.upstream_local_project}', "
+            f"downstream_local_project='{self.downstream_local_project}', "
+            f"up='{self.up}', "
+            f"dg='{self.dg}', "
+            f"copr_helper='{self.copr_helper}')"
+        )
+
     @property
     def up(self):
         if self._up is None:
