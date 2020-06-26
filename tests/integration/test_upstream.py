@@ -30,9 +30,9 @@ import subprocess
 from pathlib import Path
 
 import pytest
-
 from flexmock import flexmock
 from ogr import GithubService
+
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitException, PackitSRPMException
 from packit.local_project import LocalProject
@@ -106,19 +106,17 @@ def test_set_spec_ver(upstream_instance):
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
 
 
-def test_set_spec_ver_empty_changelog(tmpdir):
-    t = Path(str(tmpdir))
-
-    u_remote_path = t / "upstream_remote"
+def test_set_spec_ver_empty_changelog(tmp_path):
+    u_remote_path = tmp_path / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
 
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
 
-    u = t / "upstream_git"
+    u = tmp_path / "upstream_git"
     shutil.copytree(EMPTY_CHANGELOG, u)
     initiate_git_repo(u, tag="0.1.0")
 
-    with cwd(tmpdir):
+    with cwd(tmp_path):
         c = get_test_config()
 
         pc = get_local_package_config(str(u))
@@ -184,7 +182,7 @@ def test_fix_spec(upstream_instance):
     assert '"upstream_package_name" is not set' in str(ex.value)
 
 
-def test_create_srpm(upstream_instance, tmpdir):
+def test_create_srpm(upstream_instance, tmp_path):
     u, ups = upstream_instance
 
     with pytest.raises(PackitSRPMException) as exc:
@@ -196,7 +194,7 @@ def test_create_srpm(upstream_instance, tmpdir):
 
     assert srpm.exists()
 
-    srpm_path = Path(tmpdir).joinpath("custom.src.rpm")
+    srpm_path = tmp_path.joinpath("custom.src.rpm")
 
     ups.prepare_upstream_for_srpm_creation()
     srpm = ups.create_srpm(srpm_path=srpm_path)
@@ -210,7 +208,7 @@ def test_create_srpm(upstream_instance, tmpdir):
     build_srpm(srpm)
 
 
-def test_create_srpm_git_desc_release(upstream_instance, tmpdir):
+def test_create_srpm_git_desc_release(upstream_instance):
     u, ups = upstream_instance
     u.joinpath("README").write_text("\nEven better now!\n")
     subprocess.check_call(["git", "add", "."], cwd=u)
@@ -224,14 +222,13 @@ def test_create_srpm_git_desc_release(upstream_instance, tmpdir):
     assert re.match(r".+beer-0.1.0-1\.\d+\.\w+\.fc\d{2}.src.rpm$", str(srpm))
 
 
-def test_github_app(upstream_instance, tmpdir):
+def test_github_app(upstream_instance, tmp_path):
     u, ups = upstream_instance
-    t = Path(tmpdir)
 
-    fake_cert_path = t / "fake-cert.pem"
+    fake_cert_path = tmp_path / "fake-cert.pem"
     fake_cert_path.write_text("hello!")
 
-    user_config_file_path = t / ".packit.yaml"
+    user_config_file_path = tmp_path / ".packit.yaml"
     user_config_file_path.write_text(
         "---\n"
         f"authentication:\n"
@@ -240,7 +237,7 @@ def test_github_app(upstream_instance, tmpdir):
         f"        github_app_id: qwe\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmpdir)
+        str(tmp_path)
     )
     ups.config = Config.get_user_config()
     assert (
