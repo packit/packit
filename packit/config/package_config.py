@@ -25,6 +25,7 @@ import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
+from marshmallow import ValidationError
 from ogr.abstract import GitProject
 from yaml import safe_load
 
@@ -194,6 +195,31 @@ class PackageConfig(CommonPackageConfig):
             and self.spec_source_id == other.spec_source_id
             and self.upstream_tag_template == other.upstream_tag_template
         )
+
+
+class PackageConfigValidation:
+    """
+    Package config validation
+    Does not validate fields: jobs`
+    """
+
+    def __init__(self, package_config: CommonPackageConfig):
+        self.package_config: CommonPackageConfig = package_config
+
+    def validate(self) -> dict:
+        from packit.schema import PackageConfigSchema
+
+        config_file_name_full = self.package_config.config_file_path
+        try:
+            loaded_config = safe_load(open(config_file_name_full))
+        except Exception as ex:
+            logger.error(f"Cannot load package config {config_file_name_full!r}.")
+            raise PackitConfigException(f"Cannot load package config: {ex!r}.")
+
+        try:
+            return PackageConfigSchema().validate(loaded_config)
+        except ValidationError as e:
+            return e.messages
 
 
 def get_local_package_config(
