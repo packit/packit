@@ -155,6 +155,7 @@ class CommonPackageConfig:
         if self.config_file_path and self.config_file_path not in (
             item.src for item in files
         ):
+            # this relative because of glob: "Non-relative patterns are unsupported"
             files.append(
                 SyncFilesItem(src=self.config_file_path, dest=self.config_file_path)
             )
