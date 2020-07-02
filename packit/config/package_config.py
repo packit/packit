@@ -25,7 +25,6 @@ import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union
 
-from marshmallow import ValidationError
 from ogr.abstract import GitProject
 from yaml import safe_load
 
@@ -197,39 +196,17 @@ class PackageConfig(CommonPackageConfig):
         )
 
 
-class PackageConfigValidation:
+def find_packit_yaml(
+    *directory, try_local_dir_first=False, try_local_dir_last=False,
+) -> Path:
     """
-    Package config validation
-    Does not validate fields: jobs`
-    """
+    find packit.yaml in provided directories: if a file matches, it's picked
+    if no config is found, raise PackitConfigException
 
-    def __init__(self, package_config: CommonPackageConfig):
-        self.package_config: CommonPackageConfig = package_config
-
-    def validate(self) -> dict:
-        from packit.schema import PackageConfigSchema
-
-        config_file_name_full = self.package_config.config_file_path
-        try:
-            loaded_config = safe_load(open(config_file_name_full))
-        except Exception as ex:
-            logger.error(f"Cannot load package config {config_file_name_full!r}.")
-            raise PackitConfigException(f"Cannot load package config: {ex!r}.")
-
-        try:
-            return PackageConfigSchema().validate(loaded_config)
-        except ValidationError as e:
-            return e.messages
-
-
-def get_local_package_config(
-    *directory,
-    repo_name: str = None,
-    try_local_dir_first=False,
-    try_local_dir_last=False,
-) -> PackageConfig:
-    """
-    :return: local PackageConfig if present
+    :param directory: a list of dirs where we should find
+    :param try_local_dir_first: try in cwd first
+    :param try_local_dir_last: try cwd last
+    :return: Path to the config
     """
     directories = [Path(config_dir) for config_dir in directory]
     cwd = Path.cwd()
@@ -254,22 +231,50 @@ def get_local_package_config(
             config_file_name_full = config_dir / config_file_name
             if config_file_name_full.is_file():
                 logger.debug(f"Local package config found: {config_file_name_full}")
-                try:
-                    loaded_config = safe_load(open(config_file_name_full))
-                except Exception as ex:
-                    logger.error(
-                        f"Cannot load package config {config_file_name_full!r}."
-                    )
-                    raise PackitConfigException(f"Cannot load package config: {ex!r}.")
-                return parse_loaded_config(
-                    loaded_config=loaded_config,
-                    config_file_path=str(config_file_name),
-                    repo_name=repo_name,
-                    spec_file_path=str(get_local_specfile_path(config_dir)),
-                )
-
-            logger.debug(f"The local config file {config_file_name_full!r} not found.")
+                return config_file_name_full
     raise PackitConfigException("No packit config found.")
+
+
+def load_packit_yaml(config_file_path: Path) -> Dict:
+    """
+    load provided packit.yaml, raise PackitConfigException if something is wrong
+
+    :return: Dict with the file content
+    """
+    try:
+        return safe_load(config_file_path.read_text())
+    except Exception as ex:
+        logger.error(f"Cannot load package config {config_file_path}.")
+        raise PackitConfigException(f"Cannot load package config: {ex!r}.")
+
+
+def get_local_package_config(
+    *directory,
+    repo_name: str = None,
+    try_local_dir_first=False,
+    try_local_dir_last=False,
+) -> PackageConfig:
+    """
+    find packit.yaml in provided dirs, load it and return PackageConfig
+
+    :param directory: a list of dirs where we should find
+    :param repo_name: name of the git repository (default for project name)
+    :param try_local_dir_first: try in cwd first
+    :param try_local_dir_last: try cwd last
+    :return: local PackageConfig
+    """
+    config_file_name = find_packit_yaml(
+        *directory,
+        try_local_dir_first=try_local_dir_first,
+        try_local_dir_last=try_local_dir_last,
+    )
+    loaded_config = load_packit_yaml(config_file_name)
+    return parse_loaded_config(
+        loaded_config=loaded_config,
+        config_file_path=config_file_name.name,
+        repo_name=repo_name,
+        spec_file_path=str(get_local_specfile_path(config_file_name.parent)),
+    )
 
 
 def get_package_config_from_repo(
