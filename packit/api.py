@@ -31,16 +31,17 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional, Union
-
-from tabulate import tabulate
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
 from ogr.abstract import PullRequest
+from tabulate import tabulate
+
 from packit import utils
 from packit.actions import ActionName
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
-from packit.config.package_config import PackageConfigValidation
+from packit.config.package_config import find_packit_yaml, load_packit_yaml
+from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import SYNCING_NOTE
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
@@ -65,7 +66,9 @@ class PackitAPI:
     def __init__(
         self,
         config: Config,
-        package_config: CommonPackageConfig,
+        package_config: Optional[
+            CommonPackageConfig
+        ],  # validate doesn't want PackageConfig
         upstream_local_project: LocalProject = None,
         downstream_local_project: LocalProject = None,
     ) -> None:
@@ -812,45 +815,10 @@ class PackitAPI:
         # command handlers have nothing to clean
         logger.debug("PackitAPI.cleanup (there are no objects to clean)")
 
-    def validate(self) -> str:
-        """ Create output for PackageConfig validation."""
-        schema_errors = PackageConfigValidation(self.package_config).validate()
-
-        if not schema_errors:
-            return (
-                f"{self.package_config.config_file_path} is valid and ready to be used"
-            )
-
-        output = f"{self.package_config.config_file_path} does not pass validation:\n"
-        for field_name, errors in schema_errors.items():
-            output += self.validate_get_field_output(errors, field_name)
-        return output
-
-    def validate_get_field_output(
-        self,
-        errors: Union[list, dict],
-        field_name: str,
-        field_category: str = "* field",
-        level: int = 1,
-    ) -> str:
-        if isinstance(errors, list):
-            field_output = f"{field_category} {field_name}: {errors[0]}\n"
-            return field_output
-
-        field_output = self.validate_get_field_item_output(errors, field_name, level)
-        return field_output
-
-    def validate_get_field_item_output(
-        self, errors: dict, field_name: str, level: int
-    ) -> str:
-        index_output = f"{level * '*'} field {field_name} has incorrect values:\n"
-        level += 1
-        for index, item_errors in errors.items():
-            index_type_error = self.validate_get_field_output(
-                item_errors,
-                index,
-                field_category=f"{level * '*'} value at index",
-                level=level,
-            )
-            index_output += index_type_error
-        return index_output
+    @staticmethod
+    def validate_package_config(working_dir: Path) -> str:
+        """ validate .packit.yaml on the provided path and return human readable report """
+        config_path = find_packit_yaml(working_dir, try_local_dir_last=True,)
+        config_content = load_packit_yaml(config_path)
+        v = PackageConfigValidator(config_path, config_content)
+        return v.validate()

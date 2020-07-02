@@ -346,6 +346,8 @@ class PackageConfigSchema(CommonConfigSchema):
         """
         add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
         """
+        if not data:  # data is None when .packit.yaml is empty
+            return data
         for job in data.get("jobs", []):
             for k, v in data.items():
                 if k == "jobs":
@@ -361,6 +363,8 @@ class PackageConfigSchema(CommonConfigSchema):
         :param data: conf dictionary to process
         :return: processed dictionary
         """
+        if not data:  # data is None when .packit.yaml is empty
+            return data
 
         for new_key_name, old_key_name in self.deprecated_keys:
             old_key_value = data.get(old_key_name, None)
@@ -384,6 +388,8 @@ class PackageConfigSchema(CommonConfigSchema):
         :param data: conf dictionary to process
         :return: processed dictionary
         """
+        if not data:  # data is None when .packit.yaml is empty
+            return data
 
         specfile_path = data.get("specfile_path", None)
         if not specfile_path:

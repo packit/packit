@@ -29,19 +29,18 @@ import os
 
 import click
 
+from packit.api import PackitAPI
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception
-from packit.cli.utils import get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.config import get_context_settings
 
 logger = logging.getLogger(__name__)
 
 
 @click.command("validate-config", context_settings=get_context_settings())
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
-@pass_config
 @cover_packit_exception
-def validate_config(config, path_or_url):
+def validate_config(path_or_url):
     """
     Validate PackageConfig validation.
 
@@ -51,6 +50,7 @@ def validate_config(config, path_or_url):
 
     PATH_OR_URL argument is a local path or a URL to a git repository with packit configuration file
     """
-    api = get_packit_api(config=config, local_project=path_or_url)
-    output = api.validate()
+    # we use PackageConfig.load_from_dict for the validation, hence we don't parse it here
+    output = PackitAPI.validate_package_config(path_or_url)
     logger.info(output)
+    # TODO: print more if config.debug
