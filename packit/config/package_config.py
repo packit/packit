@@ -129,23 +129,25 @@ class PackageConfig(CommonPackageConfig):
         if config_file_path and not raw_dict.get("config_file_path", None):
             raw_dict.update(config_file_path=config_file_path)
 
+        # we need to process defaults first so they get propagated to JobConfigs
+
         if "jobs" not in raw_dict:
             # we want default jobs to go through the proper parsing process
             raw_dict["jobs"] = get_default_jobs()
 
-        package_config = PackageConfigSchema().load_config(raw_dict)
-
-        if not getattr(package_config, "specfile_path", None):
+        if not raw_dict.get("specfile_path", None):
             if spec_file_path:
-                package_config.specfile_path = spec_file_path
+                raw_dict["specfile_path"] = spec_file_path
             else:
                 raise PackitConfigException("Spec file was not found!")
 
-        if not getattr(package_config, "upstream_package_name", None) and repo_name:
-            package_config.upstream_package_name = repo_name
+        if not raw_dict.get("upstream_package_name", None) and repo_name:
+            raw_dict["upstream_package_name"] = repo_name
 
-        if not getattr(package_config, "downstream_package_name", None) and repo_name:
-            package_config.downstream_package_name = repo_name
+        if not raw_dict.get("downstream_package_name", None) and repo_name:
+            raw_dict["downstream_package_name"] = repo_name
+
+        package_config = PackageConfigSchema().load_config(raw_dict)
 
         logger.debug(package_config)
         return package_config

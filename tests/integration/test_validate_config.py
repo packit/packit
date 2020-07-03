@@ -23,7 +23,6 @@ from pathlib import Path
 import pytest
 
 from packit.api import PackitAPI
-from packit.config.config import Config
 from packit.utils import cwd
 
 
@@ -72,7 +71,7 @@ from packit.utils import cwd
             "** field pull_request has an incorrect value:\n"
             "*** value at index successful_build: Not a valid boolean.",
         ),
-        ("{}", "Spec file was not found!"),
+        ("{}", "packit.json is valid and ready to be used"),
         (
             """
             {
@@ -255,9 +254,8 @@ from packit.utils import cwd
 )
 def test_schema_validation(tmpdir, raw_package_config, expected_output):
     with cwd(tmpdir):
-        with open("packit.json", "w") as package_config_file:
-            package_config_file.writelines(raw_package_config)
+        Path("packit.json").write_text(raw_package_config)
+        Path("packit.spec").write_text("hello")
 
-        api = PackitAPI(Config(), None)
-        output = api.validate_package_config(Path("."))
+        output = PackitAPI.validate_package_config(Path("."))
         assert expected_output in output

@@ -901,17 +901,30 @@ def test_get_package_config_from_repo(
     assert config.create_pr
 
 
-@pytest.mark.parametrize("content", ["{}"])
+@pytest.mark.parametrize(
+    "content",
+    [
+        "{}",
+        "{jobs: [{job: build, trigger: commit}]}",
+        "{downstream_package_name: horkyze, jobs: [{job: build, trigger: commit}]}",
+        "{upstream_package_name: slize, jobs: [{job: build, trigger: commit}]}",
+    ],
+)
 def test_get_package_config_from_repo_spec_file_not_defined(content):
+    specfile_path = "packit.spec"
     gp = flexmock(GitProject)
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
-    gp.should_receive("get_files").and_return(["packit.spec"])
+    gp.should_receive("get_files").and_return([specfile_path])
     git_project = GitProject(repo="", service=GitService(), namespace="")
     config = get_package_config_from_repo(project=git_project, ref="")
     assert isinstance(config, PackageConfig)
-    assert Path(config.specfile_path).name == "packit.spec"
+    assert Path(config.specfile_path).name == specfile_path
     assert config.create_pr
+    for j in config.jobs:
+        assert j.specfile_path == specfile_path
+        assert j.downstream_package_name == config.downstream_package_name
+        assert j.upstream_package_name == config.upstream_package_name
 
 
 @pytest.mark.parametrize(
