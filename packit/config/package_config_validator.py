@@ -24,7 +24,7 @@ from typing import Dict, Union
 
 from marshmallow import ValidationError
 
-from packit.config.package_config import PackageConfig
+from packit.config.package_config import PackageConfig, get_local_specfile_path
 from packit.exceptions import PackitConfigException
 
 
@@ -40,7 +40,11 @@ class PackageConfigValidator:
         schema_errors = None
         try:
             PackageConfig.get_from_dict(
-                self.content, config_file_path=str(self.config_file_path)
+                self.content,
+                config_file_path=str(self.config_file_path),
+                spec_file_path=str(
+                    get_local_specfile_path(self.config_file_path.parent)
+                ),
             )
         except ValidationError as e:
             schema_errors = e.messages
