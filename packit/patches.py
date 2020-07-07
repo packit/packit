@@ -104,35 +104,34 @@ class PatchMetadata:
 
         return msg
 
-    def rename(self, new_name: str):
-        new_path = self.path.parent / new_name
-        logger.debug(f"Renaming the patch: {self.name} -> {new_path}")
-        self.path.rename(new_path)
-        self.path = new_path
-        self.name = new_name
-
-    def update_metadata_from_commit(self):
-        metadata = get_metadata_from_message(self.commit)
-        if not metadata:
+    @staticmethod
+    def from_commit(commit: git.Commit, patch_path: Path):
+        metadata = get_metadata_from_message(commit) or {}
+        if metadata:
             logger.debug(
-                f"Commit {self.commit.hexsha:.8} does not contain any metadata."
+                f"Commit {commit.hexsha:.8} metadata:\n"
+                f"{yaml.dump(metadata, indent=4)}"
             )
-            return
+        else:
+            logger.debug(f"Commit {commit.hexsha:.8} does not contain any metadata.")
 
-        logger.debug(
-            f"Commit {self.commit.hexsha:.8} metadata:\n"
-            f"{yaml.dump(metadata, indent=4)}"
-        )
+        name = metadata.get("patch_name")
+        if name:
+            new_path = patch_path.parent / name
+            logger.debug(f"Renaming the patch: {patch_path.name} -> {new_path}")
+            patch_path.rename(new_path)
+            patch_path = new_path
+        else:
+            name = patch_path.name
 
-        if "patch_name" in metadata:
-            self.rename(metadata["patch_name"])
-
-        self.description = metadata.get("description") or self.description
-        self.present_in_specfile = (
-            metadata.get("present_in_specfile") or self.present_in_specfile
-        )
-        self.location_in_specfile = (
-            metadata.get("location_in_specfile") or self.location_in_specfile
+        return PatchMetadata(
+            name=name,
+            path=patch_path,
+            description=metadata.get("description"),
+            present_in_specfile=metadata.get("present_in_specfile"),
+            location_in_specfile=metadata.get("location_in_specfile"),
+            ignore=metadata.get("ignore"),
+            commit=commit,
         )
 
 
@@ -279,10 +278,9 @@ class PatchGenerator:
                         # so some commits won't be covered by a dedicated patch file
                         if commit.hexsha in patch_content:
                             path = Path(patch_name)
-                            patch_metadata = PatchMetadata(
-                                commit=commit, path=path, name=path.name,
+                            patch_metadata = PatchMetadata.from_commit(
+                                commit=commit, patch_path=path
                             )
-                            patch_metadata.update_metadata_from_commit()
 
                             if patch_metadata.ignore:
                                 logger.debug(
