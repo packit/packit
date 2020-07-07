@@ -221,6 +221,9 @@ def test_create_srpm_git_desc_release(upstream_instance):
     build_srpm(srpm)
     assert re.match(r".+beer-0.1.0-1\.\d+\.\w+\.fc\d{2}.src.rpm$", str(srpm))
 
+    changelog = ups.specfile.spec_content.section("%changelog")
+    assert "- More awesome changes (Packit Test Suite)" in changelog
+
 
 def test_github_app(upstream_instance, tmp_path):
     u, ups = upstream_instance
@@ -246,3 +249,8 @@ def test_github_app(upstream_instance, tmp_path):
         )
         in ups.config.services
     )
+
+
+def test_get_last_tag(upstream_instance):
+    u, ups = upstream_instance
+    assert ups.get_last_tag() == "0.1.0"

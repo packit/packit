@@ -1,6 +1,6 @@
 import pytest
-
 from flexmock import flexmock
+
 from packit.actions import ActionName
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
