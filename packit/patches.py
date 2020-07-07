@@ -48,13 +48,30 @@ class PatchMetadata:
         description: Optional[str] = None,
         commit: Optional[git.Commit] = None,
         present_in_specfile: bool = False,
+        ignore: bool = False,
     ) -> None:
+        """
+        Metadata about patch files and relation to the respective commit.
+
+        :param name: name of the patch file
+        :param path: Path of the patch file
+        :param location_in_specfile: index of the patch in spec-file
+        :param description: will be attached as a comment above path in spec-file
+                            (if present_in_specfile=False)
+        :param commit: git.Commit relevant to this patch file
+        :param present_in_specfile: if the patch is already in the spec-file
+                                    and we don't need to add it there
+        :param ignore: We don't want to process this commit
+                        when we convert source-git commits to patches.
+                        This patch will be skipped.
+        """
         self.name = name
         self.path = path
         self.location_in_specfile = location_in_specfile
         self.description = description
         self.commit = commit
         self.present_in_specfile = present_in_specfile
+        self.ignore = ignore
 
     @property
     def specfile_comment(self) -> str:
@@ -68,19 +85,22 @@ class PatchMetadata:
 
     @property
     def commit_message(self) -> str:
-        msg = f"Apply {self.name}\n\n"
+        msg = f"Apply {self.name}\n"
 
         if self.name:
-            msg += f"patch_name: {self.name}\n"
+            msg += f"\npatch_name: {self.name}"
 
         if self.location_in_specfile:
-            msg += f"location_in_specfile: {self.location_in_specfile}\n"
+            msg += f"\nlocation_in_specfile: {self.location_in_specfile}"
 
         if self.description:
-            msg += f"description: {self.description}\n"
+            msg += f"\ndescription: {self.description}"
 
         if self.present_in_specfile:
-            msg += "present_in_specfile: true"
+            msg += "\npresent_in_specfile: true"
+
+        if self.ignore:
+            msg += "\nignore: true"
 
         return msg
 
@@ -263,8 +283,16 @@ class PatchGenerator:
                                 commit=commit, path=path, name=path.name,
                             )
                             patch_metadata.update_metadata_from_commit()
-                            logger.debug(f"[{patch_metadata.name}] {commit.summary}")
-                            patch_list.append(patch_metadata)
+
+                            if patch_metadata.ignore:
+                                logger.debug(
+                                    f"[IGNORED: {patch_metadata.name}] {commit.summary}"
+                                )
+                            else:
+                                logger.debug(
+                                    f"[{patch_metadata.name}] {commit.summary}"
+                                )
+                                patch_list.append(patch_metadata)
                             break
             else:
                 logger.warning(f"No patches between {git_ref!r} and {self.lp.ref!r}")
