@@ -409,8 +409,19 @@ class Upstream(PackitRepositoryBase):
                     raise ex
         return None
 
-    def _get_last_tag(self):
-        last_tag = run_command(["git", "describe", "--tags", "--abbrev=0"], output=True).strip()
+    def get_last_tag(self) -> Optional[str]:
+        """ get last git-tag from the repo """
+        try:
+            last_tag = run_command(
+                ["git", "describe", "--tags", "--abbrev=0"],
+                output=True,
+                cwd=self.local_project.working_dir,
+            ).strip()
+        except PackitCommandFailedError as ex:
+            logger.debug(f"{ex!r}")
+            logger.info("Can't describe this repository, are there any git tags?")
+            # no tags in the git repo
+            return None
         return last_tag
 
     def fix_spec(self, archive: str, version: str, commit: str):
@@ -460,9 +471,26 @@ class Upstream(PackitRepositoryBase):
             f"{sanitized_current_branch}{git_desc_suffix}"
         )
 
-        last_tag = self._get_last_tag()
-        cmd = ["git", "log", "--pretty=format:- %s (%an)", f"{last_tag}..HEAD"]
-        msg = run_command(cmd, output=True).strip()
+        last_tag = self.get_last_tag()
+        msg = ""
+        if last_tag:
+            # let's print changes b/w the last tag and now;
+            # ambiguous argument '0.1.0..HEAD': unknown revision or path not in the working tree.
+            # Use '--' to separate paths from revisions, like this
+            cmd = [
+                "git",
+                "log",
+                "--pretty=format:- %s (%an)",
+                f"{last_tag}..HEAD",
+                "--",
+            ]
+            msg = run_command(
+                cmd, output=True, cwd=self.local_project.working_dir
+            ).strip()
+        if not msg:
+            # no describe, no tag - just a boilerplate message w/ commit hash
+            # or, there were no changes b/w HEAD and last_tag, which implies last_tag == HEAD
+            msg = f"- Development snapshot ({commit})"
         logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
