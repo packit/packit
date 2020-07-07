@@ -296,6 +296,53 @@ def test_basic_local_update_patch_content_with_metadata(
     assert patches in git_diff
 
 
+def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
+    sourcegit_and_remote,
+    distgit_and_remote,
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+):
+    """ propose-update for sourcegit test: mock remote API, use local upstream and dist-git """
+
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+    mock_spec_download_remote_s(distgit)
+
+    create_merge_commit_in_source_git(sourcegit)
+
+    source_file = sourcegit / "big-source-file.txt"
+    source_file.write_text("new changes")
+    git_add_and_commit(
+        directory=sourcegit, message="source change\nignore: true",
+    )
+
+    source_file = sourcegit / "ignored_file.txt"
+    source_file.write_text(" And I am sad.")
+    git_add_and_commit(directory=sourcegit, message="make a file sad")
+
+    api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
+
+    git_diff = subprocess.check_output(
+        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+    ).decode()
+
+    patches = """
++# PATCHES FROM SOURCE GIT:
++
++# switching to amarillo hops
++# Author: Packit Test Suite <test@example.com>
++Patch0001: 0001-switching-to-amarillo-hops.patch
++
++# actually, let's do citra
++# Author: Packit Test Suite <test@example.com>
++Patch0002: 0002-actually-let-s-do-citra.patch
++
++
+ %description
+"""
+    assert patches in git_diff
+
+
 def test_basic_local_update_patch_content_with_downstream_patch(
     sourcegit_and_remote,
     distgit_and_remote,
