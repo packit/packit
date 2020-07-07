@@ -26,15 +26,94 @@ import datetime
 import logging
 from itertools import islice
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Optional
 
 import git
+import yaml
 
 from packit.constants import DATETIME_FORMAT
+from packit.git_utils import get_metadata_from_message
 from packit.local_project import LocalProject
 from packit.utils import is_a_git_ref, run_command
 
 logger = logging.getLogger(__name__)
+
+
+class PatchMetadata:
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        path: Optional[Path] = None,
+        location_in_specfile: Optional[str] = None,
+        description: Optional[str] = None,
+        commit: Optional[git.Commit] = None,
+        present_in_specfile: bool = False,
+    ) -> None:
+        self.name = name
+        self.path = path
+        self.location_in_specfile = location_in_specfile
+        self.description = description
+        self.commit = commit
+        self.present_in_specfile = present_in_specfile
+
+    @property
+    def specfile_comment(self) -> str:
+        comment = (
+            f"{self.commit.summary}\n"
+            f"Author: {self.commit.author.name} <{self.commit.author.email}>"
+        )
+        if self.description:
+            comment += f"\n{self.description}"
+        return comment
+
+    @property
+    def commit_message(self) -> str:
+        msg = f"Apply {self.name}\n\n"
+
+        if self.name:
+            msg += f"patch_name: {self.name}\n"
+
+        if self.location_in_specfile:
+            msg += f"location_in_specfile: {self.location_in_specfile}\n"
+
+        if self.description:
+            msg += f"description: {self.description}\n"
+
+        if self.present_in_specfile:
+            msg += "present_in_specfile: true"
+
+        return msg
+
+    def rename(self, new_name: str):
+        new_path = self.path.parent / new_name
+        logger.debug(f"Renaming the patch: {self.name} -> {new_path}")
+        self.path.rename(new_path)
+        self.path = new_path
+        self.name = new_name
+
+    def update_metadata_from_commit(self):
+        metadata = get_metadata_from_message(self.commit)
+        if not metadata:
+            logger.debug(
+                f"Commit {self.commit.hexsha:.8} does not contain any metadata."
+            )
+            return
+
+        logger.debug(
+            f"Commit {self.commit.hexsha:.8} metadata:\n"
+            f"{yaml.dump(metadata, indent=4)}"
+        )
+
+        if "patch_name" in metadata:
+            self.rename(metadata["patch_name"])
+
+        self.description = metadata.get("description") or self.description
+        self.present_in_specfile = (
+            metadata.get("present_in_specfile") or self.present_in_specfile
+        )
+        self.location_in_specfile = (
+            metadata.get("location_in_specfile") or self.location_in_specfile
+        )
 
 
 class PatchGenerator:
@@ -137,7 +216,7 @@ class PatchGenerator:
         git_ref: str,
         destination: str,
         files_to_ignore: Optional[List[str]] = None,
-    ) -> List[Tuple[Path, str]]:
+    ) -> List[PatchMetadata]:
         """
         Create patches from git commits.
 
@@ -150,7 +229,7 @@ class PatchGenerator:
         if not contained:
             self.linearize_history(git_ref)
 
-        patch_list = []
+        patch_list: List[PatchMetadata] = []
 
         try:
             commits = self.get_commits_since_ref(
@@ -179,12 +258,13 @@ class PatchGenerator:
                         # `git format-patch` usually creates one patch for a merge commit,
                         # so some commits won't be covered by a dedicated patch file
                         if commit.hexsha in patch_content:
-                            logger.debug(f"[{patch_name}] {commit.summary}")
-                            msg = (
-                                f"{commit.summary}\n"
-                                f"Author: {commit.author.name} <{commit.author.email}>"
+                            path = Path(patch_name)
+                            patch_metadata = PatchMetadata(
+                                commit=commit, path=path, name=path.name,
                             )
-                            patch_list.append((Path(patch_name), msg))
+                            patch_metadata.update_metadata_from_commit()
+                            logger.debug(f"[{patch_metadata.name}] {commit.summary}")
+                            patch_list.append(patch_metadata)
                             break
             else:
                 logger.warning(f"No patches between {git_ref!r} and {self.lp.ref!r}")
