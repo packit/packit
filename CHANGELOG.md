@@ -1,3 +1,22 @@
+# 0.13.0
+
+## Features
+
+- Commands from actions run in a shell by default; adding `bash -c` is no
+  longer required.
+- The name of the branch is included in the release field when creating a SRPM
+  from current checkout.
+- Packit configuration can be checked using the new `validate-config`
+  subcommand.
+- If possible, use the subject lines of the commits since the last tag when
+  updating `%changelog`.
+- Use patch metadata when generating patch files for dist-git.
+
+## Minor changes and fixes
+
+- Improved logs by adding `__repr__()` to multiple classes.
+- Fixed setting of default values in job configurations.
+
 # 0.12.0
 
 ## Features
