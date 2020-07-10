@@ -762,14 +762,13 @@ class Upstream(PackitRepositoryBase):
             logger.info(
                 "We will be actively waiting for the build to finish, it may take some time."
             )
-        out = utils.run_command_remote(
+        return utils.run_command_remote(
             cmd,
             cwd=self.local_project.working_dir,
             output=True,
             decode=True,
             print_live=True,
         )
-        return out
 
     def create_rpms(self, rpm_dir: Union[str, Path] = None) -> List[Path]:
         """

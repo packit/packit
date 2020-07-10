@@ -50,7 +50,7 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     :param default: used if no positional argument was given
     :return: set of string containing system name and version
     """
-    if not default and not name:
+    if not (default or name):
         return set()
 
     names = list(name) or [default]
@@ -69,7 +69,7 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     :param default: used if no positional argument was given
     :return: set of build targets
     """
-    if not default and not name:
+    if not (default or name):
         return set()
 
     names = list(name) or [default]
@@ -122,7 +122,7 @@ def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     :param default: used if no positional argument was given
     :return: set of dist-git branch names
     """
-    if not default and not name:
+    if not (default or name):
         return set()
 
     names = list(name) or [default]
@@ -152,7 +152,7 @@ def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
 
 
 def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
-    if not default and not name:
+    if not (default or name):
         return set()
 
     names = list(name) or [default]
