@@ -332,13 +332,12 @@ def parse_loaded_config(
     logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
 
     try:
-        package_config = PackageConfig.get_from_dict(
+        return PackageConfig.get_from_dict(
             raw_dict=loaded_config,
             config_file_path=config_file_path,
             repo_name=repo_name,
             spec_file_path=spec_file_path,
         )
-        return package_config
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
         raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
