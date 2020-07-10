@@ -272,7 +272,7 @@ class LocalProject:
         return False
 
     def _parse_git_service_from_git_project(self):
-        if (self.git_project is not None) and not self.git_service and not self.offline:
+        if not (self.git_project is None or self.git_service or self.offline):
             self.git_service = self.git_project.service
             logger.debug(
                 f"Parsed service {self.git_service} from the project {self.git_project}."
@@ -341,29 +341,30 @@ class LocalProject:
         return False
 
     def _parse_git_url_from_git_repo(self):
-        if self.git_repo and not self.git_url:
-            if self.remote:
-                self.git_url = next(self.git_repo.remote(self.remote).urls)
-            elif self.git_repo.remotes:
-                for remote in self.git_repo.remotes:
-                    if remote.name == "origin":
-                        # origin as a default
-                        self.git_url = remote.url
-                        break
-                else:
-                    # or use first one
-                    self.git_url = next(self.git_repo.remotes[0].urls)
+        if not self.git_repo or self.git_url:
+            return False
+
+        if self.remote:
+            self.git_url = next(self.git_repo.remote(self.remote).urls)
+        elif self.git_repo.remotes:
+            for remote in self.git_repo.remotes:
+                if remote.name == "origin":
+                    # origin as a default
+                    self.git_url = remote.url
+                    break
             else:
-                # Repo has no remotes
-                return False
-            logger.debug(
-                f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}."
-            )
-            return True
-        return False
+                # or use first one
+                self.git_url = next(self.git_repo.remotes[0].urls)
+        else:
+            # Repo has no remotes
+            return False
+        logger.debug(
+            f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}."
+        )
+        return True
 
     def _parse_namespace_from_git_url(self):
-        if self.git_url and (not self.namespace or not self.repo_name):
+        if self.git_url and not (self.namespace and self.repo_name):
             parsed_repo_url = parse_git_repo(potential_url=self.git_url)
             if (
                 parsed_repo_url.namespace == self.namespace

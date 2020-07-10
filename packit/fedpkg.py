@@ -42,10 +42,7 @@ class FedPKG:
         self.fas_username = fas_username
         self.directory = directory
         self.stage = stage
-        if stage:
-            self.fedpkg_exec = "fedpkg-stage"
-        else:
-            self.fedpkg_exec = "fedpkg"
+        self.fedpkg_exec = "fedpkg-stage" if stage else "fedpkg"
 
     def __repr__(self):
         return (

@@ -77,7 +77,7 @@ class LocalProjectParameter(click.ParamType):
                     "Provided input path_or_url is not a directory nor an URL of a git repo."
                 )
 
-            if not local_project.working_dir and not local_project.git_url:
+            if not (local_project.working_dir or local_project.git_url):
                 self.fail(
                     "Parameter is not an existing directory nor correct git url.",
                     param,

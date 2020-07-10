@@ -143,11 +143,10 @@ def get_packit_api(
         if not remote_hostname:
             continue
 
-        if upstream_hostname:
-            if remote_hostname == upstream_hostname:
-                lp_upstream = local_project
-                logger.info("Input directory is an upstream repository.")
-                break
+        if upstream_hostname and remote_hostname == upstream_hostname:
+            lp_upstream = local_project
+            logger.info("Input directory is an upstream repository.")
+            break
 
         if package_config.dist_git_base_url and (
             remote_hostname in package_config.dist_git_base_url
@@ -161,13 +160,12 @@ def get_packit_api(
         # fallback, this is the past behavior
         logger.info("Input directory is an upstream repository.")
 
-    api = PackitAPI(
+    return PackitAPI(
         config=config,
         package_config=package_config,
         upstream_local_project=lp_upstream,
         downstream_local_project=lp_downstream,
     )
-    return api
 
 
 def get_hostname_or_none(url: str) -> Optional[str]:
