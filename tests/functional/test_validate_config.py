@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2020 Red Hat, Inc.
+# Copyright (c) 2019 Red Hat, Inc.
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,15 @@
 # SOFTWARE.
 
 """
-Validate PackageConfig
+Functional tests the validate-config command
 """
 
-import logging
-import os
-from pathlib import Path
-
-import click
-from packit.local_project import LocalProject
-
-from packit.api import PackitAPI
-from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception
-from packit.config import get_context_settings
-
-logger = logging.getLogger(__name__)
+from packit.utils import cwd
+from tests.functional.spellbook import call_real_packit
 
 
-@click.command("validate-config", context_settings=get_context_settings())
-@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
-@cover_packit_exception
-def validate_config(path_or_url: LocalProject):
-    """
-    Validate PackageConfig validation.
-
-    \b
-    - checks missing values
-    - checks incorrect types
-
-    PATH_OR_URL argument is a local path or a URL to a git repository with packit configuration file
-    """
-    # we use PackageConfig.load_from_dict for the validation, hence we don't parse it here
-    output = PackitAPI.validate_package_config(Path(path_or_url.working_dir))
-    logger.info(output)
-    # TODO: print more if config.debug
+def test_srpm_command_for_path(upstream_or_distgit_path, tmp_path):
+    with cwd(tmp_path):
+        call_real_packit(
+            parameters=["--debug", "validate-config", str(upstream_or_distgit_path)]
+        )

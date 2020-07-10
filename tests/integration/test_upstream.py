@@ -34,7 +34,7 @@ from flexmock import flexmock
 from ogr import GithubService
 
 from packit.config import Config, get_local_package_config
-from packit.exceptions import PackitException, PackitSRPMException
+from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
@@ -175,11 +175,12 @@ def test_create_uncommon_archive(upstream_instance):
 def test_fix_spec(upstream_instance):
     u, ups = upstream_instance
 
-    ups.package_config.upstream_package_name = None
-    with pytest.raises(PackitException) as ex:
-        ups.fix_spec("asd.tar.gz", "1.2.3", "abcdef123")
+    ups.package_config.upstream_package_name = "beer"
+    ups.fix_spec(archive="asd.tar.gz", version="1.2.3", commit="abcdef123")
 
-    assert '"upstream_package_name" is not set' in str(ex.value)
+    release = ups.specfile.get_release()
+    # 1.20200710085501945230.master.0.g133ff39
+    assert re.match(r"\d\.\d{20}\.\w+\.\d+\.g\w{7}", release)
 
 
 def test_create_srpm(upstream_instance, tmp_path):
@@ -219,7 +220,9 @@ def test_create_srpm_git_desc_release(upstream_instance):
     srpm = ups.create_srpm()
     assert srpm.exists()
     build_srpm(srpm)
-    assert re.match(r".+beer-0.1.0-1\.\d+\.\w+\.fc\d{2}.src.rpm$", str(srpm))
+    assert re.match(
+        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.fc\d{2}.src.rpm$", str(srpm)
+    )
 
     changelog = ups.specfile.spec_content.section("%changelog")
     assert "- More awesome changes (Packit Test Suite)" in changelog

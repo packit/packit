@@ -120,10 +120,13 @@ class LocalProject:
         if refresh:
             self.refresh_the_arguments()
 
-        if ref:
-            self.checkout_ref(ref)
+        # p-s gives us both, commit hash for a PR and PR ID as well
+        # since we want to have 'pr123' in the release field, let's check out
+        # the PR itself, so if both are specified, PR ID > ref
         if pr_id:
             self.checkout_pr(pr_id)
+        elif ref:
+            self.checkout_ref(ref)
 
     def __repr__(self):
         return (

@@ -448,7 +448,9 @@ class Upstream(PackitRepositoryBase):
             "*",
         ]
         try:
-            git_des_out = run_command(git_des_command, output=True).strip()
+            git_des_out = run_command(
+                git_des_command, output=True, cwd=self.local_project.working_dir
+            ).strip()
         except PackitCommandFailedError as ex:
             # probably no tags in the git repo
             logger.info(f"Exception while describing the repository: {ex!r}")
