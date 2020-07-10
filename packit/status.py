@@ -25,8 +25,8 @@ from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Set
 
 from koji import ClientSession, BUILD_STATES
-from ogr.abstract import Release
 
+from ogr.abstract import Release
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.copr_helper import CoprHelper
@@ -138,8 +138,7 @@ class Status:
         # Select latest build for each branch.
         # [{'nvr': 'python-ogr-0.5.0-1.fc29'}, {'nvr':'python-ogr-0.6.0-1.fc29'}]
         # -> {'fc29': 'python-ogr-0.6.0-1.fc29'}
-        builds = {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
-        return builds
+        return {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
 
     def get_updates(self, number_of_updates: int = 3) -> List:
         """

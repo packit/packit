@@ -102,8 +102,7 @@ class ActionField(fields.Field):
             raise ValidationError(f"'dict' required, got {type(value)!r}.")
 
         self.validate_all_actions(actions=list(value))
-        data = {ActionName(key): val for key, val in value.items()}
-        return data
+        return {ActionName(key): val for key, val in value.items()}
 
     def validate_all_actions(self, actions: list) -> None:
         """
