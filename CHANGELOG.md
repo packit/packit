@@ -1,3 +1,14 @@
+# 0.13.1
+
+# Bug fixes
+
+- Fix a programming error in `validate-config`, which caused the sub-command
+  to fail when checking Packit configuration files.
+- Prioritize including the PR ID in the release field over the Git ref when
+  creating a SRPM from the current checkout.
+- Fix a programming error when updating the `%changelog` with the subject
+  lines of the commits since the last tag.
+
 # 0.13.0
 
 ## Features
