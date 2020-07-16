@@ -808,7 +808,11 @@ class PackitAPI:
         ]
 
         utils.run_command_remote(
-            cmd=cmd, error_message="Failed to init kerberos ticket:", fail=True
+            cmd=cmd,
+            error_message="Failed to init kerberos ticket:",
+            fail=True,
+            # this prints debug logs from kerberos to stdout
+            env={"KRB5_TRACE": "/dev/stdout"},
         )
 
     def clean(self):
