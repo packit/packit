@@ -21,6 +21,7 @@ BuildRequires:  python3-tabulate
 BuildRequires:  python3-cccolutils
 BuildRequires:  python3-copr
 BuildRequires:  python3-koji
+BuildRequires:  python3-bodhi-client
 BuildRequires:  python3-lazy-object-proxy
 BuildRequires:  python3-marshmallow
 BuildRequires:  python3-marshmallow-enum
@@ -44,7 +45,6 @@ projects into Fedora operating system.
 Summary:        %{summary}
 # See setup.cfg for details
 Requires:       python3-koji
-Requires:       python3-bodhi-client
 %{?python_provide:%python_provide python3-%{real_name}}
 
 %description -n python3-%{real_name}
