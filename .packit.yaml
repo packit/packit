@@ -9,7 +9,7 @@ upstream_project_url: https://github.com/packit-service/packit
 actions:
   create-archive:
     - "python3 setup.py sdist --dist-dir ."
-    - "sh -c 'echo packitos-$(python3 setup.py --version).tar.gz'"
+    - "echo packitos-$(python3 setup.py --version).tar.gz"
   get-current-version:
     - "python3 setup.py --version"
 
