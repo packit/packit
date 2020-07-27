@@ -464,6 +464,7 @@ class PackitAPI:
         :return: a path to the srpm
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
+
         try:
             self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
         except Exception as ex:
