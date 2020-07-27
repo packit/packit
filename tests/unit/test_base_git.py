@@ -144,7 +144,7 @@ def test_with_action_defined(packit_repository_base):
 
 def test_with_action_working_dir(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env=None, shell=True
+        command=["command", "--a"], env=None
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -180,7 +180,7 @@ def test_run_action_not_defined(packit_repository_base):
 
 def test_run_action_defined(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env=None, shell=True
+        command=["command", "--a"], env=None
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -207,7 +207,7 @@ def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object)
 
     flexmock(Sandcastle).should_receive("get_api_client").and_return(None)
     flexmock(SandcastleCommandHandler).should_receive("run_command").with_args(
-        command=["command", "-a"], env=None, shell=True
+        command=["command", "-a"], env=None
     ).and_return(None).once()
     packit_repository_base_with_sandcastle_object.config.actions_handler = "sandcastle"
     packit_repository_base_with_sandcastle_object.run_action(
