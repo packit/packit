@@ -12,7 +12,7 @@ actions:
   #   Make sure you're either building from a fully intact git repository or PyPI tarballs.
   create-archive:
     - python3 setup.py sdist --dist-dir ./fedora/
-    - ls -1t ./fedora/*.tar.gz | head -n 1
+    - bash -c "ls -1t ./fedora/*.tar.gz | head -n 1"
   get-current-version: python3 setup.py --version
 jobs:
   - job: sync_from_downstream
