@@ -23,7 +23,7 @@
 import pytest
 
 from flexmock import flexmock
-from packit import utils
+from packit.utils import commands
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
@@ -133,7 +133,7 @@ def test_with_action_non_defined(packit_repository_base):
 
 
 def test_with_action_defined(packit_repository_base):
-    flexmock(utils).should_receive("run_command").once()
+    flexmock(commands).should_receive("run_command").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
@@ -153,7 +153,7 @@ def test_with_action_working_dir(packit_repository_base):
 
 
 def test_run_action_hook_not_defined(packit_repository_base):
-    flexmock(utils).should_receive("run_command").times(0)
+    flexmock(commands).should_receive("run_command").times(0)
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
