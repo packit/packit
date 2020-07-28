@@ -25,7 +25,7 @@ from typing import Union, List, Optional, Dict
 
 from flexmock import flexmock
 
-from packit import utils
+from packit.utils import commands
 
 
 def test_basic_build(
@@ -33,7 +33,7 @@ def test_basic_build(
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(utils).should_receive("run_command_remote").with_args(
+    flexmock(commands).should_receive("run_command_remote").with_args(
         cmd=["fedpkg", "build", "--scratch", "--nowait", "--target", "asdqwe"],
         cwd=api.dg.local_project.working_dir,
         error_message="Submission of build to koji failed.",
@@ -65,7 +65,7 @@ def test_build_from_upstream(
         assert cwd == api.up.local_project.working_dir
         return "\n\nLink to koji build: https://koji...\n"
 
-    flexmock(utils, run_command_remote=mocked_run_command)
+    flexmock(commands, run_command_remote=mocked_run_command)
     api.build(
         "master",
         scratch=True,

@@ -84,9 +84,9 @@ def test_run_command_w_env():
 
 
 def test_get_packit_version_not_installed():
-    flexmock(sys.modules["packit.utils"]).should_receive("get_distribution").and_raise(
-        DistributionNotFound
-    )
+    flexmock(sys.modules["packit.utils.version"]).should_receive(
+        "get_distribution"
+    ).and_raise(DistributionNotFound)
     assert get_packit_version() == "NOT_INSTALLED"
 
 
