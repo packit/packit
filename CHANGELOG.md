@@ -1,3 +1,7 @@
+# 0.14.0
+
+- Reverted "invoke all commands in shell" change that had been introduced in 0.13.0.
+
 # 0.13.1
 
 # Bug fixes
