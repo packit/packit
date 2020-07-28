@@ -5,14 +5,16 @@
       tags:
         - classic
       required_packages:
-        - python3-packit
-        - python36
-        - python3-tox
-        - python3-pytest
-        - python3-flexmock
-        - python3-setuptools_scm
-        - make
         - krb5-devel
+        - make
+        - python36
+        - python3-devel
+        - python3-flexmock
+        - python3-packit
+        - python3-pytest
+        - python3-setuptools_scm
+        - python3-setuptools_scm_git_archive
+        - python3-tox
         - rpm-libs
         - redhat-rpm-config
       tests:
