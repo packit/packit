@@ -20,6 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+packit.utils.extensions
+=======================
+
+Keeps functions that extend Python collections (list to dict, get on nested dict)
+and force strict evaluation (`assert_existence`).
+"""
+
 import json
 from typing import Any
 

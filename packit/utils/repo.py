@@ -21,14 +21,13 @@
 # SOFTWARE.
 
 import logging
-import re
 import tempfile
 from pathlib import Path
 from typing import Tuple, Optional
-from urllib.parse import urlparse
 
 import git
 
+from ogr.parsing import parse_git_repo
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -62,24 +61,12 @@ def get_repo(url: str, directory: str = None) -> git.Repo:
 
 
 def get_namespace_and_repo_name(url: str) -> Tuple[Optional[str], str]:
-    if Path(url).exists():
-        return None, Path(url).name
-    url = url.strip("/")
-    try:
-        if url.endswith(".git"):
-            url = url[:-4]
-        if url.startswith("http"):
-            # if git_url is in format http{s}://github.com/org/repo_name
-            _, namespace, repo_name = url.rsplit("/", 2)
-        else:
-            # If git_url is in format git@github.com:org/repo_name
-            org_repo = url.split(":", 2)[1]
-            namespace, repo_name = org_repo.split("/", 2)
-    except (IndexError, ValueError) as ex:
+    parsed_git_repo = parse_git_repo(url)
+    if parsed_git_repo is None or not parsed_git_repo.repo:
         raise PackitException(
-            f"Invalid URL format, can't obtain namespace and repository name: {url}: {ex!r}"
+            f"Invalid URL format, can't obtain namespace and repository name: {url}"
         )
-    return namespace, repo_name
+    return parsed_git_repo.namespace, parsed_git_repo.repo
 
 
 def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
@@ -90,33 +77,24 @@ def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
         return False
 
 
-# TODO: merge this function into parse_git_repo in ogr
-# https://github.com/packit-service/packit/pull/555#discussion_r332871418
 def git_remote_url_to_https_url(inp: str) -> str:
     """
     turn provided git remote URL to https URL:
     returns empty string if the input can't be processed
     """
-    if not inp:
+    parsed_repo = parse_git_repo(inp)
+    if not parsed_repo or not parsed_repo.hostname:
+        logger.warning(f"{inp!r} is not an URL we recognize.")
         return ""
-    parsed = urlparse(inp)
-    if parsed.scheme and parsed.scheme in ["http", "https"]:
+
+    if inp.startswith(("http", "https")):
         logger.debug(f"Provided input {inp!r} is an url.")
         return inp
-    elif "@" in inp:
-        url_str = inp.replace("ssh://", "")
-        # now we can sub the colon (:) with slash (/)
-        url_str = url_str.replace(":", "/")
-        # and finally, get rid of the git@ junk
-        url_str = re.sub(r"\w+@", "https://", url_str)
-        # let's verify it's good
-        try:
-            urlparse(url_str)
-        except Exception:
-            logger.error(f"Unable to process {inp!r}.")
-            raise PackitException(f"Unable to process {inp}.")
-        else:
-            logger.debug(f"SSH style URL {inp!r} turned into HTTPS {url_str!r}")
-            return url_str
-    logger.warning(f"{inp!r} is not an URL we recognize.")
-    return ""
+
+    optional_suffix = ".git" if inp.endswith(".git") else ""
+    url_str = "https://{}/{}/{}{}".format(
+        parsed_repo.hostname, parsed_repo.namespace, parsed_repo.repo, optional_suffix
+    )
+
+    logger.debug(f"URL {inp!r} turned into HTTPS {url_str!r}")
+    return url_str
