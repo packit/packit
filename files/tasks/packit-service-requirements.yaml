@@ -11,12 +11,16 @@
   args:
     chdir: "{{ reverse_dir }}"
   become: true
+  environment:
+    SOURCE_BRANCH: "{{ zuul.branch }}"
 
 - name: Install packit-service-worker dependencies
   command: ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -v -c local -i localhost, files/install-deps-worker.yaml
   args:
     chdir: "{{ reverse_dir }}"
   become: true
+  environment:
+    SOURCE_BRANCH: "{{ zuul.branch }}"
 
 - name: Install packit-service test dependencies
   command: ansible-playbook -e "ansible_python_interpreter=/usr/bin/python3" -v -c local -i localhost, files/recipe-tests.yaml
