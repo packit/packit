@@ -40,6 +40,10 @@ DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
 PROD_DISTGIT_HOSTNAME = "src.fedoraproject.org"
 PROD_DISTGIT_URL = f"https://{PROD_DISTGIT_HOSTNAME}/"
+
+STG_DISTGIT_HOSTNAME = "src.stg.fedoraproject.org"
+STG_DISTGIT_URL = f"https://{STG_DISTGIT_HOSTNAME}/"
+
 ALTERNATIVE_PROD_DG_HOSTNAME = "pkgs.fedoraproject.org"
 DIST_GIT_HOSTNAME_CANDIDATES = (
     PROD_DISTGIT_HOSTNAME,

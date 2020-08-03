@@ -78,11 +78,13 @@ class PackitAPI:
         ],  # validate doesn't want PackageConfig
         upstream_local_project: LocalProject = None,
         downstream_local_project: LocalProject = None,
+        stage: bool = False,
     ) -> None:
         self.config = config
         self.package_config: CommonPackageConfig = package_config
         self.upstream_local_project = upstream_local_project
         self.downstream_local_project = downstream_local_project
+        self.stage = stage
 
         self._up = None
         self._dg = None
@@ -98,7 +100,8 @@ class PackitAPI:
             f"downstream_local_project='{self.downstream_local_project}', "
             f"up='{self.up}', "
             f"dg='{self.dg}', "
-            f"copr_helper='{self.copr_helper}')"
+            f"copr_helper='{self.copr_helper}', "
+            f"stage='{self.stage}')"
         )
 
     @property
@@ -119,6 +122,7 @@ class PackitAPI:
                 config=self.config,
                 package_config=self.package_config,
                 local_project=self.downstream_local_project,
+                stage=self.stage,
             )
         return self._dg
 
@@ -821,9 +825,11 @@ class PackitAPI:
             logger.info("Won't be doing kinit, no credentials provided.")
             return
 
+        stg = "STG." if self.stage else ""
+
         cmd = [
             "kinit",
-            f"{self.config.fas_user}@FEDORAPROJECT.ORG",
+            f"{self.config.fas_user}@{stg}FEDORAPROJECT.ORG",
             "-k",
             "-t",
             self.config.keytab_path,
