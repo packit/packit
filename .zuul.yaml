@@ -1,6 +1,5 @@
 ---
 - project:
-    name: packit-service/packit
     check:
       jobs:
         - pre-commit
@@ -59,5 +58,5 @@
     parent: packit-tests-pip-deps
     description: Run packit-service tests to check we don't break it
     required-projects:
-      - github.com/packit-service/packit-service
+      - github.com/packit/packit-service
     run: files/zuul-reverse-dep-packit-service.yaml
