@@ -384,10 +384,10 @@ class Upstream(PackitRepositoryBase):
 
             logger.info(
                 "Linking to the specfile directory:"
-                f"{archive_in_spec_dir} -> {archive_path}"
-                f"(relative path to archive: {relative_archive_path})"
+                f" {archive_in_spec_dir} -> {relative_archive_path}"
+                f" (absolute path to archive: {archive_path})"
             )
-            archive_in_spec_dir.symlink_to(archive_path)
+            archive_in_spec_dir.symlink_to(relative_archive_path)
 
     def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
         """
@@ -405,9 +405,10 @@ class Upstream(PackitRepositoryBase):
                     )
                     if archive_path.is_file():
                         archive_path_absolute = archive_path.absolute()
-                        logger.info(f"Created archive: {archive_path} (relative)")
-                        logger.info(f"\t{archive_path_absolute} (absolute)")
-                        return archive_path
+                        logger.info("Created archive:")
+                        logger.info(f"\trelative path: {archive_path}")
+                        logger.info(f"\tabsolute path: {archive_path_absolute}")
+                        return archive_path_absolute
                 except OSError as ex:
                     # File too long
                     if ex.errno == 36:
