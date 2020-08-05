@@ -82,6 +82,7 @@ class CoprHelper:
         preserve_project: bool = False,
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
+        request_admin_if_needed: bool = False,
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -142,17 +143,27 @@ class CoprHelper:
                 )
             except CoprRequestException as ex:
                 if "Only owners and admins may update their projects." in str(ex):
-                    logger.info(
-                        f"We have to be admins to be able to edit project settings. "
-                        f"Requesting the admin rights for the copr '{owner}/{project}' project."
-                    )
-                    copr_proj.request_permissions(
-                        ownername=owner,
-                        projectname=project,
-                        permissions={"admin": True},
-                    )
+                    if request_admin_if_needed:
+                        logger.info(
+                            f"Admin permissions are required "
+                            f"in order to be able to edit project settings. "
+                            f"Requesting the admin rights for the copr '{owner}/{project}' project."
+                        )
+                        copr_proj.request_permissions(
+                            ownername=owner,
+                            projectname=project,
+                            permissions={"admin": True},
+                        )
+                    else:
+                        logger.warning(
+                            f"Admin permissions are required for copr '{owner}/{project}' project"
+                            f"in order to be able to edit project settings. "
+                            f"You can make a request by specifying --request-admin-if-needed "
+                            f"when using Packit CLI."
+                        )
                 raise PackitCoprSettingsException(
-                    "Copr project update failed.", fields_to_change=fields_to_change
+                    f"Copr project update failed for '{owner}/{project}' project.",
+                    fields_to_change=fields_to_change,
                 ) from ex
 
     def get_fields_to_change(

@@ -33,9 +33,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
-from ogr.abstract import PullRequest
 from tabulate import tabulate
 
+from ogr.abstract import PullRequest
 from packit import utils
 from packit.actions import ActionName
 from packit.config import Config
@@ -671,6 +671,7 @@ class PackitAPI:
         preserve_project: bool = False,
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
+        request_admin_if_needed: bool = False,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -686,6 +687,8 @@ class PackitAPI:
         :param preserve_project: if set, project will not be created as temporary
         :param list additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
         :param list additional_repos: buildroot additional additional_repos
+        :param bool request_admin_if_needed: if we can't change the settings
+                                             and are not allowed to do so
         :return: id of the created build and url to the build web page
         """
         srpm_path = self.create_srpm(
