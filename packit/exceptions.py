@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Union
+from typing import Union, Any, Tuple, Dict
 
 from deprecated import deprecated
 
@@ -44,7 +44,7 @@ class PackitCommandFailedError(PackitException):
         self,
         *args,
         stdout_output: Union[str, bytes] = None,
-        stderr_output: Union[str, bytes] = None
+        stderr_output: Union[str, bytes] = None,
     ):
         super().__init__(*args)
         self.stdout_output = ensure_str(stdout_output)
@@ -61,6 +61,20 @@ class PackitCoprException(PackitException):
 
 class PackitCoprProjectException(PackitCoprException):
     pass
+
+
+class PackitCoprSettingsException(PackitException):
+    """
+    Raised when we can't edit the Copr project settings.
+
+    Contains the info about fields that we want to edit.
+    """
+
+    def __init__(
+        self, *args: object, fields_to_change: Dict[str, Tuple[Any, Any]]
+    ) -> None:
+        self.fields_to_change = fields_to_change
+        super().__init__(*args)
 
 
 class PackitInvalidConfigException(PackitConfigException):

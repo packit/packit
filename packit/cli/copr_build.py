@@ -86,6 +86,13 @@ logger = logging.getLogger(__name__)
     "from which packit should generate patches "
     "(this option implies the repository is source-git).",
 )
+@click.option(
+    "--request-admin-if-needed",
+    help="Ask for admin permissions when we need to change settings of the copr project "
+    "and are not allowed to do so.",
+    default=False,
+    is_flag=True,
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
@@ -101,6 +108,7 @@ def copr_build(
     preserve_project,
     upstream_ref,
     additional_repos,
+    request_admin_if_needed,
     path_or_url,
 ):
     """
@@ -135,6 +143,7 @@ def copr_build(
         list_on_homepage=list_on_homepage,
         preserve_project=preserve_project,
         additional_repos=additional_repos_list,
+        request_admin_if_needed=request_admin_if_needed,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if not nowait:
