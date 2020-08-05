@@ -131,15 +131,12 @@ class CoprHelper:
                 logger.debug(f"{field}: {old} -> {new}")
 
             try:
+                kwargs: Dict[str, Any] = {
+                    arg_name: new for arg_name, (old, new) in fields_to_change.items()
+                }
+                logger.debug(f"Copr edit arguments: {kwargs}")
                 self.copr_client.project_proxy.edit(
-                    ownername=owner,
-                    projectname=project,
-                    chroots=chroots,
-                    description=description,
-                    instructions=instructions,
-                    unlisted_on_hp=not list_on_homepage,
-                    additional_repos=additional_repos,
-                    delete_after_days=delete_after_days,
+                    ownername=owner, projectname=project, **kwargs
                 )
             except CoprRequestException as ex:
                 if "Only owners and admins may update their projects." in str(ex):
