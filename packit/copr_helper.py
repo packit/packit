@@ -23,14 +23,18 @@
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Dict, Tuple, Any
 
 from copr.v3 import Client as CoprClient
-from copr.v3.exceptions import CoprNoResultException, CoprException
+from copr.v3.exceptions import (
+    CoprNoResultException,
+    CoprException,
+    CoprRequestException,
+)
 from munch import Munch
 
 from packit.constants import COPR2GITHUB_STATE
-from packit.exceptions import PackitCoprProjectException
+from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsException
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -78,7 +82,7 @@ class CoprHelper:
         preserve_project: bool = False,
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
-        update_additional_values: bool = True,
+        request_admin_if_needed: bool = False,
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -89,33 +93,6 @@ class CoprHelper:
             copr_proj = self.copr_client.project_proxy.get(
                 ownername=owner, projectname=project
             )
-            # make sure or project has chroots set correctly
-            # we can also update other settings
-            if set(copr_proj.chroot_repos.keys()) != set(chroots):
-                logger.info(f"Updating copr project '{owner}/{project}'")
-                logger.debug(f"old targets = {set(copr_proj.chroot_repos.keys())}")
-                logger.debug(f"new targets = {set(chroots)}")
-
-                if not update_additional_values:
-                    delete_after_days = None
-                elif preserve_project:
-                    delete_after_days = -1
-                else:
-                    delete_after_days = 60
-
-                self.copr_client.project_proxy.edit(
-                    ownername=owner,
-                    projectname=project,
-                    chroots=chroots,
-                    description=description,
-                    instructions=instructions,
-                    unlisted_on_hp=not list_on_homepage
-                    if update_additional_values
-                    else None,
-                    additional_repos=additional_repos,
-                    delete_after_days=delete_after_days,
-                )
-                # TODO: additional_packages
         except CoprNoResultException as ex:
             if owner != self.configured_owner:
                 raise PackitCoprProjectException(
@@ -134,6 +111,102 @@ class CoprHelper:
                 additional_packages=additional_packages,
                 additional_repos=additional_repos,
             )
+            return
+
+        delete_after_days = -1 if preserve_project else 60
+
+        fields_to_change = self.get_fields_to_change(
+            copr_proj=copr_proj,
+            additional_repos=additional_repos,
+            chroots=chroots,
+            description=description,
+            instructions=instructions,
+            list_on_homepage=list_on_homepage,
+            delete_after_days=delete_after_days,
+        )
+
+        if fields_to_change:
+            logger.info(f"Updating copr project '{owner}/{project}'")
+            for field, (old, new) in fields_to_change.items():
+                logger.debug(f"{field}: {old} -> {new}")
+
+            try:
+                kwargs: Dict[str, Any] = {
+                    arg_name: new for arg_name, (old, new) in fields_to_change.items()
+                }
+                logger.debug(f"Copr edit arguments: {kwargs}")
+                self.copr_client.project_proxy.edit(
+                    ownername=owner, projectname=project, **kwargs
+                )
+            except CoprRequestException as ex:
+                if "Only owners and admins may update their projects." in str(ex):
+                    if request_admin_if_needed:
+                        logger.info(
+                            f"Admin permissions are required "
+                            f"in order to be able to edit project settings. "
+                            f"Requesting the admin rights for the copr '{owner}/{project}' project."
+                        )
+                        copr_proj.request_permissions(
+                            ownername=owner,
+                            projectname=project,
+                            permissions={"admin": True},
+                        )
+                    else:
+                        logger.warning(
+                            f"Admin permissions are required for copr '{owner}/{project}' project"
+                            f"in order to be able to edit project settings. "
+                            f"You can make a request by specifying --request-admin-if-needed "
+                            f"when using Packit CLI."
+                        )
+                raise PackitCoprSettingsException(
+                    f"Copr project update failed for '{owner}/{project}' project.",
+                    fields_to_change=fields_to_change,
+                ) from ex
+
+    def get_fields_to_change(
+        self,
+        copr_proj,
+        additional_repos: Optional[List[str]] = None,
+        chroots: Optional[List[str]] = None,
+        description: Optional[str] = None,
+        instructions: Optional[str] = None,
+        list_on_homepage: Optional[bool] = True,
+        delete_after_days: Optional[int] = None,
+    ) -> Dict[str, Tuple[Any, Any]]:
+
+        fields_to_change: Dict[str, Tuple[Any, Any]] = {}
+        if chroots is not None and set(copr_proj.chroot_repos.keys()) != set(chroots):
+            fields_to_change["chroots"] = (
+                set(copr_proj.chroot_repos.keys()),
+                set(chroots),
+            )
+        if description and copr_proj.description != description:
+            fields_to_change["description"] = (copr_proj.description, description)
+
+        if instructions and copr_proj.instructions != instructions:
+            fields_to_change["instructions"] = (copr_proj.instructions, instructions)
+
+        if copr_proj.unlisted_on_hp != (not list_on_homepage):
+            fields_to_change["unlisted_on_hp"] = (
+                copr_proj.unlisted_on_hp,
+                (not list_on_homepage),
+            )
+
+        if delete_after_days and copr_proj.delete_after_days != delete_after_days:
+            fields_to_change["delete_after_days"] = (
+                copr_proj.delete_after_days,
+                delete_after_days,
+            )
+
+        if additional_repos is not None and set(copr_proj.additional_repos) != set(
+            additional_repos
+        ):
+            fields_to_change["additional_repos"] = (
+                copr_proj.additional_repos,
+                additional_repos,
+            )
+
+        return fields_to_change
 
     def create_copr_project(
         self,
