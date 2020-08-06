@@ -19,9 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import subprocess
+
 import tempfile
-from pathlib import Path
 
 import git
 from flexmock import flexmock
@@ -29,7 +28,6 @@ from flexmock import flexmock
 from packit import local_project
 from packit.local_project import LocalProject
 from packit.utils import repo
-from tests.spellbook import initiate_git_repo
 
 
 def test_parse_repo_name_and_namespace_from_namespace():
@@ -359,41 +357,6 @@ def test_working_dir():
     assert project.working_dir == "./local/directory/to/git"
     assert project.git_repo
     assert project.ref == "branch"
-
-
-def test_pr_id_and_ref(tmp_path: Path):
-    """ p-s passes both ref and pr_id, we want to check out PR """
-    remote = tmp_path / "remote"
-    remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=remote)
-    upstream_git = tmp_path / "upstream_git"
-    upstream_git.mkdir()
-    initiate_git_repo(upstream_git, push=True, upstream_remote=str(remote))
-    # mimic github PR
-    pr_id = "123"
-    ref = (
-        subprocess.check_output(["git", "rev-parse", "HEAD^"], cwd=upstream_git)
-        .strip()
-        .decode()
-    )
-    local_tmp_branch = "asdqwe"
-    subprocess.check_call(["git", "branch", local_tmp_branch, ref], cwd=upstream_git)
-    subprocess.check_call(
-        ["git", "push", "origin", f"{local_tmp_branch}:refs/pull/{pr_id}/head"],
-        cwd=upstream_git,
-    )
-    subprocess.check_call(["git", "branch", "-D", local_tmp_branch], cwd=upstream_git)
-
-    LocalProject(working_dir=str(upstream_git), offline=True, pr_id=pr_id, ref=ref)
-
-    assert (
-        subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=upstream_git
-        )
-        .strip()
-        .decode()
-        == f"pr/{pr_id}"
-    )
 
 
 # OFFLINE
