@@ -29,6 +29,7 @@ from copr.v3 import (
     CoprRequestException,
 )
 from flexmock import flexmock
+from munch import munchify
 
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitCoprException, PackitCoprSettingsException
@@ -134,6 +135,219 @@ def test_copr_build_existing_project_change_settings(
         owner=owner,
         description="different description",
         instructions=instructions,
+    )
+
+    assert build_id == "1"
+    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
+
+
+def test_copr_build_existing_project_munch_no_settings_change(
+    cwd_upstream_or_distgit, api_instance
+):
+    u, d, api = api_instance
+    owner = "the-owner"
+    project = "project-name"
+    chroots = ["fedora-rawhide-x86_64"]
+
+    flexmock(ProjectProxy).should_receive("get").and_return(
+        munchify(
+            {
+                "additional_repos": [],
+                "auto_prune": True,
+                "chroot_repos": {
+                    "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
+                    "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
+                },
+                "contact": "https://github.com/packit-service/packit/issues",
+                "description": "Continuous builds initiated by packit service.\n"
+                "For more info check out https://packit.dev/",
+                "devel_mode": False,
+                "enable_net": True,
+                "full_name": "packit/packit-hello-world-127-stg",
+                "homepage": "",
+                "id": 34245,
+            }
+        )
+    )
+
+    flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
+
+    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+    )
+
+    build = flexmock(id="1", ownername=owner, projectname=project,)
+    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
+    build_id, url = api.run_copr_build(
+        project=project,
+        chroots=chroots,
+        owner=owner,
+        description=None,
+        instructions=None,
+        list_on_homepage=False,
+        preserve_project=False,
+        additional_repos=None,
+    )
+
+    assert build_id == "1"
+    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
+
+
+def test_copr_build_existing_project_munch_chroot_change(
+    cwd_upstream_or_distgit, api_instance
+):
+    u, d, api = api_instance
+    owner = "the-owner"
+    project = "project-name"
+    chroots = ["fedora-rawhide-x86_64", "fedora-31-x86_64"]
+
+    flexmock(ProjectProxy).should_receive("get").and_return(
+        munchify(
+            {
+                "additional_repos": [],
+                "auto_prune": True,
+                "chroot_repos": {
+                    "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
+                    "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
+                },
+                "contact": "https://github.com/packit-service/packit/issues",
+                "description": "Continuous builds initiated by packit service.\n"
+                "For more info check out https://packit.dev/",
+                "devel_mode": False,
+                "enable_net": True,
+                "full_name": "packit/packit-hello-world-127-stg",
+                "homepage": "",
+                "id": 34245,
+            }
+        )
+    )
+
+    flexmock(ProjectProxy).should_receive("edit").and_return().once()
+
+    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+    )
+
+    build = flexmock(id="1", ownername=owner, projectname=project,)
+    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
+    build_id, url = api.run_copr_build(
+        project=project,
+        chroots=chroots,
+        owner=owner,
+        description=None,
+        instructions=None,
+        list_on_homepage=False,
+        preserve_project=False,
+        additional_repos=None,
+    )
+
+    assert build_id == "1"
+    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
+
+
+def test_copr_build_existing_project_munch_additional_repos_change(
+    cwd_upstream_or_distgit, api_instance
+):
+    u, d, api = api_instance
+    owner = "the-owner"
+    project = "project-name"
+    chroots = ["fedora-rawhide-x86_64"]
+
+    flexmock(ProjectProxy).should_receive("get").and_return(
+        munchify(
+            {
+                "additional_repos": [],
+                "auto_prune": True,
+                "chroot_repos": {
+                    "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
+                    "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
+                },
+                "contact": "https://github.com/packit-service/packit/issues",
+                "description": "Continuous builds initiated by packit service.\n"
+                "For more info check out https://packit.dev/",
+                "devel_mode": False,
+                "enable_net": True,
+                "full_name": "packit/packit-hello-world-127-stg",
+                "homepage": "",
+                "id": 34245,
+            }
+        )
+    )
+
+    flexmock(ProjectProxy).should_receive("edit").and_return().once()
+
+    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+    )
+
+    build = flexmock(id="1", ownername=owner, projectname=project,)
+    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
+    build_id, url = api.run_copr_build(
+        project=project,
+        chroots=chroots,
+        owner=owner,
+        description=None,
+        instructions=None,
+        list_on_homepage=False,
+        preserve_project=False,
+        additional_repos=["new-repo"],
+    )
+
+    assert build_id == "1"
+    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
+
+
+def test_copr_build_existing_project_munch_list_on_homepage_change(
+    cwd_upstream_or_distgit, api_instance
+):
+    """
+    We don't get that value from Copr. => We can't check the change. => No edit.
+    """
+
+    u, d, api = api_instance
+    owner = "the-owner"
+    project = "project-name"
+    chroots = ["fedora-rawhide-x86_64"]
+
+    flexmock(ProjectProxy).should_receive("get").and_return(
+        munchify(
+            {
+                "additional_repos": [],
+                "auto_prune": True,
+                "chroot_repos": {
+                    "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
+                    "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
+                },
+                "contact": "https://github.com/packit-service/packit/issues",
+                "description": "Continuous builds initiated by packit service.\n"
+                "For more info check out https://packit.dev/",
+                "devel_mode": False,
+                "enable_net": True,
+                "full_name": "packit/packit-hello-world-127-stg",
+                "homepage": "",
+                "id": 34245,
+            }
+        )
+    )
+
+    # We don't get that value from Copr. => We can't check the change. => No edit.
+    flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
+
+    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+    )
+
+    build = flexmock(id="1", ownername=owner, projectname=project,)
+    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
+    build_id, url = api.run_copr_build(
+        project=project,
+        chroots=chroots,
+        owner=owner,
+        description=None,
+        instructions=None,
+        list_on_homepage=True,
+        preserve_project=False,
+        additional_repos=None,
     )
 
     assert build_id == "1"

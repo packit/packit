@@ -177,26 +177,45 @@ class CoprHelper:
         fields_to_change: Dict[str, Tuple[Any, Any]] = {}
         if chroots is not None and set(copr_proj.chroot_repos.keys()) != set(chroots):
             fields_to_change["chroots"] = (
-                set(copr_proj.chroot_repos.keys()),
-                set(chroots),
+                copr_proj.chroot_repos.keys(),
+                chroots,
             )
         if description and copr_proj.description != description:
             fields_to_change["description"] = (copr_proj.description, description)
 
-        if instructions and copr_proj.instructions != instructions:
-            fields_to_change["instructions"] = (copr_proj.instructions, instructions)
-
-        if copr_proj.unlisted_on_hp != (not list_on_homepage):
+        if instructions:
+            if "instructions" not in copr_proj:
+                logger.debug(
+                    "The `instructions` key was not received from Copr. "
+                    "We can't check that value to see if the update is needed."
+                )
+            elif copr_proj.instructions != instructions:
+                fields_to_change["instructions"] = (
+                    copr_proj.instructions,
+                    instructions,
+                )
+        if "unlisted_on_hp" not in copr_proj:
+            logger.debug(
+                "The `unlisted_on_hp` key was not received from Copr. "
+                "We can't check that value to see if the update is needed."
+            )
+        elif copr_proj.unlisted_on_hp != (not list_on_homepage):
             fields_to_change["unlisted_on_hp"] = (
                 copr_proj.unlisted_on_hp,
                 (not list_on_homepage),
             )
 
-        if delete_after_days and copr_proj.delete_after_days != delete_after_days:
-            fields_to_change["delete_after_days"] = (
-                copr_proj.delete_after_days,
-                delete_after_days,
-            )
+        if delete_after_days:
+            if "delete_after_days" not in copr_proj:
+                logger.debug(
+                    "The `delete_after_days` key was not received from Copr. "
+                    "We can't check that value to see if the update is needed."
+                )
+            elif copr_proj.delete_after_days != delete_after_days:
+                fields_to_change["delete_after_days"] = (
+                    copr_proj.delete_after_days,
+                    delete_after_days,
+                )
 
         if additional_repos is not None and set(copr_proj.additional_repos) != set(
             additional_repos
