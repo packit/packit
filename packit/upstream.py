@@ -183,7 +183,7 @@ class Upstream(PackitRepositoryBase):
         project = self.local_project.git_project
 
         try:
-            upstream_pr = project.pr_create(
+            upstream_pr = project.create_pr(
                 title=pr_title,
                 body=pr_description,
                 source_branch=source_branch,

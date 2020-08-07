@@ -73,7 +73,7 @@ def upstream_pr_mock():
     ],
 )
 def test_create_pull(upstream_mock, upstream_pr_mock, fork_username):
-    upstream_mock.local_project.git_project.should_receive("pr_create").with_args(
+    upstream_mock.local_project.git_project.should_receive("create_pr").with_args(
         title="test_title",
         body="test_description",
         source_branch="test_source",
