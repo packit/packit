@@ -373,11 +373,11 @@ def test_copr_build_existing_project_error_on_change_settings(
             delete_after_days=60,
             additional_repos=[],
         )
-        .should_receive("request_permissions")
-        .with_args(ownername=owner, projectname=project, permissions={"admin": True})
-        .and_return()
-        .mock()
     )
+
+    flexmock(ProjectProxy).should_receive("request_permissions").with_args(
+        ownername=owner, projectname=project, permissions={"admin": True}
+    ).and_return()
 
     flexmock(ProjectProxy).should_receive("edit").and_raise(
         CoprRequestException, "Only owners and admins may update their projects."
