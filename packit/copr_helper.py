@@ -146,7 +146,7 @@ class CoprHelper:
                             f"in order to be able to edit project settings. "
                             f"Requesting the admin rights for the copr '{owner}/{project}' project."
                         )
-                        copr_proj.request_permissions(
+                        self.copr_client.project_proxy.request_permissions(
                             ownername=owner,
                             projectname=project,
                             permissions={"admin": True},
