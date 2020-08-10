@@ -213,7 +213,7 @@ class Upstream(PackitRepositoryBase):
         sync_files_to_ignore = [
             str(sf.src.relative_to(self.local_project.working_dir))
             for sf in self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
-                Path(self.local_project.working_dir),
+                self.local_project.working_dir,
                 Path(
                     # dest (downstream) is not important, we only care about src (upstream)
                     destination
@@ -280,7 +280,7 @@ class Upstream(PackitRepositoryBase):
             f"We're about to `git-describe` the upstream repository "
             f"{self.local_project.working_dir}."
         )
-        logger.debug(f"Content: {os.listdir(self.local_project.working_dir)}")
+        logger.debug(f"Content: {os.listdir(str(self.local_project.working_dir))}")
 
         # let's inspect tags in the repo and log our findings
         cmd = ["git", "--no-pager", "tag", "--list"]
@@ -401,8 +401,8 @@ class Upstream(PackitRepositoryBase):
         for output in reversed(outputs):
             for archive_name in reversed(output.splitlines()):
                 try:
-                    archive_path = Path(
-                        self._local_project.working_dir, archive_name.strip()
+                    archive_path = (
+                        self._local_project.working_dir / archive_name.strip()
                     )
                     if archive_path.is_file():
                         archive_path_absolute = archive_path.absolute()
@@ -577,7 +577,7 @@ class Upstream(PackitRepositoryBase):
         if self.running_in_service():
             srpm_dir = "."
             rpmbuild_dir = os.path.relpath(
-                str(self.absolute_specfile_dir), self.local_project.working_dir
+                str(self.absolute_specfile_dir), str(self.local_project.working_dir)
             )
         else:
             srpm_dir = srpm_dir or os.getcwd()

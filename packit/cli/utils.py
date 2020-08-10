@@ -23,6 +23,7 @@
 import functools
 import logging
 import sys
+from pathlib import Path
 from typing import List, Optional
 
 import click
@@ -117,7 +118,7 @@ def get_packit_api(
     if dist_git_path:
         package_config.dist_git_clone_path = dist_git_path
 
-    if dist_git_path and dist_git_path == local_project.working_dir:
+    if dist_git_path and Path(dist_git_path) == local_project.working_dir:
         PackitAPI(
             config=config,
             package_config=package_config,

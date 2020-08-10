@@ -66,7 +66,7 @@ def test_get_output_from_action_defined_in_sandcastle():
     packit_repository_base = PackitRepositoryBase(
         config=c, package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd})
     )
-    packit_repository_base.local_project = LocalProject()
+    packit_repository_base.local_project = LocalProject(working_dir="/tmp")
 
     flexmock(Sandcastle).should_receive("run")
     flexmock(Sandcastle).should_receive("exec").and_return(echo_cmd)
@@ -95,7 +95,7 @@ def test_base_push_bad(distgit_and_remote):
 
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
-        working_dir=str(distgit), git_url="https://github.com/packit/lol"
+        working_dir=distgit, git_url="https://github.com/packit/lol"
     )
     flexmock(
         LocalProject,
@@ -113,7 +113,7 @@ def test_base_push_good(distgit_and_remote):
 
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
-        working_dir=str(distgit), git_url="https://github.com/packit/lol"
+        working_dir=distgit, git_url="https://github.com/packit/lol"
     )
     flexmock(
         LocalProject,
