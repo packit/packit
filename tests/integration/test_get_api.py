@@ -35,23 +35,19 @@ from tests.spellbook import get_test_config, initiate_git_repo
 def test_is_upstream(upstream_and_remote):
     upstream, _ = upstream_and_remote
     c = get_test_config()
-    api = get_packit_api(
-        config=c, local_project=LocalProject(working_dir=str(upstream))
-    )
+    api = get_packit_api(config=c, local_project=LocalProject(working_dir=upstream))
     assert api.upstream_local_project
     assert not api.downstream_local_project
-    assert api.upstream_local_project.working_dir == str(upstream)
+    assert api.upstream_local_project.working_dir == upstream
 
 
 def test_is_downstream(distgit_and_remote):
     downstream, _ = distgit_and_remote
     c = get_test_config()
-    api = get_packit_api(
-        config=c, local_project=LocalProject(working_dir=str(downstream))
-    )
+    api = get_packit_api(config=c, local_project=LocalProject(working_dir=downstream))
     assert api.downstream_local_project
     assert not api.upstream_local_project
-    assert api.downstream_local_project.working_dir == str(downstream)
+    assert api.downstream_local_project.working_dir == downstream
 
 
 def test_url_is_downstream():

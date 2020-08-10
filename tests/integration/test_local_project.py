@@ -32,7 +32,7 @@ def test_pr_id_and_ref(tmp_path: Path):
     subprocess.check_call(["git", "branch", "-D", local_tmp_branch], cwd=upstream_git)
 
     LocalProject(
-        working_dir=str(upstream_git),
+        working_dir=upstream_git,
         offline=True,
         pr_id=pr_id,
         ref=ref,
@@ -78,7 +78,7 @@ def test_pr_id_and_ref_gitlab(tmp_path: Path):
     subprocess.check_call(["git", "branch", "-D", local_tmp_branch], cwd=upstream_git)
 
     LocalProject(
-        working_dir=str(upstream_git),
+        working_dir=upstream_git,
         offline=True,
         pr_id=pr_id,
         ref=ref,

@@ -64,7 +64,7 @@ def mock_downstream_remote_functionality(downstream_n_distgit):
     u, d = downstream_n_distgit
 
     dglp = LocalProject(
-        working_dir=str(d),
+        working_dir=d,
         git_url="https://packit.dev/rpms/beer",
         git_service=PagureService(),
     )
@@ -151,7 +151,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
     flexmock(PagureUser, get_username=lambda: "packito")
 
     dglp = LocalProject(
-        working_dir=str(distgit),
+        working_dir=distgit,
         git_url="https://packit.dev/rpms/beer",
         git_service=PagureService(),
     )
@@ -232,7 +232,7 @@ def upstream_instance(upstream_and_remote, distgit_and_remote, tmp_path):
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
         pc.dist_git_clone_path = str(d)
-        lp = LocalProject(working_dir=str(u))
+        lp = LocalProject(working_dir=u)
 
         ups = Upstream(c, pc, lp)
         yield u, ups
@@ -267,9 +267,7 @@ def api_instance(upstream_and_remote, distgit_and_remote):
     d, _ = distgit_and_remote
 
     c = get_test_config()
-    api = get_packit_api(
-        config=c, local_project=LocalProject(working_dir=str(Path.cwd()))
-    )
+    api = get_packit_api(config=c, local_project=LocalProject(working_dir=Path.cwd()))
     return u, d, api
 
 
@@ -282,7 +280,7 @@ def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
         pc.dist_git_clone_path = str(distgit)
-        up_lp = LocalProject(working_dir=str(sourcegit))
+        up_lp = LocalProject(working_dir=sourcegit)
         api = PackitAPI(c, pc, up_lp)
         return api
 

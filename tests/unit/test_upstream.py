@@ -52,7 +52,7 @@ def upstream_mock(local_project_mock, package_config_mock):
     upstream = Upstream(
         config=get_test_config(),
         package_config=package_config_mock,
-        local_project=LocalProject(working_dir=str("test")),
+        local_project=LocalProject(working_dir="test"),
     )
     flexmock(upstream)
     upstream.should_receive("local_project").and_return(local_project_mock)
@@ -61,8 +61,7 @@ def upstream_mock(local_project_mock, package_config_mock):
 
 @pytest.fixture
 def upstream_pr_mock():
-    mock = flexmock(url="test_pr_url")
-    return mock
+    return flexmock(url="test_pr_url")
 
 
 @pytest.mark.parametrize(
