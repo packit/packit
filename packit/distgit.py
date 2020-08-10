@@ -298,9 +298,8 @@ class DistGit(PackitRepositoryBase):
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
         archive_name = os.path.basename(archive_path)
         try:
-            stg = "stg." if self.stage else ""
             res = requests.head(
-                f"https://src.{stg}fedoraproject.org/lookaside/pkgs/"
+                f"{self.package_config.dist_git_base_url}lookaside/pkgs/"
                 f"{self.package_config.downstream_package_name}/{archive_name}/"
             )
             if res.ok:
