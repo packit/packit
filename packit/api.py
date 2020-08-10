@@ -825,11 +825,9 @@ class PackitAPI:
             logger.info("Won't be doing kinit, no credentials provided.")
             return
 
-        stg = "STG." if self.stage else ""
-
         cmd = [
             "kinit",
-            f"{self.config.fas_user}@{stg}FEDORAPROJECT.ORG",
+            f"{self.config.fas_user}@{self.config.kerberos_realm}",
             "-k",
             "-t",
             self.config.keytab_path,
