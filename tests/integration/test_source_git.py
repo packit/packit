@@ -31,6 +31,7 @@ from tests.spellbook import (
     git_add_and_commit,
     build_srpm,
     create_merge_commit_in_source_git,
+    create_git_am_style_history,
 )
 
 
@@ -358,12 +359,6 @@ def test_basic_local_update_patch_content_with_downstream_patch(
 
     create_merge_commit_in_source_git(sourcegit)
 
-    source_file = sourcegit / "big-source-file.txt"
-    source_file.write_text("new changes")
-    git_add_and_commit(
-        directory=sourcegit, message="source change\n" "present_in_specfile: true",
-    )
-
     source_file = sourcegit / "ignored_file.txt"
     source_file.write_text(" And I am sad.")
     git_add_and_commit(directory=sourcegit, message="make a file sad")
@@ -393,7 +388,7 @@ def test_basic_local_update_patch_content_with_downstream_patch(
 
 def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path / "fedora")
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
     create_merge_commit_in_source_git(sg_path)
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref="0.1.0")
@@ -416,7 +411,7 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
 
 def test_srpm_merge_storm(mock_remote_functionality_sourcegit, api_instance_source_git):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path / "fedora")
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref="0.1.0")
@@ -436,4 +431,38 @@ def test_srpm_merge_storm(mock_remote_functionality_sourcegit, api_instance_sour
     assert set([x.name for x in sg_path.joinpath("fedora").glob("*.patch")]) == {
         "0001-MERGE-COMMIT.patch",
         "0002-ugly-merge-commit.patch",
+    }
+
+
+def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_git):
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+
+    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
+        "Patch1: citra.patch",
+        "Patch2: malt.patch",
+        "Patch8: 0001-m04r-malt.patch",
+    )
+    autosetup_line = api_instance_source_git.up.specfile.spec_content.section("%prep")[
+        0
+    ]
+    autosetup_line = autosetup_line.replace("-S patch", "-S git_am")
+    api_instance_source_git.up.specfile.spec_content.section("%prep")[
+        0
+    ] = autosetup_line
+    api_instance_source_git.up.specfile.save()
+
+    create_git_am_style_history(sg_path)
+
+    with cwd(sg_path):
+        api_instance_source_git.create_srpm(upstream_ref="0.1.0")
+
+    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    assert srpm_path.is_file()
+    build_srpm(srpm_path)
+
+    assert set([x.name for x in sg_path.joinpath("fedora").glob("*.patch")]) == {
+        "citra.patch",
+        "0001-m04r-malt.patch",
+        "malt.patch",
     }
