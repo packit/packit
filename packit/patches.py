@@ -107,7 +107,7 @@ class PatchMetadata:
         return msg
 
     @staticmethod
-    def from_commit(commit: git.Commit, patch_path: Path):
+    def from_commit(commit: git.Commit, patch_path: Path) -> "PatchMetadata":
         metadata = get_metadata_from_message(commit) or {}
         if metadata:
             logger.debug(
@@ -244,7 +244,7 @@ class PatchGenerator:
         :param git_ref: start processing commits from this till HEAD
         :param destination: place the patch files here
         :param files_to_ignore: list of files to ignore when creating patches
-        :return: [(patch_path, msg)] list of created patches (tuple of the file path and commit msg)
+        :return: [PatchMetadata, ...] list of patches
         """
         contained = self.are_child_commits_contained(git_ref)
         if not contained:
