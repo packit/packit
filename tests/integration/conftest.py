@@ -24,7 +24,7 @@ import datetime
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 
 import pytest
 from flexmock import flexmock
@@ -93,15 +93,23 @@ def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote
     return mock_remote_functionality(upstream=sourcegit, distgit=distgit)
 
 
-def mock_spec_download_remote_s(path: Path):
+def mock_spec_download_remote_s(
+    repo_path: Path, spec_dir_path: Optional[Path] = None, archive_ref: str = "HEAD"
+):
+    spec_dir_path = spec_dir_path or repo_path
+
     def mock_download_remote_sources():
         """ mock download of the remote archive and place it into dist-git repo """
-        beerware_dir = path / NAME_VERSION
-        beerware_dir.mkdir(exist_ok=True)
-        beerware_dir.joinpath("hops").write_text("Cascade\n")
-        subprocess.check_call(
-            ["tar", "-cf", str(path / TARBALL_NAME), NAME_VERSION], cwd=path
-        )
+        archive_cmd = [
+            "git",
+            "archive",
+            "--output",
+            str(spec_dir_path / TARBALL_NAME),
+            "--prefix",
+            f"{NAME_VERSION}/",
+            archive_ref,
+        ]
+        subprocess.check_call(archive_cmd, cwd=repo_path)
 
     flexmock(Specfile, download_remote_sources=mock_download_remote_sources)
 

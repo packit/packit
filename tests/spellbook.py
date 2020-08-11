@@ -29,6 +29,7 @@ import subprocess
 from pathlib import Path
 
 from click.testing import CliRunner
+from packit.patches import PatchMetadata
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
@@ -185,6 +186,42 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
         # o─┴─│─┘ sourcegit content
         # o ┌─┘ <0.1.0> commit with data
         # o─┘ empty commit #2
+
+
+def create_git_am_style_history(sg: Path):
+    """
+    create merge commit in the provided source-git repo
+
+    :param sg: the repo
+    """
+    hops = sg.joinpath("hops")
+    hops.write_text("Amarillo\n")
+    git_add_and_commit(directory=sg, message="switching to amarillo hops")
+
+    hops.write_text("Citra\n")
+    meta = PatchMetadata(
+        name="citra.patch", squash_commits=True, present_in_specfile=True
+    )
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    malt = sg.joinpath("malt")
+    malt.write_text("Munich\n")
+    meta = PatchMetadata(
+        name="malt.patch", squash_commits=True, present_in_specfile=True
+    )
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    malt.write_text("Pilsen\n")
+    git_add_and_commit(directory=sg, message="using Pilsen malt")
+
+    malt.write_text("Vienna\n")
+    git_add_and_commit(directory=sg, message="actually Vienna malt could be good")
+
+    malt.write_text("Weyermann\n")
+    meta = PatchMetadata(
+        name="0001-m04r-malt.patch", squash_commits=True, present_in_specfile=True
+    )
+    git_add_and_commit(directory=sg, message=meta.commit_message)
 
 
 def prepare_dist_git_repo(directory, push=True):
