@@ -136,6 +136,9 @@ class PatchMetadata:
             commit=commit,
         )
 
+    def __repr__(self):
+        return f"Patch(name={self.name}, commit={self.commit})"
+
 
 class PatchGenerator:
     """
