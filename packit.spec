@@ -3,30 +3,18 @@
 
 Name:           %{real_name}
 Version:        0.14.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
 URL:            https://github.com/packit/packit
 Source0:        %pypi_source
 BuildArch:      noarch
-BuildRequires:  python3-devel
+# pyproject_buildrequires
+BuildRequires:  pyproject-rpm-macros
+# required in %%install
 BuildRequires:  python3-click-man
-BuildRequires:  python3-GitPython
-BuildRequires:  python3-gnupg
-BuildRequires:  python3-ogr
-BuildRequires:  python3-packaging
-BuildRequires:  python3-pyyaml
-BuildRequires:  python3-tabulate
-BuildRequires:  python3-cccolutils
-BuildRequires:  python3-copr
-BuildRequires:  python3-koji
-BuildRequires:  python3-lazy-object-proxy
-BuildRequires:  python3-marshmallow
-BuildRequires:  python3-marshmallow-enum
-BuildRequires:  rebase-helper
-BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(setuptools-scm)
+# workaround for pyproject_buildrequires getting stuck when trying to install this
 BuildRequires:  python3dist(setuptools-scm-git-archive)
 # new-sources
 Requires:       fedpkg
@@ -54,6 +42,10 @@ check out packit package for the executable.
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
+%generate_buildrequires
+# -r: install runtime deps as well, unsatisfactory results otherwise
+%pyproject_buildrequires -r
+
 %build
 %py3_build
 
@@ -78,10 +70,13 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 %{python3_sitelib}/*
 
 %changelog
+* Tue Aug 11 2020 Jiri Popelka <jpopelka@redhat.com> - 0.14.0-2
+- use pyproject_buildrequires macro from pyproject-rpm-macros
+
 * Tue Jul 28 2020 Jiri Popelka <jpopelka@redhat.com> - 0.14.0-1
 - new upstream release 0.14.0
 
-* Thu Jul 14 2020 Hunor Csomortáni <csomh@redhat.com> - 0.13.1-1
+* Tue Jul 14 2020 Hunor Csomortáni <csomh@redhat.com> - 0.13.1-1
 - new upstream release 0.13.1
 
 * Thu Jul 09 2020 Hunor Csomortáni <csomh@redhat.com> - 0.13.0-1
