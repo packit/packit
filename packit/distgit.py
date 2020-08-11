@@ -231,7 +231,7 @@ class DistGit(PackitRepositoryBase):
             project_fork = project.get_fork()
 
         try:
-            dist_git_pr = project_fork.pr_create(
+            dist_git_pr = project_fork.create_pr(
                 title=pr_title,
                 body=pr_description,
                 source_branch=source_branch,
