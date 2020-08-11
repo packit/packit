@@ -107,7 +107,7 @@ def mock_spec_download_remote_s(path: Path):
 
 
 def mock_remote_functionality(distgit: Path, upstream: Path):
-    def mocked_pr_create(*args, **kwargs):
+    def mocked_create_pr(*args, **kwargs):
         return PullRequest(
             title="",
             id=42,
@@ -133,7 +133,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
         fork_create=lambda: None,
         get_fork=lambda: PagureProject("", "", PagureService()),
-        pr_create=mocked_pr_create,
+        create_pr=mocked_create_pr,
     )
     flexmock(
         GithubProject,

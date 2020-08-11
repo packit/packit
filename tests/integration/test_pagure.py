@@ -65,6 +65,6 @@ def test_basic_distgit_workflow(tmp_path):
         ["git", "push", "origin", f"{branch_name}:{branch_name}"], cwd=repo
     )
 
-    pr = fork.pr_create("testing PR", "serious description", "master", branch_name)
+    pr = fork.create_pr("testing PR", "serious description", "master", branch_name)
 
     proj.pr_comment(pr.id, "howdy!")
