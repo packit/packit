@@ -205,7 +205,7 @@ class Upstream(PackitRepositoryBase):
 
         :param destination: str
         :param upstream: str -- git branch or tag
-        :return: [(patch_path, msg)] list of created patches (tuple of the file path and commit msg)
+        :return: [PatchMetadata, ...] list of patches
         """
         upstream = upstream or self.get_specfile_version()
         destination = destination or self.local_project.working_dir
