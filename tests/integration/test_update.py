@@ -76,6 +76,20 @@ def test_basic_local_update(
     assert "0.1.0" in changelog
 
 
+def test_basic_local_update_reset_after_exception(
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
+):
+    """ check whether the distgit repo is not dirty after exception is raised """
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(api).should_receive("_handle_sources").and_raise(Exception)
+    with pytest.raises(Exception):
+        api.sync_release("master", "0.1.0")
+
+    assert not api.dg.is_dirty()
+
+
 def test_basic_local_update_using_distgit(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
