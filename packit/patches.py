@@ -245,7 +245,7 @@ class PatchGenerator:
         )
 
     @staticmethod
-    def process_patches(patches: Dict[str, str], commits: List[git.Commit]):
+    def process_patches(patches: Dict[str, bytes], commits: List[git.Commit]):
         """
         Pair commits (in a source-git repo) with a list patches generated with git-format-patch.
 
@@ -259,7 +259,7 @@ class PatchGenerator:
             for patch_name, patch_content in patches.items():
                 # `git format-patch` usually creates one patch for a merge commit,
                 # so some commits won't be covered by a dedicated patch file
-                if commit.hexsha in patch_content:
+                if commit.hexsha.encode() in patch_content:
                     path = Path(patch_name)
                     patch_metadata = PatchMetadata.from_commit(
                         commit=commit, patch_path=path
@@ -350,8 +350,9 @@ class PatchGenerator:
             ).strip()
 
             if git_format_patch_out:
-                patches = {
-                    patch_name: Path(patch_name).read_text()
+                patches: Dict[str, bytes] = {
+                    # we need to read bytes since we cannot decode whatever is inside patches
+                    patch_name: Path(patch_name).read_bytes()
                     for patch_name in git_format_patch_out.split("\n")
                 }
                 patch_list = self.process_patches(patches, commits)
