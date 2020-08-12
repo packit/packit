@@ -28,7 +28,7 @@ import pytest
 
 from packit.cli.utils import get_packit_api
 from packit.local_project import LocalProject
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.spellbook import (
     initiate_git_repo,
     get_test_config,

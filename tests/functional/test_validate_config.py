@@ -24,7 +24,7 @@
 Functional tests the validate-config command
 """
 
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit
 
 

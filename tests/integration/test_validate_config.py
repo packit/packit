@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 
 from packit.api import PackitAPI
-from packit.utils import cwd
+from packit.utils.commands import cwd
 
 
 @pytest.mark.parametrize(

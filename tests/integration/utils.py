@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from packit.utils import run_command
+from packit.utils.commands import run_command
 
 
 def remove_gpg_key_pair(gpg_binary: str, fingerprint: str):

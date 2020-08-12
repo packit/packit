@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from packit.utils import cwd
+from packit.utils.commands import cwd
 
 from tests.spellbook import call_packit
 
