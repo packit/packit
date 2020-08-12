@@ -33,6 +33,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
+from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
 from ogr.abstract import PullRequest
@@ -58,9 +59,15 @@ from packit.sync import sync_files
 from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.extensions import assert_existence
-from packit.utils.version import get_packit_version
 
 logger = logging.getLogger(__name__)
+
+
+def get_packit_version() -> str:
+    try:
+        return get_distribution("packitos").version
+    except DistributionNotFound:
+        return "NOT_INSTALLED"
 
 
 class PackitAPI:
@@ -147,8 +154,8 @@ class PackitAPI:
 
         :return created PullRequest if create_pr is True, else None
         """
-        assert_existence(self.up.local_project)
-        assert_existence(self.dg.local_project)
+        assert_existence(self.up.local_project, "Upstream local project")
+        assert_existence(self.dg.local_project, "Dist-git local project")
         if self.dg.is_dirty():
             raise PackitException(
                 f"The distgit repository {self.dg.local_project.working_dir} is dirty."
