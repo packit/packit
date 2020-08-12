@@ -28,38 +28,17 @@ Keeps functions that extend Python collections (list to dict, get on nested dict
 and force strict evaluation (`assert_existence`).
 """
 
-import json
 from typing import Any
 
 from packit.exceptions import PackitException
 
 
-def get_rev_list_kwargs(opt_list):
-    """
-    Converts the list of 'key=value' options to dict.
-    Options without value gets True as a value.
-    """
-    result = {}
-    for opt in opt_list:
-        opt_split = opt.split(sep="=", maxsplit=1)
-        if len(opt_split) == 1:
-            result[opt] = True
-        else:
-            key, raw_val = opt_split
-            try:
-                val = json.loads(raw_val.lower())
-                result[key] = val
-            except json.JSONDecodeError:
-                result[key] = raw_val
-    return result
-
-
-def assert_existence(obj):
+def assert_existence(obj, name):
     """
     Force the lazy object to be evaluated.
     """
     if obj is None:
-        raise PackitException("Object needs to have a value.")
+        raise PackitException(f"Object ({name}) needs to have a value.")
 
 
 def nested_get(d: dict, *keys, default=None) -> Any:

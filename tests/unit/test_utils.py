@@ -28,13 +28,13 @@ import pytest
 from flexmock import flexmock
 from pkg_resources import DistributionNotFound, Distribution
 
+from packit.api import get_packit_version
 from packit.exceptions import PackitException, ensure_str
 from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
 )
 from packit.utils.commands import run_command
-from packit.utils.version import get_packit_version
 
 
 @pytest.mark.parametrize(
@@ -104,9 +104,9 @@ def test_run_command_w_env():
 
 
 def test_get_packit_version_not_installed():
-    flexmock(sys.modules["packit.utils.version"]).should_receive(
-        "get_distribution"
-    ).and_raise(DistributionNotFound)
+    flexmock(sys.modules["packit.api"]).should_receive("get_distribution").and_raise(
+        DistributionNotFound
+    )
     assert get_packit_version() == "NOT_INSTALLED"
 
 
