@@ -28,13 +28,13 @@ import pytest
 from flexmock import flexmock
 from pkg_resources import DistributionNotFound, Distribution
 
+from packit.api import get_packit_version
 from packit.exceptions import PackitException, ensure_str
-from packit.utils import (
+from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
-    run_command,
-    get_packit_version,
 )
+from packit.utils.commands import run_command
 
 
 @pytest.mark.parametrize(
@@ -59,19 +59,39 @@ def test_get_ns_repo_exc():
     assert msg in str(ex.value)
 
 
+@pytest.mark.parametrize("inp", ["/", None, ""])
+def test_remote_to_https_invalid(inp):
+    assert git_remote_url_to_https_url(inp) == ""
+
+
+@pytest.mark.parametrize(
+    "inp",
+    [
+        "https://github.com/packit-service/packit",
+        "https://github.com/packit-service/packit.git",
+        "http://github.com/packit-service/packit",
+        "http://github.com/packit-service/packit.git",
+        "http://www.github.com/packit/packit",
+    ],
+)
+def test_remote_to_https_unchanged(inp):
+    assert git_remote_url_to_https_url(inp) == inp
+
+
 @pytest.mark.parametrize(
     "inp,ok",
     [
-        ("/", ""),
-        (None, ""),
-        (
-            "https://github.com/packit-service/packit",
-            "https://github.com/packit-service/packit",
-        ),
         ("git@github.com:packit-service/ogr", "https://github.com/packit-service/ogr"),
         (
             "ssh://ttomecek@pkgs.fedoraproject.org/rpms/alot.git",
             "https://pkgs.fedoraproject.org/rpms/alot.git",
+        ),
+        ("www.github.com/packit/packit", "https://www.github.com/packit/packit"),
+        ("github.com/packit/packit", "https://github.com/packit/packit"),
+        ("git://github.com/packit/packit", "https://github.com/packit/packit"),
+        (
+            "git+https://github.com/packit/packit.git",
+            "https://github.com/packit/packit.git",
         ),
     ],
 )
@@ -84,7 +104,7 @@ def test_run_command_w_env():
 
 
 def test_get_packit_version_not_installed():
-    flexmock(sys.modules["packit.utils"]).should_receive("get_distribution").and_raise(
+    flexmock(sys.modules["packit.api"]).should_receive("get_distribution").and_raise(
         DistributionNotFound
     )
     assert get_packit_version() == "NOT_INSTALLED"

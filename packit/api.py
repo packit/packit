@@ -33,10 +33,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
 
+from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
 from ogr.abstract import PullRequest
-from packit import utils
 from packit.actions import ActionName
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
@@ -57,9 +57,17 @@ from packit.local_project import LocalProject
 from packit.status import Status
 from packit.sync import sync_files
 from packit.upstream import Upstream
-from packit.utils import assert_existence, get_packit_version
+from packit.utils import commands
+from packit.utils.extensions import assert_existence
 
 logger = logging.getLogger(__name__)
+
+
+def get_packit_version() -> str:
+    try:
+        return get_distribution("packitos").version
+    except DistributionNotFound:
+        return "NOT_INSTALLED"
 
 
 class PackitAPI:
@@ -146,8 +154,8 @@ class PackitAPI:
 
         :return created PullRequest if create_pr is True, else None
         """
-        assert_existence(self.up.local_project)
-        assert_existence(self.dg.local_project)
+        assert_existence(self.up.local_project, "Upstream local project")
+        assert_existence(self.dg.local_project, "Dist-git local project")
         if self.dg.is_dirty():
             raise PackitException(
                 f"The distgit repository {self.dg.local_project.working_dir} is dirty."
@@ -811,7 +819,7 @@ class PackitAPI:
             self.config.keytab_path,
         ]
 
-        utils.run_command_remote(
+        commands.run_command_remote(
             cmd=cmd,
             error_message="Failed to init kerberos ticket:",
             fail=True,

@@ -31,7 +31,6 @@ from typing import Optional, List, Tuple, Union
 import git
 from packaging import version
 
-from packit import utils
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, SyncFilesConfig
@@ -48,7 +47,9 @@ from packit.exceptions import (
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
-from packit.utils import run_command, git_remote_url_to_https_url
+from packit.utils import commands
+from packit.utils.commands import run_command
+from packit.utils.repo import git_remote_url_to_https_url
 
 logger = logging.getLogger(__name__)
 
@@ -771,7 +772,7 @@ class Upstream(PackitRepositoryBase):
             logger.info(
                 "We will be actively waiting for the build to finish, it may take some time."
             )
-        return utils.run_command_remote(
+        return commands.run_command_remote(
             cmd,
             cwd=self.local_project.working_dir,
             output=True,

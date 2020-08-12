@@ -27,7 +27,7 @@ from typing import Tuple
 
 import pytest
 
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.spellbook import (
     initiate_git_repo,
     UPSTREAM,

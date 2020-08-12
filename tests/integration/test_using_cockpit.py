@@ -29,13 +29,13 @@ from pathlib import Path
 import pytest
 from flexmock import flexmock
 
-from packit import utils
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
-from packit.utils import cwd
+from packit.utils import repo
+from packit.utils.commands import cwd
 from tests.spellbook import UP_COCKPIT_OSTREE, initiate_git_repo, get_test_config
 
 
@@ -44,7 +44,7 @@ def cockpit_ostree(tmp_path, upstream_without_config):
     u = tmp_path / "up"
     initiate_git_repo(u, tag="179", copy_from=UP_COCKPIT_OSTREE)
 
-    flexmock(utils, get_namespace_and_repo_name=lambda url: ("asd", "qwe"))
+    flexmock(repo, get_namespace_and_repo_name=lambda url: ("asd", "qwe"))
     d = tmp_path / "dg"
     d.mkdir()
     initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)

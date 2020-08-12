@@ -26,7 +26,7 @@ the worst file in the universe
 
 import pytest
 
-from packit.utils import run_command
+from packit.utils.commands import run_command
 
 
 def test_run_cmd_unicode(tmp_path):

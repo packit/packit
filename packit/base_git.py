@@ -37,7 +37,7 @@ from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
 from packit.specfile import Specfile
-from packit.utils import cwd
+from packit.utils.commands import cwd
 
 logger = getLogger(__name__)
 

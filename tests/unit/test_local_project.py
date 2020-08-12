@@ -26,8 +26,9 @@ from pathlib import Path
 import git
 from flexmock import flexmock
 
-from packit import local_project, utils
+from packit import local_project
 from packit.local_project import LocalProject
+from packit.utils import repo
 from tests.spellbook import initiate_git_repo
 
 
@@ -434,7 +435,7 @@ def test_offline_git_service():
 
 def test_offline_no_clone():
     """No clone on offline"""
-    flexmock(utils).should_receive("get_repo").times(0)
+    flexmock(repo).should_receive("get_repo").times(0)
     flexmock(tempfile).should_receive("mkdtemp").times(0)
     flexmock(git.Repo).should_receive("clone_from").times(0)
 
@@ -450,7 +451,7 @@ def test_offline_no_clone():
 
 def test_offline_no_clone_no_temp_dir():
     """No clone on offline, no temp dir"""
-    flexmock(utils).should_receive("get_repo").times(0)
+    flexmock(repo).should_receive("get_repo").times(0)
     flexmock(tempfile).should_receive("mkdtemp").times(0)
     flexmock(git.Repo).should_receive("clone_from").times(0)
     project = LocalProject(git_url="http://some.example/url/reponame", offline=True)

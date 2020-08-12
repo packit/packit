@@ -38,7 +38,7 @@ from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.spellbook import (
     EMPTY_CHANGELOG,
     initiate_git_repo,

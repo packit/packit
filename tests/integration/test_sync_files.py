@@ -26,7 +26,7 @@ import pytest
 
 from packit.config import PackageConfig, SyncFilesItem, SyncFilesConfig
 from packit.sync import RawSyncFilesItem
-from packit.utils import cwd
+from packit.utils.commands import cwd
 from tests.spellbook import DATA_DIR
 
 
