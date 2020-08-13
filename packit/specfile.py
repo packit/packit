@@ -160,7 +160,7 @@ class Specfile(SpecFile):
         if not patch_list:
             return
 
-        if all([p.present_in_specfile for p in patch_list]):
+        if all(p.present_in_specfile for p in patch_list):
             logger.debug(
                 "All patches are present in the spec file, nothing to do here 🚀"
             )
