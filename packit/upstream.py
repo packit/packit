@@ -565,7 +565,9 @@ class Upstream(PackitRepositoryBase):
                 f"via {self.package_config.spec_source_id} nor Source."
             )
 
-    def create_srpm(self, srpm_path: str = None, srpm_dir: str = None) -> Path:
+    def create_srpm(
+        self, srpm_path: Union[Path, str] = None, srpm_dir: Union[Path, str] = None
+    ) -> Path:
         """
         Create SRPM from the actual content of the repo
 
@@ -575,13 +577,13 @@ class Upstream(PackitRepositoryBase):
         """
 
         if self.running_in_service():
-            srpm_dir = "."
-            rpmbuild_dir = os.path.relpath(
-                str(self.absolute_specfile_dir), str(self.local_project.working_dir)
+            srpm_dir = Path(".")
+            rpmbuild_dir = self.absolute_specfile_dir.relative_to(
+                self.local_project.working_dir
             )
         else:
-            srpm_dir = srpm_dir or os.getcwd()
-            rpmbuild_dir = str(self.absolute_specfile_dir)
+            srpm_dir = Path(srpm_dir) if srpm_dir else Path.cwd()
+            rpmbuild_dir = self.absolute_specfile_dir
 
         cmd = [
             "rpmbuild",
@@ -607,7 +609,7 @@ class Upstream(PackitRepositoryBase):
         ]
         escaped_command = " ".join(cmd)
         logger.debug(f"SRPM build command: {escaped_command}")
-        present_srpms = set(Path(srpm_dir).glob("*.src.rpm"))
+        present_srpms = set(srpm_dir.glob("*.src.rpm"))
         logger.debug(f"Present SRPMs: {present_srpms}")
         try:
             out = self.command_handler.run_command(cmd, return_output=True).strip()
@@ -634,7 +636,7 @@ class Upstream(PackitRepositoryBase):
             shutil.move(the_srpm, srpm_path)
             return Path(srpm_path)
         if self.running_in_service():
-            return Path(self.local_project.working_dir).joinpath(the_srpm)
+            return self.local_project.working_dir / the_srpm
         return Path(the_srpm)
 
     def _get_srpm_from_rpmbuild_output(self, output: str) -> str:

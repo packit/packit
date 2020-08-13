@@ -35,7 +35,7 @@ def test_basic_build(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     flexmock(commands).should_receive("run_command_remote").with_args(
         cmd=["fedpkg", "build", "--scratch", "--nowait", "--target", "asdqwe"],
-        cwd=str(api.dg.local_project.working_dir),
+        cwd=api.dg.local_project.working_dir,
         error_message="Submission of build to koji failed.",
         fail=True,
     ).once()

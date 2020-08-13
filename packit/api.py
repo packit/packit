@@ -30,7 +30,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional, Union
 
 from ogr.abstract import PullRequest
 from pkg_resources import get_distribution, DistributionNotFound
@@ -415,9 +415,7 @@ class PackitAPI:
         self.init_kerberos_ticket()
 
         if from_upstream:
-            srpm_path = self.create_srpm(
-                srpm_dir=str(self.up.local_project.working_dir)
-            )
+            srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
             return self.up.koji_build(
                 scratch=scratch,
                 nowait=nowait,
@@ -463,7 +461,10 @@ class PackitAPI:
         )
 
     def create_srpm(
-        self, output_file: str = None, upstream_ref: str = None, srpm_dir: str = None
+        self,
+        output_file: str = None,
+        upstream_ref: str = None,
+        srpm_dir: Union[Path, str] = None,
     ) -> Path:
         """
         Create srpm from the upstream repo
@@ -702,7 +703,7 @@ class PackitAPI:
         :return: id of the created build and url to the build web page
         """
         srpm_path = self.create_srpm(
-            upstream_ref=upstream_ref, srpm_dir=str(self.up.local_project.working_dir)
+            upstream_ref=upstream_ref, srpm_dir=self.up.local_project.working_dir
         )
 
         owner = owner or self.copr_helper.configured_owner

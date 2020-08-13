@@ -278,8 +278,7 @@ class DistGit(PackitRepositoryBase):
         # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("About to upload to lookaside cache.")
         f = FedPKG(
-            fas_username=self.config.fas_user,
-            directory=str(self.local_project.working_dir),
+            fas_username=self.config.fas_user, directory=self.local_project.working_dir,
         )
         try:
             f.new_sources(sources=archive_path)
@@ -326,7 +325,7 @@ class DistGit(PackitRepositoryBase):
         :param koji_target: koji target to pick (see `koji list-targets`)
         """
         fpkg = FedPKG(
-            fas_username=self.fas_user, directory=str(self.local_project.working_dir)
+            fas_username=self.fas_user, directory=self.local_project.working_dir
         )
         fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
