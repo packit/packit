@@ -311,7 +311,7 @@ class PackitRepositoryBase:
         """
         Add the given list of (patch_name, msg) to the specfile.
 
-        :param patch_list: [(patch_name, msg)]
+        :param patch_list: [PatchMetadata, ...]
         """
         if not patch_list:
             return
