@@ -719,6 +719,7 @@ class PackitAPI:
             preserve_project=preserve_project,
             additional_packages=additional_packages,
             additional_repos=additional_repos,
+            request_admin_if_needed=request_admin_if_needed,
         )
         logger.debug(
             f"Submitting a build to copr build system,"

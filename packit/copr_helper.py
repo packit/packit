@@ -78,8 +78,8 @@ class CoprHelper:
         owner: str = None,
         description: str = None,
         instructions: str = None,
-        list_on_homepage: bool = False,
-        preserve_project: bool = False,
+        list_on_homepage: Optional[bool] = False,
+        preserve_project: Optional[bool] = False,
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
         request_admin_if_needed: bool = False,
@@ -113,7 +113,9 @@ class CoprHelper:
             )
             return
 
-        delete_after_days = -1 if preserve_project else 60
+        delete_after_days: Optional[
+            int
+        ] = None if preserve_project is None else -1 if preserve_project else 60
 
         fields_to_change = self.get_fields_to_change(
             copr_proj=copr_proj,
@@ -194,18 +196,20 @@ class CoprHelper:
                     copr_proj.instructions,
                     instructions,
                 )
-        if "unlisted_on_hp" not in copr_proj:
-            logger.debug(
-                "The `unlisted_on_hp` key was not received from Copr. "
-                "We can't check that value to see if the update is needed."
-            )
-        elif copr_proj.unlisted_on_hp != (not list_on_homepage):
-            fields_to_change["unlisted_on_hp"] = (
-                copr_proj.unlisted_on_hp,
-                (not list_on_homepage),
-            )
 
-        if delete_after_days:
+        if list_on_homepage is not None:
+            if "unlisted_on_hp" not in copr_proj:
+                logger.debug(
+                    "The `unlisted_on_hp` key was not received from Copr. "
+                    "We can't check that value to see if the update is needed."
+                )
+            elif copr_proj.unlisted_on_hp != (not list_on_homepage):
+                fields_to_change["unlisted_on_hp"] = (
+                    copr_proj.unlisted_on_hp,
+                    (not list_on_homepage),
+                )
+
+        if delete_after_days is not None:
             if "delete_after_days" not in copr_proj:
                 logger.debug(
                     "The `delete_after_days` key was not received from Copr. "
