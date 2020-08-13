@@ -95,7 +95,7 @@ def test_base_push_bad(distgit_and_remote):
 
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
-        working_dir=str(distgit), git_url="https://github.com/packit-service/lol"
+        working_dir=str(distgit), git_url="https://github.com/packit/lol"
     )
     flexmock(
         LocalProject,
@@ -113,7 +113,7 @@ def test_base_push_good(distgit_and_remote):
 
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
-        working_dir=str(distgit), git_url="https://github.com/packit-service/lol"
+        working_dir=str(distgit), git_url="https://github.com/packit/lol"
     )
     flexmock(
         LocalProject,

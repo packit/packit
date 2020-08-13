@@ -1,13 +1,13 @@
 # Recording testsuite
 
-This testsuite uses [Requre project](https://github.com/packit-service/requre)
+This testsuite uses [Requre project](https://github.com/packit/requre)
 to store data from test using real credenials and communication with real
 servers, etc.
 
 ## Add new substitutions if missing
 
 If you find, that you should replace more parts that are covered now.
-Please add your code to [replacements](https://github.com/packit-service/packit/tree/master/tests/testsuite_recording/replacements.py)
+Please add your code to [replacements](https://github.com/packit/packit/tree/master/tests/testsuite_recording/replacements.py)
 
 ## Regenerate data for tests
 

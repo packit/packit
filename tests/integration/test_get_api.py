@@ -67,8 +67,7 @@ def test_url_is_downstream():
 def test_url_is_upstream():
     c = get_test_config()
     api = get_packit_api(
-        config=c,
-        local_project=LocalProject(git_url="https://github.com/packit-service/ogr"),
+        config=c, local_project=LocalProject(git_url="https://github.com/packit/ogr"),
     )
     assert api.upstream_local_project
     assert not api.downstream_local_project
@@ -94,7 +93,7 @@ def test_url_is_upstream():
             True,
         ),
         (
-            [("origin", "https://github.com/packit-service/ogr.git")],
+            [("origin", "https://github.com/packit/ogr.git")],
             flexmock(
                 upstream_project_url="some-url",
                 dist_git_base_url=None,
@@ -103,18 +102,18 @@ def test_url_is_upstream():
             True,
         ),
         (
-            [("origin", "https://github.com/packit-service/ogr.git")],
+            [("origin", "https://github.com/packit/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
                 dist_git_base_url=None,
                 synced_files=None,
             ),
             True,
         ),
         (
-            [("upstream", "https://github.com/packit-service/ogr.git")],
+            [("upstream", "https://github.com/packit/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
                 dist_git_base_url=None,
                 synced_files=None,
             ),
@@ -123,7 +122,7 @@ def test_url_is_upstream():
         (
             [("origin", "https://src.fedoraproject.org/rpms/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
                 synced_files=None,
             ),
@@ -132,7 +131,7 @@ def test_url_is_upstream():
         (
             [("origin", "https://src.fedoraproject.org/rpms/python-ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
                 dist_git_base_url="src.fedoraproject.org",
                 synced_files=None,
             ),
@@ -159,7 +158,7 @@ def test_url_is_upstream():
         (
             [("origin", "git@github.com:user/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
                 synced_files=None,
             ),
@@ -171,7 +170,7 @@ def test_url_is_upstream():
                 ("origin", "git@github.com:user/ogr.git"),
             ],
             flexmock(
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
                 dist_git_base_url="https://src.fedoraproject.org",
                 synced_files=None,
             ),
@@ -185,7 +184,7 @@ def test_url_is_upstream():
             JobConfig(
                 type=JobType.build,
                 trigger=JobConfigTriggerType.pull_request,
-                upstream_project_url="https://github.com/packit-service/ogr",
+                upstream_project_url="https://github.com/packit/ogr",
             ),
             True,
         ),

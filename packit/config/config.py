@@ -188,7 +188,7 @@ class Config:
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(
                     "packit no longer accepts 'pagure_fork_token'"
-                    " value (https://github.com/packit-service/packit/issues/495)"
+                    " value (https://github.com/packit/packit/issues/495)"
                 )
             services.add(
                 PagureService(token=pagure_user_token, instance_url=pagure_instance_url)

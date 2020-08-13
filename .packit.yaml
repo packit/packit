@@ -4,7 +4,7 @@ synced_files:
     dest: tests/
 # packit was already taken on PyPI
 upstream_package_name: packitos
-upstream_project_url: https://github.com/packit-service/packit
+upstream_project_url: https://github.com/packit/packit
 
 actions:
   create-archive:
