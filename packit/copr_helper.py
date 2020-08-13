@@ -71,6 +71,13 @@ class CoprHelper:
         copr_url = self.copr_client.config.get("copr_url")
         return f"{copr_url}/coprs/build/{build.id}/"
 
+    def get_copr_settings_url(
+        self, owner: str, project: str, section: Optional[str] = None
+    ):
+        copr_url = self.copr_client.config.get("copr_url")
+        section = section or "edit"
+        return f"{copr_url}/coprs/{owner}/{project}/{section}/"
+
     def create_copr_project_if_not_exists(
         self,
         project: str,
