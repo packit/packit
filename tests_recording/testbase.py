@@ -64,9 +64,7 @@ class PackitUnittestOgr(RequreTestCase):
         self.static_tmp = "/tmp/packit_tmp"
         os.makedirs(self.static_tmp, exist_ok=True)
         TempFile.root = self.static_tmp
-        self.project_ogr = self.conf.get_project(
-            url="https://github.com/packit-service/ogr"
-        )
+        self.project_ogr = self.conf.get_project(url="https://github.com/packit/ogr")
 
         self.pc = get_package_config_from_repo(project=self.project_ogr, ref="master")
         if not self.pc:

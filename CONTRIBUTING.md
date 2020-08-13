@@ -9,10 +9,10 @@ By contributing to this project you agree to the Developer Certificate of Origin
 
 ## Reporting Bugs
 
-Before creating bug reports, please check a [list of known issues](https://github.com/packit-service/packit/issues) to see
+Before creating bug reports, please check a [list of known issues](https://github.com/packit/packit/issues) to see
 if the problem has already been reported (or fixed in a master branch).
 
-If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/packit-service/packit/issues/new).
+If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/packit/packit/issues/new).
 Be sure to include a **descriptive title and a clear description**. Ideally, please provide:
 
 - version of packit you are using (`rpm -q packit` or `pip3 freeze | grep packitos`)
@@ -45,7 +45,7 @@ If you are introducing a new dependency, please make sure it's added to:
 
 ### Documentation
 
-If you want to update documentation, create a PR against [packit.dev](https://github.com/packit-service/packit.dev).
+If you want to update documentation, create a PR against [packit.dev](https://github.com/packit/packit.dev).
 
 #### Changelog
 
@@ -71,15 +71,15 @@ Tests are stored in [tests](/tests) directory:
   - strictly offline
 - `tests/integration`
   - testing bigger parts of codebase (integration between multiple units, packit python API)
-  - mocking with [flexmock](https://github.com/bkabrda/flexmock/) instead of using [requre](https://github.com/packit-service/requre)
+  - mocking with [flexmock](https://github.com/bkabrda/flexmock/) instead of using [requre](https://github.com/packit/requre)
 - `tests/functional`
   - testing packit as a CLI
   - be careful what you run -- no requre, no mocking
 - `tests_recording`
   - testing bigger parts of codebase (integration between multiple units, packit python API)
-  - use [requre](https://github.com/packit-service/requre)
+  - use [requre](https://github.com/packit/requre)
     for remote communication => offline in the CI
-  - prefer [requre](https://github.com/packit-service/requre) instead of mocking
+  - prefer [requre](https://github.com/packit/requre) instead of mocking
 
 Running tests locally:
 

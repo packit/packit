@@ -675,7 +675,7 @@ class Upstream(PackitRepositoryBase):
                 archive=created_archive, archive_version=current_git_describe_version
             )
 
-        # https://github.com/packit-service/packit-service/issues/314
+        # https://github.com/packit/packit-service/issues/314
         if Path(self.local_project.working_dir).joinpath("sources").exists():
             logger.warning('The upstream repo contains "sources" file or a directory.')
             logger.warning(

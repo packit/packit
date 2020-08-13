@@ -67,10 +67,10 @@ def test_remote_to_https_invalid(inp):
 @pytest.mark.parametrize(
     "inp",
     [
-        "https://github.com/packit-service/packit",
-        "https://github.com/packit-service/packit.git",
-        "http://github.com/packit-service/packit",
-        "http://github.com/packit-service/packit.git",
+        "https://github.com/packit/packit",
+        "https://github.com/packit/packit.git",
+        "http://github.com/packit/packit",
+        "http://github.com/packit/packit.git",
         "http://www.github.com/packit/packit",
     ],
 )
@@ -81,7 +81,7 @@ def test_remote_to_https_unchanged(inp):
 @pytest.mark.parametrize(
     "inp,ok",
     [
-        ("git@github.com:packit-service/ogr", "https://github.com/packit-service/ogr"),
+        ("git@github.com:packit/ogr", "https://github.com/packit/ogr"),
         (
             "ssh://ttomecek@pkgs.fedoraproject.org/rpms/alot.git",
             "https://pkgs.fedoraproject.org/rpms/alot.git",

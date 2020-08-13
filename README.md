@@ -91,7 +91,7 @@ $ dnf install packit
 ```
 
 You can also use our [`packit-releases` Copr repository](https://copr.fedorainfracloud.org/coprs/packit/packit-releases/)
-(contains also released versions of [OGR](https://github.com/packit-service/ogr)):
+(contains also released versions of [OGR](https://github.com/packit/ogr)):
 
 ```
 $ dnf copr enable packit/packit-releases
@@ -109,7 +109,7 @@ $ pip3 install --user packitos
 You can also install packit from `master` branch, if you are brave enough:
 
 You can use our [`packit-master` Copr repository](https://copr.fedorainfracloud.org/coprs/packit/packit-master/)
-(contains `master` version of [OGR](https://github.com/packit-service/ogr)):
+(contains `master` version of [OGR](https://github.com/packit/ogr)):
 
 ```
 $ dnf copr enable packit/packit-master
@@ -119,7 +119,7 @@ $ dnf install packit
 Or
 
 ```
-$ pip3 install --user git+https://github.com/packit-service/packit.git
+$ pip3 install --user git+https://github.com/packit/packit.git
 ```
 
 ### Run from git directly:
@@ -152,7 +152,7 @@ Options:
 - cockpit (@martinpitt)
 - iptables (@jsynacek)
 
-For the up to date list of projects which are using packit, [click here](https://github.com/packit-service/research/blob/master/onboard/status.md).
+For the up to date list of projects which are using packit, [click here](https://github.com/packit/research/blob/master/onboard/status.md).
 
 ## Logo design
 

@@ -240,7 +240,7 @@ class DistGit(PackitRepositoryBase):
         except Exception as ex:
             logger.error(f"There was an error while creating the PR: {ex!r}")
             if "Pull-Request have been deactivated" in str(ex):
-                logger.info("See https://github.com/packit-service/packit/issues/328")
+                logger.info("See https://github.com/packit/packit/issues/328")
             raise
         else:
             logger.info(f"PR created: {dist_git_pr.url}")
