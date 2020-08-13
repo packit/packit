@@ -27,7 +27,7 @@ import datetime
 import logging
 from itertools import islice
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import git
 import yaml
@@ -35,8 +35,8 @@ import yaml
 from packit.constants import DATETIME_FORMAT
 from packit.git_utils import get_metadata_from_message
 from packit.local_project import LocalProject
-from packit.utils.repo import is_a_git_ref
 from packit.utils.commands import run_command
+from packit.utils.repo import is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +51,7 @@ class PatchMetadata:
         commit: Optional[git.Commit] = None,
         present_in_specfile: bool = False,
         ignore: bool = False,
+        squash_commits: bool = False,
     ) -> None:
         """
         Metadata about patch files and relation to the respective commit.
@@ -66,6 +67,9 @@ class PatchMetadata:
         :param ignore: We don't want to process this commit
                         when we convert source-git commits to patches.
                         This patch will be skipped.
+        :param squash_commits: squash commits into a single patch file
+                               until next commits with squash_commits=True
+                               (git-am patches do this)
         """
         self.name = name
         self.path = path
@@ -74,6 +78,7 @@ class PatchMetadata:
         self.commit = commit
         self.present_in_specfile = present_in_specfile
         self.ignore = ignore
+        self.squash_commits = squash_commits
 
     @property
     def specfile_comment(self) -> str:
@@ -104,10 +109,13 @@ class PatchMetadata:
         if self.ignore:
             msg += "\nignore: true"
 
+        if self.squash_commits:
+            msg += "\nsquash_commits: true"
+
         return msg
 
     @staticmethod
-    def from_commit(commit: git.Commit, patch_path: Path):
+    def from_commit(commit: git.Commit, patch_path: Path) -> "PatchMetadata":
         metadata = get_metadata_from_message(commit) or {}
         if metadata:
             logger.debug(
@@ -134,7 +142,11 @@ class PatchMetadata:
             location_in_specfile=metadata.get("location_in_specfile"),
             ignore=metadata.get("ignore"),
             commit=commit,
+            squash_commits=metadata.get("squash_commits"),
         )
+
+    def __repr__(self):
+        return f"Patch(name={self.name}, commit={self.commit})"
 
 
 class PatchGenerator:
@@ -232,6 +244,74 @@ class PatchGenerator:
             env={"FILTER_BRANCH_SQUELCH_WARNING": "1"},
         )
 
+    @staticmethod
+    def process_patches(patches: Dict[str, bytes], commits: List[git.Commit]):
+        """
+        Pair commits (in a source-git repo) with a list patches generated with git-format-patch.
+
+        Pairing is done using commit.hexsha (which is always present in the patch file).
+
+        patch_list (provided List) is then mutated by appending PatchMetadata using
+        the paired information: commit and a path to the patch file.
+        """
+        patch_list: List[PatchMetadata] = []
+        for commit in commits:
+            for patch_name, patch_content in patches.items():
+                # `git format-patch` usually creates one patch for a merge commit,
+                # so some commits won't be covered by a dedicated patch file
+                if commit.hexsha.encode() in patch_content:
+                    path = Path(patch_name)
+                    patch_metadata = PatchMetadata.from_commit(
+                        commit=commit, patch_path=path
+                    )
+
+                    if patch_metadata.ignore:
+                        logger.debug(
+                            f"[IGNORED: {patch_metadata.name}] {commit.summary}"
+                        )
+                    else:
+                        logger.debug(f"[{patch_metadata.name}] {commit.summary}")
+                        patch_list.append(patch_metadata)
+                    break
+        return patch_list
+
+    @staticmethod
+    def process_git_am_style_patches(patch_list: List[PatchMetadata],):
+        """
+        When using `%autosetup -S git_am`, there is a case
+        where a single patch file contains multiple commits.
+        This is problematic for us since only the HEAD patch commit
+        is annotated.
+
+        In this case, we need to:
+        1. detect this is happening - top commit has `squash_commits=True`
+        2. process every commit, reversed (patches[-1] is HEAD)
+        3. append commits to a single patch until `squash_commits=True`
+        4. return new patch list
+        """
+        top_commit = patch_list[-1]
+        if not top_commit.squash_commits:
+            logger.debug(
+                "top commit is squash_commits=False, not the git-am style of patches"
+            )
+            return patch_list
+
+        new_patch_list: List[PatchMetadata] = []
+
+        for patch in reversed(patch_list):
+            if patch.squash_commits:
+                top_commit = patch
+                new_patch_list.append(top_commit)
+                logger.debug(f"Top commit in a patch: {top_commit}.")
+            else:
+                logger.debug(f"Appending commit {patch} to {top_commit}.")
+                top_commit.path.write_text(
+                    patch.path.read_text() + top_commit.path.read_text()
+                )
+                patch.path.unlink()
+
+        return new_patch_list
+
     def create_patches(
         self,
         git_ref: str,
@@ -244,7 +324,7 @@ class PatchGenerator:
         :param git_ref: start processing commits from this till HEAD
         :param destination: place the patch files here
         :param files_to_ignore: list of files to ignore when creating patches
-        :return: [(patch_path, msg)] list of created patches (tuple of the file path and commit msg)
+        :return: [PatchMetadata, ...] list of patches
         """
         contained = self.are_child_commits_contained(git_ref)
         if not contained:
@@ -270,30 +350,13 @@ class PatchGenerator:
             ).strip()
 
             if git_format_patch_out:
-                patches = {
-                    patch_name: Path(patch_name).read_text()
+                patches: Dict[str, bytes] = {
+                    # we need to read bytes since we cannot decode whatever is inside patches
+                    patch_name: Path(patch_name).read_bytes()
                     for patch_name in git_format_patch_out.split("\n")
                 }
-                for commit in commits:
-                    for patch_name, patch_content in patches.items():
-                        # `git format-patch` usually creates one patch for a merge commit,
-                        # so some commits won't be covered by a dedicated patch file
-                        if commit.hexsha in patch_content:
-                            path = Path(patch_name)
-                            patch_metadata = PatchMetadata.from_commit(
-                                commit=commit, patch_path=path
-                            )
-
-                            if patch_metadata.ignore:
-                                logger.debug(
-                                    f"[IGNORED: {patch_metadata.name}] {commit.summary}"
-                                )
-                            else:
-                                logger.debug(
-                                    f"[{patch_metadata.name}] {commit.summary}"
-                                )
-                                patch_list.append(patch_metadata)
-                            break
+                patch_list = self.process_patches(patches, commits)
+                patch_list = self.process_git_am_style_patches(patch_list)
             else:
                 logger.warning(f"No patches between {git_ref!r} and {self.lp.ref!r}")
 
