@@ -160,7 +160,7 @@ class Specfile(SpecFile):
         if not patch_list:
             return
 
-        if all([p.present_in_specfile for p in patch_list]):
+        if all(p.present_in_specfile for p in patch_list):
             logger.debug(
                 "All patches are present in the spec file, nothing to do here 🚀"
             )
@@ -212,35 +212,6 @@ class Specfile(SpecFile):
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
 
         logger.info(f"{len(patch_list)} patches added to {self.path!r}.")
-
-    @saves
-    def ensure_pnum(self, pnum: int = 1) -> None:
-        """
-        Make sure we use -p1 with %autosetup / %autopatch
-
-        :param pnum: use other prefix number than default 1
-        """
-        logger.debug(f"Making sure we apply patches with -p{pnum}.")
-        prep_lines = self.spec_content.section("%prep")
-
-        for i, line in enumerate(prep_lines):
-            if line.startswith(("%autosetup", "%autopatch")):
-                if re.search(r"\s-p\d", line):
-                    # -px is there, replace it with -p1
-                    prep_lines[i] = re.sub(r"-p\d", rf"-p{pnum}", line)
-                else:
-                    # -px is not there, add -p1
-                    prep_lines[i] = re.sub(
-                        r"(%auto(setup|patch))", rf"\1 -p{pnum}", line
-                    )
-            elif line.startswith("%setup"):
-                # %setup -> %autosetup -p1
-                prep_lines[i] = line.replace("%setup", f"%autosetup -p{pnum}")
-                # %autosetup does not accept -q, remove it
-                prep_lines[i] = re.sub(r"\s+-q", r"", prep_lines[i])
-
-            if prep_lines[i] != line:
-                logger.debug(f"{line!r} -> {prep_lines[i]!r}")
 
     def get_source(self, source_name: str) -> Optional[Tuple[int, str, str]]:
         """
