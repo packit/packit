@@ -262,7 +262,7 @@ class Specfile(SpecFile):
                     full_name = source_name
                 elif regex.match(line):
                     # okay, let's try the other very common default
-                    # https://github.com/packit-service/packit/issues/536#issuecomment-534074925
+                    # https://github.com/packit/packit/issues/536#issuecomment-534074925
                     full_name = prefix
                 else:
                     # nope, let's continue the search

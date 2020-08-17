@@ -533,7 +533,7 @@ class PackitAPI:
             await asyncio.sleep(0)
             return status.get_downstream_prs()
         except Exception as exc:
-            # https://github.com/packit-service/ogr/issues/67 work-around
+            # https://github.com/packit/ogr/issues/67 work-around
             logger.error(f"Failed when getting downstream PRs: {exc}")
             return []
 
