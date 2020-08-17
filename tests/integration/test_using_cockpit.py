@@ -79,7 +79,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
     )
 
     pc = get_local_package_config(str(upstream_path))
-    up_lp = LocalProject(working_dir=str(upstream_path))
+    up_lp = LocalProject(working_dir=upstream_path)
     c = get_test_config()
     api = PackitAPI(c, pc, up_lp)
     api._dg = DistGit(c, pc)
@@ -99,7 +99,7 @@ def test_srpm_on_cockpit_ostree(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
     pc = get_local_package_config(str(upstream_path))
-    up_lp = LocalProject(working_dir=str(upstream_path))
+    up_lp = LocalProject(working_dir=upstream_path)
     c = get_test_config()
     api = PackitAPI(c, pc, up_lp)
 

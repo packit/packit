@@ -140,7 +140,7 @@ class DistGit(PackitRepositoryBase):
     def get_absolute_specfile_path(self) -> Path:
         """ provide the path, don't check it """
         return (
-            Path(self.local_project.working_dir)
+            self.local_project.working_dir
             / f"{self.package_config.downstream_package_name}.spec"
         )
 
@@ -278,7 +278,7 @@ class DistGit(PackitRepositoryBase):
         # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("About to upload to lookaside cache.")
         f = FedPKG(
-            fas_username=self.config.fas_user, directory=self.local_project.working_dir
+            fas_username=self.config.fas_user, directory=self.local_project.working_dir,
         )
         try:
             f.new_sources(sources=archive_path)

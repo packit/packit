@@ -20,16 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
 import unittest
 from subprocess import check_output
 
 import rebasehelper
-from rebasehelper.exceptions import RebaseHelperError
-
 from flexmock import flexmock
-from packit.api import PackitAPI
+from rebasehelper.exceptions import RebaseHelperError
 from requre.cassette import DataTypes
+
+from packit.api import PackitAPI
 from tests_recording.testbase import PackitUnittestOgr
 
 
@@ -55,9 +54,8 @@ class ProposeUpdate(PackitUnittestOgr):
 
     def check_version_increase(self):
         # change specfile little bit to have there some change
-        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
-        with open(specfile_location, "r") as myfile:
-            filedata = myfile.read()
+        specfile_location = self.lp.working_dir / "python-ogr.spec"
+        filedata = specfile_location.read_text()
         # Patch the specfile with new version
         version_increase = "0.0.0"
         for line in filedata.splitlines():
@@ -67,8 +65,7 @@ class ProposeUpdate(PackitUnittestOgr):
                 version_increase = ".".join([v1, str(int(v2) + 1), v3])
                 filedata = filedata.replace(version, version_increase)
                 break
-        with open(specfile_location, "w") as myfile:
-            myfile.write(filedata)
+        specfile_location.write_text(filedata)
         check_output(
             f"cd {self.lp.working_dir};"
             f"git commit -m 'test change' python-ogr.spec;"
@@ -81,10 +78,10 @@ class ProposeUpdate(PackitUnittestOgr):
         """
         change specfile little bit to have there some change, do not increase version
         """
-        specfile_location = os.path.join(self.lp.working_dir, "python-ogr.spec")
-        version_increase = "10.0.0"
-        with open(specfile_location, "a") as myfile:
+        specfile_location = self.lp.working_dir / "python-ogr.spec"
+        with specfile_location.open("a") as myfile:
             myfile.write("\n# comment\n")
+        version_increase = "10.0.0"
         check_output(
             f"cd {self.lp.working_dir};"
             f"git commit -m 'test change' python-ogr.spec;"

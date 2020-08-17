@@ -51,7 +51,7 @@ def init(path_or_url, force):
     Generate new packit config.
     """
 
-    working_dir = Path(path_or_url.working_dir)
+    working_dir = path_or_url.working_dir
     config_path = get_existing_config(working_dir)
     if config_path:
         if not force:

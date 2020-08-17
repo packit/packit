@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from packit.exceptions import PackitCommandFailedError
 
@@ -37,10 +37,13 @@ class FedPKG:
     """
 
     def __init__(
-        self, fas_username: str = None, directory: str = None, stage: bool = False
+        self,
+        fas_username: str = None,
+        directory: Union[Path, str] = None,
+        stage: bool = False,
     ):
         self.fas_username = fas_username
-        self.directory = directory
+        self.directory = Path(directory) if directory else None
         self.stage = stage
         self.fedpkg_exec = "fedpkg-stage" if stage else "fedpkg"
 
@@ -53,7 +56,7 @@ class FedPKG:
         )
 
     def new_sources(self, sources="", fail=True):
-        if not Path(self.directory).is_dir():
+        if not self.directory.is_dir():
             raise Exception("Cannot access fedpkg repository:")
 
         return commands.run_command_remote(

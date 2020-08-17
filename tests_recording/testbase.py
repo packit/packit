@@ -20,12 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
+
 import shutil
+from os import makedirs
 from subprocess import check_output, CalledProcessError
 
-from requre.helpers.tempfile import TempFile
 from requre.base_testclass import RequreTestCase
+from requre.helpers.tempfile import TempFile
 
 import packit.distgit
 import packit.upstream
@@ -34,9 +35,6 @@ from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
 DATA_DIR = "test_data"
-PERSISTENT_DATA_PREFIX = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), DATA_DIR
-)
 
 
 class PackitUnittestOgr(RequreTestCase):
@@ -49,7 +47,8 @@ class PackitUnittestOgr(RequreTestCase):
         conf.dry_run = True
         return conf
 
-    def set_git_user(self):
+    @staticmethod
+    def set_git_user():
         try:
             check_output(["git", "config", "--global", "-l"])
         except CalledProcessError:
@@ -62,7 +61,7 @@ class PackitUnittestOgr(RequreTestCase):
         super().setUp()
         self.conf = self.get_test_config()
         self.static_tmp = "/tmp/packit_tmp"
-        os.makedirs(self.static_tmp, exist_ok=True)
+        makedirs(self.static_tmp, exist_ok=True)
         TempFile.root = self.static_tmp
         self.project_ogr = self.conf.get_project(url="https://github.com/packit/ogr")
 

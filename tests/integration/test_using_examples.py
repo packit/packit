@@ -59,9 +59,7 @@ def example_repo(request, tmp_path):
 
 def test_srpm_on_example(example_repo):
     c = get_test_config()
-    api = get_packit_api(
-        config=c, local_project=LocalProject(working_dir=str(example_repo))
-    )
+    api = get_packit_api(config=c, local_project=LocalProject(working_dir=example_repo))
     with cwd(example_repo):
         path = api.create_srpm()
     assert path.exists()

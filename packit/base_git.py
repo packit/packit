@@ -82,13 +82,13 @@ class PackitRepositoryBase:
     @property
     def absolute_specfile_dir(self) -> Path:
         """ get dir where the spec file is"""
-        return Path(self.absolute_specfile_path).parent
+        return self.absolute_specfile_path.parent
 
     @property
     def absolute_specfile_path(self) -> Path:
         if not self._specfile_path:
-            self._specfile_path = Path(self.local_project.working_dir).joinpath(
-                self.package_config.specfile_path
+            self._specfile_path = (
+                self.local_project.working_dir / self.package_config.specfile_path
             )
             if not self._specfile_path.exists():
                 raise FileNotFoundError(f"Specfile {self._specfile_path} not found.")

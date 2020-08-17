@@ -23,13 +23,14 @@
 import logging
 import shutil
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Optional, Union, Iterable
 
 import git
-
 from ogr.abstract import GitProject, GitService
 from ogr import GitlabService
 from ogr.parsing import parse_git_repo
+
 from packit.exceptions import PackitException
 from packit.utils.repo import is_git_repo, get_repo, is_a_git_ref
 
@@ -59,7 +60,7 @@ class LocalProject:
     def __init__(
         self,
         git_repo: git.Repo = None,
-        working_dir: str = "",
+        working_dir: Union[Path, str] = None,
         ref: str = "",
         git_project: GitProject = None,
         git_service: GitService = None,
@@ -75,7 +76,7 @@ class LocalProject:
         """
 
         :param git_repo: git.Repo
-        :param working_dir: str (working directory for the project)
+        :param working_dir: Path|str (working directory for the project)
         :param ref: str (git ref (branch/tag/commit) if set, then checked out)
         :param git_project: ogr.GitProject (remote API for project)
         :param git_service: ogr.GitService (tokens for remote API)
@@ -90,7 +91,7 @@ class LocalProject:
         """
         self.working_dir_temporary = False
         self.git_repo: git.Repo = git_repo
-        self.working_dir: str = working_dir
+        self.working_dir: Path = Path(working_dir) if working_dir else None
         self._ref = ref
         self.git_project = git_project
         self.git_service = git_service
@@ -290,7 +291,7 @@ class LocalProject:
 
     def _parse_working_dir_from_git_repo(self):
         if self.git_repo and not self.working_dir:
-            self.working_dir = self.git_repo.working_dir
+            self.working_dir = Path(self.git_repo.working_dir)
             logger.debug(
                 f"Parsed working directory {self.working_dir} from the repo {self.git_repo}."
             )

@@ -157,7 +157,7 @@ def test_basic_local_update_from_downstream(
 
     api.sync_from_downstream("master", "master", True)
 
-    new_upstream = Path(api.up.local_project.working_dir)
+    new_upstream = api.up.local_project.working_dir
     assert (new_upstream / "beer.spec").is_file()
     spec = Specfile(new_upstream / "beer.spec")
     assert spec.get_version() == "0.0.0"
