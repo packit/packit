@@ -28,6 +28,7 @@ from typing import Optional, Union, Iterable
 import git
 
 from ogr.abstract import GitProject, GitService
+from ogr import GitlabService
 from ogr.parsing import parse_git_repo
 from packit.exceptions import PackitException
 from packit.utils.repo import is_git_repo, get_repo, is_a_git_ref
@@ -398,12 +399,15 @@ class LocalProject:
 
     def checkout_pr(self, pr_id: Union[str, int]):
         """
-        Fetch selected PR and check it out. This will work for github and pagure, not for gitlab.
+        Fetch selected PR and check it out.
         """
+        is_gitlab = True if isinstance(self.git_service, GitlabService) else False
         logger.info(f"Checking out PR {pr_id}.")
         remote_name = self.remote or "origin"
         rem: git.Remote = self.git_repo.remotes[remote_name]
-        remote_ref = f"+refs/pull/{pr_id}/head"
+        remote_ref = "+refs/{}/{}/head".format(
+            "merge-requests" if is_gitlab else "pull", pr_id
+        )
         local_ref = f"refs/remotes/{remote_name}/pr/{pr_id}"
         local_branch = f"pr/{pr_id}"
         rem.fetch(f"{remote_ref}:{local_ref}")
