@@ -121,7 +121,7 @@ def test_set_spec_ver_empty_changelog(tmp_path):
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        lp = LocalProject(working_dir=str(u))
+        lp = LocalProject(working_dir=u)
 
         ups = Upstream(c, pc, lp)
 

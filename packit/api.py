@@ -26,17 +26,16 @@ This is the official python interface for packit.
 
 import asyncio
 import logging
-import os
 import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional
+from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional, Union
 
+from ogr.abstract import PullRequest
 from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
-from ogr.abstract import PullRequest
 from packit.actions import ActionName
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
@@ -210,10 +209,11 @@ class PackitAPI:
                 f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
 
-            path = os.path.join(self.dg.local_project.working_dir, "README.packit")
-            logger.debug(f"Path of README: {path}")
-            with open(path, "w") as f:
-                f.write(SYNCING_NOTE.format(packit_version=get_packit_version()))
+            readme_path = self.dg.local_project.working_dir / "README.packit"
+            logger.debug(f"README: {readme_path}")
+            readme_path.write_text(
+                SYNCING_NOTE.format(packit_version=get_packit_version())
+            )
 
             files_to_sync = self.package_config.get_all_files_to_sync()
 
@@ -235,8 +235,8 @@ class PackitAPI:
                     )
 
                 raw_sync_files = files_to_sync.get_raw_files_to_sync(
-                    Path(self.up.local_project.working_dir),
-                    Path(self.dg.local_project.working_dir),
+                    self.up.local_project.working_dir,
+                    self.dg.local_project.working_dir,
                 )
 
                 # exclude spec, we have special plans for it
@@ -260,8 +260,8 @@ class PackitAPI:
             # when the action is defined, we still need to copy the files
             if self.up.has_action(action=ActionName.prepare_files):
                 raw_sync_files = files_to_sync.get_raw_files_to_sync(
-                    Path(self.up.local_project.working_dir),
-                    Path(self.dg.local_project.working_dir),
+                    self.up.local_project.working_dir,
+                    self.dg.local_project.working_dir,
                 )
                 sync_files(raw_sync_files)
 
@@ -328,8 +328,8 @@ class PackitAPI:
             self.up.checkout_branch(local_pr_branch)
 
         raw_sync_files = self.package_config.synced_files.get_raw_files_to_sync(
-            dest_dir=Path(self.dg.local_project.working_dir),
-            src_dir=Path(self.up.local_project.working_dir),
+            dest_dir=self.dg.local_project.working_dir,
+            src_dir=self.up.local_project.working_dir,
         )
 
         reverse_raw_sync_files = [
@@ -386,7 +386,7 @@ class PackitAPI:
         ):
             make_new_sources = True
         else:
-            sources_file = Path(self.dg.local_project.working_dir) / "sources"
+            sources_file = self.dg.local_project.working_dir / "sources"
             if self.dg.upstream_archive_name not in sources_file.read_text():
                 make_new_sources = True
         if make_new_sources:
@@ -461,7 +461,10 @@ class PackitAPI:
         )
 
     def create_srpm(
-        self, output_file: str = None, upstream_ref: str = None, srpm_dir: str = None
+        self,
+        output_file: str = None,
+        upstream_ref: str = None,
+        srpm_dir: Union[Path, str] = None,
     ) -> Path:
         """
         Create srpm from the upstream repo

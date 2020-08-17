@@ -4,38 +4,36 @@
 import logging
 import tempfile
 from pathlib import Path
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import git
-
 from ogr.parsing import parse_git_repo
+
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
 
 
-def is_git_repo(directory: str) -> bool:
+def is_git_repo(directory: Union[Path, str]) -> bool:
     """
     Test, if the directory is a git repo.
     (Has .git subdirectory?)
     """
-    return Path(directory).joinpath(".git").is_dir()
+    return Path(directory, ".git").is_dir()
 
 
-def get_repo(url: str, directory: str = None) -> git.Repo:
+def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
     """
     Use directory as a git repo or clone repo to the tempdir.
     """
-    if not directory:
-        tempdir = tempfile.mkdtemp()
-        directory = tempdir
+    directory = str(directory) if directory else tempfile.mkdtemp()
 
-    # TODO: optimize cloning: single branch and last n commits?
     if is_git_repo(directory=directory):
         logger.debug(f"Repo already exists in {directory}.")
         repo = git.repo.Repo(directory)
     else:
         logger.debug(f"Cloning repo {url} -> {directory}")
+        # TODO: optimize cloning: single branch and last n commits?
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
