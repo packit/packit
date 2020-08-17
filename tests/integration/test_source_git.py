@@ -134,13 +134,6 @@ def test_basic_local_update_patch_content(
     assert "Patch0004:" not in git_diff
 
     assert (
-        """ %prep
--%autosetup -n %{upstream_name}-%{version}
-+%autosetup -p1 -n %{upstream_name}-%{version}"""
-        in git_diff
-    )
-
-    assert (
         """ - 0.1.0-1
 +- new upstream release: 0.1.0
 +

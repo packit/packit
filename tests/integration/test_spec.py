@@ -20,14 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pathlib import Path
-from shutil import copy
-
-import pytest
 from rebasehelper.specfile import SpecContent
 
 from packit.specfile import Specfile
-from tests.spellbook import SPECFILE, UP_OSBUILD, UP_EDD, UP_VSFTPD
+from tests.spellbook import SPECFILE
 
 
 def test_write_spec_content():
@@ -43,20 +39,3 @@ def test_write_spec_content():
         assert "new line 1" in specfile.read()
         spec.spec_content = SpecContent(content)
         spec.write_spec_content()
-
-
-@pytest.mark.parametrize(
-    "input_spec",
-    [
-        UP_VSFTPD / "Fedora" / "vsftpd.spec",
-        UP_OSBUILD / "osbuild.spec",
-        UP_EDD / "edd.spec",
-    ],
-)
-def test_ensure_pnum(tmp_path, input_spec):
-    spec = Path(copy(input_spec, tmp_path))
-    Specfile(spec).ensure_pnum()
-    text = spec.read_text()
-    assert "%autosetup -p1" in text
-    # %autosetup does not accept -q
-    assert "-q" not in text
