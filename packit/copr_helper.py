@@ -261,7 +261,7 @@ class CoprHelper:
                     or "Continuous builds initiated by packit service.\n"
                     "For more info check out https://packit.dev/"
                 ),
-                contact="https://github.com/packit-service/packit/issues",
+                contact="https://github.com/packit/packit/issues",
                 # don't show project on Copr homepage by default
                 unlisted_on_hp=not list_on_homepage,
                 # delete project after the specified period of time

@@ -78,7 +78,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                         "We've encountered an error while talking to GitHub API, please make sure"
                         " that you pass GitHub API token and it has correct permissions, \n"
                         f"precise error message: {exc} \n"
-                        "https://github.com/packit-service/packit/tree/master/docs\n"
+                        "https://github.com/packit/packit/tree/master/docs\n"
                     )
                 sys.exit(exit_code or 3)
             except Exception as exc:
@@ -89,7 +89,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                     click.echo(
                         "Unexpected exception occurred,\n"
                         "please fill an issue here:\n"
-                        "https://github.com/packit-service/packit/issues",
+                        "https://github.com/packit/packit/issues",
                         err=True,
                     )
                 sys.exit(exit_code or 4)

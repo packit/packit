@@ -158,7 +158,7 @@ def test_copr_build_existing_project_munch_no_settings_change(
                     "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
                     "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
                 },
-                "contact": "https://github.com/packit-service/packit/issues",
+                "contact": "https://github.com/packit/packit/issues",
                 "description": "Continuous builds initiated by packit service.\n"
                 "For more info check out https://packit.dev/",
                 "devel_mode": False,
@@ -210,7 +210,7 @@ def test_copr_build_existing_project_munch_chroot_change(
                     "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
                     "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
                 },
-                "contact": "https://github.com/packit-service/packit/issues",
+                "contact": "https://github.com/packit/packit/issues",
                 "description": "Continuous builds initiated by packit service.\n"
                 "For more info check out https://packit.dev/",
                 "devel_mode": False,
@@ -262,7 +262,7 @@ def test_copr_build_existing_project_munch_additional_repos_change(
                     "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
                     "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
                 },
-                "contact": "https://github.com/packit-service/packit/issues",
+                "contact": "https://github.com/packit/packit/issues",
                 "description": "Continuous builds initiated by packit service.\n"
                 "For more info check out https://packit.dev/",
                 "devel_mode": False,
@@ -318,7 +318,7 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
                     "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
                     "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
                 },
-                "contact": "https://github.com/packit-service/packit/issues",
+                "contact": "https://github.com/packit/packit/issues",
                 "description": "Continuous builds initiated by packit service.\n"
                 "For more info check out https://packit.dev/",
                 "devel_mode": False,

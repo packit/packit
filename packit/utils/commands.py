@@ -55,7 +55,7 @@ def run_command(
 
     # we can't use universal newlines here b/c the output from the command can be encoded
     # in something alien and we would "can't decode this using utf-8" errors
-    # https://github.com/packit-service/systemd-rhel8-flock/pull/9#issuecomment-550184016
+    # https://github.com/packit/systemd-rhel8-flock/pull/9#issuecomment-550184016
     shell = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
