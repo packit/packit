@@ -81,7 +81,7 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 * Tue Jul 28 2020 Jiri Popelka <jpopelka@redhat.com> - 0.14.0-1
 - new upstream release 0.14.0
 
-* Thu Jul 14 2020 Hunor Csomortáni <csomh@redhat.com> - 0.13.1-1
+* Tue Jul 14 2020 Hunor Csomortáni <csomh@redhat.com> - 0.13.1-1
 - new upstream release 0.13.1
 
 * Thu Jul 09 2020 Hunor Csomortáni <csomh@redhat.com> - 0.13.0-1
