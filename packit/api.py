@@ -711,6 +711,7 @@ class PackitAPI:
             raise PackitCoprException(
                 "Copr owner not set. Use Copr config file or `--owner` when calling packit CLI."
             )
+        logger.info(f"We will operate with COPR owner {owner}.")
 
         self.copr_helper.create_copr_project_if_not_exists(
             project=project,
