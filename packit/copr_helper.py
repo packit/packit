@@ -96,6 +96,10 @@ class CoprHelper:
 
         Raises PackitCoprException on any problems.
         """
+        logger.info(
+            f"Trying to get {owner}/{project} Copr project. "
+            "The project will be created if it does not exist."
+        )
         try:
             copr_proj = self.copr_client.project_proxy.get(
                 ownername=owner, projectname=project
@@ -119,6 +123,12 @@ class CoprHelper:
                 additional_repos=additional_repos,
             )
             return
+        except CoprRequestException as ex:
+            logger.debug(repr(ex))
+            logger.error(
+                f"We were not able to get copr project {owner}/{project}: {ex}"
+            )
+            raise
 
         delete_after_days: Optional[
             int
