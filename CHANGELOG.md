@@ -1,3 +1,13 @@
+# 0.15.0
+
+## Minor changes and fixes
+
+- `copr-build` CLI command has new `request-admin-if-needed` option. If you specify it,
+  we ask for the admin access to the Copr project in case we can't edit the settings of the project.
+- Creating archive with custom command was fixed.
+  The archive was not found when building SRPM because of the incorrect processing of the paths from the command output.
+- Logs related to SRPM creation and Copr project handling are improved.
+
 # 0.14.0
 
 - Reverted "invoke all commands in shell" change that had been introduced in 0.13.0.
