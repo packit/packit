@@ -194,10 +194,12 @@ class CoprHelper:
     ) -> Dict[str, Tuple[Any, Any]]:
 
         fields_to_change: Dict[str, Tuple[Any, Any]] = {}
-        if chroots is not None and set(copr_proj.chroot_repos.keys()) != set(chroots):
+        if chroots is not None and not set(chroots) <= set(
+            copr_proj.chroot_repos.keys()
+        ):
             fields_to_change["chroots"] = (
-                copr_proj.chroot_repos.keys(),
-                chroots,
+                list(copr_proj.chroot_repos.keys()),
+                list(set(copr_proj.chroot_repos.keys()) | set(chroots)),
             )
         if description and copr_proj.description != description:
             fields_to_change["description"] = (copr_proj.description, description)
