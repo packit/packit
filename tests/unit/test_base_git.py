@@ -19,18 +19,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import logging
 
 import pytest
-
 from flexmock import flexmock
-from packit.utils import commands
+
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.command_handler import LocalCommandHandler, SandcastleCommandHandler
+from packit.command_handler import LocalCommandHandler
 from packit.config import Config, RunCommandType, PackageConfig
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
+from packit.utils import commands
 from tests.spellbook import can_a_module_be_imported
 
 
@@ -98,7 +99,7 @@ def packit_repository_base_more_actions():
 
 
 @pytest.fixture()
-def packit_repository_base_with_sandcastle_object():
+def packit_repository_base_with_sandcastle_object(tmp_path):
     c = Config()
     c.command_handler = RunCommandType.sandcastle
     b = PackitRepositoryBase(
@@ -110,7 +111,7 @@ def packit_repository_base_with_sandcastle_object():
             }
         ),
     )
-    b.local_project = LocalProject()
+    b.local_project = LocalProject(working_dir=tmp_path)
     return b
 
 
@@ -144,7 +145,7 @@ def test_with_action_defined(packit_repository_base):
 
 def test_with_action_working_dir(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env=None
+        command=["command", "--a"], env=None, print_live=True
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -180,7 +181,7 @@ def test_run_action_not_defined(packit_repository_base):
 
 def test_run_action_defined(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env=None
+        command=["command", "--a"], env=None, print_live=True
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -202,17 +203,34 @@ def test_run_action_defined(packit_repository_base):
 @pytest.mark.skipif(
     not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
 )
-def test_run_action_in_sandcastle(packit_repository_base_with_sandcastle_object):
+def test_run_action_in_sandcastle(
+    packit_repository_base_with_sandcastle_object, caplog
+):
     from sandcastle import Sandcastle
 
     flexmock(Sandcastle).should_receive("get_api_client").and_return(None)
-    flexmock(SandcastleCommandHandler).should_receive("run_command").with_args(
-        command=["command", "-a"], env=None
-    ).and_return(None).once()
+    flexmock(Sandcastle).should_receive("run").and_return(None)
+    flexmock(Sandcastle).should_receive("exec").with_args(
+        command=["command", "-a"]
+    ).and_return(
+        [
+            "make po-pull\n"
+            "make[1]: Entering directory "
+            "'/sandcastle/docker-io-usercont-sandcastle-prod-20200820-160948197515'\n"
+            "TEMP_DIR=$(mktemp --tmpdir -d anaconda-localization-XXXXXXXXXX)\n"
+        ]
+    ).once()
     packit_repository_base_with_sandcastle_object.config.actions_handler = "sandcastle"
-    packit_repository_base_with_sandcastle_object.run_action(
-        ActionName.pre_sync, None, "arg", "kwarg"
-    )
+    flexmock(Sandcastle).should_receive("delete_pod").and_return(None)
+    with caplog.at_level(logging.INFO, logger="packit"):
+        packit_repository_base_with_sandcastle_object.run_action(
+            ActionName.pre_sync, None, "arg", "kwarg"
+        )
+        # leading space means that we have the output actually printed
+        # and it's not a single line with the whole output
+        assert " Running command: command -a\n" in caplog.text
+        assert " make po-pull\n" in caplog.text
+        assert " anaconda-localization-XXXXXXXXXX)\n" in caplog.text
 
 
 def test_run_action_more_actions(packit_repository_base_more_actions):
