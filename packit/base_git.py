@@ -282,7 +282,7 @@ class PackitRepositoryBase:
             commands_to_run = self.get_commands_for_actions(action)
             logger.info(f"Using user-defined script for {action}: {commands_to_run}")
             for cmd in commands_to_run:
-                self.command_handler.run_command(command=cmd, env=env)
+                self.command_handler.run_command(command=cmd, env=env, print_live=True)
             return False
         logger.debug(f"Running default implementation for {action}.")
         return True
@@ -302,9 +302,10 @@ class PackitRepositoryBase:
         logger.info(f"Using user-defined script for {action}: {commands_to_run}")
         for cmd in commands_to_run:
             outputs.append(
-                self.command_handler.run_command(cmd, return_output=True, env=env)
+                self.command_handler.run_command(
+                    cmd, return_output=True, env=env, print_live=True
+                )
             )
-        logger.debug(f"Action command output: {outputs}")
         return outputs
 
     def specfile_add_patches(self, patch_list: List[PatchMetadata]) -> None:
