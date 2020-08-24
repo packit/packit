@@ -23,6 +23,7 @@
 """
 Functional tests for srpm command
 """
+import json
 from pathlib import Path
 
 from packit.utils.commands import cwd
@@ -53,6 +54,25 @@ def test_srpm_command_for_path_with_multiple_sources(
 def test_srpm_command(cwd_upstream_or_distgit):
     call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
     srpm_path = list(cwd_upstream_or_distgit.glob("*.src.rpm"))[0]
+    assert srpm_path.exists()
+    build_srpm(srpm_path)
+
+
+def test_action_output(upstream_and_remote):
+    upstream_repo_path = upstream_and_remote[0]
+    packit_yaml_path = upstream_repo_path / ".packit.json"
+    packit_yaml_dict = json.loads(packit_yaml_path.read_text())
+    # http://www.atlaspiv.cz/?page=detail&beer_id=4187
+    the_line_we_want = "MadCat - Imperial Stout Rum Barrel Aged 20°"
+    packit_yaml_dict["actions"] = {
+        "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"]
+    }
+    packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
+    out = call_real_packit(
+        parameters=["srpm"], cwd=upstream_repo_path, return_output=True
+    )
+    assert f"\n{the_line_we_want}\n" in out.decode()
+    srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)
 

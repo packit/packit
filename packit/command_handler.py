@@ -58,6 +58,7 @@ class CommandHandler:
         return_output: bool = True,
         env: Optional[Dict] = None,
         cwd: Union[str, Path] = None,
+        print_live: bool = False,
     ):
         """
         exec a command
@@ -66,6 +67,7 @@ class CommandHandler:
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
+        :param print_live: print output from the command realtime to INFO log
         """
         raise NotImplementedError("This should be implemented")
 
@@ -84,6 +86,7 @@ class LocalCommandHandler(CommandHandler):
         return_output: bool = True,
         env: Optional[Dict] = None,
         cwd: Union[str, Path] = None,
+        print_live: bool = False,
     ):
         """
         exec a command
@@ -92,12 +95,14 @@ class LocalCommandHandler(CommandHandler):
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
+        :param print_live: print output from the command realtime to INFO log
         """
         return commands.run_command(
             cmd=command,
             cwd=cwd or self.local_project.working_dir,
             output=return_output,
             env=env,
+            print_live=print_live,
         )
 
 
@@ -111,6 +116,7 @@ class SandcastleCommandHandler(CommandHandler):
         return_output: bool = True,
         env: Optional[Dict] = None,
         cwd: Union[str, Path] = None,
+        print_live: bool = False,
     ):
         """
         Executes command in a sandbox provided by sandcastle.
@@ -119,6 +125,7 @@ class SandcastleCommandHandler(CommandHandler):
         :param return_output: return output from this method if True
         :param env: dict with env vars to set for the command
         :param cwd: working directory to run command in
+        :param print_live: not used here
         """
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
         from sandcastle.api import Sandcastle, MappedDir
@@ -138,8 +145,15 @@ class SandcastleCommandHandler(CommandHandler):
         try:
             logger.info(f"Running command: {' '.join(command)}")
             out = sandcastle.exec(command=command)
-            if return_output:
-                return out
-            return None
         finally:
             sandcastle.delete_pod()
+
+        # out = ['make po-pull\nmake[1]: Entering directory \'/sand
+        for output_item in out:
+            for output_line in output_item.split("\n"):
+                if output_line:
+                    logger.info(output_line)
+
+        if return_output:
+            return out
+        return None
