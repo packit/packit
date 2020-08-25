@@ -213,12 +213,10 @@ def test_run_action_in_sandcastle(
     flexmock(Sandcastle).should_receive("exec").with_args(
         command=["command", "-a"]
     ).and_return(
-        [
-            "make po-pull\n"
-            "make[1]: Entering directory "
-            "'/sandcastle/docker-io-usercont-sandcastle-prod-20200820-160948197515'\n"
-            "TEMP_DIR=$(mktemp --tmpdir -d anaconda-localization-XXXXXXXXXX)\n"
-        ]
+        "make po-pull\n"
+        "make[1]: Entering directory "
+        "'/sandcastle/docker-io-usercont-sandcastle-prod-20200820-160948197515'\n"
+        "TEMP_DIR=$(mktemp --tmpdir -d anaconda-localization-XXXXXXXXXX)\n"
     ).once()
     packit_repository_base_with_sandcastle_object.config.actions_handler = "sandcastle"
     flexmock(Sandcastle).should_receive("delete_pod").and_return(None)
