@@ -144,15 +144,15 @@ class SandcastleCommandHandler(CommandHandler):
         sandcastle.run()
         try:
             logger.info(f"Running command: {' '.join(command)}")
-            out = sandcastle.exec(command=command)
+            out: str = sandcastle.exec(command=command)
         finally:
             sandcastle.delete_pod()
 
-        # out = ['make po-pull\nmake[1]: Entering directory \'/sand
-        for output_item in out:
-            for output_line in output_item.split("\n"):
-                if output_line:
-                    logger.info(output_line)
+        logger.info(f"Output of {command!r}:")
+        # out = 'make po-pull\nmake[1]: Entering directory \'/sand
+        for output_line in out.split("\n"):
+            if output_line:
+                logger.info(output_line)
 
         if return_output:
             return out
