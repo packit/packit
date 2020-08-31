@@ -25,6 +25,7 @@ import logging
 import os
 import re
 import shutil
+import tarfile
 from pathlib import Path
 from typing import Optional, List, Tuple, Union
 
@@ -448,7 +449,7 @@ class Upstream(PackitRepositoryBase):
         :param commit: commit to set in the changelog
         """
         self._fix_spec_source(archive)
-        self._fix_spec_prep(version)
+        self._fix_spec_prep(version, archive)
 
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
@@ -516,7 +517,7 @@ class Upstream(PackitRepositoryBase):
             changelog_entry=msg,
         )
 
-    def _fix_spec_prep(self, version):
+    def _fix_spec_prep(self, version, archive):
         prep = self.specfile.spec_content.section("%prep")
         if not prep:
             logger.warning("This package doesn't have a %prep section.")
@@ -536,6 +537,7 @@ class Upstream(PackitRepositoryBase):
             )
             return
 
+        inner_archive_dir = self.get_inner_archive_dir(archive)
         new_setup_line = m[1]
         # replace -n with our -n because it's better
         args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
@@ -544,11 +546,7 @@ class Upstream(PackitRepositoryBase):
             new_setup_line += args_match.group(2)
         else:
             new_setup_line += m[2]
-        if not self.package_config.upstream_package_name:
-            raise PackitException(
-                '"upstream_package_name" is not set: unable to fix the spec file; please set it.'
-            )
-        new_setup_line += f" -n {self.package_config.upstream_package_name}-{version}"
+        new_setup_line += f" -n {inner_archive_dir}"
         logger.debug(
             f"New {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
             f" line:\n{new_setup_line}"
@@ -921,3 +919,63 @@ class Upstream(PackitRepositoryBase):
             )
             logger.error(msg)
             raise PackitException(msg)
+
+    def get_inner_archive_dir(self, archive: str) -> Union[str, None]:
+        """
+        Returns tar archive top-level directory or None
+
+        Currently supported archives:
+        * tar including compression (for details check python tarfile module doc)
+
+        :param archive: name of archive
+        :return: archive top level directory or None
+        """
+
+        if tarfile.is_tarfile(f"{self.absolute_specfile_dir}/{archive}"):
+            logger.debug(f"Archive {archive} is tar.")
+            return self.get_inner_tar_dir(archive)
+        else:
+            return None
+
+    def get_inner_tar_dir(self, archive: str) -> Union[str, None]:
+        """
+        Returns tar archive top-level directory, if there is exactly one.
+
+        :param archive: name of tar/compressed tar archive
+        :return: archive top level directory if exactly one is found
+                None in other cases
+        """
+
+        tar = tarfile.open(f"{self.absolute_specfile_dir}/{archive}")
+        root_dirs = set()
+        for tar_item in tar.getmembers():
+            if tar_item.isdir() and "/" not in tar_item.name:
+                root_dirs.add(tar_item.name)
+            # required for archives where top-level dir was added using tar --transform
+            # option - in that case, tar archive will not contain dir related entry
+            if tar_item.isfile() and "/" in tar_item.name:
+                root_dirs.add(tar_item.name.split("/")[0])
+
+        root_dirs_count = len(root_dirs)
+        archive_root_items_count = len(
+            {i.name for i in tar.getmembers() if "/" not in i.name}
+        )
+
+        if root_dirs_count == 1:
+            root_dir = root_dirs.pop()
+            logger.debug(f"Directory {dir} found in archive {archive}")
+            return root_dir
+        elif root_dirs_count == 0:
+            logger.warning(f"No directory found in archive {archive}.")
+        elif root_dirs_count >= 2:
+            logger.warning(
+                f"Archive {archive} contains multiple directories on the top level: "
+                f"the common practice in the industry is to have only one in the "
+                f'following format: "PACKAGE-VERSION"'
+            )
+        elif archive_root_items_count > 1:
+            logger.warning(
+                f"Archive f{archive} contains multiple root items. It can be "
+                f"intentional or can signal incorrect archive structure."
+            )
+        return None
