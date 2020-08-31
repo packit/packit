@@ -60,10 +60,11 @@ def upstream_mock(local_project_mock, package_config_mock):
         config=get_test_config(),
         package_config=package_config_mock,
         local_project=LocalProject(working_dir="test"),
-        # local_project=local_project_mock
     )
     flexmock(upstream)
     upstream.should_receive("local_project").and_return(local_project_mock)
+    upstream.should_receive("absolute_specfile_path").and_return("_spec_file_path")
+    upstream.should_receive("absolute_specfile_dir").and_return("_spec_file_dir")
     return upstream
 
 
@@ -90,6 +91,27 @@ def spec_mock():
         return spec_mock
 
     return spec_mock_factory
+
+
+@pytest.fixture
+def tar_mock():
+    def tar_mock_factory(archive_items=[], is_tarfile=True):
+        tarfile_mock = flexmock(packit.upstream.tarfile)
+        tarinfo_mock_list = [
+            flexmock(
+                **{
+                    "name": name,
+                    "isdir": lambda v=isdir: v,
+                    "isfile": lambda v=isdir: not isdir,
+                }
+            )
+            for name, isdir in archive_items
+        ]
+        tar_mock = flexmock(getmembers=lambda: tarinfo_mock_list)
+        tarfile_mock.should_receive("open").and_return(tar_mock)
+        tarfile_mock.should_receive("is_tarfile").and_return(is_tarfile)
+
+    return tar_mock_factory
 
 
 @pytest.mark.parametrize(
@@ -151,11 +173,10 @@ def test_get_commands_for_actions(action_config, result):
 
 
 @pytest.mark.parametrize(
-    "package_name, version, orig_setup_line, new_setup_line",
+    "inner_archive_dir, orig_setup_line, new_setup_line",
     [
         pytest.param(
-            "test_pkg_name",
-            "0.42",
+            "test_pkg_name-0.42",
             ["%setup -q -n %{srcname}-%{version}"],
             ["%setup -q -n test_pkg_name-0.42"],
             id="test1",
@@ -163,12 +184,12 @@ def test_get_commands_for_actions(action_config, result):
     ],
 )
 def test_fix_spec__setup_line(
-    version, package_name, orig_setup_line, new_setup_line, upstream_mock, spec_mock
+    inner_archive_dir, orig_setup_line, new_setup_line, upstream_mock, spec_mock
 ):
     flexmock(packit.upstream).should_receive("run_command").and_return("mocked")
 
-    upstream_mock.package_config.upstream_package_name = package_name
     upstream_mock.should_receive("_fix_spec_source")
+    upstream_mock.should_receive("get_inner_archive_dir").and_return(inner_archive_dir)
     upstream_mock.should_receive("specfile").and_return(
         spec_mock(setup_line=orig_setup_line)
     )
@@ -177,7 +198,7 @@ def test_fix_spec__setup_line(
         "%prep", new_setup_line
     ).once().and_return(flexmock())
 
-    upstream_mock.fix_spec("_archive", version, "_commit1234")
+    upstream_mock.fix_spec("_archive", "_version", "_commit1234")
 
 
 @pytest.mark.parametrize(
@@ -237,3 +258,55 @@ def test_get_version_from_tag(
     with expectation:
         upstream_mock.package_config.upstream_tag_template = tag_template
         assert upstream_mock.get_version_from_tag(tag) == expected_output
+
+
+@pytest.mark.parametrize(
+    "archive_type, expected_return_value",
+    [
+        pytest.param("tar", "_inner_archive_dir", id="tar_archive"),
+        pytest.param("unknown", None, id="unknown_archive"),
+    ],
+)
+def test_get_inner_archive_dir(
+    archive_type, expected_return_value, upstream_mock, tar_mock
+):
+    if archive_type == "tar":
+        tar_mock()
+        upstream_mock.should_receive("get_inner_tar_dir").and_return(
+            "_inner_tar_dir"
+        ).with_args("_archive").once()
+        assert upstream_mock.get_inner_archive_dir("_archive") == "_inner_tar_dir"
+    elif archive_type == "unknown":
+        tar_mock(is_tarfile=False)
+        assert upstream_mock.get_inner_archive_dir("_archive") is None
+
+
+@pytest.mark.parametrize(
+    "archive_items, expected_result",
+    [
+        pytest.param(
+            [("dir1", True), ("dir1/dir2", True), ("dir1/file1", False)],
+            "dir1",
+            id="valid_archive",
+        ),
+        pytest.param(
+            [("dir1/dir2", True), ("dir1/file1", False)],
+            "dir1",
+            id="valid_archive_no_separate_top_level",
+        ),
+        pytest.param([], None, id="invalid_archive_empty"),
+        pytest.param(
+            [("dir1", True), ("dir2", True), ("dir1/file1", False)],
+            None,
+            id="invalid_two_dirs",
+        ),
+        pytest.param(
+            [("dir1", True), ("dir1/dir2", True), ("file1", False)],
+            "dir1",
+            id="warning_file_in_root",
+        ),
+    ],
+)
+def test_get_inner_tar_dir(archive_items, expected_result, upstream_mock, tar_mock):
+    tar_mock(archive_items=archive_items)
+    assert upstream_mock.get_inner_tar_dir("_archive") == expected_result
