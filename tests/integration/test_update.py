@@ -131,7 +131,8 @@ def test_basic_local_update_direct_push_no_dg_spec(
     u, d, api = api_instance
     d.joinpath("beer.spec").unlink()
     subprocess.check_call(
-        ["git", "commit", "-m", "remove spec", "-a"], cwd=str(d),
+        ["git", "commit", "-m", "remove spec", "-a"],
+        cwd=str(d),
     )
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)

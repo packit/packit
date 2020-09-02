@@ -257,7 +257,9 @@ class LocalProject:
 
         return False
 
-    def _parse_git_project_from_repo_namespace_and_git_project(self,) -> bool:
+    def _parse_git_project_from_repo_namespace_and_git_project(
+        self,
+    ) -> bool:
 
         if (
             self.repo_name

@@ -62,7 +62,8 @@ def job_config_simple():
 
 
 @pytest.mark.parametrize(
-    "files,expected", [(["foo.spec"], "foo.spec"), ([], None)],
+    "files,expected",
+    [(["foo.spec"], "foo.spec"), ([], None)],
 )
 def test_get_specfile_path_from_repo(files, expected):
     gp = flexmock(GitProject)
@@ -686,7 +687,8 @@ def test_package_config_parse_error(raw):
                 spec_source_id="Source3",
                 jobs=[
                     get_job_config_build_for_branch(
-                        specfile_path="fedora/package.spec", spec_source_id="Source3",
+                        specfile_path="fedora/package.spec",
+                        spec_source_id="Source3",
                     )
                 ],
             ),

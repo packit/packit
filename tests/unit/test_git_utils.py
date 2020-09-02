@@ -37,9 +37,15 @@ from packit.git_utils import get_metadata_from_message, get_message_from_metadat
         ),
         pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
         pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
-        pytest.param("key: value", {"key": "value"}, id="one key-value",),
         pytest.param(
-            "key: value\n", {"key": "value"}, id="one key-value with empty-line",
+            "key: value",
+            {"key": "value"},
+            id="one key-value",
+        ),
+        pytest.param(
+            "key: value\n",
+            {"key": "value"},
+            id="one key-value with empty-line",
         ),
         pytest.param(
             "key: value\nsecond_key: value",
@@ -67,9 +73,15 @@ from packit.git_utils import get_metadata_from_message, get_message_from_metadat
             id="two sentences and one key-value",
         ),
         pytest.param(
-            "key: value\nsentence at the end", None, id="sentence at the end",
+            "key: value\nsentence at the end",
+            None,
+            id="sentence at the end",
         ),
-        pytest.param("key: [a,b,c]", {"key": ["a", "b", "c"]}, id="list as a value",),
+        pytest.param(
+            "key: [a,b,c]",
+            {"key": ["a", "b", "c"]},
+            id="list as a value",
+        ),
         pytest.param(
             "key:\n- a\n- b\n- c",
             {"key": ["a", "b", "c"]},

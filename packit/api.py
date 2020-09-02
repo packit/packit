@@ -840,7 +840,10 @@ class PackitAPI:
     @staticmethod
     def validate_package_config(working_dir: Path) -> str:
         """ validate .packit.yaml on the provided path and return human readable report """
-        config_path = find_packit_yaml(working_dir, try_local_dir_last=True,)
+        config_path = find_packit_yaml(
+            working_dir,
+            try_local_dir_last=True,
+        )
         config_content = load_packit_yaml(config_path)
         v = PackageConfigValidator(config_path, config_content)
         return v.validate()

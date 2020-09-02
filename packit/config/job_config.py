@@ -89,9 +89,9 @@ class JobMetadataConfig:
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
-        self.dist_git_branches: Set[str] = set(
-            dist_git_branches
-        ) if dist_git_branches else set()
+        self.dist_git_branches: Set[str] = (
+            set(dist_git_branches) if dist_git_branches else set()
+        )
         self.branch: str = branch
         self.scratch: bool = scratch
         self.list_on_homepage: bool = list_on_homepage

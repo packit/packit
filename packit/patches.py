@@ -276,7 +276,9 @@ class PatchGenerator:
         return patch_list
 
     @staticmethod
-    def process_git_am_style_patches(patch_list: List[PatchMetadata],):
+    def process_git_am_style_patches(
+        patch_list: List[PatchMetadata],
+    ):
         """
         When using `%autosetup -S git_am`, there is a case
         where a single patch file contains multiple commits.
@@ -346,7 +348,10 @@ class PatchGenerator:
                 ".",
             ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
             git_format_patch_out = run_command(
-                cmd=git_f_p_cmd, cwd=self.lp.working_dir, output=True, decode=True,
+                cmd=git_f_p_cmd,
+                cwd=self.lp.working_dir,
+                output=True,
+                decode=True,
             ).strip()
 
             if git_format_patch_out:
