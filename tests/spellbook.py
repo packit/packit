@@ -146,7 +146,8 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
     git_add_and_commit(directory=sg, message="actually, let's do citra")
     subprocess.check_call(["git", "checkout", "master"], cwd=sg)
     subprocess.check_call(
-        ["git", "merge", "--no-ff", "-m", "MERGE COMMIT!", "new-changes"], cwd=sg,
+        ["git", "merge", "--no-ff", "-m", "MERGE COMMIT!", "new-changes"],
+        cwd=sg,
     )
     if go_nuts:
         malt = sg.joinpath("malt")

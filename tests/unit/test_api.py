@@ -85,7 +85,8 @@ testdata = [
 
 
 @pytest.mark.parametrize(
-    "helper,build,web_url", testdata,
+    "helper,build,web_url",
+    testdata,
 )
 class TestPackitAPI:
     def test_copr_web_build_url(self, helper, build, web_url):

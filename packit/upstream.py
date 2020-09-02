@@ -508,7 +508,9 @@ class Upstream(PackitRepositoryBase):
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
         self.specfile.set_spec_version(
-            version=version, release=release, changelog_entry=msg,
+            version=version,
+            release=release,
+            changelog_entry=msg,
         )
 
     def _fix_spec_prep(self, version):

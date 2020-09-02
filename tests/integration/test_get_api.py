@@ -63,7 +63,8 @@ def test_url_is_downstream():
 def test_url_is_upstream():
     c = get_test_config()
     api = get_packit_api(
-        config=c, local_project=LocalProject(git_url="https://github.com/packit/ogr"),
+        config=c,
+        local_project=LocalProject(git_url="https://github.com/packit/ogr"),
     )
     assert api.upstream_local_project
     assert not api.downstream_local_project

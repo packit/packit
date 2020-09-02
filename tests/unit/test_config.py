@@ -236,7 +236,8 @@ def test_user_config_fork_token(tmp_path, recwarn):
 
 
 @pytest.mark.parametrize(
-    "config", [get_job_config_simple(), get_job_config_full()],
+    "config",
+    [get_job_config_simple(), get_job_config_full()],
 )
 def test_serialize_and_deserialize_job_config(config):
     schema = JobConfigSchema()

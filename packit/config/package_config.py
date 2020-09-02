@@ -199,7 +199,9 @@ class PackageConfig(CommonPackageConfig):
 
 
 def find_packit_yaml(
-    *directory, try_local_dir_first=False, try_local_dir_last=False,
+    *directory,
+    try_local_dir_first=False,
+    try_local_dir_last=False,
 ) -> Path:
     """
     find packit.yaml in provided directories: if a file matches, it's picked

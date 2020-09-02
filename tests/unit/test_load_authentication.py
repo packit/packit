@@ -45,7 +45,8 @@ authentication = {
 
 
 @pytest.mark.parametrize(
-    "key", dep_keys,
+    "key",
+    dep_keys,
 )
 def test_with_deprecated_keys(key, caplog, recwarn):
     raw_dict = {key: "somevalue"}

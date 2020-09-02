@@ -74,13 +74,15 @@ class Config:
         # users will never set these, so let's hide those from them
 
         # name of the handler to run actions and commands, default to current env
-        self.command_handler: RunCommandType = RunCommandType(
-            command_handler
-        ) if command_handler else RunCommandType.local
+        self.command_handler: RunCommandType = (
+            RunCommandType(command_handler) if command_handler else RunCommandType.local
+        )
         # a dir where the PV is mounted: both in sandbox and in worker
         self.command_handler_work_dir: str = command_handler_work_dir
         # name of the PVC so that the sandbox has the same volume mounted
-        self.command_handler_pvc_env_var: str = command_handler_pvc_env_var  # pointer to pointer
+        self.command_handler_pvc_env_var: str = (
+            command_handler_pvc_env_var  # pointer to pointer
+        )
         # name of sandbox container image
         self.command_handler_image_reference: str = command_handler_image_reference
         # do I really need to explain this?

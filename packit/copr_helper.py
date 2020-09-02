@@ -130,9 +130,9 @@ class CoprHelper:
             )
             raise
 
-        delete_after_days: Optional[
-            int
-        ] = None if preserve_project is None else -1 if preserve_project else 60
+        delete_after_days: Optional[int] = (
+            None if preserve_project is None else -1 if preserve_project else 60
+        )
 
         fields_to_change = self.get_fields_to_change(
             copr_proj=copr_proj,
