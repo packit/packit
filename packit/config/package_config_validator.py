@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, Union, List, Any
 
 from marshmallow import ValidationError
 
@@ -38,7 +38,7 @@ class PackageConfigValidator:
 
     def validate(self) -> str:
         """ Create output for PackageConfig validation."""
-        schema_errors = None
+        schema_errors: Union[List[Any], Dict[Any, Any]] = None
         try:
             PackageConfig.get_from_dict(
                 self.content,
@@ -56,6 +56,10 @@ class PackageConfigValidator:
             return f"{self.config_file_path.name} is valid and ready to be used"
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
+        if isinstance(schema_errors, list):
+            output += "\n".join(map(str, schema_errors))
+            return output
+
         for field_name, errors in schema_errors.items():
             output += self.validate_get_field_output(errors, field_name)
         return output
