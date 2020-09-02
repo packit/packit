@@ -55,7 +55,10 @@ def test_get_versions(name, versions):
 @pytest.mark.parametrize(
     "names,versions",
     [
-        (["fedora-30", "fedora-stable"], {"fedora-30", "fedora-31", "fedora-32"},),
+        (
+            ["fedora-30", "fedora-stable"],
+            {"fedora-30", "fedora-31", "fedora-32"},
+        ),
         (["fedora-31", "fedora-stable"], {"fedora-31", "fedora-32"}),
         ([], {"fedora-31", "fedora-32"}),
     ],
@@ -84,7 +87,10 @@ def test_get_versions_empty_without_default():
         ("fedora-29-x86_64", {"fedora-29-x86_64"}),
         ("fedora-29-aarch64", {"fedora-29-aarch64"}),
         ("fedora-29-i386", {"fedora-29-i386"}),
-        ("fedora-stable-aarch64", {"fedora-31-aarch64", "fedora-32-aarch64"},),
+        (
+            "fedora-stable-aarch64",
+            {"fedora-31-aarch64", "fedora-32-aarch64"},
+        ),
         ("fedora-development-aarch64", {"fedora-33-aarch64", "fedora-rawhide-aarch64"}),
         (
             "fedora-all",
@@ -123,7 +129,10 @@ def test_get_build_targets_without_default():
             ["fedora-30", "fedora-stable"],
             {"fedora-30-x86_64", "fedora-31-x86_64", "fedora-32-x86_64"},
         ),
-        (["fedora-31", "fedora-stable"], {"fedora-31-x86_64", "fedora-32-x86_64"},),
+        (
+            ["fedora-31", "fedora-stable"],
+            {"fedora-31-x86_64", "fedora-32-x86_64"},
+        ),
     ],
 )
 def test_get_build_targets_from_multiple_values(names, versions):

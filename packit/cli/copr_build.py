@@ -129,9 +129,9 @@ def copr_build(
         *targets.split(","), default="fedora-rawhide-x86_64"
     )
 
-    additional_repos_list: Optional[List[str]] = additional_repos.split(
-        ","
-    ) if additional_repos else None
+    additional_repos_list: Optional[List[str]] = (
+        additional_repos.split(",") if additional_repos else None
+    )
 
     build_id, repo_url = api.run_copr_build(
         project=project,

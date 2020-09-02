@@ -308,7 +308,8 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     source_file = sourcegit / "big-source-file.txt"
     source_file.write_text("new changes")
     git_add_and_commit(
-        directory=sourcegit, message="source change\nignore: true",
+        directory=sourcegit,
+        message="source change\nignore: true",
     )
 
     source_file = sourcegit / "ignored_file.txt"
