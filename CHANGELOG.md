@@ -1,3 +1,9 @@
+# 0.16.0
+
+* fixup sandcastle logging: exec returns str, not List[str]
+* improve action output logging
+* Append new copr chroots, do not remove existing ones
+
 # 0.15.0
 
 ## Minor changes and fixes
