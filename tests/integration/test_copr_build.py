@@ -61,7 +61,11 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -127,7 +131,11 @@ def test_copr_build_existing_project_change_settings(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -176,7 +184,11 @@ def test_copr_build_existing_project_munch_no_settings_change(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -228,7 +240,11 @@ def test_copr_build_existing_project_munch_chroot_change(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -280,7 +296,11 @@ def test_copr_build_existing_project_munch_additional_repos_change(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -337,7 +357,11 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -391,7 +415,11 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -446,7 +474,11 @@ def test_copr_build_existing_project_munch_do_not_remove_present_chroots(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -501,7 +533,11 @@ def test_copr_build_existing_project_munch_append_chroots(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
@@ -551,7 +587,11 @@ def test_copr_build_existing_project_error_on_change_settings(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
     )
 
-    build = flexmock(id="1", ownername=owner, projectname=project,)
+    build = flexmock(
+        id="1",
+        ownername=owner,
+        projectname=project,
+    )
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
 
     with pytest.raises(PackitCoprSettingsException) as e_info:

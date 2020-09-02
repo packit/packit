@@ -28,7 +28,7 @@ from marshmallow import Schema, fields, post_load, pre_load, ValidationError, po
 try:
     from marshmallow import __version_info__
 
-    MM3 = __version_info__[0] >= 3
+    MM3 = int(__version_info__[0]) >= 3
 except ImportError:
     MM3 = False
 from marshmallow_enum import EnumField
@@ -95,7 +95,7 @@ class ActionField(fields.Field):
         self,
         value: Any,
         attr: Optional[str],
-        data: Optional[Mapping[ActionName, Any]],
+        data: Optional[Mapping[str, Any]],
         **kwargs,
     ) -> Dict:
         if not isinstance(value, dict):

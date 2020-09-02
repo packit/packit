@@ -117,7 +117,9 @@ class Status:
 
         return latest_releases[:number_of_releases]
 
-    def get_koji_builds(self,) -> Dict:
+    def get_koji_builds(
+        self,
+    ) -> Dict:
         """
         Get latest koji builds as a dict of branch: latest build in that branch.
         """
