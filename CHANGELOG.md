@@ -1,3 +1,11 @@
+# 0.16.0
+
+## Minor changes and fixes
+
+- Correctly log output when using sandcastle (packit-service) since it returns a single string instead of a list.
+- Improve action output logging: you will see the output from actions by default.
+- Allow having different job definitions for multiple chroots in Copr.
+
 # 0.15.0
 
 ## Minor changes and fixes
