@@ -89,7 +89,7 @@ def test_get_version_macro(upstream_instance):
         setup.write(data)
 
     data = u.joinpath("beer.spec").read_text()
-    data = data.replace("0.1.0", "%(python3 %{S:" + str(setup_path) + "} --version)")
+    data = data.replace("0.1.0", "%(python3 " + str(setup_path) + " --version)")
     with open(u.joinpath("beer.spec"), "w") as f:
         f.write(data)
 
