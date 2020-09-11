@@ -49,7 +49,7 @@ from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
 from packit.utils import commands
 from packit.utils.commands import run_command
-from packit.utils.repo import git_remote_url_to_https_url
+from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
 
 logger = logging.getLogger(__name__)
 
@@ -669,7 +669,9 @@ class Upstream(PackitRepositoryBase):
         :param upstream_ref: str, needed for the sourcegit mode
         """
         current_git_describe_version = self.get_current_version()
-        upstream_ref = upstream_ref or self.package_config.upstream_ref
+        upstream_ref = self._expand_git_ref(
+            upstream_ref or self.package_config.upstream_ref
+        )
 
         if upstream_ref:
             self.prepare_upstream_using_source_git(upstream_ref)
@@ -856,3 +858,25 @@ class Upstream(PackitRepositoryBase):
             )
 
         return rpms
+
+    def _expand_git_ref(self, ref: Optional[str]) -> str:
+        if not ref or not re.match(r".*[\[\?\*].*", ref):
+            logger.debug("No ref given or is not glob pattern")
+            return ref
+
+        tag = self.command_handler.run_command(
+            get_current_version_command(ref),
+            return_output=True,
+            cwd=self.local_project.working_dir,
+        ).strip()
+        logger.debug(f"Matching tag for {ref}: {tag}")
+
+        # expand to SHA to keep backward compatibility
+        sha = self.command_handler.run_command(
+            ["git", "show-ref", "-s", tag],
+            return_output=True,
+            cwd=self.local_project.working_dir,
+        ).strip()
+
+        logger.debug(f"SHA for matching tag: {sha}")
+        return sha
