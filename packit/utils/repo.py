@@ -4,7 +4,7 @@
 import logging
 import tempfile
 from pathlib import Path
-from typing import Tuple, Optional, Union
+from typing import Tuple, Optional, Union, List
 
 import git
 from ogr.parsing import parse_git_repo
@@ -77,3 +77,14 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
     logger.debug(f"URL {inp!r} turned into HTTPS {url_str!r}")
     return url_str
+
+
+def get_current_version_command(glob_pattern: str) -> List[str]:
+    return [
+        "git",
+        "describe",
+        "--abbrev=0",
+        "--tags",
+        "--match",
+        glob_pattern,
+    ]
