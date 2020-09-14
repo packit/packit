@@ -861,11 +861,12 @@ class Upstream(PackitRepositoryBase):
 
     def _expand_git_ref(self, ref: Optional[str]) -> str:
         if not ref or not re.match(r".*[\[\?\*].*", ref):
+            # regex matches any globbing pattern (`[`, `?` or `*` is used)
             logger.debug("No ref given or is not glob pattern")
             return ref
 
         tag = self.command_handler.run_command(
-            get_current_version_command(ref),
+            get_current_version_command(ref, refs="all"),
             return_output=True,
             cwd=self.local_project.working_dir,
         ).strip()

@@ -100,7 +100,7 @@ class CommonPackageConfig:
         # command to get current version of the project
         self.current_version_command: List[
             str
-        ] = current_version_command or get_current_version_command("*")
+        ] = current_version_command or get_current_version_command(glob_pattern="*")
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
 
