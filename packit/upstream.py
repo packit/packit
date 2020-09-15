@@ -860,6 +860,14 @@ class Upstream(PackitRepositoryBase):
         return rpms
 
     def _expand_git_ref(self, ref: Optional[str]) -> str:
+        """
+        Expands given git ref.
+        If given globbing pattern, tries to expand it to git ref.
+        If no ref given or isn't globbing pattern, returns it.
+
+        :param ref: git ref to be expanded if necessary
+        :return: same ref if is not globbing pattern, otherwise expanded
+        """
         if not ref or not re.match(r".*[\[\?\*].*", ref):
             # regex matches any globbing pattern (`[`, `?` or `*` is used)
             logger.debug("No ref given or is not glob pattern")
@@ -872,12 +880,4 @@ class Upstream(PackitRepositoryBase):
         ).strip()
         logger.debug(f"Matching tag for {ref}: {tag}")
 
-        # expand to SHA to keep backward compatibility
-        sha = self.command_handler.run_command(
-            ["git", "show-ref", "-s", tag],
-            return_output=True,
-            cwd=self.local_project.working_dir,
-        ).strip()
-
-        logger.debug(f"SHA for matching tag: {sha}")
-        return sha
+        return tag
