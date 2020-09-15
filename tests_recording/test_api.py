@@ -72,7 +72,7 @@ class ProposeUpdate(PackitUnittestOgr):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release("master")
+        self.api.sync_release(dist_git_branch="master")
 
     def test_comment_in_spec(self):
         """
@@ -88,7 +88,7 @@ class ProposeUpdate(PackitUnittestOgr):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release("master")
+        self.api.sync_release(dist_git_branch="master")
 
     @unittest.skipIf(
         hasattr(rebasehelper, "VERSION")
