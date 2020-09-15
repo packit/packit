@@ -23,6 +23,8 @@
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from packit.specfile import Specfile
 from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
@@ -55,14 +57,18 @@ def test_basic_local_update_without_patching(
     assert spec.get_version() == "0.1.0"
 
 
+@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_basic_local_update_empty_patch(
-    distgit_and_remote, mock_remote_functionality_sourcegit, api_instance_source_git
+    distgit_and_remote,
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     """ propose-update for sourcegit test: mock remote API, use local upstream and dist-git """
 
     distgit, _ = distgit_and_remote
     mock_spec_download_remote_s(distgit)
-    api_instance_source_git.sync_release("master", "0.1.0", upstream_ref="0.1.0")
+    api_instance_source_git.sync_release("master", "0.1.0", upstream_ref=ref)
 
     assert (distgit / TARBALL_NAME).is_file()
     spec = Specfile(distgit / "beer.spec")
@@ -380,12 +386,13 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     assert patches in git_diff
 
 
-def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
+@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
+def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
     create_merge_commit_in_source_git(sg_path)
     with cwd(sg_path):
-        api_instance_source_git.create_srpm(upstream_ref="0.1.0")
+        api_instance_source_git.create_srpm(upstream_ref=ref)
     srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
     build_srpm(srpm_path)
@@ -403,12 +410,15 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
     }
 
 
-def test_srpm_merge_storm(mock_remote_functionality_sourcegit, api_instance_source_git):
+@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
+def test_srpm_merge_storm(
+    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     with cwd(sg_path):
-        api_instance_source_git.create_srpm(upstream_ref="0.1.0")
+        api_instance_source_git.create_srpm(upstream_ref=ref)
     srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
     build_srpm(srpm_path)
@@ -428,7 +438,8 @@ def test_srpm_merge_storm(mock_remote_functionality_sourcegit, api_instance_sour
     }
 
 
-def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_git):
+@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
+def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_git, ref):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
 
@@ -449,7 +460,7 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     create_git_am_style_history(sg_path)
 
     with cwd(sg_path):
-        api_instance_source_git.create_srpm(upstream_ref="0.1.0")
+        api_instance_source_git.create_srpm(upstream_ref=ref)
 
     srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
