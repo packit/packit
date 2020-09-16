@@ -57,7 +57,7 @@ def test_basic_local_update_without_patching(
     assert spec.get_version() == "0.1.0"
 
 
-@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
+@pytest.mark.parametrize("ref", [None, "0.1.0", "0.1*", "0.*"])
 def test_basic_local_update_empty_patch(
     distgit_and_remote,
     mock_remote_functionality_sourcegit,
