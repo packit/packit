@@ -297,14 +297,15 @@ class Upstream(PackitRepositoryBase):
                 "There are no tags in the repo, `git describe` will very likely fail."
             )
 
-        # raw_version - version before processing by Upstream.get_version_from_tag()
         raw_ver = self.command_handler.run_command(
             self.package_config.current_version_command,
             return_output=True,
             cwd=self.local_project.working_dir,
         ).strip()
+        logger.debug(f"Raw version: {raw_ver}")
 
         ver = self.get_version_from_tag(raw_ver)
+        logger.debug(f"Version: {ver}")
 
         if "-" in ver:
             # RPM refuses dashes in version/release
@@ -910,11 +911,13 @@ class Upstream(PackitRepositoryBase):
         field = "version"
         regex = self._template2regex(self.package_config.upstream_tag_template)
         p = re.compile(regex)
-        try:
-            return p.match(tag).group(field)
-        except (IndexError, AttributeError):
-            logger.error(
+        match = p.match(tag)
+        if match and field in match.groupdict():
+            return match.group(field)
+        else:
+            msg = (
                 f'Unable to extract "{field}" from {tag} using '
                 f"{self.package_config.upstream_tag_template}"
             )
-            raise
+            logger.error(msg)
+            raise PackitException(msg)

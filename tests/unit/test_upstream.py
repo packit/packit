@@ -27,6 +27,7 @@ from flexmock import flexmock
 
 import packit
 from packit.actions import ActionName
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from tests.spellbook import get_test_config
@@ -34,12 +35,9 @@ from tests.spellbook import get_test_config
 
 @pytest.fixture
 def package_config_mock():
-    def package_config_mock_factory(upstream_package_name="test_package_name"):
-        mock = flexmock(synced_files=None, upstream_package_name=upstream_package_name)
-        mock.should_receive("current_version_command")
-        return mock
-
-    return package_config_mock_factory
+    mock = flexmock(synced_files=None, upstream_package_name="test_package_name")
+    mock.should_receive("current_version_command")
+    return mock
 
 
 @pytest.fixture
@@ -60,7 +58,7 @@ def local_project_mock(git_project_mock):
 def upstream_mock(local_project_mock, package_config_mock):
     upstream = Upstream(
         config=get_test_config(),
-        package_config=package_config_mock(),
+        package_config=package_config_mock,
         local_project=LocalProject(working_dir="test"),
         # local_project=local_project_mock
     )
@@ -215,20 +213,20 @@ def test_get_current_version(action_output, version, expected_result, upstream_m
             "test-{version}",
             "1.0.0",
             does_not_raise(),
-            id="valid-string-valid_template",
+            id="valid_string-valid_template",
         ),
         pytest.param(
             "1.0.0",
             "tag-{random_field}",
             "1.0.0",
-            pytest.raises(AttributeError),
+            pytest.raises(PackitException),
             id="missing_version_in_template",
         ),
         pytest.param(
             "some_name-1.0.0",
             "other_name-{version}",
             "1.0.0",
-            pytest.raises(AttributeError),
+            pytest.raises(PackitException),
             id="no_match_found",
         ),
     ],
