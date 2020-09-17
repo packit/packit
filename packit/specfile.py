@@ -188,11 +188,14 @@ class Specfile(SpecFile):
 
         logger.debug(f"Adding source-git patches ({len(source_git_patches)})")
         new_content = "\n# PATCHES FROM SOURCE GIT:\n"
+        patch_number_offset = len(original_patches)
         for i, patch_metadata in enumerate(source_git_patches):
             new_content += "\n# " + "\n# ".join(
                 patch_metadata.specfile_comment.split("\n")
             )
-            new_content += f"\nPatch{(i + 1):04d}: {patch_metadata.name}\n"
+            new_content += (
+                f"\nPatch{(i + 1 + patch_number_offset):04d}: {patch_metadata.name}\n"
+            )
 
         # valid=None: take any SourceX even if it's disabled
         last_source_tag_line = [
@@ -211,7 +214,9 @@ class Specfile(SpecFile):
         # insert new content below last Source
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
 
-        logger.info(f"{len(patch_list)} patches added to {self.path!r}.")
+        logger.info(
+            f"{len(source_git_patches)}/{len(patch_list)} patches added to {self.path!r}."
+        )
 
     def get_source(self, source_name: str) -> Optional[Tuple[int, str, str]]:
         """
