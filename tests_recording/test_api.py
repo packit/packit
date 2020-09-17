@@ -20,42 +20,96 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import unittest
 from subprocess import check_output
-
-import rebasehelper
 from flexmock import flexmock
 from rebasehelper.exceptions import RebaseHelperError
 from requre.cassette import DataTypes
+from requre.online_replacing import (
+    apply_decorator_to_all_methods,
+    record_requests_for_all_methods,
+    replace_module_match,
+)
+from requre.helpers.tempfile import TempFile
+from requre.helpers.simple_object import Simple
+from requre.helpers.files import StoreFiles
+from requre.helpers.git.pushinfo import PushInfoStorageList
+from requre.helpers.git.fetchinfo import FetchInfoStorageList
+from requre.helpers.git.repo import Repo
 
 from packit.api import PackitAPI
-from tests_recording.testbase import PackitUnittestOgr
+from tests_recording.testbase import PackitTest
 
 
-@unittest.skip("Not working yet")
-class ProposeUpdate(PackitUnittestOgr):
+@record_requests_for_all_methods()
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="packit.utils.run_command_remote", decorate=Simple.decorator_plain()
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="packit.fedpkg.FedPKG.clone",
+        decorate=StoreFiles.where_arg_references(
+            key_position_params_dict={"target_path": 2}
+        ),
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="git.repo.base.Repo.clone_from",
+        decorate=StoreFiles.where_arg_references(
+            key_position_params_dict={"to_path": 2},
+            return_decorator=Repo.decorator_plain,
+        ),
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="git.remote.Remote.push", decorate=PushInfoStorageList.decorator_plain()
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="git.remote.Remote.fetch", decorate=FetchInfoStorageList.decorator_plain()
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(what="tempfile.mkdtemp", decorate=TempFile.mkdtemp())
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(what="tempfile.mktemp", decorate=TempFile.mktemp())
+)
+# Be aware that decorator stores login and token to test_data, replace it by some value.
+# Default precommit hook doesn't do that for copr.v3.helpers, see README.md
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="copr.v3.helpers.config_from_file", decorate=Simple.decorator_plain()
+    )
+)
+class ProposeUpdate(PackitTest):
+    def cassette_setup(self, cassette):
+        cassette.data_miner.data_type = DataTypes.Dict
+
     def setUp(self):
-        if (
-            hasattr(rebasehelper, "VERSION")
-            and int(rebasehelper.VERSION.split(".")[1]) >= 19
-        ):
-            self.cassette.data_miner.key = "rebase-helper>=0.19"
-        else:
-            self.cassette.data_miner.key = "rebase-helper<0.19"
-        self.cassette.data_miner.data_type = DataTypes.Dict
-
         super().setUp()
-        self.api = PackitAPI(
-            config=self.conf, package_config=self.pc, upstream_local_project=self.lp
-        )
-        self.api._up = self.upstream
-        self.api._dg = self.dg
         self.set_git_user()
+        self._api = None
+
+    @property
+    def api(self):
+        if not self._api:
+            self._api = PackitAPI(
+                config=self.config,
+                package_config=self.pc,
+                upstream_local_project=self.lp,
+            )
+            self.api._up = self.upstream
+            self.api._dg = self.dg
+        return self._api
 
     def check_version_increase(self):
         # change specfile little bit to have there some change
-        specfile_location = self.lp.working_dir / "python-ogr.spec"
-        filedata = specfile_location.read_text()
+        filedata = self.project_specfile_location.read_text()
         # Patch the specfile with new version
         version_increase = "0.0.0"
         for line in filedata.splitlines():
@@ -65,53 +119,36 @@ class ProposeUpdate(PackitUnittestOgr):
                 version_increase = ".".join([v1, str(int(v2) + 1), v3])
                 filedata = filedata.replace(version, version_increase)
                 break
-        specfile_location.write_text(filedata)
+        self.project_specfile_location.write_text(filedata)
         check_output(
             f"cd {self.lp.working_dir};"
-            f"git commit -m 'test change' python-ogr.spec;"
+            f"git commit -m 'test change' {self._project_specfile_path.name};"
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release(dist_git_branch="master")
+        self.api.sync_release(dist_git_branch="master", force=True)
 
     def test_comment_in_spec(self):
         """
         change specfile little bit to have there some change, do not increase version
         """
-        specfile_location = self.lp.working_dir / "python-ogr.spec"
-        with specfile_location.open("a") as myfile:
+        with self.project_specfile_location.open("a") as myfile:
             myfile.write("\n# comment\n")
         version_increase = "10.0.0"
         check_output(
             f"cd {self.lp.working_dir};"
-            f"git commit -m 'test change' python-ogr.spec;"
+            f"git commit -m 'test change' {self._project_specfile_path};"
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
         self.api.sync_release(dist_git_branch="master")
 
-    @unittest.skipIf(
-        hasattr(rebasehelper, "VERSION")
-        and int(rebasehelper.VERSION.split(".")[1]) >= 19,
-        "Older version of rebasehelper raised exception",
-    )
     def test_version_change_exception(self):
         """
         check if it raises exception, because sources are not uploaded in distgit
         Downgrade rebasehelper to version < 0.19.0
         """
         self.assertRaises(RebaseHelperError, self.check_version_increase)
-
-    @unittest.skipUnless(
-        hasattr(rebasehelper, "VERSION")
-        and int(rebasehelper.VERSION.split(".")[1]) >= 19,
-        "New version of rebasehelper works without raised exception",
-    )
-    def test_version_change_new_rebaseheler(self):
-        """
-        check if it not raises exception, because sources are not uploaded in distgit
-        """
-        self.check_version_increase()
 
     def test_version_change_mocked(self):
         """
