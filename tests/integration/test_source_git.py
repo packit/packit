@@ -397,7 +397,7 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git):
             raise AssertionError(
                 "packit-patches- branch was found - the history shouldn't have been linearized"
             )
-    assert set([x.name for x in sg_path.joinpath("fedora").glob("*.patch")]) == {
+    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
         "0001-switching-to-amarillo-hops.patch",
         "0002-actually-let-s-do-citra.patch",
     }
@@ -422,7 +422,7 @@ def test_srpm_merge_storm(mock_remote_functionality_sourcegit, api_instance_sour
         raise AssertionError(
             "packit-patches- branch was not found - this should trigger the linearization"
         )
-    assert set([x.name for x in sg_path.joinpath("fedora").glob("*.patch")]) == {
+    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
         "0001-MERGE-COMMIT.patch",
         "0002-ugly-merge-commit.patch",
     }
@@ -455,7 +455,7 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
-    assert set([x.name for x in sg_path.joinpath("fedora").glob("*.patch")]) == {
+    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
         "citra.patch",
         "0001-m04r-malt.patch",
         "malt.patch",
