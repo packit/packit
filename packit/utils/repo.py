@@ -4,7 +4,7 @@
 import logging
 import tempfile
 from pathlib import Path
-from typing import Tuple, Optional, Union
+from typing import Tuple, Optional, Union, List
 
 import git
 from ogr.parsing import parse_git_repo
@@ -77,3 +77,26 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
     logger.debug(f"URL {inp!r} turned into HTTPS {url_str!r}")
     return url_str
+
+
+def get_current_version_command(
+    glob_pattern: str, refs: Optional[str] = "tags"
+) -> List[str]:
+    """
+    Returns command that find latest git reference matching given pattern.
+
+    :param glob_pattern: pattern that is used to find latest ref
+    :param refs: specifies what kind of ref is used; \
+        default is `"tags"` that searches through all tags (including non-annotated), \
+        pass `None` to search only annotated tags or `"all"` to search through \
+        all refs (including branches and remote refs)
+    :return: command to find latest ref
+    """
+    return [
+        "git",
+        "describe",
+        "--abbrev=0",
+        f"--{refs}" if refs else "",
+        "--match",
+        glob_pattern,
+    ]

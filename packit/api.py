@@ -167,7 +167,9 @@ class PackitAPI:
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
-        upstream_ref = upstream_ref or self.package_config.upstream_ref
+        upstream_ref = self.up._expand_git_ref(
+            upstream_ref or self.package_config.upstream_ref
+        )
         create_pr = create_pr and self.package_config.create_pr
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
