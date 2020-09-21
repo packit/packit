@@ -387,7 +387,6 @@ class PatchGenerator:
         :param no_merge_commits: do not include merge commits in the list if True
         :return: list of commits (last commit on the current branch.).
         """
-
         if is_a_git_ref(repo=self.lp.git_repo, ref=git_ref):
             upstream_ref = git_ref
         else:
