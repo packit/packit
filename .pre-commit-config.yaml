@@ -7,8 +7,12 @@ repos:
     rev: 20.8b1
     hooks:
       - id: black
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.7.2
+    hooks:
+      - id: pyupgrade
   - repo: https://github.com/prettier/prettier
-    rev: 2.1.1
+    rev: 2.1.2
     hooks:
       - id: prettier
         exclude: tests_recording/test_data/*

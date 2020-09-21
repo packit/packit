@@ -73,7 +73,7 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
         return set()
 
     names = list(name) or [default]
-    possible_sys_and_versions: Set[str] = set([])
+    possible_sys_and_versions: Set[str] = set()
     for one_name in names:
         name_split = one_name.rsplit("-", maxsplit=2)
         l_name_split = len(name_split)
