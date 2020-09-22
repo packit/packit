@@ -297,11 +297,14 @@ class Upstream(PackitRepositoryBase):
                 "There are no tags in the repo, `git describe` will very likely fail."
             )
 
-        ver = self.command_handler.run_command(
+        raw_ver = self.command_handler.run_command(
             self.package_config.current_version_command,
             return_output=True,
             cwd=self.local_project.working_dir,
         ).strip()
+        logger.debug(f"Raw version: {raw_ver}")
+
+        ver = self.get_version_from_tag(raw_ver)
         logger.debug(f"Version: {ver}")
 
         if "-" in ver:
@@ -884,3 +887,37 @@ class Upstream(PackitRepositoryBase):
         logger.debug(f"Matching tag for {ref}: {tag}")
 
         return tag
+
+    @staticmethod
+    def _template2regex(template) -> str:
+        """
+        Converts tag template to regex with named groups.
+
+        :param template: tag_template string
+        :return: regex string which can be used by python re module
+        """
+
+        p = re.compile(r"{(.*?)}")
+        return p.sub(r"(?P<\g<1>>.*)", template)
+
+    def get_version_from_tag(self, tag: str) -> str:
+        """
+        Extracts version from git tag using upstream_template_tag
+
+        :param tag: git tag containing version
+        :return: version string
+        """
+
+        field = "version"
+        regex = self._template2regex(self.package_config.upstream_tag_template)
+        p = re.compile(regex)
+        match = p.match(tag)
+        if match and field in match.groupdict():
+            return match.group(field)
+        else:
+            msg = (
+                f'Unable to extract "{field}" from {tag} using '
+                f"{self.package_config.upstream_tag_template}"
+            )
+            logger.error(msg)
+            raise PackitException(msg)

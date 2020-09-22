@@ -52,10 +52,30 @@ def test_get_spec_version(upstream_instance):
     assert ups.get_specfile_version() == "0.1.0"
 
 
-def test_get_current_version(upstream_instance):
+@pytest.mark.parametrize(
+    "tag, tag_template, expected_output",
+    [
+        pytest.param(
+            "1.0.0",
+            "{version}",
+            "1.0.0",
+            id="pure_version-valid_template",
+        ),
+        pytest.param(
+            "test-1.0.0",
+            "test-{version}",
+            "1.0.0",
+            id="valid_string-valid_template",
+        ),
+    ],
+)
+def test_get_current_version(tag, tag_template, expected_output, upstream_instance):
     u, ups = upstream_instance
+    flexmock(ups)
+    ups.package_config.upstream_tag_template = tag_template
+    ups.should_receive("command_handler.run_command").and_return(tag)
 
-    assert ups.get_current_version() == "0.1.0"
+    assert ups.get_current_version() == expected_output
 
 
 @pytest.mark.parametrize(
