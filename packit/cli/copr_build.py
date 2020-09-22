@@ -120,10 +120,20 @@ def copr_build(
     api = get_packit_api(config=config, local_project=path_or_url)
     if not project:
         logger.debug("COPR project name was not passed via CLI.")
-        project = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
+
         if isinstance(api.package_config, PackageConfig):
             project = api.package_config.get_copr_build_project_value()
-            logger.info(f"Using COPR project name = {project}")
+
+        if project:
+            logger.debug("Using a first COPR project found in the job configuration.")
+        else:
+            logger.debug(
+                "COPR project not found in the job configuration. "
+                "Using the default one."
+            )
+            project = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
+
+    logger.info(f"Using COPR project name = {project}")
 
     targets_to_build = get_build_targets(
         *targets.split(","), default="fedora-rawhide-x86_64"
