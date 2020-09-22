@@ -623,3 +623,10 @@ ALL_KOJI_TARGETS_SNAPSHOT = [
     "f33-container-build",
     "f33-container-updates-candidate",
 ]
+
+
+def run_packit(*args, working_dir=None, **kwargs):
+    working_dir = working_dir or Path.cwd()
+    with cwd(working_dir):
+        cli_runner = CliRunner()
+        cli_runner.invoke(packit_base, *args, catch_exceptions=False, **kwargs)

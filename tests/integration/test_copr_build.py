@@ -22,17 +22,20 @@
 
 import pytest
 from copr.v3 import (
-    ProjectProxy,
-    Client,
     BuildProxy,
+    Client,
     CoprNoResultException,
     CoprRequestException,
+    ProjectProxy,
 )
 from flexmock import flexmock
 from munch import munchify
 
+from packit.api import PackitAPI
+from packit.config import PackageConfig
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitCoprException, PackitCoprSettingsException
+from tests.spellbook import run_packit
 
 
 def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
@@ -652,3 +655,64 @@ def test_copr_build_no_owner(cwd_upstream_or_distgit, api_instance):
             instructions="the instructions",
         )
     assert "owner not set" in str(ex)
+
+
+def test_copr_build_cli_no_project_configured(upstream_and_remote):
+    upstream, _ = upstream_and_remote
+    flexmock(PackitAPI).should_receive("run_copr_build").with_args(
+        project="packit-cli-upstream_remote-upstream_git-master",
+        chroots=["fedora-rawhide-x86_64"],
+        owner=None,
+        description=None,
+        instructions=None,
+        upstream_ref=None,
+        list_on_homepage=False,
+        preserve_project=False,
+        additional_repos=None,
+        request_admin_if_needed=False,
+    ).and_return(("id", "url")).once()
+
+    run_packit(["copr-build", "--nowait"], working_dir=upstream)
+
+
+def test_copr_build_cli_project_set_via_cli(upstream_and_remote):
+    upstream, _ = upstream_and_remote
+    flexmock(PackitAPI).should_receive("run_copr_build").with_args(
+        project="the-project",
+        chroots=["fedora-rawhide-x86_64"],
+        owner=None,
+        description=None,
+        instructions=None,
+        upstream_ref=None,
+        list_on_homepage=False,
+        preserve_project=False,
+        additional_repos=None,
+        request_admin_if_needed=False,
+    ).and_return(("id", "url")).once()
+
+    run_packit(
+        ["copr-build", "--nowait", "--project", "the-project"], working_dir=upstream
+    )
+
+
+def test_copr_build_cli_project_set_from_config(upstream_and_remote):
+    upstream, _ = upstream_and_remote
+
+    flexmock(PackageConfig).should_receive("get_copr_build_project_value").and_return(
+        "some-project"
+    )
+
+    flexmock(PackitAPI).should_receive("run_copr_build").with_args(
+        project="some-project",
+        chroots=["fedora-rawhide-x86_64"],
+        owner=None,
+        description=None,
+        instructions=None,
+        upstream_ref=None,
+        list_on_homepage=False,
+        preserve_project=False,
+        additional_repos=None,
+        request_admin_if_needed=False,
+    ).and_return(("id", "url")).once()
+
+    run_packit(["copr-build", "--nowait"], working_dir=upstream)
