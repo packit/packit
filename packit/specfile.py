@@ -86,10 +86,14 @@ class Specfile(SpecFile):
             if version:
                 # also this code adds 3 rpmbuild dirs into the upstream repo,
                 # we should ask rebase-helper not to do that
-                self.set_version(version=version)
+                # using set_tag instead of set_version to turn off preserving macros
+                self.set_tag("Version", version, preserve_macros=False)
 
             if release:
-                self.set_release_number(release=release)
+                # using set_tag instead of set_release to turn off preserving macros
+                self.set_tag(
+                    "Release", "{}%{{?dist}}".format(release), preserve_macros=False
+                )
 
             if not changelog_entry:
                 return

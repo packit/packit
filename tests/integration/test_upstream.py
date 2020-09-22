@@ -42,6 +42,7 @@ from packit.upstream import Upstream
 from packit.utils.commands import cwd
 from tests.spellbook import (
     EMPTY_CHANGELOG,
+    UPSTREAM_MACRO_IN_SOURCE,
     initiate_git_repo,
     get_test_config,
     build_srpm,
@@ -141,6 +142,40 @@ def test_set_spec_ver(upstream_instance):
 
     assert ups.get_specfile_version() == new_ver
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
+
+
+def test_set_spec_macro_source(tmp_path):
+    u_remote_path = tmp_path / "upstream_remote"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+
+    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+
+    u = tmp_path / "upstream_git"
+    shutil.copytree(UPSTREAM_MACRO_IN_SOURCE, u)
+    initiate_git_repo(u, tag="0.1.0")
+
+    with cwd(tmp_path):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        lp = LocalProject(working_dir=u)
+
+        ups = Upstream(c, pc, lp)
+
+    expected_sources = ups.specfile.sources
+    new_ver = "1.2.3"
+    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+
+    assert ups.get_specfile_version() == new_ver
+    assert ups.specfile.sources == expected_sources
+
+    expected_sources = ups.specfile.sources
+    new_rel = "121"
+    ups.specfile.set_spec_version(release=new_rel)
+
+    assert ups.specfile.get_release() == new_rel
+    assert ups.specfile.sources == expected_sources
 
 
 def test_set_spec_ver_empty_changelog(tmp_path):
