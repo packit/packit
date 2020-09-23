@@ -115,7 +115,16 @@ class PatchMetadata:
         return msg
 
     @staticmethod
-    def from_commit(commit: git.Commit, patch_path: Path) -> "PatchMetadata":
+    def from_commit(
+        commit: git.Commit, patch_path: Optional[Path] = None
+    ) -> "PatchMetadata":
+        """
+        Load PatchMetadata from an existing git.Commit
+
+        @param commit: the git.Commit to load the metadata from
+        @param patch_path: optional Path to an existing patch file present on the disk
+        @return: PatchMetadata instance
+        """
         metadata = get_metadata_from_message(commit) or {}
         if metadata:
             logger.debug(
@@ -126,13 +135,14 @@ class PatchMetadata:
             logger.debug(f"Commit {commit.hexsha:.8} does not contain any metadata.")
 
         name = metadata.get("patch_name")
-        if name:
-            new_path = patch_path.parent / name
-            logger.debug(f"Renaming the patch: {patch_path.name} -> {new_path}")
-            patch_path.rename(new_path)
-            patch_path = new_path
-        else:
-            name = patch_path.name
+        if patch_path:
+            if name:
+                new_path = patch_path.parent / name
+                logger.debug(f"Renaming the patch: {patch_path.name} -> {new_path}")
+                patch_path.rename(new_path)
+                patch_path = new_path
+            else:
+                name = patch_path.name
 
         return PatchMetadata(
             name=name,
