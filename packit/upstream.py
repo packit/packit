@@ -253,16 +253,16 @@ class Upstream(PackitRepositoryBase):
         Return version of the latest release available: prioritize bigger from upstream
         package repositories or the version in spec
         """
-        ups_ver = version.parse(self.get_latest_released_version() or "")
-        spec_ver = version.parse(self.get_specfile_version())
+        ups_ver = self.get_latest_released_version() or ""
+        spec_ver = self.get_specfile_version()
 
-        if ups_ver > spec_ver:
+        if version.parse(ups_ver) > version.parse(spec_ver):
             logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
             logger.info(f"Picking version {ups_ver!r} from upstream registry.")
-            return str(ups_ver)
+            return ups_ver
 
         logger.info(f"Picking version {spec_ver!r} found in spec file.")
-        return str(spec_ver)
+        return spec_ver
 
     def get_current_version(self) -> str:
         """
