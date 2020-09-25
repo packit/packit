@@ -52,6 +52,7 @@ class PatchMetadata:
         present_in_specfile: bool = False,
         ignore: bool = False,
         squash_commits: bool = False,
+        no_prefix: bool = False,
     ) -> None:
         """
         Metadata about patch files and relation to the respective commit.
@@ -70,6 +71,7 @@ class PatchMetadata:
         :param squash_commits: squash commits into a single patch file
                                until next commits with squash_commits=True
                                (git-am patches do this)
+        :param no_prefix: do not prepend a/ and b/ when generating the patch file
         """
         self.name = name
         self.path = path
@@ -79,6 +81,7 @@ class PatchMetadata:
         self.present_in_specfile = present_in_specfile
         self.ignore = ignore
         self.squash_commits = squash_commits
+        self.no_prefix = no_prefix
 
     @property
     def specfile_comment(self) -> str:
@@ -111,6 +114,9 @@ class PatchMetadata:
 
         if self.squash_commits:
             msg += "\nsquash_commits: true"
+
+        if self.no_prefix:
+            msg += "\nno_prefix: true"
 
         return msg
 
@@ -153,6 +159,7 @@ class PatchMetadata:
             ignore=metadata.get("ignore"),
             commit=commit,
             squash_commits=metadata.get("squash_commits"),
+            no_prefix=metadata.get("no_prefix"),
         )
 
     def __repr__(self):
@@ -254,8 +261,50 @@ class PatchGenerator:
             env={"FILTER_BRANCH_SQUELCH_WARNING": "1"},
         )
 
-    @staticmethod
-    def process_patches(patches: Dict[str, bytes], commits: List[git.Commit]):
+    def run_git_format_patch(
+        self,
+        destination: str,
+        files_to_ignore: List[str],
+        ref_or_range: str,
+        no_prefix: bool = False,
+    ):
+        """
+        run `git format-patch $ref_or_range` in self.local_project.working_dir
+
+        :param destination: place the patches here
+        :param files_to_ignore: ignore changes in these files
+        :param ref_or_range: [ <since> | <revision range> ]:
+               1. A single commit, <since>, specifies that the commits leading to the tip of the
+                  current branch that are not in the history that leads to the <since> to be
+                  output.
+
+               2. Generic <revision range> expression (see "SPECIFYING REVISIONS" section in
+                  gitrevisions(7)) means the commits in the specified range.
+        :param no_prefix: prefix is the leading a/ and b/ - format-patch does this by default
+        :return: str, git format-patch output: new-line separated list of patch names
+        """
+        git_f_p_cmd = ["git", "format-patch", "--output-directory", f"{destination}"]
+        if no_prefix:
+            git_f_p_cmd.append("--no-prefix")
+        git_f_p_cmd += [
+            ref_or_range,
+            "--",
+            ".",
+        ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
+        return run_command(
+            cmd=git_f_p_cmd,
+            cwd=self.lp.working_dir,
+            output=True,
+            decode=True,
+        ).strip()
+
+    def process_patches(
+        self,
+        patches: Dict[str, bytes],
+        commits: List[git.Commit],
+        destination: str,
+        files_to_ignore: List[str] = None,
+    ):
         """
         Pair commits (in a source-git repo) with a list patches generated with git-format-patch.
 
@@ -263,6 +312,11 @@ class PatchGenerator:
 
         patch_list (provided List) is then mutated by appending PatchMetadata using
         the paired information: commit and a path to the patch file.
+
+        :param patches: Dict: commit hexsha -> patch content
+        :param commits: list of commits we created the patches from
+        :param destination: place the patch files here
+        :param files_to_ignore: list of files to ignore when creating patches
         """
         patch_list: List[PatchMetadata] = []
         for commit in commits:
@@ -281,7 +335,24 @@ class PatchGenerator:
                         )
                     else:
                         logger.debug(f"[{patch_metadata.name}] {commit.summary}")
-                        patch_list.append(patch_metadata)
+                        if patch_metadata.no_prefix:
+                            # sadly, we have work to do, the original patch is no good:
+                            # format-patch by default generates patches with prefixes a/ and b/
+                            # no-prefix means we don't want those: we need create the patch, again
+                            # https://github.com/packit/dist-git-to-source-git/issues/85#issuecomment-698827925
+                            git_f_p_out = self.run_git_format_patch(
+                                destination,
+                                files_to_ignore,
+                                f"{commit}^..{commit}",
+                                no_prefix=True,
+                            )
+                            patch_list.append(
+                                PatchMetadata.from_commit(
+                                    commit=commit, patch_path=Path(git_f_p_out)
+                                )
+                            )
+                        else:
+                            patch_list.append(patch_metadata)
                     break
         return patch_list
 
@@ -338,6 +409,7 @@ class PatchGenerator:
         :param files_to_ignore: list of files to ignore when creating patches
         :return: [PatchMetadata, ...] list of patches
         """
+        files_to_ignore = files_to_ignore or []
         contained = self.are_child_commits_contained(git_ref)
         if not contained:
             self.linearize_history(git_ref)
@@ -348,21 +420,9 @@ class PatchGenerator:
             commits = self.get_commits_since_ref(
                 git_ref, add_upstream_head_commit=False
             )
-            git_f_p_cmd = [
-                "git",
-                "format-patch",
-                "--output-directory",
-                f"{destination}",
-                git_ref,
-                "--",
-                ".",
-            ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
-            git_format_patch_out = run_command(
-                cmd=git_f_p_cmd,
-                cwd=self.lp.working_dir,
-                output=True,
-                decode=True,
-            ).strip()
+            git_format_patch_out = self.run_git_format_patch(
+                destination, files_to_ignore, git_ref
+            )
 
             if git_format_patch_out:
                 patches: Dict[str, bytes] = {
@@ -370,7 +430,9 @@ class PatchGenerator:
                     patch_name: Path(patch_name).read_bytes()
                     for patch_name in git_format_patch_out.split("\n")
                 }
-                patch_list = self.process_patches(patches, commits)
+                patch_list = self.process_patches(
+                    patches, commits, destination, files_to_ignore
+                )
                 patch_list = self.process_git_am_style_patches(patch_list)
             else:
                 logger.warning(f"No patches between {git_ref!r} and {self.lp.ref!r}")
