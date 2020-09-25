@@ -37,14 +37,6 @@ logger = logging.getLogger("packit")
     "--output", metavar="FILE", help="Write the SRPM to FILE instead of current dir."
 )
 @click.option(
-    "--remote",
-    default=None,
-    help=(
-        "Name of the remote to discover upstream project URL, "
-        "If this is not specified, default to origin."
-    ),
-)
-@click.option(
     "--upstream-ref",
     default=None,
     help="Git ref of the last upstream commit in the current branch "
@@ -53,7 +45,7 @@ logger = logging.getLogger("packit")
 )
 @click.argument(
     "path_or_url",
-    type=LocalProjectParameter(remote_param_name="remote"),
+    type=LocalProjectParameter(),
     default=os.path.curdir,
 )
 @pass_config
@@ -63,7 +55,6 @@ def srpm(
     output,
     path_or_url,
     upstream_ref,
-    remote,  # click introspects this in LocalProjectParameter
 ):
     """
     Create new SRPM (.src.rpm file) using content of the upstream repository.
