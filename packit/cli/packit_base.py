@@ -60,6 +60,14 @@ class AliasedGroup(click.Group):
 @click.option("--fas-user", help="Fedora Account System username.")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
 @click.option(
+    "--remote",
+    default=None,
+    help=(
+        "Name of the remote to discover upstream project URL, "
+        "If this is not specified, default to the first remote."
+    ),
+)
+@click.option(
     "--dry-run",
     is_flag=True,
     help="Do not perform any remote changes (pull requests or comments).",
@@ -68,7 +76,7 @@ class AliasedGroup(click.Group):
     version=get_distribution("packitos").version, message="%(version)s"
 )
 @click.pass_context
-def packit_base(ctx, debug, fas_user, keytab, dry_run):
+def packit_base(ctx, debug, fas_user, keytab, dry_run, remote):
     """Integrate upstream open source projects into Fedora operating system."""
     if debug:
         # to be able to logger.debug() also in get_user_config()
@@ -79,6 +87,7 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run):
     c.dry_run = dry_run or c.dry_run
     c.fas_user = fas_user or c.fas_user
     c.keytab_path = keytab or c.keytab_path
+    c.upstream_git_remote = remote or c.upstream_git_remote
     ctx.obj = c
 
     if ctx.obj.debug:

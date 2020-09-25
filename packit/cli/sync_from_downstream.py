@@ -60,7 +60,7 @@ logger = logging.getLogger(__name__)
     help="Push to a fork before creating a pull request.",
 )
 @click.option(
-    "--remote",
+    "--remote-to-push",
     default=None,
     help=(
         "Name of the remote where packit should push. "
@@ -77,7 +77,7 @@ logger = logging.getLogger(__name__)
 @click.option("-x", "--exclude", help="File to exclude from sync", multiple=True)
 @click.argument(
     "path_or_url",
-    type=LocalProjectParameter(remote_param_name="remote"),
+    type=LocalProjectParameter(),
     default=os.path.curdir,
 )
 @cover_packit_exception
@@ -89,7 +89,7 @@ def sync_from_downstream(
     no_pr,
     path_or_url,
     fork,
-    remote,
+    remote_to_push,
     exclude,
     force,
 ):
@@ -110,7 +110,7 @@ def sync_from_downstream(
             upstream_branch=upstream_branch,
             no_pr=no_pr,
             fork=fork,
-            remote_name=remote,
+            remote_name=remote_to_push,
             exclude_files=exclude,
             force=force,
         )

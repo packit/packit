@@ -38,16 +38,12 @@ class LocalProjectParameter(click.ParamType):
 
     name = "path_or_url"
 
-    def __init__(
-        self, branch_param_name: str = None, remote_param_name: str = None
-    ) -> None:
+    def __init__(self, branch_param_name: str = None) -> None:
         """
         :param branch_param_name: name of the cli function parameter (not the option name)
-        :param remote_param_name: name of the remote cli function parameter (not the option name)
         """
         super().__init__()
         self.branch_param_name = branch_param_name
-        self.remote_param_name = remote_param_name
 
     def convert(self, value, param, ctx):
         try:
@@ -59,18 +55,19 @@ class LocalProjectParameter(click.ParamType):
                     for param in ctx.command.params:
                         if param.name == self.branch_param_name:
                             branch_name = param.default
-            remote_name = ctx.params.get(self.remote_param_name, None)
 
             if os.path.isdir(value):
                 absolute_path = os.path.abspath(value)
                 logger.debug(f"Input is a directory: {absolute_path}")
                 local_project = LocalProject(
-                    working_dir=absolute_path, ref=branch_name, remote=remote_name
+                    working_dir=absolute_path,
+                    ref=branch_name,
+                    remote=ctx.obj.upstream_git_remote,
                 )
             elif git_remote_url_to_https_url(value):
                 logger.debug(f"Input is a URL to a git repo: {value}")
                 local_project = LocalProject(
-                    git_url=value, ref=branch_name, remote=remote_name
+                    git_url=value, ref=branch_name, remote=ctx.obj.upstream_git_remote
                 )
             else:
                 self.fail(
