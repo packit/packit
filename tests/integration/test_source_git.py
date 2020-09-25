@@ -34,6 +34,7 @@ from tests.spellbook import (
     build_srpm,
     create_merge_commit_in_source_git,
     create_git_am_style_history,
+    create_patch_mixed_history,
 )
 
 
@@ -469,5 +470,41 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
         "citra.patch",
         "0001-m04r-malt.patch",
+        "malt.patch",
+    }
+
+
+@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
+def test_srpm_git_no_prefix_patches(
+    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+):
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+
+    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
+        "Patch1: amarillo.patch",
+        "Patch2: citra.patch",
+        "Patch8: malt.patch",
+    )
+    api_instance_source_git.up.specfile.spec_content.section("%prep")[0:2] = [
+        "%setup -n %{upstream_name}-%{version}",
+        "%patch1 -p1",
+        "%patch2 -p0",
+        "%patch8 -p1",
+    ]
+    api_instance_source_git.up.specfile.save()
+
+    create_patch_mixed_history(sg_path)
+
+    with cwd(sg_path):
+        api_instance_source_git.create_srpm(upstream_ref=ref)
+
+    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    assert srpm_path.is_file()
+    build_srpm(srpm_path)
+
+    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+        "amarillo.patch",
+        "citra.patch",
         "malt.patch",
     }
