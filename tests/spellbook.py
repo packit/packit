@@ -225,6 +225,27 @@ def create_git_am_style_history(sg: Path):
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
 
+def create_patch_mixed_history(sg: Path):
+    """
+    create a git history where we mix prefix and no-prefix
+
+    :param sg: the repo
+    """
+    hops = sg.joinpath("hops")
+    hops.write_text("Amarillo\n")
+    meta = PatchMetadata(name="amarillo.patch", present_in_specfile=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    hops.write_text("Citra\n")
+    meta = PatchMetadata(name="citra.patch", present_in_specfile=True, no_prefix=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    malt = sg.joinpath("malt")
+    malt.write_text("Munich\n")
+    meta = PatchMetadata(name="malt.patch", present_in_specfile=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+
 def prepare_dist_git_repo(directory, push=True):
     subprocess.check_call(["git", "branch", "f30"], cwd=directory)
     if push:
