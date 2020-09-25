@@ -68,14 +68,6 @@ logger = logging.getLogger(__name__)
     help="Do not create a pull request to downstream repository.",
 )
 @click.option(
-    "--remote",
-    default=None,
-    help=(
-        "Name of the remote to discover upstream project URL, "
-        "If this is not specified, default to origin."
-    ),
-)
-@click.option(
     "--upstream-ref",
     default=None,
     help="Git ref of the last upstream commit in the current branch "
@@ -91,7 +83,7 @@ logger = logging.getLogger(__name__)
 )
 @click.argument(
     "path_or_url",
-    type=LocalProjectParameter(remote_param_name="remote"),
+    type=LocalProjectParameter(),
     default=os.path.curdir,
 )
 @click.argument("version", required=False)
@@ -107,7 +99,6 @@ def update(
     path_or_url,
     upstream_ref,
     version,
-    remote,  # click introspects this in LocalProjectParameter
     force,
 ):
     """
