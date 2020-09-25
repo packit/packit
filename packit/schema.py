@@ -420,6 +420,7 @@ class UserConfigSchema(MM23Schema):
     dry_run = fields.Bool()
     fas_user = fields.String()
     keytab_path = fields.String()
+    upstream_git_remote = fields.String()
     github_token = fields.String()
     pagure_user_token = fields.String()
     pagure_fork_token = fields.String()

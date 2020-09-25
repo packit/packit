@@ -34,14 +34,6 @@ logger = logging.getLogger("packit")
 
 @click.command("local-build", context_settings=get_context_settings())
 @click.option(
-    "--remote",
-    default=None,
-    help=(
-        "Name of the remote to discover upstream project URL, "
-        "If this is not specified, default to origin."
-    ),
-)
-@click.option(
     "--upstream-ref",
     default=None,
     help="Git ref of the last upstream commit in the current branch "
@@ -50,12 +42,12 @@ logger = logging.getLogger("packit")
 )
 @click.argument(
     "path_or_url",
-    type=LocalProjectParameter(remote_param_name="remote"),
+    type=LocalProjectParameter(),
     default=os.path.curdir,
 )
 @pass_config
 @cover_packit_exception
-def local_build(config, path_or_url, upstream_ref, remote):
+def local_build(config, path_or_url, upstream_ref):
     """
     Create RPMs using content of the upstream repository.
 
