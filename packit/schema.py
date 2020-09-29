@@ -265,6 +265,7 @@ class CommonConfigSchema(MM23Schema):
     upstream_package_name = fields.String()
     upstream_ref = fields.String()
     upstream_tag_template = fields.String()
+    archive_root_dir_template = fields.String()
     dist_git_url = NotProcessedField(
         additional_message="it is generated from dist_git_base_url and downstream_package_name",
         load_only=True,
