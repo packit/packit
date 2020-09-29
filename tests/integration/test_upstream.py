@@ -33,6 +33,7 @@ import pytest
 from flexmock import flexmock
 from ogr import GithubService
 
+import packit
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
@@ -278,3 +279,23 @@ def test_github_app(upstream_instance, tmp_path):
 def test_get_last_tag(upstream_instance):
     u, ups = upstream_instance
     assert ups.get_last_tag() == "0.1.0"
+
+
+@pytest.mark.parametrize(
+    "template, expected_output",
+    [
+        pytest.param("{upstream_pkg_name}-{version}", "beerware-0.1.0", id="default"),
+        pytest.param(
+            "{version}-{upstream_pkg_name}", "0.1.0-beerware", id="ver-pkg_name"
+        ),
+    ],
+)
+def test_get_archive_root_dir(template, expected_output, upstream_instance):
+    u, ups = upstream_instance
+    flexmock(packit.upstream.tarfile).should_receive("is_tarfile").and_return(False)
+    ups.package_config.archive_root_dir_template = template
+
+    archive = ups.create_archive()
+    archive_root_dir = ups.get_archive_root_dir(archive)
+
+    assert archive_root_dir == expected_output

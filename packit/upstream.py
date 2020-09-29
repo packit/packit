@@ -449,7 +449,7 @@ class Upstream(PackitRepositoryBase):
         :param commit: commit to set in the changelog
         """
         self._fix_spec_source(archive)
-        self._fix_spec_prep(version, archive)
+        self._fix_spec_prep(archive)
 
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
@@ -517,7 +517,7 @@ class Upstream(PackitRepositoryBase):
             changelog_entry=msg,
         )
 
-    def _fix_spec_prep(self, version, archive):
+    def _fix_spec_prep(self, archive):
         prep = self.specfile.spec_content.section("%prep")
         if not prep:
             logger.warning("This package doesn't have a %prep section.")
@@ -537,7 +537,8 @@ class Upstream(PackitRepositoryBase):
             )
             return
 
-        inner_archive_dir = self.get_inner_archive_dir(archive)
+        archive_root_dir = self.get_archive_root_dir(archive)
+
         new_setup_line = m[1]
         # replace -n with our -n because it's better
         args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
@@ -546,7 +547,7 @@ class Upstream(PackitRepositoryBase):
             new_setup_line += args_match.group(2)
         else:
             new_setup_line += m[2]
-        new_setup_line += f" -n {inner_archive_dir}"
+        new_setup_line += f" -n {archive_root_dir}"
         logger.debug(
             f"New {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
             f" line:\n{new_setup_line}"
@@ -920,24 +921,42 @@ class Upstream(PackitRepositoryBase):
             logger.error(msg)
             raise PackitException(msg)
 
-    def get_inner_archive_dir(self, archive: str) -> Union[str, None]:
+    def get_archive_root_dir(self, archive: str) -> Union[str, None]:
         """
-        Returns tar archive top-level directory or None
+        Returns archive root dir.
+        It uses 2 techniques:
+        1. tries to extract it directly from archive.
+        2. will generate name based on archive_root_dir_template
 
         Currently supported archives:
         * tar including compression (for details check python tarfile module doc)
 
         :param archive: name of archive
         :return: archive top level directory or None
+
+        .. raises:: PackitException if failed - all used methods returned None
         """
 
+        archive_root_dir = None
+
+        logger.debug("Trying to extract archive_root_dir from known archives")
         if tarfile.is_tarfile(f"{self.absolute_specfile_dir}/{archive}"):
             logger.debug(f"Archive {archive} is tar.")
-            return self.get_inner_tar_dir(archive)
+            archive_root_dir = self.get_archive_root_dir_from_tar(archive)
         else:
-            return None
+            logger.debug(f"Archive {archive} is not tar.")
 
-    def get_inner_tar_dir(self, archive: str) -> Union[str, None]:
+        if archive_root_dir is None:
+            logger.debug(
+                "Using archive_root_dir_template config option. If not set it defaults to "
+                "{{upstream_pkg_name}}-{{version}}. Check "
+                "https://packit.dev/docs/configuration/#archive_root_dir_template for more details."
+            )
+            archive_root_dir = self.get_archive_root_dir_from_template()
+
+        return archive_root_dir
+
+    def get_archive_root_dir_from_tar(self, archive: str) -> Union[str, None]:
         """
         Returns tar archive top-level directory, if there is exactly one.
 
@@ -963,7 +982,7 @@ class Upstream(PackitRepositoryBase):
 
         if root_dirs_count == 1:
             root_dir = root_dirs.pop()
-            logger.debug(f"Directory {dir} found in archive {archive}")
+            logger.debug(f"Directory {root_dir} found in archive {archive}")
             return root_dir
         elif root_dirs_count == 0:
             logger.warning(f"No directory found in archive {archive}.")
@@ -979,3 +998,25 @@ class Upstream(PackitRepositoryBase):
                 f"intentional or can signal incorrect archive structure."
             )
         return None
+
+    def get_archive_root_dir_from_template(self) -> Union[str, None]:
+        """
+        Generates archive root dir based on archive_root_dir_template.
+        archive_root_dir_template default value is "{upstream_pkg_name}-{version}"
+
+        :returns: archive root dir name based on template
+        """
+        template = self.package_config.archive_root_dir_template
+        logger.debug(
+            f"archive_root_dir_template is set or defaults to if not set to: {template}"
+        )
+        archive_root_dir = template.replace(
+            "{upstream_pkg_name}", self.package_config.upstream_package_name
+        ).replace("{version}", self.get_version())
+        not_replaced = re.findall("{.*?}", archive_root_dir)
+        if not_replaced:
+            logger.warning(
+                f"Probably not all archive_root_dir_template tags were "
+                f"replaced: {' ,'.join(not_replaced)}"
+            )
+        return archive_root_dir
