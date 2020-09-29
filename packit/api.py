@@ -133,8 +133,8 @@ class PackitAPI:
     def sync_release(
         self,
         dist_git_branch: str,
-        use_local_content=False,
         version: str = None,
+        use_local_content=False,
         force_new_sources=False,
         upstream_ref: str = None,
         create_pr: bool = True,

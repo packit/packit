@@ -64,7 +64,7 @@ def test_basic_local_update(
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
-    api.sync_release("master", "0.1.0")
+    api.sync_release(dist_git_branch="master", version="0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -83,7 +83,7 @@ def test_basic_local_update_using_distgit(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
 
-    api.sync_release("master", "0.1.0")
+    api.sync_release(dist_git_branch="master", version="0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -112,7 +112,7 @@ def test_basic_local_update_direct_push(
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)
 
-    api.sync_release("master", "0.1.0", create_pr=False)
+    api.sync_release(dist_git_branch="master", version="0.1.0", create_pr=False)
 
     remote_dir_clone = Path(f"{distgit_remote}-clone")
     subprocess.check_call(
@@ -137,7 +137,7 @@ def test_basic_local_update_direct_push_no_dg_spec(
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)
 
-    api.sync_release("master", "0.1.0", create_pr=False)
+    api.sync_release(dist_git_branch="master", version="0.1.0", create_pr=False)
 
     remote_dir_clone = Path(f"{distgit_remote}-clone")
     subprocess.check_call(
