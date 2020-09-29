@@ -1,25 +1,18 @@
 # 0.17.0
 
-* Fix test failures in tests/integration/test_source_git.py
-* Use correct arguments in sync_release() from tests
-* patches: support git format-patch --no-prefix
-* cli: make --remote global
-* Update contribution guidelines
-* Don't drop zeros in version numbers
-* PatchMetadata.from_commit: make path optional
-* Fix picking correct COPR project name for CLI
-* Set REDIS_SERVICE_HOST when running reverse-dep-p-s tests
-* Add integration tests
-* Add changes based on reviews
-* Use upstream_tag_template to get version from tag
-* Implement remarks from review of `upstream_ref`
-* Refactor `_expand_git_ref` and add tests
-* Support globbing for branches in `upstream_ref`
-* Support globbing pattern for tag in upstream_ref
-* Add pyupgrade to pre-commit
-* Add badge for pre-commit and black
-* Start numbering source-git patches after the original patches
-* Use correct setup.py path in test_get_version_macro
+## Minor changes and fixes
+
+- When adding patches to specfile, the numbering of source-git patches begins after original patches.
+- It is now possible to use globbing pattern when specifying ref in packit config.
+- `upstream_tag_template` is now used for extracting version from git tag.
+- Specifiying project using CLI is fixed.
+- Packit doesn't drop leading zeros in version strings.
+- Our contribution guidelines are cleaned up.
+- `--remote` option is now global and available to all the commands.
+- `sync-from-downstream --remote` was renamed to `--remote-to-push`.
+- `--remote` can now be specified in user's config (via
+  `upstream_git_remote` parameter).
+- packit is now able generate a patch file withformat-patch without leading a/ and b/ in the patch diff.
 
 # 0.16.0
 

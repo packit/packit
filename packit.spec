@@ -2,7 +2,7 @@
 %global real_name packit
 
 Name:           %{real_name}
-Version:        0.16.0
+Version:        0.17.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -78,6 +78,9 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 29 2020 Dominika Hodovska <dhodovsk@redhat.com> - 0.17.0-1
+- new upstream release 0.17.0
+
 * Wed Sep 02 2020 Matej Focko <mfocko@redhat.com> - 0.16.0-1
 - new upstream release 0.16.0
 
