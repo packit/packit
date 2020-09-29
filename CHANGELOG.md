@@ -1,3 +1,26 @@
+# 0.17.0
+
+* Fix test failures in tests/integration/test_source_git.py
+* Use correct arguments in sync_release() from tests
+* patches: support git format-patch --no-prefix
+* cli: make --remote global
+* Update contribution guidelines
+* Don't drop zeros in version numbers
+* PatchMetadata.from_commit: make path optional
+* Fix picking correct COPR project name for CLI
+* Set REDIS_SERVICE_HOST when running reverse-dep-p-s tests
+* Add integration tests
+* Add changes based on reviews
+* Use upstream_tag_template to get version from tag
+* Implement remarks from review of `upstream_ref`
+* Refactor `_expand_git_ref` and add tests
+* Support globbing for branches in `upstream_ref`
+* Support globbing pattern for tag in upstream_ref
+* Add pyupgrade to pre-commit
+* Add badge for pre-commit and black
+* Start numbering source-git patches after the original patches
+* Use correct setup.py path in test_get_version_macro
+
 # 0.16.0
 
 ## Minor changes and fixes
