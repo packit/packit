@@ -12,7 +12,7 @@
 - `sync-from-downstream --remote` was renamed to `--remote-to-push`.
 - `--remote` can now be specified in user's config (via
   `upstream_git_remote` parameter).
-- packit is now able generate a patch file withformat-patch without leading a/ and b/ in the patch diff.
+- packit is now able to generate a patch file with format-patch without leading a/ and b/ in the patch diff.
 
 # 0.16.0
 
