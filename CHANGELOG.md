@@ -2,7 +2,7 @@
 
 ## Minor changes and fixes
 
-- When adding patches to specfile, the numbering of source-git patches begins after original patches.
+- When adding patches to a specfile, the numbering of source-git patches begins after original patches.
 - It is now possible to use globbing pattern when specifying ref in packit config.
 - `upstream_tag_template` is now used for extracting version from git tag.
 - Specifiying project using CLI is fixed.
