@@ -178,6 +178,7 @@ def test_get_user_config(tmp_path):
         "debug: true\n"
         "fas_user: rambo\n"
         "keytab_path: './rambo.keytab'\n"
+        "kerberos_realm: STG.FEDORAPROJECT.ORG\n"
         "github_token: GITHUB_TOKEN\n"
         "pagure_user_token: PAGURE_TOKEN\n"
     )
@@ -188,6 +189,7 @@ def test_get_user_config(tmp_path):
     assert config.debug and isinstance(config.debug, bool)
     assert config.fas_user == "rambo"
     assert config.keytab_path == "./rambo.keytab"
+    assert config.kerberos_realm == "STG.FEDORAPROJECT.ORG"
 
     assert GithubService(token="GITHUB_TOKEN") in config.services
     assert PagureService(token="PAGURE_TOKEN") in config.services
@@ -214,6 +216,7 @@ def test_get_user_config_new_authentication(tmp_path):
     assert config.debug and isinstance(config.debug, bool)
     assert config.fas_user == "rambo"
     assert config.keytab_path == "./rambo.keytab"
+    assert config.kerberos_realm == "FEDORAPROJECT.ORG"
 
     assert GithubService(token="GITHUB_TOKEN") in config.services
     assert (

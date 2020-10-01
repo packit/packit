@@ -56,6 +56,7 @@ class Config:
         fas_user: Optional[str] = None,
         keytab_path: Optional[str] = None,
         upstream_git_remote: Optional[str] = None,
+        kerberos_realm: Optional[str] = "FEDORAPROJECT.ORG",
         command_handler: str = None,
         command_handler_work_dir: str = SANDCASTLE_WORK_DIR,
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
@@ -66,6 +67,7 @@ class Config:
         self.debug: bool = debug
         self.fas_user: Optional[str] = fas_user
         self.keytab_path: Optional[str] = keytab_path
+        self.kerberos_realm = kerberos_realm
         self.dry_run: bool = dry_run
         self.upstream_git_remote = upstream_git_remote
 
