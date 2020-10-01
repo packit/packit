@@ -1,3 +1,19 @@
+# 0.17.0
+
+## Minor changes and fixes
+
+- When adding patches to a specfile, the numbering of source-git patches begins after original patches.
+- It is now possible to use globbing pattern when specifying ref in packit config.
+- `upstream_tag_template` is now used for extracting version from git tag.
+- Specifiying project using CLI is fixed.
+- Packit doesn't drop leading zeros in version strings.
+- Our contribution guidelines are cleaned up.
+- `--remote` option is now global and available to all the commands.
+- `sync-from-downstream --remote` was renamed to `--remote-to-push`.
+- `--remote` can now be specified in user's config (via
+  `upstream_git_remote` parameter).
+- packit is now able to generate a patch file with format-patch without leading a/ and b/ in the patch diff.
+
 # 0.16.0
 
 ## Minor changes and fixes
