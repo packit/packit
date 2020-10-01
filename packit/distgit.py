@@ -29,6 +29,7 @@ from typing import Optional, Sequence, List
 import cccolutils
 import git
 import requests
+
 from ogr.abstract import PullRequest
 
 from packit.base_git import PackitRepositoryBase
@@ -66,6 +67,7 @@ class DistGit(PackitRepositoryBase):
         config: Config,
         package_config: CommonPackageConfig,
         local_project: LocalProject = None,
+        stage: bool = False,
     ):
         super().__init__(config=config, package_config=package_config)
 
@@ -73,6 +75,7 @@ class DistGit(PackitRepositoryBase):
 
         self.fas_user = self.config.fas_user
         self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
+        self.stage = stage
         self._downstream_config: Optional[PackageConfig] = None
 
     def __repr__(self):
@@ -103,7 +106,9 @@ class DistGit(PackitRepositoryBase):
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
-                f = FedPKG(fas_username=self.fas_user, directory=tmpdir)
+                f = FedPKG(
+                    fas_username=self.fas_user, directory=tmpdir, stage=self.stage
+                )
                 f.clone(
                     self.package_config.downstream_package_name,
                     tmpdir,
@@ -280,6 +285,7 @@ class DistGit(PackitRepositoryBase):
         f = FedPKG(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
+            stage=self.stage,
         )
         try:
             f.new_sources(sources=archive_path)
@@ -293,7 +299,7 @@ class DistGit(PackitRepositoryBase):
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
-                "https://src.fedoraproject.org/lookaside/pkgs/"
+                f"{self.package_config.dist_git_base_url}lookaside/pkgs/"
                 f"{self.package_config.downstream_package_name}/{archive_name}/"
             )
             if res.ok:
@@ -326,7 +332,9 @@ class DistGit(PackitRepositoryBase):
         :param koji_target: koji target to pick (see `koji list-targets`)
         """
         fpkg = FedPKG(
-            fas_username=self.fas_user, directory=self.local_project.working_dir
+            fas_username=self.fas_user,
+            directory=self.local_project.working_dir,
+            stage=self.stage,
         )
         fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 

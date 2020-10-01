@@ -433,6 +433,7 @@ class UserConfigSchema(MM23Schema):
     command_handler_pvc_env_var = fields.String()
     command_handler_image_reference = fields.String()
     command_handler_k8s_namespace = fields.String()
+    kerberos_realm = fields.String()
 
     @post_load
     def make_instance(self, data, **kwargs):
