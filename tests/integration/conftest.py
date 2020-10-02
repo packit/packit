@@ -21,8 +21,10 @@
 # SOFTWARE.
 
 import datetime
+import io
 import shutil
 import subprocess
+import tarfile
 from pathlib import Path
 from typing import Iterator, Optional
 
@@ -349,3 +351,19 @@ def upstream_without_config(tmp_path):
     subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote)
 
     return u_remote
+
+
+@pytest.fixture
+def create_archive():
+    def create_archive_factory(output_path):
+        out = io.BytesIO()
+        with tarfile.open(fileobj=out, mode="w:gz") as tar:
+            t = tarfile.TarInfo("dir1")
+            t.type = tarfile.DIRTYPE
+            tar.addfile(t)
+
+        out.seek(0)
+        with open(output_path, "bw") as archive:
+            archive.write(out.read())
+
+    return create_archive_factory
