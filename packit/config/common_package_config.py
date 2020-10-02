@@ -70,6 +70,7 @@ class CommonPackageConfig:
         create_pr: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
+        archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
     ):
@@ -106,6 +107,7 @@ class CommonPackageConfig:
         ] = current_version_command or get_current_version_command(glob_pattern="*")
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
+        self.archive_root_dir_template = archive_root_dir_template
 
     def __repr__(self):
         return (

@@ -165,6 +165,7 @@ class JobConfig(CommonPackageConfig):
         create_pr: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
+        archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
     ):
@@ -186,6 +187,7 @@ class JobConfig(CommonPackageConfig):
             create_pr=create_pr,
             spec_source_id=spec_source_id,
             upstream_tag_template=upstream_tag_template,
+            archive_root_dir_template=archive_root_dir_template,
             patch_generation_ignore_paths=patch_generation_ignore_paths,
             notifications=notifications,
         )
