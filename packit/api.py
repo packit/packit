@@ -286,10 +286,7 @@ class PackitAPI:
             if not use_local_content:
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
             self.dg.refresh_specfile()
-            branch = local_pr_branch if create_pr else dist_git_branch
-            self.dg.local_project.git_repo.git.reset(
-                "--hard", f"remotes/origin/{branch}"
-            )
+            self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
         return new_pr
 
     def sync_from_downstream(
