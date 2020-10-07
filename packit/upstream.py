@@ -390,7 +390,7 @@ class Upstream(PackitRepositoryBase):
             logger.info(
                 "Linking to the specfile directory:"
                 f" {archive_in_spec_dir} -> {relative_archive_path}"
-                f" (absolute path to archive: {archive_path})"
+                f" (given path to archive: {archive_path})"
             )
             archive_in_spec_dir.symlink_to(relative_archive_path)
 
@@ -405,13 +405,15 @@ class Upstream(PackitRepositoryBase):
         for output in reversed(outputs):
             for archive_name in reversed(output.splitlines()):
                 try:
-                    archive_path = (
-                        self._local_project.working_dir / archive_name.strip()
-                    )
+                    archive_path = Path(archive_name.strip())
+
+                    if not archive_path.is_absolute():
+                        archive_path = self._local_project.working_dir / archive_path
+
                     if archive_path.is_file():
                         archive_path_absolute = archive_path.absolute()
                         logger.info("Created archive:")
-                        logger.info(f"\trelative path: {archive_path}")
+                        logger.info(f"\tparsed   path: {archive_path}")
                         logger.info(f"\tabsolute path: {archive_path_absolute}")
                         return archive_path_absolute
                 except OSError as ex:
