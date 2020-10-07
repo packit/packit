@@ -19,16 +19,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from collections import Counter
 
 import pytest
+from flexmock import flexmock
 
+import packit
 from packit.config.aliases import (
     get_versions,
     get_build_targets,
     get_branches,
-    ALIASES,
+    # ALIASES,
     get_koji_targets,
     get_all_koji_targets,
+    get_aliases,
 )
 from packit.exceptions import PackitException
 from tests.spellbook import ALL_KOJI_TARGETS_SNAPSHOT
@@ -113,9 +117,9 @@ def test_get_build_targets_invalid_input():
         get_build_targets(name)
     err_msg = (
         f"Cannot get build target from '{name}'"
-        f", packit understands values like these: '{list(ALIASES.keys())}'."
+        f", packit understands values like these: '."
     )
-    assert str(ex.value) == err_msg
+    assert err_msg in str(ex.value)
 
 
 def test_get_build_targets_without_default():
@@ -219,3 +223,19 @@ def test_get_all_koji_targets():
     assert "rawhide" in targets
     assert "epel8" in targets
     assert all(isinstance(target, str) for target in targets)
+
+
+def test_get_aliases(bodhi_client_response):
+    flexmock(packit.config.aliases.BodhiClient).should_receive(
+        "get_releases"
+    ).and_return(bodhi_client_response)
+    aliases = get_aliases()
+
+    assert Counter(aliases["fedora-stable"]) == Counter(["fedora-31"])
+    assert Counter(aliases["fedora-development"]) == Counter(
+        ["fedora-34", "fedora-rawhide"]
+    )
+    assert Counter(aliases["fedora-all"]) == Counter(
+        ["fedora-34", "fedora-rawhide", "fedora-31"]
+    )
+    assert Counter(aliases["epel-all"]) == Counter(["epel-8"])
