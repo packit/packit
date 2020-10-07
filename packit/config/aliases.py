@@ -19,18 +19,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import functools
+from collections import defaultdict
 from typing import Dict, List, Set
+
+from bodhi.client.bindings import BodhiClient
 
 from packit.exceptions import PackitException
 from packit.utils.commands import run_command
 
-ALIASES: Dict[str, List[str]] = {
-    "fedora-development": ["fedora-33", "fedora-rawhide"],
-    "fedora-stable": ["fedora-31", "fedora-32"],
-    "fedora-all": ["fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"],
-    "epel-all": ["epel-6", "epel-7", "epel-8"],
-}
+
+# ALIASES: Dict[str, List[str]] = {
+#     "fedora-development": ["fedora-33", "fedora-rawhide"],
+#     "fedora-stable": ["fedora-31", "fedora-32"],
+#     "fedora-all": ["fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"],
+#     "epel-all": ["epel-6", "epel-7", "epel-8"],
+# }
 ARCHITECTURE_LIST: List[str] = [
     "aarch64",
     "armhfp",
@@ -56,7 +60,7 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     names = list(name) or [default]
     versions: Set[str] = set()
     for one_name in names:
-        versions.update(ALIASES.get(one_name, [one_name]))
+        versions.update(get_aliases().get(one_name, [one_name]))
     return versions
 
 
@@ -85,7 +89,7 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
             else:
                 err_msg = (
                     "Cannot get build target from '{one_name}'"
-                    f", packit understands values like these: '{list(ALIASES.keys())}'."
+                    f", packit understands values like these: '{list(get_aliases().keys())}'."
                 )
                 raise PackitException(err_msg.format(one_name=one_name))
 
@@ -183,3 +187,37 @@ def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
 
 def get_all_koji_targets() -> List[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).split()
+
+
+@functools.lru_cache(maxsize=None)
+def get_aliases() -> Dict[str, List[str]]:
+    """
+    Function to automatically determine fedora-all, fedora-stable, fedora-development and epel-all
+    aliases.
+    Current data are fetched via bodhi client, with default base url
+    `https://bodhi.fedoraproject.org/'.
+
+    :return: dictionary containing aliases
+    """
+
+    bodhi_client = BodhiClient()
+    releases = bodhi_client.get_releases(exclude_archived=True)
+    aliases = defaultdict(list)
+    for release in releases.releases:
+
+        if release.id_prefix == "FEDORA" and release.name != "ELN":
+            name = release.long_name.lower().replace(" ", "-")
+            aliases["fedora-all"].append(name)
+            if release.state == "current":
+                aliases["fedora-stable"].append(name)
+            elif release.state == "pending":
+                aliases["fedora-development"].append(name)
+
+        elif release.id_prefix == "FEDORA-EPEL":
+            name = release.name.lower()
+            aliases["epel-all"].append(name)
+
+    aliases["fedora-all"].append("fedora-rawhide")
+    aliases["fedora-development"].append("fedora-rawhide")
+
+    return aliases
