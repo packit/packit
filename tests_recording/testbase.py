@@ -24,9 +24,9 @@
 import shutil
 from os import makedirs
 from subprocess import check_output, CalledProcessError
-
-from requre.base_testclass import RequreTestCase
+import unittest
 from requre.helpers.tempfile import TempFile
+from pathlib import Path
 
 import packit.distgit
 import packit.upstream
@@ -34,18 +34,76 @@ from packit.config import Config, get_package_config_from_repo
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 
-DATA_DIR = "test_data"
+
+def socket_guard(*args, **kwargs):
+    raise Exception("Internet connection not allowed")
 
 
-class PackitUnittestOgr(RequreTestCase):
-    @staticmethod
-    def get_test_config():
-        try:
-            conf = Config.get_user_config()
-        except PackitException:
-            conf = Config()
-        conf.dry_run = True
-        return conf
+class PackitTest(unittest.TestCase):
+    def setUp(self):
+        self.static_tmp = "/tmp/packit_tmp"
+        makedirs(self.static_tmp, exist_ok=True)
+        TempFile.root = self.static_tmp
+
+        self._config = None
+        self._project = None
+        self._project_url = "https://github.com/packit/requre"
+        self._project_specfile_path = Path("fedora") / "python-requre.spec"
+        self._pc = None
+        self._dg = None
+        self._lp = None
+        self._upstream = None
+
+    def tearDown(self):
+        shutil.rmtree(self.static_tmp)
+
+    @property
+    def config(self):
+        if not self._config:
+            try:
+                self._config = Config.get_user_config()
+            except PackitException:
+                self._config = Config()
+            self._config.dry_run = True
+        return self._config
+
+    @property
+    def project(self):
+        if not self._project:
+            self._project = self.config.get_project(url=self._project_url)
+        return self._project
+
+    @property
+    def pc(self):
+        if not self._pc:
+            self._pc = get_package_config_from_repo(project=self.project, ref="master")
+            if not self._pc:
+                raise RuntimeError("Package config not found.")
+        return self._pc
+
+    @property
+    def dg(self):
+        if not self._dg:
+            self._dg = packit.distgit.DistGit(self.config, self.pc)
+        return self._dg
+
+    @property
+    def lp(self):
+        if not self._lp:
+            self._lp = LocalProject(git_project=self.project)
+        return self._lp
+
+    @property
+    def upstream(self):
+        if not self._upstream:
+            self._upstream = packit.upstream.Upstream(
+                self.config, self.pc, local_project=self.lp
+            )
+        return self._upstream
+
+    @property
+    def project_specfile_location(self):
+        return self.lp.working_dir / self._project_specfile_path
 
     @staticmethod
     def set_git_user():
@@ -56,24 +114,3 @@ class PackitUnittestOgr(RequreTestCase):
                 ["git", "config", "--global", "user.email", "test@example.com"]
             )
             check_output(["git", "config", "--global", "user.name", "Tester"])
-
-    def setUp(self):
-        super().setUp()
-        self.conf = self.get_test_config()
-        self.static_tmp = "/tmp/packit_tmp"
-        makedirs(self.static_tmp, exist_ok=True)
-        TempFile.root = self.static_tmp
-        self.project_ogr = self.conf.get_project(url="https://github.com/packit/ogr")
-
-        self.pc = get_package_config_from_repo(project=self.project_ogr, ref="master")
-        if not self.pc:
-            raise RuntimeError("Package config not found.")
-        self.dg = packit.distgit.DistGit(self.conf, self.pc)
-        self.lp = LocalProject(git_project=self.project_ogr)
-        self.upstream = packit.upstream.Upstream(
-            self.conf, self.pc, local_project=self.lp
-        )
-
-    def tearDown(self):
-        super().tearDown()
-        shutil.rmtree(self.static_tmp)
