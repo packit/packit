@@ -1,103 +1,36 @@
 import pytest
+from flexmock import flexmock
 from munch import munchify
+
+import packit
+
+
+@pytest.fixture
+def bodhi_client_response():
+    def response_factory(releases_list):
+        releases = [
+            {
+                "name": name,
+                "long_name": long_name,
+                "id_prefix": id_prefix,
+                "state": state,
+            }
+            for name, long_name, id_prefix, state in releases_list
+        ]
+        response = {"releases": releases}
+        return munchify(response)
+
+    return response_factory
 
 
 @pytest.fixture()
-def bodhi_client_response():
-    bodhi_client_response = {
-        "releases": [
-            {
-                "name": "EPEL-8",
-                "long_name": "Fedora EPEL 8",
-                "version": "8",
-                "id_prefix": "FEDORA-EPEL",
-                "branch": "epel8",
-                "dist_tag": "epel8",
-                "stable_tag": "epel8",
-                "testing_tag": "epel8-testing",
-                "candidate_tag": "epel8-testing-candidate",
-                "pending_signing_tag": "epel8-signing-pending",
-                "pending_testing_tag": "epel8-testing-pending",
-                "pending_stable_tag": "epel8-pending",
-                "override_tag": "epel8-override",
-                "mail_template": "fedora_epel_legacy_errata_template",
-                "state": "current",
-                "composed_by_bodhi": True,
-                "create_automatic_updates": False,
-                "package_manager": "unspecified",
-                "testing_repository": None,
-                "composes": [],
-            },
-            {
-                "name": "F31F",
-                "long_name": "Fedora 31 Flatpaks",
-                "version": "31",
-                "id_prefix": "FEDORA-FLATPAK",
-                "branch": "f31",
-                "dist_tag": "f31-flatpak",
-                "stable_tag": "f31-flatpak-updates",
-                "testing_tag": "f31-flatpak-updates-testing",
-                "candidate_tag": "f31-flatpak-updates-candidate",
-                "pending_signing_tag": "",
-                "pending_testing_tag": "f31-flatpak-updates-testing-pending",
-                "pending_stable_tag": "f31-flatpak-updates-pending",
-                "override_tag": "f31-flatpak-override",
-                "mail_template": "fedora_errata_template",
-                "state": "current",
-                "composed_by_bodhi": True,
-                "create_automatic_updates": False,
-                "package_manager": "unspecified",
-                "testing_repository": None,
-                "composes": [],
-            },
-            {
-                "name": "F31",
-                "long_name": "Fedora 31",
-                "version": "31",
-                "id_prefix": "FEDORA",
-                "branch": "f31",
-                "dist_tag": "f31",
-                "stable_tag": "f31-updates",
-                "testing_tag": "f31-updates-testing",
-                "candidate_tag": "f31-updates-candidate",
-                "pending_signing_tag": "f31-signing-pending",
-                "pending_testing_tag": "f31-updates-testing-pending",
-                "pending_stable_tag": "f31-updates-pending",
-                "override_tag": "f31-override",
-                "mail_template": "fedora_errata_template",
-                "state": "current",
-                "composed_by_bodhi": True,
-                "create_automatic_updates": False,
-                "package_manager": "dnf",
-                "testing_repository": "updates-testing",
-                "composes": [],
-            },
-            {
-                "name": "F34",
-                "long_name": "Fedora 34",
-                "version": "34",
-                "id_prefix": "FEDORA",
-                "branch": "f34",
-                "dist_tag": "f34",
-                "stable_tag": "f34",
-                "testing_tag": "f34-updates-testing",
-                "candidate_tag": "f34-updates-candidate",
-                "pending_signing_tag": "f34-signing-pending",
-                "pending_testing_tag": "f34-updates-testing-pending",
-                "pending_stable_tag": "f34-updates-pending",
-                "override_tag": "f34-override",
-                "mail_template": "fedora_errata_template",
-                "state": "pending",
-                "composed_by_bodhi": False,
-                "create_automatic_updates": True,
-                "package_manager": "unspecified",
-                "testing_repository": None,
-                "composes": [],
-            },
-        ],
-        "page": 1,
-        "pages": 1,
-        "rows_per_page": 20,
-        "total": 19,
-    }
-    return munchify(bodhi_client_response)
+def mock_get_aliases():
+    mock_aliases_module = flexmock(packit.config.aliases)
+    mock_aliases_module.should_receive("get_aliases").and_return(
+        {
+            "fedora-all": ["fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"],
+            "fedora-stable": ["fedora-31", "fedora-32"],
+            "fedora-development": ["fedora-33", "fedora-rawhide"],
+            "epel-all": ["epel-6", "epel-7", "epel-8"],
+        }
+    )

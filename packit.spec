@@ -28,6 +28,7 @@ BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
+BuildRequires:  python3-bodhi-client
 # new-sources
 Requires:       fedpkg
 # bumpspec
