@@ -20,24 +20,83 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import unittest
 
-import pkg_resources
+from requre.cassette import DataTypes
+from requre.online_replacing import (
+    apply_decorator_to_all_methods,
+    record_requests_for_all_methods,
+    replace_module_match,
+)
+from requre.helpers.tempfile import TempFile
+from requre.helpers.simple_object import Simple
+from requre.helpers.files import StoreFiles
+from requre.helpers.git.pushinfo import PushInfoStorageList
+from requre.helpers.git.fetchinfo import FetchInfoStorageList
+from requre.helpers.git.repo import Repo
 
 from packit.status import Status
-from requre.cassette import DataTypes
-from tests_recording.testbase import PackitUnittestOgr
+from tests_recording.testbase import PackitTest
 
 
-@unittest.skip("Not working yet")
-class TestStatus(PackitUnittestOgr):
+@record_requests_for_all_methods()
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="packit.utils.run_command_remote", decorate=Simple.decorator_plain()
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="packit.fedpkg.FedPKG.clone",
+        decorate=StoreFiles.where_arg_references(
+            key_position_params_dict={"target_path": 2}
+        ),
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="git.repo.base.Repo.clone_from",
+        decorate=StoreFiles.where_arg_references(
+            key_position_params_dict={"to_path": 2},
+            return_decorator=Repo.decorator_plain,
+        ),
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="git.remote.Remote.push", decorate=PushInfoStorageList.decorator_plain()
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="git.remote.Remote.fetch", decorate=FetchInfoStorageList.decorator_plain()
+    )
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(what="tempfile.mkdtemp", decorate=TempFile.mkdtemp())
+)
+@apply_decorator_to_all_methods(
+    replace_module_match(what="tempfile.mktemp", decorate=TempFile.mktemp())
+)
+# Be aware that decorator stores login and token to test_data, replace it by some value.
+# Default precommit hook doesn't do that for copr.v3.helpers, see README.md
+@apply_decorator_to_all_methods(
+    replace_module_match(
+        what="copr.v3.helpers.config_from_file", decorate=Simple.decorator_plain()
+    )
+)
+class TestStatus(PackitTest):
+    def cassette_setup(self, cassette):
+        cassette.data_miner.data_type = DataTypes.Dict
+
     def setUp(self):
         super().setUp()
-        self.cassette.data_miner.key = (
-            f'github-{pkg_resources.get_distribution("PyGithub").version}'
-        )
-        self.cassette.data_miner.data_type = DataTypes.Dict
-        self.status = Status(self.conf, self.pc, self.upstream, self.dg)
+        self._status = None
+
+    @property
+    def status(self):
+        if not self._status:
+            self._status = Status(self.config, self.pc, self.upstream, self.dg)
+        return self._status
 
     def test_status(self):
         assert self.status
@@ -70,10 +129,9 @@ class TestStatus(PackitUnittestOgr):
                 stable_branches.append(branch)
         assert len(set(stable_branches)) == len(stable_branches)
 
-    @unittest.skip("The replaying does not work.")
     def test_up_releases(self):
         table = self.status.get_up_releases()
-        assert len(table) >= 5
+        assert len(table) >= 1
 
     def test_dowstream_pr(self):
         table = self.status.get_downstream_prs()
