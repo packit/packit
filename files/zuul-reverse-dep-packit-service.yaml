@@ -10,7 +10,5 @@
     - include_tasks: tasks/install-packit.yaml
     - name: Run unit, integration tests
       command: make check
-      environment:
-        REDIS_SERVICE_HOST: redis
       args:
         chdir: "{{ reverse_dir }}"
