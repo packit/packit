@@ -1,6 +1,6 @@
 # 0.18.0
 
-- Packit got new `archive_root_dir_template` config option to get custom archive root dir.
+- Packit got new `archive_root_dir_template` config option to get custom archive root dir. You can find more info [in the documentation](https://packit.dev/docs/configuration/#archive_root_dir_template).
 
 # 0.17.0
 
