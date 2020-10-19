@@ -133,3 +133,42 @@ def test_srpm_twice(cwd_upstream_or_distgit):
     assert srpm_files[0].exists()
 
     build_srpm(srpm_files[0])
+
+
+def _test_srpm_symlinking(upstream_repo_path, path_prefix):
+    packit_yaml_path = upstream_repo_path / ".packit.json"
+    packit_yaml_dict = json.loads(packit_yaml_path.read_text())
+
+    sources_tarball = "random_sources.tar.gz"
+    desired_path = f"{path_prefix}/tmp/{sources_tarball}"
+    packit_yaml_dict["actions"] = {
+        "create-archive": [
+            f"bash -c 'mkdir tmp; touch {desired_path}; echo {desired_path}'"
+        ]
+    }
+    packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
+    out = call_real_packit(
+        parameters=["srpm"], cwd=upstream_repo_path, return_output=True
+    )
+    assert f"\n{desired_path}\n" in out.decode()
+
+    srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
+    assert srpm_path.exists()
+
+    tarball = Path(upstream_repo_path / sources_tarball)
+    # check if it's symlink
+    assert tarball.is_symlink()
+    # links to correct file
+    assert (
+        tarball.resolve() == (upstream_repo_path / f"tmp/{sources_tarball}").absolute()
+    )
+
+
+def test_srpm_symlinking_relative_path(upstream_and_remote):
+    upstream_repo_path = upstream_and_remote[0]
+    _test_srpm_symlinking(upstream_repo_path, ".")
+
+
+def test_srpm_symlinking_absolute_path(upstream_and_remote):
+    upstream_repo_path = upstream_and_remote[0]
+    _test_srpm_symlinking(upstream_repo_path, upstream_repo_path)
