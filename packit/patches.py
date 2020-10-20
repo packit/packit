@@ -435,7 +435,7 @@ class PatchGenerator:
                 )
                 patch_list = self.process_git_am_style_patches(patch_list)
             else:
-                logger.warning(f"No patches between {git_ref!r} and {self.lp.ref!r}")
+                logger.info(f"No patches between {git_ref!r} and {self.lp.ref!r}")
 
             return patch_list
         finally:
