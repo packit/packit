@@ -277,7 +277,7 @@ class PackitAPI:
             if create_pr:
                 title = f"Update to upstream release {full_version}"
 
-                if not self.dg.pr_exists(title, description, dist_git_branch):
+                if not self.dg.pr_exists(title, description.rstrip(), dist_git_branch):
                     new_pr = self.push_and_create_pr(
                         pr_title=title,
                         pr_description=description,
