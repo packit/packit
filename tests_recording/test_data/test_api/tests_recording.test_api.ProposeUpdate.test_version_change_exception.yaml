@@ -21,7 +21,7 @@ git.remote:
   fetch:
     all:
       metadata:
-        latency: 2.3265836238861084
+        latency: 2.1348159313201904
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -38,168 +38,28 @@ git.remote:
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'master           '
+        remote_ref_path: 'master    '
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'refs/pull/1/head '
+        remote_ref_path: 'f30       '
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: refs/pull/10/head
+        remote_ref_path: 'f31       '
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: refs/pull/11/head
+        remote_ref_path: 'f32       '
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: refs/pull/12/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/13/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/14/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/15/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/16/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/17/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/18/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/19/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/2/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/20/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/21/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/22/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/23/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/24/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/25/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/26/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/27/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/28/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/29/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/3/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/30/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/31/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/32/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/33/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/34/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: refs/pull/35/head
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/4/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/5/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/6/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/7/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/8/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'refs/pull/9/head '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'f30              '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'f31              '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'f32              '
-      - flags: 4
-        note: ''
-        old_commit: null
-        remote_ref_path: 'f33              '
+        remote_ref_path: 'f33       '
 git.repo.base:
   clone_from:
     all:
       metadata:
-        latency: 1.4865167140960693
+        latency: 1.8395652770996094
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -224,7 +84,7 @@ packit.fedpkg:
   clone:
     all:
       metadata:
-        latency: 4.139026403427124
+        latency: 2.96218204498291
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -245,7 +105,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.34256672859191895
+            latency: 0.4389228820800781
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -327,8 +187,8 @@ requests.sessions:
               network_count: 8
               node_id: MDEwOlJlcG9zaXRvcnkyMDc3NzgzMTk=
               notifications_url: https://api.github.com/repos/packit/requre/notifications{?since,all,participating}
-              open_issues: 7
-              open_issues_count: 7
+              open_issues: 6
+              open_issues_count: 6
               organization:
                 avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
                 events_url: https://api.github.com/users/packit/events{/privacy}
@@ -373,9 +233,9 @@ requests.sessions:
                 push: true
               private: false
               pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
-              pushed_at: '2020-10-05T11:26:38Z'
+              pushed_at: '2020-10-09T11:46:25Z'
               releases_url: https://api.github.com/repos/packit/requre/releases{/id}
-              size: 399
+              size: 405
               ssh_url: git@github.com:packit/requre.git
               stargazers_count: 4
               stargazers_url: https://api.github.com/repos/packit/requre/stargazers
@@ -388,12 +248,12 @@ requests.sessions:
               teams_url: https://api.github.com/repos/packit/requre/teams
               temp_clone_token: ''
               trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
-              updated_at: '2020-10-05T11:26:42Z'
+              updated_at: '2020-10-09T11:46:27Z'
               url: https://api.github.com/repos/packit/requre
               watchers: 4
               watchers_count: 4
             _next: null
-            elapsed: 0.342094
+            elapsed: 0.438152
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -405,9 +265,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 07 Oct 2020 08:07:16 GMT
-              ETag: W/"c51a2fc7e475b943edea1e6e20b5155cb47d731ddf169aab731b157eba50e306"
-              Last-Modified: Mon, 05 Oct 2020 11:26:42 GMT
+              Date: Tue, 20 Oct 2020 10:48:14 GMT
+              ETag: W/"8cb8af4164409bef9208afe94c2a953cca6975ad00065ddb435ab96dcf563eea"
+              Last-Modified: Fri, 09 Oct 2020 11:46:27 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Status: 200 OK
@@ -419,12 +279,11 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 0B54:624B:10FE8F5:1405038:5F7D7733
-              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
-                admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+              X-GitHub-Request-Id: F180:F31B:1F20C811:23F28671:5F8EC06E
+              X-OAuth-Scopes: notifications, repo, workflow
               X-RateLimit-Limit: '5000'
               X-RateLimit-Remaining: '4996'
-              X-RateLimit-Reset: '1602061608'
+              X-RateLimit-Reset: '1603194466'
               X-RateLimit-Used: '4'
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
@@ -433,7 +292,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=master:
         all:
           metadata:
-            latency: 0.18293023109436035
+            latency: 0.19189047813415527
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -454,7 +313,7 @@ requests.sessions:
             __store_indicator: 2
             _content:
               _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
+                git: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
                 html: https://github.com/packit/requre/blob/master/.packit.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
               content: 'LS0tCnNwZWNmaWxlX3BhdGg6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMK
@@ -509,31 +368,31 @@ requests.sessions:
 
                 CiAgICB0cmlnZ2VyOiBjb21taXQKICAgIG1ldGFkYXRhOgogICAgICBicmFu
 
-                Y2g6IG1hc3RlcgogICAgICB0YXJnZXRzOgogICAgICAgIC0gZmVkb3JhLXN0
+                Y2g6IG1hc3RlcgogICAgICB0YXJnZXRzOgogICAgICAgIC0gZmVkb3JhLWFs
 
-                YWJsZQogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAgICAgIHByZXNl
+                bAogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAgICAgIHByZXNlcnZl
 
-                cnZlX3Byb2plY3Q6IFRydWUKICAtIGpvYjogY29wcl9idWlsZAogICAgdHJp
+                X3Byb2plY3Q6IFRydWUKICAtIGpvYjogY29wcl9idWlsZAogICAgdHJpZ2dl
 
-                Z2dlcjogcmVsZWFzZQogICAgbWV0YWRhdGE6CiAgICAgIHRhcmdldHM6CiAg
+                cjogcmVsZWFzZQogICAgbWV0YWRhdGE6CiAgICAgIHRhcmdldHM6CiAgICAg
 
-                ICAgICAgLSBmZWRvcmEtc3RhYmxlCiAgICAgIGxpc3Rfb25faG9tZXBhZ2U6
+                ICAgLSBmZWRvcmEtYWxsCiAgICAgIGxpc3Rfb25faG9tZXBhZ2U6IFRydWUK
 
-                IFRydWUKICAgICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQo=
+                ICAgICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQo=
 
                 '
               download_url: https://raw.githubusercontent.com/packit/requre/master/.packit.yaml
               encoding: base64
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
               html_url: https://github.com/packit/requre/blob/master/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-              size: 1430
+              sha: d115b8280494d3c9b288c0a739d1c8fa58da1e3b
+              size: 1424
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
             _next: null
-            elapsed: 0.182531
+            elapsed: 0.191287
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -545,9 +404,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 07 Oct 2020 08:07:18 GMT
-              ETag: W/"c4e8c63dde234df9b5816a1a0e71dcedbceeec63"
-              Last-Modified: Mon, 05 Oct 2020 11:26:37 GMT
+              Date: Tue, 20 Oct 2020 10:48:17 GMT
+              ETag: W/"d115b8280494d3c9b288c0a739d1c8fa58da1e3b"
+              Last-Modified: Fri, 09 Oct 2020 11:46:24 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Status: 200 OK
@@ -559,12 +418,11 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 0B54:624B:10FEDCB:140509D:5F7D7734
-              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
-                admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+              X-GitHub-Request-Id: F180:F31B:1F20CD62:23F286D9:5F8EC06E
+              X-OAuth-Scopes: notifications, repo, workflow
               X-RateLimit-Limit: '5000'
               X-RateLimit-Remaining: '4995'
-              X-RateLimit-Reset: '1602061608'
+              X-RateLimit-Reset: '1603194466'
               X-RateLimit-Used: '5'
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
@@ -573,7 +431,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/?ref=master:
         all:
           metadata:
-            latency: 0.19863295555114746
+            latency: 0.27811098098754883
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -620,16 +478,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=master
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
+                git: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
                 html: https://github.com/packit/requre/blob/master/.packit.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
               download_url: https://raw.githubusercontent.com/packit/requre/master/.packit.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
               html_url: https://github.com/packit/requre/blob/master/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-              size: 1430
+              sha: d115b8280494d3c9b288c0a739d1c8fa58da1e3b
+              size: 1424
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
             - _links:
@@ -737,16 +595,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=master
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/17e9e85d329d0340864d5e2cad2fd63880d530f0
+                git: https://api.github.com/repos/packit/requre/git/blobs/da4c6034b0e3af8352884f9b7cd0941c0f2d4b5d
                 html: https://github.com/packit/requre/blob/master/README.md
                 self: https://api.github.com/repos/packit/requre/contents/README.md?ref=master
               download_url: https://raw.githubusercontent.com/packit/requre/master/README.md
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/17e9e85d329d0340864d5e2cad2fd63880d530f0
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/da4c6034b0e3af8352884f9b7cd0941c0f2d4b5d
               html_url: https://github.com/packit/requre/blob/master/README.md
               name: README.md
               path: README.md
-              sha: 17e9e85d329d0340864d5e2cad2fd63880d530f0
-              size: 471
+              sha: da4c6034b0e3af8352884f9b7cd0941c0f2d4b5d
+              size: 967
               type: file
               url: https://api.github.com/repos/packit/requre/contents/README.md?ref=master
             - _links:
@@ -815,15 +673,15 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/files?ref=master
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/39f05abcceb71b360652ce0f5bd19f0112dcb627
+                git: https://api.github.com/repos/packit/requre/git/trees/d50c2379a8c2dfd4316a91fb149229fd2c64d1ec
                 html: https://github.com/packit/requre/tree/master/requre
                 self: https://api.github.com/repos/packit/requre/contents/requre?ref=master
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/39f05abcceb71b360652ce0f5bd19f0112dcb627
+              git_url: https://api.github.com/repos/packit/requre/git/trees/d50c2379a8c2dfd4316a91fb149229fd2c64d1ec
               html_url: https://github.com/packit/requre/tree/master/requre
               name: requre
               path: requre
-              sha: 39f05abcceb71b360652ce0f5bd19f0112dcb627
+              sha: d50c2379a8c2dfd4316a91fb149229fd2c64d1ec
               size: 0
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/requre?ref=master
@@ -867,7 +725,7 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/tests?ref=master
             _next: null
-            elapsed: 0.197638
+            elapsed: 0.277057
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -879,9 +737,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 07 Oct 2020 08:07:18 GMT
-              ETag: W/"9b5ea247d48fbd45a3611110be56da7f94ed2876"
-              Last-Modified: Mon, 05 Oct 2020 11:26:42 GMT
+              Date: Tue, 20 Oct 2020 10:48:17 GMT
+              ETag: W/"97242393e2957f90e2e91fe324f905e8307f35c1"
+              Last-Modified: Fri, 09 Oct 2020 11:46:27 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Status: 200 OK
@@ -893,12 +751,11 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 0B54:624B:10FEE30:1405655:5F7D7736
-              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
-                admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+              X-GitHub-Request-Id: F180:F31B:1F20CDD2:23F28D0C:5F8EC071
+              X-OAuth-Scopes: notifications, repo, workflow
               X-RateLimit-Limit: '5000'
               X-RateLimit-Remaining: '4994'
-              X-RateLimit-Reset: '1602061608'
+              X-RateLimit-Reset: '1603194466'
               X-RateLimit-Used: '6'
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
@@ -907,7 +764,7 @@ requests.sessions:
       https://files.pythonhosted.org/packages/source/r/requre/requre-0.5.0.tar.gz:
         all:
           metadata:
-            latency: 0.3604891300201416
+            latency: 0.40799474716186523
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -927,7 +784,7 @@ requests.sessions:
             __store_indicator: 0
             _content: false
             _next: null
-            elapsed: 0.360383
+            elapsed: 0.40786
             encoding: null
             headers:
               Accept-Ranges: bytes
@@ -935,7 +792,7 @@ requests.sessions:
               Connection: keep-alive
               Content-Length: '0'
               Content-Type: application/octet-stream
-              Date: Wed, 07 Oct 2020 08:07:31 GMT
+              Date: Tue, 20 Oct 2020 10:48:27 GMT
               Server: nginx/1.13.9
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Cache: MISS, MISS
@@ -944,8 +801,8 @@ requests.sessions:
               X-Frame-Options: deny
               X-Permitted-Cross-Domain-Policies: none
               X-Robots-Header: noindex
-              X-Served-By: cache-bwi5127-BWI, cache-hhn4054-HHN
-              X-Timer: S1602058051.431909,VS0,VE183
+              X-Served-By: cache-bwi5133-BWI, cache-hhn4023-HHN
+              X-Timer: S1603190908.684640,VS0,VE157
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
             reason: Not Found
@@ -953,7 +810,7 @@ requests.sessions:
       https://release-monitoring.org/api/project/Fedora/python-requre:
         all:
           metadata:
-            latency: 0.4507606029510498
+            latency: 0.4718620777130127
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -977,15 +834,15 @@ requests.sessions:
               error: No package "python-requre" found in distro "Fedora"
               output: notok
             _next: null
-            elapsed: 0.449604
+            elapsed: 0.471151
             encoding: null
             headers:
-              AppTime: D=13695
+              AppTime: D=39057
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '85'
               Content-Type: application/json
-              Date: Wed, 07 Oct 2020 08:07:23 GMT
+              Date: Tue, 20 Oct 2020 10:48:21 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.43 (Fedora) mod_wsgi/4.6.8 Python/3.8
@@ -993,8 +850,8 @@ requests.sessions:
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: X313O0yATaBl8bzHCrCNoAAAA0E
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: X47AdSwSz2-6rJByDMXcuAAAARg
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -1003,7 +860,7 @@ requests.sessions:
       https://release-monitoring.org/api/projects?pattern=python-requre:
         all:
           metadata:
-            latency: 1.350292444229126
+            latency: 1.4247896671295166
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1027,15 +884,15 @@ requests.sessions:
               projects: []
               total: 0
             _next: null
-            elapsed: 1.350027
+            elapsed: 1.423829
             encoding: null
             headers:
-              AppTime: D=919786
+              AppTime: D=1011212
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '26'
               Content-Type: application/json
-              Date: Wed, 07 Oct 2020 08:07:23 GMT
+              Date: Tue, 20 Oct 2020 10:48:21 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.43 (Fedora) mod_wsgi/4.6.8 Python/3.8
@@ -1043,8 +900,8 @@ requests.sessions:
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X313O-VSn505xIQ9ey1NhAAACUA
+              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
+              X-Fedora-RequestID: X47AdT-aDKnNzCgSNFx6NwAAAUw
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -1053,7 +910,7 @@ requests.sessions:
       ? https://src.fedoraproject.org/repo/pkgs/python-requre/requre-0.4.0.tar.gz/sha512/85293577f56e19dd0fad13bb5e118ac2ab39d7570d640a754b9d8d8054078c89c949d4695ef018915b17a2f2428f1635032352dcf3c9a036a2d633013cc35dd9/requre-0.4.0.tar.gz
       : all:
           metadata:
-            latency: 0.45000338554382324
+            latency: 0.5002138614654541
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1074,22 +931,22 @@ requests.sessions:
             __store_indicator: 0
             _content: false
             _next: null
-            elapsed: 0.449882
+            elapsed: 0.500155
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Wed, 07 Oct 2020 08:07:30 GMT
+              Date: Tue, 20 Oct 2020 10:48:26 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X313QvWRoMThh4PkDxClbQAAAsQ
+              X-Fedora-RequestID: X47Ael6HH9AwN5cexM-bDgAAAEY
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
               accept-ranges: bytes
-              apptime: D=2237
+              apptime: D=3223
               content-length: '99281'
               content-type: application/x-gzip
               etag: '"183d1-5afe23fe51240"'
@@ -2844,7 +2701,7 @@ requests.sessions:
       https://src.fedoraproject.org/lookaside/pkgs/python-requre/requre-0.5.0.tar.gz/:
         all:
           metadata:
-            latency: 0.4217081069946289
+            latency: 0.482743501663208
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -2863,19 +2720,19 @@ requests.sessions:
             __store_indicator: 1
             _content: ''
             _next: null
-            elapsed: 0.421396
+            elapsed: 0.482616
             encoding: iso-8859-1
             headers:
-              AppTime: D=2005
+              AppTime: D=2620
               Connection: Keep-Alive
-              Date: Wed, 07 Oct 2020 08:07:30 GMT
+              Date: Tue, 20 Oct 2020 10:48:26 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: X313QpDJn7OzjnAkNZDRnAAACRU
+              X-Fedora-RequestID: X47AevxClNvF5yge@Pa7awAAAYo
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
               content-type: text/html; charset=iso-8859-1
