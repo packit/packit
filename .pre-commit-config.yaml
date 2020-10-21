@@ -11,8 +11,8 @@ repos:
     rev: v2.7.2
     hooks:
       - id: pyupgrade
-  - repo: https://github.com/prettier/prettier
-    rev: 2.1.2
+  - repo: https://github.com/prettier/pre-commit
+    rev: v2.1.2
     hooks:
       - id: prettier
         exclude: tests_recording/test_data/*
