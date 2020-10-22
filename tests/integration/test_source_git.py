@@ -36,6 +36,7 @@ from tests.spellbook import (
     create_git_am_style_history,
     create_patch_mixed_history,
     create_history_with_empty_commit,
+    run_prep_for_srpm,
 )
 
 
@@ -503,6 +504,10 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
         "0001-m04r-malt.patch",
         "malt.patch",
     }
+    run_prep_for_srpm(srpm_path)
+    prep_root = sg_path.joinpath("beerware-0.1.0")
+    assert prep_root.joinpath("malt").read_text() == "Munich\n"
+    assert prep_root.joinpath("hops").read_text() == "Saaz\n"
 
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
