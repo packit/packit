@@ -226,6 +226,12 @@ def create_git_am_style_history(sg: Path):
     )
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
+    malt.write_text("Munich\n")
+    git_add_and_commit(directory=sg, message="I like Munich malt!")
+
+    hops.write_text("Saaz\n")
+    git_add_and_commit(directory=sg, message="Saaz is interesting")
+
 
 def create_patch_mixed_history(sg: Path):
     """
@@ -292,6 +298,32 @@ def call_packit(fnc=None, parameters=None, envs=None, working_dir=None):
 
 def build_srpm(path: Path):
     run_command(["rpmbuild", "--rebuild", str(path)], output=True)
+
+
+def run_prep_for_srpm(srpm_path: Path):
+    cmd = [
+        "rpmbuild",
+        "-rp",
+        "--define",
+        f"_sourcedir {srpm_path.parent}",
+        "--define",
+        f"_srcdir {srpm_path.parent}",
+        "--define",
+        f"_specdir {srpm_path.parent}",
+        "--define",
+        f"_srcrpmdir {srpm_path.parent}",
+        "--define",
+        f"_topdir {srpm_path.parent}",
+        # we also need these 3 so that rpmbuild won't create them
+        "--define",
+        f"_builddir {srpm_path.parent}",
+        "--define",
+        f"_rpmdir {srpm_path.parent}",
+        "--define",
+        f"_buildrootdir {srpm_path.parent}",
+        str(srpm_path),
+    ]
+    run_command(cmd)
 
 
 def can_a_module_be_imported(module_name):
