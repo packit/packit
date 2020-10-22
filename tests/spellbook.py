@@ -75,7 +75,9 @@ def get_test_config():
 
 def git_add_and_commit(directory, message):
     subprocess.check_call(["git", "add", "."], cwd=directory)
-    subprocess.check_call(["git", "commit", "-m", message], cwd=directory)
+    subprocess.check_call(
+        ["git", "commit", "--allow-empty", "-m", message], cwd=directory
+    )
 
 
 def initiate_git_repo(
@@ -238,6 +240,31 @@ def create_patch_mixed_history(sg: Path):
 
     hops.write_text("Citra\n")
     meta = PatchMetadata(name="citra.patch", present_in_specfile=True, no_prefix=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    malt = sg.joinpath("malt")
+    malt.write_text("Munich\n")
+    meta = PatchMetadata(name="malt.patch", present_in_specfile=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+
+def create_history_with_empty_commit(sg: Path):
+    """
+    create a git history with an empty commit
+
+    :param sg: the repo
+    """
+    hops = sg.joinpath("hops")
+    hops.write_text("Amarillo\n")
+    meta = PatchMetadata(name="amarillo.patch", present_in_specfile=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    hops.write_text("Citra\n")
+    meta = PatchMetadata(name="citra.patch", present_in_specfile=True)
+    git_add_and_commit(directory=sg, message=meta.commit_message)
+
+    # https://en.wikipedia.org/wiki/Saaz_hops
+    meta = PatchMetadata(name="saaz.patch", present_in_specfile=True)
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
     malt = sg.joinpath("malt")
