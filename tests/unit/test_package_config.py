@@ -973,6 +973,23 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
             PackageConfig(
                 config_file_path="packit.yaml",
                 specfile_path="file.spec",
+                downstream_package_name="package",
+                synced_files=SyncFilesConfig(
+                    files_to_sync=[SyncFilesItem(src="file.spec", dest="package.spec")]
+                ),
+            ),
+            SyncFilesConfig(
+                files_to_sync=[
+                    SyncFilesItem(src="file.spec", dest="package.spec"),
+                    SyncFilesItem(src="packit.yaml", dest="packit.yaml"),
+                ]
+            ),
+        ),
+        (
+            PackageConfig(
+                config_file_path="packit.yaml",
+                specfile_path="file.spec",
+                downstream_package_name="package",
                 synced_files=SyncFilesConfig(
                     files_to_sync=[SyncFilesItem(src="file.txt", dest="file.txt")]
                 ),
@@ -980,7 +997,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
             SyncFilesConfig(
                 files_to_sync=[
                     SyncFilesItem(src="file.txt", dest="file.txt"),
-                    SyncFilesItem(src="file.spec", dest="file.spec"),
+                    SyncFilesItem(src="file.spec", dest="package.spec"),
                     SyncFilesItem(src="packit.yaml", dest="packit.yaml"),
                 ]
             ),
@@ -990,10 +1007,11 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
                 config_file_path="packit.yaml",
                 specfile_path="file.spec",
                 synced_files=SyncFilesConfig([]),
+                downstream_package_name="package",
             ),
             SyncFilesConfig(
                 files_to_sync=[
-                    SyncFilesItem(src="file.spec", dest="file.spec"),
+                    SyncFilesItem(src="file.spec", dest="package.spec"),
                     SyncFilesItem(src="packit.yaml", dest="packit.yaml"),
                 ]
             ),
