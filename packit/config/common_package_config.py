@@ -24,17 +24,16 @@
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
 import os
-from typing import Optional, List, Union, Dict
-
-from packit.sync import SyncFilesItem
+from typing import Dict, List, Optional, Union
 
 from packit.actions import ActionName
-from packit.config.sync_files_config import SyncFilesConfig
 from packit.config.notifications import (
     NotificationsConfig,
     PullRequestNotificationsConfig,
 )
+from packit.config.sync_files_config import SyncFilesConfig
 from packit.constants import PROD_DISTGIT_URL
+from packit.sync import SyncFilesItem
 from packit.utils.repo import get_current_version_command
 
 
@@ -155,7 +154,14 @@ class CommonPackageConfig:
         files = self.synced_files.files_to_sync
 
         if self.specfile_path not in (item.src for item in files):
-            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
+            files.append(
+                SyncFilesItem(
+                    src=self.specfile_path,
+                    dest=f"{self.downstream_package_name}.spec"
+                    if self.downstream_package_name
+                    else self.specfile_path,
+                )
+            )
 
         if self.config_file_path and self.config_file_path not in (
             item.src for item in files
