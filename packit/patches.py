@@ -31,6 +31,7 @@ from typing import List, Optional, Dict
 
 import git
 import yaml
+from packit.exceptions import PackitException
 
 from packit.constants import DATETIME_FORMAT
 from packit.git_utils import get_metadata_from_message
@@ -320,6 +321,27 @@ class PatchGenerator:
         """
         patch_list: List[PatchMetadata] = []
         for commit in commits:
+            # commit.size doesn't work since even an empty commit is size > 0 (287)
+            if not commit.stats.files:
+                # this patch is empty - rpmbuild is okay with empty patches (!)
+                logger.debug(f"commit {commit} is empty")
+                patch = PatchMetadata.from_commit(commit=commit)
+                if not patch.present_in_specfile:
+                    # it's empty and not present in spec file
+                    # nothing to do here
+                    continue
+                if not patch.name:
+                    raise PackitException(
+                        f"Empty commit {commit} is referencing a patch which is present in spec"
+                        " file but the name is not defined in the commit metadata"
+                        " - please define it."
+                    )
+                patch_list.append(patch)
+
+                # we need to create it since `git format-patch` won't
+                Path(destination).joinpath(patch.name).write_text("")
+                logger.info(f"created empty patch {patch.path}")
+                continue
             for patch_name, patch_content in patches.items():
                 # `git format-patch` usually creates one patch for a merge commit,
                 # so some commits won't be covered by a dedicated patch file
@@ -420,6 +442,7 @@ class PatchGenerator:
             commits = self.get_commits_since_ref(
                 git_ref, add_upstream_head_commit=False
             )
+            # this is a string, separated by new-lines, with the names of patch files
             git_format_patch_out = self.run_git_format_patch(
                 destination, files_to_ignore, git_ref
             )
@@ -464,7 +487,7 @@ class PatchGenerator:
         else:
             upstream_ref = f"origin/{git_ref}"
             if upstream_ref not in self.lp.git_repo.refs:
-                raise Exception(
+                raise PackitException(
                     f"Upstream {upstream_ref!r} branch nor {git_ref!r} tag not found."
                 )
 
