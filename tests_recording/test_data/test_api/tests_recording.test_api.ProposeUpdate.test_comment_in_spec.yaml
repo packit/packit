@@ -21,7 +21,7 @@ git.remote:
   fetch:
     all:
       metadata:
-        latency: 2.2448012828826904
+        latency: 1.9568521976470947
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -36,56 +36,235 @@ git.remote:
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'master    '
+        remote_ref_path: 'master           '
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'f30       '
+        remote_ref_path: 'refs/pull/1/head '
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'f31       '
+        remote_ref_path: refs/pull/10/head
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'f32       '
+        remote_ref_path: refs/pull/11/head
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'f33       '
-  push:
+        remote_ref_path: refs/pull/12/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/13/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/14/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/15/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/16/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/17/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/18/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/19/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/2/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/20/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/21/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/22/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/23/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/24/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/25/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/26/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/27/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/28/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/29/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/3/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/30/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/31/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/32/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/33/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/34/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/35/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/36/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/37/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/38/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/39/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/4/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/40/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/41/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/42/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/43/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/44/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/45/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/46/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/5/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/6/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/7/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/8/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'refs/pull/9/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'f30              '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'f31              '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'f32              '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'f33              '
+git.repo.base:
+  clone_from:
     all:
       metadata:
-        latency: 7.389948606491089
+        latency: 1.1148486137390137
         module_call_list:
         - unittest.case
         - requre.online_replacing
         - tests_recording.test_api
-        - packit.api
-        - packit.distgit
-        - packit.base_git
+        - tests_recording.testbase
         - packit.local_project
-        - requre.objects
-        - requre.helpers.git.pushinfo
+        - packit.utils.repo
+        - requre.helpers.files
         - requre.objects
         - requre.cassette
-        - git.remote
-        - push
+        - git.repo.base
+        - clone_from
       output:
-      - _old_commit_sha: c6a732c
-        flags: 128
-        local_ref:
-        - /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/packit-dist-git_2/.git
-        - refs/heads/0.4.0-master-update
-        remote_ref_string: refs/heads/0.4.0-master-update
-        summary: 'c6a732c...4f91816 (forced update)
-
-          '
+        _bare: false
+        _common_dir: null
+        _working_tree_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/static_tmp_1
+        git_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/static_tmp_1/.git
+        working_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/static_tmp_1
 packit.fedpkg:
   clone:
     all:
       metadata:
-        latency: 2.7929165363311768
+        latency: 2.621762752532959
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -104,7 +283,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.41181015968322754
+            latency: 0.2874124050140381
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -230,9 +409,9 @@ requests.sessions:
                 push: true
               private: false
               pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
-              pushed_at: '2020-10-09T11:46:25Z'
+              pushed_at: '2020-10-21T12:18:11Z'
               releases_url: https://api.github.com/repos/packit/requre/releases{/id}
-              size: 405
+              size: 406
               ssh_url: git@github.com:packit/requre.git
               stargazers_count: 4
               stargazers_url: https://api.github.com/repos/packit/requre/stargazers
@@ -245,12 +424,12 @@ requests.sessions:
               teams_url: https://api.github.com/repos/packit/requre/teams
               temp_clone_token: ''
               trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
-              updated_at: '2020-10-09T11:46:27Z'
+              updated_at: '2020-10-21T12:18:14Z'
               url: https://api.github.com/repos/packit/requre
               watchers: 4
               watchers_count: 4
             _next: null
-            elapsed: 0.410896
+            elapsed: 0.283696
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -262,9 +441,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Tue, 20 Oct 2020 10:47:46 GMT
-              ETag: W/"8cb8af4164409bef9208afe94c2a953cca6975ad00065ddb435ab96dcf563eea"
-              Last-Modified: Fri, 09 Oct 2020 11:46:27 GMT
+              Date: Thu, 22 Oct 2020 12:16:36 GMT
+              ETag: W/"6f02e1e8a9c6bd568caca9eadca3b810f904f0e050f189f63535b06993cbb9f9"
+              Last-Modified: Wed, 21 Oct 2020 12:18:14 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Status: 200 OK
@@ -276,11 +455,13 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: F176:7C68:1DF2DDDC:22997D2B:5F8EC052
-              X-OAuth-Scopes: notifications, repo, workflow
+              X-GitHub-Request-Id: B39E:12BED:24063920:29AC1F93:5F917824
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
               X-RateLimit-Limit: '5000'
               X-RateLimit-Remaining: '4999'
-              X-RateLimit-Reset: '1603194466'
+              X-RateLimit-Reset: '1603372596'
               X-RateLimit-Used: '1'
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
@@ -289,7 +470,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=master:
         all:
           metadata:
-            latency: 0.18621182441711426
+            latency: 0.18927884101867676
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -387,7 +568,7 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
             _next: null
-            elapsed: 0.185407
+            elapsed: 0.186748
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -399,9 +580,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Tue, 20 Oct 2020 10:47:49 GMT
+              Date: Thu, 22 Oct 2020 12:16:38 GMT
               ETag: W/"d115b8280494d3c9b288c0a739d1c8fa58da1e3b"
-              Last-Modified: Fri, 09 Oct 2020 11:46:24 GMT
+              Last-Modified: Wed, 21 Oct 2020 12:18:10 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Status: 200 OK
@@ -413,11 +594,13 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: F176:7C68:1DF2E15C:22997D90:5F8EC052
-              X-OAuth-Scopes: notifications, repo, workflow
+              X-GitHub-Request-Id: B39E:12BED:24063D5E:29AC201A:5F917824
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
               X-RateLimit-Limit: '5000'
               X-RateLimit-Remaining: '4998'
-              X-RateLimit-Reset: '1603194466'
+              X-RateLimit-Reset: '1603372596'
               X-RateLimit-Used: '2'
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
@@ -426,7 +609,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/?ref=master:
         all:
           metadata:
-            latency: 0.1775052547454834
+            latency: 0.1738133430480957
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -484,16 +667,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/684cd8c27867e8e75e427aa6fd41861474d0844e
+                git: https://api.github.com/repos/packit/requre/git/blobs/7fb3591cb03af08b19cc0c3b2bbb6d3cf544d8fb
                 html: https://github.com/packit/requre/blob/master/.pre-commit-config.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=master
               download_url: https://raw.githubusercontent.com/packit/requre/master/.pre-commit-config.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/684cd8c27867e8e75e427aa6fd41861474d0844e
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/7fb3591cb03af08b19cc0c3b2bbb6d3cf544d8fb
               html_url: https://github.com/packit/requre/blob/master/.pre-commit-config.yaml
               name: .pre-commit-config.yaml
               path: .pre-commit-config.yaml
-              sha: 684cd8c27867e8e75e427aa6fd41861474d0844e
-              size: 1156
+              sha: 7fb3591cb03af08b19cc0c3b2bbb6d3cf544d8fb
+              size: 1159
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=master
             - _links:
@@ -718,7 +901,7 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/tests?ref=master
             _next: null
-            elapsed: 0.176567
+            elapsed: 0.170598
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -730,9 +913,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Tue, 20 Oct 2020 10:47:49 GMT
-              ETag: W/"97242393e2957f90e2e91fe324f905e8307f35c1"
-              Last-Modified: Fri, 09 Oct 2020 11:46:27 GMT
+              Date: Thu, 22 Oct 2020 12:16:38 GMT
+              ETag: W/"c5b8b774e456765e129ff2d31c58a8b39321aae9"
+              Last-Modified: Wed, 21 Oct 2020 12:18:14 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Status: 200 OK
@@ -744,11 +927,13 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: F176:7C68:1DF2E1AD:22998177:5F8EC055
-              X-OAuth-Scopes: notifications, repo, workflow
+              X-GitHub-Request-Id: B39E:12BED:24063DFD:29AC24B8:5F917826
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
               X-RateLimit-Limit: '5000'
               X-RateLimit-Remaining: '4997'
-              X-RateLimit-Reset: '1603194466'
+              X-RateLimit-Reset: '1603372596'
               X-RateLimit-Used: '3'
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
@@ -757,7 +942,7 @@ requests.sessions:
       https://release-monitoring.org/api/project/Fedora/python-requre:
         all:
           metadata:
-            latency: 0.4797556400299072
+            latency: 0.5082957744598389
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -779,15 +964,15 @@ requests.sessions:
               error: No package "python-requre" found in distro "Fedora"
               output: notok
             _next: null
-            elapsed: 0.479024
+            elapsed: 0.502154
             encoding: null
             headers:
-              AppTime: D=29632
+              AppTime: D=18052
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '85'
               Content-Type: application/json
-              Date: Tue, 20 Oct 2020 10:47:52 GMT
+              Date: Thu, 22 Oct 2020 12:16:42 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.43 (Fedora) mod_wsgi/4.6.8 Python/3.8
@@ -795,8 +980,8 @@ requests.sessions:
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AWF6HH9AwN5cexM-XFAAAAFU
+              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
+              X-Fedora-RequestID: X5F4KobJLabpIQ@ceVtzcQAACNE
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -805,7 +990,7 @@ requests.sessions:
       https://release-monitoring.org/api/projects?pattern=python-requre:
         all:
           metadata:
-            latency: 1.1928935050964355
+            latency: 1.131300687789917
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -827,15 +1012,15 @@ requests.sessions:
               projects: []
               total: 0
             _next: null
-            elapsed: 1.192312
+            elapsed: 1.125377
             encoding: null
             headers:
-              AppTime: D=765547
+              AppTime: D=749047
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '26'
               Content-Type: application/json
-              Date: Tue, 20 Oct 2020 10:47:53 GMT
+              Date: Thu, 22 Oct 2020 12:16:42 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.43 (Fedora) mod_wsgi/4.6.8 Python/3.8
@@ -844,817 +1029,16 @@ requests.sessions:
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AWQGRGwDfJwjiJHGdzQAAAEc
+              X-Fedora-RequestID: X5F4KnR--xIDY20s@iWvmQAACIw
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/jscotka/rpms/python-requre:
-        all:
-          metadata:
-            latency: 0.2891256809234619
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              access_groups:
-                admin: []
-                collaborator: []
-                commit: []
-                ticket: []
-              access_users:
-                admin: []
-                collaborator: []
-                commit: []
-                owner:
-                - jscotka
-                ticket: []
-              close_status: []
-              custom_keys: []
-              date_created: '1600700802'
-              date_modified: '1600700802'
-              description: The python-requre package
-              fullname: forks/jscotka/rpms/python-requre
-              id: 45827
-              milestones: {}
-              name: python-requre
-              namespace: rpms
-              parent:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - jscotka
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1586178839'
-                date_modified: '1586178846'
-                description: The python-requre package
-                fullname: rpms/python-requre
-                id: 41574
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent: null
-                priorities: {}
-                tags: []
-                url_path: rpms/python-requre
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              priorities: {}
-              tags: []
-              url_path: fork/jscotka/rpms/python-requre
-              user:
-                fullname: "Jan \u0160\u010Dotka"
-                name: jscotka
-                url_path: user/jscotka
-            _next: null
-            elapsed: 0.288428
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:10 GMT
-              Keep-Alive: timeout=15, max=499
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47Aaqsq79ncW0mHIY9eogAAAkY
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=134101
-              content-length: '1578'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-BB9HMj1GoV7i4UBY7uCDbwW8C'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-BB9HMj1GoV7i4UBY7uCDbwW8C'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR6g.zGVDuljbC0E_I10nBNv2Splorck;
-                Expires=Fri, 20-Nov-2020 10:48:10 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/lachmanfrantisek/rpms/python-requre:
-        all:
-          metadata:
-            latency: 0.26529526710510254
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              access_groups:
-                admin: []
-                collaborator: []
-                commit: []
-                ticket: []
-              access_users:
-                admin: []
-                collaborator: []
-                commit: []
-                owner:
-                - lachmanfrantisek
-                ticket: []
-              close_status: []
-              custom_keys: []
-              date_created: '1600763657'
-              date_modified: '1600763657'
-              description: The python-requre package
-              fullname: forks/lachmanfrantisek/rpms/python-requre
-              id: 45852
-              milestones: {}
-              name: python-requre
-              namespace: rpms
-              parent:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - jscotka
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1586178839'
-                date_modified: '1586178846'
-                description: The python-requre package
-                fullname: rpms/python-requre
-                id: 41574
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent: null
-                priorities: {}
-                tags: []
-                url_path: rpms/python-requre
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              priorities: {}
-              tags: []
-              url_path: fork/lachmanfrantisek/rpms/python-requre
-              user:
-                fullname: "Franti\u0161ek Lachman"
-                name: lachmanfrantisek
-                url_path: user/lachmanfrantisek
-            _next: null
-            elapsed: 0.264623
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:11 GMT
-              Keep-Alive: timeout=15, max=497
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47Aa6sq79ncW0mHIY9erwAAAkE
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=147362
-              content-length: '1625'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-8XfH5X2gprJFxRBpzM2Zwc4KS'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-8XfH5X2gprJFxRBpzM2Zwc4KS'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR6w.MK4c2Ce8KVvbWAlMigURcYbEQMQ;
-                Expires=Fri, 20-Nov-2020 10:48:11 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/lbarczio/rpms/python-requre:
-        all:
-          metadata:
-            latency: 0.2368168830871582
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.read_only
-            - ogr.services.pagure.project
-            - ogr.services.pagure.pull_request
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              access_groups:
-                admin: []
-                collaborator: []
-                commit: []
-                ticket: []
-              access_users:
-                admin: []
-                collaborator: []
-                commit: []
-                owner:
-                - lbarczio
-                ticket: []
-              close_status: []
-              custom_keys: []
-              date_created: '1603187163'
-              date_modified: '1603187163'
-              description: The python-requre package
-              fullname: forks/lbarczio/rpms/python-requre
-              id: 46377
-              milestones: {}
-              name: python-requre
-              namespace: rpms
-              parent:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - jscotka
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1586178839'
-                date_modified: '1586178846'
-                description: The python-requre package
-                fullname: rpms/python-requre
-                id: 41574
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent: null
-                priorities: {}
-                tags: []
-                url_path: rpms/python-requre
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              priorities: {}
-              tags: []
-              url_path: fork/lbarczio/rpms/python-requre
-              user:
-                fullname: "Laura Barcziov\xE1"
-                name: lbarczio
-                url_path: user/lbarczio
-            _next: null
-            elapsed: 0.236161
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:12 GMT
-              Keep-Alive: timeout=15, max=494
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AbKsq79ncW0mHIY9eyQAAAlg
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=115638
-              content-length: '1583'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-ibNfSjVYWx6TnpzywuFDaReXW'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-ibNfSjVYWx6TnpzywuFDaReXW'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR7A.TdZzsTSriK4rocwrd8YLiIGLYz4;
-                Expires=Fri, 20-Nov-2020 10:48:12 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/lbarczio/rpms/python-requre/git/urls:
-        all:
-          metadata:
-            latency: 0.20279693603515625
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              total_urls: 2
-              urls:
-                git: https://src.fedoraproject.org/forks/lbarczio/rpms/python-requre.git
-                ssh: ssh://lbarczio@pkgs.fedoraproject.org/forks/lbarczio/rpms/python-requre.git
-            _next: null
-            elapsed: 0.202038
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:01 GMT
-              Keep-Alive: timeout=15, max=493
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AYcPQdRj6M9GzC2ZrHAAAAdI
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=84671
-              content-length: '212'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-YcyrfQFDehF8Ix6sVHYOtBvUD'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-YcyrfQFDehF8Ix6sVHYOtBvUD'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR4Q.DgUnNodt5dsLi1N6VmfcLMGWqxk;
-                Expires=Fri, 20-Nov-2020 10:48:01 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/packit/rpms/python-requre:
-        all:
-          metadata:
-            latency: 0.31372690200805664
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              access_groups:
-                admin: []
-                collaborator: []
-                commit: []
-                ticket: []
-              access_users:
-                admin: []
-                collaborator: []
-                commit: []
-                owner:
-                - packit
-                ticket: []
-              close_status: []
-              custom_keys: []
-              date_created: '1600761157'
-              date_modified: '1600761157'
-              description: The python-requre package
-              fullname: forks/packit/rpms/python-requre
-              id: 45851
-              milestones: {}
-              name: python-requre
-              namespace: rpms
-              parent:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - jscotka
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1586178839'
-                date_modified: '1586178846'
-                description: The python-requre package
-                fullname: rpms/python-requre
-                id: 41574
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent: null
-                priorities: {}
-                tags: []
-                url_path: rpms/python-requre
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              priorities: {}
-              tags: []
-              url_path: fork/packit/rpms/python-requre
-              user:
-                fullname: Packit Bot
-                name: packit
-                url_path: user/packit
-            _next: null
-            elapsed: 0.312867
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:10 GMT
-              Keep-Alive: timeout=15, max=498
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47Aaqsq79ncW0mHIY9eqwAAAko
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=192967
-              content-length: '1563'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-gH9r6LO3Ws3K0XRDHOcmaKZ1Z'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-gH9r6LO3Ws3K0XRDHOcmaKZ1Z'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR6g.zGVDuljbC0E_I10nBNv2Splorck;
-                Expires=Fri, 20-Nov-2020 10:48:10 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/projects?fork=True&pattern=python-requre:
-        all:
-          metadata:
-            latency: 0.894395112991333
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              args:
-                fork: true
-                namespace: null
-                owner: null
-                page: 1
-                pattern: python-requre
-                per_page: 20
-                short: false
-                tags: []
-                username: null
-              pagination:
-                first: https://src.fedoraproject.org/api/0/projects?per_page=20&fork=True&pattern=python-requre&page=1
-                last: https://src.fedoraproject.org/api/0/projects?per_page=20&fork=True&pattern=python-requre&page=1
-                next: null
-                page: 1
-                pages: 1
-                per_page: 20
-                prev: null
-              projects:
-              - access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - jscotka
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1600700802'
-                date_modified: '1600700802'
-                description: The python-requre package
-                fullname: forks/jscotka/rpms/python-requre
-                id: 45827
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                priorities: {}
-                tags: []
-                url_path: fork/jscotka/rpms/python-requre
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              - access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - packit
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1600761157'
-                date_modified: '1600761157'
-                description: The python-requre package
-                fullname: forks/packit/rpms/python-requre
-                id: 45851
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                priorities: {}
-                tags: []
-                url_path: fork/packit/rpms/python-requre
-                user:
-                  fullname: Packit Bot
-                  name: packit
-                  url_path: user/packit
-              - access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - lachmanfrantisek
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1600763657'
-                date_modified: '1600763657'
-                description: The python-requre package
-                fullname: forks/lachmanfrantisek/rpms/python-requre
-                id: 45852
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                priorities: {}
-                tags: []
-                url_path: fork/lachmanfrantisek/rpms/python-requre
-                user:
-                  fullname: "Franti\u0161ek Lachman"
-                  name: lachmanfrantisek
-                  url_path: user/lachmanfrantisek
-              - access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - lbarczio
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1603187163'
-                date_modified: '1603187163'
-                description: The python-requre package
-                fullname: forks/lbarczio/rpms/python-requre
-                id: 46377
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                priorities: {}
-                tags: []
-                url_path: fork/lbarczio/rpms/python-requre
-                user:
-                  fullname: "Laura Barcziov\xE1"
-                  name: lbarczio
-                  url_path: user/lbarczio
-              total_projects: 4
-            _next: null
-            elapsed: 0.892922
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:10 GMT
-              Keep-Alive: timeout=15, max=500
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47Aaqsq79ncW0mHIY9eigAAAkU
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=277818
-              content-length: '8088'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-rGrHs4eBmZWQxwQIYIaIv9Oj9'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-rGrHs4eBmZWQxwQIYIaIv9Oj9'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR6g.zGVDuljbC0E_I10nBNv2Splorck;
-                Expires=Fri, 20-Nov-2020 10:48:10 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
             status_code: 200
       https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?status=Open:
         all:
           metadata:
-            latency: 1.8772811889648438
+            latency: 1.3923227787017822
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1691,19 +1075,507 @@ requests.sessions:
               requests:
               - assignee: null
                 branch: master
-                branch_from: 0.5.0-master-update
-                cached_merge_status: FFORWARD
+                branch_from: 0.4.0-master-update
+                cached_merge_status: unknown
                 closed_at: null
                 closed_by: null
                 comments: []
-                commit_start: 4a3a9c8a45e387e7c50f0e1f10c914649f1cdfff
-                commit_stop: 4a3a9c8a45e387e7c50f0e1f10c914649f1cdfff
+                commit_start: 9f8dd9632ef2cb4ed263edb068c866860ca5d10f
+                commit_stop: 9f8dd9632ef2cb4ed263edb068c866860ca5d10f
+                date_created: '1603368005'
+                id: 46
+                initial_comment: 'Upstream tag: 0.4.0
+
+                  Upstream commit: 38cd5bb6'
+                last_updated: '1603368005'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1586178846'
+                  description: The python-requre package
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - lachmanfrantisek
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600763657'
+                  date_modified: '1600763657'
+                  description: The python-requre package
+                  fullname: forks/lachmanfrantisek/rpms/python-requre
+                  id: 45852
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1586178846'
+                    description: The python-requre package
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/lachmanfrantisek/rpms/python-requre
+                  user:
+                    fullname: "Franti\u0161ek Lachman"
+                    name: lachmanfrantisek
+                    url_path: user/lachmanfrantisek
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.4.0
+                uid: 59423c84c54a40a79bdb2b65b9939ece
+                updated_on: '1603368005'
+                user:
+                  fullname: "Franti\u0161ek Lachman"
+                  name: lachmanfrantisek
+                  url_path: user/lachmanfrantisek
+              - assignee: null
+                branch: master
+                branch_from: 0.4.0-master-update
+                cached_merge_status: FFORWARD
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: rebased onto 9f8dd9632ef2cb4ed263edb068c866860ca5d10f
+                  commit: null
+                  date_created: '1603368001'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 59157
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    fullname: "Franti\u0161ek Lachman"
+                    name: lachmanfrantisek
+                    url_path: user/lachmanfrantisek
+                commit_start: 9f8dd9632ef2cb4ed263edb068c866860ca5d10f
+                commit_stop: 9f8dd9632ef2cb4ed263edb068c866860ca5d10f
+                date_created: '1603364971'
+                id: 45
+                initial_comment: 'Upstream tag: 0.4.0
+
+                  Upstream commit: 2d5ffe6b'
+                last_updated: '1603368134'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1586178846'
+                  description: The python-requre package
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - lachmanfrantisek
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600763657'
+                  date_modified: '1600763657'
+                  description: The python-requre package
+                  fullname: forks/lachmanfrantisek/rpms/python-requre
+                  id: 45852
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1586178846'
+                    description: The python-requre package
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/lachmanfrantisek/rpms/python-requre
+                  user:
+                    fullname: "Franti\u0161ek Lachman"
+                    name: lachmanfrantisek
+                    url_path: user/lachmanfrantisek
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.4.0
+                uid: 3cc6fe2b20b84480b8cf01a576accc35
+                updated_on: '1603368134'
+                user:
+                  fullname: "Franti\u0161ek Lachman"
+                  name: lachmanfrantisek
+                  url_path: user/lachmanfrantisek
+              - assignee: null
+                branch: master
+                branch_from: 0.5.0-master-update
+                cached_merge_status: unknown
+                closed_at: null
+                closed_by: null
+                comments: []
+                commit_start: ec04725b32f8a10594bde0972930b60b1d336067
+                commit_stop: ec04725b32f8a10594bde0972930b60b1d336067
+                date_created: '1603190937'
+                id: 42
+                initial_comment: 'Upstream tag: 0.5.0
+
+                  Upstream commit: e815c39f'
+                last_updated: '1603368000'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1586178846'
+                  description: The python-requre package
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - lbarczio
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1603187163'
+                  date_modified: '1603187163'
+                  description: The python-requre package
+                  fullname: forks/lbarczio/rpms/python-requre
+                  id: 46377
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1586178846'
+                    description: The python-requre package
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/lbarczio/rpms/python-requre
+                  user:
+                    fullname: "Laura Barcziov\xE1"
+                    name: lbarczio
+                    url_path: user/lbarczio
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.5.0
+                uid: 63645772baac4205bafae497d9844ea5
+                updated_on: '1603190937'
+                user:
+                  fullname: "Laura Barcziov\xE1"
+                  name: lbarczio
+                  url_path: user/lbarczio
+              - assignee: null
+                branch: master
+                branch_from: 0.4.0-master-update
+                cached_merge_status: unknown
+                closed_at: null
+                closed_by: null
+                comments: []
+                commit_start: 4f91816ecedb9fa3c323313725d2e782ac166bce
+                commit_stop: 4f91816ecedb9fa3c323313725d2e782ac166bce
+                date_created: '1603190892'
+                id: 41
+                initial_comment: 'Upstream tag: 0.4.0
+
+                  Upstream commit: 6957453b'
+                last_updated: '1603368000'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1586178846'
+                  description: The python-requre package
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - lbarczio
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1603187163'
+                  date_modified: '1603187163'
+                  description: The python-requre package
+                  fullname: forks/lbarczio/rpms/python-requre
+                  id: 46377
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1586178846'
+                    description: The python-requre package
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/lbarczio/rpms/python-requre
+                  user:
+                    fullname: "Laura Barcziov\xE1"
+                    name: lbarczio
+                    url_path: user/lbarczio
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.4.0
+                uid: f876e7aa4d7e4f549169e2f85c3e948c
+                updated_on: '1603191025'
+                user:
+                  fullname: "Laura Barcziov\xE1"
+                  name: lbarczio
+                  url_path: user/lbarczio
+              - assignee: null
+                branch: master
+                branch_from: 0.5.0-master-update
+                cached_merge_status: unknown
+                closed_at: null
+                closed_by: null
+                comments: []
+                commit_start: ec04725b32f8a10594bde0972930b60b1d336067
+                commit_stop: ec04725b32f8a10594bde0972930b60b1d336067
                 date_created: '1603187330'
                 id: 40
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: e815c39f'
-                last_updated: '1603187351'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -1810,18 +1682,34 @@ requests.sessions:
               - assignee: null
                 branch: master
                 branch_from: 0.4.0-master-update
-                cached_merge_status: FFORWARD
+                cached_merge_status: unknown
                 closed_at: null
                 closed_by: null
-                comments: []
-                commit_start: c6a732cfbbd05e5b65281992cb5df1a8d8502b7f
-                commit_stop: c6a732cfbbd05e5b65281992cb5df1a8d8502b7f
+                comments:
+                - comment: rebased onto 4f91816ecedb9fa3c323313725d2e782ac166bce
+                  commit: null
+                  date_created: '1603190889'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 59021
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    fullname: "Laura Barcziov\xE1"
+                    name: lbarczio
+                    url_path: user/lbarczio
+                commit_start: 4f91816ecedb9fa3c323313725d2e782ac166bce
+                commit_stop: 4f91816ecedb9fa3c323313725d2e782ac166bce
                 date_created: '1603187176'
                 id: 39
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187351'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -1920,7 +1808,7 @@ requests.sessions:
                 threshold_reached: null
                 title: Update to upstream release 0.4.0
                 uid: 9997c6999d90495e9c7c3a97e044f017
-                updated_on: '1603187176'
+                updated_on: '1603191048'
                 user:
                   fullname: "Laura Barcziov\xE1"
                   name: lbarczio
@@ -1955,7 +1843,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: 87808f12'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -2089,7 +1977,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -2255,7 +2143,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: 87808f12'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -2421,7 +2309,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -2603,7 +2491,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: 87808f12'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -2785,7 +2673,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -2983,7 +2871,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -3197,7 +3085,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -3427,7 +3315,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -3673,7 +3561,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -3871,7 +3759,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: 87808f12'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -4149,7 +4037,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -4363,7 +4251,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: d0b1b9b5'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -4657,7 +4545,7 @@ requests.sessions:
                 initial_comment: 'Upstream tag: 0.4.0
 
                   Upstream commit: 6957453b'
-                last_updated: '1603187326'
+                last_updated: '1603368000'
                 project:
                   access_groups:
                     admin: []
@@ -4761,1128 +4649,32 @@ requests.sessions:
                   fullname: "Jan \u0160\u010Dotka"
                   name: jscotka
                   url_path: user/jscotka
-              - assignee: null
-                branch: master
-                branch_from: 0.5.0-master-update
-                cached_merge_status: unknown
-                closed_at: null
-                closed_by: null
-                comments:
-                - comment: rebased onto 3f8503b11745e5d2767efde60e0512edf3815242
-                  commit: null
-                  date_created: '1601630452'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57636
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 605b4b249f5b32f5610f3877f9a8f9f872a2dca0
-                  commit: null
-                  date_created: '1601979101'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57904
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 854125542da791e8df52c274d67752d208a3bdb1
-                  commit: null
-                  date_created: '1602000286'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58034
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 268ef502395f86267de91ced5643affa6edf5434
-                  commit: null
-                  date_created: '1602058075'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58111
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 9c3150bbc0676f0c279e2f589b9e99c2eb323aa9
-                  commit: null
-                  date_created: '1602156191'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58260
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 4cf77c217d59dbcea7bfdd4bb12f3bd4394c66b2
-                  commit: null
-                  date_created: '1602156886'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58285
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 3a90c5cdcd6100ada23d88af50b7e098d083b7d9
-                  commit: null
-                  date_created: '1602159231'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58314
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                commit_start: 3a90c5cdcd6100ada23d88af50b7e098d083b7d9
-                commit_stop: 3a90c5cdcd6100ada23d88af50b7e098d083b7d9
-                date_created: '1601541260'
-                id: 24
-                initial_comment: 'Upstream tag: 0.5.0
-
-                  Upstream commit: d0b1b9b5'
-                last_updated: '1603187326'
-                project:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                remote_git: null
-                repo_from:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1600700802'
-                  date_modified: '1600700802'
-                  description: The python-requre package
-                  fullname: forks/jscotka/rpms/python-requre
-                  id: 45827
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent:
-                    access_groups:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      ticket: []
-                    access_users:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      owner:
-                      - jscotka
-                      ticket: []
-                    close_status: []
-                    custom_keys: []
-                    date_created: '1586178839'
-                    date_modified: '1586178846'
-                    description: The python-requre package
-                    fullname: rpms/python-requre
-                    id: 41574
-                    milestones: {}
-                    name: python-requre
-                    namespace: rpms
-                    parent: null
-                    priorities: {}
-                    tags: []
-                    url_path: rpms/python-requre
-                    user:
-                      fullname: "Jan \u0160\u010Dotka"
-                      name: jscotka
-                      url_path: user/jscotka
-                  priorities: {}
-                  tags: []
-                  url_path: fork/jscotka/rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                status: Open
-                tags: []
-                threshold_reached: null
-                title: Update to upstream release 0.5.0
-                uid: 8b3de993a8814d01811461f5cf0ee1b4
-                updated_on: '1602159231'
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              - assignee: null
-                branch: master
-                branch_from: 0.4.0-master-update
-                cached_merge_status: unknown
-                closed_at: null
-                closed_by: null
-                comments:
-                - comment: rebased onto e5679437d476dbfd88dfc9038ddf477b5c7fdc36
-                  commit: null
-                  date_created: '1601630417'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57633
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 103e8adbdf00cdeb619dda4f9b8d892a71085c04
-                  commit: null
-                  date_created: '1601979055'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57898
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 0a64f99ed3ef05e58c18da2936af748d19c169b4
-                  commit: null
-                  date_created: '1601985142'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57930
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 7a77b7f7f4adec9aa0e82d3a350b851fbb56a40f
-                  commit: null
-                  date_created: '1601985181'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57938
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto d4262e05bf82a6732a1884d93b0d4a65271651ba
-                  commit: null
-                  date_created: '1601985918'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57949
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 2833e9f1a6fb729eebd8882334bb7aceb5147db1
-                  commit: null
-                  date_created: '1601998794'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57998
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 2740c9191c27ad7c62f9c2b6952cdd50c45406da
-                  commit: null
-                  date_created: '1601999173'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58013
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 686ad232d9e929f36a0231deefb70f412b0e2b86
-                  commit: null
-                  date_created: '1602000244'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58027
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto d79b8d99ea4191535fd5bf77f13342d5defcbaf3
-                  commit: null
-                  date_created: '1602058033'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58102
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 42ff00213954ed2cd518e7bde7f13c71ff2f7768
-                  commit: null
-                  date_created: '1602156177'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58250
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 334d3538bc72136f3a2a2606d5d1385a237a8b88
-                  commit: null
-                  date_created: '1602156844'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58274
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 6f8b072c37de57111c0d823ceea25c2de524f2bd
-                  commit: null
-                  date_created: '1602159215'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58303
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                commit_start: 6f8b072c37de57111c0d823ceea25c2de524f2bd
-                commit_stop: 6f8b072c37de57111c0d823ceea25c2de524f2bd
-                date_created: '1601541218'
-                id: 23
-                initial_comment: 'Upstream tag: 0.4.0
-
-                  Upstream commit: 6957453b'
-                last_updated: '1603187326'
-                project:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                remote_git: null
-                repo_from:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1600700802'
-                  date_modified: '1600700802'
-                  description: The python-requre package
-                  fullname: forks/jscotka/rpms/python-requre
-                  id: 45827
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent:
-                    access_groups:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      ticket: []
-                    access_users:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      owner:
-                      - jscotka
-                      ticket: []
-                    close_status: []
-                    custom_keys: []
-                    date_created: '1586178839'
-                    date_modified: '1586178846'
-                    description: The python-requre package
-                    fullname: rpms/python-requre
-                    id: 41574
-                    milestones: {}
-                    name: python-requre
-                    namespace: rpms
-                    parent: null
-                    priorities: {}
-                    tags: []
-                    url_path: rpms/python-requre
-                    user:
-                      fullname: "Jan \u0160\u010Dotka"
-                      name: jscotka
-                      url_path: user/jscotka
-                  priorities: {}
-                  tags: []
-                  url_path: fork/jscotka/rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                status: Open
-                tags: []
-                threshold_reached: null
-                title: Update to upstream release 0.4.0
-                uid: c9b782fffc254519a5f9bc10b21bc5ae
-                updated_on: '1602159566'
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              - assignee: null
-                branch: master
-                branch_from: 0.5.0-master-update
-                cached_merge_status: unknown
-                closed_at: null
-                closed_by: null
-                comments:
-                - comment: rebased onto dc0a74235c39cf2cd31b2dc71fcbb357c0fd2537
-                  commit: null
-                  date_created: '1601541257'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57486
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 3f8503b11745e5d2767efde60e0512edf3815242
-                  commit: null
-                  date_created: '1601630453'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57638
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 605b4b249f5b32f5610f3877f9a8f9f872a2dca0
-                  commit: null
-                  date_created: '1601979101'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57906
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 268ef502395f86267de91ced5643affa6edf5434
-                  commit: null
-                  date_created: '1602058075'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58112
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 9c3150bbc0676f0c279e2f589b9e99c2eb323aa9
-                  commit: null
-                  date_created: '1602156191'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58261
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 4cf77c217d59dbcea7bfdd4bb12f3bd4394c66b2
-                  commit: null
-                  date_created: '1602156886'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58284
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 3a90c5cdcd6100ada23d88af50b7e098d083b7d9
-                  commit: null
-                  date_created: '1602159231'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58315
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                commit_start: 3a90c5cdcd6100ada23d88af50b7e098d083b7d9
-                commit_stop: 3a90c5cdcd6100ada23d88af50b7e098d083b7d9
-                date_created: '1601539476'
-                id: 22
-                initial_comment: 'Upstream tag: 0.5.0
-
-                  Upstream commit: d0b1b9b5'
-                last_updated: '1603187326'
-                project:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                remote_git: null
-                repo_from:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1600700802'
-                  date_modified: '1600700802'
-                  description: The python-requre package
-                  fullname: forks/jscotka/rpms/python-requre
-                  id: 45827
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent:
-                    access_groups:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      ticket: []
-                    access_users:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      owner:
-                      - jscotka
-                      ticket: []
-                    close_status: []
-                    custom_keys: []
-                    date_created: '1586178839'
-                    date_modified: '1586178846'
-                    description: The python-requre package
-                    fullname: rpms/python-requre
-                    id: 41574
-                    milestones: {}
-                    name: python-requre
-                    namespace: rpms
-                    parent: null
-                    priorities: {}
-                    tags: []
-                    url_path: rpms/python-requre
-                    user:
-                      fullname: "Jan \u0160\u010Dotka"
-                      name: jscotka
-                      url_path: user/jscotka
-                  priorities: {}
-                  tags: []
-                  url_path: fork/jscotka/rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                status: Open
-                tags: []
-                threshold_reached: null
-                title: Update to upstream release 0.5.0
-                uid: 81757d78e6824ae89184afa0fb8ebf4f
-                updated_on: '1602159231'
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              - assignee: null
-                branch: master
-                branch_from: 0.4.0-master-update
-                cached_merge_status: unknown
-                closed_at: null
-                closed_by: null
-                comments:
-                - comment: rebased onto f87d8478a994cd10b0e1ef2fa8ae839c369ddf24
-                  commit: null
-                  date_created: '1601541216'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57481
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto e5679437d476dbfd88dfc9038ddf477b5c7fdc36
-                  commit: null
-                  date_created: '1601630416'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57630
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 103e8adbdf00cdeb619dda4f9b8d892a71085c04
-                  commit: null
-                  date_created: '1601979055'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57900
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 0a64f99ed3ef05e58c18da2936af748d19c169b4
-                  commit: null
-                  date_created: '1601985142'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57931
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 7a77b7f7f4adec9aa0e82d3a350b851fbb56a40f
-                  commit: null
-                  date_created: '1601985181'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57939
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto d4262e05bf82a6732a1884d93b0d4a65271651ba
-                  commit: null
-                  date_created: '1601985919'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57951
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 2833e9f1a6fb729eebd8882334bb7aceb5147db1
-                  commit: null
-                  date_created: '1601998794'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 57999
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 2740c9191c27ad7c62f9c2b6952cdd50c45406da
-                  commit: null
-                  date_created: '1601999174'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58014
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 686ad232d9e929f36a0231deefb70f412b0e2b86
-                  commit: null
-                  date_created: '1602000244'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58028
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto d79b8d99ea4191535fd5bf77f13342d5defcbaf3
-                  commit: null
-                  date_created: '1602058033'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58103
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 42ff00213954ed2cd518e7bde7f13c71ff2f7768
-                  commit: null
-                  date_created: '1602156177'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58251
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 334d3538bc72136f3a2a2606d5d1385a237a8b88
-                  commit: null
-                  date_created: '1602156845'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58275
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                - comment: rebased onto 6f8b072c37de57111c0d823ceea25c2de524f2bd
-                  commit: null
-                  date_created: '1602159215'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 58304
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                commit_start: 6f8b072c37de57111c0d823ceea25c2de524f2bd
-                commit_stop: 6f8b072c37de57111c0d823ceea25c2de524f2bd
-                date_created: '1601539436'
-                id: 21
-                initial_comment: 'Upstream tag: 0.4.0
-
-                  Upstream commit: 6957453b'
-                last_updated: '1603187326'
-                project:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                remote_git: null
-                repo_from:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1600700802'
-                  date_modified: '1600700802'
-                  description: The python-requre package
-                  fullname: forks/jscotka/rpms/python-requre
-                  id: 45827
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent:
-                    access_groups:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      ticket: []
-                    access_users:
-                      admin: []
-                      collaborator: []
-                      commit: []
-                      owner:
-                      - jscotka
-                      ticket: []
-                    close_status: []
-                    custom_keys: []
-                    date_created: '1586178839'
-                    date_modified: '1586178846'
-                    description: The python-requre package
-                    fullname: rpms/python-requre
-                    id: 41574
-                    milestones: {}
-                    name: python-requre
-                    namespace: rpms
-                    parent: null
-                    priorities: {}
-                    tags: []
-                    url_path: rpms/python-requre
-                    user:
-                      fullname: "Jan \u0160\u010Dotka"
-                      name: jscotka
-                      url_path: user/jscotka
-                  priorities: {}
-                  tags: []
-                  url_path: fork/jscotka/rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                status: Open
-                tags: []
-                threshold_reached: null
-                title: Update to upstream release 0.4.0
-                uid: f356d3cbcec4442194ef330cc05f1832
-                updated_on: '1602159568'
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              total_requests: 28
+              total_requests: 32
             _next: null
-            elapsed: 0.857398
+            elapsed: 1.072264
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:47:58 GMT
+              Date: Thu, 22 Oct 2020 12:16:49 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AXsPQdRj6M9GzC2ZqrQAAAdc
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: X5F4MS46eAMZowHWVIkt9AAAB4o
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=414463
-              content-length: '142871'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-tSl6xGe3GvoikqRtXoNVgGCza'
+              apptime: D=724014
+              content-length: '121977'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-iXMXr75Lb0rkG1ntR1v0wNTWG'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-tSl6xGe3GvoikqRtXoNVgGCza'; object-src 'none'; base-uri
+                'self' 'nonce-iXMXr75Lb0rkG1ntR1v0wNTWG'; object-src 'none'; base-uri
                 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR3g.Lc_4bQvTx1DQSz_NX5S_wolWAvE;
-                Expires=Fri, 20-Nov-2020 10:47:58 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNjRiZjk4NmZlMzhlM2Y2NzgxZTM5MjdlNGNjYjVhYTEyOGExM2Y5OSJ9.EnMJsQ.Oh895M9wlt6cQIV_5duLMRO4qzs;
+                Expires=Sun, 22-Nov-2020 12:16:49 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -5891,7 +4683,7 @@ requests.sessions:
       https://src.fedoraproject.org/lookaside/pkgs/python-requre/requre-0.4.0.tar.gz/:
         all:
           metadata:
-            latency: 0.3965451717376709
+            latency: 0.5078325271606445
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -5908,277 +4700,23 @@ requests.sessions:
             __store_indicator: 1
             _content: ''
             _next: null
-            elapsed: 0.396161
+            elapsed: 0.50538
             encoding: ISO-8859-1
             headers:
               Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:47:57 GMT
+              Date: Thu, 22 Oct 2020 12:16:48 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AXV6HH9AwN5cexM-X3AAAAEA
+              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
+              X-Fedora-RequestID: X5F4MBTUCKKIhyw5MgKNFAAACEA
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=8121
+              apptime: D=6246
               content-type: text/html;charset=ISO-8859-1
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
             status_code: 200
-    POST:
-      https://src.fedoraproject.org/api/0/-/whoami:
-        all:
-          metadata:
-            latency: 0.1994173526763916
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.services.pagure.project
-            - ogr.services.pagure.user
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              username: lbarczio
-            _next: null
-            elapsed: 0.198624
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:00 GMT
-              Keep-Alive: timeout=15, max=497
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AYMPQdRj6M9GzC2Zq1wAAAcw
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=72447
-              content-length: '29'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-ZEPNHRnhdBt955AMvcVD3qZau'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-ZEPNHRnhdBt955AMvcVD3qZau'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR4A.7xo3ndcfNo--dr-7unpaPulchvU;
-                Expires=Fri, 20-Nov-2020 10:48:00 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/rpms/python-requre/pull-request/new:
-        all:
-          metadata:
-            latency: 1.2613635063171387
-            module_call_list:
-            - unittest.case
-            - requre.online_replacing
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.read_only
-            - ogr.services.pagure.project
-            - ogr.services.pagure.pull_request
-            - ogr.services.pagure.project
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              assignee: null
-              branch: master
-              branch_from: 0.4.0-master-update
-              cached_merge_status: unknown
-              closed_at: null
-              closed_by: null
-              comments: []
-              commit_start: 4f91816ecedb9fa3c323313725d2e782ac166bce
-              commit_stop: 4f91816ecedb9fa3c323313725d2e782ac166bce
-              date_created: '1603190892'
-              id: 41
-              initial_comment: 'Upstream tag: 0.4.0
-
-                Upstream commit: 6957453b'
-              last_updated: '1603190892'
-              project:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - jscotka
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1586178839'
-                date_modified: '1586178846'
-                description: The python-requre package
-                fullname: rpms/python-requre
-                id: 41574
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent: null
-                priorities: {}
-                tags: []
-                url_path: rpms/python-requre
-                user:
-                  fullname: "Jan \u0160\u010Dotka"
-                  name: jscotka
-                  url_path: user/jscotka
-              remote_git: null
-              repo_from:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - lbarczio
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1603187163'
-                date_modified: '1603187163'
-                description: The python-requre package
-                fullname: forks/lbarczio/rpms/python-requre
-                id: 46377
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent:
-                  access_groups:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    ticket: []
-                  access_users:
-                    admin: []
-                    collaborator: []
-                    commit: []
-                    owner:
-                    - jscotka
-                    ticket: []
-                  close_status: []
-                  custom_keys: []
-                  date_created: '1586178839'
-                  date_modified: '1586178846'
-                  description: The python-requre package
-                  fullname: rpms/python-requre
-                  id: 41574
-                  milestones: {}
-                  name: python-requre
-                  namespace: rpms
-                  parent: null
-                  priorities: {}
-                  tags: []
-                  url_path: rpms/python-requre
-                  user:
-                    fullname: "Jan \u0160\u010Dotka"
-                    name: jscotka
-                    url_path: user/jscotka
-                priorities: {}
-                tags: []
-                url_path: fork/lbarczio/rpms/python-requre
-                user:
-                  fullname: "Laura Barcziov\xE1"
-                  name: lbarczio
-                  url_path: user/lbarczio
-              status: Open
-              tags: []
-              threshold_reached: null
-              title: Update to upstream release 0.4.0
-              uid: f876e7aa4d7e4f549169e2f85c3e948c
-              updated_on: '1603190892'
-              user:
-                fullname: "Laura Barcziov\xE1"
-                name: lbarczio
-                url_path: user/lbarczio
-            _next: null
-            elapsed: 1.260689
-            encoding: null
-            headers:
-              Connection: Keep-Alive
-              Date: Tue, 20 Oct 2020 10:48:12 GMT
-              Keep-Alive: timeout=15, max=493
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X47AbKsq79ncW0mHIY9ezQAAAkQ
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=1132682
-              content-length: '3361'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-WNpTAJsTuVf9rBjosXCfUNpwN'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-WNpTAJsTuVf9rBjosXCfUNpwN'; object-src 'none'; base-uri
-                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNzc0Mzc2Mjk3ODAyMTA0NTIxZTUwZmJhMTlkNjhjZjgxN2M0YmJhMyJ9.EnBR7Q.Ro8XfvjIfu7au1XSf13DWwcFheA;
-                Expires=Fri, 20-Nov-2020 10:48:13 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-unittest.case:
-  requre.online_replacing:
-    tests_recording.test_api:
-      tests_recording.testbase:
-        packit.local_project:
-          packit.utils.repo:
-            requre.helpers.files:
-              requre.objects:
-                requre.cassette:
-                  git.repo.base:
-                    clone_from:
-                      all:
-                        metadata:
-                          latency: 1.5857632160186768
-                          module_call_list:
-                          - unittest.case
-                          - requre.online_replacing
-                          - tests_recording.test_api
-                          - tests_recording.testbase
-                          - packit.local_project
-                          - packit.utils.repo
-                          - requre.helpers.files
-                          - requre.objects
-                          - requre.cassette
-                          - git.repo.base
-                          - clone_from
-                        output:
-                          _bare: false
-                          _common_dir: null
-                          _working_tree_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/static_tmp_1
-                          git_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/static_tmp_1/.git
-                          working_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_comment_in_spec.yaml/static_tmp_1
