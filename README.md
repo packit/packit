@@ -159,3 +159,4 @@ For the up to date list of projects which are using packit, [click here](https:/
 ## Logo design
 
 Created by `Marián Mrva` - [@surfer19](https://github.com/surfer19)
+test
