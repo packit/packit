@@ -24,17 +24,16 @@
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
 import os
-from typing import Optional, List, Union, Dict
-
-from packit.sync import SyncFilesItem
+from typing import Dict, List, Optional, Union
 
 from packit.actions import ActionName
-from packit.config.sync_files_config import SyncFilesConfig
 from packit.config.notifications import (
     NotificationsConfig,
     PullRequestNotificationsConfig,
 )
+from packit.config.sync_files_config import SyncFilesConfig
 from packit.constants import PROD_DISTGIT_URL
+from packit.sync import SyncFilesItem
 from packit.utils.repo import get_current_version_command
 
 
@@ -68,6 +67,7 @@ class CommonPackageConfig:
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = True,
+        sync_changelog: bool = False,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
@@ -93,6 +93,7 @@ class CommonPackageConfig:
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
         self.create_pr: bool = create_pr
+        self.sync_changelog: bool = sync_changelog
         self.spec_source_id: str = spec_source_id
         self.notifications = notifications or NotificationsConfig(
             pull_request=PullRequestNotificationsConfig()
@@ -126,6 +127,7 @@ class CommonPackageConfig:
             f"upstream_ref='{self.upstream_ref}', "
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
             f"create_pr='{self.create_pr}', "
+            f"synced_files='{self.synced_files}', "
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}')"
@@ -152,7 +154,14 @@ class CommonPackageConfig:
         files = self.synced_files.files_to_sync
 
         if self.specfile_path not in (item.src for item in files):
-            files.append(SyncFilesItem(src=self.specfile_path, dest=self.specfile_path))
+            files.append(
+                SyncFilesItem(
+                    src=self.specfile_path,
+                    dest=f"{self.downstream_package_name}.spec"
+                    if self.downstream_package_name
+                    else self.specfile_path,
+                )
+            )
 
         if self.config_file_path and self.config_file_path not in (
             item.src for item in files

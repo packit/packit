@@ -163,6 +163,7 @@ class JobConfig(CommonPackageConfig):
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = True,
+        sync_changelog: bool = False,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
@@ -185,6 +186,7 @@ class JobConfig(CommonPackageConfig):
             upstream_ref=upstream_ref,
             allowed_gpg_keys=allowed_gpg_keys,
             create_pr=create_pr,
+            sync_changelog=sync_changelog,
             spec_source_id=spec_source_id,
             upstream_tag_template=upstream_tag_template,
             archive_root_dir_template=archive_root_dir_template,
@@ -213,6 +215,7 @@ class JobConfig(CommonPackageConfig):
             f"upstream_ref='{self.upstream_ref}', "
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
             f"create_pr='{self.create_pr}', "
+            f"sync_changelog='{self.sync_changelog}', "
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}')"
@@ -248,6 +251,7 @@ class JobConfig(CommonPackageConfig):
             and self.actions == other.actions
             and self.allowed_gpg_keys == other.allowed_gpg_keys
             and self.create_pr == other.create_pr
+            and self.sync_changelog == other.sync_changelog
             and self.spec_source_id == other.spec_source_id
             and self.upstream_tag_template == other.upstream_tag_template
         )
