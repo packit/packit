@@ -54,7 +54,7 @@ from packit.exceptions import (
 )
 from packit.local_project import LocalProject
 from packit.status import Status
-from packit.sync import sync_files
+from packit.sync import RawSyncFilesItem, sync_files
 from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.extensions import assert_existence
@@ -221,36 +221,18 @@ class PackitAPI:
                 SYNCING_NOTE.format(packit_version=get_packit_version())
             )
 
-            files_to_sync = self.package_config.get_all_files_to_sync()
-
-            if self.up.with_action(action=ActionName.prepare_files):
-                comment = f"- new upstream release: {full_version}"
-                try:
-                    self.dg.set_specfile_content(
-                        self.up.specfile, full_version, comment
-                    )
-                except FileNotFoundError as ex:
-                    # no downstream spec file: this is either a mistake or
-                    # there is no spec file in dist-git yet, hence warning
-                    logger.warning(
-                        f"There is not spec file downstream: {ex}, copying the one from upstream."
-                    )
-                    shutil.copy2(
-                        self.up.absolute_specfile_path,
-                        self.dg.get_absolute_specfile_path(),
-                    )
-
-                raw_sync_files = files_to_sync.get_raw_files_to_sync(
+            raw_sync_files = (
+                self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
                     self.up.local_project.working_dir,
                     self.dg.local_project.working_dir,
                 )
+            )
 
-                # exclude spec, we have special plans for it
-                raw_sync_files = [
-                    x for x in raw_sync_files if x.src != self.up.absolute_specfile_path
-                ]
-
-                sync_files(raw_sync_files)
+            if self.up.with_action(action=ActionName.prepare_files):
+                raw_files_to_sync = self._prepare_files_to_sync(
+                    raw_sync_files=raw_sync_files, full_version=full_version
+                )
+                sync_files(raw_files_to_sync)
                 if upstream_ref:
                     if self.up.with_action(action=ActionName.create_patches):
                         patches = self.up.create_patches(
@@ -258,17 +240,13 @@ class PackitAPI:
                             destination=str(self.dg.absolute_specfile_dir),
                         )
                         self.dg.specfile_add_patches(patches)
-
                 self._handle_sources(
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
 
             # when the action is defined, we still need to copy the files
             if self.up.has_action(action=ActionName.prepare_files):
-                raw_sync_files = files_to_sync.get_raw_files_to_sync(
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
-                )
+
                 sync_files(raw_sync_files)
 
             self.dg.commit(title=f"{full_version} upstream release", msg=description)
@@ -291,6 +269,29 @@ class PackitAPI:
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
         return new_pr
+
+    def _prepare_files_to_sync(
+        self, raw_sync_files, full_version
+    ) -> List[RawSyncFilesItem]:
+        if self.package_config.sync_changelog:
+            return raw_sync_files
+
+        comment = f"- new upstream release: {full_version}"
+        try:
+            self.dg.set_specfile_content(self.up.specfile, full_version, comment)
+        except FileNotFoundError as ex:
+            # no downstream spec file: this is either a mistake or
+            # there is no spec file in dist-git yet, hence warning
+            logger.warning(
+                f"There is not spec file downstream: {ex}, copying the one from upstream."
+            )
+            shutil.copy2(
+                self.up.absolute_specfile_path,
+                self.dg.get_absolute_specfile_path(),
+            )
+
+        # exclude spec, we have special plans for it
+        return [x for x in raw_sync_files if x.src != self.up.absolute_specfile_path]
 
     def sync_from_downstream(
         self,

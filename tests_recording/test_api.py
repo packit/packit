@@ -143,6 +143,26 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release(dist_git_branch="master")
 
+    def test_changelog_sync(self):
+        """
+        Bump version two times and see if the changelog is synced
+        when it's configured to do so.
+        """
+        original_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()
+        check_output(
+            f"cd {self.lp.working_dir};"
+            f"rpmdev-bumpspec {self._project_specfile_path};"
+            f"rpmdev-bumpspec {self._project_specfile_path};"
+            f"git commit -m 'test change' {self._project_specfile_path}",
+            shell=True,
+        )
+        changed_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()
+        assert original_upstream_spec_content != changed_upstream_spec_content
+        self.api.package_config.sync_changelog = True
+        self.api.sync_release(dist_git_branch="master", use_local_content=True)
+        new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
+        assert changed_upstream_spec_content == new_downstream_spec_content
+
     def test_version_change_exception(self):
         """
         check if it raises exception, because sources are not uploaded in distgit
