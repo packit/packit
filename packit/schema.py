@@ -281,6 +281,7 @@ class CommonConfigSchema(MM23Schema):
     synced_files = fields.Nested(SyncFilesConfigSchema)
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
+    sync_changelog = fields.Bool(default=False)
     patch_generation_ignore_paths = fields.List(fields.String())
     notifications = fields.Nested(NotificationsSchema)
 
