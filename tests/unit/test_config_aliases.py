@@ -25,6 +25,7 @@ import bodhi
 import pytest
 from flexmock import flexmock
 
+import packit
 from packit.config.aliases import (
     get_versions,
     get_build_targets,
@@ -32,6 +33,7 @@ from packit.config.aliases import (
     get_koji_targets,
     get_all_koji_targets,
     get_aliases,
+    get_valid_build_targets,
 )
 from packit.exceptions import PackitException
 from tests.spellbook import ALL_KOJI_TARGETS_SNAPSHOT
@@ -263,3 +265,25 @@ class TestGetAliases:
         )
         assert Counter(aliases["fedora-all"]) == Counter(expected_return["fedora-all"])
         assert Counter(aliases["epel-all"]) == Counter(expected_return["epel-all"])
+
+
+@pytest.mark.parametrize(
+    "targets, chroots, expected_result",
+    [
+        pytest.param(["f1", "f2"], ["f1", "f2"], {"f1", "f2"}, id="identical"),
+        pytest.param(["f1", "f2"], ["f2", "f3"], {"f2"}, id="some_common"),
+        pytest.param(["f1", "f2"], ["f3", "f4"], {}, id="none_common"),
+        pytest.param([], ["f1", "f2"], {}, id="one_empty"),
+        pytest.param([], [], {}, id="both_empty"),
+    ],
+)
+def test_get_valid_build_targets(targets, chroots, expected_result):
+    flexmock(packit.config.aliases).should_receive("get_build_targets").and_return(
+        targets
+    )
+    flexmock(packit.config.aliases.CoprHelper).should_receive(
+        "get_available_chroots"
+    ).and_return(chroots)
+
+    get_valid_build_targets()
+    assert True
