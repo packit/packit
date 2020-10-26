@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import functools
+import logging
 from collections import defaultdict
 from typing import Dict, List, Set
 
@@ -28,14 +29,15 @@ from bodhi.client.bindings import BodhiClient
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
 from packit.utils.commands import run_command
+from packit.utils.fallback_return_value import fallback_return_value
 
+ALIASES: Dict[str, List[str]] = {
+    "fedora-development": ["fedora-33", "fedora-rawhide"],
+    "fedora-stable": ["fedora-31", "fedora-32"],
+    "fedora-all": ["fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"],
+    "epel-all": ["epel-6", "epel-7", "epel-8"],
+}
 
-# ALIASES: Dict[str, List[str]] = {
-#     "fedora-development": ["fedora-33", "fedora-rawhide"],
-#     "fedora-stable": ["fedora-31", "fedora-32"],
-#     "fedora-all": ["fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"],
-#     "epel-all": ["epel-6", "epel-7", "epel-8"],
-# }
 ARCHITECTURE_LIST: List[str] = [
     "aarch64",
     "armhfp",
@@ -45,6 +47,8 @@ ARCHITECTURE_LIST: List[str] = [
     "x86_64",
 ]
 DEFAULT_VERSION = "fedora-stable"
+
+logger = logging.getLogger(__name__)
 
 
 def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
@@ -129,7 +133,10 @@ def get_valid_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set:
     :return: set of build targets available also in copr chroots
     """
     build_targets = get_build_targets(*name, default)
+    logger.info(f"Build targets: {build_targets} ")
     copr_chroots = CoprHelper.get_available_chroots()
+    logger.info(f"Copr chroots: {copr_chroots} ")
+    logger.info(f"Result set: {set(build_targets) & set(copr_chroots)}")
     return set(build_targets) & set(copr_chroots)
 
 
@@ -206,6 +213,7 @@ def get_all_koji_targets() -> List[str]:
 
 
 @functools.lru_cache(maxsize=None)
+@fallback_return_value(ALIASES)
 def get_aliases() -> Dict[str, List[str]]:
     """
     Function to automatically determine fedora-all, fedora-stable, fedora-development and epel-all

@@ -139,6 +139,8 @@ def copr_build(
         *targets.split(","), default="fedora-rawhide-x86_64"
     )
 
+    logger.info(f"Targets to build: {targets_to_build}.")
+
     additional_repos_list: Optional[List[str]] = (
         additional_repos.split(",") if additional_repos else None
     )
