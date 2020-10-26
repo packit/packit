@@ -25,6 +25,7 @@ from typing import Dict, List, Set
 
 from bodhi.client.bindings import BodhiClient
 
+from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
 from packit.utils.commands import run_command
 
@@ -64,7 +65,7 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     return versions
 
 
-def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
     """
     Expand the aliases to the name(s) and transfer to the build targets.
 
@@ -115,6 +116,21 @@ def get_build_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
             }
         )
     return possible_sys_and_versions
+
+
+def get_valid_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set:
+    """
+    Function generates set which contains build targets available also in copr chroots.
+
+    :param name: name(s) of the system and version or target name. (passed to
+                packit.config.aliases.get_build_targets() function)
+            or target name (e.g. "fedora-30-x86_64"/"fedora-stable-x86_64")
+    :param default: used if no positional argument was given
+    :return: set of build targets available also in copr chroots
+    """
+    build_targets = get_build_targets(*name, default)
+    copr_chroots = CoprHelper.get_available_chroots()
+    return set(build_targets) & set(copr_chroots)
 
 
 def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
