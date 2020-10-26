@@ -175,6 +175,9 @@ class TestGetBranches:
         ],
     )
     def test_get_branches_from_multiple_values(self, names, versions):
+        flexmock(packit.config.aliases).should_receive("get_versions").and_return(
+            versions
+        )
         assert get_branches(*names) == versions
 
     def test_get_branches_without_default(self):
