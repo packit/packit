@@ -1,3 +1,10 @@
+# 0.19.0
+
+- Allow syncing full content of the spec-file.
+- Let packit create empty patch files from empty commits.
+- Check for the existing pull requests in distgit when using `propose-update`.
+- Allow symlinking absolute path to the archive within repository.
+
 # 0.18.0
 
 - Packit got new `archive_root_dir_template` config option to get custom archive root dir. You can find more info [in the documentation](https://packit.dev/docs/configuration/#archive_root_dir_template).
