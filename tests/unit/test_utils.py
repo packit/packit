@@ -30,7 +30,7 @@ from pkg_resources import DistributionNotFound, Distribution
 
 from packit.api import get_packit_version
 from packit.exceptions import PackitException, ensure_str
-from packit.utils.fallback_return_value import fallback_return_value
+from packit.utils.decorators import fallback_return_value
 from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,

@@ -29,13 +29,13 @@ from bodhi.client.bindings import BodhiClient
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
 from packit.utils.commands import run_command
-from packit.utils.fallback_return_value import fallback_return_value
+from packit.utils.decorators import fallback_return_value
 
 ALIASES: Dict[str, List[str]] = {
     "fedora-development": ["fedora-33", "fedora-rawhide"],
     "fedora-stable": ["fedora-31", "fedora-32"],
     "fedora-all": ["fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"],
-    "epel-all": ["epel-6", "epel-7", "epel-8"],
+    "epel-all": ["el-6", "epel-7", "epel-8"],
 }
 
 ARCHITECTURE_LIST: List[str] = [
@@ -212,7 +212,7 @@ def get_all_koji_targets() -> List[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).split()
 
 
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=1)
 @fallback_return_value(ALIASES)
 def get_aliases() -> Dict[str, List[str]]:
     """
