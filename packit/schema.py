@@ -284,6 +284,7 @@ class CommonConfigSchema(MM23Schema):
     sync_changelog = fields.Bool(default=False)
     patch_generation_ignore_paths = fields.List(fields.String())
     notifications = fields.Nested(NotificationsSchema)
+    copy_upstream_release_description = fields.Bool(default=False)
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
