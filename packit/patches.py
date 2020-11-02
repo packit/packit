@@ -54,6 +54,7 @@ class PatchMetadata:
         ignore: bool = False,
         squash_commits: bool = False,
         no_prefix: bool = False,
+        metadata_defined: bool = None,
     ) -> None:
         """
         Metadata about patch files and relation to the respective commit.
@@ -73,6 +74,7 @@ class PatchMetadata:
                                until next commits with squash_commits=True
                                (git-am patches do this)
         :param no_prefix: do not prepend a/ and b/ when generating the patch file
+        :param metadata_defined: are any of the metadata defined in a commit message
         """
         self.name = name
         self.path = path
@@ -83,6 +85,8 @@ class PatchMetadata:
         self.ignore = ignore
         self.squash_commits = squash_commits
         self.no_prefix = no_prefix
+        # this is set during PatchMetadata.from_commit()
+        self.metadata_defined = metadata_defined
 
     @property
     def specfile_comment(self) -> str:
@@ -133,11 +137,13 @@ class PatchMetadata:
         @return: PatchMetadata instance
         """
         metadata = get_metadata_from_message(commit) or {}
+        metadata_defined = False
         if metadata:
             logger.debug(
                 f"Commit {commit.hexsha:.8} metadata:\n"
                 f"{yaml.dump(metadata, indent=4)}"
             )
+            metadata_defined = True
         else:
             logger.debug(f"Commit {commit.hexsha:.8} does not contain any metadata.")
 
@@ -161,6 +167,7 @@ class PatchMetadata:
             commit=commit,
             squash_commits=metadata.get("squash_commits"),
             no_prefix=metadata.get("no_prefix"),
+            metadata_defined=metadata_defined,
         )
 
     def __repr__(self):
@@ -385,35 +392,64 @@ class PatchGenerator:
         """
         When using `%autosetup -S git_am`, there is a case
         where a single patch file contains multiple commits.
-        This is problematic for us since only the HEAD patch commit
-        is annotated.
+        This is problematic for us since only the leading commit
+        is annotated. To make matters worse, we also want to support the fact
+        that leading commits would not follow the scheme - make contributions easier.
 
         In this case, we need to:
-        1. detect this is happening - top commit has `squash_commits=True`
+        1. detect this is happening - a commit has `squash_commits=True`
         2. process every commit, reversed (patches[-1] is HEAD)
         3. append commits to a single patch until `squash_commits=True`
         4. return new patch list
         """
-        top_commit = patch_list[-1]
-        if not top_commit.squash_commits:
+        if not any(commit.squash_commits for commit in patch_list):
             logger.debug(
-                "top commit is squash_commits=False, not the git-am style of patches"
+                "any of the commits has squash_commits=True, not the git-am style of patches"
             )
             return patch_list
 
         new_patch_list: List[PatchMetadata] = []
 
-        for patch in reversed(patch_list):
+        prepend_patches = ""
+        # this iterator is being reused in both cycles below
+        # first we process the commits before first squash_commits and
+        # prepend them before the first top_commit
+        # while the second cycle goes through the rest of the patches
+        reversed_patch_list = reversed(patch_list)
+        while True:
+            # iterate through the list until squash_commits=True is found
+            # prepend those commits to the first top patch
+            patch = next(reversed_patch_list)
             if patch.squash_commits:
-                top_commit = patch
-                new_patch_list.append(top_commit)
-                logger.debug(f"Top commit in a patch: {top_commit}.")
+                # top_patch is a leading commit with squash_commits=True
+                top_patch = patch
+                break
+            logger.debug(f"Prepending patch {patch}.")
+            prepend_patches = patch.path.read_text() + prepend_patches
+            patch.path.unlink()
+        if prepend_patches:
+            top_patch.path.write_text(top_patch.path.read_text() + prepend_patches)
+
+        while True:
+            if (
+                patch.squash_commits
+                or patch.present_in_specfile
+                or patch.metadata_defined
+            ):
+                top_patch = patch
+                new_patch_list.append(top_patch)
+                logger.debug(f"Top commit in a patch: {top_patch}.")
             else:
-                logger.debug(f"Appending commit {patch} to {top_commit}.")
-                top_commit.path.write_text(
-                    patch.path.read_text() + top_commit.path.read_text()
+                logger.debug(f"Appending commit {patch} to {top_patch}.")
+                top_patch.path.write_text(
+                    patch.path.read_text() + top_patch.path.read_text()
                 )
                 patch.path.unlink()
+            # we are draining rest of the iterator here
+            try:
+                patch = next(reversed_patch_list)
+            except StopIteration:
+                break
 
         return new_patch_list
 
