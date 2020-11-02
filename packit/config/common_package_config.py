@@ -73,6 +73,7 @@ class CommonPackageConfig:
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
+        copy_upstream_release_description: bool = False,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -109,6 +110,7 @@ class CommonPackageConfig:
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
         self.archive_root_dir_template = archive_root_dir_template
+        self.copy_upstream_release_description = copy_upstream_release_description
 
     def __repr__(self):
         return (
@@ -130,7 +132,8 @@ class CommonPackageConfig:
             f"synced_files='{self.synced_files}', "
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
-            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}')"
+            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"
+            f"copy_upstream_release_description='{self.copy_upstream_release_description}')"
         )
 
     @property
