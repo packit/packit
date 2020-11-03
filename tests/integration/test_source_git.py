@@ -128,6 +128,7 @@ def test_basic_local_update_patch_content(
     git_diff = subprocess.check_output(
         ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
     ).decode()
+
     assert (
         """
 -Version:        0.0.0
@@ -159,7 +160,10 @@ def test_basic_local_update_patch_content(
 
     assert (
         """ - 0.1.0-1
-+- new upstream release: 0.1.0
++- commit with data (Packit Test Suite)
++- empty commit #2 (Packit Test Suite)
++- empty commit #1 (Packit Test Suite)
++- empty commit #0 (Packit Test Suite)
 +
  * Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1
  - No brewing, yet."""

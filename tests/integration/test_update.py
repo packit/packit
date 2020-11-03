@@ -90,6 +90,37 @@ def test_basic_local_update_reset_after_exception(
     assert not api.dg.is_dirty()
 
 
+def test_basic_local_update_copy_upstream_release_description(
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
+):
+    """basic propose-update test: mock remote API, use local upstream and dist-git,
+    set copy_upstream_release_description in package config to True"""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    release = flexmock(body="Some description of the upstream release")
+    api.up.local_project.git_project = flexmock(get_release=lambda name: release)
+    api.package_config.copy_upstream_release_description = True
+    api.sync_release(dist_git_branch="master", version="0.1.0")
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.get_version() == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    changelog = "\n".join(spec.spec_content.section("%changelog"))
+
+    assert (
+        """- 0.1.0-1
+Some description of the upstream release
+"""
+        in changelog
+    )
+
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
 def test_basic_local_update_using_distgit(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
