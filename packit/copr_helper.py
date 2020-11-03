@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import functools
 import logging
 import time
 from datetime import datetime, timedelta
@@ -353,3 +353,20 @@ class CoprHelper:
         return [(build.id, build.projectname, build.state) for build in builds][
             :number_of_builds
         ]
+
+    @staticmethod
+    @functools.lru_cache(maxsize=1)
+    def get_available_chroots() -> list:
+        """
+        Gets available copr chroots. Uses cache to avoid repetitive url fetching.
+
+        :return: list of valid chroots
+        """
+
+        client = CoprClient.create_from_config_file()
+        return list(
+            filter(
+                lambda chroot: not chroot.startswith("_"),
+                client.mock_chroot_proxy.get_list().keys(),
+            )
+        )

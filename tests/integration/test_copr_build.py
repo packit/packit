@@ -31,6 +31,7 @@ from copr.v3 import (
 from flexmock import flexmock
 from munch import munchify
 
+import packit
 from packit.api import PackitAPI
 from packit.config import PackageConfig
 from packit.copr_helper import CoprHelper
@@ -657,7 +658,7 @@ def test_copr_build_no_owner(cwd_upstream_or_distgit, api_instance):
     assert "owner not set" in str(ex)
 
 
-def test_copr_build_cli_no_project_configured(upstream_and_remote):
+def test_copr_build_cli_no_project_configured(upstream_and_remote, copr_client_mock):
     upstream, _ = upstream_and_remote
     flexmock(PackitAPI).should_receive("run_copr_build").with_args(
         project="packit-cli-upstream_remote-upstream_git-master",
@@ -672,10 +673,15 @@ def test_copr_build_cli_no_project_configured(upstream_and_remote):
         request_admin_if_needed=False,
     ).and_return(("id", "url")).once()
 
+    flexmock(packit.copr_helper.CoprClient).should_receive(
+        "create_from_config_file"
+    ).and_return(copr_client_mock)
+    CoprHelper.get_available_chroots.cache_clear()
+
     run_packit(["copr-build", "--nowait"], working_dir=upstream)
 
 
-def test_copr_build_cli_project_set_via_cli(upstream_and_remote):
+def test_copr_build_cli_project_set_via_cli(upstream_and_remote, copr_client_mock):
     upstream, _ = upstream_and_remote
     flexmock(PackitAPI).should_receive("run_copr_build").with_args(
         project="the-project",
@@ -690,17 +696,26 @@ def test_copr_build_cli_project_set_via_cli(upstream_and_remote):
         request_admin_if_needed=False,
     ).and_return(("id", "url")).once()
 
+    flexmock(packit.copr_helper.CoprClient).should_receive(
+        "create_from_config_file"
+    ).and_return(copr_client_mock)
+    CoprHelper.get_available_chroots.cache_clear()
+
     run_packit(
         ["copr-build", "--nowait", "--project", "the-project"], working_dir=upstream
     )
 
 
-def test_copr_build_cli_project_set_from_config(upstream_and_remote):
+def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client_mock):
     upstream, _ = upstream_and_remote
 
     flexmock(PackageConfig).should_receive("get_copr_build_project_value").and_return(
         "some-project"
     )
+    flexmock(packit.copr_helper.CoprClient).should_receive(
+        "create_from_config_file"
+    ).and_return(copr_client_mock)
+    CoprHelper.get_available_chroots.cache_clear()
 
     flexmock(PackitAPI).should_receive("run_copr_build").with_args(
         project="some-project",

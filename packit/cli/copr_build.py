@@ -28,7 +28,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings, PackageConfig
-from packit.config.aliases import get_build_targets
+from packit.config.aliases import get_valid_build_targets
 
 logger = logging.getLogger(__name__)
 
@@ -135,9 +135,11 @@ def copr_build(
 
     logger.info(f"Using COPR project name = {project}")
 
-    targets_to_build = get_build_targets(
+    targets_to_build = get_valid_build_targets(
         *targets.split(","), default="fedora-rawhide-x86_64"
     )
+
+    logger.info(f"Targets to build: {targets_to_build}.")
 
     additional_repos_list: Optional[List[str]] = (
         additional_repos.split(",") if additional_repos else None
