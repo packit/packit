@@ -426,11 +426,16 @@ class Upstream(PackitRepositoryBase):
                     raise ex
         return None
 
-    def get_last_tag(self) -> Optional[str]:
-        """ get last git-tag from the repo """
+    def get_last_tag(self, before: str = None) -> Optional[str]:
+        """get last git-tag from the repo
+        :param before: get last tag before the given tag
+        """
         try:
+            cmd = ["git", "describe", "--tags", "--abbrev=0"]
+            if before:
+                cmd += [f"{before}^"]
             last_tag = run_command(
-                ["git", "describe", "--tags", "--abbrev=0"],
+                cmd,
                 output=True,
                 cwd=self.local_project.working_dir,
             ).strip()
@@ -440,6 +445,26 @@ class Upstream(PackitRepositoryBase):
             # no tags in the git repo
             return None
         return last_tag
+
+    def get_commit_messages(self, after: str = None, before: str = "HEAD") -> str:
+        """
+        :param after: get commit messages after this revision,
+        if None, all commit messages before 'before' will be returned
+        :param before:  get commit messages before this revision
+        :return: commit messages
+        """
+        # let's print changes b/w the last 2 revisions;
+        # ambiguous argument '0.1.0..HEAD': unknown revision or path not in the working tree.
+        # Use '--' to separate paths from revisions, like this
+        commits_range = f"{after}..{before}" if after else before
+        cmd = [
+            "git",
+            "log",
+            "--pretty=format:- %s (%an)",
+            commits_range,
+            "--",
+        ]
+        return run_command(cmd, output=True, cwd=self.local_project.working_dir).strip()
 
     def fix_spec(self, archive: str, version: str, commit: str):
         """
@@ -493,19 +518,7 @@ class Upstream(PackitRepositoryBase):
         last_tag = self.get_last_tag()
         msg = ""
         if last_tag:
-            # let's print changes b/w the last tag and now;
-            # ambiguous argument '0.1.0..HEAD': unknown revision or path not in the working tree.
-            # Use '--' to separate paths from revisions, like this
-            cmd = [
-                "git",
-                "log",
-                "--pretty=format:- %s (%an)",
-                f"{last_tag}..HEAD",
-                "--",
-            ]
-            msg = run_command(
-                cmd, output=True, cwd=self.local_project.working_dir
-            ).strip()
+            msg = self.get_commit_messages(after=last_tag)
         if not msg:
             # no describe, no tag - just a boilerplate message w/ commit hash
             # or, there were no changes b/w HEAD and last_tag, which implies last_tag == HEAD
