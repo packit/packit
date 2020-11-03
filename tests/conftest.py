@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Tuple
 
 import pytest
+from flexmock import flexmock
 
 from packit.utils.commands import cwd
 from tests.spellbook import (
@@ -162,3 +163,27 @@ def cwd_upstream_or_distgit(
 
     with cwd(cwd_path):
         yield cwd_path
+
+
+@pytest.fixture
+def copr_client_mock(get_list_return=None):
+    get_list_return = {
+        "centos-stream-aarch64": "",
+        "custom-1-x86_64": "",
+        "epel-6-x86_64": "",
+        "epel-8-x86_64": "",
+        "fedora-31-aarch64": "",
+        "fedora-31-armhfp": "This is emulated on x86_64",
+        "fedora-31-x86_64": "",
+        "fedora-32-armhfp": "This is emulated on x86_64",
+        "fedora-32-i386": "Not-released Koji packages",
+        "fedora-32-s390x": "This is emulated on x86_64",
+        "fedora-32-x86_64": "",
+        "fedora-33-x86_64": "",
+        "fedora-eln-x86_64": "",
+        "fedora-rawhide-aarch64": "",
+        "fedora-rawhide-x86_64": "",
+    }
+
+    copr_mock = flexmock(mock_chroot_proxy=flexmock(get_list=lambda: get_list_return))
+    return copr_mock
