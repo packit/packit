@@ -427,7 +427,8 @@ class Upstream(PackitRepositoryBase):
         return None
 
     def get_last_tag(self, before: str = None) -> Optional[str]:
-        """get last git-tag from the repo
+        """
+        Get last git-tag from the repo.
         :param before: get last tag before the given tag
         """
         try:
@@ -460,6 +461,7 @@ class Upstream(PackitRepositoryBase):
         cmd = [
             "git",
             "log",
+            "--no-merges",
             "--pretty=format:- %s (%an)",
             commits_range,
             "--",
