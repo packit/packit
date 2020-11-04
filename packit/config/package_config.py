@@ -69,6 +69,7 @@ class PackageConfig(CommonPackageConfig):
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
+        copy_upstream_release_description: bool = False,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -92,6 +93,7 @@ class PackageConfig(CommonPackageConfig):
             archive_root_dir_template=archive_root_dir_template,
             patch_generation_ignore_paths=patch_generation_ignore_paths,
             notifications=notifications,
+            copy_upstream_release_description=copy_upstream_release_description,
         )
         self.jobs: List[JobConfig] = jobs or []
 
@@ -118,7 +120,8 @@ class PackageConfig(CommonPackageConfig):
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"archive_root_dir_template={self.archive_root_dir_template}', "
-            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}')"
+            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}', "
+            f"copy_upstream_release_description='{self.copy_upstream_release_description}')"
         )
 
     @classmethod
@@ -202,6 +205,8 @@ class PackageConfig(CommonPackageConfig):
             and self.sync_changelog == other.sync_changelog
             and self.spec_source_id == other.spec_source_id
             and self.upstream_tag_template == other.upstream_tag_template
+            and self.copy_upstream_release_description
+            == other.copy_upstream_release_description
         )
 
 

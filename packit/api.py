@@ -230,7 +230,9 @@ class PackitAPI:
 
             if self.up.with_action(action=ActionName.prepare_files):
                 raw_files_to_sync = self._prepare_files_to_sync(
-                    raw_sync_files=raw_sync_files, full_version=full_version
+                    raw_sync_files=raw_sync_files,
+                    full_version=full_version,
+                    upstream_tag=upstream_tag,
                 )
                 sync_files(raw_files_to_sync)
                 if upstream_ref:
@@ -271,12 +273,17 @@ class PackitAPI:
         return new_pr
 
     def _prepare_files_to_sync(
-        self, raw_sync_files, full_version
+        self, raw_sync_files, full_version, upstream_tag
     ) -> List[RawSyncFilesItem]:
         if self.package_config.sync_changelog:
             return raw_sync_files
-
-        comment = f"- new upstream release: {full_version}"
+        comment = (
+            self.up.local_project.git_project.get_release(name=full_version).body
+            if self.package_config.copy_upstream_release_description
+            else self.up.get_commit_messages(
+                after=self.up.get_last_tag(upstream_tag), before=upstream_tag
+            )
+        )
         try:
             self.dg.set_specfile_content(self.up.specfile, full_version, comment)
         except FileNotFoundError as ex:
