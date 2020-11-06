@@ -1,4 +1,3 @@
-IMAGE=docker.io/usercont/packit
 TESTS_IMAGE=packit-tests
 
 CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
@@ -6,10 +5,6 @@ TESTS_CONTAINER_RUN=$(CONTAINER_ENGINE) run --rm -ti -v $(CURDIR):/src --env TES
 TESTS_RECORDING_PATH=tests_recording
 TESTS_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
 
-
-# To build base image for packit-service-worker
-image:
-	$(CONTAINER_ENGINE) build --rm -t $(IMAGE) .
 
 tests_image:
 	$(CONTAINER_ENGINE) build --tag $(TESTS_IMAGE) -f Dockerfile.tests .
