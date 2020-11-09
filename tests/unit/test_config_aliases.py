@@ -275,9 +275,9 @@ class TestGetAliases:
     [
         pytest.param(["f1", "f2"], ["f1", "f2"], {"f1", "f2"}, id="identical"),
         pytest.param(["f1", "f2"], ["f2", "f3"], {"f2"}, id="some_common"),
-        pytest.param(["f1", "f2"], ["f3", "f4"], {}, id="none_common"),
-        pytest.param([], ["f1", "f2"], {}, id="one_empty"),
-        pytest.param([], [], {}, id="both_empty"),
+        pytest.param(["f1", "f2"], ["f3", "f4"], set(), id="none_common"),
+        pytest.param([], ["f1", "f2"], set(), id="one_empty"),
+        pytest.param([], [], set(), id="both_empty"),
     ],
 )
 def test_get_valid_build_targets(targets, chroots, expected_result):
@@ -288,5 +288,23 @@ def test_get_valid_build_targets(targets, chroots, expected_result):
         "get_available_chroots"
     ).and_return(chroots)
 
-    get_valid_build_targets()
-    assert True
+    assert get_valid_build_targets() == expected_result
+
+
+@pytest.mark.parametrize(
+    "name, default",
+    [
+        pytest.param(["f1", "f2"], dict(default="test"), id="name_set-default_set"),
+        pytest.param(["f1", "f2"], dict(default="None"), id="name_set-default_None"),
+        pytest.param([], dict(default="test"), id="name_None-default_set"),
+        pytest.param([], dict(default=None), id="name_None-default_None"),
+    ],
+)
+def test_get_valid_build_targets_get_aliases_call(name, default):
+    flexmock(packit.config.aliases).should_receive("get_build_targets").with_args(
+        *name, **default
+    ).and_return(set())
+    flexmock(packit.config.aliases.CoprHelper).should_receive(
+        "get_available_chroots"
+    ).and_return(set())
+    get_valid_build_targets(*name, **default)
