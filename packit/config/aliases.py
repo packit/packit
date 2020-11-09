@@ -132,7 +132,7 @@ def get_valid_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set:
     :param default: used if no positional argument was given
     :return: set of build targets available also in copr chroots
     """
-    build_targets = get_build_targets(*name, default)
+    build_targets = get_build_targets(*name, default=default)
     logger.info(f"Build targets: {build_targets} ")
     copr_chroots = CoprHelper.get_available_chroots()
     logger.info(f"Copr chroots: {copr_chroots} ")
