@@ -34,7 +34,6 @@ from packit.config.notifications import (
 from packit.config.sync_files_config import SyncFilesConfig
 from packit.constants import PROD_DISTGIT_URL
 from packit.sync import SyncFilesItem
-from packit.utils.repo import get_current_version_command
 
 
 class CommonPackageConfig:
@@ -104,9 +103,7 @@ class CommonPackageConfig:
         # uncommitted changes will not be present in the archive
         self.create_tarball_command: List[str] = create_tarball_command
         # command to get current version of the project
-        self.current_version_command: List[
-            str
-        ] = current_version_command or get_current_version_command(glob_pattern="*")
+        self.current_version_command: List[str] = current_version_command
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
         self.archive_root_dir_template = archive_root_dir_template
