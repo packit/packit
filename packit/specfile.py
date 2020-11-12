@@ -24,12 +24,12 @@ import inspect
 import re
 from logging import getLogger
 from pathlib import Path
-from typing import Union, List, Tuple, Optional
+from typing import Union, List, Optional
 
 from rebasehelper.helpers.macro_helper import MacroHelper
 from rebasehelper.specfile import SpecFile, RebaseHelperError, saves
+from rebasehelper.tags import Tag, Tags
 
-from packit.constants import SPEC_PACKAGE_SECTION
 from packit.patches import PatchMetadata
 
 try:
@@ -218,30 +218,13 @@ class Specfile(SpecFile):
             f"{len(source_git_patches)}/{len(patch_list)} patches added to {self.path!r}."
         )
 
-    def get_source(self, source_name: str) -> Optional[Tuple[int, str, str]]:
+    def get_source(self, source_name: str) -> Optional[Tag]:
         """
         get specific Source from spec
 
         :param source_name: precise name of the Source, e.g. Source1, or Source
-        :return: index within the section, real name of the source, whole source line
+        :return: corresponding Source Tag
         """
-        prefix = "Source"
-        self.get_main_source()
-        regex = re.compile(r"^Source\s*:.+$")
-        spec_section = self.spec_content.section(SPEC_PACKAGE_SECTION)
-        for idx, line in enumerate(spec_section):
-            # we are looking for Source lines
-            if line.startswith(prefix):
-                # it's a Source line!
-                if line.startswith(source_name):
-                    # it even matches the specific Source\d+
-                    full_name = source_name
-                elif regex.match(line):
-                    # okay, let's try the other very common default
-                    # https://github.com/packit/packit/issues/536#issuecomment-534074925
-                    full_name = prefix
-                else:
-                    # nope, let's continue the search
-                    continue
-                return idx, full_name, line
-        return None
+        # sanitize the name, this will also add index if there isn't one
+        source_name, *_ = Tags._sanitize_tag(source_name, 0, 0)
+        return next(self.tags.filter(name=source_name, valid=None), None)
