@@ -5,8 +5,6 @@ daysUntilClose: 14
 # Issues with these labels will never be considered stale
 exemptLabels:
   - pinned
-  - security
-  - bug
   - EPIC
 # Label to use when marking an issue as stale
 staleLabel: stale
@@ -22,7 +20,7 @@ markComment: |
 
   Thank you for your contribution! :unicorn: :rocket: :robot:
 
-  (Note: issues labeled with *pinned*, *security*, *bug* or *EPIC* are
+  (Note: issues labeled with *pinned* or *EPIC* are
   never marked as stale.)
 # Comment to post when closing a stale issue. Set to `false` to disable
 closeComment: false
