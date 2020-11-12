@@ -267,45 +267,30 @@ class Upstream(PackitRepositoryBase):
 
     def get_current_version(self) -> str:
         """
-        Get version of the project in current state (hint `git describe`)
+        Get version of the project in current state. Tries following steps:
 
-        :return: e.g. 0.1.1.dev86+ga17a559.d20190315 or 0.6.1.1.gce4d84e
+        1. get output from actions
+        2. use configured `current_version_command (.packit.yaml)
+        3. extract version from `self.get_last_tag()` using `self.get_version_from_tag()`
+
+        :return: version (e.g. 0.1.1)
         """
+
         action_output = self.get_output_from_action(
             action=ActionName.get_current_version
         )
         if action_output:
             return action_output[-1].strip()
 
-        logger.debug(
-            f"We're about to `git-describe` the upstream repository "
-            f"{self.local_project.working_dir}."
-        )
-        logger.debug(f"Content: {os.listdir(str(self.local_project.working_dir))}")
-
-        # let's inspect tags in the repo and log our findings
-        cmd = ["git", "--no-pager", "tag", "--list"]
-        tags = self.command_handler.run_command(
-            cmd, return_output=True, cwd=self.local_project.working_dir
-        ).strip()
-        if tags:
-            tag_list = tags.split("\n")
-            logger.debug(
-                f"The repo has {len(tag_list)} tags and the latest is {tag_list[-1]!r}"
-            )
+        elif self.package_config.current_version_command:
+            ver = self.command_handler.run_command(
+                self.package_config.current_version_command,
+                return_output=True,
+                cwd=self.local_project.working_dir,
+            ).strip()
+            logger.debug(f"Raw version: {ver}")
         else:
-            logger.warning(
-                "There are no tags in the repo, `git describe` will very likely fail."
-            )
-
-        raw_ver = self.command_handler.run_command(
-            self.package_config.current_version_command,
-            return_output=True,
-            cwd=self.local_project.working_dir,
-        ).strip()
-        logger.debug(f"Raw version: {raw_ver}")
-
-        ver = self.get_version_from_tag(raw_ver)
+            ver = self.get_version_from_tag(self.get_last_tag())
         logger.debug(f"Version: {ver}")
 
         if "-" in ver:
@@ -431,6 +416,12 @@ class Upstream(PackitRepositoryBase):
         Get last git-tag from the repo.
         :param before: get last tag before the given tag
         """
+
+        logger.debug(
+            f"We're about to `git-describe` the upstream repository "
+            f"{self.local_project.working_dir}."
+        )
+
         try:
             cmd = ["git", "describe", "--tags", "--abbrev=0"]
             if before:
