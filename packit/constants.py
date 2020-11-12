@@ -91,5 +91,3 @@ SYNCING_NOTE = (
     "This repository is maintained by packit.\nhttps://packit.dev/\n"
     "The file was generated using packit {packit_version}.\n"
 )
-
-SPEC_PACKAGE_SECTION = "%package"
