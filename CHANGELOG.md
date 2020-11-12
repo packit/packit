@@ -1,3 +1,15 @@
+# 0.20.0
+
+- The `fedora-all`, `fedora-stable`, `fedora-development` and `epel-all`
+  chroot aliases are now translated to concrete chroots by consulting Bodhi,
+  making the transition to new Fedora releases smoother.
+- A new, `copy_upstream_release_description` option is available in
+  `packit.yaml`. When set to `true`, the GitHub release description is going
+  to be used to update the changelog in the spec-file, when creating a new
+  update in Fedora dist-git. When set to `false` (the default), the subject
+  lines of the commits included in the release are used to update the changelog.
+- Fix an issue (#1012) by improving how the current version is discovered.
+
 # 0.19.0
 
 - Allow syncing full content of the spec-file.
