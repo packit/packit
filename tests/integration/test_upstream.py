@@ -221,6 +221,41 @@ def test_fix_spec(upstream_instance):
     assert re.match(r"\d\.\d{20}\.\w+\.\d+\.g\w{7}", release)
 
 
+@pytest.mark.parametrize(
+    "spec_source_id, expected_line",
+    [
+        pytest.param(
+            "Source",
+            r"Source:\s*fixed-source-archive.tar.gz",
+            id="Source",
+        ),
+        pytest.param(
+            "Source0",
+            r"Source:\s*fixed-source-archive.tar.gz",
+            id="Source0",
+        ),
+        pytest.param(
+            "Source100",
+            r"Source100:\s*fixed-source-archive.tar.gz",
+            id="Source100",
+        ),
+    ],
+)
+def test__fix_spec_source(upstream_instance, spec_source_id, expected_line):
+    u, ups = upstream_instance
+
+    data = u.joinpath("beer.spec").read_text()
+    data = re.sub(r"(Source:.*)", "\\1\nSource100: extra-sources.tar.gz", data)
+    with open(u.joinpath("beer.spec"), "w") as f:
+        f.write(data)
+
+    ups.package_config.spec_source_id = spec_source_id
+    ups._fix_spec_source("fixed-source-archive.tar.gz")
+    ups.specfile.write_spec_content()
+
+    assert re.search(expected_line, u.joinpath("beer.spec").read_text())
+
+
 def test_create_srpm(upstream_instance, tmp_path):
     u, ups = upstream_instance
 
