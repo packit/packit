@@ -36,7 +36,7 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, SyncFilesConfig
 from packit.config.common_package_config import CommonPackageConfig
-from packit.constants import SPEC_PACKAGE_SECTION, DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
+from packit.constants import DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
 from packit.exceptions import (
     PackitException,
     PackitSRPMNotFoundException,
@@ -567,10 +567,9 @@ class Upstream(PackitRepositoryBase):
     def _fix_spec_source(self, archive):
         response = self.specfile.get_source(self.package_config.spec_source_id)
         if response:
-            idx, source_name, _ = response
-            self.specfile.spec_content.section(SPEC_PACKAGE_SECTION)[
-                idx
-            ] = f"{source_name}: {archive}"
+            self.specfile.set_raw_tag_value(
+                response.name, archive, section=response.section_index
+            )
         else:
             raise PackitException(
                 "The spec file doesn't have sources set "
