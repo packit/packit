@@ -30,6 +30,7 @@ from pkg_resources import DistributionNotFound, Distribution
 
 from packit.api import get_packit_version
 from packit.exceptions import PackitException, ensure_str
+from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
 from packit.utils.decorators import fallback_return_value
 from packit.utils.repo import (
     get_namespace_and_repo_name,
@@ -168,3 +169,12 @@ class TestFallbackReturnValue:
 
         elif not raise_exception:
             assert simple_function() == 42
+
+
+@pytest.mark.parametrize(
+    "inp,exp,exp_rpm",
+    (("pr/123", "pr-123", "pr123"), ("🌈🌈🌈", "🌈🌈🌈", "🌈🌈🌈"), ("@#$#$%", "------", "")),
+)
+def test_sanitize_branch(inp, exp, exp_rpm):
+    assert sanitize_branch_name(inp) == exp
+    assert sanitize_branch_name_for_rpm(inp) == exp_rpm
