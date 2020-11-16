@@ -29,6 +29,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings, PackageConfig
 from packit.config.aliases import get_valid_build_targets
+from packit.utils import sanitize_branch_name
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +132,8 @@ def copr_build(
                 "COPR project not found in the job configuration. "
                 "Using the default one."
             )
-            project = f"packit-cli-{path_or_url.repo_name}-{path_or_url.ref}"
+            sanitized_ref = sanitize_branch_name(path_or_url.ref)
+            project = f"packit-cli-{path_or_url.repo_name}-{sanitized_ref}"
 
     logger.info(f"Using COPR project name = {project}")
 
