@@ -271,6 +271,11 @@ def get_default_jobs() -> List[Dict]:
     return deepcopy(
         [
             {
+                "job": "copr_build",
+                "trigger": "pull_request",
+                "metadata": {"targets": "fedora-stable"},
+            },
+            {
                 "job": "tests",
                 "trigger": "pull_request",
                 "metadata": {"targets": "fedora-stable"},
