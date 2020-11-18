@@ -98,6 +98,12 @@ def get_default_job_config(**kwargs):
     """ pass kwargs to JobConfig constructor """
     return [
         JobConfig(
+            type=JobType.copr_build,
+            trigger=JobConfigTriggerType.pull_request,
+            metadata=JobMetadataConfig(targets=["fedora-stable"]),
+            **kwargs
+        ),
+        JobConfig(
             type=JobType.tests,
             trigger=JobConfigTriggerType.pull_request,
             metadata=JobMetadataConfig(targets=["fedora-stable"]),
