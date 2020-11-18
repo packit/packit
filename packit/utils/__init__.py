@@ -34,3 +34,28 @@ __all__ = [
     is_a_git_ref.__name__,
     git_remote_url_to_https_url.__name__,
 ]
+
+
+def sanitize_branch_name(branch_name: str) -> str:
+    """
+    replace potentially problematic characters in provided string, a branch name
+
+    e.g. copr says:
+        Name must contain only letters, digits, underscores, dashes and dots.
+    """
+    # https://stackoverflow.com/questions/3411771/best-way-to-replace-multiple-characters-in-a-string
+    offenders = "!@#$%^&*()+={[}]|\\'\":;<,>/?~`"
+    for o in offenders:
+        branch_name = branch_name.replace(o, "-")
+    return branch_name
+
+
+def sanitize_branch_name_for_rpm(branch_name: str) -> str:
+    """
+    rpm is picky about release: hates "/" - it's an error
+    also prints a warning for "-"
+    """
+    offenders = "!@#$%^&*()+={[}]|\\'\":;<,>/?~`"
+    for o in offenders:
+        branch_name = branch_name.replace(o, "")
+    return branch_name.replace("-", ".")

@@ -48,7 +48,7 @@ from packit.exceptions import (
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
-from packit.utils import commands
+from packit.utils import commands, sanitize_branch_name_for_rpm
 from packit.utils.commands import run_command
 from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
 
@@ -293,10 +293,8 @@ class Upstream(PackitRepositoryBase):
             ver = self.get_version_from_tag(self.get_last_tag())
         logger.debug(f"Version: {ver}")
 
-        if "-" in ver:
-            # RPM refuses dashes in version/release
-            ver = ver.replace("-", ".")
-            logger.debug(f"Sanitized version: {ver}")
+        ver = sanitize_branch_name_for_rpm(ver)
+        logger.debug(f"Sanitized version: {ver}")
 
         return ver
 
@@ -498,9 +496,7 @@ class Upstream(PackitRepositoryBase):
             # the leading dot is put here b/c git_desc_suffix can be empty
             # and we could have two subsequent dots - rpm errors in such a case
         current_branch = self.local_project.ref
-        # rpm is picky about release: hates "/" - it's an error
-        # also prints a warning for "-"
-        sanitized_current_branch = current_branch.replace("/", "").replace("-", ".")
+        sanitized_current_branch = sanitize_branch_name_for_rpm(current_branch)
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         release = (

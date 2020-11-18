@@ -292,6 +292,7 @@ class CoprHelper:
                 f"(owner={owner} project={project} chroots={chroots}): {ex}"
             )
             logger.error(error)
+            logger.error(ex.result)
             raise PackitCoprProjectException(error, ex)
 
     def watch_copr_build(
