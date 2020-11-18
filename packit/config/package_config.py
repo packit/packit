@@ -389,7 +389,7 @@ def get_specfile_path_from_repo(
     :param ref: git ref
     :return: str path of the spec file or None
     """
-    spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
+    spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$", recursive=True)
 
     if not spec_files:
         logger.debug(f"No spec file found in {project.full_repo_name!r}")
