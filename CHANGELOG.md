@@ -1,3 +1,11 @@
+# 0.21.0
+
+- If the first `Source` tag in a spec file is not indexed, it is always returned,
+  no matter the value of `source_name`.
+- Sanitize potentially problematic characters in a branch name
+  before creating a copr project name from it.
+- Default job now includes copr build as well.
+
 # 0.20.0
 
 - The `fedora-all`, `fedora-stable`, `fedora-development` and `epel-all`
