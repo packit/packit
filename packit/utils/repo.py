@@ -61,9 +61,10 @@ def git_remote_url_to_https_url(inp: str) -> str:
     turn provided git remote URL to https URL:
     returns empty string if the input can't be processed
     """
+    logger.debug(f"Parsing git remote URL {inp!r} and converting it to https-like URL.")
     parsed_repo = parse_git_repo(inp)
     if not parsed_repo or not parsed_repo.hostname:
-        logger.warning(f"{inp!r} is not an URL we recognize.")
+        logger.debug(f"{inp!r} is not an URL we recognize.")
         return ""
 
     if inp.startswith(("http", "https")):
