@@ -53,6 +53,7 @@ from packit.exceptions import (
     PackitCoprException,
 )
 from packit.local_project import LocalProject
+from packit.source_git import SourceGitGenerator
 from packit.status import Status
 from packit.sync import RawSyncFilesItem, sync_files
 from packit.upstream import Upstream
@@ -876,3 +877,35 @@ class PackitAPI:
         config_content = load_packit_yaml(config_path)
         v = PackageConfigValidator(config_path, config_content)
         return v.validate()
+
+    def create_sourcegit_from_upstream(
+        self,
+        upstream_url: str,
+        upstream_ref: Optional[str] = None,
+        dist_git_path: Optional[Path] = None,
+        dist_git_branch: Optional[str] = None,
+        fedora_package: Optional[str] = None,
+        centos_package: Optional[str] = None,
+    ):
+        """
+        generate a source-git repo from provided upstream repo
+        and a corresponding package in Fedora/CentOS ecosystem
+
+        :param upstream_url: upstream repo URL we want to use as a base
+        :param upstream_ref: upstream git-ref to use as a base
+        :param fedora_package: pick up specfile and downstream sources from this fedora package
+        :param centos_package: pick up specfile and downstream sources from this centos package
+        :param dist_git_branch: branch in dist-git to use
+        :param dist_git_path: path to a local clone of a dist-git repo
+        """
+        sgg = SourceGitGenerator(
+            config=self.config,
+            local_project=self.upstream_local_project,
+            upstream_url=upstream_url,
+            upstream_ref=upstream_ref,
+            dist_git_path=dist_git_path,
+            dist_git_branch=dist_git_branch,
+            fedora_package=fedora_package,
+            centos_package=centos_package,
+        )
+        sgg.create_from_upstream()

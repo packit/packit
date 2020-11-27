@@ -437,5 +437,43 @@ class LocalProject:
         """
         return self.git_repo.remote(name=remote_name).push(refspec=refspec, force=force)
 
+    def stage(self, path: str = ".", force: bool = True):
+        """
+        stage provided path from working tree to index
+
+        force: bypass gitignore
+        """
+        self.git_repo.git.add(path, force=force)
+
+    def commit(
+        self, message: str, body: Optional[str] = None, allow_empty: bool = True
+    ):
+        """ Commit staged changes """
+        other_message_kwargs = {"message": body} if body else {}
+        # some of the commits may be empty and it's not an error,
+        # e.g. extra source files
+        self.git_repo.git.commit(
+            allow_empty=allow_empty, m=message, **other_message_kwargs
+        )
+
+    def get_commits(self, ref: str = "HEAD"):
+        return self.git_repo.iter_commits(ref)
+
+    def fetch(self, remote: str, refspec: Optional[str] = None):
+        """
+        fetch refs from a remote to this repo
+
+        @param remote: str or path of the repo we fetch from
+        @param refspec: see man git-fetch
+        """
+        if refspec:
+            self.git_repo.git.fetch(remote, refspec)
+        else:
+            self.git_repo.git.fetch(remote, "--tags")
+
+    def reset(self, ref: str):
+        """ git reset --hard $ref """
+        self.git_repo.head.reset(ref, index=True, working_tree=True)
+
     def __del__(self):
         self.clean()

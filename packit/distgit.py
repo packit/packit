@@ -43,6 +43,7 @@ from packit.exceptions import PackitException, PackitConfigException
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
 from packit.utils.commands import cwd
+from packit.utils.repo import clone_fedora_package
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,21 @@ class DistGit(PackitRepositoryBase):
             f"downstream_config='{self.downstream_config}', "
             f"absolute_specfile_path='{self.absolute_specfile_path}')"
         )
+
+    @classmethod
+    def clone(
+        cls,
+        config: Config,
+        package_config: CommonPackageConfig,
+        path: Path,
+        branch,
+    ) -> "DistGit":
+        # TODO: use fedpkg for this, or even better, the lp property below
+        clone_fedora_package(
+            package_config.downstream_package_name, path, branch=branch
+        )
+        lp = LocalProject(working_dir=path)
+        return cls(config, package_config, local_project=lp)
 
     @property
     def local_project(self):

@@ -72,6 +72,7 @@ mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_dat
 %{_mandir}/man1/packit*.1*
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/%{real_name}
+%{_bindir}/packitpatch
 
 %files -n python3-%{real_name}
 %license LICENSE

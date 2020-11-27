@@ -1,0 +1,69 @@
+#!/usr/bin/bash
+
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+# this script wraps /usr/bin/patch with code which is executed during patch
+# application of `rpmbuild -bp` run, see the RPM macros defined in constants.py
+
+# do set -x for development/debugging
+set -eu
+
+# this will print a path to a git repo
+# correct repo is /path/BUILD/<TOP-LEVEL-DIR-IN-ARCHIVE>
+top_level_git_path=$(git rev-parse --show-toplevel)
+second_to_last_dir=$(basename $(dirname ${top_level_git_path}))
+# we cannot override %__scm_setup_patch b/c it is called from %autosetup
+# and some specs have %setup + %autopatch, so we need to make sure
+# the git repo exists here
+if [ $second_to_last_dir != "BUILD" ]; then
+  git init
+  # we are doing -f to bypass .gitignore which can mask packit.yaml or the specfile
+  # https://github.com/packit/dist-git-to-source-git/issues/66#issuecomment-694284493
+  git add -f .
+  # that PWD magic prints the name of the PWD, which usually is NAME-VERSION
+  git commit -q --allow-empty -a -m "${PWD##*/} base"
+fi
+
+if [ "$1" == "%{1}" ]; then
+  # rpm pipes the patch here
+  # also, Michal Domonkos is a genius
+  patch_path=$(readlink -f /dev/stdin)
+else
+  patch_path=$1
+fi
+patch_name=$(basename $patch_path)
+patch_id=$2
+
+# we process first and second arg above, the rest is for patch
+# and we don't want backup files in our source-git repos
+patch_args=$(echo ${@:3} | sed -e 's/ -b//' -e 's/--backup//')
+
+cat - | /usr/bin/patch ${patch_args}
+
+commit_message=$(cat << EOF
+Apply patch ${patch_name}
+
+patch_name: ${patch_name}
+present_in_specfile: true
+EOF
+)
+
+# when patches are applied with -p0, we need to strip the prefix
+# in packit when creating the patch files
+if echo ${@:3} | grep -E "[-]p0|[-]p 0"; then
+  commit_message=$(cat << EOF
+$commit_message
+no_prefix: true
+EOF
+)
+fi
+
+if [ "$patch_id" != "%{2}" ]; then
+  # concat 2 strings and separate them with \n - a nightmare to do in bash
+  printf -v commit_message "${commit_message}\nlocation_in_specfile: ${patch_id}"
+fi
+
+git add -f .
+# patches can be empty, rpmbuild is fine with it
+git commit -m "$commit_message" --allow-empty
