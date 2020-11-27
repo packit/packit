@@ -104,7 +104,7 @@ class PackitRepositoryBase:
         return self._specfile
 
     @property
-    def absolute_source_dir(self):
+    def absolute_source_dir(self) -> Path:
         """
         absolute path to the directory where `Source` files
         from spec files can be found

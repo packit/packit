@@ -30,6 +30,8 @@ import click
 from github import GithubException
 
 from ogr.parsing import parse_git_repo
+from packit.config.package_config import PackageConfig
+
 from packit.api import PackitAPI
 from packit.config import Config, get_local_package_config
 from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
@@ -104,27 +106,36 @@ def cover_packit_exception(_func=None, *, exit_code=None):
 
 
 def get_packit_api(
-    config: Config, local_project: LocalProject, dist_git_path: str = None
+    config: Config,
+    local_project: LocalProject,
+    dist_git_path: str = None,
+    load_packit_yaml: bool = True,
 ):
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config = get_local_package_config(
-        local_project.working_dir,
-        repo_name=local_project.repo_name,
-        try_local_dir_last=True,
-    )
+    if load_packit_yaml:
+        package_config = get_local_package_config(
+            local_project.working_dir,
+            repo_name=local_project.repo_name,
+            try_local_dir_last=True,
+        )
+    else:
+        package_config = PackageConfig()
 
     if dist_git_path:
         package_config.dist_git_clone_path = dist_git_path
 
     if dist_git_path and Path(dist_git_path) == local_project.working_dir:
-        PackitAPI(
+        return PackitAPI(
             config=config,
             package_config=package_config,
             upstream_local_project=None,
             downstream_local_project=local_project,
         )
+
+    if not local_project.git_repo:
+        raise PackitException(f"{local_project.working_dir!r} is not a git repository.")
 
     remote_urls: List[str] = []
     for remote in local_project.git_repo.remotes:
