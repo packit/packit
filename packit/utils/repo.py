@@ -33,7 +33,6 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
         repo = git.repo.Repo(directory)
     else:
         logger.debug(f"Cloning repo {url} -> {directory}")
-        # TODO: optimize cloning: single branch and last n commits?
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
