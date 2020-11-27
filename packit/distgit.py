@@ -36,7 +36,6 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
     PackageConfig,
-    SyncFilesConfig,
     get_local_package_config,
 )
 from packit.config.common_package_config import CommonPackageConfig
@@ -62,6 +61,9 @@ class DistGit(PackitRepositoryBase):
     and methods of this class interact with the local copy.
     """
 
+    # we store downstream content in source-git in this subdir
+    source_git_downstream_suffix = "fedora"
+
     def __init__(
         self,
         config: Config,
@@ -74,7 +76,6 @@ class DistGit(PackitRepositoryBase):
         self._local_project = local_project
 
         self.fas_user = self.config.fas_user
-        self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
         self.stage = stage
         self._downstream_config: Optional[PackageConfig] = None
 
@@ -156,6 +157,10 @@ class DistGit(PackitRepositoryBase):
             if not self._specfile_path.exists():
                 raise FileNotFoundError(f"Specfile {self._specfile_path} not found.")
         return self._specfile_path
+
+    def get_root_downstream_dir_for_source_git(self, root_dir: Path) -> Path:
+        """ root directory within a source-git repo where all the downstream files are stored """
+        return root_dir.joinpath(self.source_git_downstream_suffix)
 
     def update_branch(self, branch_name: str):
         """
