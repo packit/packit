@@ -341,3 +341,26 @@ def test_get_archive_root_dir_from_template(
     upstream_mock.should_receive("get_version").and_return("1.0")
     upstream_mock.package_config.archive_root_dir_template = template
     assert upstream_mock.get_archive_root_dir_from_template() == expected_return_value
+
+
+@pytest.mark.parametrize(
+    "version, tag_template, expected_output, expectation",
+    [
+        pytest.param(
+            "1.0.0", "{version}", "1.0.0", does_not_raise(), id="valid_template"
+        ),
+        pytest.param(
+            "1.0.0",
+            "{rsion}",
+            "1.0.0",
+            pytest.raises(PackitException),
+            id="invalid_template",
+        ),
+    ],
+)
+def test_convert_version_to_tag(
+    version, tag_template, expected_output, expectation, upstream_mock
+):
+    with expectation:
+        upstream_mock.package_config.upstream_tag_template = tag_template
+        assert upstream_mock.convert_version_to_tag(version) == expected_output

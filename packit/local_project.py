@@ -417,10 +417,10 @@ class LocalProject:
         self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
         self.git_repo.branches[local_branch].checkout()
 
-    def checkout_release(self, version: str) -> None:
-        logger.info(f"Checking out upstream version {version}.")
+    def checkout_release(self, tag: str) -> None:
+        logger.info(f"Checking out upstream version {tag}.")
         try:
-            self.git_repo.git.checkout(version)
+            self.git_repo.git.checkout(tag)
         except Exception as ex:
             raise PackitException(f"Cannot checkout release tag: {ex!r}.")
 
