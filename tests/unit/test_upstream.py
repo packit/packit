@@ -28,44 +28,7 @@ from flexmock import flexmock
 import packit
 from packit.actions import ActionName
 from packit.exceptions import PackitException
-from packit.local_project import LocalProject
 from packit.upstream import Upstream
-from tests.spellbook import get_test_config
-
-
-@pytest.fixture
-def package_config_mock():
-    mock = flexmock(synced_files=None, upstream_package_name="test_package_name")
-    mock.should_receive("current_version_command")
-    return mock
-
-
-@pytest.fixture
-def git_project_mock():
-    mock = flexmock(upstream_project_url="dummy_url")
-    return mock
-
-
-@pytest.fixture
-def local_project_mock(git_project_mock):
-    mock = flexmock(
-        git_project=git_project_mock, working_dir="/mock_dir", ref="mock_ref"
-    )
-    return mock
-
-
-@pytest.fixture
-def upstream_mock(local_project_mock, package_config_mock):
-    upstream = Upstream(
-        config=get_test_config(),
-        package_config=package_config_mock,
-        local_project=LocalProject(working_dir="test"),
-    )
-    flexmock(upstream)
-    upstream.should_receive("local_project").and_return(local_project_mock)
-    upstream.should_receive("absolute_specfile_path").and_return("_spec_file_path")
-    upstream.should_receive("absolute_specfile_dir").and_return("_spec_file_dir")
-    return upstream
 
 
 @pytest.fixture
