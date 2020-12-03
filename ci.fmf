@@ -15,7 +15,7 @@
       execute:
         how: shell
         script:
-        - pwd; cd ~/git-source && pwd && make check
+        - cd ~/git-source || :; pwd && ls -lah && make check
     /session-recording:
       prepare:
         how: ansible
@@ -24,4 +24,4 @@
       execute:
         how: shell
         script:
-        - pwd; cd ~/git-source && pwd && make check TESTS_TARGET=tests_recording
+        - cd ~/git-source || :; pwd && ls -lah && make check TESTS_TARGET=tests_recording
