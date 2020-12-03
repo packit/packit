@@ -126,7 +126,7 @@ packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} %{_d
 %{__git} am %{-q} %{-p:-p%{-p*}}\
 patch_name=`basename %{1}`\
 commit_msg=`%{__git} log --format=%B -n1`\
-metadata_commit_msg=`printf "patch_name: $patch_name\\npresent_in_specfile: true\\nlocation_in_specfile: %{2}\\nsquash_commits: true"`\
+metadata_commit_msg=`printf "patch_name: $patch_name\\npresent_in_specfile: true\\nsquash_commits: true"`\
 %{__git} commit --amend -m "$commit_msg" -m "$metadata_commit_msg"
 
 %__scm_apply_git(qp:m:)\
