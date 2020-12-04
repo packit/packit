@@ -924,6 +924,26 @@ class Upstream(PackitRepositoryBase):
             logger.error(msg)
             raise PackitException(msg)
 
+    def convert_version_to_tag(self, version_: str) -> str:
+        """
+        Converts version to tag using upstream_tag_tepmlate
+
+        :param version_: version to be converted
+        upstream_template_tag
+        :return: tag
+        """
+        try:
+            tag = self.package_config.upstream_tag_template.format(version=version_)
+        except KeyError:
+            msg = (
+                f"Invalid upstream_tag_template: {self.package_config.upstream_tag_template} - "
+                f'"version" placeholder is missing'
+            )
+            logger.error(msg)
+            raise PackitException(msg)
+
+        return tag
+
     def get_archive_root_dir(self, archive: str) -> Union[str, None]:
         """
         Returns archive root dir.

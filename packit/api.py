@@ -138,6 +138,7 @@ class PackitAPI:
         self,
         dist_git_branch: str,
         version: str = None,
+        tag: str = None,
         use_local_content=False,
         force_new_sources=False,
         upstream_ref: str = None,
@@ -150,6 +151,7 @@ class PackitAPI:
         :param dist_git_branch: branch in dist-git
         :param use_local_content: don't check out anything
         :param version: upstream version to update in Fedora
+        :param tag: upstream git tag
         :param force_new_sources: don't check the lookaside cache and perform new-sources
         :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
         :param create_pr: create a pull request if set to True
@@ -157,6 +159,24 @@ class PackitAPI:
 
         :return created PullRequest if create_pr is True, else None
         """
+
+        # process version and tag parameters
+        if version and tag:
+            raise PackitException(
+                "Function parameters version and tag are mutually exclusive."
+            )
+        elif not tag:
+            if not version:
+                version = self.up.get_version()
+                if not version:
+                    raise PackitException(
+                        "Could not figure out version of latest upstream release."
+                    )
+            upstream_tag = self.up.convert_version_to_tag(version)
+        elif tag:
+            upstream_tag = tag
+            version = self.up.get_version_from_tag(tag)
+
         assert_existence(self.up.local_project, "Upstream local project")
         assert_existence(self.dg.local_project, "Dist-git local project")
         if self.dg.is_dirty():
@@ -177,17 +197,9 @@ class PackitAPI:
         create_pr = create_pr and self.package_config.create_pr
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
-        full_version = version or self.up.get_version()
-
-        if not full_version:
-            raise PackitException(
-                "Could not figure out version of latest upstream release."
-            )
         current_up_branch = self.up.active_branch
         try:
-            upstream_tag = self.up.package_config.upstream_tag_template.format(
-                version=full_version
-            )
+
             if not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
 
@@ -206,7 +218,7 @@ class PackitAPI:
             self.dg.checkout_branch(dist_git_branch)
 
             if create_pr:
-                local_pr_branch = f"{full_version}-{dist_git_branch}-update"
+                local_pr_branch = f"{version}-{dist_git_branch}-update"
                 self.dg.create_branch(local_pr_branch)
                 self.dg.checkout_branch(local_pr_branch)
 
@@ -231,7 +243,7 @@ class PackitAPI:
             if self.up.with_action(action=ActionName.prepare_files):
                 raw_files_to_sync = self._prepare_files_to_sync(
                     raw_sync_files=raw_sync_files,
-                    full_version=full_version,
+                    full_version=version,
                     upstream_tag=upstream_tag,
                 )
                 sync_files(raw_files_to_sync)
@@ -251,11 +263,11 @@ class PackitAPI:
 
                 sync_files(raw_sync_files)
 
-            self.dg.commit(title=f"{full_version} upstream release", msg=description)
+            self.dg.commit(title=f"{version} upstream release", msg=description)
 
             new_pr = None
             if create_pr:
-                title = f"Update to upstream release {full_version}"
+                title = f"Update to upstream release {version}"
 
                 if not self.dg.pr_exists(title, description.rstrip(), dist_git_branch):
                     new_pr = self.push_and_create_pr(
