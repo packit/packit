@@ -20,11 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from contextlib import nullcontext as does_not_raise
+
 from munch import Munch
 import pytest
-import flexmock
+from flexmock import flexmock
 
+from packit.api import PackitAPI
 from packit.copr_helper import CoprHelper
+from packit.exceptions import PackitException
 
 
 def build_dict(copr_url, id):
@@ -84,6 +88,17 @@ testdata = [
 ]
 
 
+@pytest.fixture
+def api_mock(config_mock, package_config_mock, upstream_mock, distgit_mock):
+    api = PackitAPI(config=config_mock, package_config=package_config_mock)
+    flexmock(api)
+    api._up = upstream_mock
+    api._dg = distgit_mock
+    api.should_receive("_prepare_files_to_sync").and_return([])
+    api.should_receive("_handle_sources")
+    return api
+
+
 @pytest.mark.parametrize(
     "helper,build,web_url",
     testdata,
@@ -91,3 +106,37 @@ testdata = [
 class TestPackitAPI:
     def test_copr_web_build_url(self, helper, build, web_url):
         assert helper.copr_web_build_url(build) == web_url
+
+
+@pytest.mark.parametrize(
+    "version, tag, get_version_return, expectation",
+    [
+        pytest.param("1.1.1", None, None, does_not_raise(), id="version_set"),
+        pytest.param(None, "v1.1.1", None, does_not_raise(), id="tag_set"),
+        pytest.param(
+            "1.1", "v1.1.1", None, pytest.raises(PackitException), id="both_set"
+        ),
+        pytest.param(
+            None, None, "1.1", does_not_raise(), id="none_set-get_version_exists"
+        ),
+        pytest.param(
+            None,
+            None,
+            None,
+            pytest.raises(PackitException),
+            id="none_set-get_version_None",
+        ),
+    ],
+)
+def test_sync_release_version_tag_processing(
+    version, tag, get_version_return, expectation, api_mock
+):
+    api_mock.up.package_config.upstream_tag_template = "v{version}"
+    api_mock.up.should_receive("get_version").and_return(get_version_return)
+    api_mock.should_receive("_prepare_files_to_sync").with_args(
+        raw_sync_files=[], full_version=version, upstream_tag=tag
+    )
+    with expectation:
+        api_mock.sync_release(
+            version=version or get_version_return, tag=tag, dist_git_branch="_"
+        )
