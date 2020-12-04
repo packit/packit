@@ -76,6 +76,11 @@ class CoprHelper:
     ):
         copr_url = self.copr_client.config.get("copr_url")
         section = section or "edit"
+
+        # COPR groups starts with '@' but url have '/g/owner'
+        if owner.startswith("@"):
+            owner = f"g/{owner[1:]}"
+
         return f"{copr_url}/coprs/{owner}/{project}/{section}/"
 
     def create_copr_project_if_not_exists(
