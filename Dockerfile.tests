@@ -1,12 +1,7 @@
 # Packit (test) dependencies.
 # To run tests locally via 'make check_in_container'.
 
-FROM fedora:31
-
-RUN dnf -y install ansible
-
-ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
-    ANSIBLE_STDOUT_CALLBACK=debug
+FROM docker.io/usercont/base
 
 COPY files/tasks/*.yaml /files/tasks/
 COPY files/*.yaml /files/
