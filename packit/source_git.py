@@ -240,11 +240,11 @@ class SourceGitGenerator:
         run `rpmbuild -bp` in the dist-git repo to get a git-repo
         in the %prep phase so we can pick the commits in the source-git repo
         """
-        packitpatch_path = shutil.which("packitpatch")
-        if not packitpatch_path:
+        _packitpatch_path = shutil.which("_packitpatch")
+        if not _packitpatch_path:
             raise PackitException(
                 "We are trying to unpack a dist-git archive and lay patches on top "
-                'by running `rpmbuild -bp` but we cannot find "packitpatch" command on PATH: '
+                'by running `rpmbuild -bp` but we cannot find "_packitpatch" command on PATH: '
                 "please install packit as an RPM."
             )
         logger.info(

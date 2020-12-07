@@ -102,8 +102,9 @@ SYNCING_NOTE = (
 # `rpmbuild -bp` and get a git repo out of %prep
 # once the command is finished, the file is cleaned up
 RPM_MACROS_FOR_PREP = r"""
-# we want both: here and in packitpatch
-# if there are no patches, packitpatch never gets invoked and this will b/c of autosetup
+# we want both: here and in _packitpatch
+# if there are no patches, _packitpatch never gets invoked and
+# this will be invoked b/c of %autosetup
 %__scm_setup_patch(q)\
 %{__git} init\
 %{__git} add -f .\
@@ -112,9 +113,9 @@ RPM_MACROS_FOR_PREP = r"""
 # %{1} = absolute path to the patch
 # %{2} = patch ID
 %__scm_apply_patch(qp:m:)\
-packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} %{_default_patch_flags}
+_packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} %{_default_patch_flags}
 
-%__patch packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} %{_default_patch_flags}
+%__patch _packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} %{_default_patch_flags}
 
 %__scm_setup_git(q)\
 %{__git} init %{-q}\
