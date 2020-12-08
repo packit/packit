@@ -39,7 +39,9 @@ def get_message_from_metadata(metadata: dict, header: Optional[str] = None) -> s
             f"We can save only dictionaries to metadata. Not {metadata}"
         )
 
-    content = yaml.dump(metadata, indent=4) if metadata else ""
+    content = (
+        yaml.dump(metadata, indent=4, default_flow_style=False) if metadata else ""
+    )
     if not header:
         return content
 
