@@ -35,7 +35,7 @@ jobs:
     trigger: pull_request
     metadata:
       targets:
-        - fedora-stable # on rawhide we have problems with the new marshmallow
+        - fedora-all
         - epel-8
 
   - job: copr_build
