@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from contextlib import nullcontext as does_not_raise
+from contextlib import suppress as does_not_raise
 
 from munch import Munch
 import pytest
