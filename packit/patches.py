@@ -141,7 +141,7 @@ class PatchMetadata:
         if metadata:
             logger.debug(
                 f"Commit {commit.hexsha:.8} metadata:\n"
-                f"{yaml.dump(metadata, indent=4)}"
+                f"{yaml.dump(metadata, indent=4, default_flow_style=False)}"
             )
             metadata_defined = True
         else:
