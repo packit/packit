@@ -8,6 +8,7 @@ from typing import Tuple, Optional, Union, List
 
 import git
 from ogr.parsing import parse_git_repo
+from packit.utils.commands import run_command
 
 from packit.exceptions import PackitException
 
@@ -33,7 +34,6 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
         repo = git.repo.Repo(directory)
     else:
         logger.debug(f"Cloning repo {url} -> {directory}")
-        # TODO: optimize cloning: single branch and last n commits?
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
@@ -101,3 +101,47 @@ def get_current_version_command(
         "--match",
         glob_pattern,
     ]
+
+
+def clone_centos_package(
+    package_name: str,
+    dist_git_path: Path,
+    branch: str = "c8s",
+    namespace: str = "rpms",
+    stg: bool = False,
+):
+    """
+    clone selected package from git.[stg.]centos.org
+    """
+    run_command(
+        [
+            "git",
+            "clone",
+            "-b",
+            branch,
+            f"https://git{'.stg' if stg else ''}.centos.org/{namespace}/{package_name}.git",
+            str(dist_git_path),
+        ]
+    )
+
+
+def clone_fedora_package(
+    package_name: str,
+    dist_git_path: Path,
+    branch: str = "c8s",
+    namespace: str = "rpms",
+    stg: bool = False,
+):
+    """
+    clone selected package from Fedora's src.fedoraproject.org
+    """
+    run_command(
+        [
+            "git",
+            "clone",
+            "-b",
+            branch,
+            f"https://src{'.stg' if stg else ''}.fedoraproject.org/{namespace}/{package_name}.git",
+            str(dist_git_path),
+        ]
+    )
