@@ -880,7 +880,7 @@ class PackitAPI:
 
     def create_sourcegit_from_upstream(
         self,
-        upstream_url: str,
+        upstream_url: Optional[str] = None,
         upstream_ref: Optional[str] = None,
         dist_git_path: Optional[Path] = None,
         dist_git_branch: Optional[str] = None,

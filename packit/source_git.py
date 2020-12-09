@@ -11,6 +11,8 @@ import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
 
+from git import GitCommandError
+
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.config import Config
 from packit.config.package_config import PackageConfig
@@ -95,7 +97,7 @@ class SourceGitGenerator:
         self,
         local_project: LocalProject,
         config: Config,
-        upstream_url: str,
+        upstream_url: Optional[str] = None,
         upstream_ref: Optional[str] = None,
         dist_git_path: Optional[Path] = None,
         dist_git_branch: Optional[str] = None,
@@ -120,7 +122,7 @@ class SourceGitGenerator:
         self.tmpdir = tmpdir or Path(tempfile.mkdtemp(prefix="packit-sg-"))
         self._dist_git: Optional[DistGit] = None
         self._primary_archive: Optional[Path] = None
-        self._upstream_ref = upstream_ref
+        self._upstream_ref: Optional[str] = upstream_ref
         self.dist_git_branch = dist_git_branch
 
         if dist_git_path:
@@ -149,16 +151,24 @@ class SourceGitGenerator:
                 self.package_config.downstream_package_name
             )
 
-        if Path(upstream_url).is_dir():
-            self.upstream_repo_path: Path = Path(upstream_url)
-            self.upstream_lp = LocalProject(working_dir=self.upstream_repo_path)
+        if upstream_url:
+            if Path(upstream_url).is_dir():
+                self.upstream_repo_path: Path = Path(upstream_url)
+                self.upstream_lp: LocalProject = LocalProject(
+                    working_dir=self.upstream_repo_path
+                )
+            else:
+                self.upstream_repo_path = self.tmpdir.joinpath(
+                    f"{self.package_config.downstream_package_name}-upstream"
+                )
+                self.upstream_lp = LocalProject(
+                    git_url=upstream_url, working_dir=self.upstream_repo_path
+                )
         else:
-            self.upstream_repo_path = self.tmpdir.joinpath(
-                f"{self.package_config.downstream_package_name}-upstream"
-            )
-            self.upstream_lp = LocalProject(
-                git_url=upstream_url, working_dir=self.upstream_repo_path
-            )
+            # $CWD is the upstream repo and we just need to pick
+            # downstream stuff
+            self.upstream_repo_path = self.local_project.working_dir
+            self.upstream_lp = self.local_project
 
     @property
     def primary_archive(self) -> Path:
@@ -174,12 +184,29 @@ class SourceGitGenerator:
 
     @property
     def upstream_ref(self) -> str:
-        if not self._upstream_ref:
+        if self._upstream_ref is None:
             self._upstream_ref = get_tarball_comment(str(self.primary_archive))
-            logger.info(
-                "upstream base ref was not set, "
-                f"discovered it from the archive: {self._upstream_ref}"
-            )
+            if self._upstream_ref:
+                logger.info(
+                    "upstream base ref was not set, "
+                    f"discovered it from the archive: {self._upstream_ref}"
+                )
+            else:
+                # fallback to HEAD
+                try:
+                    self._upstream_ref = self.local_project.commit_hexsha
+                except ValueError as ex:
+                    raise PackitException(
+                        "Current branch seems to be empty - we cannot get the hash of "
+                        "the top commit. We need to set upstream_ref in packit.yaml to "
+                        "distinct between upstream and downstream changes. "
+                        "Please set --upstream-ref or pull the upstream git history yourself. "
+                        f"Error: {ex}"
+                    )
+                logger.info(
+                    "upstream base ref was not set, "
+                    f"falling back to the HEAD commit: {self._upstream_ref}"
+                )
         return self._upstream_ref
 
     @property
@@ -218,22 +245,24 @@ class SourceGitGenerator:
         """
         Pull the base ref from upstream to our source-git repo
         """
-        if not self.upstream_ref:
-            raise PackitException(
-                "upstream ref is not set, please provide it (it's the upstream git ref"
-                " you want to have as a start for your source-git repo)"
-            )
-        # this fetch operation is pretty intense
+        # fetch operation is pretty intense
         # if upstream_ref is a commit, we need to fetch everything
         # if it's a tag or branch, we can only fetch that ref
         self.local_project.fetch(
-            str(self.upstream_lp.working_dir), "+refs/heads/*:refs/remotes/upstream/*"
+            str(self.upstream_lp.working_dir), "+refs/heads/*:refs/remotes/origin/*"
         )
         self.local_project.fetch(
             str(self.upstream_lp.working_dir),
-            "+refs/remotes/origin/*:refs/remotes/upstream/*",
+            "+refs/remotes/origin/*:refs/remotes/origin/*",
         )
-        self.local_project.reset(f"upstream/{self.upstream_ref}")
+        try:
+            next(self.local_project.get_commits())
+        except GitCommandError as ex:
+            logger.debug(f"Can't get next commit: {ex}")
+            # the repo is empty, rebase would fail
+            self.local_project.reset(self.upstream_ref)
+        else:
+            self.local_project.rebase(self.upstream_ref)
 
     def _run_prep(self):
         """

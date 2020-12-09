@@ -48,17 +48,23 @@ logger = logging.getLogger(__name__)
 )
 @click.option(
     "--upstream-url",
-    help="URL or local path to the upstream project URL; "
-    "this implies creating a source-git repo",
+    help="URL or local path to the upstream project; "
+    "defaults to current git repository",
 )
 @click.option(
     "--upstream-ref",
-    help="Use this upstream git ref as a base for your source-git repo",
+    help="Use this upstream git ref as a base for your source-git repo; "
+    "defaults to current tip of the git repository",
 )
-@click.option("--fedora-package", help="Pick spec file from this Fedora Linux package")
+@click.option(
+    "--fedora-package",
+    help="Pick spec file from this Fedora Linux package; "
+    "implies creating a source-git repo",
+)
 @click.option(
     "--centos-package",
-    help="Pick spec file from this CentOS Linux or CentOS Stream package",
+    help="Pick spec file from this CentOS Linux or CentOS Stream package; "
+    "implies creating a source-git repo",
 )
 @click.option(
     "--dist-git-branch",
@@ -105,7 +111,7 @@ def init(
         # Use default name
         config_path = working_dir / ".packit.yaml"
 
-    if upstream_url:
+    if fedora_package or centos_package or dist_git_branch or dist_git_path:
         # we're doing a source-git repo
         logger.warning(
             "Generating source-git repositories is experimental, "

@@ -24,11 +24,11 @@ import logging
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Union, Iterable
+from typing import Optional, Union, Iterable, Iterator
 
 import git
-from ogr.abstract import GitProject, GitService
 from ogr import GitlabService
+from ogr.abstract import GitProject, GitService
 from ogr.parsing import parse_git_repo
 
 from packit.exceptions import PackitException
@@ -456,7 +456,7 @@ class LocalProject:
             allow_empty=allow_empty, m=message, **other_message_kwargs
         )
 
-    def get_commits(self, ref: str = "HEAD"):
+    def get_commits(self, ref: str = "HEAD") -> Iterator[git.Commit]:
         return self.git_repo.iter_commits(ref)
 
     def fetch(self, remote: str, refspec: Optional[str] = None):
@@ -470,6 +470,9 @@ class LocalProject:
             self.git_repo.git.fetch(remote, refspec)
         else:
             self.git_repo.git.fetch(remote, "--tags")
+
+    def rebase(self, ref: str):
+        self.git_repo.git.rebase(ref)
 
     def reset(self, ref: str):
         """ git reset --hard $ref """

@@ -101,8 +101,11 @@ index 17e9e85..99ef68c 100644
 """
 
 
-def test_create_srcgit_requre(api_instance_source_git, tmp_path: Path):
-    """ use requre to create a source-git out of it """
+def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
+    """
+    use requre to create a source-git out of it in an empty git repo - packit
+    will pull upstream git history
+    """
     # clone dist-git
     pkg = "python-requre"
     dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
@@ -133,6 +136,55 @@ def test_create_srcgit_requre(api_instance_source_git, tmp_path: Path):
         api_instance_source_git.config,
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
+        dist_git_path=dist_git_path,
+    )
+    sgg.create_from_upstream()
+
+    # verify it
+    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
+    srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
+    assert srpm_path.is_file()
+    # requre needs sphinx, so SRPM is fine
+
+
+def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path):
+    """
+    use requre to create a source-git out of it in a branch with upstream git history
+    - this should only layer downstream changes on top
+    """
+    # clone dist-git
+    pkg = "python-requre"
+    dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
+    dist_git_path = tmp_path.joinpath(pkg)
+    source_git_path = tmp_path.joinpath("requre-sg")
+    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+    dg_lp = LocalProject(working_dir=dist_git_path)
+
+    # check out specific ref
+    subprocess.check_call(["git", "reset", "--hard", dist_git_ref], cwd=dist_git_path)
+
+    # add a patch in there
+    spec = Specfile(dist_git_path / f"{pkg}.spec", sources_dir=dist_git_path)
+    patch_name = "hello.patch"
+    patch_path = dist_git_path.joinpath(patch_name)
+    patch_path.write_text(REQURE_PATCH)
+    patch = PatchMetadata(name=patch_name, path=patch_path, present_in_specfile=False)
+    spec.add_patches([patch])
+    dg_lp.stage()
+    dg_lp.commit("add the hello patch")
+    subprocess.check_call(["fedpkg", "prep"], cwd=dist_git_path)
+
+    # create src-git
+    source_git_path.mkdir()
+    subprocess.check_call(
+        ["git", "clone", "https://github.com/packit/requre", str(source_git_path)]
+    )
+    subprocess.check_call(
+        ["git", "checkout", "-B", "source-git-0.4.0", "0.4.0"], cwd=source_git_path
+    )
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
         dist_git_path=dist_git_path,
     )
     sgg.create_from_upstream()
