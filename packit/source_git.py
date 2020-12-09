@@ -279,50 +279,28 @@ class SourceGitGenerator:
         logger.info(
             f"expanding %prep section in {self.dist_git.local_project.working_dir}"
         )
-        user_rpmmacros_path = Path("~/.rpmmacros").expanduser()
-        user_rpmmacros_path_bkp = Path(f"{user_rpmmacros_path}.bkp")
-        restore = False
 
-        if user_rpmmacros_path.is_file():
-            logger.debug(
-                f"{user_rpmmacros_path} exists, backing it up and replacing with ours"
-            )
-            shutil.move(user_rpmmacros_path, user_rpmmacros_path_bkp)
-            restore = True
-        user_rpmmacros_path.write_text(RPM_MACROS_FOR_PREP)
+        rpmbuild_args = [
+            "rpmbuild",
+            "--nodeps",
+            "--define",
+            f"_topdir {str(self.dist_git.local_project.working_dir)}",
+            "-bp",
+            "--define",
+            f"_specdir {str(self.dist_git.absolute_specfile_dir)}",
+            "--define",
+            f"_sourcedir {str(self.dist_git.absolute_source_dir)}",
+        ]
+        rpmbuild_args += RPM_MACROS_FOR_PREP
+        if logger.level <= logging.DEBUG:  # -vv can be super-duper verbose
+            rpmbuild_args.append("-v")
+        rpmbuild_args.append(str(self.dist_git.absolute_specfile_path))
 
-        try:
-            rpmbuild_args = [
-                "rpmbuild",
-                "--nodeps",
-                "--define",
-                f"_topdir {str(self.dist_git.local_project.working_dir)}",
-                "-bp",
-            ]
-            rpmbuild_args += [
-                "--define",
-                f"_specdir {str(self.dist_git.absolute_specfile_dir)}",
-            ]
-            rpmbuild_args += [
-                "--define",
-                f"_sourcedir {str(self.dist_git.absolute_source_dir)}",
-            ]
-            if logger.level <= logging.DEBUG:  # -vv can be super-duper verbose
-                rpmbuild_args.append("-v")
-            rpmbuild_args.append(str(self.dist_git.absolute_specfile_path))
-
-            run_command(
-                rpmbuild_args,
-                cwd=self.dist_git.local_project.working_dir,
-                print_live=True,
-            )
-        finally:
-            user_rpmmacros_path.unlink()
-            if restore:
-                logger.debug(
-                    f"restoring {user_rpmmacros_path_bkp} as {user_rpmmacros_path}"
-                )
-                shutil.move(user_rpmmacros_path_bkp, user_rpmmacros_path)
+        run_command(
+            rpmbuild_args,
+            cwd=self.dist_git.local_project.working_dir,
+            print_live=True,
+        )
 
     def _put_downstream_sources(self):
         """
