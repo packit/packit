@@ -91,3 +91,51 @@ SYNCING_NOTE = (
     "This repository is maintained by packit.\nhttps://packit.dev/\n"
     "The file was generated using packit {packit_version}.\n"
 )
+
+# shell code wrapped in lua as a python constant, what could go wrong?
+# for real now: this horror is being used when creating source-git repos from upstream
+# these macros override RPM default macros for setup and patching so that
+# `rpmbuild -bp` leaves a git repo after invoking %prep
+RPM_MACROS_FOR_PREP = [
+    # we want both 'git init': here and in _packitpatch
+    # if there are no patches, _packitpatch never gets invoked and
+    # this will be invoked b/c of %autosetup
+    "-D",
+    "__scm_setup_patch(q) "
+    "%{__git} init && "
+    "%{__git} add -f . && "
+    '%{__git} commit -q --allow-empty -a -m "%{NAME}-%{VERSION} base"',
+    # %{1} = absolute path to the patch
+    # %{2} = patch ID
+    "-D",
+    "__scm_apply_patch(qp:m:) "
+    "_packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} "
+    "%{_default_patch_flags}",
+    # override patch program with _packitpatch
+    "-D",
+    "__patch _packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} "
+    "--fuzz=%{_default_patch_fuzz} %{_default_patch_flags}",
+    "-D",
+    "__scm_setup_git(q) "
+    "%{__git} init %{-q} && "
+    "%{__git} add -f . && "
+    '%{__git} commit -q --allow-empty -a -m "%{NAME}-%{VERSION} base"',
+    # commit_msg contains commit message of the last commit
+    "-D",
+    "__scm_apply_git_am(qp:m:) "
+    "%{__git} am %{-q} %{-p:-p%{-p*}} && "
+    "patch_name=`basename %{1}` "
+    "commit_msg=`%{__git} log --format=%B -n1` "
+    r'metadata_commit_msg=`printf "patch_name: $patch_name\\n'
+    r'present_in_specfile: true\\nsquash_commits: true"` '
+    '%{__git} commit --amend -m "$commit_msg" -m "$metadata_commit_msg"',
+    # do the same of %autosetup -Sgit
+    # that is, apply packit patch metadata to the patch commit
+    # so packit can create the matching patch file
+    "-D",
+    "__scm_apply_git(qp:m:) "
+    "%{__git} apply --index %{-p:-p%{-p*}} - && "
+    "patch_name=`basename %{1}` "
+    r'metadata_commit_msg=`printf "patch_name: $patch_name\\npresent_in_specfile: true\\n"` '
+    '%{__git} commit %{-q} -m %{-m*} -m "$metadata_commit_msg" --author "%{__scm_author}"',
+]

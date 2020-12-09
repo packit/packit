@@ -99,9 +99,17 @@ class PackitRepositoryBase:
     def specfile(self) -> Specfile:
         if self._specfile is None:
             self._specfile = Specfile(
-                self.absolute_specfile_path, self.absolute_specfile_dir
+                self.absolute_specfile_path, self.absolute_source_dir
             )
         return self._specfile
+
+    @property
+    def absolute_source_dir(self) -> Path:
+        """
+        absolute path to the directory where `Source` files
+        from spec files can be found
+        """
+        return self.absolute_specfile_dir
 
     def create_branch(
         self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
@@ -116,7 +124,6 @@ class PackitRepositoryBase:
         :return the branch which was just created
         """
         # it's not an error if the branch already exists
-        origin = self.local_project.git_repo.remote("origin")
         if branch_name in self.local_project.git_repo.branches:
             logger.debug(
                 f"It seems that branch {branch_name!r} already exists, checking it out."
@@ -126,6 +133,7 @@ class PackitRepositoryBase:
             head = self.local_project.git_repo.create_head(branch_name, commit=base)
 
         if setup_tracking:
+            origin = self.local_project.git_repo.remote("origin")
             if branch_name in origin.refs:
                 remote_ref = origin.refs[branch_name]
             else:
@@ -143,6 +151,7 @@ class PackitRepositoryBase:
 
         :param git_ref: ref to check out
         """
+        logger.info(f"Checking out branch {git_ref}.")
         if git_ref in self.local_project.git_repo.heads:
             head = self.local_project.git_repo.heads[git_ref]
         else:

@@ -34,7 +34,7 @@ from packaging import version
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.config import Config, SyncFilesConfig
+from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.constants import DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
 from packit.exceptions import (
@@ -74,15 +74,12 @@ class Upstream(PackitRepositoryBase):
         self.config = config
         self.package_config = package_config
 
-        self.files_to_sync: Optional[SyncFilesConfig] = self.package_config.synced_files
-
     def __repr__(self):
         return (
             "Upstream("
             f"config='{self.config}', "
             f"package_config='{self.package_config}', "
             f"local_project='{self.local_project}', "
-            f"files_to_sync='{self.files_to_sync}', "
             f"active_branch='{self.active_branch}')"
         )
 
