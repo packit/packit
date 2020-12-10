@@ -6,16 +6,16 @@
 
 ![Packit](design/export/logo-no-borders.png)
 
-----
+---
 
 Packit is a CLI tool that helps developers auto-package upstream projects
-into Fedora operating system.   
+into Fedora operating system.
 
-You can use packit to continously build your upstream project in Fedora.   
+You can use packit to continously build your upstream project in Fedora.
 
 With packit you can create SRPMs, open pull requests in dist-git, submit koji builds and even create bodhi updates, effectively replacing the whole Fedora packaging workflow.
 
-----
+---
 
 ## To start using Packit
 
