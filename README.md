@@ -1,50 +1,33 @@
+# Packit
+
 [![Build Status](https://zuul-ci.org/gated.svg)](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit)
 [![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-![Packit](design/export/logo-extended.png)
+![Packit](design/export/logo-no-borders.png)
 
-## Elevator pitch
+----
 
 Packit is a CLI tool that helps developers auto-package upstream projects
-into Fedora operating system.
-You can use packit to continously build your upstream project in Fedora.
-With packit you can create SRPMs, open pull requests in dist-git, submit koji builds and even
-create bodhi updates, effectively replacing the whole Fedora packaging workflow.
+into Fedora operating system.   
 
-## Plan and current status
+You can use packit to continously build your upstream project in Fedora.   
 
-We are working on two things now:
+With packit you can create SRPMs, open pull requests in dist-git, submit koji builds and even create bodhi updates, effectively replacing the whole Fedora packaging workflow.
 
-1.  Packit as a tool - a standalone CLI tool which you can install from Fedora
-    repositories and use easily.
-2.  Packit service - A service offering built on top of packit tool. Our
-    expectation is that you would add packit service into your Github
-    repository and it would start handling things automatically: opening pull
-    requests on dist-git, building packages, creating updates, ...
+----
 
-For the run-down of the planned work, please see the task-list below.
+## To start using Packit
 
-- [ ] E2E workflow for getting upstream releases into Fedora using packit CLI.
-  - [x] Bring new upstream releases into Fedora rawhide as dist-git pull
-        requests. ([propose-update](https://packit.dev/docs/cli/propose-update/) command included in 0.1.0 release)
-  - [x] Build the change once it's merged. #137
-  - [x] Send new downstream changes back to upstream. (so the spec files are in
-        sync) #145
-  - [x] Packit can create bodhi updates. #139
-  - [x] Ability to propose updates also to stable releases of Fedora.
-  - [x] Create SRPMs from the upstream repository
-  - [x] Build RPMs in COPR and integrate the results into Github.
-- [ ] source-git
-  - [x] Packit can create a SRPM from a source-git repo.
-  - [ ] You can release to rawhide from source-git using packit.
-  - [ ] Packit can create a source-git repository.
-  - [ ] Packit helps developers with their source-git repositories.
-- [x] Packit as a service
-  - [x] Packit reacts to Github webhooks.
-  - [x] Have a Github app for packit.
-    - [x] Github app is on Marketplace.
-  - [x] Packit service is deployed and usable by anyone.
+See our documentation on [packit.dev]
+
+Learn more on [Packit as a service](https://packit.dev/docs/packit-as-a-service/)
+
+Try Packit [Testing Farm](https://packit.dev/docs/testing-farm/)
+
+## To start developing Packit
+
+The [Contributing Guidelines](CONTRIBUTING.md) hosts all information you need to know to contribute to code and documentation, run tests and additionnal configuration.
 
 ## Workflows covered by packit
 
@@ -56,88 +39,17 @@ This list contains workflows covered by packit tool and links to the documentati
 - [Create a SRPM from the current content in the upstream repository.](https://packit.dev/docs/cli/srpm/)
 - [Sync content of the Fedora dist-git repo into the upstream repository.](https://packit.dev/docs/cli/sync-from-downstream/)
 
-## Configuration
-
-Configuration file for packit is described [here](http://packit.dev/docs/configuration/).
-
-TL;DR
-
-```yaml
-specfile_path: packit.spec
-synced_files:
-  - packit.spec
-upstream_package_name: packitos
-downstream_package_name: packit
-```
-
-## User configuration file
-
-User configuration file for packit is described [here](http://packit.dev/docs/configuration/#user-configuration-file).
-
 ## Requirements
 
 Packit is written in python 3 and is supported only on 3.6 and later.
 
-When packit interacts with dist-git, it uses `fedpkg`, we suggest installing it:
-
-```bash
-sudo dnf install -y fedpkg
-```
-
 ## Installation
 
-On Fedora:
+See how to start using packit [here](https://packit.dev/docs/guide/).
 
-```
-$ dnf install packit
-```
+## User configuration file
 
-You can also use our [`packit-releases` Copr repository](https://copr.fedorainfracloud.org/coprs/packit/packit-releases/)
-(contains also released versions of [OGR](https://github.com/packit/ogr)):
-
-```
-$ dnf copr enable packit/packit-releases
-$ dnf install packit
-```
-
-Or from PyPI:
-
-```
-$ pip3 install --user packitos
-```
-
-(packit project on PyPI is NOT this packit project)
-
-You can also install packit from `master` branch, if you are brave enough:
-
-You can use our [`packit-master` Copr repository](https://copr.fedorainfracloud.org/coprs/packit/packit-master/)
-(contains `master` version of [OGR](https://github.com/packit/ogr)):
-
-```
-$ dnf copr enable packit/packit-master
-$ dnf install packit
-```
-
-Or
-
-```
-$ pip3 install --user git+https://github.com/packit/packit.git
-```
-
-### Run from git directly:
-
-You don't need need to install packit to try it out. You can run it directly
-from git (if you have all the dependencies installed):
-
-```
-$ python3 -m packit.cli.packit_base --help
-Usage: packit_base.py [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  -d, --debug
-  -h, --help         Show this message and exit.
-...
-```
+User configuration file for packit is described [here](http://packit.dev/docs/configuration/#user-configuration-file).
 
 ## Who is interested
 
