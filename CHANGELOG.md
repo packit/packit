@@ -1,3 +1,11 @@
+# 0.22.0
+
+- `packit init` introduces the `--upstream-url` option. When specified,
+  `init` also sets up a source-git repository next to creating a configuration file.
+- Don't rewrite macros when setting release and version in spec file.
+- Fix generation of Copr settings URL for groups.
+- Improve processing of the version when proposing a Fedora update.
+
 # 0.21.0
 
 - If the first `Source` tag in a spec file is not indexed, it is always returned,
