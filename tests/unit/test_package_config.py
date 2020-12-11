@@ -1057,7 +1057,7 @@ def test_get_all_files_to_sync(package_config, all_synced_files):
 
 def test_notifications_section():
     pc = PackageConfig.get_from_dict({"specfile_path": "package.spec"})
-    assert pc.notifications.pull_request.successful_build
+    assert not pc.notifications.pull_request.successful_build
 
 
 def test_get_local_specfile_path():
