@@ -174,7 +174,7 @@ class MM23Schema(Schema):
 class PullRequestNotificationsSchema(MM23Schema):
     """ Configuration of commenting on pull requests. """
 
-    successful_build = fields.Bool(default=True)
+    successful_build = fields.Bool(default=False)
 
     @post_load
     def make_instance(self, data, **kwargs):
