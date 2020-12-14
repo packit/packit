@@ -19,7 +19,7 @@ With packit you can create SRPMs, open pull requests in dist-git, submit koji bu
 
 ## To start using Packit
 
-See our documentation on [packit.dev]
+See our [documentation](https://packit.dev/docs/guide/)
 
 Learn more on [Packit as a service](https://packit.dev/docs/packit-as-a-service/)
 
