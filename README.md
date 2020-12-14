@@ -21,10 +21,6 @@ With packit you can create SRPMs, open pull requests in dist-git, submit koji bu
 
 See our [documentation](https://packit.dev/docs/guide/)
 
-Learn more on [Packit as a service](https://packit.dev/docs/packit-as-a-service/)
-
-Try Packit [Testing Farm](https://packit.dev/docs/testing-farm/)
-
 ## To start developing Packit
 
 The [Contributing Guidelines](CONTRIBUTING.md) hosts all information you need to know to contribute to code and documentation, run tests and additionnal configuration.
