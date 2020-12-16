@@ -6,7 +6,7 @@ Release:        1%{?dist}
 Summary:        A tool to make you happy
 
 License:        Beerware
-%if 0%{?fedora} >= 28
+%if 0%{?fedora} >= 28 || 0%{?rhel} >= 8
 Source0:        %{upstream_name}-%{version}.tar.gz
 %endif
 BuildArch:      noarch

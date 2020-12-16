@@ -329,7 +329,7 @@ def test_create_srpm_git_desc_release(upstream_instance):
     assert srpm.exists()
     build_srpm(srpm)
     assert re.match(
-        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.fc\d{2}.src.rpm$", str(srpm)
+        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.(fc\d{2}|el\d).src.rpm$", str(srpm)
     )
 
     changelog = ups.specfile.spec_content.section("%changelog")
