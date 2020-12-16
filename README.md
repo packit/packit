@@ -41,10 +41,6 @@ Packit is written in python 3 and is supported only on 3.6 and later.
 
 ## Installation
 
-```bash
-sudo dnf install -y fedpkg
-```
-
 For complete informations on how to start using packit, please [click here](https://packit.dev/docs/guide/#have-packit-tooling-installed-locally).
 
 ## User configuration file
