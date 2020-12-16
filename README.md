@@ -19,11 +19,7 @@ With packit you can create SRPMs, open pull requests in dist-git, submit koji bu
 
 ## To start using Packit
 
-See our documentation on [packit.dev]
-
-Learn more on [Packit as a service](https://packit.dev/docs/packit-as-a-service/)
-
-Try Packit [Testing Farm](https://packit.dev/docs/testing-farm/)
+See our [documentation](https://packit.dev/docs/guide/)
 
 ## To start developing Packit
 
@@ -45,7 +41,7 @@ Packit is written in python 3 and is supported only on 3.6 and later.
 
 ## Installation
 
-See how to start using packit [here](https://packit.dev/docs/guide/).
+For complete informations on how to start using packit, please [click here](https://packit.dev/docs/guide/#have-packit-tooling-installed-locally).
 
 ## User configuration file
 
@@ -53,20 +49,7 @@ User configuration file for packit is described [here](http://packit.dev/docs/co
 
 ## Who is interested
 
-- Identity team (@pvoborni)
-- Plumbers - Source Git (@msekletar @lnykryn)
-- shells (@siteshwar)
-- python-operator-courier (Ralph Bean)
-- @thrix
-- youtube-dl (Till Mass)
-- [greenboot](https://github.com/LorbusChris/greenboot/) (@LorbusChris)
-- ABRT
-- OSBS (atomic-reactor, osbs-client, koji-containerbuild) (@cverna)
-- CoreOS (starting with rpm-ostree, ignition, and ostree) (@jlebon)
-- cockpit (@martinpitt)
-- iptables (@jsynacek)
-
-For the up to date list of projects which are using packit, [click here](https://github.com/packit/research/blob/master/onboard/status.md).
+For the up to date list of projects which are using packit, [click here](https://dashboard.packit.dev/projects).
 
 ## Logo design
 
