@@ -41,7 +41,7 @@ repos:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
   - repo: https://github.com/packit/pre-commit-hooks
-    rev: 9b169f07b6400eb73ed5e5d6d28eb0d9280031b3
+    rev: a0ee4e8abebda41b5c2420a98d8251296df89e54
     hooks:
       - id: check-rebase
         args:
