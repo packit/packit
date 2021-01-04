@@ -37,7 +37,7 @@ from packit.config.aliases import get_branches
 logger = logging.getLogger(__name__)
 
 
-@click.command("propose-update", context_settings=get_context_settings())
+@click.command("propose-downstream", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
     help="Comma separated list of target branches in dist-git to release into. "
@@ -89,7 +89,7 @@ logger = logging.getLogger(__name__)
 @click.argument("version", required=False)
 @pass_config
 @cover_packit_exception
-def update(
+def downstream(
     config,
     dist_git_path,
     dist_git_branch,
@@ -102,7 +102,7 @@ def update(
     force,
 ):
     """
-    Release current upstream release into Fedora
+    Land a new upstream release in Fedora.
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
