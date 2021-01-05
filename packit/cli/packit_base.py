@@ -34,7 +34,7 @@ from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
-from packit.cli.update import update
+from packit.cli.propose_downstream import downstream
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
@@ -51,6 +51,13 @@ class AliasedGroup(click.Group):
                 fg="yellow",
             )
             return click.Group.get_command(self, ctx, "init")
+        elif cmd_name == "propose-update":
+            click.secho(
+                "WARNING: 'packit propose-update' is deprecated and will be removed. "
+                "Use 'packit propose-downstream' instead.",
+                fg="yellow",
+            )
+            return click.Group.get_command(self, ctx, "propose-downstream")
         else:
             return click.Group.get_command(self, ctx, cmd_name)
 
@@ -104,7 +111,7 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run, remote):
     logger.debug(f"Packit {packit_version} is being used.")
 
 
-packit_base.add_command(update)
+packit_base.add_command(downstream)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
 packit_base.add_command(copr_build)
