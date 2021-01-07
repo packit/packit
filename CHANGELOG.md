@@ -1,3 +1,12 @@
+# 0.23.0
+
+- The `propose-update` has been deprecated in favour of `propose-downstream`
+  to unify the naming between CLI and service. ([@jpopelka](https://github.com/jpopelka), [#1065](https://github.com/packit-service/packit/pull/1065))
+- Our README has been cleaned and simplified. ([@ChainYo](https://github.com/ChainYo), [#1058](https://github.com/packit-service/packit/pull/1058))
+- The :champagne: comment with the installation instructions has been disabled by default. ([@mfocko](https://github.com/mfocko), [#1057](https://github.com/packit-service/packit/pull/1057))
+  - More information can be found in [our documentation](https://packit.dev/docs/configuration/#notifications).
+- The packit is being prepared to be released in RHEL/EPEL. ([@nforro](https://github.com/nforro), [#1055](https://github.com/packit-service/packit/pull/1055))
+
 # 0.22.0
 
 - `packit init` introduces the `--upstream-url` option. When specified,
