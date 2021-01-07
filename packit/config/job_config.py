@@ -35,20 +35,14 @@ logger = getLogger(__name__)
 
 
 class JobType(Enum):
-    """ Type of the job to execute: pick the correct handler """
+    """ Type of the job used by users in the config """
 
     propose_downstream = "propose_downstream"
     build = "build"
     sync_from_downstream = "sync_from_downstream"
     copr_build = "copr_build"
     production_build = "production_build"  # koji build
-    add_to_whitelist = "add_to_whitelist"
     tests = "tests"
-    report_test_results = "report_test_results"
-    pull_request_action = "pull_request_action"
-    copr_build_finished = "copr_build_finished"
-    copr_build_started = "copr_build_started"
-    create_bugzilla = "create_bugzilla"
 
 
 class JobConfigTriggerType(Enum):
