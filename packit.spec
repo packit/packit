@@ -55,6 +55,11 @@ check out packit package for the executable.
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
+%if 0%{?rhel}
+# Remove option unsupported in setuptools < 40.6.0
+sed -i '/\[options\.data_files\]/,+2d' setup.cfg
+%endif
+
 %build
 %py3_build
 
@@ -64,7 +69,12 @@ python3 setup.py --command-packages=click_man.commands man_pages --target %{buil
 
 # FIXME: workaround for setuptools installing it into bash_completion/ instead of bash-completion/
 install -d -m 755 %{buildroot}%{_datadir}/bash-completion/completions
+%if 0%{?rhel}
+# Copy the file directly from builddir
+cp files/bash-completion/packit %{buildroot}%{_datadir}/bash-completion/completions/packit
+%else
 mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_datadir}/bash-completion/completions/packit
+%endif
 
 %files
 %license LICENSE
