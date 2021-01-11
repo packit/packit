@@ -7,7 +7,7 @@ TESTS_RECORDING_PATH=tests_recording
 TESTS_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
 
 
-# To build base image for packit-service-worker
+# To build base image for packit-worker
 image:
 	$(CONTAINER_ENGINE) build --rm -t $(IMAGE) .
 
