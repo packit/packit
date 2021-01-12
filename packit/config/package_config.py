@@ -294,7 +294,7 @@ def get_local_package_config(
 
 
 def get_package_config_from_repo(
-    project: GitProject, ref: str, spec_file_path: Optional[str] = None
+    project: GitProject, ref: str = None, spec_file_path: Optional[str] = None
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
@@ -380,13 +380,11 @@ def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Pa
     return None
 
 
-def get_specfile_path_from_repo(
-    project: GitProject, ref: str = "master"
-) -> Optional[str]:
+def get_specfile_path_from_repo(project: GitProject, ref: str = None) -> Optional[str]:
     """
     Get the path of the spec file in the given repo if present.
     :param project: GitProject
-    :param ref: git ref
+    :param ref: git ref (defaults to repo's default branch)
     :return: str path of the spec file or None
     """
     spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
