@@ -94,7 +94,7 @@ class Status:
                 dg_versions[branch] = self.dg.specfile.get_version()
             except PackitException:
                 logger.debug(f"Can't figure out the version of branch: {branch}.")
-        self.dg.checkout_branch("master")
+        self.dg.checkout_branch()
 
         return dg_versions
 
