@@ -41,8 +41,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--dist-git-branch",
     help="Comma separated list of target branches in dist-git to release into. "
-    "(defaults to 'master')",
-    default="master",
+    "(defaults to repo's default branch)",
 )
 @click.option(
     "--dist-git-path",
@@ -113,8 +112,12 @@ def downstream(
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
-    branches_to_update = get_branches(*dist_git_branch.split(","), default="master")
-    click.echo(f"Syncing from the following branches: {', '.join(branches_to_update)}")
+    default_dg_branch = api.dg.local_project.git_project.default_branch
+    dist_git_branch = dist_git_branch or default_dg_branch
+    branches_to_update = get_branches(*dist_git_branch.split(","))
+    click.echo(
+        f"Proposing update of the following branches: {', '.join(branches_to_update)}"
+    )
 
     for branch in branches_to_update:
         api.sync_release(
