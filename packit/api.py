@@ -315,8 +315,8 @@ class PackitAPI:
 
     def sync_from_downstream(
         self,
-        dist_git_branch: str,
-        upstream_branch: str,
+        dist_git_branch: str = None,
+        upstream_branch: str = None,
         no_pr: bool = False,
         fork: bool = True,
         remote_name: str = None,
@@ -326,19 +326,21 @@ class PackitAPI:
         """
         Sync content of Fedora dist-git repo back to upstream
 
-        :param exclude_files: files that will be excluded from the sync
-        :param dist_git_branch: branch in dist-git
-        :param upstream_branch: upstream branch
+        :param dist_git_branch: branch in dist-git, defaults to repo's default branch
+        :param upstream_branch: upstream branch, defaults to repo's default branch
         :param no_pr: won't create a pull request if set to True
         :param fork: forks the project if set to True
         :param remote_name: name of remote where we should push; if None, try to find a ssh_url
+        :param exclude_files: files that will be excluded from the sync
         :param force: ignore changes in the git index
         """
         exclude_files = exclude_files or []
         if not dist_git_branch:
-            raise PackitException("Dist-git branch is not set.")
+            dist_git_branch = self.dg.local_project.git_project.default_branch
+            logger.info(f"Dist-git branch not set, defaulting to {dist_git_branch!r}.")
         if not upstream_branch:
-            raise PackitException("Upstream branch is not set.")
+            upstream_branch = self.up.local_project.git_project.default_branch
+            logger.info(f"Upstream branch not set, defaulting to {upstream_branch!r}.")
         logger.info(f"Upstream active branch: {self.up.active_branch}")
 
         if not force and self.up.is_dirty():
