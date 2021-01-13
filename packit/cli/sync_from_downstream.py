@@ -102,7 +102,9 @@ def sync_from_downstream(
     api = get_packit_api(config=config, local_project=path_or_url)
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
-    branches_to_sync = get_branches(*dist_git_branch.split(","))
+    branches_to_sync = get_branches(
+        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
+    )
     click.echo(f"Syncing from the following branches: {', '.join(branches_to_sync)}")
 
     default_upstream_branch = api.up.local_project.git_project.default_branch
