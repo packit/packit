@@ -430,7 +430,7 @@ class LocalProject:
         """
         push changes to a remote using provided refspec
 
-        :param refspec: e.g. "master", "HEAD:f30"
+        :param refspec: e.g. "main", "HEAD:f30"
         :param remote_name: name of the remote where we push
         :param force: force push: yes or no?
         :return: a list of git.remote.PushInfo objects - have fun

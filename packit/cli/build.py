@@ -86,7 +86,9 @@ def build(
     )
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
-    branches_to_build = get_branches(*dist_git_branch.split(","))
+    branches_to_build = get_branches(
+        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
+    )
     click.echo(f"Building from the following branches: {', '.join(branches_to_build)}")
 
     for branch in branches_to_build:

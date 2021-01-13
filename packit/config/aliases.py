@@ -55,7 +55,7 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     """
     Expand the aliases to the name(s).
 
-    :param name: name(s) of the system and version (e.g. "fedora-30"/"fedora-stable")
+    :param name: name(s) of the system and version (e.g. "fedora-30" or "fedora-stable")
     :param default: used if no positional argument was given
     :return: set of string containing system name and version
     """
@@ -73,8 +73,8 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
     """
     Expand the aliases to the name(s) and transfer to the build targets.
 
-    :param name: name(s) of the system and version (e.g. "fedora-30"/"fedora-stable")
-            or target name (e.g. "fedora-30-x86_64"/"fedora-stable-x86_64")
+    :param name: name(s) of the system and version (e.g. "fedora-30" or "fedora-stable")
+            or target name (e.g. "fedora-30-x86_64" or "fedora-stable-x86_64")
     :param default: used if no positional argument was given
     :return: set of build targets
     """
@@ -128,7 +128,7 @@ def get_valid_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set:
 
     :param name: name(s) of the system and version or target name. (passed to
                 packit.config.aliases.get_build_targets() function)
-            or target name (e.g. "fedora-30-x86_64"/"fedora-stable-x86_64")
+            or target name (e.g. "fedora-30-x86_64" or "fedora-stable-x86_64")
     :param default: used if no positional argument was given
     :return: set of build targets available also in copr chroots
     """
@@ -140,13 +140,16 @@ def get_valid_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set:
     return set(build_targets) & set(copr_chroots)
 
 
-def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+def get_branches(
+    *name: str, default=DEFAULT_VERSION, default_dg_branch="main"
+) -> Set[str]:
     """
     Expand the aliases to the name(s) and transfer to the dist-git branch name.
 
-    :param name: name(s) of the system and version (e.g. "fedora-stable"/"fedora-30")
-            or branch name (e.g. "f30"/"epel8")
+    :param name: name(s) of the system and version (e.g. "fedora-stable" or "fedora-30")
+            or branch name (e.g. "f30" or "epel8")
     :param default: used if no positional argument was given
+    :param default_dg_branch: repo's default branch
     :return: set of dist-git branch names
     """
     if not (default or name):
@@ -157,7 +160,7 @@ def get_branches(*name: str, default=DEFAULT_VERSION) -> Set[str]:
 
     for sys_and_version in get_versions(*names):
         if "rawhide" in sys_and_version:
-            branches.add("master")
+            branches.add(default_dg_branch)
         elif sys_and_version.startswith("fedora"):
             sys, version = sys_and_version.rsplit("-", maxsplit=1)
             branches.add(f"f{version}")
