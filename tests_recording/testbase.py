@@ -48,7 +48,7 @@ class PackitTest(unittest.TestCase):
         self._config = None
         self._project = None
         self._project_url = "https://github.com/packit/requre"
-        self._project_specfile_path = Path("fedora") / "python-requre.spec"
+        self._project_specfile_path = Path("fedora", "python-requre.spec")
         self._pc = None
         self._dg = None
         self._lp = None
