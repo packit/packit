@@ -167,14 +167,13 @@ class PackitAPI:
                 "Function parameters version and tag are mutually exclusive."
             )
         elif not tag:
+            version = version or self.up.get_version()
             if not version:
-                version = self.up.get_version()
-                if not version:
-                    raise PackitException(
-                        "Could not figure out version of latest upstream release."
-                    )
+                raise PackitException(
+                    "Could not figure out version of latest upstream release."
+                )
             upstream_tag = self.up.convert_version_to_tag(version)
-        elif tag:
+        else:
             upstream_tag = tag
             version = self.up.get_version_from_tag(tag)
 
@@ -248,13 +247,14 @@ class PackitAPI:
                     upstream_tag=upstream_tag,
                 )
                 sync_files(raw_files_to_sync)
-                if upstream_ref:
-                    if self.up.with_action(action=ActionName.create_patches):
-                        patches = self.up.create_patches(
-                            upstream=upstream_ref,
-                            destination=str(self.dg.absolute_specfile_dir),
-                        )
-                        self.dg.specfile_add_patches(patches)
+                if upstream_ref and self.up.with_action(
+                    action=ActionName.create_patches
+                ):
+                    patches = self.up.create_patches(
+                        upstream=upstream_ref,
+                        destination=str(self.dg.absolute_specfile_dir),
+                    )
+                    self.dg.specfile_add_patches(patches)
                 self._handle_sources(
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
