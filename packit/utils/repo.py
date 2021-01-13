@@ -128,20 +128,20 @@ def clone_centos_package(
 def clone_fedora_package(
     package_name: str,
     dist_git_path: Path,
-    branch: str = "c8s",
+    branch: str = None,
     namespace: str = "rpms",
     stg: bool = False,
 ):
     """
     clone selected package from Fedora's src.fedoraproject.org
     """
-    run_command(
-        [
-            "git",
-            "clone",
-            "-b",
-            branch,
-            f"https://src{'.stg' if stg else ''}.fedoraproject.org/{namespace}/{package_name}.git",
-            str(dist_git_path),
-        ]
-    )
+    command = [
+        "git",
+        "clone",
+        f"https://src{'.stg' if stg else ''}.fedoraproject.org/{namespace}/{package_name}.git",
+        str(dist_git_path),
+    ]
+    if branch:
+        command += ["-b", branch]
+
+    run_command(command)

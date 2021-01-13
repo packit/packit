@@ -96,7 +96,7 @@ class DistGit(PackitRepositoryBase):
         config: Config,
         package_config: CommonPackageConfig,
         path: Path,
-        branch,
+        branch: str = None,
     ) -> "DistGit":
         # TODO: use fedpkg for this, or even better, the lp property below
         clone_fedora_package(
