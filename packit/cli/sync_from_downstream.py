@@ -107,11 +107,10 @@ def sync_from_downstream(
     )
     click.echo(f"Syncing from the following branches: {', '.join(branches_to_sync)}")
 
-    default_upstream_branch = api.up.local_project.git_project.default_branch
     for branch in branches_to_sync:
         api.sync_from_downstream(
             dist_git_branch=branch,
-            upstream_branch=upstream_branch or default_upstream_branch,
+            upstream_branch=upstream_branch,
             no_pr=no_pr,
             fork=fork,
             remote_name=remote_to_push,
