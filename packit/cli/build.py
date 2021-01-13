@@ -38,8 +38,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--dist-git-branch",
     help="Comma separated list of target branches in dist-git to release into. "
-    "(defaults to 'master')",
-    default="master",
+    "(defaults to repo's default branch)",
 )
 @click.option(
     "--dist-git-path",
@@ -85,9 +84,10 @@ def build(
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
-
-    branches_to_build = get_branches(*dist_git_branch.split(","), default="master")
-    click.echo(f"Building for the following branches: {', '.join(branches_to_build)}")
+    default_dg_branch = api.dg.local_project.git_project.default_branch
+    dist_git_branch = dist_git_branch or default_dg_branch
+    branches_to_build = get_branches(*dist_git_branch.split(","))
+    click.echo(f"Building from the following branches: {', '.join(branches_to_build)}")
 
     for branch in branches_to_build:
         try:
