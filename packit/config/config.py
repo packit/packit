@@ -144,7 +144,7 @@ class Config:
         # required to avoid cyclical imports
         from packit.schema import UserConfigSchema
 
-        config = UserConfigSchema().load_config(raw_dict)
+        config = UserConfigSchema().load(raw_dict)
         logger.debug(f"Loaded config: {config}")
 
         return config

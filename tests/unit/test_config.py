@@ -250,6 +250,6 @@ def test_user_config_fork_token(tmp_path, recwarn):
 )
 def test_serialize_and_deserialize_job_config(config):
     schema = JobConfigSchema()
-    serialized = schema.dump_config(config)
-    new_config = schema.load_config(serialized)
+    serialized = schema.dump(config)
+    new_config = schema.load(serialized)
     assert new_config == config
