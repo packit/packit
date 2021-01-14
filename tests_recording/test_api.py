@@ -129,7 +129,7 @@ class ProposeUpdate(PackitTest):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release(dist_git_branch="master", force=True)
+        self.api.sync_release(force=True)
 
     def test_comment_in_spec(self):
         """
@@ -144,7 +144,7 @@ class ProposeUpdate(PackitTest):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release(dist_git_branch="master")
+        self.api.sync_release()
 
     def test_changelog_sync(self):
         """
@@ -162,7 +162,7 @@ class ProposeUpdate(PackitTest):
         changed_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()
         assert original_upstream_spec_content != changed_upstream_spec_content
         self.api.package_config.sync_changelog = True
-        self.api.sync_release(dist_git_branch="master", use_local_content=True)
+        self.api.sync_release(use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
 

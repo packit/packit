@@ -137,7 +137,7 @@ class PackitAPI:
 
     def sync_release(
         self,
-        dist_git_branch: str,
+        dist_git_branch: str = None,
         version: str = None,
         tag: str = None,
         use_local_content=False,
@@ -149,7 +149,7 @@ class PackitAPI:
         """
         Update given package in Fedora
 
-        :param dist_git_branch: branch in dist-git
+        :param dist_git_branch: branch in dist-git, defaults to repo's default branch
         :param use_local_content: don't check out anything
         :param version: upstream version to update in Fedora
         :param tag: upstream git tag
@@ -160,7 +160,9 @@ class PackitAPI:
 
         :return created PullRequest if create_pr is True, else None
         """
-
+        dist_git_branch = (
+            dist_git_branch or self.dg.local_project.git_project.default_branch
+        )
         # process version and tag parameters
         if version and tag:
             raise PackitException(
