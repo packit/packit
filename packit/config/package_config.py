@@ -23,7 +23,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional, List, Dict, Union
+from typing import Optional, List, Dict, Union, Set
 
 from ogr.abstract import GitProject
 from yaml import safe_load
@@ -181,6 +181,12 @@ class PackageConfig(CommonPackageConfig):
                 f" if this is not the one you want."
             )
         return projects_list[0]
+
+    def get_propose_downstream_dg_branches_value(self) -> Optional[Set]:
+        for job in self.jobs:
+            if job.type == JobType.propose_downstream:
+                return job.metadata.dist_git_branches
+        return set()
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
