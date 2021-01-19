@@ -126,6 +126,65 @@ def test_project_from_copr_build_job(package_config, project):
     assert config_project_value == project
 
 
+@pytest.mark.parametrize(
+    "package_config, expected",
+    [
+        (
+            PackageConfig(
+                specfile_path="xxx",
+                jobs=[
+                    JobConfig(
+                        type=JobType.propose_downstream,
+                        trigger=JobConfigTriggerType.pull_request,
+                        metadata=JobMetadataConfig(
+                            dist_git_branches=[
+                                "example",
+                            ]
+                        ),
+                    )
+                ],
+            ),
+            {
+                "example",
+            },
+        ),
+        (
+            PackageConfig(
+                specfile_path="xxx",
+                jobs=[
+                    JobConfig(
+                        type=JobType.propose_downstream,
+                        trigger=JobConfigTriggerType.pull_request,
+                        metadata=JobMetadataConfig(
+                            dist_git_branches=[
+                                "example1",
+                                "example2",
+                            ]
+                        ),
+                    )
+                ],
+            ),
+            {"example1", "example2"},
+        ),
+        (
+            PackageConfig(
+                specfile_path="xxx",
+                jobs=[
+                    JobConfig(
+                        type=JobType.propose_downstream,
+                        trigger=JobConfigTriggerType.pull_request,
+                    )
+                ],
+            ),
+            set(),
+        ),
+    ],
+)
+def test_dg_branches_from_propose_downstream_job(package_config, expected):
+    branches = package_config.get_propose_downstream_dg_branches_value()
+    assert branches == expected
+
+
 def test_package_config_equal(job_config_simple):
     assert PackageConfig(
         specfile_path="fedora/package.spec",
