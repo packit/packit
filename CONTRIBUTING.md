@@ -2,7 +2,7 @@
 
 Please follow common guidelines for our projects [here](https://github.com/packit/contributing).
 
-## Reporting Bugs
+## Reporting LadyBugs
 
 - [List of known issues](https://github.com/packit/packit/issues) and in case you need to create a new issue, you can do so [here](https://github.com/packit/packit/issues/new).
 - Getting a version of `packit`:<br>
