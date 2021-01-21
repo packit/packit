@@ -108,7 +108,10 @@ class ProposeUpdate(PackitTest):
         return self._api
 
     def check_version_increase(self):
-        # change specfile little bit to have there some change
+        """Bump version in specfile and tag it with the new version.
+        Might fail if such tag already exists in requre repo.
+        In that case you probably need to bump Version in fedora/python-requre.spec
+        """
         filedata = self.project_specfile_location.read_text()
         # Patch the specfile with new version
         version_increase = "0.0.0"

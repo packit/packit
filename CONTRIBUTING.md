@@ -33,25 +33,23 @@ Tests are stored in [tests](/tests) directory:
 
 Running tests locally:
 
-```
-make check_in_container
-```
+    make check_in_container
 
-To select a subset of the whole test suite, set `TESTS_TARGET`. For example to
-run only the unit tests use:
+To select a subset of the whole test suite, set `TESTS_TARGET`.
+For example to run only the unit tests use:
 
-```
-TESTS_TARGET=tests/unit make check_in_container
-```
+    TESTS_TARGET=tests/unit make check_in_container
 
-As a CI we use [Zuul](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit) with a configuration in [.zuul.yaml](.zuul.yaml).
-If you want to re-run CI/tests in a pull request, just include `recheck` in a comment.
+Tests use pre-generated responses stored in [tests_recording/test_data/](tests_recording/test_data).
+To (re-)generate response file(s):
 
-When running the tests we are using the pregenerated responses that are saved in the ./tests/integration/test_data.
-If you need to generate a new file, just run the tests and provide environment variables for the service.
-The missing file will be automatically generated from the real response. Do not forget to commit the file as well.
+- [add requre to test image](files/local-tests-requirements.yaml)
+- remove files from [tests_recording/test_data/](tests_recording/test_data) you want to re-generate
+- set tokens in your [~/.config/.packit.yaml](https://packit.dev/docs/configuration/#user-configuration-file)
+- `make check_in_container_regenerate_data`
+- commit changed/new files
 
-If you need to regenerate a response file, just remove it and rerun the tests.
+See also [tests_recording/README.md](tests_recording/README.md)
 
 The saving of the responses is turned on by the `RECORD_REQUESTS` environment variable.
 The file, that will be used for storing, can be set by `RESPONSE_FILE` variable
@@ -63,6 +61,9 @@ response_file = self.get_datafile_filename() # name generated from the test name
 PersistentObjectStorage().storage_file = response_file
 ```
 
+As a CI we use [Zuul](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit) with a configuration in [.zuul.yaml](.zuul.yaml).
+If you want to re-run CI/tests in a pull request, just include `recheck` in a PR comment.
+
 ### Additional configuration for development purposes
 
 #### Copr build
@@ -70,17 +71,17 @@ PersistentObjectStorage().storage_file = response_file
 For cases you'd like to trigger copr build in your copr project, you can configure it in
 packit configuration of your chosen package:
 
-```
+```yaml
 jobs:
-- job: copr_build
-  trigger: pull_request
-  metadata:
-    targets:
-      - some_targets
-    # (Optional) Defaults to 'packit'
-    owner: <your_fedora_username>
-    # (Optional) Defaults to <github_namespace>-<github_repo>
-    project: some_project_name
+  - job: copr_build
+    trigger: pull_request
+    metadata:
+      targets:
+        - some_targets
+      # (Optional) Defaults to 'packit'
+      owner: <your_fedora_username>
+      # (Optional) Defaults to <github_namespace>-<github_repo>
+      project: some_project_name
 ```
 
 ---
