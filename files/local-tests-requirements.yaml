@@ -8,6 +8,8 @@
     - include_tasks: tasks/configure-git.yaml
     - include_tasks: tasks/ogr-master.yaml
     - include_tasks: tasks/sandcastle-master.yaml
+    # In case you need to (re-)generate tests_recording/test_data/
+    #- include_tasks: tasks/requre-master.yaml
     - name: Install pre-commit
       dnf:
         name: pre-commit

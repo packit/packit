@@ -20,7 +20,7 @@ repos:
     rev: v3.4.0
     hooks:
       - id: check-added-large-files
-        exclude: tests_requre/test_data/test_api*
+        exclude: tests_recording/test_data/test_api/*
       - id: check-ast
       - id: check-merge-conflict
       - id: check-yaml
