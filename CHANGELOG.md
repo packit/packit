@@ -1,3 +1,9 @@
+# 0.24.0
+
+* Requre documentation updated
+* Rename packit-service-worker to packit-worker
+* [JobType] Remove values not used by users
+
 # 0.23.0
 
 - The `propose-update` has been renamed to `propose-downstream`; `propose-update` is now deprecated
