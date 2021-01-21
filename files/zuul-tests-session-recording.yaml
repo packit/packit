@@ -10,5 +10,8 @@
     - include_tasks: tasks/sandcastle-master.yaml
     - name: Run session recorded tests
       command: make check TESTS_TARGET=tests_recording
+      # uncomment once https://github.com/packit/requre/issues/145 is resolved
+      #      environment:
+      #        REQURE_MODE: read
       args:
         chdir: "{{ project_dir }}"
