@@ -1,3 +1,7 @@
+# 0.24.0
+
+- No user-facing changes done in this release.
+
 # 0.23.0
 
 - The `propose-update` has been renamed to `propose-downstream`; `propose-update` is now deprecated
