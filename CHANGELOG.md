@@ -1,6 +1,6 @@
 # 0.24.0
 
-- We've fixed internal stuff.
+- No user-facing changes done in this release.
 
 # 0.23.0
 
