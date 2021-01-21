@@ -1,8 +1,8 @@
 # 0.24.0
 
-* Requre documentation updated
-* Rename packit-service-worker to packit-worker
-* [JobType] Remove values not used by users
+- Requre documentation updated
+- Rename packit-service-worker to packit-worker
+- [JobType] Remove values not used by users
 
 # 0.23.0
 
