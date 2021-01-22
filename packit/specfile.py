@@ -145,16 +145,6 @@ class Specfile(SpecFile):
         return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
 
     @saves
-    def remove_applied_patches(self) -> None:
-        """
-        In prep section comment out all lines starting with %patch
-        """
-        indexes = [p.index for p in self.get_applied_patches()]
-        if indexes:
-            logger.debug("About to remove all %patch from %prep.")
-            self._process_patches(comment_out=indexes)
-
-    @saves
     def add_patches(self, patch_list: List[PatchMetadata]) -> None:
         """
         Add given patches to the specfile.
