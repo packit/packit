@@ -127,7 +127,7 @@ class TestGetBuildTargets:
         assert err_msg in str(ex.value)
 
     def test_get_build_targets_without_default(self):
-        assert get_build_targets(default=None) == set()
+        assert get_build_targets(default="") == set()
 
     @pytest.mark.parametrize(
         "names,versions",
@@ -148,24 +148,36 @@ class TestGetBuildTargets:
 
 class TestGetBranches:
     @pytest.mark.parametrize(
-        "name,branches",
+        "name,default_dg_branch,branches",
         [
-            ("fedora-29", {"f29"}),
-            ("fedora-rawhide", {"master"}),
-            ("rawhide", {"master"}),
-            ("master", {"master"}),
-            ("f30", {"f30"}),
-            ("fedora-development", {"f33", "master"}),
-            ("fedora-stable", {"f31", "f32"}),
-            ("epel-7", {"epel7"}),
-            ("epel7", {"epel7"}),
-            ("el6", {"el6"}),
-            ("epel-6", {"el6"}),
-            ("fedora-all", {"f31", "f32", "f33", "master"}),
+            ("fedora-29", None, {"f29"}),
+            ("fedora-rawhide", None, {"main"}),
+            ("fedora-rawhide", "main", {"main"}),
+            ("fedora-rawhide", "master", {"master"}),
+            ("rawhide", None, {"main"}),
+            ("rawhide", "main", {"main"}),
+            ("rawhide", "master", {"master"}),
+            ("main", None, {"main"}),
+            ("master", None, {"master"}),
+            ("f30", None, {"f30"}),
+            ("fedora-development", None, {"f33", "main"}),
+            ("fedora-development", "main", {"f33", "main"}),
+            ("fedora-development", "master", {"f33", "master"}),
+            ("fedora-stable", None, {"f31", "f32"}),
+            ("epel-7", None, {"epel7"}),
+            ("epel7", None, {"epel7"}),
+            ("el6", None, {"el6"}),
+            ("epel-6", None, {"el6"}),
+            ("fedora-all", None, {"f31", "f32", "f33", "main"}),
+            ("fedora-all", "main", {"f31", "f32", "f33", "main"}),
+            ("fedora-all", "master", {"f31", "f32", "f33", "master"}),
         ],
     )
-    def test_get_branches(self, name, branches, mock_get_aliases):
-        assert get_branches(name) == branches
+    def test_get_branches(self, name, default_dg_branch, branches, mock_get_aliases):
+        if default_dg_branch:
+            assert get_branches(name, default_dg_branch=default_dg_branch) == branches
+        else:
+            assert get_branches(name) == branches
 
     @pytest.mark.parametrize(
         "names,versions",

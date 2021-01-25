@@ -38,14 +38,13 @@ class CentOSDistGit(DistGit):
         config: Config,
         package_config: CommonPackageConfig,
         path: Path,
-        branch,
+        branch: str = None,
     ) -> "CentOSDistGit":
         clone_centos_package(
             package_config.downstream_package_name, path, branch=branch
         )
         lp = LocalProject(working_dir=path)
-        i = cls(config, package_config, local_project=lp)
-        return i
+        return cls(config, package_config, local_project=lp)
 
     @property
     def absolute_source_dir(self):
@@ -227,19 +226,23 @@ class SourceGitGenerator:
         if self.centos_package:
             self.dist_git_branch = self.dist_git_branch or "c8s"
             return CentOSDistGit.clone(
-                self.config,
-                self.package_config,
-                self.dist_git_path,
+                config=self.config,
+                package_config=self.package_config,
+                path=self.dist_git_path,
                 branch=self.dist_git_branch,
             )
-
-        self.dist_git_branch = self.dist_git_branch or "master"
-        return DistGit.clone(
-            self.config,
-            self.package_config,
-            self.dist_git_path,
-            branch=self.dist_git_branch,
-        )
+        else:
+            # If self.dist_git_branch is None we will checkout/store repo's default branch
+            dg = DistGit.clone(
+                config=self.config,
+                package_config=self.package_config,
+                path=self.dist_git_path,
+                branch=self.dist_git_branch,
+            )
+            self.dist_git_branch = (
+                self.dist_git_branch or dg.local_project.git_project.default_branch
+            )
+            return dg
 
     def _pull_upstream_ref(self):
         """

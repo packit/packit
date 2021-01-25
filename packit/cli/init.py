@@ -69,7 +69,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--dist-git-branch",
     help="Get spec file from this downstream branch, "
-    "for Fedora this defaults to master, for CentOS it's c8s. "
+    "for Fedora this defaults to main, for CentOS it's c8s. "
     "When --dist-git-path is set, the default is the branch which is already checked out.",
 )
 @click.option(

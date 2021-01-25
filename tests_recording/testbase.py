@@ -76,9 +76,9 @@ class PackitTest(unittest.TestCase):
     @property
     def pc(self):
         if not self._pc:
-            self._pc = get_package_config_from_repo(project=self.project, ref="master")
-            if not self._pc:
-                raise RuntimeError("Package config not found.")
+            self._pc = get_package_config_from_repo(project=self.project)
+        if not self._pc:
+            raise RuntimeError("Package config not found.")
         return self._pc
 
     @property

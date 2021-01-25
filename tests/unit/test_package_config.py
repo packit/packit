@@ -945,7 +945,7 @@ def test_get_package_config_from_repo(
     if mock_spec_search:
         gp.should_receive("get_files").and_return(["packit.spec"]).once()
     config = get_package_config_from_repo(
-        project=project, ref="", spec_file_path=spec_path_option
+        project=project, spec_file_path=spec_path_option
     )
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == spec_path
@@ -974,7 +974,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
     gp.should_receive("get_file_content").and_return(content)
     gp.should_receive("get_files").and_return([specfile_path])
     git_project = GitProject(repo="", service=GitService(), namespace="")
-    config = get_package_config_from_repo(project=git_project, ref="")
+    config = get_package_config_from_repo(project=git_project)
     assert isinstance(config, PackageConfig)
     assert Path(config.specfile_path).name == specfile_path
     assert config.create_pr

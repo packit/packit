@@ -38,8 +38,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--dist-git-branch",
     help="Comma separated list of target branches in dist-git to create bodhi update in. "
-    "(defaults to 'master')",
-    default="master",
+    "(defaults to repo's default branch)",
 )
 @click.option(
     "--koji-build",
@@ -75,8 +74,14 @@ def create_update(
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    branches_to_update = get_branches(*dist_git_branch.split(","), default="master")
-    click.echo(f"Syncing from the following branches: {', '.join(branches_to_update)}")
+    default_dg_branch = api.dg.local_project.git_project.default_branch
+    dist_git_branch = dist_git_branch or default_dg_branch
+    branches_to_update = get_branches(
+        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
+    )
+    click.echo(
+        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}"
+    )
 
     for branch in branches_to_update:
         api.create_update(
