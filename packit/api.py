@@ -137,7 +137,7 @@ class PackitAPI:
 
     def sync_release(
         self,
-        dist_git_branch: str,
+        dist_git_branch: str = None,
         version: str = None,
         tag: str = None,
         use_local_content=False,
@@ -149,7 +149,7 @@ class PackitAPI:
         """
         Update given package in Fedora
 
-        :param dist_git_branch: branch in dist-git
+        :param dist_git_branch: branch in dist-git, defaults to repo's default branch
         :param use_local_content: don't check out anything
         :param version: upstream version to update in Fedora
         :param tag: upstream git tag
@@ -160,21 +160,22 @@ class PackitAPI:
 
         :return created PullRequest if create_pr is True, else None
         """
-
+        dist_git_branch = (
+            dist_git_branch or self.dg.local_project.git_project.default_branch
+        )
         # process version and tag parameters
         if version and tag:
             raise PackitException(
                 "Function parameters version and tag are mutually exclusive."
             )
         elif not tag:
+            version = version or self.up.get_version()
             if not version:
-                version = self.up.get_version()
-                if not version:
-                    raise PackitException(
-                        "Could not figure out version of latest upstream release."
-                    )
+                raise PackitException(
+                    "Could not figure out version of latest upstream release."
+                )
             upstream_tag = self.up.convert_version_to_tag(version)
-        elif tag:
+        else:
             upstream_tag = tag
             version = self.up.get_version_from_tag(tag)
 
@@ -248,13 +249,14 @@ class PackitAPI:
                     upstream_tag=upstream_tag,
                 )
                 sync_files(raw_files_to_sync)
-                if upstream_ref:
-                    if self.up.with_action(action=ActionName.create_patches):
-                        patches = self.up.create_patches(
-                            upstream=upstream_ref,
-                            destination=str(self.dg.absolute_specfile_dir),
-                        )
-                        self.dg.specfile_add_patches(patches)
+                if upstream_ref and self.up.with_action(
+                    action=ActionName.create_patches
+                ):
+                    patches = self.up.create_patches(
+                        upstream=upstream_ref,
+                        destination=str(self.dg.absolute_specfile_dir),
+                    )
+                    self.dg.specfile_add_patches(patches)
                 self._handle_sources(
                     add_new_sources=True, force_new_sources=force_new_sources
                 )
@@ -315,8 +317,8 @@ class PackitAPI:
 
     def sync_from_downstream(
         self,
-        dist_git_branch: str,
-        upstream_branch: str,
+        dist_git_branch: str = None,
+        upstream_branch: str = None,
         no_pr: bool = False,
         fork: bool = True,
         remote_name: str = None,
@@ -326,19 +328,21 @@ class PackitAPI:
         """
         Sync content of Fedora dist-git repo back to upstream
 
-        :param exclude_files: files that will be excluded from the sync
-        :param dist_git_branch: branch in dist-git
-        :param upstream_branch: upstream branch
+        :param dist_git_branch: branch in dist-git, defaults to repo's default branch
+        :param upstream_branch: upstream branch, defaults to repo's default branch
         :param no_pr: won't create a pull request if set to True
         :param fork: forks the project if set to True
         :param remote_name: name of remote where we should push; if None, try to find a ssh_url
+        :param exclude_files: files that will be excluded from the sync
         :param force: ignore changes in the git index
         """
         exclude_files = exclude_files or []
         if not dist_git_branch:
-            raise PackitException("Dist-git branch is not set.")
+            dist_git_branch = self.dg.local_project.git_project.default_branch
+            logger.info(f"Dist-git branch not set, defaulting to {dist_git_branch!r}.")
         if not upstream_branch:
-            raise PackitException("Upstream branch is not set.")
+            upstream_branch = self.up.local_project.git_project.default_branch
+            logger.info(f"Upstream branch not set, defaulting to {upstream_branch!r}.")
         logger.info(f"Upstream active branch: {self.up.active_branch}")
 
         if not force and self.up.is_dirty():

@@ -110,7 +110,7 @@ def get_packit_api(
     local_project: LocalProject,
     dist_git_path: str = None,
     load_packit_yaml: bool = True,
-):
+) -> PackitAPI:
     """
     Load the package config, set other options and return the PackitAPI
     """
