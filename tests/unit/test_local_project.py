@@ -219,42 +219,10 @@ def test_clone_project_checkout_branch():
     """Checkout existing branch"""
     project = LocalProject(
         git_repo=flexmock(
-            active_branch="branch",
             working_dir=Path("something"),
-            branches={
-                "other": flexmock(checkout=lambda: None)
-                .should_receive("checkout")
-                .once()
-                .mock()
-            },
+            git=flexmock().should_receive("checkout").with_args("other").once().mock(),
+            commit=lambda: "9e131ba261d8d07fd1c55d8aff6ade085f5cd354",
         ),
-        ref="other",
-        git_url="git@github.com:org/name",
-    )
-    assert project.git_repo
-    assert project.working_dir == Path("something")
-    assert project._ref == "other"
-
-
-def test_clone_project_checkout_new_branch():
-    """Checkout newly created branch"""
-    branches = {}
-    project = LocalProject(
-        git_repo=flexmock(
-            active_branch="branch",
-            working_dir="something",
-            branches=branches,
-            head=flexmock(is_detached=False),
-        )
-        .should_receive("create_head")
-        .with_args("other")
-        .replace_with(
-            lambda x: branches.setdefault(
-                x, flexmock().should_receive("checkout").once().mock()
-            )
-        )
-        .once()
-        .mock(),
         ref="other",
         git_url="git@github.com:org/name",
     )

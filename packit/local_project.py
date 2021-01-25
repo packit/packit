@@ -393,12 +393,10 @@ class LocalProject:
             return self.git_repo.active_branch.name
 
     def checkout_ref(self, ref: str):
-        """ Check out selected ref in the git repo; equiv of git checkout -B ref """
-        logger.info(f"Checking out ref {ref}.")
-        if ref not in self.git_repo.branches:
-            self.git_repo.create_head(self._ref)
-
-        self.git_repo.branches[self._ref].checkout()
+        """ Check out selected ref in the git repo"""
+        logger.info(f"Checking out ref {ref!r}.")
+        self.git_repo.git.checkout(ref)
+        logger.debug(f"Current commit is '{self.git_repo.commit()}'")
 
     def checkout_pr(self, pr_id: Union[str, int]):
         """
