@@ -22,7 +22,6 @@
 
 from subprocess import check_output
 
-import pytest
 from flexmock import flexmock
 from rebasehelper.exceptions import RebaseHelperError
 from requre.cassette import DataTypes
@@ -133,7 +132,6 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release(force=True)
 
-    @pytest.mark.xfail(reason="https://github.com/packit/requre/issues/145")
     def test_comment_in_spec(self):
         """
         change specfile little bit to have there some change, do not increase version
@@ -149,7 +147,6 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release()
 
-    @pytest.mark.xfail(reason="https://github.com/packit/requre/issues/145")
     def test_changelog_sync(self):
         """
         Bump version two times and see if the changelog is synced
@@ -170,7 +167,6 @@ class ProposeUpdate(PackitTest):
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
 
-    @pytest.mark.xfail(reason="https://github.com/packit/requre/issues/145")
     def test_version_change_exception(self):
         """
         check if it raises exception, because sources are not uploaded in distgit
@@ -178,7 +174,6 @@ class ProposeUpdate(PackitTest):
         """
         self.assertRaises(RebaseHelperError, self.check_version_increase)
 
-    @pytest.mark.xfail(reason="https://github.com/packit/requre/issues/145")
     def test_version_change_mocked(self):
         """
         version is not not uploaded, so skip in this test
