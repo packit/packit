@@ -329,7 +329,7 @@ class DistGit(PackitRepositoryBase):
                 )
                 return True
             logger.debug(f"Archive {archive_name!r} not found in the lookaside cache.")
-        except requests.exceptions.BaseHTTPError:
+        except requests.exceptions.HTTPError:
             logger.warning(
                 f"Error trying to find {archive_name!r} in the lookaside cache."
             )
