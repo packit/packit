@@ -6,10 +6,10 @@
   tasks:
     - include_tasks: tasks/rpm-test-deps.yaml
     - include_tasks: tasks/configure-git.yaml
-    - include_tasks: tasks/ogr-master.yaml
+    - include_tasks: tasks/ogr.yaml
     - include_tasks: tasks/sandcastle.yaml
     # In case you need to (re-)generate tests_recording/test_data/
-    #- include_tasks: tasks/requre-master.yaml
+    #- include_tasks: tasks/requre.yaml
     - name: Install pre-commit
       dnf:
         name: pre-commit
