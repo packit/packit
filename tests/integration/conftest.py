@@ -59,6 +59,7 @@ from tests.spellbook import (
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
+SOURCE_GIT_RELEASE_TAG = "0.1.0"
 
 
 @pytest.fixture()
@@ -198,7 +199,7 @@ def sourcegit_and_remote(tmp_path):
 
     sourcegit_dir = tmp_path / "source_git"
     shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
-    initiate_git_repo(sourcegit_dir, tag="0.1.0")
+    initiate_git_repo(sourcegit_dir, tag=SOURCE_GIT_RELEASE_TAG)
     subprocess.check_call(
         ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path], cwd=sourcegit_remote
     )
@@ -282,6 +283,7 @@ def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
         pc.dist_git_clone_path = str(distgit)
+        pc.upstream_ref = SOURCE_GIT_RELEASE_TAG
         up_lp = LocalProject(working_dir=sourcegit)
         api = PackitAPI(c, pc, up_lp)
         return api

@@ -56,7 +56,6 @@ def test_basic_local_update_without_patching(
     api_instance_source_git.sync_release(
         dist_git_branch="master",
         version="0.1.0",
-        use_local_content=True,
         upstream_ref="0.1.0",
     )
 
@@ -79,7 +78,6 @@ def test_basic_local_update_empty_patch(
     api_instance_source_git.sync_release(
         dist_git_branch="master",
         version="0.1.0",
-        use_local_content=True,
         upstream_ref=ref,
     )
 
@@ -121,7 +119,6 @@ def test_basic_local_update_patch_content(
     api_instance_source_git.sync_release(
         dist_git_branch="master",
         version="0.1.0",
-        use_local_content=True,
         upstream_ref="0.1.0",
     )
 
@@ -294,7 +291,6 @@ def test_basic_local_update_patch_content_with_metadata(
     api_instance_source_git.sync_release(
         dist_git_branch="master",
         version="0.1.0",
-        use_local_content=True,
         upstream_ref="0.1.0",
     )
 
@@ -352,7 +348,6 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     api_instance_source_git.sync_release(
         dist_git_branch="master",
         version="0.1.0",
-        use_local_content=True,
         upstream_ref="0.1.0",
     )
 
@@ -398,7 +393,6 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     api_instance_source_git.sync_release(
         dist_git_branch="master",
         version="0.1.0",
-        use_local_content=True,
         upstream_ref="0.1.0",
     )
 
