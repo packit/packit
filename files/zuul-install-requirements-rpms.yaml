@@ -4,4 +4,4 @@
   tasks:
     - include_tasks: tasks/generic-dnf-requirements.yaml
     - include_tasks: tasks/build-rpm-deps.yaml
-    - include_tasks: tasks/requre-master.yaml
+    - include_tasks: tasks/requre.yaml
