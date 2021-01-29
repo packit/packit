@@ -201,8 +201,14 @@ class PackitAPI:
 
         current_up_branch = self.up.active_branch
         try:
-
-            if not use_local_content:
+            # we want to check out the tag only when local_content is not set
+            # and it's an actual upstream repo and not source-git
+            if upstream_ref:
+                logger.info(
+                    "We will not check out the upstream tag "
+                    "because this is a source-git repo."
+                )
+            elif not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
 
             self.dg.check_last_commit()
@@ -281,7 +287,7 @@ class PackitAPI:
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
-            if not use_local_content:
+            if not use_local_content and not upstream_ref:
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")

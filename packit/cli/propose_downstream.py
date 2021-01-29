@@ -52,7 +52,8 @@ logger = logging.getLogger(__name__)
     "--local-content",
     is_flag=True,
     default=False,
-    help="Do not checkout release tag. Use the current state of the repo.",
+    help="Do not checkout release tag. Use the current state of the repo. "
+    "This option is set by default for source-git repos",
 )
 @click.option(
     "--force-new-sources",
