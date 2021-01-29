@@ -1,9 +1,0 @@
----
-- name: pip install packit deps with ogr & requre from master
-  hosts: all
-  tasks:
-    - include_tasks: tasks/generic-dnf-requirements.yaml
-    - include_tasks: tasks/python-compile-deps.yaml
-    - include_tasks: tasks/ogr-master.yaml
-    - include_tasks: tasks/requre-master.yaml
-    - include_tasks: tasks/sandcastle-master.yaml
