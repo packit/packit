@@ -44,6 +44,8 @@ from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils.commands import cwd
+from packit.utils.repo import create_new_repo
+
 from tests.integration.utils import remove_gpg_key_pair
 from tests.spellbook import (
     get_test_config,
@@ -195,9 +197,7 @@ def cwd_upstream(upstream_and_remote) -> Iterator[Path]:
 def sourcegit_and_remote(tmp_path):
     sourcegit_remote = tmp_path / "source_git_remote"
     sourcegit_remote.mkdir()
-    subprocess.check_call(
-        ["git", "init", "--bare", ".", "-b", "main"], cwd=sourcegit_remote
-    )
+    create_new_repo(sourcegit_remote, ["--bare"])
 
     sourcegit_dir = tmp_path / "source_git"
     shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
@@ -214,7 +214,7 @@ def sourcegit_and_remote(tmp_path):
 def downstream_n_distgit(tmp_path):
     d_remote = tmp_path / "downstream_remote"
     d_remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", ".", "-b", "main"], cwd=d_remote)
+    create_new_repo(d_remote, ["--bare"])
 
     d = tmp_path / "dist_git"
     shutil.copytree(DISTGIT, d)
@@ -352,7 +352,7 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
 def upstream_without_config(tmp_path):
     u_remote = tmp_path / "upstream_remote"
     u_remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", ".", "-b", "main"], cwd=u_remote)
+    create_new_repo(u_remote, ["--bare"])
 
     return u_remote
 
