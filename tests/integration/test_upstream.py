@@ -148,7 +148,9 @@ def test_set_spec_macro_source(tmp_path):
     u_remote_path = tmp_path / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
 
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+    subprocess.check_call(
+        ["git", "init", "--bare", ".", "-b", "main"], cwd=u_remote_path
+    )
 
     u = tmp_path / "upstream_git"
     shutil.copytree(UPSTREAM_MACRO_IN_SOURCE, u)
@@ -182,7 +184,9 @@ def test_set_spec_ver_empty_changelog(tmp_path):
     u_remote_path = tmp_path / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
 
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+    subprocess.check_call(
+        ["git", "init", "--bare", ".", "-b", "main"], cwd=u_remote_path
+    )
 
     u = tmp_path / "upstream_git"
     shutil.copytree(EMPTY_CHANGELOG, u)

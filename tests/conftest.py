@@ -50,7 +50,9 @@ def get_git_repo_and_remote(
     """
     u_remote_path = target_dir / f"upstream_remote-{repo_template_path.name}"
     u_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+    subprocess.check_call(
+        ["git", "init", "--bare", ".", "-b", "main"], cwd=u_remote_path
+    )
 
     u = target_dir / f"local_clone-{repo_template_path.name}"
     shutil.copytree(repo_template_path, u)
@@ -83,7 +85,9 @@ def upstream_spec_not_in_root(tmp_path) -> Tuple[Path, Path]:
 def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
     d_remote_path = tmp_path / "dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
+    subprocess.check_call(
+        ["git", "init", "--bare", ".", "-b", "main"], cwd=d_remote_path
+    )
 
     d = tmp_path / "dist_git"
     shutil.copytree(DISTGIT, d)
@@ -104,7 +108,9 @@ def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
 def ogr_distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
     d_remote_path = tmp_path / "ogr_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=d_remote_path)
+    subprocess.check_call(
+        ["git", "init", "--bare", ".", "-b", "main"], cwd=d_remote_path
+    )
 
     d = tmp_path / "ogr_dist_git"
     shutil.copytree(DG_OGR, d)

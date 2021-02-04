@@ -87,7 +87,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
 
     with cwd(upstream_path):
         api.sync_release(
-            dist_git_branch="master",
+            dist_git_branch="main",
             use_local_content=False,
             version="179",
             force_new_sources=False,

@@ -54,7 +54,7 @@ def test_basic_local_update_without_patching(
     mock_spec_download_remote_s(distgit)
 
     api_instance_source_git.sync_release(
-        dist_git_branch="master",
+        dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
     )
@@ -76,7 +76,7 @@ def test_basic_local_update_empty_patch(
     distgit, _ = distgit_and_remote
     mock_spec_download_remote_s(distgit)
     api_instance_source_git.sync_release(
-        dist_git_branch="master",
+        dist_git_branch="main",
         version="0.1.0",
         upstream_ref=ref,
     )
@@ -117,7 +117,7 @@ def test_basic_local_update_patch_content(
     git_add_and_commit(directory=sourcegit, message="make a file sad")
 
     api_instance_source_git.sync_release(
-        dist_git_branch="master",
+        dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
     )
@@ -289,7 +289,7 @@ def test_basic_local_update_patch_content_with_metadata(
     git_add_and_commit(directory=sourcegit, message="make a file sad")
 
     api_instance_source_git.sync_release(
-        dist_git_branch="master",
+        dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
     )
@@ -346,7 +346,7 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     git_add_and_commit(directory=sourcegit, message="make a file sad")
 
     api_instance_source_git.sync_release(
-        dist_git_branch="master",
+        dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
     )
@@ -391,7 +391,7 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     git_add_and_commit(directory=sourcegit, message="make a file sad")
 
     api_instance_source_git.sync_release(
-        dist_git_branch="master",
+        dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
     )
