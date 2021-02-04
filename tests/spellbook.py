@@ -30,6 +30,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 from packit.patches import PatchMetadata
+from packit.utils.repo import create_new_repo
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
@@ -104,7 +105,7 @@ def initiate_git_repo(
 
     if copy_from:
         shutil.copytree(copy_from, directory)
-    subprocess.check_call(["git", "init", ".", "-b", "main"], cwd=directory)
+    create_new_repo(directory, [])
     git_set_user_email(directory)
     for i in range(3):
         subprocess.check_call(
