@@ -40,6 +40,8 @@ from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils.commands import cwd
+from packit.utils.repo import create_new_repo
+
 from tests.spellbook import (
     EMPTY_CHANGELOG,
     UPSTREAM_MACRO_IN_SOURCE,
@@ -148,7 +150,7 @@ def test_set_spec_macro_source(tmp_path):
     u_remote_path = tmp_path / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
 
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+    create_new_repo(u_remote_path, ["--bare"])
 
     u = tmp_path / "upstream_git"
     shutil.copytree(UPSTREAM_MACRO_IN_SOURCE, u)
@@ -182,7 +184,7 @@ def test_set_spec_ver_empty_changelog(tmp_path):
     u_remote_path = tmp_path / "upstream_remote"
     u_remote_path.mkdir(parents=True, exist_ok=True)
 
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=u_remote_path)
+    create_new_repo(u_remote_path, ["--bare"])
 
     u = tmp_path / "upstream_git"
     shutil.copytree(EMPTY_CHANGELOG, u)
