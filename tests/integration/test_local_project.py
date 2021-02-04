@@ -12,7 +12,7 @@ def test_pr_id_and_ref(tmp_path: Path):
     """ p-s passes both ref and pr_id, we want to check out PR """
     remote = tmp_path / "remote"
     remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=remote)
+    subprocess.check_call(["git", "init", "--bare", ".", "-b", "main"], cwd=remote)
     upstream_git = tmp_path / "upstream_git"
     upstream_git.mkdir()
     initiate_git_repo(upstream_git, push=True, upstream_remote=str(remote))
@@ -53,7 +53,7 @@ def test_pr_id_and_ref_gitlab(tmp_path: Path):
     """ p-s passes both ref and pr_id, we want to check out PR """
     remote = tmp_path / "remote"
     remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=remote)
+    subprocess.check_call(["git", "init", "--bare", ".", "-b", "main"], cwd=remote)
     upstream_git = tmp_path / "upstream_git"
     upstream_git.mkdir()
     initiate_git_repo(upstream_git, push=True, upstream_remote=str(remote))

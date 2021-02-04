@@ -40,7 +40,7 @@ def test_basic_build(
         fail=True,
     ).once()
 
-    api.build("master", scratch=True, nowait=True, koji_target="asdqwe")
+    api.build("main", scratch=True, nowait=True, koji_target="asdqwe")
 
 
 def test_build_from_upstream(

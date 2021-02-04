@@ -104,7 +104,8 @@ def initiate_git_repo(
 
     if copy_from:
         shutil.copytree(copy_from, directory)
-    subprocess.check_call(["git", "init", "."], cwd=directory)
+    subprocess.check_call(["git", "init", ".", "-b", "main"], cwd=directory)
+    git_set_user_email(directory)
     for i in range(3):
         subprocess.check_call(
             ["git", "commit", "--allow-empty", "-m", f"empty commit #{i}"],
@@ -114,7 +115,6 @@ def initiate_git_repo(
     directory_path.joinpath("README").write_text("Best upstream project ever!")
     # this file is in the tarball
     directory_path.joinpath("hops").write_text("Cascade\n")
-    git_set_user_email(directory)
     subprocess.check_call(["git", "add", "."], cwd=directory)
     subprocess.check_call(["git", "commit", "-m", "commit with data"], cwd=directory)
     if tag:
@@ -130,7 +130,7 @@ def initiate_git_repo(
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
         subprocess.check_call(
-            ["git", "push", "--tags", "-u", "origin", "master:master"], cwd=directory
+            ["git", "push", "--tags", "-u", "origin", "main:main"], cwd=directory
         )
 
 
@@ -147,7 +147,7 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
     git_add_and_commit(directory=sg, message="switching to amarillo hops")
     hops.write_text("Citra\n")
     git_add_and_commit(directory=sg, message="actually, let's do citra")
-    subprocess.check_call(["git", "checkout", "master"], cwd=sg)
+    subprocess.check_call(["git", "checkout", "main"], cwd=sg)
     subprocess.check_call(
         ["git", "merge", "--no-ff", "-m", "MERGE COMMIT!", "new-changes"],
         cwd=sg,
@@ -157,7 +157,7 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
         subprocess.check_call(["git", "checkout", "-B", "ugly-merge", "0.1.0^"], cwd=sg)
         malt.write_text("Munich\n")
         git_add_and_commit(directory=sg, message="let's start with the Munich malt")
-        subprocess.check_call(["git", "checkout", "master"], cwd=sg)
+        subprocess.check_call(["git", "checkout", "main"], cwd=sg)
         subprocess.check_call(
             ["git", "merge", "--no-ff", "-m", "ugly merge commit", "ugly-merge"],
             cwd=sg,
@@ -167,7 +167,7 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
         )
         malt.write_text("Pilsen\n")
         git_add_and_commit(directory=sg, message="let's try Pilsen instead")
-        subprocess.check_call(["git", "checkout", "master"], cwd=sg)
+        subprocess.check_call(["git", "checkout", "main"], cwd=sg)
         subprocess.check_call(
             [
                 "git",
@@ -180,7 +180,7 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
             ],
             cwd=sg,
         )
-        # M─┐ [master] ugly merge commit #2
+        # M─┐ [main] ugly merge commit #2
         # │ o [ugly-merge2] let's try Pilsen instead
         # M─│─┐ ugly merge commit
         # │ │ o [ugly-merge] let's start with the Munich malt
