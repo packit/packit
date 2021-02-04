@@ -5,6 +5,8 @@ from pathlib import Path
 
 from ogr import GithubService, GitlabService
 from packit.local_project import LocalProject
+from packit.utils.repo import create_new_repo
+
 from tests.spellbook import initiate_git_repo
 
 
@@ -12,7 +14,7 @@ def test_pr_id_and_ref(tmp_path: Path):
     """ p-s passes both ref and pr_id, we want to check out PR """
     remote = tmp_path / "remote"
     remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=remote)
+    create_new_repo(remote, ["--bare"])
     upstream_git = tmp_path / "upstream_git"
     upstream_git.mkdir()
     initiate_git_repo(upstream_git, push=True, upstream_remote=str(remote))
@@ -53,7 +55,7 @@ def test_pr_id_and_ref_gitlab(tmp_path: Path):
     """ p-s passes both ref and pr_id, we want to check out PR """
     remote = tmp_path / "remote"
     remote.mkdir()
-    subprocess.check_call(["git", "init", "--bare", "."], cwd=remote)
+    create_new_repo(remote, ["--bare"])
     upstream_git = tmp_path / "upstream_git"
     upstream_git.mkdir()
     initiate_git_repo(upstream_git, push=True, upstream_remote=str(remote))

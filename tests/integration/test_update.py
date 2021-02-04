@@ -64,7 +64,7 @@ def test_basic_local_update(
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
-    api.sync_release(dist_git_branch="master", version="0.1.0")
+    api.sync_release(dist_git_branch="main", version="0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -85,7 +85,7 @@ def test_basic_local_update_reset_after_exception(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     flexmock(api).should_receive("_handle_sources").and_raise(Exception)
     with pytest.raises(Exception):
-        api.sync_release("master", "0.1.0")
+        api.sync_release("main", "0.1.0")
 
     assert not api.dg.is_dirty()
 
@@ -101,7 +101,7 @@ def test_basic_local_update_copy_upstream_release_description(
     release = flexmock(body="Some description of the upstream release")
     api.up.local_project.git_project = flexmock(get_release=lambda name: release)
     api.package_config.copy_upstream_release_description = True
-    api.sync_release(dist_git_branch="master", version="0.1.0")
+    api.sync_release(dist_git_branch="main", version="0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -128,7 +128,7 @@ def test_basic_local_update_using_distgit(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
 
-    api.sync_release(dist_git_branch="master", version="0.1.0")
+    api.sync_release(dist_git_branch="main", version="0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -157,7 +157,7 @@ def test_basic_local_update_direct_push(
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)
 
-    api.sync_release(dist_git_branch="master", version="0.1.0", create_pr=False)
+    api.sync_release(dist_git_branch="main", version="0.1.0", create_pr=False)
 
     remote_dir_clone = Path(f"{distgit_remote}-clone")
     subprocess.check_call(
@@ -182,7 +182,7 @@ def test_basic_local_update_direct_push_no_dg_spec(
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)
 
-    api.sync_release(dist_git_branch="master", version="0.1.0", create_pr=False)
+    api.sync_release(dist_git_branch="main", version="0.1.0", create_pr=False)
 
     remote_dir_clone = Path(f"{distgit_remote}-clone")
     subprocess.check_call(
@@ -201,7 +201,7 @@ def test_basic_local_update_from_downstream(
     flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
     u, d, api = api_instance
 
-    api.sync_from_downstream("master", "master", True)
+    api.sync_from_downstream("main", "main", True)
 
     new_upstream = api.up.local_project.working_dir
     assert (new_upstream / "beer.spec").is_file()

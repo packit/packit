@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Tuple, Optional, Union, List
 
 import git
+import subprocess
 from ogr.parsing import parse_git_repo
 from packit.utils.commands import run_command
 
@@ -145,3 +146,14 @@ def clone_fedora_package(
         command += ["-b", branch]
 
     run_command(command)
+
+
+def create_new_repo(cwd: Path, switches: List[str]):
+    subprocess.check_call(["git", "init"] + switches + [str(cwd)])
+    # TODO: Replace with -b / --initial-branch in `git init` when possible
+    if "--bare" not in switches:
+        subprocess.check_call(["git", "checkout", "-b", "main"], cwd=cwd)
+    else:
+        subprocess.check_call(
+            ["git", "symbolic-ref", "HEAD", "refs/heads/main"], cwd=cwd
+        )

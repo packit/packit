@@ -10,6 +10,8 @@ from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.source_git import SourceGitGenerator
 from packit.specfile import Specfile
+from packit.utils.repo import create_new_repo
+
 from tests.spellbook import initiate_git_repo
 
 UNIVERSAL_PACKAGE_NAME = "redhat-rpm-config"
@@ -18,7 +20,7 @@ UNIVERSAL_PACKAGE_NAME = "redhat-rpm-config"
 @pytest.mark.parametrize(
     "fedora_package, centos_package, branch",
     (
-        (UNIVERSAL_PACKAGE_NAME, None, "master"),
+        (UNIVERSAL_PACKAGE_NAME, None, "main"),
         (None, UNIVERSAL_PACKAGE_NAME, "c8s"),
     ),
 )
@@ -45,7 +47,7 @@ def test_fetch_upstream_ref(api_instance_source_git, tmp_path: Path):
     s = tmp_path.joinpath("s")
     u = tmp_path.joinpath("u")
     u.mkdir()
-    subprocess.check_call(["git", "init", str(s)])
+    create_new_repo(Path(s), [])
     initiate_git_repo(u, tag=tag)
     sgg = SourceGitGenerator(
         LocalProject(working_dir=s),
@@ -58,14 +60,14 @@ def test_fetch_upstream_ref(api_instance_source_git, tmp_path: Path):
     sgg._pull_upstream_ref()
 
     assert s.joinpath(".git").is_dir()
-    assert sgg.local_project.ref == "master"
+    assert sgg.local_project.ref == "main"
     assert sgg.local_project.working_dir.joinpath("hops").read_text() == "Cascade\n"
     assert sgg.local_project.git_repo.head.commit.message == "commit with data\n"
 
 
 @pytest.mark.parametrize(
     "fedora_package, centos_package, branch",
-    (("fuse-overlayfs", None, "master"),),
+    (("fuse-overlayfs", None, "main"),),
 )
 def test_run_prep(
     api_instance_source_git, fedora_package, centos_package, branch, tmp_path: Path
@@ -130,7 +132,7 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
 
     # create src-git
     source_git_path.mkdir()
-    subprocess.check_call(["git", "init", str(source_git_path)])
+    create_new_repo(Path(source_git_path), [])
     sgg = SourceGitGenerator(
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,

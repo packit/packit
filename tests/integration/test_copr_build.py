@@ -661,7 +661,7 @@ def test_copr_build_no_owner(cwd_upstream_or_distgit, api_instance):
 def test_copr_build_cli_no_project_configured(upstream_and_remote, copr_client_mock):
     upstream, _ = upstream_and_remote
     flexmock(PackitAPI).should_receive("run_copr_build").with_args(
-        project="packit-cli-upstream_remote-upstream_git-master",
+        project="packit-cli-upstream_remote-upstream_git-main",
         chroots=["fedora-rawhide-x86_64"],
         owner=None,
         description=None,
