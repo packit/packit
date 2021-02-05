@@ -327,8 +327,7 @@ class PackitRepositoryBase:
         if not patch_list:
             return
 
-        self.specfile.remove_applied_patches()
-        self.specfile.add_patches(patch_list)
+        self.specfile.set_patches(patch_list)
 
         self.local_project.git_repo.index.write()
 
