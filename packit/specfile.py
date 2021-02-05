@@ -24,13 +24,12 @@ import inspect
 import re
 from logging import getLogger
 from pathlib import Path
-from typing import Union, List, Optional
-
-from rebasehelper.helpers.macro_helper import MacroHelper
-from rebasehelper.specfile import SpecFile, RebaseHelperError, saves
-from rebasehelper.tags import Tag, Tags
+from typing import Union, List, Optional, Dict
 
 from packit.patches import PatchMetadata
+from rebasehelper.helpers.macro_helper import MacroHelper
+from rebasehelper.specfile import SpecFile, RebaseHelperError, saves, PatchObject
+from rebasehelper.tags import Tag, Tags
 
 try:
     from rebasehelper.plugins.plugin_manager import plugin_manager
@@ -145,19 +144,9 @@ class Specfile(SpecFile):
         return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
 
     @saves
-    def remove_applied_patches(self) -> None:
+    def set_patches(self, patch_list: List[PatchMetadata]) -> None:
         """
-        In prep section comment out all lines starting with %patch
-        """
-        indexes = [p.index for p in self.get_applied_patches()]
-        if indexes:
-            logger.debug("About to remove all %patch from %prep.")
-            self._process_patches(comment_out=indexes)
-
-    @saves
-    def add_patches(self, patch_list: List[PatchMetadata]) -> None:
-        """
-        Add given patches to the specfile.
+        Set given patches in the spec file
 
         :param patch_list: [PatchMetadata]
         """
@@ -170,57 +159,62 @@ class Specfile(SpecFile):
             )
             return
 
-        logger.debug(f"About to add patches {patch_list} to specfile.")
-        if [t.name for t in self.tags.filter(name="Patch*")]:
-            logger.debug("This specfile already contains patches.")
+        # we could have generated patches before (via git-format-patch)
+        # so let's reload the spec
+        self.reload()
 
-        source_git_patches: List[PatchMetadata] = []
-        original_patches: List[PatchMetadata] = []
-        for patch in patch_list:
-            if patch.present_in_specfile:
-                original_patches.append(patch)
-            else:
-                source_git_patches.append(patch)
+        applied_patches: Dict[str, PatchObject] = {
+            p.get_patch_name(): p for p in self.get_applied_patches()
+        }
 
-        logger.debug(
-            f"Original patches ({len(original_patches)}) "
-            "has to be already in the spec-file. "
-            "Following patches will not be added to the spec-file:\n - "
-            + "\n - ".join(f"{patch.name} ({patch.path})" for patch in original_patches)
-            + "\n"
+        for patch_metadata in patch_list:
+            if patch_metadata.present_in_specfile:
+                logger.debug(
+                    f"Patch {patch_metadata.name} is already present in the spec file."
+                )
+                continue
+
+            if patch_metadata.name in applied_patches:
+                logger.debug(
+                    f"Patch {patch_metadata.name} is already defined in the spec file."
+                )
+                continue
+
+            self.add_patch(patch_metadata)
+
+    def add_patch(self, patch_metadata: PatchMetadata):
+        """
+        Add provided patch to the spec file:
+         * Set Patch index to be +1 than the highest index of an existing specfile patch
+         * The Patch placement logic works like this:
+           * If there already are patches, then the patch is added after them
+           * If there are no existing patches, the patch is added after Source definitions
+        """
+        try:
+            patch_number_offset = max([x.index for x in self.get_applied_patches()])
+        except ValueError:
+            logger.debug("There are no patches in the spec.")
+            patch_number_offset = 0
+
+        new_content = "\n# " + "\n# ".join(patch_metadata.specfile_comment.split("\n"))
+        new_content += (
+            f"\nPatch{(1 + patch_number_offset):04d}: {patch_metadata.name}\n"
         )
 
-        logger.debug(f"Adding source-git patches ({len(source_git_patches)})")
-        new_content = "\n# PATCHES FROM SOURCE GIT:\n"
-        patch_number_offset = len(original_patches)
-        for i, patch_metadata in enumerate(source_git_patches):
-            new_content += "\n# " + "\n# ".join(
-                patch_metadata.specfile_comment.split("\n")
-            )
-            new_content += (
-                f"\nPatch{(i + 1 + patch_number_offset):04d}: {patch_metadata.name}\n"
-            )
-
-        # valid=None: take any SourceX even if it's disabled
-        last_source_tag_line = [
-            t.line for t in self.tags.filter(name="Source*", valid=None)
-        ][-1]
-        # find the first empty line after last_source_tag
-        for i, line in enumerate(
-            self.spec_content.section("%package")[last_source_tag_line:]
-        ):
-            if line.strip() == "":
-                break
+        if self.get_applied_patches():
+            last_source_tag_line = [
+                t.line for t in self.tags.filter(name="Patch*", valid=None)
+            ][-1]
         else:
-            logger.error("Can't find where to add patches.")
-            return
-        where = last_source_tag_line + i
-        # insert new content below last Source
-        self.spec_content.section("%package")[where:where] = new_content.split("\n")
+            last_source_tag_line = [
+                t.line for t in self.tags.filter(name="Source*", valid=None)
+            ][-1]
 
-        logger.info(
-            f"{len(source_git_patches)}/{len(patch_list)} patches added to {self.path!r}."
-        )
+        where = last_source_tag_line + 1
+
+        logger.debug(f"Adding patch {patch_metadata.name} to the spec file.")
+        self.spec_content.section("%package")[where:where] = new_content.split("\n")
+        self.save()
 
     def get_source(self, source_name: str) -> Optional[Tag]:
         """
