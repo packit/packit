@@ -23,14 +23,7 @@
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union
 
-from marshmallow import Schema, fields, post_load, pre_load, ValidationError, post_dump
-
-try:
-    from marshmallow import __version_info__
-
-    MM3 = int(__version_info__[0]) >= 3
-except ImportError:
-    MM3 = False
+from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
@@ -140,38 +133,7 @@ class NotProcessedField(fields.Field):
             logger.warning(f"{additional_message}")
 
 
-class MM23Schema(Schema):
-    """
-    Schema compatible with Marshmallow v2 and v3.
-    Remove this once we don't need v2 (when F31 is EOL) and inherit directly from Schema.
-    """
-
-    def __init__(self, **kwargs):
-        if MM3:
-            super().__init__(**kwargs)
-        else:  # v2
-            super().__init__(strict=True, **kwargs)
-
-    def load_config(self, *args, **kwargs):
-        if MM3:
-            result = super().load(*args, **kwargs)
-        else:  # v2
-            result = super().load(*args, **kwargs).data
-        return result
-
-    def dump_config(self, *args, **kwargs):
-        if MM3:
-            result = super().dump(*args, **kwargs)
-        else:  # v2
-            result = super().dump(*args, **kwargs).data
-        return result
-
-    @post_dump
-    def remove_none_values(self, data, **kwargs):
-        return {key: value for key, value in data.items() if value is not None}
-
-
-class PullRequestNotificationsSchema(MM23Schema):
+class PullRequestNotificationsSchema(Schema):
     """ Configuration of commenting on pull requests. """
 
     successful_build = fields.Bool(default=False)
@@ -181,7 +143,7 @@ class PullRequestNotificationsSchema(MM23Schema):
         return PullRequestNotificationsConfig(**data)
 
 
-class NotificationsSchema(MM23Schema):
+class NotificationsSchema(Schema):
     """ Configuration of notifications. """
 
     pull_request = fields.Nested(PullRequestNotificationsSchema)
@@ -191,7 +153,7 @@ class NotificationsSchema(MM23Schema):
         return NotificationsConfig(**data)
 
 
-class SyncFilesConfigSchema(MM23Schema):
+class SyncFilesConfigSchema(Schema):
     """
     Schema for processing SyncFilesConfig config data.
     """
@@ -218,20 +180,20 @@ class SyncFilesConfigSchema(MM23Schema):
             return data
 
 
-class JobMetadataSchema(MM23Schema):
+class JobMetadataSchema(Schema):
     """ Jobs metadata. """
 
-    targets = fields.List(fields.String())
+    targets = fields.List(fields.String(), missing=None)
     timeout = fields.Integer()
-    owner = fields.String()
-    project = fields.String()
-    dist_git_branches = fields.List(fields.String())
-    branch = fields.String()
+    owner = fields.String(missing=None)
+    project = fields.String(missing=None)
+    dist_git_branches = fields.List(fields.String(), missing=None)
+    branch = fields.String(missing=None)
     scratch = fields.Boolean()
     list_on_homepage = fields.Boolean()
     preserve_project = fields.Boolean()
-    additional_packages = fields.List(fields.String())
-    additional_repos = fields.List(fields.String())
+    additional_packages = fields.List(fields.String(), missing=None)
+    additional_repos = fields.List(fields.String(), missing=None)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
@@ -253,28 +215,28 @@ class JobMetadataSchema(MM23Schema):
         return JobMetadataConfig(**data)
 
 
-class CommonConfigSchema(MM23Schema):
+class CommonConfigSchema(Schema):
     """
     Common methods for JobConfigSchema and PackageConfigSchema
     """
 
-    config_file_path = fields.String()
-    specfile_path = fields.String()
-    downstream_package_name = fields.String()
+    config_file_path = fields.String(missing=None)
+    specfile_path = fields.String(missing=None)
+    downstream_package_name = fields.String(missing=None)
     upstream_project_url = fields.String(missing=None)
-    upstream_package_name = fields.String()
-    upstream_ref = fields.String()
+    upstream_package_name = fields.String(missing=None)
+    upstream_ref = fields.String(missing=None)
     upstream_tag_template = fields.String()
     archive_root_dir_template = fields.String()
     dist_git_url = NotProcessedField(
         additional_message="it is generated from dist_git_base_url and downstream_package_name",
         load_only=True,
     )
-    dist_git_base_url = fields.String()
-    dist_git_namespace = fields.String()
-    create_tarball_command = fields.List(fields.String())
-    current_version_command = fields.List(fields.String())
-    allowed_gpg_keys = fields.List(fields.String())
+    dist_git_base_url = fields.String(mising=None)
+    dist_git_namespace = fields.String(missing=None)
+    create_tarball_command = fields.List(fields.String(), missing=None)
+    current_version_command = fields.List(fields.String(), missing=None)
+    allowed_gpg_keys = fields.List(fields.String(), missing=None)
     spec_source_id = fields.Method(
         deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
     )
@@ -282,9 +244,19 @@ class CommonConfigSchema(MM23Schema):
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     sync_changelog = fields.Bool(default=False)
-    patch_generation_ignore_paths = fields.List(fields.String())
+    patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
+
+    # For backwards compatibility with packit-service. Should be removed once
+    # packit-service uses dump method.
+    def dump_config(self, *args, **kwargs):
+        return self.dump(*args, **kwargs)
+
+    # For backwards compatibility with packit-service. Should be removed once
+    # packit-service uses load method.
+    def load_config(self, *args, **kwargs):
+        return self.load(*args, **kwargs)
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
@@ -414,7 +386,7 @@ class PackageConfigSchema(CommonConfigSchema):
         return PackageConfig(**data)
 
 
-class UserConfigSchema(MM23Schema):
+class UserConfigSchema(Schema):
     """
     Schema for processing Config config data.
     """
@@ -437,6 +409,16 @@ class UserConfigSchema(MM23Schema):
     command_handler_image_reference = fields.String()
     command_handler_k8s_namespace = fields.String()
     kerberos_realm = fields.String()
+
+    # For backwards compatibility with packit-service. Should be removed once
+    # packit-service uses dump method.
+    def dump_config(self, *args, **kwargs):
+        return self.dump(*args, **kwargs)
+
+    # For backwards compatibility with packit-service. Should be removed once
+    # packit-service uses load method.
+    def load_config(self, *args, **kwargs):
+        return self.load(*args, **kwargs)
 
     @post_load
     def make_instance(self, data, **kwargs):

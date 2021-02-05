@@ -223,7 +223,7 @@ class JobConfig(CommonPackageConfig):
         # required to avoid cyclical imports
         from packit.schema import JobConfigSchema
 
-        config = JobConfigSchema().load_config(raw_dict)
+        config = JobConfigSchema().load(raw_dict)
         logger.debug(f"Loaded config: {config}")
 
         return config

@@ -42,7 +42,7 @@ from packit.config.package_config import (
     PackageConfig,
     get_local_specfile_path,
 )
-from packit.schema import MM3, PackageConfigSchema
+from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
 from tests.unit.test_config import (
@@ -362,7 +362,6 @@ def test_package_config_validate(raw, is_valid):
         PackageConfig.get_from_dict(raw)
 
 
-@pytest.mark.xfail(not MM3, reason="Marshmallow v2 doesn't raise when unknown field")
 @pytest.mark.parametrize(
     "raw,is_valid",
     [
@@ -1117,6 +1116,6 @@ def test_get_local_specfile_path():
 )
 def test_serialize_and_deserialize(package_config):
     schema = PackageConfigSchema()
-    serialized = schema.dump_config(package_config)
-    new_package_config = schema.load_config(serialized)
+    serialized = schema.dump(package_config)
+    new_package_config = schema.load(serialized)
     assert package_config == new_package_config
