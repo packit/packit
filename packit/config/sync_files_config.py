@@ -52,7 +52,7 @@ class SyncFilesConfig:
         # required to avoid cyclical imports
         from packit.schema import SyncFilesConfigSchema
 
-        config = SyncFilesConfigSchema().load_config(raw_dict)
+        config = SyncFilesConfigSchema().load(raw_dict)
         logger.debug(f"Loaded config: {config}")
 
         return config

@@ -156,7 +156,7 @@ class PackageConfig(CommonPackageConfig):
         if not raw_dict.get("downstream_package_name", None) and repo_name:
             raw_dict["downstream_package_name"] = repo_name
 
-        package_config = PackageConfigSchema().load_config(raw_dict)
+        package_config = PackageConfigSchema().load(raw_dict)
 
         logger.debug(package_config)
         return package_config
