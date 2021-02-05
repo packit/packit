@@ -28,8 +28,9 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
-from packit.config.aliases import get_branches
+from packit.config.aliases import get_branches, get_koji_targets
 from packit.exceptions import PackitCommandFailedError, ensure_str
+from packit.exceptions import PackitConfigException
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +85,7 @@ def build(
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
+
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
     branches_to_build = get_branches(
@@ -91,24 +93,36 @@ def build(
     )
     click.echo(f"Building from the following branches: {', '.join(branches_to_build)}")
 
-    for branch in branches_to_build:
-        try:
-            out = api.build(
-                dist_git_branch=branch,
-                scratch=scratch,
-                nowait=nowait,
-                koji_target=koji_target,
-                from_upstream=from_upstream,
-            )
-        except PackitCommandFailedError as ex:
-            logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
-            logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
-            click.echo(
-                f"Build for branch '{branch}' failed. \n"
-                f">>> {logs_stdout}\n"
-                f"!!! {logs_stderr}\n",
-                err=True,
-            )
-        else:
-            if out:
-                print(ensure_str(out))
+    if koji_target is None:
+        targets_to_build = {None}
+    else:
+        targets_to_build = get_koji_targets(koji_target)
+
+    if len(targets_to_build) > 1 and len(branches_to_build) > 1:
+        raise PackitConfigException(
+            "Parameters --dist-git-branch and --koji-target cannot have "
+            "multiple values at the same time."
+        )
+
+    for target in targets_to_build:
+        for branch in branches_to_build:
+            try:
+                out = api.build(
+                    dist_git_branch=branch,
+                    scratch=scratch,
+                    nowait=nowait,
+                    koji_target=target,
+                    from_upstream=from_upstream,
+                )
+            except PackitCommandFailedError as ex:
+                logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
+                logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
+                click.echo(
+                    f"Build for branch '{branch}' failed. \n"
+                    f">>> {logs_stdout}\n"
+                    f"!!! {logs_stderr}\n",
+                    err=True,
+                )
+            else:
+                if out:
+                    print(ensure_str(out))
