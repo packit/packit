@@ -26,7 +26,7 @@ from pkg_resources import get_distribution
 from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
-from packit.cli.propose_downstream import downstream
+from packit.cli.propose_downstream import propose_downstream
 from tests.spellbook import call_packit
 
 
@@ -43,7 +43,7 @@ def test_base_version():
     assert result.output.strip() == get_distribution("packitos").version
 
 
-@pytest.mark.parametrize("cmd_function", [downstream, build, create_update])
+@pytest.mark.parametrize("cmd_function", [propose_downstream, build, create_update])
 def test_base_subcommand_direct(cmd_function):
     result = call_packit(cmd_function, parameters=["--help"])
     assert result.exit_code == 0
