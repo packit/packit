@@ -89,7 +89,7 @@ logger = logging.getLogger(__name__)
 @click.argument("version", required=False)
 @pass_config
 @cover_packit_exception
-def downstream(
+def propose_downstream(
     config,
     dist_git_path,
     dist_git_branch,

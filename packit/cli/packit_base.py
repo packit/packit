@@ -15,7 +15,7 @@ from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
-from packit.cli.propose_downstream import downstream
+from packit.cli.propose_downstream import propose_downstream
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
@@ -92,7 +92,7 @@ def packit_base(ctx, debug, fas_user, keytab, dry_run, remote):
     logger.debug(f"Packit {packit_version} is being used.")
 
 
-packit_base.add_command(downstream)
+packit_base.add_command(propose_downstream)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
 packit_base.add_command(copr_build)
