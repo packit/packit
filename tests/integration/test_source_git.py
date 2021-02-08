@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import os
 import subprocess
 from pathlib import Path
 
@@ -89,7 +89,6 @@ def test_basic_local_update_empty_patch(
     for section in spec.spec_content.sections:
         if "%package" in section[0]:
             spec_package_section += "\n".join(section[1])
-    assert "# PATCHES FROM SOURCE GIT" not in spec_package_section
     assert not spec.patches["applied"]
     assert not spec.patches["not_applied"]
 
@@ -133,8 +132,9 @@ def test_basic_local_update_patch_content(
         in git_diff
     )
 
-    patches = """
-+# PATCHES FROM SOURCE GIT:
+    # make sure the patches are placed after Source0
+    patches = """\
+Source0:        %{upstream_name}-%{version}.tar.gz
 +
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
@@ -149,7 +149,6 @@ def test_basic_local_update_patch_content(
 +Patch0003: 0003-source-change.patch
 +
 +
- %description
 """
     assert patches in git_diff
 
@@ -299,8 +298,6 @@ def test_basic_local_update_patch_content_with_metadata(
     ).decode()
 
     patches = """
-+# PATCHES FROM SOURCE GIT:
-+
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
 +Patch0001: 0001-switching-to-amarillo-hops.patch
@@ -315,7 +312,6 @@ def test_basic_local_update_patch_content_with_metadata(
 +Patch0003: testing.patch
 +
 +
- %description
 """
     assert patches in git_diff
 
@@ -356,8 +352,6 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     ).decode()
 
     patches = """
-+# PATCHES FROM SOURCE GIT:
-+
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
 +Patch0001: 0001-switching-to-amarillo-hops.patch
@@ -367,7 +361,6 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
 +Patch0002: 0002-actually-let-s-do-citra.patch
 +
 +
- %description
 """
     assert patches in git_diff
 
@@ -401,8 +394,6 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     ).decode()
 
     patches = """
-+# PATCHES FROM SOURCE GIT:
-+
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
 +Patch0001: 0001-switching-to-amarillo-hops.patch
@@ -412,7 +403,6 @@ def test_basic_local_update_patch_content_with_downstream_patch(
 +Patch0002: 0002-actually-let-s-do-citra.patch
 +
 +
- %description
 """
     assert patches in git_diff
 
@@ -573,5 +563,54 @@ def test_srpm_empty_patch(
         "citra.patch",
         "saaz.patch",
         "malt.patch",
+    }
+    assert sg_path.joinpath("fedora", "saaz.patch").read_text() == ""
+
+
+@pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
+def test_srpm_patch_non_conseq_indices(
+    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+):
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+
+    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
+        "Patch0: amarillo.patch",
+        "Patch3: citra.patch",
+        "Patch4: saaz.patch",
+        "Patch5: malt.patch",
+    )
+    api_instance_source_git.up.specfile.save()
+
+    create_history_with_empty_commit(sg_path)
+
+    malt = sg_path.joinpath("malt")
+    malt.write_text("Wheat\n")
+    git_add_and_commit(directory=sg_path, message="Weißbier! Summer is coming!")
+
+    with cwd(sg_path):
+        api_instance_source_git.create_srpm(upstream_ref=ref)
+
+    # make sure the patch is inserted AFTER existing patches
+    patches = api_instance_source_git.up.specfile.tags.filter(name="Patch*", valid=None)
+    last_patch = list(patches)[-1]
+    assert last_patch.name == "Patch6"
+    assert (
+        os.path.basename(
+            api_instance_source_git.up.specfile.get_applied_patches()[-1].path
+        )
+        == "0004-Wei-bier-Summer-is-coming.patch"
+    )
+
+    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    assert srpm_path.is_file()
+    build_srpm(srpm_path)
+
+    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+        "amarillo.patch",
+        "citra.patch",
+        "saaz.patch",
+        "malt.patch",
+        "0004-Wei-bier-Summer-is-coming.patch",
     }
     assert sg_path.joinpath("fedora", "saaz.patch").read_text() == ""
