@@ -31,10 +31,27 @@ import click
 
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.config import pass_config, get_context_settings, PackageConfig
 from packit.config.aliases import get_branches
 
 logger = logging.getLogger(__name__)
+
+
+def get_dg_branches(api, dist_git_branch):
+    cmdline_dg_branches = dist_git_branch.split(",") if dist_git_branch else []
+    config_dg_branches = []
+    if isinstance(api.package_config, PackageConfig):
+        config_dg_branches = (
+            api.package_config.get_propose_downstream_dg_branches_value()
+        )
+
+    default_dg_branch = api.dg.local_project.git_project.default_branch
+
+    dg_branches = (
+        cmdline_dg_branches or config_dg_branches or default_dg_branch.split(",")
+    )
+
+    return get_branches(*dg_branches, default_dg_branch=default_dg_branch)
 
 
 @click.command("propose-downstream", context_settings=get_context_settings())
@@ -110,14 +127,13 @@ def propose_downstream(
     VERSION argument is optional, the latest upstream version
     will be used by default
     """
+
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
-    default_dg_branch = api.dg.local_project.git_project.default_branch
-    dist_git_branch = dist_git_branch or default_dg_branch
-    branches_to_update = get_branches(
-        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
-    )
+
+    branches_to_update = get_dg_branches(api, dist_git_branch)
+
     click.echo(
         f"Proposing update of the following branches: {', '.join(branches_to_update)}"
     )
