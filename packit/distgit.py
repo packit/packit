@@ -69,6 +69,10 @@ class DistGit(PackitRepositoryBase):
     # this applies to Fedora and CentOS Stream 9
     spec_dir_name = ""
 
+    # sources are stored in this dir in dist-git
+    # this applies to Fedora and CentOS Stream 9
+    source_dir_name = ""
+
     def __init__(
         self,
         config: Config,
@@ -170,6 +174,11 @@ class DistGit(PackitRepositoryBase):
             / self.spec_dir_name
             / f"{self.package_config.downstream_package_name}.spec"
         )
+
+    @property
+    def absolute_source_dir(self) -> Path:
+        """ absoulute path to directory with spec-file sources """
+        return self.local_project.working_dir / self.source_dir_name
 
     @property
     def absolute_specfile_path(self) -> Path:
@@ -294,7 +303,7 @@ class DistGit(PackitRepositoryBase):
         """
         with cwd(self.local_project.working_dir):
             self.specfile.download_remote_sources()
-        archive = self.absolute_specfile_dir / self.upstream_archive_name
+        archive = self.absolute_source_dir / self.upstream_archive_name
         if not archive.exists():
             raise PackitException(
                 "Upstream archive was not downloaded, something is wrong."
