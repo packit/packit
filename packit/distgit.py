@@ -65,6 +65,10 @@ class DistGit(PackitRepositoryBase):
     # we store downstream content in source-git in this subdir
     source_git_downstream_suffix = "fedora"
 
+    # spec files are stored in this dir in dist-git
+    # this applies to Fedora and CentOS Stream 9
+    spec_dir_name = ""
+
     def __init__(
         self,
         config: Config,
@@ -163,6 +167,7 @@ class DistGit(PackitRepositoryBase):
         """ provide the path, don't check it """
         return (
             self.local_project.working_dir
+            / self.spec_dir_name
             / f"{self.package_config.downstream_package_name}.spec"
         )
 
