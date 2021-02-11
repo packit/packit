@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class CentOSDistGit(DistGit):
-    """ Fedora and CentOS dist-git differ """
+    """ CentOS dist-git layout implementation """
 
-    # we store downstream content in source-git in this subdir
-    source_git_downstream_suffix = "SPECS"
+    # spec files are stored in this dir in dist-git
+    spec_dir_name = "SPECS"
 
     @classmethod
     def clone(
