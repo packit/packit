@@ -62,8 +62,9 @@ rm -rf %{pypi_name}.egg-info
 %py3_install
 python3 setup.py --command-packages=click_man.commands man_pages --target %{buildroot}%{_mandir}/man1
 
+# FIXME: workaround for setuptools installing it into bash_completion/ instead of bash-completion/
 install -d -m 755 %{buildroot}%{_datadir}/bash-completion/completions
-cp files/bash-completion/packit %{buildroot}%{_datadir}/bash-completion/completions/packit
+mv %{buildroot}%{_datadir}/bash_completion/completions/packit %{buildroot}%{_datadir}/bash-completion/completions/packit
 
 %files
 %license LICENSE
