@@ -1,3 +1,12 @@
+# 0.25.0
+
+- `propose-update` command now respects requested dist-git branches. ([#1094](https://github.com/packit/packit/pull/1094))
+- Improve the way how patches are added to spec file. ([#1100](https://github.com/packit/packit/pull/1100))
+- Implement koji-target aliases for build command. ([#1052](https://github.com/packit/packit/pull/1052))
+- Don't check out release tag for source-git repos. ([#1093](https://github.com/packit/packit/pull/1093))
+- Don't behave as if 'ref' would be always a branch. ([#1089](https://github.com/packit/packit/pull/1089))
+- Allow upstream/downstream default branch other than master. ([#1074](https://github.com/packit/packit/pull/1074))
+
 # 0.24.0
 
 - No user-facing changes done in this release.
