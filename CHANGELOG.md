@@ -5,7 +5,7 @@
 - Implement koji-target aliases for build command. ([#1052](https://github.com/packit/packit/pull/1052))
 - `propose-downstream` on source-git repositories now always uses `--local-content`.  ([#1093](https://github.com/packit/packit/pull/1093))
 - Don't behave as if 'ref' would be always a branch. ([#1089](https://github.com/packit/packit/pull/1089))
-- Allow upstream/downstream default branch other than master. ([#1074](https://github.com/packit/packit/pull/1074))
+- Detect a name of the default branch of a repository instead of assuming it to be `called master`.  ([#1074](https://github.com/packit/packit/pull/1074))
 
 # 0.24.0
 
