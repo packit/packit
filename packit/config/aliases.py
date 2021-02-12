@@ -234,7 +234,6 @@ def get_aliases() -> Dict[str, List[str]]:
 
         if release.id_prefix == "FEDORA" and release.name != "ELN":
             name = release.long_name.lower().replace(" ", "-")
-            aliases["fedora-all"].append(name)
             if release.state == "current":
                 aliases["fedora-stable"].append(name)
             elif release.state == "pending":
@@ -244,7 +243,12 @@ def get_aliases() -> Dict[str, List[str]]:
             name = release.name.lower()
             aliases["epel-all"].append(name)
 
-    aliases["fedora-all"].append("fedora-rawhide")
-    aliases["fedora-development"].append("fedora-rawhide")
+    if aliases.get("fedora-development"):
+        aliases["fedora-development"].sort(key=lambda x: int(x.rsplit("-")[-1]))
+        # The Fedora with the highest version is "rawhide", but
+        # Bodhi always uses release names, and has no concept of "rawhide".
+        aliases["fedora-development"][-1] = "fedora-rawhide"
+
+    aliases["fedora-all"] = aliases["fedora-development"] + aliases["fedora-stable"]
 
     return aliases
