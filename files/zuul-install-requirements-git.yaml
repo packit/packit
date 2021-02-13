@@ -1,9 +1,9 @@
 ---
-- name: pip install packit deps with ogr & requre
+- name: Install ogr & sandcastle & requre from git
   hosts: all
   tasks:
     - include_tasks: tasks/generic-dnf-requirements.yaml
     - include_tasks: tasks/python-compile-deps.yaml
     - include_tasks: tasks/ogr.yaml
-    - include_tasks: tasks/requre.yaml
     - include_tasks: tasks/sandcastle.yaml
+    - include_tasks: tasks/requre.yaml
