@@ -1,7 +1,10 @@
 ---
-- name: Install RPM dependencies for packit.
+- name: Install RPM dependencies for packit
   hosts: all
   tasks:
     - include_tasks: tasks/generic-dnf-requirements.yaml
     - include_tasks: tasks/build-rpm-deps.yaml
-    - include_tasks: tasks/requre.yaml
+    - name: Install python3-requre rpm
+      dnf:
+        name: python3-requre
+      become: true
