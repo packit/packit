@@ -21,7 +21,7 @@ git.remote:
   fetch:
     all:
       metadata:
-        latency: 2.6227879524230957
+        latency: 2.3421926498413086
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -36,7 +36,7 @@ git.remote:
       - flags: 4
         note: ''
         old_commit: null
-        remote_ref_path: 'master           '
+        remote_ref_path: 'rawhide          '
       - flags: 4
         note: ''
         old_commit: null
@@ -340,7 +340,23 @@ git.remote:
       - flags: 4
         note: ''
         old_commit: null
+        remote_ref_path: refs/pull/78/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/79/head
+      - flags: 4
+        note: ''
+        old_commit: null
         remote_ref_path: 'refs/pull/8/head '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/80/head
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: refs/pull/81/head
       - flags: 4
         note: ''
         old_commit: null
@@ -361,11 +377,19 @@ git.remote:
         note: ''
         old_commit: null
         remote_ref_path: 'f33              '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'f34              '
+      - flags: 4
+        note: ''
+        old_commit: null
+        remote_ref_path: 'main             '
 git.repo.base:
   clone_from:
     all:
       metadata:
-        latency: 1.9144947528839111
+        latency: 2.6761088371276855
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -388,7 +412,7 @@ packit.fedpkg:
   clone:
     all:
       metadata:
-        latency: 3.2345097064971924
+        latency: 2.99983286857605
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -407,7 +431,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.29145240783691406
+            latency: 0.3776853084564209
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -441,7 +465,7 @@ requests.sessions:
               contents_url: https://api.github.com/repos/packit/requre/contents/{+path}
               contributors_url: https://api.github.com/repos/packit/requre/contributors
               created_at: '2019-09-11T09:49:47Z'
-              default_branch: master
+              default_branch: main
               delete_branch_on_merge: false
               deployments_url: https://api.github.com/repos/packit/requre/deployments
               description: Library for testing python code what allows store output
@@ -533,9 +557,9 @@ requests.sessions:
                 push: true
               private: false
               pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
-              pushed_at: '2021-01-20T12:24:44Z'
+              pushed_at: '2021-02-12T11:26:20Z'
               releases_url: https://api.github.com/repos/packit/requre/releases{/id}
-              size: 545
+              size: 569
               ssh_url: git@github.com:packit/requre.git
               stargazers_count: 5
               stargazers_url: https://api.github.com/repos/packit/requre/stargazers
@@ -548,12 +572,12 @@ requests.sessions:
               teams_url: https://api.github.com/repos/packit/requre/teams
               temp_clone_token: ''
               trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
-              updated_at: '2021-01-20T12:24:47Z'
+              updated_at: '2021-02-10T11:35:20Z'
               url: https://api.github.com/repos/packit/requre
               watchers: 5
               watchers_count: 5
             _next: null
-            elapsed: 0.290481
+            elapsed: 0.376952
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -565,36 +589,35 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Mon, 25 Jan 2021 10:39:20 GMT
-              ETag: W/"c9586434624d0827a5de944cee9c2cbcde1892dffa7beb126999c6aad58fc1fe"
+              Date: Mon, 15 Feb 2021 14:19:43 GMT
+              ETag: W/"63ce4509f3acecb77685033a10f70439d35b9ed26e403dd940b95b36b5e7a6b9"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
-              Status: 200 OK
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: repo
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 80C9:23BA:1C18485:1EE6EA2:600E9FD8
+              X-GitHub-Request-Id: 4F43:F072:3BEC0E:433BFF:602A82FF
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4984'
-              X-RateLimit-Reset: '1611574082'
+              X-RateLimit-Remaining: '4966'
+              X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
-              last-modified: Wed, 20 Jan 2021 12:24:47 GMT
-              x-ratelimit-used: '16'
+              last-modified: Wed, 10 Feb 2021 11:35:20 GMT
+              x-ratelimit-used: '34'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
-      https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=master:
+      https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=main:
         all:
           metadata:
-            latency: 0.1890418529510498
+            latency: 0.202955961227417
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -613,9 +636,9 @@ requests.sessions:
             __store_indicator: 2
             _content:
               _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
-                html: https://github.com/packit/requre/blob/master/.packit.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
+                git: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+                html: https://github.com/packit/requre/blob/main/.packit.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
               content: 'LS0tCnNwZWNmaWxlX3BhdGg6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMK
 
                 c3luY2VkX2ZpbGVzOgogIC0gZmVkb3JhL2NoYW5nZWxvZwojIGh0dHBzOi8v
@@ -668,31 +691,31 @@ requests.sessions:
 
                 CiAgICB0cmlnZ2VyOiBjb21taXQKICAgIG1ldGFkYXRhOgogICAgICBicmFu
 
-                Y2g6IG1hc3RlcgogICAgICB0YXJnZXRzOgogICAgICAgIC0gZmVkb3JhLWFs
+                Y2g6IG1haW4KICAgICAgdGFyZ2V0czoKICAgICAgICAtIGZlZG9yYS1hbGwK
 
-                bAogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAgICAgIHByZXNlcnZl
+                ICAgICAgbGlzdF9vbl9ob21lcGFnZTogVHJ1ZQogICAgICBwcmVzZXJ2ZV9w
 
-                X3Byb2plY3Q6IFRydWUKICAtIGpvYjogY29wcl9idWlsZAogICAgdHJpZ2dl
+                cm9qZWN0OiBUcnVlCiAgLSBqb2I6IGNvcHJfYnVpbGQKICAgIHRyaWdnZXI6
 
-                cjogcmVsZWFzZQogICAgbWV0YWRhdGE6CiAgICAgIHRhcmdldHM6CiAgICAg
+                IHJlbGVhc2UKICAgIG1ldGFkYXRhOgogICAgICB0YXJnZXRzOgogICAgICAg
 
-                ICAgLSBmZWRvcmEtYWxsCiAgICAgIGxpc3Rfb25faG9tZXBhZ2U6IFRydWUK
+                IC0gZmVkb3JhLWFsbAogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAg
 
-                ICAgICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQo=
+                ICAgIHByZXNlcnZlX3Byb2plY3Q6IFRydWUK
 
                 '
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.packit.yaml
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
               encoding: base64
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
-              html_url: https://github.com/packit/requre/blob/master/.packit.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              html_url: https://github.com/packit/requre/blob/main/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: d115b8280494d3c9b288c0a739d1c8fa58da1e3b
-              size: 1424
+              sha: e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              size: 1422
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             _next: null
-            elapsed: 0.188842
+            elapsed: 0.202222
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -704,36 +727,35 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Mon, 25 Jan 2021 10:39:22 GMT
-              ETag: W/"d115b8280494d3c9b288c0a739d1c8fa58da1e3b"
+              Date: Mon, 15 Feb 2021 14:19:46 GMT
+              ETag: W/"e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
-              Status: 200 OK
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 80C9:23BA:1C186EA:1EE6ED1:600E9FD8
+              X-GitHub-Request-Id: 4F43:F072:3BEC40:433C03:602A82FF
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4983'
-              X-RateLimit-Reset: '1611574082'
+              X-RateLimit-Remaining: '4965'
+              X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
-              last-modified: Wed, 20 Jan 2021 12:24:43 GMT
-              x-ratelimit-used: '17'
+              last-modified: Wed, 10 Feb 2021 11:35:18 GMT
+              x-ratelimit-used: '35'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
-      https://api.github.com:443/repos/packit/requre/contents/?ref=master:
+      https://api.github.com:443/repos/packit/requre/contents/?ref=main:
         all:
           metadata:
-            latency: 0.22488856315612793
+            latency: 0.1888895034790039
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -753,279 +775,279 @@ requests.sessions:
             _content:
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/trees/e8a93ef92b25bfafaffa0c5438c54c569cfe0206
-                html: https://github.com/packit/requre/tree/master/.github
-                self: https://api.github.com/repos/packit/requre/contents/.github?ref=master
+                html: https://github.com/packit/requre/tree/main/.github
+                self: https://api.github.com/repos/packit/requre/contents/.github?ref=main
               download_url: null
               git_url: https://api.github.com/repos/packit/requre/git/trees/e8a93ef92b25bfafaffa0c5438c54c569cfe0206
-              html_url: https://github.com/packit/requre/tree/master/.github
+              html_url: https://github.com/packit/requre/tree/main/.github
               name: .github
               path: .github
               sha: e8a93ef92b25bfafaffa0c5438c54c569cfe0206
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/.github?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.github?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/894a44cc066a027465cd26d634948d56d13af9af
-                html: https://github.com/packit/requre/blob/master/.gitignore
-                self: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.gitignore
+                html: https://github.com/packit/requre/blob/main/.gitignore
+                self: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.gitignore
               git_url: https://api.github.com/repos/packit/requre/git/blobs/894a44cc066a027465cd26d634948d56d13af9af
-              html_url: https://github.com/packit/requre/blob/master/.gitignore
+              html_url: https://github.com/packit/requre/blob/main/.gitignore
               name: .gitignore
               path: .gitignore
               sha: 894a44cc066a027465cd26d634948d56d13af9af
               size: 1203
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
-                html: https://github.com/packit/requre/blob/master/.packit.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.packit.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/d115b8280494d3c9b288c0a739d1c8fa58da1e3b
-              html_url: https://github.com/packit/requre/blob/master/.packit.yaml
+                git: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+                html: https://github.com/packit/requre/blob/main/.packit.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              html_url: https://github.com/packit/requre/blob/main/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: d115b8280494d3c9b288c0a739d1c8fa58da1e3b
-              size: 1424
+              sha: e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              size: 1422
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/8d11abbce541397c715b91d6014303cf16a09459
-                html: https://github.com/packit/requre/blob/master/.pre-commit-config.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.pre-commit-config.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/8d11abbce541397c715b91d6014303cf16a09459
-              html_url: https://github.com/packit/requre/blob/master/.pre-commit-config.yaml
+                git: https://api.github.com/repos/packit/requre/git/blobs/60764b4136523dcd415560795e04369755075b89
+                html: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-config.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/60764b4136523dcd415560795e04369755075b89
+              html_url: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
               name: .pre-commit-config.yaml
               path: .pre-commit-config.yaml
-              sha: 8d11abbce541397c715b91d6014303cf16a09459
+              sha: 60764b4136523dcd415560795e04369755075b89
               size: 1224
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
-                html: https://github.com/packit/requre/blob/master/.pre-commit-hooks.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.pre-commit-hooks.yaml
+                html: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-hooks.yaml
               git_url: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
-              html_url: https://github.com/packit/requre/blob/master/.pre-commit-hooks.yaml
+              html_url: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
               name: .pre-commit-hooks.yaml
               path: .pre-commit-hooks.yaml
               sha: c84199ac2bf81c70e53aaf6701997b0d475e80ff
               size: 1608
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
-                html: https://github.com/packit/requre/blob/master/.zuul.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.zuul.yaml
+                html: https://github.com/packit/requre/blob/main/.zuul.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.zuul.yaml
               git_url: https://api.github.com/repos/packit/requre/git/blobs/335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
-              html_url: https://github.com/packit/requre/blob/master/.zuul.yaml
+              html_url: https://github.com/packit/requre/blob/main/.zuul.yaml
               name: .zuul.yaml
               path: .zuul.yaml
               sha: 335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
               size: 593
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
-                html: https://github.com/packit/requre/blob/master/CONTRIBUTING.md
-                self: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/CONTRIBUTING.md
+                html: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
+                self: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/CONTRIBUTING.md
               git_url: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
-              html_url: https://github.com/packit/requre/blob/master/CONTRIBUTING.md
+              html_url: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
               name: CONTRIBUTING.md
               path: CONTRIBUTING.md
               sha: 2b19dfb12887fa5a9e3f1595912cf589231ea39a
               size: 159
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/8201f992154a14a7fcd95a5937d5c40c610990c9
-                html: https://github.com/packit/requre/blob/master/DCO
-                self: https://api.github.com/repos/packit/requre/contents/DCO?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/DCO
+                html: https://github.com/packit/requre/blob/main/DCO
+                self: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/DCO
               git_url: https://api.github.com/repos/packit/requre/git/blobs/8201f992154a14a7fcd95a5937d5c40c610990c9
-              html_url: https://github.com/packit/requre/blob/master/DCO
+              html_url: https://github.com/packit/requre/blob/main/DCO
               name: DCO
               path: DCO
               sha: 8201f992154a14a7fcd95a5937d5c40c610990c9
               size: 1421
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/DCO?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
-                html: https://github.com/packit/requre/blob/master/Dockerfile.tests
-                self: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/Dockerfile.tests
+                html: https://github.com/packit/requre/blob/main/Dockerfile.tests
+                self: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/Dockerfile.tests
               git_url: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
-              html_url: https://github.com/packit/requre/blob/master/Dockerfile.tests
+              html_url: https://github.com/packit/requre/blob/main/Dockerfile.tests
               name: Dockerfile.tests
               path: Dockerfile.tests
               sha: 3e3a7a6fc84303c6f3ec70f204430899eaec0a40
               size: 206
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/5cb23a21a2a206185ec1b62429baec88b5198821
-                html: https://github.com/packit/requre/blob/master/LICENSE
-                self: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/LICENSE
+                html: https://github.com/packit/requre/blob/main/LICENSE
+                self: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/LICENSE
               git_url: https://api.github.com/repos/packit/requre/git/blobs/5cb23a21a2a206185ec1b62429baec88b5198821
-              html_url: https://github.com/packit/requre/blob/master/LICENSE
+              html_url: https://github.com/packit/requre/blob/main/LICENSE
               name: LICENSE
               path: LICENSE
               sha: 5cb23a21a2a206185ec1b62429baec88b5198821
               size: 1063
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
-                html: https://github.com/packit/requre/blob/master/Makefile
-                self: https://api.github.com/repos/packit/requre/contents/Makefile?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/Makefile
+                html: https://github.com/packit/requre/blob/main/Makefile
+                self: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/Makefile
               git_url: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
-              html_url: https://github.com/packit/requre/blob/master/Makefile
+              html_url: https://github.com/packit/requre/blob/main/Makefile
               name: Makefile
               path: Makefile
               sha: cd564a3994f077b6f9193e8322c93851395a8fa2
               size: 604
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/da4c6034b0e3af8352884f9b7cd0941c0f2d4b5d
-                html: https://github.com/packit/requre/blob/master/README.md
-                self: https://api.github.com/repos/packit/requre/contents/README.md?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/README.md
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/da4c6034b0e3af8352884f9b7cd0941c0f2d4b5d
-              html_url: https://github.com/packit/requre/blob/master/README.md
+                git: https://api.github.com/repos/packit/requre/git/blobs/8a35ca1dce7c51573d66259bf3538051ea2e4171
+                html: https://github.com/packit/requre/blob/main/README.md
+                self: https://api.github.com/repos/packit/requre/contents/README.md?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/README.md
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/8a35ca1dce7c51573d66259bf3538051ea2e4171
+              html_url: https://github.com/packit/requre/blob/main/README.md
               name: README.md
               path: README.md
-              sha: da4c6034b0e3af8352884f9b7cd0941c0f2d4b5d
-              size: 967
+              sha: 8a35ca1dce7c51573d66259bf3538051ea2e4171
+              size: 965
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/README.md?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/README.md?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/3332f2db67e65b2f48961dc799202177bcafc07f
-                html: https://github.com/packit/requre/blob/master/ci.fmf
-                self: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/ci.fmf
+                html: https://github.com/packit/requre/blob/main/ci.fmf
+                self: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/ci.fmf
               git_url: https://api.github.com/repos/packit/requre/git/blobs/3332f2db67e65b2f48961dc799202177bcafc07f
-              html_url: https://github.com/packit/requre/blob/master/ci.fmf
+              html_url: https://github.com/packit/requre/blob/main/ci.fmf
               name: ci.fmf
               path: ci.fmf
               sha: 3332f2db67e65b2f48961dc799202177bcafc07f
               size: 225
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/9f53e4035ec214764c124f3c6a1eb44ce913e862
-                html: https://github.com/packit/requre/tree/master/docs
-                self: https://api.github.com/repos/packit/requre/contents/docs?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/aff3529e615f5857521c008c16df738e575beacc
+                html: https://github.com/packit/requre/tree/main/docs
+                self: https://api.github.com/repos/packit/requre/contents/docs?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/9f53e4035ec214764c124f3c6a1eb44ce913e862
-              html_url: https://github.com/packit/requre/tree/master/docs
+              git_url: https://api.github.com/repos/packit/requre/git/trees/aff3529e615f5857521c008c16df738e575beacc
+              html_url: https://github.com/packit/requre/tree/main/docs
               name: docs
               path: docs
-              sha: 9f53e4035ec214764c124f3c6a1eb44ce913e862
+              sha: aff3529e615f5857521c008c16df738e575beacc
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/docs?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/docs?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/trees/b00df103b0b2fd4a878943e39b6084ad512a0ac3
-                html: https://github.com/packit/requre/tree/master/examples
-                self: https://api.github.com/repos/packit/requre/contents/examples?ref=master
+                html: https://github.com/packit/requre/tree/main/examples
+                self: https://api.github.com/repos/packit/requre/contents/examples?ref=main
               download_url: null
               git_url: https://api.github.com/repos/packit/requre/git/trees/b00df103b0b2fd4a878943e39b6084ad512a0ac3
-              html_url: https://github.com/packit/requre/tree/master/examples
+              html_url: https://github.com/packit/requre/tree/main/examples
               name: examples
               path: examples
               sha: b00df103b0b2fd4a878943e39b6084ad512a0ac3
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/examples?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/examples?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/trees/7741d8957ecca87927cd687905d5a38d25fb153f
-                html: https://github.com/packit/requre/tree/master/fedora
-                self: https://api.github.com/repos/packit/requre/contents/fedora?ref=master
+                html: https://github.com/packit/requre/tree/main/fedora
+                self: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
               download_url: null
               git_url: https://api.github.com/repos/packit/requre/git/trees/7741d8957ecca87927cd687905d5a38d25fb153f
-              html_url: https://github.com/packit/requre/tree/master/fedora
+              html_url: https://github.com/packit/requre/tree/main/fedora
               name: fedora
               path: fedora
               sha: 7741d8957ecca87927cd687905d5a38d25fb153f
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/fedora?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/trees/1c65764bf6541feeb65b1820a3b5be833dc62136
-                html: https://github.com/packit/requre/tree/master/files
-                self: https://api.github.com/repos/packit/requre/contents/files?ref=master
+                html: https://github.com/packit/requre/tree/main/files
+                self: https://api.github.com/repos/packit/requre/contents/files?ref=main
               download_url: null
               git_url: https://api.github.com/repos/packit/requre/git/trees/1c65764bf6541feeb65b1820a3b5be833dc62136
-              html_url: https://github.com/packit/requre/tree/master/files
+              html_url: https://github.com/packit/requre/tree/main/files
               name: files
               path: files
               sha: 1c65764bf6541feeb65b1820a3b5be833dc62136
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/files?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/files?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/cd984f8d41b345d226d9e6a84ba378f47807b343
-                html: https://github.com/packit/requre/tree/master/requre
-                self: https://api.github.com/repos/packit/requre/contents/requre?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/42ba5763affe7cf374e45c35ad6b0fc79869faa9
+                html: https://github.com/packit/requre/tree/main/requre
+                self: https://api.github.com/repos/packit/requre/contents/requre?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/cd984f8d41b345d226d9e6a84ba378f47807b343
-              html_url: https://github.com/packit/requre/tree/master/requre
+              git_url: https://api.github.com/repos/packit/requre/git/trees/42ba5763affe7cf374e45c35ad6b0fc79869faa9
+              html_url: https://github.com/packit/requre/tree/main/requre
               name: requre
               path: requre
-              sha: cd984f8d41b345d226d9e6a84ba378f47807b343
+              sha: 42ba5763affe7cf374e45c35ad6b0fc79869faa9
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/requre?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/requre?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
-                html: https://github.com/packit/requre/blob/master/setup.cfg
-                self: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/setup.cfg
+                html: https://github.com/packit/requre/blob/main/setup.cfg
+                self: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/setup.cfg
               git_url: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
-              html_url: https://github.com/packit/requre/blob/master/setup.cfg
+              html_url: https://github.com/packit/requre/blob/main/setup.cfg
               name: setup.cfg
               path: setup.cfg
               sha: 71615dbb8e91325f049c3822645862c06c4d4e0d
               size: 1197
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
-                html: https://github.com/packit/requre/blob/master/setup.py
-                self: https://api.github.com/repos/packit/requre/contents/setup.py?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/setup.py
+                html: https://github.com/packit/requre/blob/main/setup.py
+                self: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/setup.py
               git_url: https://api.github.com/repos/packit/requre/git/blobs/3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
-              html_url: https://github.com/packit/requre/blob/master/setup.py
+              html_url: https://github.com/packit/requre/blob/main/setup.py
               name: setup.py
               path: setup.py
               sha: 3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
               size: 1191
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/setup.py?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/c46c6360d2182089d7795329e0ea56693af364c6
-                html: https://github.com/packit/requre/tree/master/tests
-                self: https://api.github.com/repos/packit/requre/contents/tests?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/a3e7794b98b936883289692446c656f18a17738c
+                html: https://github.com/packit/requre/tree/main/tests
+                self: https://api.github.com/repos/packit/requre/contents/tests?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/c46c6360d2182089d7795329e0ea56693af364c6
-              html_url: https://github.com/packit/requre/tree/master/tests
+              git_url: https://api.github.com/repos/packit/requre/git/trees/a3e7794b98b936883289692446c656f18a17738c
+              html_url: https://github.com/packit/requre/tree/main/tests
               name: tests
               path: tests
-              sha: c46c6360d2182089d7795329e0ea56693af364c6
+              sha: a3e7794b98b936883289692446c656f18a17738c
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/tests?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/tests?ref=main
             _next: null
-            elapsed: 0.224147
+            elapsed: 0.188164
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -1037,11 +1059,10 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Mon, 25 Jan 2021 10:39:22 GMT
-              ETag: W/"e699fe408e8c91abfd0bdf2c69599074077ab567"
+              Date: Mon, 15 Feb 2021 14:19:46 GMT
+              ETag: W/"e382a60337c166d4f71d905ebde405ce01d7a3d8"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
-              Status: 200 OK
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
@@ -1050,23 +1071,23 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 80C9:23BA:1C18713:1EE715F:600E9FDA
+              X-GitHub-Request-Id: 4F43:F072:3BEC44:433C3B:602A8302
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4982'
-              X-RateLimit-Reset: '1611574082'
+              X-RateLimit-Remaining: '4964'
+              X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
-              last-modified: Wed, 20 Jan 2021 12:24:47 GMT
-              x-ratelimit-used: '18'
+              last-modified: Wed, 10 Feb 2021 11:35:20 GMT
+              x-ratelimit-used: '36'
             raw: !!binary ""
             reason: OK
             status_code: 200
       https://release-monitoring.org/api/project/Fedora/python-requre:
         all:
           metadata:
-            latency: 0.4139537811279297
+            latency: 0.4168980121612549
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1088,24 +1109,24 @@ requests.sessions:
               error: No package "python-requre" found in distro "Fedora"
               output: notok
             _next: null
-            elapsed: 0.413654
+            elapsed: 0.416321
             encoding: null
             headers:
-              AppTime: D=14525
+              AppTime: D=9190
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '85'
               Content-Type: application/json
-              Date: Mon, 25 Jan 2021 10:39:27 GMT
+              Date: Mon, 15 Feb 2021 14:19:51 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.46 (Fedora) mod_wsgi/4.6.8 Python/3.8
-              Set-Cookie: c7f2af7958ac7bdd3fe2e687de986bfb=7aacc1f5bb969f6d1cbd9c02217f1fb9;
+              Set-Cookie: c7f2af7958ac7bdd3fe2e687de986bfb=dc3b35513dbf1fee4e3b0ae22269d46e;
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YA6f3-s3zlJpejyXns-6mAAAAA4
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: YCqDB4Mk8OY2Esva87eIpAAACIw
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -1114,7 +1135,7 @@ requests.sessions:
       https://release-monitoring.org/api/projects?pattern=python-requre:
         all:
           metadata:
-            latency: 1.1806204319000244
+            latency: 1.105323076248169
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1136,24 +1157,24 @@ requests.sessions:
               projects: []
               total: 0
             _next: null
-            elapsed: 1.180439
+            elapsed: 1.104743
             encoding: null
             headers:
-              AppTime: D=634623
+              AppTime: D=657934
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '26'
               Content-Type: application/json
-              Date: Mon, 25 Jan 2021 10:39:27 GMT
+              Date: Mon, 15 Feb 2021 14:19:51 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.46 (Fedora) mod_wsgi/4.6.8 Python/3.8
-              Set-Cookie: c7f2af7958ac7bdd3fe2e687de986bfb=7aacc1f5bb969f6d1cbd9c02217f1fb9;
+              Set-Cookie: c7f2af7958ac7bdd3fe2e687de986bfb=dc3b35513dbf1fee4e3b0ae22269d46e;
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YA6f3-s3zlJpejyXns-60AAAAAc
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: YCqDB9E1tRiyWiJIG-n6ZgAAC8w
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -1162,7 +1183,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/rpms/python-requre/git/branches:
         all:
           metadata:
-            latency: 0.5726883411407471
+            latency: 0.8888223171234131
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1181,36 +1202,38 @@ requests.sessions:
               branches:
               - f32
               - f33
+              - f34
+              - main
+              - rawhide
               - f30
               - f31
-              - master
-              default: master
-              total_branches: 5
+              default: rawhide
+              total_branches: 7
             _next: null
-            elapsed: 0.571929
+            elapsed: 0.888176
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Mon, 25 Jan 2021 10:39:26 GMT
+              Date: Mon, 15 Feb 2021 14:19:50 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YA6f3kt9aS7-cOSzjvq8jgAAAQ8
+              X-Fedora-RequestID: YCqDBuWuajVlkJLXqTcVPwAAC8Q
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=169475
-              content-length: '133'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-kDHixJxcp03FfHP5gD2QkvOnS'
+              apptime: D=402856
+              content-length: '160'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-NeokU2X6gszAcqXEWWYWzVNA4'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-kDHixJxcp03FfHP5gD2QkvOnS'; object-src 'none'; base-uri
+                'self' 'nonce-NeokU2X6gszAcqXEWWYWzVNA4'; object-src 'none'; base-uri
                 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYzY5ZDBiYjE1NWVkZWY2MDE4ZTFiNmRhZWE0NWExNzVlMjNjNWQxMCJ9.EvAxXg.7HhNlLOJspnBP0oLKUssKmddMeA;
-                Expires=Thu, 25-Feb-2021 10:39:26 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiZWY0YzlmMWFkZmU3OGVmMmE1MDMxZGEzNTQ5ZGE5MzJiNjVkNTNiMSJ9.EwwUhg.cfvOU1NOgsviYxqaZAXKDMFK_yE;
+                Expires=Thu, 18-Mar-2021 14:19:50 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -1218,7 +1241,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?status=Open:
         all:
           metadata:
-            latency: 0.5137753486633301
+            latency: 0.7167654037475586
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1254,20 +1277,21 @@ requests.sessions:
                 prev: null
               requests:
               - assignee: null
-                branch: master
-                branch_from: 0.5.0-master-update
+                branch: rawhide
+                branch_from: 0.5.0-rawhide-update
                 cached_merge_status: unknown
                 closed_at: null
                 closed_by: null
                 comments: []
-                commit_start: 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
-                commit_stop: 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
-                date_created: '1611571157'
-                id: 77
+                commit_start: 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                commit_stop: 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                date_created: '1613398779'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/81
+                id: 81
                 initial_comment: 'Upstream tag: 0.5.0
 
-                  Upstream commit: 64cd06ed'
-                last_updated: '1611571164'
+                  Upstream commit: f9b8d60e'
+                last_updated: '1613398779'
                 project:
                   access_groups:
                     admin: []
@@ -1294,6 +1318,7 @@ requests.sessions:
                   date_created: '1586178839'
                   date_modified: '1611220001'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
                   id: 41574
                   milestones: {}
@@ -1304,6 +1329,7 @@ requests.sessions:
                   tags: []
                   url_path: rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1326,6 +1352,7 @@ requests.sessions:
                   date_created: '1600700802'
                   date_modified: '1600700802'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
                   fullname: forks/jscotka/rpms/python-requre
                   id: 45827
                   milestones: {}
@@ -1357,6 +1384,7 @@ requests.sessions:
                     date_created: '1586178839'
                     date_modified: '1611220001'
                     description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
                     fullname: rpms/python-requre
                     id: 41574
                     milestones: {}
@@ -1367,6 +1395,7 @@ requests.sessions:
                     tags: []
                     url_path: rpms/python-requre
                     user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
                       fullname: "Jan \u0160\u010Dotka"
                       name: jscotka
                       url_path: user/jscotka
@@ -1374,6 +1403,7 @@ requests.sessions:
                   tags: []
                   url_path: fork/jscotka/rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1381,15 +1411,16 @@ requests.sessions:
                 tags: []
                 threshold_reached: null
                 title: Update to upstream release 0.5.0
-                uid: afa696d555f247e993a4ab735e161dfa
-                updated_on: '1611571164'
+                uid: 952f5245f27641019dafa2aaece48287
+                updated_on: '1613398779'
                 user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
                   fullname: "Jan \u0160\u010Dotka"
                   name: jscotka
                   url_path: user/jscotka
               - assignee: null
-                branch: master
-                branch_from: 0.6.0-master-update
+                branch: rawhide
+                branch_from: 0.6.0-rawhide-update
                 cached_merge_status: unknown
                 closed_at: null
                 closed_by: null
@@ -1398,25 +1429,25 @@ requests.sessions:
                     errors available at https://fedoraproject.org/wiki/Zuul-based-ci
 
 
-                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/2408b06f9a0a4ca8a06f4314a7408b55)
-                    : FAILURE in 2m 00s
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/803e60ac9f914c91b8a5a1734dcbd09d)
+                    : SUCCESS in 2m 24s
 
-                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/c4d5ab28dee64e068a70ad2a124eeb85)
-                    : SUCCESS in 1m 03s
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/97c2d491ae9347a2905b6951e1c05157)
+                    : FAILURE in 3m 03s
 
-                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
                     : SKIPPED (non-voting)
 
                     - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/None)
                     : SKIPPED (non-voting)
 
-                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
-                    : SKIPPED (non-voting)
-
                     - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/None)
                     : SKIPPED (non-voting)
 
-                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
                     : SKIPPED (non-voting)
 
                     - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/None)
@@ -1436,28 +1467,30 @@ requests.sessions:
 
                     '
                   commit: null
-                  date_created: '1611570738'
+                  date_created: '1613398026'
                   edited_on: null
                   editor: null
                   filename: null
-                  id: 65268
+                  id: 67453
                   line: null
                   notification: false
                   parent: null
                   reactions: {}
                   tree: null
                   user:
+                    full_url: https://src.fedoraproject.org/user/zuul
                     fullname: Zuul CI Bot (Fabien Boucher)
                     name: zuul
                     url_path: user/zuul
-                commit_start: 8a43a8f7715bae3f9c50cf3c89e204e3f29d9c78
-                commit_stop: 8a43a8f7715bae3f9c50cf3c89e204e3f29d9c78
-                date_created: '1611570583'
-                id: 76
+                commit_start: 286abd877fa04bbdb81818ec0ce65d3e16ea9cd3
+                commit_stop: 286abd877fa04bbdb81818ec0ce65d3e16ea9cd3
+                date_created: '1613397807'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/80
+                id: 80
                 initial_comment: 'Upstream tag: 0.6.0
 
-                  Upstream commit: 2b4cba71'
-                last_updated: '1611571155'
+                  Upstream commit: 2e83f585'
+                last_updated: '1613398775'
                 project:
                   access_groups:
                     admin: []
@@ -1484,6 +1517,7 @@ requests.sessions:
                   date_created: '1586178839'
                   date_modified: '1611220001'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
                   id: 41574
                   milestones: {}
@@ -1494,6 +1528,7 @@ requests.sessions:
                   tags: []
                   url_path: rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1516,6 +1551,7 @@ requests.sessions:
                   date_created: '1600700802'
                   date_modified: '1600700802'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
                   fullname: forks/jscotka/rpms/python-requre
                   id: 45827
                   milestones: {}
@@ -1547,6 +1583,7 @@ requests.sessions:
                     date_created: '1586178839'
                     date_modified: '1611220001'
                     description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
                     fullname: rpms/python-requre
                     id: 41574
                     milestones: {}
@@ -1557,6 +1594,7 @@ requests.sessions:
                     tags: []
                     url_path: rpms/python-requre
                     user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
                       fullname: "Jan \u0160\u010Dotka"
                       name: jscotka
                       url_path: user/jscotka
@@ -1564,6 +1602,7 @@ requests.sessions:
                   tags: []
                   url_path: fork/jscotka/rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1571,43 +1610,63 @@ requests.sessions:
                 tags: []
                 threshold_reached: null
                 title: Update to upstream release 0.6.0
-                uid: 637d382f607647618727bd0593280c67
-                updated_on: '1611570738'
+                uid: 036a4de38f78427e84c3a906dd64a3eb
+                updated_on: '1613398026'
                 user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
                   fullname: "Jan \u0160\u010Dotka"
                   name: jscotka
                   url_path: user/jscotka
               - assignee: null
-                branch: master
-                branch_from: 0.5.0-master-update
+                branch: rawhide
+                branch_from: 0.5.0-rawhide-update
                 cached_merge_status: FFORWARD
                 closed_at: null
                 closed_by: null
                 comments:
-                - comment: rebased onto 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
+                - comment: rebased onto 4dae335e8aa878c2ef2eb4e45c8666e5c30d23c4
                   commit: null
-                  date_created: '1611571155'
+                  date_created: '1613398361'
                   edited_on: null
                   editor: null
                   filename: null
-                  id: 65270
+                  id: 67454
                   line: null
                   notification: true
                   parent: null
                   reactions: {}
                   tree: null
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
-                commit_start: 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
-                commit_stop: 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
-                date_created: '1611570538'
-                id: 75
+                - comment: rebased onto 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                  commit: null
+                  date_created: '1613398775'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 67456
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                commit_start: 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                commit_stop: 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                date_created: '1613397736'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/79
+                id: 79
                 initial_comment: 'Upstream tag: 0.5.0
 
                   Upstream commit: 39d951a0'
-                last_updated: '1611571160'
+                last_updated: '1613398775'
                 project:
                   access_groups:
                     admin: []
@@ -1634,6 +1693,7 @@ requests.sessions:
                   date_created: '1586178839'
                   date_modified: '1611220001'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
                   id: 41574
                   milestones: {}
@@ -1644,6 +1704,7 @@ requests.sessions:
                   tags: []
                   url_path: rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1666,6 +1727,7 @@ requests.sessions:
                   date_created: '1600700802'
                   date_modified: '1600700802'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
                   fullname: forks/jscotka/rpms/python-requre
                   id: 45827
                   milestones: {}
@@ -1697,6 +1759,7 @@ requests.sessions:
                     date_created: '1586178839'
                     date_modified: '1611220001'
                     description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
                     fullname: rpms/python-requre
                     id: 41574
                     milestones: {}
@@ -1707,6 +1770,7 @@ requests.sessions:
                     tags: []
                     url_path: rpms/python-requre
                     user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
                       fullname: "Jan \u0160\u010Dotka"
                       name: jscotka
                       url_path: user/jscotka
@@ -1714,6 +1778,7 @@ requests.sessions:
                   tags: []
                   url_path: fork/jscotka/rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1721,59 +1786,80 @@ requests.sessions:
                 tags: []
                 threshold_reached: null
                 title: Update to upstream release 0.5.0
-                uid: f68f511dcbc44f9ea107ba3093c929e7
-                updated_on: '1611571160'
+                uid: 9f156e2582c74ec8a960615dbba56bcc
+                updated_on: '1613398775'
                 user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
                   fullname: "Jan \u0160\u010Dotka"
                   name: jscotka
                   url_path: user/jscotka
               - assignee: null
-                branch: master
-                branch_from: 0.5.0-master-update
+                branch: rawhide
+                branch_from: 0.5.0-rawhide-update
                 cached_merge_status: FFORWARD
                 closed_at: null
                 closed_by: null
                 comments:
-                - comment: rebased onto a5b0cfa04a93c5a7d369a1a8a9c0a410cb3bf94c
+                - comment: rebased onto 36e482d950d6b129941691a1cb39e9a89c297da2
                   commit: null
-                  date_created: '1611570536'
+                  date_created: '1613397733'
                   edited_on: null
                   editor: null
                   filename: null
-                  id: 65267
+                  id: 67446
                   line: null
                   notification: true
                   parent: null
                   reactions: {}
                   tree: null
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
-                - comment: rebased onto 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
+                - comment: rebased onto 4dae335e8aa878c2ef2eb4e45c8666e5c30d23c4
                   commit: null
-                  date_created: '1611571155'
+                  date_created: '1613398361'
                   edited_on: null
                   editor: null
                   filename: null
-                  id: 65269
+                  id: 67455
                   line: null
                   notification: true
                   parent: null
                   reactions: {}
                   tree: null
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
-                commit_start: 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
-                commit_stop: 037a8c5a23e66abc845365e1e35a240bb1a9a6ed
-                date_created: '1611570513'
-                id: 74
+                - comment: rebased onto 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                  commit: null
+                  date_created: '1613398776'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 67457
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                commit_start: 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                commit_stop: 88f26627ef4e592a93f6337b51d3b9a1166aabed
+                date_created: '1613397701'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/78
+                id: 78
                 initial_comment: 'Upstream tag: 0.5.0
 
-                  Upstream commit: 120b24fc'
-                last_updated: '1611571167'
+                  Upstream commit: c5b27370'
+                last_updated: '1613398776'
                 project:
                   access_groups:
                     admin: []
@@ -1800,6 +1886,7 @@ requests.sessions:
                   date_created: '1586178839'
                   date_modified: '1611220001'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
                   id: 41574
                   milestones: {}
@@ -1810,6 +1897,7 @@ requests.sessions:
                   tags: []
                   url_path: rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1832,6 +1920,7 @@ requests.sessions:
                   date_created: '1600700802'
                   date_modified: '1600700802'
                   description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
                   fullname: forks/jscotka/rpms/python-requre
                   id: 45827
                   milestones: {}
@@ -1863,6 +1952,7 @@ requests.sessions:
                     date_created: '1586178839'
                     date_modified: '1611220001'
                     description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
                     fullname: rpms/python-requre
                     id: 41574
                     milestones: {}
@@ -1873,6 +1963,7 @@ requests.sessions:
                     tags: []
                     url_path: rpms/python-requre
                     user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
                       fullname: "Jan \u0160\u010Dotka"
                       name: jscotka
                       url_path: user/jscotka
@@ -1880,6 +1971,7 @@ requests.sessions:
                   tags: []
                   url_path: fork/jscotka/rpms/python-requre
                   user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
                     fullname: "Jan \u0160\u010Dotka"
                     name: jscotka
                     url_path: user/jscotka
@@ -1887,38 +1979,39 @@ requests.sessions:
                 tags: []
                 threshold_reached: null
                 title: Update to upstream release 0.5.0
-                uid: 884d56e1e46c4e65824b7b9dbb576c36
-                updated_on: '1611571167'
+                uid: 30ac3f05dd334f8d9d15c062086bb509
+                updated_on: '1613398776'
                 user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
                   fullname: "Jan \u0160\u010Dotka"
                   name: jscotka
                   url_path: user/jscotka
               total_requests: 4
             _next: null
-            elapsed: 0.391032
+            elapsed: 0.589725
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Mon, 25 Jan 2021 10:39:33 GMT
+              Date: Mon, 15 Feb 2021 14:19:56 GMT
               Keep-Alive: timeout=15, max=499
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YA6f5Ut9aS7-cOSzjvq@LwAAAQA
+              X-Fedora-RequestID: YCqDDOWuajVlkJLXqTcVpQAAC9U
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=253503
-              content-length: '21549'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-tyLIrsbMXYRhQmzfbQv4UlRMp'
+              apptime: D=450594
+              content-length: '25506'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-IIyczNXa6YDd28798bKZG9K4B'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-tyLIrsbMXYRhQmzfbQv4UlRMp'; object-src 'none'; base-uri
+                'self' 'nonce-IIyczNXa6YDd28798bKZG9K4B'; object-src 'none'; base-uri
                 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYzY5ZDBiYjE1NWVkZWY2MDE4ZTFiNmRhZWE0NWExNzVlMjNjNWQxMCJ9.EvAxZQ.Xxs1xAH7SpQESg-hlf285sZalv0;
-                Expires=Thu, 25-Feb-2021 10:39:33 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiZWY0YzlmMWFkZmU3OGVmMmE1MDMxZGEzNTQ5ZGE5MzJiNjVkNTNiMSJ9.EwwUjA.mlJn-J6rDjMJ5g3FFqfMMIktIZo;
+                Expires=Thu, 18-Mar-2021 14:19:56 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -1927,7 +2020,7 @@ requests.sessions:
       https://src.fedoraproject.org/lookaside/pkgs/python-requre/requre-0.5.0.tar.gz/:
         all:
           metadata:
-            latency: 0.6014134883880615
+            latency: 0.398317813873291
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1944,21 +2037,21 @@ requests.sessions:
             __store_indicator: 1
             _content: ''
             _next: null
-            elapsed: 0.601112
+            elapsed: 0.397982
             encoding: ISO-8859-1
             headers:
               Connection: Keep-Alive
-              Date: Mon, 25 Jan 2021 10:39:32 GMT
+              Date: Mon, 15 Feb 2021 14:19:56 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YA6f5Ps3zlJpejyXns-8RwAAAAE
+              X-Fedora-RequestID: YCqDDK1dgOFIlzI06WWoNQAABMQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=1911
+              apptime: D=5168
               content-type: text/html;charset=ISO-8859-1
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
