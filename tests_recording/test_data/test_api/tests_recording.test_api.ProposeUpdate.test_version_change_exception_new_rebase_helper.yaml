@@ -2,17 +2,17 @@ X:
   file:
     tar:
       StoreFiles:
-        tests_recording.test_api.ProposeUpdate.test_version_change_exception.yaml:
+        tests_recording.test_api.ProposeUpdate.test_version_change_exception_new_rebase_helper.yaml:
           target_path:
             all:
               metadata:
                 latency: 0
-              output: tests_recording.test_api.ProposeUpdate.test_version_change_exception.yaml.packit-dist-git_2_1.tar.xz
+              output: tests_recording.test_api.ProposeUpdate.test_version_change_exception_new_rebase_helper.yaml.packit-dist-git_2_1.tar.xz
           to_path:
             all:
               metadata:
                 latency: 0
-              output: tests_recording.test_api.ProposeUpdate.test_version_change_exception.yaml.static_tmp_1_1.tar.xz
+              output: tests_recording.test_api.ProposeUpdate.test_version_change_exception_new_rebase_helper.yaml.static_tmp_1_1.tar.xz
 _requre:
   DataTypes: 3
   key_strategy: StorageKeysInspectSimple
@@ -21,7 +21,7 @@ git.remote:
   fetch:
     all:
       metadata:
-        latency: 2.137575149536133
+        latency: 3.368887424468994
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -391,7 +391,7 @@ git.repo.base:
   clone_from:
     all:
       metadata:
-        latency: 3.3492627143859863
+        latency: 2.245945453643799
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -409,14 +409,14 @@ git.repo.base:
       output:
         _bare: false
         _common_dir: null
-        _working_tree_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_version_change_exception.yaml/static_tmp_1
-        git_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_version_change_exception.yaml/static_tmp_1/.git
-        working_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_version_change_exception.yaml/static_tmp_1
+        _working_tree_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_version_change_exception_new_rebase_helper.yaml/static_tmp_1
+        git_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_version_change_exception_new_rebase_helper.yaml/static_tmp_1/.git
+        working_dir: /tmp/packit_tmp/tests_recording.test_api.ProposeUpdate.test_version_change_exception_new_rebase_helper.yaml/static_tmp_1
 packit.fedpkg:
   clone:
     all:
       metadata:
-        latency: 3.797577142715454
+        latency: 5.095874786376953
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -437,7 +437,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.34679698944091797
+            latency: 0.29993343353271484
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -585,7 +585,7 @@ requests.sessions:
               watchers: 5
               watchers_count: 5
             _next: null
-            elapsed: 0.346139
+            elapsed: 0.298449
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -597,7 +597,7 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Mon, 15 Feb 2021 14:19:57 GMT
+              Date: Mon, 15 Feb 2021 14:26:29 GMT
               ETag: W/"63ce4509f3acecb77685033a10f70439d35b9ed26e403dd940b95b36b5e7a6b9"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
@@ -609,23 +609,23 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 4F4D:1A2F:4AD232D:523B02F:602A830D
+              X-GitHub-Request-Id: 4FFC:F55D:263A031:29C95BD:602A8495
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4963'
+              X-RateLimit-Remaining: '4954'
               X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
               last-modified: Wed, 10 Feb 2021 11:35:20 GMT
-              x-ratelimit-used: '37'
+              x-ratelimit-used: '46'
             raw: !!binary ""
             reason: OK
             status_code: 200
       https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=main:
         all:
           metadata:
-            latency: 0.5586459636688232
+            latency: 0.1790299415588379
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -725,7 +725,7 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             _next: null
-            elapsed: 0.557465
+            elapsed: 0.178218
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -737,35 +737,35 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Mon, 15 Feb 2021 14:20:01 GMT
+              Date: Mon, 15 Feb 2021 14:26:32 GMT
               ETag: W/"e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 4F4D:1A2F:4AD2814:523B073:602A830D
+              X-GitHub-Request-Id: 4FFC:F55D:263A212:29C95E2:602A8495
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4962'
+              X-RateLimit-Remaining: '4953'
               X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
               last-modified: Wed, 10 Feb 2021 11:35:18 GMT
-              x-ratelimit-used: '38'
+              x-ratelimit-used: '47'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
       https://api.github.com:443/repos/packit/requre/contents/?ref=main:
         all:
           metadata:
-            latency: 0.21034765243530273
+            latency: 0.16046762466430664
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1059,7 +1059,7 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/tests?ref=main
             _next: null
-            elapsed: 0.209622
+            elapsed: 0.159761
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -1071,35 +1071,35 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Mon, 15 Feb 2021 14:20:02 GMT
+              Date: Mon, 15 Feb 2021 14:26:32 GMT
               ETag: W/"e382a60337c166d4f71d905ebde405ce01d7a3d8"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 4F4D:1A2F:4AD290C:523B6A2:602A8311
+              X-GitHub-Request-Id: 4FFC:F55D:263A232:29C97E7:602A8498
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4961'
+              X-RateLimit-Remaining: '4952'
               X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
               last-modified: Wed, 10 Feb 2021 11:35:20 GMT
-              x-ratelimit-used: '39'
+              x-ratelimit-used: '48'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
       https://files.pythonhosted.org/packages/source/r/requre/requre-0.6.0.tar.gz:
         all:
           metadata:
-            latency: 0.3177168369293213
+            latency: 0.31958627700805664
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1119,7 +1119,7 @@ requests.sessions:
             __store_indicator: 0
             _content: false
             _next: null
-            elapsed: 0.317594
+            elapsed: 0.319502
             encoding: null
             headers:
               Accept-Ranges: bytes
@@ -1127,7 +1127,7 @@ requests.sessions:
               Connection: keep-alive
               Content-Length: '0'
               Content-Type: application/octet-stream
-              Date: Mon, 15 Feb 2021 14:20:15 GMT
+              Date: Mon, 15 Feb 2021 14:26:45 GMT
               Server: nginx/1.13.9
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Cache: MISS, MISS
@@ -1136,8 +1136,8 @@ requests.sessions:
               X-Frame-Options: deny
               X-Permitted-Cross-Domain-Policies: none
               X-Robots-Header: noindex
-              X-Served-By: cache-bwi5133-BWI, cache-fra19120-FRA
-              X-Timer: S1613398815.052635,VS0,VE158
+              X-Served-By: cache-bwi5138-BWI, cache-fra19180-FRA
+              X-Timer: S1613399206.797953,VS0,VE164
               X-XSS-Protection: 1; mode=block
             raw: !!binary ""
             reason: Not Found
@@ -1145,7 +1145,7 @@ requests.sessions:
       https://release-monitoring.org/api/project/Fedora/python-requre:
         all:
           metadata:
-            latency: 1.457871913909912
+            latency: 0.4492506980895996
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1169,15 +1169,15 @@ requests.sessions:
               error: No package "python-requre" found in distro "Fedora"
               output: notok
             _next: null
-            elapsed: 1.457316
+            elapsed: 0.448644
             encoding: null
             headers:
-              AppTime: D=11207
+              AppTime: D=17649
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '85'
               Content-Type: application/json
-              Date: Mon, 15 Feb 2021 14:20:07 GMT
+              Date: Mon, 15 Feb 2021 14:26:38 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.46 (Fedora) mod_wsgi/4.6.8 Python/3.8
@@ -1186,7 +1186,7 @@ requests.sessions:
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: YCqDFyvipusbmEvgnrvJhgAADFg
+              X-Fedora-RequestID: YCqEnq4Slp5knjoLWf9vhQAAAVg
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -1195,7 +1195,7 @@ requests.sessions:
       https://release-monitoring.org/api/projects?pattern=python-requre:
         all:
           metadata:
-            latency: 1.2860140800476074
+            latency: 1.194448471069336
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1219,15 +1219,15 @@ requests.sessions:
               projects: []
               total: 0
             _next: null
-            elapsed: 1.2855
+            elapsed: 1.193866
             encoding: null
             headers:
-              AppTime: D=754865
+              AppTime: D=781510
               Cache-control: private
               Connection: Keep-Alive
               Content-Length: '26'
               Content-Type: application/json
-              Date: Mon, 15 Feb 2021 14:20:08 GMT
+              Date: Mon, 15 Feb 2021 14:26:38 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache/2.4.46 (Fedora) mod_wsgi/4.6.8 Python/3.8
@@ -1235,8 +1235,8 @@ requests.sessions:
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: YCqDGE98Oz-45UH5xquYQwAADBE
+              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
+              X-Fedora-RequestID: YCqEnu5A6QaWN76ZHyk7RQAAAEA
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -1245,7 +1245,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/rpms/python-requre/git/branches:
         all:
           metadata:
-            latency: 0.4490647315979004
+            latency: 0.5073599815368652
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1274,38 +1274,38 @@ requests.sessions:
               default: rawhide
               total_branches: 7
             _next: null
-            elapsed: 0.448437
+            elapsed: 0.506639
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Mon, 15 Feb 2021 14:20:06 GMT
+              Date: Mon, 15 Feb 2021 14:26:37 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YCqDFkBMgemGmOxFOjXxzgAACNE
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: YCqEnb@6y6b7sHsj0O5CqQAAAAQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=56183
+              apptime: D=85820
               content-length: '160'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-EqWYbgONrEZcwcF93O4Mm7RNT'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-2F3OTrAJnTBC00tacAc5MO4vZ'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-EqWYbgONrEZcwcF93O4Mm7RNT'; object-src 'none'; base-uri
+                'self' 'nonce-2F3OTrAJnTBC00tacAc5MO4vZ'; object-src 'none'; base-uri
                 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiZWZkOTQ2YmQxNmI0YTA1NDgxN2MxM2M3ZDZiNTRhY2NhZDk5YjM4MyJ9.EwwUlg.UWeOzUcZfuHIP0risQerpWRdSCk;
-                Expires=Thu, 18-Mar-2021 14:20:06 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiNGJlY2ZkZDZjYmU5Y2JjZDJiMDkxMWE3NTI5ZjhkMDQ4MDZmZDE2MCJ9.EwwWHQ.n-FJiUrN_vssBdLGiZkxYfspTHo;
+                Expires=Thu, 18-Mar-2021 14:26:37 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
             status_code: 200
-      ? https://src.fedoraproject.org/repo/pkgs/python-requre/requre-0.5.0.tar.gz/sha512/3f9f8249363c7373ff1c41831d91d93ba5dfa05019036d4595681698c1aa587069325815d2bd5d99b0764a1093b2b9d96a1211ec259eab42be98f5847adedd9e/requre-0.5.0.tar.gz
+      ? https://src.fedoraproject.org/repo/pkgs/rpms/python-requre/requre-0.5.0.tar.gz/sha512/3f9f8249363c7373ff1c41831d91d93ba5dfa05019036d4595681698c1aa587069325815d2bd5d99b0764a1093b2b9d96a1211ec259eab42be98f5847adedd9e/requre-0.5.0.tar.gz
       : all:
           metadata:
-            latency: 0.6377110481262207
+            latency: 0.46811461448669434
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -1326,22 +1326,22 @@ requests.sessions:
             __store_indicator: 0
             _content: false
             _next: null
-            elapsed: 0.637584
+            elapsed: 0.467894
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Mon, 15 Feb 2021 14:20:13 GMT
+              Date: Mon, 15 Feb 2021 14:26:45 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YCqDHbXG2YiA9GKZyoxx2AAABk0
+              X-Fedora-RequestID: YCqEpeiTdYTSgh1UTZCBUgAABg0
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
               accept-ranges: bytes
-              apptime: D=8498
+              apptime: D=17240
               content-length: '211929'
               content-type: application/x-gzip
               etag: '"33bd9-5b5f5e4651cc0"'
@@ -5073,7 +5073,7 @@ requests.sessions:
       https://src.fedoraproject.org/lookaside/pkgs/python-requre/requre-0.6.0.tar.gz/:
         all:
           metadata:
-            latency: 0.4177560806274414
+            latency: 0.39069342613220215
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -5092,19 +5092,19 @@ requests.sessions:
             __store_indicator: 1
             _content: ''
             _next: null
-            elapsed: 0.417432
+            elapsed: 0.390328
             encoding: iso-8859-1
             headers:
-              AppTime: D=2348
+              AppTime: D=8115
               Connection: Keep-Alive
-              Date: Mon, 15 Feb 2021 14:20:12 GMT
+              Date: Mon, 15 Feb 2021 14:26:44 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: YCqDHLXG2YiA9GKZyoxxiQAABkM
+              X-Fedora-RequestID: YCqEpMV7GwU88RFI5AlncQAAAQU
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
               content-type: text/html; charset=iso-8859-1
