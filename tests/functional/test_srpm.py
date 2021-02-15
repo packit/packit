@@ -71,7 +71,8 @@ def test_action_output(upstream_and_remote):
     out = call_real_packit(
         parameters=["srpm"], cwd=upstream_repo_path, return_output=True
     )
-    assert f"\n{the_line_we_want}\n" in out.decode()
+
+    assert f"INFO   {the_line_we_want}\n" in out.decode()
     srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)
@@ -150,7 +151,7 @@ def _test_srpm_symlinking(upstream_repo_path, path_prefix):
     out = call_real_packit(
         parameters=["srpm"], cwd=upstream_repo_path, return_output=True
     )
-    assert f"\n{desired_path}\n" in out.decode()
+    assert f"INFO   {desired_path}\n" in out.decode()
 
     srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
     assert srpm_path.exists()
