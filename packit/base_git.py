@@ -81,6 +81,10 @@ class PackitRepositoryBase:
             )
         return self._command_handler
 
+    def is_command_handler_set(self) -> bool:
+        """ return True when command_handler is initialized """
+        return bool(self._command_handler)
+
     def running_in_service(self) -> bool:
         """ are we running in packit service? """
         return self.command_handler.name == RunCommandType.sandcastle
