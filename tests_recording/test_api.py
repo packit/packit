@@ -21,8 +21,9 @@
 # SOFTWARE.
 
 from subprocess import check_output
-
+import unittest
 from flexmock import flexmock
+import rebasehelper
 from rebasehelper.exceptions import RebaseHelperError
 from requre.cassette import DataTypes
 from requre.online_replacing import (
@@ -167,10 +168,26 @@ class ProposeUpdate(PackitTest):
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
 
+    @unittest.skipIf(
+        int(getattr(rebasehelper, "VERSION", "0.18.0").split(".")[1]) >= 24,
+        "Old version of RebaseHelper raises exception",
+    )
     def test_version_change_exception(self):
         """
         check if it raises exception, because sources are not uploaded in distgit
-        Downgrade rebasehelper to version < 0.19.0
+        Downgrade rebasehelper to version < 0.24.0
+        """
+        self.assertRaises(RebaseHelperError, self.check_version_increase)
+
+    @unittest.skipIf(
+        int(getattr(rebasehelper, "VERSION", "0.18.0").split(".")[1]) < 24,
+        "New version of rebasehelper >=24",
+    )
+    def test_version_change_exception_new_rebase_helper(self):
+        """
+        check if it raises exception, because sources are not uploaded in distgit
+        New version raises same error, but it raises it on another place
+        Upgrade rebase helper >= 0.24.0
         """
         self.assertRaises(RebaseHelperError, self.check_version_increase)
 
