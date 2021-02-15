@@ -49,7 +49,7 @@ def set_logging(
     level=logging.INFO,
     handler_class=logging.StreamHandler,
     handler_kwargs=None,
-    date_format="%H:%M:%S",
+    date_format=None,
 ):
     """
     Set personal logger for this library.
