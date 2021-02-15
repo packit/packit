@@ -1,0 +1,40 @@
+From 1f866530f5b3c49012c61b299f3c4e1dceff2a71 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Thu, 18 Oct 2018 14:25:58 +0200
+Subject: [PATCH] Use the role from the crond context for system job contexts.
+
+New SELinux policy added multiple roles for the system_u user on crond_t.
+The default context returned from get_default_context_with_level() is now
+unconfined_t instead of system_cronjob_t which is incorrect for system cron
+jobs.
+We use the role to limit the default context to system_cronjob_t.
+---
+ src/security.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/security.c b/src/security.c
+index d1bdc7f..5213cf3 100644
+--- a/src/security.c
++++ b/src/security.c
+@@ -505,6 +505,7 @@ get_security_context(const char *name, int crontab_fd,
+ 		retval = get_default_context_with_level(seuser, level, NULL, &scontext);
+ 	}
+ 	else {
++		const char *current_user, *current_role;
+ 		if (getcon(&current_context_str) < 0) {
+ 			log_it(name, getpid(), "getcon FAILED", "", 0);
+ 			return (security_getenforce() > 0);
+@@ -517,8 +518,9 @@ get_security_context(const char *name, int crontab_fd,
+ 			return (security_getenforce() > 0);
+ 		}
+
+-		const char *current_user = context_user_get(current_context);
+-		retval = get_default_context_with_level(current_user, level, NULL, &scontext);
++		current_user = context_user_get(current_context);
++		current_role = context_role_get(current_context);
++		retval = get_default_context_with_rolelevel(current_user, current_role, level, NULL, &scontext);
+
+ 		freecon(current_context_str);
+ 		context_free(current_context);
+--
+2.14.5
