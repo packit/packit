@@ -16,12 +16,12 @@ X:
 _requre:
   DataTypes: 3
   key_strategy: StorageKeysInspectSimple
-  version_storage_file: 2
+  version_storage_file: 3
 git.repo.base:
   clone_from:
     all:
       metadata:
-        latency: 1.3577167987823486
+        latency: 5.077169418334961
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -44,7 +44,7 @@ packit.fedpkg:
   clone:
     all:
       metadata:
-        latency: 4.62562894821167
+        latency: 8.305272579193115
         module_call_list:
         - unittest.case
         - requre.online_replacing
@@ -63,7 +63,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.31952595710754395
+            latency: 3.323021173477173
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -97,7 +97,7 @@ requests.sessions:
               contents_url: https://api.github.com/repos/packit/requre/contents/{+path}
               contributors_url: https://api.github.com/repos/packit/requre/contributors
               created_at: '2019-09-11T09:49:47Z'
-              default_branch: master
+              default_branch: main
               delete_branch_on_merge: false
               deployments_url: https://api.github.com/repos/packit/requre/deployments
               description: Library for testing python code what allows store output
@@ -106,8 +106,8 @@ requests.sessions:
               downloads_url: https://api.github.com/repos/packit/requre/downloads
               events_url: https://api.github.com/repos/packit/requre/events
               fork: false
-              forks: 8
-              forks_count: 8
+              forks: 9
+              forks_count: 9
               forks_url: https://api.github.com/repos/packit/requre/forks
               full_name: packit/requre
               git_commits_url: https://api.github.com/repos/packit/requre/git/commits{/sha}
@@ -140,13 +140,13 @@ requests.sessions:
               milestones_url: https://api.github.com/repos/packit/requre/milestones{/number}
               mirror_url: null
               name: requre
-              network_count: 8
+              network_count: 9
               node_id: MDEwOlJlcG9zaXRvcnkyMDc3NzgzMTk=
               notifications_url: https://api.github.com/repos/packit/requre/notifications{?since,all,participating}
-              open_issues: 7
-              open_issues_count: 7
+              open_issues: 6
+              open_issues_count: 6
               organization:
-                avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
+                avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
                 events_url: https://api.github.com/users/packit/events{/privacy}
                 followers_url: https://api.github.com/users/packit/followers
                 following_url: https://api.github.com/users/packit/following{/other_user}
@@ -165,7 +165,7 @@ requests.sessions:
                 type: Organization
                 url: https://api.github.com/users/packit
               owner:
-                avatar_url: https://avatars3.githubusercontent.com/u/46870917?v=4
+                avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
                 events_url: https://api.github.com/users/packit/events{/privacy}
                 followers_url: https://api.github.com/users/packit/followers
                 following_url: https://api.github.com/users/packit/following{/other_user}
@@ -189,11 +189,11 @@ requests.sessions:
                 push: true
               private: false
               pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
-              pushed_at: '2020-10-05T11:26:38Z'
+              pushed_at: '2021-02-12T11:26:20Z'
               releases_url: https://api.github.com/repos/packit/requre/releases{/id}
-              size: 399
+              size: 569
               ssh_url: git@github.com:packit/requre.git
-              stargazers_count: 4
+              stargazers_count: 5
               stargazers_url: https://api.github.com/repos/packit/requre/stargazers
               statuses_url: https://api.github.com/repos/packit/requre/statuses/{sha}
               subscribers_count: 8
@@ -204,12 +204,12 @@ requests.sessions:
               teams_url: https://api.github.com/repos/packit/requre/teams
               temp_clone_token: ''
               trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
-              updated_at: '2020-10-05T11:26:42Z'
+              updated_at: '2021-02-10T11:35:20Z'
               url: https://api.github.com/repos/packit/requre
-              watchers: 4
-              watchers_count: 4
+              watchers: 5
+              watchers_count: 5
             _next: null
-            elapsed: 0.319152
+            elapsed: 3.320107
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -221,35 +221,35 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 07 Oct 2020 08:08:16 GMT
-              ETag: W/"c51a2fc7e475b943edea1e6e20b5155cb47d731ddf169aab731b157eba50e306"
-              Last-Modified: Mon, 05 Oct 2020 11:26:42 GMT
+              Date: Mon, 15 Feb 2021 14:49:49 GMT
+              ETag: W/"63ce4509f3acecb77685033a10f70439d35b9ed26e403dd940b95b36b5e7a6b9"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
-              Status: 200 OK
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: repo
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 0B49:71A0:1097208:1396FB5:5F7D7770
+              X-GitHub-Request-Id: 4EAF:43F2:7D27557:8A1C2DF:602A8A0D
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
-                admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4987'
-              X-RateLimit-Reset: '1602061608'
-              X-RateLimit-Used: '13'
+              X-RateLimit-Remaining: '4951'
+              X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
+              last-modified: Wed, 10 Feb 2021 11:35:20 GMT
+              x-ratelimit-used: '49'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
-      https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=master:
+      https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=main:
         all:
           metadata:
-            latency: 0.2097015380859375
+            latency: 0.2624552249908447
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -268,9 +268,9 @@ requests.sessions:
             __store_indicator: 2
             _content:
               _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-                html: https://github.com/packit/requre/blob/master/.packit.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
+                git: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+                html: https://github.com/packit/requre/blob/main/.packit.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
               content: 'LS0tCnNwZWNmaWxlX3BhdGg6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMK
 
                 c3luY2VkX2ZpbGVzOgogIC0gZmVkb3JhL2NoYW5nZWxvZwojIGh0dHBzOi8v
@@ -323,31 +323,31 @@ requests.sessions:
 
                 CiAgICB0cmlnZ2VyOiBjb21taXQKICAgIG1ldGFkYXRhOgogICAgICBicmFu
 
-                Y2g6IG1hc3RlcgogICAgICB0YXJnZXRzOgogICAgICAgIC0gZmVkb3JhLXN0
+                Y2g6IG1haW4KICAgICAgdGFyZ2V0czoKICAgICAgICAtIGZlZG9yYS1hbGwK
 
-                YWJsZQogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAgICAgIHByZXNl
+                ICAgICAgbGlzdF9vbl9ob21lcGFnZTogVHJ1ZQogICAgICBwcmVzZXJ2ZV9w
 
-                cnZlX3Byb2plY3Q6IFRydWUKICAtIGpvYjogY29wcl9idWlsZAogICAgdHJp
+                cm9qZWN0OiBUcnVlCiAgLSBqb2I6IGNvcHJfYnVpbGQKICAgIHRyaWdnZXI6
 
-                Z2dlcjogcmVsZWFzZQogICAgbWV0YWRhdGE6CiAgICAgIHRhcmdldHM6CiAg
+                IHJlbGVhc2UKICAgIG1ldGFkYXRhOgogICAgICB0YXJnZXRzOgogICAgICAg
 
-                ICAgICAgLSBmZWRvcmEtc3RhYmxlCiAgICAgIGxpc3Rfb25faG9tZXBhZ2U6
+                IC0gZmVkb3JhLWFsbAogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAg
 
-                IFRydWUKICAgICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQo=
+                ICAgIHByZXNlcnZlX3Byb2plY3Q6IFRydWUK
 
                 '
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.packit.yaml
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
               encoding: base64
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-              html_url: https://github.com/packit/requre/blob/master/.packit.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              html_url: https://github.com/packit/requre/blob/main/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-              size: 1430
+              sha: e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              size: 1422
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             _next: null
-            elapsed: 0.209348
+            elapsed: 0.261946
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -359,35 +359,35 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 07 Oct 2020 08:08:16 GMT
-              ETag: W/"c4e8c63dde234df9b5816a1a0e71dcedbceeec63"
-              Last-Modified: Mon, 05 Oct 2020 11:26:37 GMT
+              Date: Mon, 15 Feb 2021 14:49:49 GMT
+              ETag: W/"e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
-              Status: 200 OK
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 0B49:71A0:1097278:139701E:5F7D7770
+              X-GitHub-Request-Id: 4EAF:43F2:7D275C6:8A1C344:602A8A0D
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
-                admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4986'
-              X-RateLimit-Reset: '1602061608'
-              X-RateLimit-Used: '14'
+              X-RateLimit-Remaining: '4950'
+              X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
+              last-modified: Wed, 10 Feb 2021 11:35:18 GMT
+              x-ratelimit-used: '50'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
-      https://api.github.com:443/repos/packit/requre/contents/?ref=master:
+      https://api.github.com:443/repos/packit/requre/contents/?ref=main:
         all:
           metadata:
-            latency: 0.44139647483825684
+            latency: 0.376448392868042
             module_call_list:
             - unittest.case
             - requre.online_replacing
@@ -406,280 +406,280 @@ requests.sessions:
             __store_indicator: 2
             _content:
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/0aa474ce2a82ce5a75d6cd9f24b708e0c4e53c9d
-                html: https://github.com/packit/requre/tree/master/.github
-                self: https://api.github.com/repos/packit/requre/contents/.github?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/e8a93ef92b25bfafaffa0c5438c54c569cfe0206
+                html: https://github.com/packit/requre/tree/main/.github
+                self: https://api.github.com/repos/packit/requre/contents/.github?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/0aa474ce2a82ce5a75d6cd9f24b708e0c4e53c9d
-              html_url: https://github.com/packit/requre/tree/master/.github
+              git_url: https://api.github.com/repos/packit/requre/git/trees/e8a93ef92b25bfafaffa0c5438c54c569cfe0206
+              html_url: https://github.com/packit/requre/tree/main/.github
               name: .github
               path: .github
-              sha: 0aa474ce2a82ce5a75d6cd9f24b708e0c4e53c9d
+              sha: e8a93ef92b25bfafaffa0c5438c54c569cfe0206
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/.github?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.github?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/894a44cc066a027465cd26d634948d56d13af9af
-                html: https://github.com/packit/requre/blob/master/.gitignore
-                self: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.gitignore
+                html: https://github.com/packit/requre/blob/main/.gitignore
+                self: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.gitignore
               git_url: https://api.github.com/repos/packit/requre/git/blobs/894a44cc066a027465cd26d634948d56d13af9af
-              html_url: https://github.com/packit/requre/blob/master/.gitignore
+              html_url: https://github.com/packit/requre/blob/main/.gitignore
               name: .gitignore
               path: .gitignore
               sha: 894a44cc066a027465cd26d634948d56d13af9af
               size: 1203
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-                html: https://github.com/packit/requre/blob/master/.packit.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.packit.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-              html_url: https://github.com/packit/requre/blob/master/.packit.yaml
+                git: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+                html: https://github.com/packit/requre/blob/main/.packit.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              html_url: https://github.com/packit/requre/blob/main/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: c4e8c63dde234df9b5816a1a0e71dcedbceeec63
-              size: 1430
+              sha: e07e2633b30d37ac8fb997ccbd4e2d1cf0254a1e
+              size: 1422
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/684cd8c27867e8e75e427aa6fd41861474d0844e
-                html: https://github.com/packit/requre/blob/master/.pre-commit-config.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.pre-commit-config.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/684cd8c27867e8e75e427aa6fd41861474d0844e
-              html_url: https://github.com/packit/requre/blob/master/.pre-commit-config.yaml
+                git: https://api.github.com/repos/packit/requre/git/blobs/60764b4136523dcd415560795e04369755075b89
+                html: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-config.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/60764b4136523dcd415560795e04369755075b89
+              html_url: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
               name: .pre-commit-config.yaml
               path: .pre-commit-config.yaml
-              sha: 684cd8c27867e8e75e427aa6fd41861474d0844e
-              size: 1156
+              sha: 60764b4136523dcd415560795e04369755075b89
+              size: 1224
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
-                html: https://github.com/packit/requre/blob/master/.pre-commit-hooks.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.pre-commit-hooks.yaml
+                html: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-hooks.yaml
               git_url: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
-              html_url: https://github.com/packit/requre/blob/master/.pre-commit-hooks.yaml
+              html_url: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
               name: .pre-commit-hooks.yaml
               path: .pre-commit-hooks.yaml
               sha: c84199ac2bf81c70e53aaf6701997b0d475e80ff
               size: 1608
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/e9aa8051f60dcab00e294c406d7bd1cd0a4c7b26
-                html: https://github.com/packit/requre/blob/master/.zuul.yaml
-                self: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/.zuul.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/e9aa8051f60dcab00e294c406d7bd1cd0a4c7b26
-              html_url: https://github.com/packit/requre/blob/master/.zuul.yaml
+                git: https://api.github.com/repos/packit/requre/git/blobs/335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
+                html: https://github.com/packit/requre/blob/main/.zuul.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.zuul.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
+              html_url: https://github.com/packit/requre/blob/main/.zuul.yaml
               name: .zuul.yaml
               path: .zuul.yaml
-              sha: e9aa8051f60dcab00e294c406d7bd1cd0a4c7b26
-              size: 697
+              sha: 335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
+              size: 593
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/74a08b9f4ad3eb76690be44f2b8f75b2a04ef493
-                html: https://github.com/packit/requre/blob/master/CONTRIBUTING.md
-                self: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/CONTRIBUTING.md
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/74a08b9f4ad3eb76690be44f2b8f75b2a04ef493
-              html_url: https://github.com/packit/requre/blob/master/CONTRIBUTING.md
+                git: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
+                html: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
+                self: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/CONTRIBUTING.md
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
+              html_url: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
               name: CONTRIBUTING.md
               path: CONTRIBUTING.md
-              sha: 74a08b9f4ad3eb76690be44f2b8f75b2a04ef493
-              size: 238
+              sha: 2b19dfb12887fa5a9e3f1595912cf589231ea39a
+              size: 159
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/8201f992154a14a7fcd95a5937d5c40c610990c9
-                html: https://github.com/packit/requre/blob/master/DCO
-                self: https://api.github.com/repos/packit/requre/contents/DCO?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/DCO
+                html: https://github.com/packit/requre/blob/main/DCO
+                self: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/DCO
               git_url: https://api.github.com/repos/packit/requre/git/blobs/8201f992154a14a7fcd95a5937d5c40c610990c9
-              html_url: https://github.com/packit/requre/blob/master/DCO
+              html_url: https://github.com/packit/requre/blob/main/DCO
               name: DCO
               path: DCO
               sha: 8201f992154a14a7fcd95a5937d5c40c610990c9
               size: 1421
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/DCO?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
-                html: https://github.com/packit/requre/blob/master/Dockerfile.tests
-                self: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/Dockerfile.tests
+                html: https://github.com/packit/requre/blob/main/Dockerfile.tests
+                self: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/Dockerfile.tests
               git_url: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
-              html_url: https://github.com/packit/requre/blob/master/Dockerfile.tests
+              html_url: https://github.com/packit/requre/blob/main/Dockerfile.tests
               name: Dockerfile.tests
               path: Dockerfile.tests
               sha: 3e3a7a6fc84303c6f3ec70f204430899eaec0a40
               size: 206
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/5cb23a21a2a206185ec1b62429baec88b5198821
-                html: https://github.com/packit/requre/blob/master/LICENSE
-                self: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/LICENSE
+                html: https://github.com/packit/requre/blob/main/LICENSE
+                self: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/LICENSE
               git_url: https://api.github.com/repos/packit/requre/git/blobs/5cb23a21a2a206185ec1b62429baec88b5198821
-              html_url: https://github.com/packit/requre/blob/master/LICENSE
+              html_url: https://github.com/packit/requre/blob/main/LICENSE
               name: LICENSE
               path: LICENSE
               sha: 5cb23a21a2a206185ec1b62429baec88b5198821
               size: 1063
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
-                html: https://github.com/packit/requre/blob/master/Makefile
-                self: https://api.github.com/repos/packit/requre/contents/Makefile?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/Makefile
+                html: https://github.com/packit/requre/blob/main/Makefile
+                self: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/Makefile
               git_url: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
-              html_url: https://github.com/packit/requre/blob/master/Makefile
+              html_url: https://github.com/packit/requre/blob/main/Makefile
               name: Makefile
               path: Makefile
               sha: cd564a3994f077b6f9193e8322c93851395a8fa2
               size: 604
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/17e9e85d329d0340864d5e2cad2fd63880d530f0
-                html: https://github.com/packit/requre/blob/master/README.md
-                self: https://api.github.com/repos/packit/requre/contents/README.md?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/README.md
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/17e9e85d329d0340864d5e2cad2fd63880d530f0
-              html_url: https://github.com/packit/requre/blob/master/README.md
+                git: https://api.github.com/repos/packit/requre/git/blobs/8a35ca1dce7c51573d66259bf3538051ea2e4171
+                html: https://github.com/packit/requre/blob/main/README.md
+                self: https://api.github.com/repos/packit/requre/contents/README.md?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/README.md
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/8a35ca1dce7c51573d66259bf3538051ea2e4171
+              html_url: https://github.com/packit/requre/blob/main/README.md
               name: README.md
               path: README.md
-              sha: 17e9e85d329d0340864d5e2cad2fd63880d530f0
-              size: 471
+              sha: 8a35ca1dce7c51573d66259bf3538051ea2e4171
+              size: 965
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/README.md?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/README.md?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/3332f2db67e65b2f48961dc799202177bcafc07f
-                html: https://github.com/packit/requre/blob/master/ci.fmf
-                self: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/ci.fmf
+                html: https://github.com/packit/requre/blob/main/ci.fmf
+                self: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/ci.fmf
               git_url: https://api.github.com/repos/packit/requre/git/blobs/3332f2db67e65b2f48961dc799202177bcafc07f
-              html_url: https://github.com/packit/requre/blob/master/ci.fmf
+              html_url: https://github.com/packit/requre/blob/main/ci.fmf
               name: ci.fmf
               path: ci.fmf
               sha: 3332f2db67e65b2f48961dc799202177bcafc07f
               size: 225
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/2c3a0d48563fb293102ba5e4a6cc27e44b18a06c
-                html: https://github.com/packit/requre/tree/master/docs
-                self: https://api.github.com/repos/packit/requre/contents/docs?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/aff3529e615f5857521c008c16df738e575beacc
+                html: https://github.com/packit/requre/tree/main/docs
+                self: https://api.github.com/repos/packit/requre/contents/docs?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/2c3a0d48563fb293102ba5e4a6cc27e44b18a06c
-              html_url: https://github.com/packit/requre/tree/master/docs
+              git_url: https://api.github.com/repos/packit/requre/git/trees/aff3529e615f5857521c008c16df738e575beacc
+              html_url: https://github.com/packit/requre/tree/main/docs
               name: docs
               path: docs
-              sha: 2c3a0d48563fb293102ba5e4a6cc27e44b18a06c
+              sha: aff3529e615f5857521c008c16df738e575beacc
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/docs?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/docs?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/a47f49275991217d8bd05cb2f2baaec8bcdb9a8e
-                html: https://github.com/packit/requre/tree/master/examples
-                self: https://api.github.com/repos/packit/requre/contents/examples?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/b00df103b0b2fd4a878943e39b6084ad512a0ac3
+                html: https://github.com/packit/requre/tree/main/examples
+                self: https://api.github.com/repos/packit/requre/contents/examples?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/a47f49275991217d8bd05cb2f2baaec8bcdb9a8e
-              html_url: https://github.com/packit/requre/tree/master/examples
+              git_url: https://api.github.com/repos/packit/requre/git/trees/b00df103b0b2fd4a878943e39b6084ad512a0ac3
+              html_url: https://github.com/packit/requre/tree/main/examples
               name: examples
               path: examples
-              sha: a47f49275991217d8bd05cb2f2baaec8bcdb9a8e
+              sha: b00df103b0b2fd4a878943e39b6084ad512a0ac3
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/examples?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/examples?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/f07d1341cc7f544f43dc395ed19e65a7e6c51b3b
-                html: https://github.com/packit/requre/tree/master/fedora
-                self: https://api.github.com/repos/packit/requre/contents/fedora?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/7741d8957ecca87927cd687905d5a38d25fb153f
+                html: https://github.com/packit/requre/tree/main/fedora
+                self: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/f07d1341cc7f544f43dc395ed19e65a7e6c51b3b
-              html_url: https://github.com/packit/requre/tree/master/fedora
+              git_url: https://api.github.com/repos/packit/requre/git/trees/7741d8957ecca87927cd687905d5a38d25fb153f
+              html_url: https://github.com/packit/requre/tree/main/fedora
               name: fedora
               path: fedora
-              sha: f07d1341cc7f544f43dc395ed19e65a7e6c51b3b
+              sha: 7741d8957ecca87927cd687905d5a38d25fb153f
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/fedora?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/trees/1c65764bf6541feeb65b1820a3b5be833dc62136
-                html: https://github.com/packit/requre/tree/master/files
-                self: https://api.github.com/repos/packit/requre/contents/files?ref=master
+                html: https://github.com/packit/requre/tree/main/files
+                self: https://api.github.com/repos/packit/requre/contents/files?ref=main
               download_url: null
               git_url: https://api.github.com/repos/packit/requre/git/trees/1c65764bf6541feeb65b1820a3b5be833dc62136
-              html_url: https://github.com/packit/requre/tree/master/files
+              html_url: https://github.com/packit/requre/tree/main/files
               name: files
               path: files
               sha: 1c65764bf6541feeb65b1820a3b5be833dc62136
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/files?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/files?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/39f05abcceb71b360652ce0f5bd19f0112dcb627
-                html: https://github.com/packit/requre/tree/master/requre
-                self: https://api.github.com/repos/packit/requre/contents/requre?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/42ba5763affe7cf374e45c35ad6b0fc79869faa9
+                html: https://github.com/packit/requre/tree/main/requre
+                self: https://api.github.com/repos/packit/requre/contents/requre?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/39f05abcceb71b360652ce0f5bd19f0112dcb627
-              html_url: https://github.com/packit/requre/tree/master/requre
+              git_url: https://api.github.com/repos/packit/requre/git/trees/42ba5763affe7cf374e45c35ad6b0fc79869faa9
+              html_url: https://github.com/packit/requre/tree/main/requre
               name: requre
               path: requre
-              sha: 39f05abcceb71b360652ce0f5bd19f0112dcb627
+              sha: 42ba5763affe7cf374e45c35ad6b0fc79869faa9
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/requre?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/requre?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
-                html: https://github.com/packit/requre/blob/master/setup.cfg
-                self: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/setup.cfg
+                html: https://github.com/packit/requre/blob/main/setup.cfg
+                self: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/setup.cfg
               git_url: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
-              html_url: https://github.com/packit/requre/blob/master/setup.cfg
+              html_url: https://github.com/packit/requre/blob/main/setup.cfg
               name: setup.cfg
               path: setup.cfg
               sha: 71615dbb8e91325f049c3822645862c06c4d4e0d
               size: 1197
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
             - _links:
                 git: https://api.github.com/repos/packit/requre/git/blobs/3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
-                html: https://github.com/packit/requre/blob/master/setup.py
-                self: https://api.github.com/repos/packit/requre/contents/setup.py?ref=master
-              download_url: https://raw.githubusercontent.com/packit/requre/master/setup.py
+                html: https://github.com/packit/requre/blob/main/setup.py
+                self: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/setup.py
               git_url: https://api.github.com/repos/packit/requre/git/blobs/3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
-              html_url: https://github.com/packit/requre/blob/master/setup.py
+              html_url: https://github.com/packit/requre/blob/main/setup.py
               name: setup.py
               path: setup.py
               sha: 3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
               size: 1191
               type: file
-              url: https://api.github.com/repos/packit/requre/contents/setup.py?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/84c621e54729aae0b18c8698de0ece25acc697cf
-                html: https://github.com/packit/requre/tree/master/tests
-                self: https://api.github.com/repos/packit/requre/contents/tests?ref=master
+                git: https://api.github.com/repos/packit/requre/git/trees/a3e7794b98b936883289692446c656f18a17738c
+                html: https://github.com/packit/requre/tree/main/tests
+                self: https://api.github.com/repos/packit/requre/contents/tests?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/84c621e54729aae0b18c8698de0ece25acc697cf
-              html_url: https://github.com/packit/requre/tree/master/tests
+              git_url: https://api.github.com/repos/packit/requre/git/trees/a3e7794b98b936883289692446c656f18a17738c
+              html_url: https://github.com/packit/requre/tree/main/tests
               name: tests
               path: tests
-              sha: 84c621e54729aae0b18c8698de0ece25acc697cf
+              sha: a3e7794b98b936883289692446c656f18a17738c
               size: 0
               type: dir
-              url: https://api.github.com/repos/packit/requre/contents/tests?ref=master
+              url: https://api.github.com/repos/packit/requre/contents/tests?ref=main
             _next: null
-            elapsed: 0.440819
+            elapsed: 0.375714
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -691,40 +691,41 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 07 Oct 2020 08:08:17 GMT
-              ETag: W/"9b5ea247d48fbd45a3611110be56da7f94ed2876"
-              Last-Modified: Mon, 05 Oct 2020 11:26:42 GMT
+              Date: Mon, 15 Feb 2021 14:49:49 GMT
+              ETag: W/"e382a60337c166d4f71d905ebde405ce01d7a3d8"
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
-              Status: 200 OK
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
               Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With, Accept-Encoding
+                Accept, X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 0B49:71A0:10972E9:13970A3:5F7D7770
+              X-GitHub-Request-Id: 4EAF:43F2:7D27665:8A1C3BA:602A8A0D
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
-                admin:repo_hook, delete_repo, gist, notifications, repo, user, write:discussion
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4985'
-              X-RateLimit-Reset: '1602061608'
-              X-RateLimit-Used: '15'
+              X-RateLimit-Remaining: '4949'
+              X-RateLimit-Reset: '1613400904'
               X-XSS-Protection: 1; mode=block
+              last-modified: Wed, 10 Feb 2021 11:35:20 GMT
+              x-ratelimit-used: '51'
             raw: !!binary ""
-            reason: OK
+            reason: ''
             status_code: 200
       https://src.fedoraproject.org/api/0/rpms/python-requre/git/branches:
         all:
           metadata:
-            latency: 0.5087389945983887
+            latency: 0.8270053863525391
             module_call_list:
             - unittest.case
             - requre.online_replacing
             - tests_recording.test_status
             - packit.status
+            - packit.base_git
             - ogr.services.pagure.project
             - ogr.services.pagure.service
             - requests.sessions
@@ -736,38 +737,40 @@ requests.sessions:
             __store_indicator: 2
             _content:
               branches:
-              - f30
-              - f31
               - f32
               - f33
-              - master
-              default: master
-              total_branches: 5
+              - f34
+              - main
+              - rawhide
+              - f30
+              - f31
+              default: rawhide
+              total_branches: 7
             _next: null
-            elapsed: 0.508174
+            elapsed: 0.82628
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Wed, 07 Oct 2020 08:08:24 GMT
+              Date: Mon, 15 Feb 2021 14:50:11 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
               X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: X313eD@M9TdayC5m8GVJDwAACQ0
+              X-Fedora-RequestID: YCqKI0PDdMhQlKsX4zQ1xAAAAE8
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=78553
-              content-length: '133'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-x7k0xYhlc2X7O7RpN7mqdAWJM'
+              apptime: D=88705
+              content-length: '160'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-5zLcfkuQoRdIMGDOotkI8RPMJ'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
-                'self' 'nonce-x7k0xYhlc2X7O7RpN7mqdAWJM'; object-src 'none'; base-uri
+                'self' 'nonce-5zLcfkuQoRdIMGDOotkI8RPMJ'; object-src 'none'; base-uri
                 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTkyMmUyNjVhODBhYjhjZTA4Njg4NjM3NjEwMjNmMGM5MWIyNDI0MCJ9.El8I-A.1Y6bWriN2aL2ap0lAvLt0QisB0g;
-                Expires=Sat, 07-Nov-2020 08:08:24 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMTA0ZDJkMzYyNzlmY2Y4NWI1ZjEyYzI3NTMzOGZjYjlkZjAxYWEwMiJ9.Ewwbow.Z_TKpg2gMWTIupx8NKgOkYz78JA;
+                Expires=Thu, 18-Mar-2021 14:50:11 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
