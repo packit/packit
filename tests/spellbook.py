@@ -27,6 +27,7 @@ A book with our finest spells
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 from click.testing import CliRunner
 from packit.patches import PatchMetadata
@@ -57,6 +58,7 @@ DG_OGR = DATA_DIR / "dg-ogr"
 SPECFILE = DATA_DIR / "upstream_git/beer.spec"
 UPSTREAM_SPEC_NOT_IN_ROOT = DATA_DIR / "spec_not_in_root/upstream"
 SYNC_FILES = DATA_DIR / "sync_files"
+CRONIE = DATA_DIR / "cronie"
 
 
 def git_set_user_email(directory):
@@ -87,8 +89,10 @@ def initiate_git_repo(
     tag=None,
     upstream_remote="https://lol.wat",
     push=False,
-    copy_from: str = None,
+    copy_from: Optional[Path] = None,
     remotes=None,
+    empty_commits_count: int = 3,
+    add_initial_content: bool = True,
 ):
     """
     Initiate a git repo for testing.
@@ -107,15 +111,16 @@ def initiate_git_repo(
         shutil.copytree(copy_from, directory)
     create_new_repo(directory, [])
     git_set_user_email(directory)
-    for i in range(3):
+    for i in range(empty_commits_count):
         subprocess.check_call(
             ["git", "commit", "--allow-empty", "-m", f"empty commit #{i}"],
             cwd=directory,
         )
-    directory_path = Path(directory)
-    directory_path.joinpath("README").write_text("Best upstream project ever!")
-    # this file is in the tarball
-    directory_path.joinpath("hops").write_text("Cascade\n")
+    if add_initial_content:
+        directory_path = Path(directory)
+        directory_path.joinpath("README").write_text("Best upstream project ever!")
+        # this file is in the tarball
+        directory_path.joinpath("hops").write_text("Cascade\n")
     subprocess.check_call(["git", "add", "."], cwd=directory)
     subprocess.check_call(["git", "commit", "-m", "commit with data"], cwd=directory)
     if tag:
