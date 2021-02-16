@@ -247,14 +247,23 @@ class TestGetAliases:
         [
             pytest.param(
                 [
-                    ("F31", "Fedora 31", "FEDORA", "current"),
+                    ("F30", "Fedora 30", "FEDORA", "archived"),
+                    ("F31", "Fedora 31", "FEDORA", "archived"),
+                    ("F32", "Fedora 32", "FEDORA", "current"),
+                    ("F33", "Fedora 33", "FEDORA", "current"),
                     ("F34", "Fedora 34", "FEDORA", "pending"),
+                    ("F35", "Fedora 35", "FEDORA", "pending"),
                     ("F31F", "Fedora 31 Flatpaks", "FEDORA-FLATPAK", "current"),
                     ("EPEL-8", "Fedora EPEL 8", "FEDORA-EPEL", "current"),
                 ],
                 {
-                    "fedora-all": ["fedora-31", "fedora-34", "fedora-rawhide"],
-                    "fedora-stable": ["fedora-31"],
+                    "fedora-all": [
+                        "fedora-32",
+                        "fedora-33",
+                        "fedora-34",
+                        "fedora-rawhide",
+                    ],
+                    "fedora-stable": ["fedora-32", "fedora-33"],
                     "fedora-development": ["fedora-34", "fedora-rawhide"],
                     "epel-all": ["epel-8"],
                 },
