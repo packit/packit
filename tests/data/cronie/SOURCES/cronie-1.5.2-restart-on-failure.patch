@@ -1,0 +1,12 @@
+diff -ru cronie-1.5.2/contrib/cronie.systemd cronie-1.5.2_patched/contrib/cronie.systemd
+--- cronie-1.5.2/contrib/cronie.systemd	2018-11-27 15:26:46.797288342 +0100
++++ cronie-1.5.2_patched/contrib/cronie.systemd	2018-11-27 15:26:19.479159225 +0100
+@@ -7,6 +7,8 @@
+ ExecStart=/usr/sbin/crond -n $CRONDARGS
+ ExecReload=/bin/kill -HUP $MAINPID
+ KillMode=process
++Restart=on-failure
++RestartSec=30s
+
+ [Install]
+ WantedBy=multi-user.target

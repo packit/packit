@@ -9,7 +9,7 @@ from packit.config import Config
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
-from tests.spellbook import get_test_config
+from tests.spellbook import get_test_config, CRONIE, initiate_git_repo
 
 
 @pytest.fixture
@@ -135,3 +135,21 @@ def distgit_mock(local_project_mock, config_mock, package_config_mock):
     distgit.should_receive("push")
     distgit.should_receive("absolute_specfile_dir").and_return(Path("/mock_path"))
     return distgit
+
+
+@pytest.fixture
+def cronie(tmp_path: Path):
+    """ c8s dist-git repo with cronie """
+    remote_url = "https://git.centos.org/rpms/cronie"
+    d = tmp_path / "cronie"
+    initiate_git_repo(
+        d,
+        copy_from=CRONIE,
+        push=False,
+        remotes=[
+            ("origin", remote_url),
+        ],
+        empty_commits_count=0,
+        add_initial_content=False,
+    )
+    return d

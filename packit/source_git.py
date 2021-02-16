@@ -26,11 +26,16 @@ from packit.utils.repo import clone_centos_package
 logger = logging.getLogger(__name__)
 
 
+# TODO: we'll need to distinct b/w 8 and 9 - 9 will follow Fedora
 class CentOSDistGit(DistGit):
-    """ Fedora and CentOS dist-git differ """
+    """ CentOS dist-git layout implementation """
 
-    # we store downstream content in source-git in this subdir
-    source_git_downstream_suffix = "SPECS"
+    # spec files are stored in this dir in dist-git
+    spec_dir_name = "SPECS"
+
+    # sources are stored in this dir in dist-git
+    # this applies to CentOS Stream 8 and CentOS Linux 7 and 8
+    source_dir_name = "SOURCES"
 
     @classmethod
     def clone(
@@ -45,10 +50,6 @@ class CentOSDistGit(DistGit):
         )
         lp = LocalProject(working_dir=path)
         return cls(config, package_config, local_project=lp)
-
-    @property
-    def absolute_source_dir(self):
-        return self.local_project.working_dir / "SOURCES"
 
 
 def get_distgit_kls_from_repo(
@@ -311,6 +312,7 @@ class SourceGitGenerator:
         """
         if self.dist_git_branch:
             self.dist_git.checkout_branch(self.dist_git_branch)
+        self.dist_git.download_upstream_archive()
         root_downstream_dir = self.dist_git.get_root_downstream_dir_for_source_git(
             self.local_project.working_dir
         )

@@ -196,3 +196,24 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
     # requre needs sphinx, so SRPM is fine
+
+
+@pytest.mark.slow
+def test_centos_cronie(api_instance_source_git, tmp_path: Path):
+    source_git_path = tmp_path.joinpath("cronie-sg")
+    # create src-git
+    source_git_path.mkdir()
+    create_new_repo(source_git_path, [])
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
+        "https://github.com/cronie-crond/cronie",
+        upstream_ref="cronie-1.5.2",
+        centos_package="cronie",
+    )
+    sgg.create_from_upstream()
+
+    # verify it
+    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
+    srpm_path = list(source_git_path.glob("cronie-1.5.2-*.src.rpm"))[0]
+    assert srpm_path.is_file()
