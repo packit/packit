@@ -30,16 +30,18 @@ class StreamLogger(threading.Thread):
 
 
 class PackitFormatter(logging.Formatter):
-    def format(self, record):
-        if record.levelno == logging.INFO:
-            self._style._fmt = "%(message)s"
-        elif record.levelno > logging.INFO:
-            self._style._fmt = "%(levelname)-8s %(message)s"
-        else:  # debug
-            self._style._fmt = (
-                "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
-            )
-        return logging.Formatter.format(self, record)
+    def __init__(
+        self,
+        fmt=None,
+        datefmt=None,
+        *args,
+    ):
+        fmt = (
+            fmt
+            or "%(asctime)s.%(msecs).03d %(filename)-17s %(levelname)-6s %(message)s"
+        )
+        datefmt = datefmt or "%Y-%m-%d %H:%M:%S"
+        super().__init__(fmt, datefmt, *args)
 
 
 def set_logging(
@@ -47,7 +49,7 @@ def set_logging(
     level=logging.INFO,
     handler_class=logging.StreamHandler,
     handler_kwargs=None,
-    date_format="%H:%M:%S",
+    date_format=None,
 ):
     """
     Set personal logger for this library.
