@@ -1,3 +1,5 @@
+summary:
+  Unit, integration & functional tests.
 prepare:
   how: ansible
   playbooks:
