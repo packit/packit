@@ -3,6 +3,5 @@ prepare:
   playbooks:
   - files/packit-testing-farm-prepare.yaml
 execute:
-  how: shell
   script:
   - pwd; ls -lah; make check
