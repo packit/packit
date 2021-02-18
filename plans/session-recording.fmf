@@ -1,3 +1,5 @@
+summary:
+  Tests using pre-recorded responses from external services.
 prepare:
   how: ansible
   playbooks:
