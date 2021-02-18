@@ -1,5 +1,4 @@
 execute:
-  how: shell
   script:
   - packit --version
   - packit --help
