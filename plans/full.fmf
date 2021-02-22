@@ -6,4 +6,4 @@ prepare:
   - files/packit-testing-farm-prepare.yaml
 execute:
   script:
-  - pwd; ls -lah; make check
+  - make check
