@@ -1,0 +1,9 @@
+summary:
+  Unit, integration & functional tests.
+prepare:
+  how: ansible
+  playbooks:
+  - files/packit-testing-farm-prepare.yaml
+execute:
+  script:
+  - make check
