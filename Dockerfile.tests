@@ -1,7 +1,7 @@
 # Packit (test) dependencies.
 # To run tests locally via 'make check_in_container'.
 
-FROM docker.io/usercont/base
+FROM quay.io/packit/base
 
 COPY files/tasks/*.yaml /files/tasks/
 COPY files/*.yaml /files/
