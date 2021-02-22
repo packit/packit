@@ -398,7 +398,9 @@ class DistGit(PackitRepositoryBase):
                 f"{self.package_config.downstream_package_name!r}: \n{builds_str}"
             )
 
-            koji_tag = f"{dist_git_branch}-updates-candidate"
+            # EPEL uses "testing-candidate" instead of "updates-candidate"
+            prefix = "testing" if dist_git_branch.startswith("epel") else "updates"
+            koji_tag = f"{dist_git_branch}-{prefix}-candidate"
             try:
                 koji_builds = [builds_d[koji_tag]]
                 koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
