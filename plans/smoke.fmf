@@ -1,0 +1,6 @@
+summary:
+  Basic smoke tests.
+execute:
+  script:
+  - packit --version
+  - packit --help
