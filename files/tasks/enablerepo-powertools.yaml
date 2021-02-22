@@ -1,0 +1,10 @@
+---
+- name: Install dnf-plugins-core
+  dnf:
+    name: dnf-plugins-core
+    state: present
+  become: true
+- name: Enable Powertools repo (CentOS)
+  command: dnf config-manager --set-enabled powertools
+  when: ansible_distribution == 'CentOS'
+  become: true

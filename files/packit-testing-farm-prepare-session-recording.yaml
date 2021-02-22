@@ -6,3 +6,4 @@
     - include_tasks: tasks/python-compile-deps.yaml
     - include_tasks: tasks/rpm-test-deps.yaml
     - include_tasks: tasks/requre.yaml
+    - include_tasks: tasks/enablerepo-powertools.yaml
