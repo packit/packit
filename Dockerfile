@@ -1,6 +1,6 @@
 # pip3 install packit from this repo.
 
-FROM docker.io/usercont/base
+FROM quay.io/packit/base
 
 WORKDIR /src
 
