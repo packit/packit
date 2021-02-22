@@ -4,5 +4,3 @@ execute:
   script:
   - packit --version
   - packit --help
-  - packit status https://github.com/packit/packit
-  - packit status https://src.fedoraproject.org/rpms/packit
