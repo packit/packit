@@ -1,29 +1,10 @@
-# -*- coding: utf-8 -*-
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import os
 import sys
 import pytest
+import textwrap
 
 from flexmock import flexmock
 from pkg_resources import DistributionNotFound, Distribution
@@ -35,6 +16,7 @@ from packit.utils.decorators import fallback_return_value
 from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
+    git_patch_ish,
 )
 from packit.utils.commands import run_command
 
@@ -178,3 +160,122 @@ class TestFallbackReturnValue:
 def test_sanitize_branch(inp, exp, exp_rpm):
     assert sanitize_branch_name(inp) == exp
     assert sanitize_branch_name_for_rpm(inp) == exp_rpm
+
+
+@pytest.mark.parametrize(
+    "inp,outp",
+    [
+        pytest.param(
+            """
+            """,
+            """
+            """,
+            id="empty-patch",
+        ),
+        # There are some \t characters in the strings bellow,
+        # and thats expected.
+        pytest.param(
+            textwrap.dedent(
+                """
+                Short description: NSCD must use nscd user.
+                Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+                Origin: PATCH
+                Upstream status: not-needed
+
+                Fedora-specific configuration adjustment to introduce the nscd user.
+                (Upstream does not assume this user exists.)
+
+                diff -Nrup a/nscd/nscd.conf b/nscd/nscd.conf
+                --- a/nscd/nscd.conf	2012-06-05 07:42:49.000000000 -0600
+                +++ b/nscd/nscd.conf	2012-06-07 12:15:21.818318670 -0600
+                @@ -33,7 +33,7 @@
+                 #	logfile			/var/log/nscd.log
+                 #	threads			4
+                 #	max-threads		32
+                -#	server-user		nobody
+                +	server-user		nscd
+                 #	stat-user		somebody
+                    debug-level		0
+                 #	reload-count		5
+            """
+            ),
+            textwrap.dedent(
+                """
+                Short description: NSCD must use nscd user.
+                Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+                Origin: PATCH
+                Upstream status: not-needed
+
+                Fedora-specific configuration adjustment to introduce the nscd user.
+                (Upstream does not assume this user exists.)
+
+                diff --git a/nscd/nscd.conf b/nscd/nscd.conf
+                --- a/nscd/nscd.conf
+                +++ b/nscd/nscd.conf
+                @@ -33,7 +33,7 @@
+                 #	logfile			/var/log/nscd.log
+                 #	threads			4
+                 #	max-threads		32
+                -#	server-user		nobody
+                +	server-user		nscd
+                 #	stat-user		somebody
+                    debug-level		0
+                 #	reload-count		5
+            """
+            ),
+            id="remove-timestamps",
+        ),
+        pytest.param(
+            textwrap.dedent(
+                """
+                Short description: NSCD must use nscd user.
+                Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+                Origin: PATCH
+                Upstream status: not-needed
+
+                Fedora-specific configuration adjustment to introduce the nscd user.
+                (Upstream does not assume this user exists.)
+
+                --- a/nscd/nscd.conf	2012-06-05 07:42:49.000000000 -0600
+                +++ b/nscd/nscd.conf	2012-06-07 12:15:21.818318670 -0600
+                @@ -33,7 +33,7 @@
+                 #	logfile			/var/log/nscd.log
+                 #	threads			4
+                 #	max-threads		32
+                -#	server-user		nobody
+                +	server-user		nscd
+                 #	stat-user		somebody
+                    debug-level		0
+                 #	reload-count		5
+            """
+            ),
+            textwrap.dedent(
+                """
+                Short description: NSCD must use nscd user.
+                Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+                Origin: PATCH
+                Upstream status: not-needed
+
+                Fedora-specific configuration adjustment to introduce the nscd user.
+                (Upstream does not assume this user exists.)
+
+                diff --git a/nscd/nscd.conf b/nscd/nscd.conf
+                --- a/nscd/nscd.conf
+                +++ b/nscd/nscd.conf
+                @@ -33,7 +33,7 @@
+                 #	logfile			/var/log/nscd.log
+                 #	threads			4
+                 #	max-threads		32
+                -#	server-user		nobody
+                +	server-user		nscd
+                 #	stat-user		somebody
+                    debug-level		0
+                 #	reload-count		5
+            """
+            ),
+            id="add-missing-diff",
+        ),
+    ],
+)
+def test_git_patch_ish(inp, outp):
+    assert git_patch_ish(inp) == outp

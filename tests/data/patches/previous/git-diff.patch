@@ -1,0 +1,93 @@
+Short description: fnmatch() fails with MBCS.
+Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+Origin: PATCH
+Bug-RHEL: #819430, #826149, #826151
+Bug-Upstream: #14185
+Upstream status: not-submitted
+
+fnmatch() fails when '*' wildcard is applied on the file name
+containing multi-byte character(s)
+
+This needs to be reviewed thoroughly and go upstream with a
+new test case.
+
+
+diff --git a/posix/fnmatch.c b/posix/fnmatch.c
+index 5896812c966ac7c6..63df3dae0911030f 100644
+--- a/posix/fnmatch.c
++++ b/posix/fnmatch.c
+@@ -237,6 +237,7 @@ fnmatch (const char *pattern, const char *string, int flags)
+ {
+   if (__glibc_unlikely (MB_CUR_MAX != 1))
+     {
++      const char *orig_pattern = pattern;
+       mbstate_t ps;
+       size_t n;
+       const char *p;
+@@ -256,10 +257,8 @@ fnmatch (const char *pattern, const char *string, int flags)
+                                                  alloca_used);
+           n = mbsrtowcs (wpattern, &p, n + 1, &ps);
+           if (__glibc_unlikely (n == (size_t) -1))
+-            /* Something wrong.
+-               XXX Do we have to set 'errno' to something which mbsrtows hasn't
+-               already done?  */
+-            return -1;
++	    /* Something wrong: Fall back to single byte matching.  */
++	    goto try_singlebyte;
+           if (p)
+             {
+               memset (&ps, '\0', sizeof (ps));
+@@ -271,10 +270,8 @@ fnmatch (const char *pattern, const char *string, int flags)
+         prepare_wpattern:
+           n = mbsrtowcs (NULL, &pattern, 0, &ps);
+           if (__glibc_unlikely (n == (size_t) -1))
+-            /* Something wrong.
+-               XXX Do we have to set 'errno' to something which mbsrtows hasn't
+-               already done?  */
+-            return -1;
++	    /* Something wrong: Fall back to single byte matching.  */
++	    goto try_singlebyte;
+           if (__glibc_unlikely (n >= (size_t) -1 / sizeof (wchar_t)))
+             {
+               __set_errno (ENOMEM);
+@@ -297,14 +294,8 @@ fnmatch (const char *pattern, const char *string, int flags)
+                                                 alloca_used);
+           n = mbsrtowcs (wstring, &p, n + 1, &ps);
+           if (__glibc_unlikely (n == (size_t) -1))
+-            {
+-              /* Something wrong.
+-                 XXX Do we have to set 'errno' to something which
+-                 mbsrtows hasn't already done?  */
+-            free_return:
+-              free (wpattern_malloc);
+-              return -1;
+-            }
++	    /* Something wrong: Fall back to single byte matching.  */
++	    goto free_and_try_singlebyte;
+           if (p)
+             {
+               memset (&ps, '\0', sizeof (ps));
+@@ -316,10 +307,8 @@ fnmatch (const char *pattern, const char *string, int flags)
+         prepare_wstring:
+           n = mbsrtowcs (NULL, &string, 0, &ps);
+           if (__glibc_unlikely (n == (size_t) -1))
+-            /* Something wrong.
+-               XXX Do we have to set 'errno' to something which mbsrtows hasn't
+-               already done?  */
+-            goto free_return;
++	    /* Something wrong: Fall back to singlebyte matching. */
++	    goto free_and_try_singlebyte;
+           if (__glibc_unlikely (n >= (size_t) -1 / sizeof (wchar_t)))
+             {
+               free (wpattern_malloc);
+@@ -346,6 +335,10 @@ fnmatch (const char *pattern, const char *string, int flags)
+       free (wpattern_malloc);
+ 
+       return res;
++      free_and_try_singlebyte:
++	free(wpattern_malloc);
++      try_singlebyte:
++	pattern = orig_pattern;
+     }
+ 
+   return internal_fnmatch (pattern, string, string + strlen (string),

@@ -1,30 +1,12 @@
-# MIT License
-#
-# Copyright (c) 2020 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 """
 Processing RPM spec file patches.
 """
 import datetime
 import logging
+import tempfile
 from itertools import islice
 from pathlib import Path
 from typing import List, Optional, Dict
@@ -37,7 +19,7 @@ from packit.exceptions import PackitException, PackitGitException
 from packit.git_utils import get_metadata_from_message
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import is_a_git_ref
+from packit.utils.repo import is_a_git_ref, git_patch_ish
 
 logger = logging.getLogger(__name__)
 
@@ -322,7 +304,7 @@ class PatchGenerator:
         commits: List[git.Commit],
         destination: str,
         files_to_ignore: List[str] = None,
-    ):
+    ) -> List[PatchMetadata]:
         """
         Pair commits (in a source-git repo) with a list patches generated with git-format-patch.
 
@@ -398,7 +380,7 @@ class PatchGenerator:
     @staticmethod
     def process_git_am_style_patches(
         patch_list: List[PatchMetadata],
-    ):
+    ) -> List[PatchMetadata]:
         """
         When using `%autosetup -S git_am`, there is a case
         where a single patch file contains multiple commits.
@@ -462,6 +444,51 @@ class PatchGenerator:
                 break
 
         return new_patch_list
+
+    @staticmethod
+    def undo_identical(
+        patch_list: List[PatchMetadata],
+        repo: git.Repo,
+    ) -> List[PatchMetadata]:
+        """
+        Remove from patch_list and undo changes of patch files which
+        have the same patch-id as their previous version, and so they
+        can be considerd identical.
+
+        :param patch_list: List of patches to check.
+        :param repo: Git repo to work in.
+        :return: A filtered list of patches, with identical patches removed.
+        """
+        ret: List[PatchMetadata] = []
+        for patch in patch_list:
+            relative_patch_path = patch.path.relative_to(repo.working_dir)
+            logger.debug(f"Processing {relative_patch_path} ...")
+            new_patch = str(relative_patch_path) in repo.untracked_files
+            if new_patch:
+                logger.debug(f"{relative_patch_path} is a new patch")
+                ret.append(patch)
+                continue
+
+            # patch-id before the change
+            prev_patch = repo.git.show(f"HEAD:{relative_patch_path}")
+            prev_patch = git_patch_ish(prev_patch)
+            with tempfile.TemporaryFile(mode="w+") as fp:
+                fp.write(prev_patch)
+                fp.seek(0)
+                prev_patch_id = repo.git.patch_id("--stable", istream=fp).split()[0]
+                logger.debug(f"Previous patch-id: {prev_patch_id}")
+
+            # current patch-id
+            with open(patch.path, "r") as fp:
+                current_patch_id = repo.git.patch_id("--stable", istream=fp).split()[0]
+                logger.debug(f"Current patch-id: {current_patch_id}")
+
+            if current_patch_id != prev_patch_id:
+                ret.append(patch)
+            else:
+                # this looks the same, don't change it
+                repo.git.checkout("--", relative_patch_path)
+        return ret
 
     def create_patches(
         self,
