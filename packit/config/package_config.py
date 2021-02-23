@@ -156,10 +156,7 @@ class PackageConfig(CommonPackageConfig):
         if not raw_dict.get("downstream_package_name", None) and repo_name:
             raw_dict["downstream_package_name"] = repo_name
 
-        package_config = PackageConfigSchema().load(raw_dict)
-
-        logger.debug(package_config)
-        return package_config
+        return PackageConfigSchema().load(raw_dict)
 
     def get_copr_build_project_value(self) -> Optional[str]:
         """
