@@ -83,6 +83,9 @@ def create_update(
         f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}"
     )
 
+    if branches_to_update:
+        click.echo("Please provide Bodhi username and password when asked for.")
+
     for branch in branches_to_update:
         api.create_update(
             koji_builds=koji_build,
