@@ -27,6 +27,7 @@ from pathlib import Path
 from subprocess import CalledProcessError
 
 import pytest
+from distro import linux_distribution
 
 from tests.functional.spellbook import call_real_packit
 
@@ -37,7 +38,7 @@ def test_rpm_command(ogr_distgit_and_remote):
     )
     rpm_paths = ogr_distgit_and_remote[0].glob("noarch/*.rpm")
 
-    assert all([rpm_path.exists() for rpm_path in rpm_paths])
+    assert all(rpm_path.exists() for rpm_path in rpm_paths)
 
 
 def test_local_build_with_remote_good(ogr_distgit_and_remote):
@@ -47,7 +48,7 @@ def test_local_build_with_remote_good(ogr_distgit_and_remote):
     )
     rpm_paths = ogr_distgit_and_remote[0].glob("noarch/*.rpm")
 
-    assert all([rpm_path.exists() for rpm_path in rpm_paths])
+    assert all(rpm_path.exists() for rpm_path in rpm_paths)
 
 
 def test_local_build_with_remote_bad(ogr_distgit_and_remote):
@@ -60,9 +61,13 @@ def test_local_build_with_remote_bad(ogr_distgit_and_remote):
     assert b"Remote named 'burcak' didn't exist" in ex.value.output
 
 
+@pytest.mark.skipif(
+    linux_distribution()[0].startswith("CentOS"),
+    reason="No rpmautospec-rpm-macros installed",
+)
 def test_rpm_command_for_path(ogr_distgit_and_remote):
     call_real_packit(
         parameters=["--debug", "local-build", str(ogr_distgit_and_remote[0])]
     )
     rpm_paths = Path.cwd().glob("noarch/*.rpm")
-    assert all([rpm_path.exists() for rpm_path in rpm_paths])
+    assert all(rpm_path.exists() for rpm_path in rpm_paths)
