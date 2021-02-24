@@ -13,5 +13,6 @@
   dnf:
     name:
       - rpmautospec-rpm-macros
-    enablerepo: updates-testing
+    state: present
+  when: ansible_distribution == 'Fedora'
   become: true
