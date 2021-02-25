@@ -36,6 +36,7 @@ from packit.config.job_config import (
 )
 from packit.config.package_config import NotificationsConfig
 from packit.config.notifications import PullRequestNotificationsConfig
+from packit.config.sources import SourcesItem
 from packit.sync import SyncFilesItem
 
 logger = getLogger(__name__)
@@ -131,6 +132,19 @@ class NotProcessedField(fields.Field):
         additional_message = self.metadata.get("additional_message")
         if additional_message:
             logger.warning(f"{additional_message}")
+
+
+class SourceSchema(Schema):
+    """
+    Schema for sources.
+    """
+
+    path = fields.String(required=True)
+    url = fields.String(required=True)
+
+    @post_load
+    def make_instance(self, data, **_):
+        return SourcesItem(**data)
 
 
 class PullRequestNotificationsSchema(Schema):
@@ -247,6 +261,7 @@ class CommonConfigSchema(Schema):
     patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
+    sources = fields.List(fields.Nested(SourceSchema), missing=None)
 
     # For backwards compatibility with packit-service. Should be removed once
     # packit-service uses dump method.
