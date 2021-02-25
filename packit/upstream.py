@@ -452,7 +452,19 @@ class Upstream(PackitRepositoryBase):
             commits_range,
             "--",
         ]
-        return run_command(cmd, output=True, cwd=self.local_project.working_dir).strip()
+        try:
+            return run_command(
+                cmd, output=True, cwd=self.local_project.working_dir
+            ).strip()
+        except PackitCommandFailedError as ex:
+            logger.error(f"We couldn't get commit messages for %changelog\n{ex}")
+            logger.info(f"Does the git ref {after} exist in the git repo?")
+            logger.info(
+                "If the ref is a git tag, "
+                'you should consider setting "upstream_tag_template":\n  '
+                "https://packit.dev/docs/configuration/#upstream_tag_template"
+            )
+            raise
 
     def fix_spec(self, archive: str, version: str, commit: str):
         """
