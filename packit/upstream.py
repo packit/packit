@@ -704,9 +704,7 @@ class Upstream(PackitRepositoryBase):
             )
             logger.warning("Therefore skipping downloading of remote sources.")
         else:
-            # > Method that iterates over all sources and downloads ones,
-            # > which contain URL instead of just a file.
-            self.specfile.download_remote_sources()
+            self.download_remote_sources()
 
     def fix_specfile_to_use_local_archive(self, archive, archive_version) -> None:
         """

@@ -23,11 +23,13 @@ import logging
 
 import pytest
 from flexmock import flexmock
+from rebasehelper.helpers.download_helper import DownloadHelper
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.command_handler import LocalCommandHandler
 from packit.config import Config, RunCommandType, PackageConfig
+from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
@@ -258,3 +260,124 @@ def test_get_output_from_action_not_defined(packit_repository_base):
 
     result = packit_repository_base.get_output_from_action(ActionName.create_patches)
     assert result is None
+
+
+@pytest.mark.parametrize(
+    "source, package_config, expected",
+    [
+        pytest.param(
+            "rsync-3.1.3.tar.gz",
+            PackageConfig(
+                specfile_path="rsync.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.3.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                ],
+                jobs=[],
+            ),
+            "https://git.centos.org/sources/rsync/c8s/82e7829",
+        ),
+        pytest.param(
+            "rsync-3.1.3.tar.gz",
+            PackageConfig(
+                specfile_path="rsync.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.2.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                ],
+                jobs=[],
+            ),
+            None,
+        ),
+        pytest.param(
+            "rsync-3.1.3.tar.gz",
+            PackageConfig(
+                specfile_path="rsync.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.3.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                    SourcesItem(
+                        path="rsync-3.1.2.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7828",
+                    ),
+                ],
+                jobs=[],
+            ),
+            "https://git.centos.org/sources/rsync/c8s/82e7829",
+        ),
+    ],
+)
+def test_get_matching_source_url_from_config(source, package_config, expected):
+    base_git = PackitRepositoryBase(config=flexmock(), package_config=package_config)
+    assert base_git.get_matching_source_url_from_config(source) == expected
+
+
+@pytest.mark.parametrize(
+    "sources, package_config, expected_url",
+    [
+        pytest.param(
+            ["https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz"],
+            PackageConfig(
+                specfile_path="rsync.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.3.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                ],
+                jobs=[],
+            ),
+            "https://git.centos.org/sources/rsync/c8s/82e7829",
+        ),
+        pytest.param(
+            ["https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz"],
+            PackageConfig(
+                specfile_path="rsync.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.2.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                ],
+                jobs=[],
+            ),
+            "https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz",
+        ),
+        pytest.param(
+            ["https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz"],
+            PackageConfig(
+                specfile_path="rsync.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.3.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                    SourcesItem(
+                        path="rsync-3.1.2.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7828",
+                    ),
+                ],
+                jobs=[],
+            ),
+            "https://git.centos.org/sources/rsync/c8s/82e7829",
+        ),
+    ],
+)
+def test_download_remote_sources(sources, package_config, expected_url, tmp_path):
+    base_git = PackitRepositoryBase(config=flexmock(), package_config=package_config)
+    specfile = flexmock(sources=sources, sources_location=tmp_path)
+    flexmock(base_git).should_receive("specfile").and_return(specfile)
+
+    expected_path = tmp_path / "rsync-3.1.3.tar.gz"
+
+    flexmock(DownloadHelper).should_receive("download_file").with_args(
+        expected_url, str(expected_path)
+    ).once()
+
+    base_git.download_remote_sources()
