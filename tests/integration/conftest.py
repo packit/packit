@@ -36,12 +36,12 @@ from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
 
 from packit.api import PackitAPI
+from packit.base_git import PackitRepositoryBase
 from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
-from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
@@ -116,7 +116,7 @@ def mock_spec_download_remote_s(
         ]
         subprocess.check_call(archive_cmd, cwd=repo_path)
 
-    flexmock(Specfile, download_remote_sources=mock_download_remote_sources)
+    flexmock(PackitRepositoryBase, download_remote_sources=mock_download_remote_sources)
 
 
 def mock_remote_functionality(distgit: Path, upstream: Path):

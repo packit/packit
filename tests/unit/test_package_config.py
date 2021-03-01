@@ -42,6 +42,7 @@ from packit.config.package_config import (
     PackageConfig,
     get_local_specfile_path,
 )
+from packit.config.sources import SourcesItem
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -408,6 +409,27 @@ def test_package_config_not_equal(not_equal_package_config):
             {
                 "specfile_path": "fedora/package.spec",
                 "notifications": {"pull_request": False},
+            },
+            False,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "sources": [{"path": "example_path"}],
+            },
+            False,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "sources": [{"url": "example_url"}],
+            },
+            False,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
+                "sources": {"path": "example_path", "url": "example_url"},
             },
             False,
         ),
@@ -784,6 +806,29 @@ def test_package_config_parse_error(raw):
                 ],
             ),
             id="sync_changelog_false_by_default",
+        ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "sources": [
+                    {
+                        "path": "rsync-3.1.3.tar.gz",
+                        "url": "https://git.centos.org/sources/rsync/c8s/82e7829",
+                    }
+                ],
+                "jobs": [],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                sources=[
+                    SourcesItem(
+                        path="rsync-3.1.3.tar.gz",
+                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                    ),
+                ],
+                jobs=[],
+            ),
+            id="sources",
         ),
     ],
 )
@@ -1170,6 +1215,25 @@ def test_get_local_specfile_path():
             dist_git_base_url="https://something.wicked",
             downstream_package_name="package",
             spec_source_id="Source1",
+        ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            actions={
+                ActionName.pre_sync: "some/pre-sync/command --option",
+                ActionName.get_current_version: "get-me-version",
+            },
+            jobs=[],
+            upstream_project_url="https://github.com/asd/qwe",
+            upstream_package_name="qwe",
+            dist_git_base_url="https://something.wicked",
+            downstream_package_name="package",
+            spec_source_id="Source1",
+            sources=[
+                SourcesItem(
+                    path="rsync-3.1.3.tar.gz",
+                    url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                ),
+            ],
         ),
     ],
 )

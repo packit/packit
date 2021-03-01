@@ -32,6 +32,7 @@ from packit.actions import ActionName
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.job_config import JobConfig, get_default_jobs, JobType
 from packit.config.notifications import NotificationsConfig
+from packit.config.sources import SourcesItem
 from packit.config.sync_files_config import SyncFilesConfig
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
@@ -70,6 +71,7 @@ class PackageConfig(CommonPackageConfig):
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
+        sources: Optional[List[SourcesItem]] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -94,6 +96,7 @@ class PackageConfig(CommonPackageConfig):
             patch_generation_ignore_paths=patch_generation_ignore_paths,
             notifications=notifications,
             copy_upstream_release_description=copy_upstream_release_description,
+            sources=sources,
         )
         self.jobs: List[JobConfig] = jobs or []
 
@@ -121,7 +124,8 @@ class PackageConfig(CommonPackageConfig):
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"archive_root_dir_template={self.archive_root_dir_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}', "
-            f"copy_upstream_release_description='{self.copy_upstream_release_description}')"
+            f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
+            f"sources='{self.sources}')"
         )
 
     @classmethod
@@ -210,6 +214,7 @@ class PackageConfig(CommonPackageConfig):
             and self.upstream_tag_template == other.upstream_tag_template
             and self.copy_upstream_release_description
             == other.copy_upstream_release_description
+            and self.sources == other.sources
         )
 
 

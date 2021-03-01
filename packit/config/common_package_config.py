@@ -31,6 +31,7 @@ from packit.config.notifications import (
     NotificationsConfig,
     PullRequestNotificationsConfig,
 )
+from packit.config.sources import SourcesItem
 from packit.config.sync_files_config import SyncFilesConfig
 from packit.constants import PROD_DISTGIT_URL
 from packit.sync import SyncFilesItem
@@ -73,6 +74,7 @@ class CommonPackageConfig:
         patch_generation_ignore_paths: List[str] = None,
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
+        sources: Optional[List[SourcesItem]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -108,6 +110,7 @@ class CommonPackageConfig:
         self.upstream_tag_template = upstream_tag_template
         self.archive_root_dir_template = archive_root_dir_template
         self.copy_upstream_release_description = copy_upstream_release_description
+        self.sources = sources or []
 
     def __repr__(self):
         return (
@@ -130,7 +133,8 @@ class CommonPackageConfig:
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"
-            f"copy_upstream_release_description='{self.copy_upstream_release_description}')"
+            f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
+            f"sources='{self.sources}')"
         )
 
     @property
