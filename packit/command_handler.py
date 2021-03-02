@@ -24,9 +24,9 @@ import logging
 from pathlib import Path
 from typing import Dict, Type, List, Optional, Union
 
-from packit.utils import commands
 from packit.config import RunCommandType, Config
 from packit.local_project import LocalProject
+from packit.utils import commands
 
 logger = logging.getLogger(__name__)
 
@@ -110,6 +110,37 @@ class LocalCommandHandler(CommandHandler):
 class SandcastleCommandHandler(CommandHandler):
     name = RunCommandType.sandcastle
 
+    def __init__(self, local_project: LocalProject, config: Config):
+        super().__init__(local_project=local_project, config=config)
+        self.local_project = local_project
+        self.config = config
+        # we import here so that packit does not depend on sandcastle (and thus python-kube)
+        from sandcastle.api import Sandcastle, MappedDir
+
+        self._sandcastle: Optional[Sandcastle] = None
+        self._mapped_dir: Optional[MappedDir] = None
+
+    @property
+    def sandcastle(self):
+        """ initialize Sandcastle lazily """
+        if self._sandcastle is None:
+            # we import here so that packit does not depend on sandcastle (and thus python-kube)
+            from sandcastle.api import Sandcastle, MappedDir
+
+            self._mapped_dir = MappedDir(
+                local_dir=self.local_project.working_dir,
+                path=self.config.command_handler_work_dir,
+                with_interim_pvc=True,
+            )
+            self._sandcastle = Sandcastle(
+                image_reference=self.config.command_handler_image_reference,
+                k8s_namespace_name=self.config.command_handler_k8s_namespace,
+                mapped_dir=self._mapped_dir,
+            )
+            logger.debug("running the sandcastle pod")
+            self._sandcastle.run()
+        return self._sandcastle
+
     def run_command(
         self,
         command: List[str],
@@ -127,26 +158,8 @@ class SandcastleCommandHandler(CommandHandler):
         :param cwd: working directory to run command in
         :param print_live: not used here
         """
-        # we import here so that packit does not depend on sandcastle (and thus python-kube)
-        from sandcastle.api import Sandcastle, MappedDir
-
-        md = MappedDir(
-            local_dir=self.local_project.working_dir,
-            path=cwd or self.config.command_handler_work_dir,
-            with_interim_pvc=True,
-        )
-        sandcastle = Sandcastle(
-            image_reference=self.config.command_handler_image_reference,
-            k8s_namespace_name=self.config.command_handler_k8s_namespace,
-            mapped_dir=md,
-            env_vars=env,
-        )
-        sandcastle.run()
-        try:
-            logger.info(f"Running command: {' '.join(command)}")
-            out: str = sandcastle.exec(command=command)
-        finally:
-            sandcastle.delete_pod()
+        logger.info(f"Running command: {' '.join(command)}")
+        out: str = self.sandcastle.exec(command=command, env=env, cwd=cwd)
 
         logger.info(f"Output of {command!r}:")
         # out = 'make po-pull\nmake[1]: Entering directory \'/sand
@@ -157,3 +170,14 @@ class SandcastleCommandHandler(CommandHandler):
         if return_output:
             return out
         return None
+
+    def clean(self):
+        if self._sandcastle:
+            logger.info("Deleting sandcastle pod.")
+            self._sandcastle.delete_pod()
+            self._sandcastle = None
+        else:
+            logger.info("Sandcastle pod is not running, nothing to clean up")
+
+    def __del__(self):
+        self.clean()

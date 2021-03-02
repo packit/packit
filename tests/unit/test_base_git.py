@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import logging
+from pathlib import Path
+from typing import List, Optional, Dict, Union
 
 import pytest
 from flexmock import flexmock
@@ -210,27 +212,57 @@ def test_run_action_in_sandcastle(
 ):
     from sandcastle import Sandcastle
 
-    flexmock(Sandcastle).should_receive("get_api_client").and_return(None)
-    flexmock(Sandcastle).should_receive("run").and_return(None)
-    flexmock(Sandcastle).should_receive("exec").with_args(
-        command=["command", "-a"]
-    ).and_return(
-        "make po-pull\n"
-        "make[1]: Entering directory "
-        "'/sandcastle/docker-io-usercont-sandcastle-prod-20200820-160948197515'\n"
-        "TEMP_DIR=$(mktemp --tmpdir -d anaconda-localization-XXXXXXXXXX)\n"
-    ).once()
-    packit_repository_base_with_sandcastle_object.config.actions_handler = "sandcastle"
-    flexmock(Sandcastle).should_receive("delete_pod").and_return(None)
+    flexmock(Sandcastle).should_receive("get_api_client").and_return(None).once()
+    flexmock(Sandcastle).should_receive("run").and_return(None).once()
+
+    def mocked_exec(
+        command: List[str],
+        env: Optional[Dict] = None,
+        cwd: Union[str, Path] = None,
+    ):
+        if command == ["command", "-b"]:
+            return "1.2.3"
+        elif command == ["command", "-a"]:
+            return (
+                "make po-pull\n"
+                "make[1]: Entering directory "
+                "'/sandcastle/docker-io-usercont-sandcastle-prod-20200820-160948197515'\n"
+                "TEMP_DIR=$(mktemp --tmpdir -d anaconda-localization-XXXXXXXXXX)\n"
+            )
+        else:
+            raise Exception("This command was not expected")
+
+    flexmock(Sandcastle, exec=mocked_exec)
+    flexmock(Sandcastle).should_receive("delete_pod").once().and_return(None)
     with caplog.at_level(logging.INFO, logger="packit"):
         packit_repository_base_with_sandcastle_object.run_action(
-            ActionName.pre_sync, None, "arg", "kwarg"
+            ActionName.pre_sync, None, "arg1", "kwarg1"
         )
+        packit_repository_base_with_sandcastle_object.run_action(
+            ActionName.get_current_version, None, "arg2", "kwarg2"
+        )
+        # this is being called in PackitAPI.clean
+        packit_repository_base_with_sandcastle_object.command_handler.clean()
         # leading space means that we have the output actually printed
         # and it's not a single line with the whole output
         assert " Running command: command -a\n" in caplog.text
         assert " make po-pull\n" in caplog.text
         assert " anaconda-localization-XXXXXXXXXX)\n" in caplog.text
+        assert " 1.2.3\n" in caplog.text
+
+
+def test_command_handler_is_set(packit_repository_base_with_sandcastle_object):
+    from sandcastle import Sandcastle
+
+    flexmock(Sandcastle).should_receive("get_api_client").and_return(None).once()
+    flexmock(Sandcastle).should_receive("run").and_return(None).once()
+
+    # it's not set initially
+    assert not packit_repository_base_with_sandcastle_object.is_command_handler_set()
+
+    # and should be set once we invoke it
+    assert packit_repository_base_with_sandcastle_object.command_handler.sandcastle
+    assert packit_repository_base_with_sandcastle_object.is_command_handler_set()
 
 
 def test_run_action_more_actions(packit_repository_base_more_actions):

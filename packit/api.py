@@ -874,8 +874,11 @@ class PackitAPI:
 
     def clean(self):
         """ clean up stuff once all the work is done """
-        # command handlers have nothing to clean
-        logger.debug("PackitAPI.cleanup (there are no objects to clean)")
+        # this is called in p-s: Handler.clean
+        if self.up.is_command_handler_set():
+            self.up.command_handler.clean()
+        if self.dg.is_command_handler_set():
+            self.dg.command_handler.clean()
 
     @staticmethod
     def validate_package_config(working_dir: Path) -> str:
