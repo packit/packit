@@ -31,9 +31,9 @@ from typing import List, Optional, Dict
 
 import git
 import yaml
-from packit.exceptions import PackitException
 
 from packit.constants import DATETIME_FORMAT
+from packit.exceptions import PackitException, PackitGitException
 from packit.git_utils import get_metadata_from_message
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
@@ -221,8 +221,7 @@ class PatchGenerator:
         logger.debug(f"All commits are contained on top of {git_ref!r}.")
         return True
 
-    @staticmethod
-    def linearize_history(git_ref: str):
+    def linearize_history(self, git_ref: str):
         r"""
         Transform complex git history into a linear one starting from a selected git ref.
 
@@ -244,6 +243,12 @@ class PatchGenerator:
             "Therefore we are going to make the history linear on a dedicated branch \n"
             "to make sure the patches will be able to be applied."
         )
+        if self.lp.git_repo.is_dirty():
+            raise PackitGitException(
+                "The source-git repo is dirty which means we won't be able to do a linear history. "
+                "Please commit the changes to resolve the issue. If you are changing the content "
+                "of the repository in an action, you can commit those as well."
+            )
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         target_branch = f"packit-patches-{current_time}"
         logger.info(f"Switch branch to {target_branch!r}.")
