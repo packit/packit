@@ -25,6 +25,7 @@ from pathlib import Path
 
 import pytest
 
+from packit.exceptions import PackitException
 from packit.specfile import Specfile
 from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
@@ -457,6 +458,18 @@ def test_srpm_merge_storm(
         "0001-MERGE-COMMIT.patch",
         "0002-ugly-merge-commit.patch",
     }
+
+
+def test_srpm_merge_storm_dirty(api_instance_source_git):
+    ref = "0.1.0"
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", ref)
+    create_merge_commit_in_source_git(sg_path, go_nuts=True)
+    (sg_path / "malt").write_text("Mordor\n")
+    with pytest.raises(PackitException) as ex:
+        with cwd(sg_path):
+            api_instance_source_git.create_srpm(upstream_ref=ref)
+    assert "he source-git repo is dirty" in str(ex.value)
 
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])

@@ -108,3 +108,7 @@ class PackitRPMNotFoundException(PackitRPMException):
 
 class PackitFailedToCreateRPMException(PackitRPMException):
     """ Failed to create RPM """
+
+
+class PackitGitException(PackitException):
+    """ Operation with a git repo failed """
