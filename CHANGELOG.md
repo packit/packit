@@ -1,3 +1,13 @@
+# 0.26.0
+
+- Fix construction of the Koji tag for epel branches when running `packit create-update`. ([#1122](https://github.com/packit/packit/pull/1122))
+- `create-update` now also shows a message about Bodhi requiring the password. ([#1127](https://github.com/packit/packit/pull/1127))
+- `packit init` correctly picks up sources from CentOS and fetches specfile from CentOS dist-git. ([#1106](https://github.com/packit/packit/pull/1106))
+- Fix translating of the target aliases by treating the highest pending version in Bodhi as `rawhide`. ([#1114](https://github.com/packit/packit/pull/1114))
+- The format of Packit logs is unified for all log levels. ([#1119](https://github.com/packit/packit/pull/1119))
+- There is a new configuration option `sources` which enables to define sources to override their URLs in specfile.
+  You can read more about this in [our documentation](https://packit.dev/docs/configuration/#sources). ([#1131](https://github.com/packit/packit/pull/1131))
+
 # 0.25.0
 
 - `propose-update` command now respects requested dist-git branches. ([#1094](https://github.com/packit/packit/pull/1094))
