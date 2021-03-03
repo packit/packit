@@ -469,7 +469,7 @@ def test_srpm_merge_storm_dirty(api_instance_source_git):
     with pytest.raises(PackitException) as ex:
         with cwd(sg_path):
             api_instance_source_git.create_srpm(upstream_ref=ref)
-    assert "he source-git repo is dirty" in str(ex.value)
+    assert "The source-git repo is dirty" in str(ex.value)
 
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
