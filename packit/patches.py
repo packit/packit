@@ -275,6 +275,7 @@ class PatchGenerator:
             # git prints nasty warning when filter-branch is used that it's dangerous
             # this env var prevents it from prints
             env={"FILTER_BRANCH_SQUELCH_WARNING": "1"},
+            print_live=True,
         )
 
     def run_git_format_patch(
