@@ -252,7 +252,7 @@ class PatchGenerator:
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         target_branch = f"packit-patches-{current_time}"
         logger.info(f"Switch branch to {target_branch!r}.")
-        run_command(["git", "checkout", "-B", target_branch])
+        self.lp.create_branch(target_branch)
         target = f"{git_ref}..HEAD"
         logger.debug(f"Linearize history {target}.")
         # https://stackoverflow.com/a/17994534/909579
@@ -276,6 +276,7 @@ class PatchGenerator:
             # this env var prevents it from prints
             env={"FILTER_BRANCH_SQUELCH_WARNING": "1"},
             print_live=True,
+            cwd=self.lp.working_dir,
         )
 
     def run_git_format_patch(
@@ -509,7 +510,7 @@ class PatchGenerator:
         finally:
             if not contained:
                 # check out the previous branch
-                run_command(["git", "checkout", "-", "--"])
+                run_command(["git", "checkout", "-", "--"], cwd=self.lp.working_dir)
                 # we could also delete the newly created branch,
                 # but let's not do that so that user can inspect it
 
