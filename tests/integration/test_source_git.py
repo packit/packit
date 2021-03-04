@@ -26,6 +26,7 @@ from pathlib import Path
 import pytest
 
 from packit.exceptions import PackitException
+from packit.patches import PatchGenerator
 from packit.specfile import Specfile
 from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
@@ -461,15 +462,31 @@ def test_srpm_merge_storm(
 
 
 def test_srpm_merge_storm_dirty(api_instance_source_git):
+    """ verify the linearization is halted when a source-git repo si dirty """
     ref = "0.1.0"
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / "fedora", ref)
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     (sg_path / "malt").write_text("Mordor\n")
     with pytest.raises(PackitException) as ex:
-        with cwd(sg_path):
+        with cwd("/"):  # let's mimic p-s by having different cwd than the project
             api_instance_source_git.create_srpm(upstream_ref=ref)
     assert "The source-git repo is dirty" in str(ex.value)
+
+
+def test_linearization(api_instance_source_git):
+    ref = "0.1.0"
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path, sg_path / "fedora", ref)
+    create_merge_commit_in_source_git(sg_path, go_nuts=True)
+    with cwd("/"):  # let's mimic p-s by having different cwd than the project
+        pg = PatchGenerator(api_instance_source_git.upstream_local_project)
+        pg.create_patches(ref, sg_path / "fedora")
+    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+        "0001-sourcegit-content.patch",
+        "0002-MERGE-COMMIT.patch",
+        "0003-ugly-merge-commit.patch",
+    }
 
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])

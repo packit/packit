@@ -398,6 +398,40 @@ class LocalProject:
         self.git_repo.git.checkout(ref)
         logger.debug(f"Current commit is '{self.git_repo.commit()}'")
 
+    def create_branch(
+        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+    ) -> git.Head:
+        """
+        Create a new git branch in git
+
+        :param branch_name: name of the branch to check out and fetch
+        :param base: we base our new branch on this one
+        :param setup_tracking: set up remote tracking
+               (exc will be raised if the branch is not in the remote)
+        :return the branch which was just created
+        """
+        # it's not an error if the branch already exists
+        if branch_name in self.git_repo.branches:
+            logger.debug(
+                f"It seems that branch {branch_name!r} already exists, checking it out."
+            )
+            head = self.git_repo.branches[branch_name]
+        else:
+            head = self.git_repo.create_head(branch_name, commit=base)
+
+        if setup_tracking:
+            origin = self.git_repo.remote("origin")
+            if branch_name in origin.refs:
+                remote_ref = origin.refs[branch_name]
+            else:
+                raise PackitException(
+                    f"Remote origin doesn't have ref {branch_name!r}."
+                )
+            # this is important to fedpkg: build can't find the tracking branch otherwise
+            head.set_tracking_branch(remote_ref)
+
+        return head
+
     def checkout_pr(self, pr_id: Union[str, int]):
         """
         Fetch selected PR and check it out.
