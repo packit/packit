@@ -251,6 +251,9 @@ def test_run_action_in_sandcastle(
         assert " 1.2.3\n" in caplog.text
 
 
+@pytest.mark.skipif(
+    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+)
 def test_command_handler_is_set(packit_repository_base_with_sandcastle_object):
     from sandcastle import Sandcastle
 
