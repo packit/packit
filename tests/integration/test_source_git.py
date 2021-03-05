@@ -439,6 +439,12 @@ def test_srpm_merge_storm(
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
+
+    # linearization creates a new branch, make some arbitrary moves to verify
+    # we end up in the former branch after the build
+    subprocess.check_call(["git", "checkout", "-B", "test-branch"], cwd=sg_path)
+    subprocess.check_call(["git", "checkout", "main"], cwd=sg_path)
+
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
     srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
@@ -454,6 +460,13 @@ def test_srpm_merge_storm(
         raise AssertionError(
             "packit-patches- branch was not found - this should trigger the linearization"
         )
+    # make sure we are on the main branch
+    assert (
+        "main"
+        == subprocess.check_output(["git", "branch", "--show-current"], cwd=sg_path)
+        .decode()
+        .strip()
+    )
     assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
         "0001-MERGE-COMMIT.patch",
         "0002-ugly-merge-commit.patch",
