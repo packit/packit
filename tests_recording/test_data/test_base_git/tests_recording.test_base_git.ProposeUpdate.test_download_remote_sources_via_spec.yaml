@@ -1,0 +1,96 @@
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+requests.sessions:
+  send:
+    GET:
+      https://example.org/:
+      - metadata:
+          latency: 0.48049330711364746
+          module_call_list:
+          - unittest.case
+          - requre.online_replacing
+          - tests_recording.test_base_git
+          - packit.base_git
+          - rebasehelper.helpers.download_helper
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 0
+          _content: false
+          _next: null
+          elapsed: 0.480354
+          encoding: UTF-8
+          headers:
+            Accept-Ranges: bytes
+            Age: '183759'
+            Cache-Control: max-age=604800
+            Content-Encoding: gzip
+            Content-Length: '648'
+            Content-Type: text/html; charset=UTF-8
+            Date: Fri, 05 Mar 2021 13:08:49 GMT
+            Etag: '"3147526947+ident"'
+            Expires: Fri, 12 Mar 2021 13:08:49 GMT
+            Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
+            Server: ECS (dcb/7EA2)
+            Vary: Accept-Encoding
+            X-Cache: HIT
+          raw: !!binary |
+            H4sIAAAAAAAA/31UTXPbIBC9+1ds1UsyIyQnaRqPLWn6mWkPaQ9pDz0SsbKYCFAByfZ08t+7Qo4j
+            N5makYFdeLvvsZC9Eqb0uxah9qopZtljh1wUM6Bf5qVvsPi85aptED4ZxaXO0tE6G5co9BzKmluH
+            Po86X7FFBGkxcdbetwx/d7LPo49Ge9SeDWEjKMdZHnnc+nQIvzpAvYSkucI86iVuWmP9ZP9GCl/n
+            AntZIguTGKSWXvKGuZI3mJ89QTm/IzJDBvvApXPR6LszYgd/wjBMeXm/tqbTgpWmMXYJr6s5tfPV
+            YYnidi31EuZPppYLIfX6yFZRpqziSja7JTDekpzM7ZxHFcPYs07G8KGR+v6Gl7fBdE2bYohucW0Q
+            fn6NaPy9RQ23XLth8gWbHr0sOXzDDslyMMTw3hJ3wqalzKGV1VMuYfAQ/oXsJ3SDcEt4O5+32+cM
+            L1EB77x5geg5qtV/RRPUJhncGSvQMsuF7BzplFweAZgtczUXZkPI7RYu6Luibxjb9R0/mcehJfPz
+            09WEDF8O6sXU99JJj2JC7TGTi8WbxWKSyXD+TGBpLPfSEEttNE5B3ykUksOJ4lu21+dq0Od0An6s
+            4lFV/KPYROVjx8MkZJaGCi3CWWXpeB1n2VCbdDsp2L6O67NnN5NMo68tftTSgQh2oFFlLHQOYZg1
+            Tef8QLhHwBHBDQ56DjpF98kl8Mt0RGIXtnhCGqtlj6ahIXkJoLNIdHxtOg+tlRSiNHS0Ugcxgebc
+            3VOFhOgtWiWdI0eSpe0hz4weCItVHg3PhFum6WazSSTXPDF2nY4hXbpPMypujB1IEKAKQZKE0HgR
+            ELM0iJOle6nS8UH7CyjrfG/oBAAA
+          reason: OK
+          status_code: 200
+      https://httpbin.org/anything/rsync-3.1.3.tar.gz:
+      - metadata:
+          latency: 1.0003538131713867
+          module_call_list:
+          - unittest.case
+          - requre.online_replacing
+          - tests_recording.test_base_git
+          - packit.base_git
+          - rebasehelper.specfile
+          - rebasehelper.helpers.download_helper
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 0
+          _content: false
+          _next: null
+          elapsed: 1.000207
+          encoding: null
+          headers:
+            Access-Control-Allow-Credentials: 'true'
+            Access-Control-Allow-Origin: '*'
+            Connection: keep-alive
+            Content-Length: '414'
+            Content-Type: application/json
+            Date: Fri, 05 Mar 2021 13:08:50 GMT
+            Server: gunicorn/19.9.0
+          raw: !!binary |
+            ewogICJhcmdzIjoge30sIAogICJkYXRhIjogIiIsIAogICJmaWxlcyI6IHt9LCAKICAiZm9ybSI6
+            IHt9LCAKICAiaGVhZGVycyI6IHsKICAgICJBY2NlcHQiOiAiKi8qIiwgCiAgICAiQWNjZXB0LUVu
+            Y29kaW5nIjogImd6aXAsIGRlZmxhdGUiLCAKICAgICJIb3N0IjogImh0dHBiaW4ub3JnIiwgCiAg
+            ICAiVXNlci1BZ2VudCI6ICJweXRob24tcmVxdWVzdHMvMi4yNC4wIiwgCiAgICAiWC1BbXpuLVRy
+            YWNlLUlkIjogIlJvb3Q9MS02MDQyMmQ2MS0xYWNhODc2MTcxYzRmODg1MTdmNTc5ZWQiCiAgfSwg
+            CiAgImpzb24iOiBudWxsLCAKICAibWV0aG9kIjogIkdFVCIsIAogICJvcmlnaW4iOiAiOTQuMTEy
+            LjIyOS40OSIsIAogICJ1cmwiOiAiaHR0cHM6Ly9odHRwYmluLm9yZy9hbnl0aGluZy9yc3luYy0z
+            LjEuMy50YXIuZ3oiCn0K
+          reason: OK
+          status_code: 200
