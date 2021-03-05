@@ -133,27 +133,10 @@ class PackitRepositoryBase:
                (exc will be raised if the branch is not in the remote)
         :return the branch which was just created
         """
-        # it's not an error if the branch already exists
-        if branch_name in self.local_project.git_repo.branches:
-            logger.debug(
-                f"It seems that branch {branch_name!r} already exists, checking it out."
-            )
-            head = self.local_project.git_repo.branches[branch_name]
-        else:
-            head = self.local_project.git_repo.create_head(branch_name, commit=base)
-
-        if setup_tracking:
-            origin = self.local_project.git_repo.remote("origin")
-            if branch_name in origin.refs:
-                remote_ref = origin.refs[branch_name]
-            else:
-                raise PackitException(
-                    f"Remote origin doesn't have ref {branch_name!r}."
-                )
-            # this is important to fedpkg: build can't find the tracking branch otherwise
-            head.set_tracking_branch(remote_ref)
-
-        return head
+        # keeping the method in this class to preserve compatibility
+        return self.local_project.create_branch(
+            branch_name=branch_name, base=base, setup_tracking=setup_tracking
+        )
 
     def checkout_branch(self, git_ref: str = None):
         """
