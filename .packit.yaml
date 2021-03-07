@@ -5,7 +5,7 @@ synced_files:
 # packit was already taken on PyPI
 upstream_package_name: packitos
 upstream_project_url: https://github.com/packit/packit
-copy_upstream_release_description: true
+copy_upstream_release_description: false
 
 actions:
   create-archive:
