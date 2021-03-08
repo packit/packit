@@ -1,0 +1,22 @@
+From 6aceabb69fdef1c85d73c5e17b08b7dedcdcf05d Mon Sep 17 00:00:00 2001
+From: Tomas Tomecek <ttomecek@redhat.com>
+Date: Tue, 16 Feb 2021 09:51:20 +0100
+Subject: [PATCH 11/20] Apply patch glibc-cs-path.patch
+
+patch_name: glibc-cs-path.patch
+present_in_specfile: true
+location_in_specfile: 11
+---
+ sysdeps/unix/confstr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
+index 15859c3b27..9b63b7f806 100644
+--- a/sysdeps/unix/confstr.h
++++ b/sysdeps/unix/confstr.h
+@@ -1 +1 @@
+-#define	CS_PATH	"/bin:/usr/bin"
++#define	CS_PATH	"/usr/bin"
+-- 
+2.29.2
+

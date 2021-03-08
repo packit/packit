@@ -1,0 +1,48 @@
+From 9de5daa2fb3df914b367c0966fd0adc13298d096 Mon Sep 17 00:00:00 2001
+From: Tomas Tomecek <ttomecek@redhat.com>
+Date: Tue, 16 Feb 2021 09:51:20 +0100
+Subject: [PATCH 09/20] Apply patch glibc-rh1070416.patch
+
+patch_name: glibc-rh1070416.patch
+present_in_specfile: true
+location_in_specfile: 9
+---
+ nscd/nscd.service | 2 ++
+ nscd/nscd.socket  | 8 ++++++++
+ 2 files changed, 10 insertions(+)
+ create mode 100644 nscd/nscd.socket
+
+diff --git a/nscd/nscd.service b/nscd/nscd.service
+index ab38e8f982..a97018605c 100644
+--- a/nscd/nscd.service
++++ b/nscd/nscd.service
+@@ -2,6 +2,7 @@
+ 
+ [Unit]
+ Description=Name Service Cache Daemon
++After=syslog.target
+ 
+ [Service]
+ Type=forking
+@@ -17,3 +18,4 @@ PIDFile=/run/nscd/nscd.pid
+ 
+ [Install]
+ WantedBy=multi-user.target
++Also=nscd.socket
+diff --git a/nscd/nscd.socket b/nscd/nscd.socket
+new file mode 100644
+index 0000000000..7e512d5339
+--- /dev/null
++++ b/nscd/nscd.socket
+@@ -0,0 +1,8 @@
++[Unit]
++Description=Name Service Cache Daemon Socket
++
++[Socket]
++ListenDatagram=/var/run/nscd/socket
++
++[Install]
++WantedBy=sockets.target
+-- 
+2.29.2
+

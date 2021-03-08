@@ -1,0 +1,28 @@
+From 12668fa2cd987d47af4018a772bcf9d2b04f0970 Mon Sep 17 00:00:00 2001
+From: Tomas Tomecek <ttomecek@redhat.com>
+Date: Tue, 16 Feb 2021 09:51:19 +0100
+Subject: [PATCH 05/20] Apply patch glibc-fedora-manual-dircategory.patch
+
+patch_name: glibc-fedora-manual-dircategory.patch
+present_in_specfile: true
+location_in_specfile: 5
+---
+ manual/libc.texinfo | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/manual/libc.texinfo b/manual/libc.texinfo
+index ad606cae63..d094809f02 100644
+--- a/manual/libc.texinfo
++++ b/manual/libc.texinfo
+@@ -14,7 +14,7 @@
+ @include macros.texi
+ 
+ @comment Tell install-info what to do.
+-@dircategory Software libraries
++@dircategory Libraries
+ @direntry
+ * Libc: (libc).                 C library.
+ @end direntry
+-- 
+2.29.2
+
