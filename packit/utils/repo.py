@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+import re
 import tempfile
 from pathlib import Path
 from typing import Tuple, Optional, Union, List
@@ -157,3 +158,32 @@ def create_new_repo(cwd: Path, switches: List[str]):
         subprocess.check_call(
             ["git", "symbolic-ref", "HEAD", "refs/heads/main"], cwd=cwd
         )
+
+
+def git_patch_ish(patch: str) -> str:
+    """
+    Massage patch to look like a Git-style patch, so that it can
+    be passed to 'git patch-id' in order to calculate a patch-id.
+
+    :param patch: Patch to transform.
+    :return: Transformed patch.
+    """
+    # Prettend as if format is 'diff --git'
+    pattern = re.compile(r"^diff -\w+ ", flags=re.MULTILINE)
+    repl = r"diff --git "
+    patch = re.sub(pattern, repl, patch)
+
+    # Remove timestamps from comparison lines
+    pattern = re.compile(r"^((---|\+\+\+) .+)\t\d{4}.+$", flags=re.MULTILINE)
+    repl = r"\1"
+    patch = re.sub(pattern, repl, patch)
+
+    # Add missing 'diff --git' lines
+    if "diff --git " not in patch:
+        # Timestamps (see above) already need to be removed
+        # for this substitution pattern to work.
+        pattern = re.compile(r"(\n--- (.+)\n\+\+\+ (.+)\n)")
+        repl = r"\ndiff --git \2 \3\1"
+        patch = re.sub(pattern, repl, patch)
+
+    return patch

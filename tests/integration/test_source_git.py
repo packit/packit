@@ -45,7 +45,6 @@ from tests.spellbook import (
 def test_basic_local_update_without_patching(
     sourcegit_and_remote,
     distgit_and_remote,
-    mock_patching,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):

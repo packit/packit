@@ -53,6 +53,7 @@ from packit.exceptions import (
     PackitCoprException,
 )
 from packit.local_project import LocalProject
+from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
 from packit.sync import RawSyncFilesItem, sync_files
@@ -261,6 +262,9 @@ class PackitAPI:
                     patches = self.up.create_patches(
                         upstream=upstream_ref,
                         destination=str(self.dg.absolute_specfile_dir),
+                    )
+                    patches = PatchGenerator.undo_identical(
+                        patches, self.dg.local_project.git_repo
                     )
                     self.dg.specfile_add_patches(patches)
                 self._handle_sources(

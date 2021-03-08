@@ -29,6 +29,7 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
+from packit.patches import PatchGenerator
 
 
 def build_dict(copr_url, id):
@@ -136,6 +137,7 @@ def test_sync_release_version_tag_processing(
     api_mock.should_receive("_prepare_files_to_sync").with_args(
         raw_sync_files=[], full_version=version, upstream_tag=tag
     )
+    flexmock(PatchGenerator).should_receive("undo_identical")
     with expectation:
         api_mock.sync_release(
             version=version or get_version_return, tag=tag, dist_git_branch="_"
