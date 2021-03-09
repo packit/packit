@@ -34,7 +34,7 @@ import yaml
 
 from packit.constants import DATETIME_FORMAT
 from packit.exceptions import PackitException, PackitGitException
-from packit.git_utils import get_metadata_from_message
+from packit.utils.repo import get_metadata_from_message
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
 from packit.utils.repo import is_a_git_ref

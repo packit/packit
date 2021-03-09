@@ -23,7 +23,7 @@
 import pytest
 from flexmock import flexmock
 
-from packit.git_utils import get_metadata_from_message, get_message_from_metadata
+from packit.utils.repo import get_metadata_from_message, get_message_from_metadata
 
 
 @pytest.mark.parametrize(
