@@ -17,18 +17,23 @@ def git_repo(tmpdir):
     source-git repo.
     """
     repo = git.Repo.init(tmpdir)
-    shutil.copytree(
-        src="tests/data/patches/previous/",
-        dst=repo.working_tree_dir,
-        dirs_exist_ok=True,
-    )
+    try:
+        # dirs_exist_ok parameter doesn't exist in python < 3.8
+        shutil.copytree(
+            src="tests/data/patches/previous/",
+            dst=repo.working_tree_dir,
+        )
+    except FileExistsError:
+        pass
     repo.git.add(repo.working_tree_dir)
     repo.git.commit("-mInitial patches")
-    shutil.copytree(
-        src="tests/data/patches/regenerated/",
-        dst=repo.working_tree_dir,
-        dirs_exist_ok=True,
-    )
+    try:
+        shutil.copytree(
+            src="tests/data/patches/regenerated/",
+            dst=repo.working_tree_dir,
+        )
+    except FileExistsError:
+        pass
     return repo
 
 
