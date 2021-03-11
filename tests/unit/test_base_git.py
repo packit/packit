@@ -37,6 +37,7 @@ from packit.local_project import LocalProject
 from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils import commands
+from sandcastle import SandcastleCommandFailed
 from tests.spellbook import can_a_module_be_imported
 
 
@@ -203,6 +204,40 @@ def test_run_action_defined(packit_repository_base):
     packit_repository_base.run_action(
         ActionName.pre_sync, action_method, "arg", "kwarg"
     )
+
+
+@pytest.mark.skipif(
+    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+)
+def test_run_action_fail_prints_output(
+    packit_repository_base_with_sandcastle_object, caplog
+):
+    from sandcastle import Sandcastle
+
+    flexmock(Sandcastle).should_receive("get_api_client").and_return(None).once()
+    flexmock(Sandcastle).should_receive("run").and_return(None).once()
+    flexmock(Sandcastle).should_receive("exec").and_raise(
+        SandcastleCommandFailed(
+            output="ONE RING TO RULE\nTHEM ALL\n",
+            reason={
+                "metadata": {},
+                "status": "Failure",
+                "message": "that's not the ring",
+            },
+            rc=137,
+        )
+    )
+    flexmock(Sandcastle).should_receive("delete_pod").once().and_return(None)
+    with caplog.at_level(logging.INFO, logger="packit"):
+        with pytest.raises(SandcastleCommandFailed):
+            packit_repository_base_with_sandcastle_object.run_action(
+                ActionName.pre_sync, None, "arg1", "kwarg1"
+            )
+        # this is being called in PackitAPI.clean
+        packit_repository_base_with_sandcastle_object.command_handler.clean()
+        assert (
+            "The command failed, output:\nONE RING TO RULE\nTHEM ALL\n" in caplog.text
+        )
 
 
 @pytest.mark.skipif(

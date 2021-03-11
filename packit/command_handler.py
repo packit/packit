@@ -159,7 +159,17 @@ class SandcastleCommandHandler(CommandHandler):
         :param print_live: not used here
         """
         logger.info(f"Running command: {' '.join(command)}")
-        out: str = self.sandcastle.exec(command=command, env=env, cwd=cwd)
+
+        # we import here so that packit does not depend on sandcastle (and thus python-kube)
+        from sandcastle import SandcastleCommandFailed
+
+        try:
+            out: str = self.sandcastle.exec(command=command, env=env, cwd=cwd)
+        except SandcastleCommandFailed as ex:
+            # we need to log the output when the command fails
+            # ex.output is a multiline string usually
+            logger.info(f"The command failed, output:\n{ex.output}")
+            raise
 
         logger.info(f"Output of {command!r}:")
         # out = 'make po-pull\nmake[1]: Entering directory \'/sand
