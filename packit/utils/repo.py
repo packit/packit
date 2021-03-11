@@ -1,6 +1,8 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
-
+"""
+Helpers and wrappers on top of git.
+"""
 import logging
 import re
 import tempfile
@@ -8,6 +10,7 @@ from pathlib import Path
 from typing import Tuple, Optional, Union, List
 
 import git
+import yaml
 import subprocess
 from ogr.parsing import parse_git_repo
 from packit.utils.commands import run_command
@@ -187,3 +190,81 @@ def git_patch_ish(patch: str) -> str:
         patch = re.sub(pattern, repl, patch)
 
     return patch
+
+
+def get_message_from_metadata(metadata: dict, header: Optional[str] = None) -> str:
+    if not isinstance(metadata, dict):
+        raise PackitException(
+            f"We can save only dictionaries to metadata. Not {metadata}"
+        )
+
+    content = (
+        yaml.dump(metadata, indent=4, default_flow_style=False) if metadata else ""
+    )
+    if not header:
+        return content
+
+    return f"{header}\n\n{content}"
+
+
+def get_metadata_from_message(commit: git.Commit) -> Optional[dict]:
+    """
+    Tries to load yaml format from the git message.
+
+    We are skipping first line until
+    the rest of the content is yaml-loaded to dictionary (yaml object type).
+
+    If nothing found, we return None.
+
+    Reference:
+    https://gitpython.readthedocs.io/en/stable/reference.html
+    ?highlight=archive#module-git.objects.commit
+
+    e.g.:
+
+    I)
+    key: value
+    another: value
+    -> {"key": "value", "another": "value"}
+
+    II)
+    On sentence.
+
+    key: value
+    another: value
+    -> {"key": "value", "another": "value"}
+
+    III)
+    A lot of
+    text
+
+    before keys.
+
+    key: value
+    another: value
+    -> {"key": "value", "another": "value"}
+
+    IV)
+    Other values are supported as well:
+
+    key:
+    - first
+    - second
+    - third
+
+    :param commit: git.Commit object
+    :return: dict loaded from message if it satisfies the rules above
+    """
+    splitted_message = commit.message.split("\n")
+
+    for i in range(len(splitted_message)):
+        message_part = "\n".join(splitted_message[i:])
+        try:
+            loaded_part = yaml.safe_load(message_part)
+        except yaml.YAMLError:
+            continue
+
+        if isinstance(loaded_part, dict):
+            return loaded_part
+
+    return None

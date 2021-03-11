@@ -1,2 +1,6 @@
 *.py[co]
 .tox
+.idea
+shelf/*
+*/workspace.xml
+
