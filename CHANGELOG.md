@@ -1,3 +1,11 @@
+# 0.27.0
+
+- (Source-git) Several improvements of history linearization.
+- (Source-git) Detect identical patches in propose-downstream.
+- (Source-git) Patches in spec file are added after first empty line below last Patch/Source.
+- Fetch all sources defined in packit.yaml.
+- New option to sync only specfile from downstream.
+
 # 0.26.0
 
 - Fix construction of the Koji tag for epel branches when running `packit create-update`. ([#1122](https://github.com/packit/packit/pull/1122))
