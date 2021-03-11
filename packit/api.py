@@ -524,7 +524,7 @@ class PackitAPI:
             self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
         except Exception as ex:
             raise PackitSRPMException(
-                f"Preparing of the upstream to the SRPM build failed: {ex}"
+                f"Preparation of the repository for creation of an SRPM failed: {ex}"
             ) from ex
         try:
             srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
