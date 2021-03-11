@@ -66,6 +66,8 @@ class JobMetadataConfig:
         preserve_project: bool = False,
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
+        fmf_url: str = None,
+        fmf_ref: str = None,
     ):
         """
         :param targets: copr_build job, mock chroots where to build
@@ -93,6 +95,8 @@ class JobMetadataConfig:
         self.preserve_project: bool = preserve_project
         self.additional_packages: List[str] = additional_packages or []
         self.additional_repos: List[str] = additional_repos or []
+        self.fmf_url = fmf_url
+        self.fmf_ref = fmf_ref
 
     def __repr__(self):
         return (
@@ -107,7 +111,9 @@ class JobMetadataConfig:
             f"list_on_homepage={self.list_on_homepage}, "
             f"preserve_project={self.preserve_project}, "
             f"additional_packages={self.additional_packages}, "
-            f"additional_repos={self.additional_repos})"
+            f"additional_repos={self.additional_repos}, "
+            f"fmf_url={self.fmf_url}, "
+            f"fmf_ref={self.fmf_ref})"
         )
 
     def __eq__(self, other: object):
@@ -127,6 +133,8 @@ class JobMetadataConfig:
             and self.preserve_project == other.preserve_project
             and self.additional_packages == other.additional_packages
             and self.additional_repos == other.additional_repos
+            and self.fmf_url == other.fmf_url
+            and self.fmf_ref == other.fmf_ref
         )
 
 
