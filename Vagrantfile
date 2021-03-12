@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision :ansible_local do |ansible|
 	    ansible.verbose = "v"
-	    ansible.playbook = "files/install-build-deps.yaml"
+	    ansible.playbook = "files/install-requirements-rpms.yaml"
 	    ansible.become = true
     end
 

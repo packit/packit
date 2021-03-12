@@ -18,21 +18,21 @@
     name: packit-tests-rpm
     parent: base
     description: Run tests with dependencies installed as RPMs
-    pre-run: files/zuul-install-requirements-rpms.yaml
+    pre-run: files/install-requirements-rpms.yaml
     run: files/zuul-tests.yaml
 
 - job:
     name: packit-tests-pip-deps
     parent: base
     description: Run tests with dependencies installed from PyPI
-    pre-run: files/zuul-install-requirements-pip.yaml
+    pre-run: files/install-requirements-pip.yaml
     run: files/zuul-tests.yaml
 
 - job:
     name: packit-tests-git-main
     parent: base
     description: Run tests with dependencies installed from git main & PyPI
-    pre-run: files/zuul-install-requirements-git.yaml
+    pre-run: files/install-requirements-git.yaml
     run: files/zuul-tests.yaml
 
 - job:
