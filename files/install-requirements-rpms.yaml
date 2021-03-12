@@ -2,8 +2,12 @@
 - name: Install RPM dependencies for packit
   hosts: all
   vars:
+    # Zuul base job redefines project_dir
     project_dir: "{{ playbook_dir }}/.."
   tasks:
     - include_tasks: tasks/generic-dnf-requirements.yaml
     - include_tasks: tasks/build-rpm-deps.yaml
-    - include_tasks: tasks/ogr.yaml
+    - name: Install python3-requre rpm
+      dnf:
+        name: python3-requre
+      become: true
