@@ -578,93 +578,23 @@ class Upstream(PackitRepositoryBase):
         self, srpm_path: Union[Path, str] = None, srpm_dir: Union[Path, str] = None
     ) -> Path:
         """
-        Create SRPM from the actual content of the repo
+        Create SRPM from the actual content of the repo.
 
-        :param srpm_path: path to the srpm
-        :param srpm_dir: path to the directory where the srpm is meant to be placed
-        :return: path to the srpm
+        Args:
+            srpm_path (Union[Path, str]): Path to the SRPM.
+
+                Defaults to `None`.
+            srpm_dir (Union[Path, str]): Path to the directory where the SRPM is
+                meant to be placed.
+
+                Defaults to `None`.
+
+        Returns:
+            Path to the SRPM.
         """
-
-        if self.running_in_service():
-            srpm_dir = Path(".")
-            rpmbuild_dir = self.absolute_specfile_dir.relative_to(
-                self.local_project.working_dir
-            )
-        else:
-            srpm_dir = Path(srpm_dir) if srpm_dir else Path.cwd()
-            rpmbuild_dir = self.absolute_specfile_dir
-
-        cmd = [
-            "rpmbuild",
-            "-bs",
-            "--define",
-            f"_sourcedir {rpmbuild_dir}",
-            "--define",
-            f"_srcdir {rpmbuild_dir}",
-            "--define",
-            f"_specdir {rpmbuild_dir}",
-            "--define",
-            f"_srcrpmdir {srpm_dir}",
-            "--define",
-            f"_topdir {rpmbuild_dir}",
-            # we also need these 3 so that rpmbuild won't create them
-            "--define",
-            f"_builddir {rpmbuild_dir}",
-            "--define",
-            f"_rpmdir {rpmbuild_dir}",
-            "--define",
-            f"_buildrootdir {rpmbuild_dir}",
-            self.package_config.specfile_path,
-        ]
-        escaped_command = " ".join(cmd)
-        logger.debug(f"SRPM build command: {escaped_command}")
-        present_srpms = set(srpm_dir.glob("*.src.rpm"))
-        logger.debug(f"Present SRPMs: {present_srpms}")
-        try:
-            out = self.command_handler.run_command(cmd, return_output=True).strip()
-        except PackitCommandFailedError as ex:
-            logger.error(f"The `rpmbuild` command failed: {ex!r}")
-            raise PackitFailedToCreateSRPMException(
-                f"reason:\n"
-                f"{ex}\n"
-                f"command:\n"
-                f"{escaped_command}\n"
-                f"stdout:\n"
-                f"{ex.stdout_output}\n"
-                f"stderr:\n"
-                f"{ex.stderr_output}"
-            ) from ex
-        except PackitException as ex:
-            logger.error(f"The `rpmbuild` command failed: {ex!r}")
-            raise PackitFailedToCreateSRPMException(
-                f"The `rpmbuild` command failed:\n{ex}"
-            ) from ex
-
-        the_srpm = self._get_srpm_from_rpmbuild_output(out)
-        if srpm_path:
-            shutil.move(the_srpm, srpm_path)
-            return Path(srpm_path)
-        if self.running_in_service():
-            return self.local_project.working_dir / the_srpm
-        return Path(the_srpm)
-
-    def _get_srpm_from_rpmbuild_output(self, output: str) -> str:
-        """
-        Try to find the srpm file in the `rpmbuild -bs` command output.
-
-        :param output: output of the `rpmbuild -bs` command
-        :return: the name of the SRPM file
-        """
-        logger.debug(f"The `rpmbuild` command output: {output}")
-        # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
-        reg = r": (.+\.src\.rpm)$"
-        try:
-            the_srpm = re.findall(reg, output)[0]
-        except IndexError:
-            raise PackitSRPMNotFoundException(
-                "SRPM cannot be found, something is wrong."
-            )
-        return the_srpm
+        return SRPMBuilder(
+            upstream=self, srpm_path=srpm_path, srpm_dir=srpm_dir
+        ).build()
 
     def prepare_upstream_for_srpm_creation(self, upstream_ref: str = None):
         """
@@ -1043,3 +973,124 @@ class Upstream(PackitRepositoryBase):
                 f"replaced: {' ,'.join(not_replaced)}"
             )
         return archive_root_dir
+
+
+class SRPMBuilder:
+    def __init__(
+        self,
+        upstream: Upstream,
+        srpm_path: Union[Path, str] = None,
+        srpm_dir: Union[Path, str] = None,
+    ) -> None:
+        self.upstream = upstream
+        self.srpm_path = srpm_path
+
+        if self.upstream.running_in_service():
+            self.srpm_dir = Path(".")
+            self.rpmbuild_dir = self.upstream.absolute_specfile_dir.relative_to(
+                self.upstream.local_project.working_dir
+            )
+        else:
+            self.srpm_dir = Path(srpm_dir) if srpm_dir else Path.cwd()
+            self.rpmbuild_dir = self.upstream.absolute_specfile_dir
+
+    def _get_srpm_from_rpmbuild_output(self, output: str) -> str:
+        """
+        Try to find the SRPM file in the `rpmbuild -bs` command output.
+
+        Args:
+            output (str): Output of the `rpmbuild -bs` command.
+
+        Returns:
+            Name of the SRPM file.
+        """
+        logger.debug(f"The `rpmbuild` command output: {output}")
+        # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
+        reg = r": (.+\.src\.rpm)$"
+        try:
+            the_srpm = re.findall(reg, output)[0]
+        except IndexError:
+            raise PackitSRPMNotFoundException(
+                "SRPM cannot be found, something is wrong."
+            )
+        return the_srpm
+
+    def get_build_command(self) -> Tuple[List[str], str]:
+        """
+        Constructs `rpmbuild` command.
+
+        Returns:
+            Escaped `rpmbuild` command.
+        """
+        cmd = [
+            "rpmbuild",
+            "-bs",
+            "--define",
+            f"_sourcedir {self.rpmbuild_dir}",
+            "--define",
+            f"_srcdir {self.rpmbuild_dir}",
+            "--define",
+            f"_specdir {self.rpmbuild_dir}",
+            "--define",
+            f"_srcrpmdir {self.srpm_dir}",
+            "--define",
+            f"_topdir {self.rpmbuild_dir}",
+            # we also need these 3 so that rpmbuild won't create them
+            "--define",
+            f"_builddir {self.rpmbuild_dir}",
+            "--define",
+            f"_rpmdir {self.rpmbuild_dir}",
+            "--define",
+            f"_buildrootdir {self.rpmbuild_dir}",
+            self.upstream.package_config.specfile_path,
+        ]
+        escaped_command = " ".join(cmd)
+
+        logger.debug(f"SRPM build command: {escaped_command}")
+        return cmd, escaped_command
+
+    def get_path(self, out: str) -> Path:
+        """
+        Get path to the SRPM file. In case it is necessary to move the built SRPM,
+        move it.
+
+        Args:
+            out (str): Output of the `rpmbuild` command.
+
+        Returns:
+            Path to the SRPM.
+        """
+        built_srpm_path = self._get_srpm_from_rpmbuild_output(out)
+        if self.srpm_path:
+            shutil.move(built_srpm_path, self.srpm_path)
+            return Path(self.srpm_path)
+
+        if self.upstream.running_in_service():
+            return self.upstream.local_project.working_dir / built_srpm_path
+        return Path(built_srpm_path)
+
+    def build(self) -> Path:
+        cmd, escaped_command = self.get_build_command()
+
+        present_srpms = set(self.srpm_dir.glob("*.src.rpm"))
+        logger.debug(f"Present SRPMs: {present_srpms}")
+
+        try:
+            out = self.upstream.command_handler.run_command(
+                cmd, return_output=True
+            ).strip()
+        except PackitCommandFailedError as ex:
+            logger.error(f"The `rpmbuild` command failed: {ex!r}")
+            raise PackitFailedToCreateSRPMException(
+                f"reason:\n{ex}\n"
+                f"command:\n{escaped_command}\n"
+                f"stdout:\n{ex.stdout_output}\n"
+                f"stderr:\n{ex.stderr_output}"
+            ) from ex
+        except PackitException as ex:
+            logger.error(f"The `rpmbuild` command failed: {ex!r}")
+            raise PackitFailedToCreateSRPMException(
+                f"The `rpmbuild` command failed:\n{ex}"
+            ) from ex
+
+        return self.get_path(out)
