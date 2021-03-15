@@ -7,7 +7,7 @@ COPY files/tasks/*.yaml /files/tasks/
 COPY files/*.yaml /files/
 COPY *.spec .
 
-RUN ansible-playbook -v -c local -i localhost, /files/install-build-deps.yaml
+RUN ansible-playbook -v -c local -i localhost, /files/install-requirements-rpms.yaml
 RUN ansible-playbook -v -c local -i localhost, /files/local-tests-requirements.yaml
 
 WORKDIR /src

@@ -5,9 +5,9 @@ FROM quay.io/packit/base
 WORKDIR /src
 
 COPY files/tasks/*.yaml files/tasks/
-COPY files/install-build-deps.yaml files/
+COPY files/install-requirements-rpms.yaml files/
 COPY *.spec ./
-RUN ansible-playbook -v -c local -i localhost, files/install-build-deps.yaml \
+RUN ansible-playbook -v -c local -i localhost, files/install-requirements-rpms.yaml \
     && dnf clean all
 
 COPY ./ ./
