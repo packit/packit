@@ -43,7 +43,8 @@ jobs:
     metadata:
       branch: main
       targets:
-        - fedora-stable
+        - fedora-all
+        - epel-8
       project: packit-master
       list_on_homepage: True
       preserve_project: True
