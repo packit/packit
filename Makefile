@@ -1,4 +1,4 @@
-IMAGE=docker.io/usercont/packit
+IMAGE=quay.io/packit/packit
 TESTS_IMAGE=packit-tests
 
 CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
@@ -6,12 +6,12 @@ TESTS_RECORDING_PATH=tests_recording
 TESTS_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
 
 
-# To build base image for packit-worker
+# In case you don't want to use pre-built image
 image:
-	$(CONTAINER_ENGINE) build --rm -t $(IMAGE) .
+	$(CONTAINER_ENGINE) build --rm --tag $(IMAGE) .
 
 tests_image:
-	$(CONTAINER_ENGINE) build --tag $(TESTS_IMAGE) -f Dockerfile.tests .
+	$(CONTAINER_ENGINE) build --rm --tag $(TESTS_IMAGE) -f Dockerfile.tests .
 	sleep 2
 
 tests_image_remove:
