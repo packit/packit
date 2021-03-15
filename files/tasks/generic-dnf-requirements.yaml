@@ -9,5 +9,4 @@
       - rpmdevtools
       - python3-bodhi-client
       - fedpkg
-      - python3-cccolutils
   become: true
