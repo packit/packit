@@ -42,6 +42,9 @@ from tests.spellbook import (
 )
 
 
+DISTRO_DIR = ".distro"
+
+
 def test_basic_local_update_without_patching(
     sourcegit_and_remote,
     distgit_and_remote,
@@ -411,7 +414,7 @@ def test_basic_local_update_patch_content_with_downstream_patch(
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
     create_merge_commit_in_source_git(sg_path)
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
@@ -426,7 +429,7 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref)
             raise AssertionError(
                 "packit-patches- branch was found - the history shouldn't have been linearized"
             )
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-switching-to-amarillo-hops.patch",
         "0002-actually-let-s-do-citra.patch",
     }
@@ -437,7 +440,7 @@ def test_srpm_merge_storm(
     mock_remote_functionality_sourcegit, api_instance_source_git, ref
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
 
     # linearization creates a new branch, make some arbitrary moves to verify
@@ -467,7 +470,7 @@ def test_srpm_merge_storm(
         .decode()
         .strip()
     )
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-MERGE-COMMIT.patch",
         "0002-ugly-merge-commit.patch",
     }
@@ -477,7 +480,7 @@ def test_srpm_merge_storm_dirty(api_instance_source_git):
     """ verify the linearization is halted when a source-git repo si dirty """
     ref = "0.1.0"
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", ref)
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, ref)
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     (sg_path / "malt").write_text("Mordor\n")
     with pytest.raises(PackitException) as ex:
@@ -489,12 +492,12 @@ def test_srpm_merge_storm_dirty(api_instance_source_git):
 def test_linearization(api_instance_source_git):
     ref = "0.1.0"
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", ref)
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, ref)
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     with cwd("/"):  # let's mimic p-s by having different cwd than the project
         pg = PatchGenerator(api_instance_source_git.upstream_local_project)
-        pg.create_patches(ref, sg_path / "fedora")
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+        pg.create_patches(ref, sg_path / DISTRO_DIR)
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-sourcegit-content.patch",
         "0002-MERGE-COMMIT.patch",
         "0003-ugly-merge-commit.patch",
@@ -504,7 +507,7 @@ def test_linearization(api_instance_source_git):
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_git, ref):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
     api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
         "Patch1: citra.patch",
@@ -529,7 +532,7 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "citra.patch",
         "0001-m04r-malt.patch",
         "malt.patch",
@@ -545,7 +548,7 @@ def test_srpm_git_no_prefix_patches(
     mock_remote_functionality_sourcegit, api_instance_source_git, ref
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
     api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
         "Patch1: amarillo.patch",
@@ -569,7 +572,7 @@ def test_srpm_git_no_prefix_patches(
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "amarillo.patch",
         "citra.patch",
         "malt.patch",
@@ -581,7 +584,7 @@ def test_srpm_empty_patch(
     mock_remote_functionality_sourcegit, api_instance_source_git, ref
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
     api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
         "Patch1: amarillo.patch",
@@ -600,13 +603,13 @@ def test_srpm_empty_patch(
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "amarillo.patch",
         "citra.patch",
         "saaz.patch",
         "malt.patch",
     }
-    assert sg_path.joinpath("fedora", "saaz.patch").read_text() == ""
+    assert sg_path.joinpath(DISTRO_DIR, "saaz.patch").read_text() == ""
 
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
@@ -614,7 +617,7 @@ def test_srpm_patch_non_conseq_indices(
     mock_remote_functionality_sourcegit, api_instance_source_git, ref
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
-    mock_spec_download_remote_s(sg_path, sg_path / "fedora", "0.1.0")
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
     api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
         "Patch0: amarillo.patch",
@@ -648,11 +651,11 @@ def test_srpm_patch_non_conseq_indices(
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
-    assert {x.name for x in sg_path.joinpath("fedora").glob("*.patch")} == {
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "amarillo.patch",
         "citra.patch",
         "saaz.patch",
         "malt.patch",
         "0004-Wei-bier-Summer-is-coming.patch",
     }
-    assert sg_path.joinpath("fedora", "saaz.patch").read_text() == ""
+    assert sg_path.joinpath(DISTRO_DIR, "saaz.patch").read_text() == ""

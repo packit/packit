@@ -1,7 +1,7 @@
 ---
-specfile_path: fedora/beer.spec
+specfile_path: .distro/beer.spec
 synced_files:
-  - src: fedora/beer.spec
+  - src: .distro/beer.spec
     dest: beer.spec
   - .packit.yaml
 patch_generation_ignore_paths: ["ignored_file.txt"]
