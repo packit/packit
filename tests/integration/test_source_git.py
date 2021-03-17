@@ -132,11 +132,14 @@ def test_basic_local_update_patch_content(
 +Version:        0.1.0"""
         in git_diff
     )
-
-    # make sure the patches are placed after Source0
-    patches = """\
+    # Make sure the patches are placed after Source0, but outside %if %endif
+    patches = (
+        """\
 Source0:        %{upstream_name}-%{version}.tar.gz
-+
+ %endif
+ BuildArch:      noarch
+ """  # because linters would remove the trailing whitespace
+        + """
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
 +Patch0001: 0001-switching-to-amarillo-hops.patch
@@ -149,8 +152,8 @@ Source0:        %{upstream_name}-%{version}.tar.gz
 +# Author: Packit Test Suite <test@example.com>
 +Patch0003: 0003-source-change.patch
 +
-+
 """
+    )
     assert patches in git_diff
 
     assert "Patch0004:" not in git_diff
@@ -312,7 +315,6 @@ def test_basic_local_update_patch_content_with_metadata(
 +# Few words for info.
 +Patch0003: testing.patch
 +
-+
 """
     assert patches in git_diff
 
@@ -361,7 +363,6 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
 +# Author: Packit Test Suite <test@example.com>
 +Patch0002: 0002-actually-let-s-do-citra.patch
 +
-+
 """
     assert patches in git_diff
 
@@ -402,7 +403,6 @@ def test_basic_local_update_patch_content_with_downstream_patch(
 +# actually, let's do citra
 +# Author: Packit Test Suite <test@example.com>
 +Patch0002: 0002-actually-let-s-do-citra.patch
-+
 +
 """
     assert patches in git_diff
