@@ -150,6 +150,18 @@ class CommonPackageConfig:
             f"{self.downstream_package_name}.git"
         )
 
+    def get_specfile_sync_files_item(self):
+        """
+        Get SyncFilesItem object for the specfile.
+        :return: SyncFilesItem
+        """
+        return SyncFilesItem(
+            src=self.specfile_path,
+            dest=f"{self.downstream_package_name}.spec"
+            if self.downstream_package_name
+            else self.specfile_path,
+        )
+
     def get_all_files_to_sync(self):
         """
         Adds the default files (config file, spec file) to synced files when doing propose-update.
@@ -158,14 +170,7 @@ class CommonPackageConfig:
         files = self.synced_files.files_to_sync
 
         if self.specfile_path not in (item.src for item in files):
-            files.append(
-                SyncFilesItem(
-                    src=self.specfile_path,
-                    dest=f"{self.downstream_package_name}.spec"
-                    if self.downstream_package_name
-                    else self.specfile_path,
-                )
-            )
+            files.append(self.get_specfile_sync_files_item())
 
         if self.config_file_path and self.config_file_path not in (
             item.src for item in files
