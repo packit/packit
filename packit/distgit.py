@@ -63,7 +63,7 @@ class DistGit(PackitRepositoryBase):
     """
 
     # we store downstream content in source-git in this subdir
-    source_git_downstream_suffix = "fedora"
+    source_git_downstream_suffix = ".distro"
 
     # spec files are stored in this dir in dist-git
     # this applies to Fedora and CentOS Stream 9
