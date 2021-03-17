@@ -191,15 +191,13 @@ class Specfile(SpecFile):
            * If there are no existing patches, the patch is added after Source definitions
         """
         try:
-            patch_number_offset = max([x.index for x in self.get_applied_patches()])
+            patch_number_offset = max(x.index for x in self.get_applied_patches())
         except ValueError:
             logger.debug("There are no patches in the spec.")
             patch_number_offset = 0
 
         new_content = "\n# " + "\n# ".join(patch_metadata.specfile_comment.split("\n"))
-        new_content += (
-            f"\nPatch{(1 + patch_number_offset):04d}: {patch_metadata.name}\n"
-        )
+        new_content += f"\nPatch{(1 + patch_number_offset):04d}: {patch_metadata.name}"
 
         if self.get_applied_patches():
             last_source_tag_line = [
@@ -210,7 +208,16 @@ class Specfile(SpecFile):
                 t.line for t in self.tags.filter(name="Source*", valid=None)
             ][-1]
 
-        where = last_source_tag_line + 1
+        # Find first empty line after last_source_tag_line
+        for index, line in enumerate(
+            self.spec_content.section("%package")[last_source_tag_line:],
+            start=last_source_tag_line,
+        ):
+            if not line:
+                where = index
+                break
+        else:
+            where = len(self.spec_content.section("%package"))
 
         logger.debug(f"Adding patch {patch_metadata.name} to the spec file.")
         self.spec_content.section("%package")[where:where] = new_content.split("\n")
