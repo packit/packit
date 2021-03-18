@@ -830,6 +830,36 @@ def test_package_config_parse_error(raw):
             ),
             id="sources",
         ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "release",
+                        "metadata": {
+                            "fmf_url": "https://example.com",
+                            "fmf_ref": "test_ref",
+                        },
+                    },
+                ],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                sync_changelog=False,
+                jobs=[
+                    JobConfig(
+                        type=JobType.copr_build,
+                        specfile_path="fedora/package.spec",
+                        trigger=JobConfigTriggerType.release,
+                        metadata=JobMetadataConfig(
+                            fmf_url="https://example.com", fmf_ref="test_ref"
+                        ),
+                    ),
+                ],
+            ),
+            id="sync_changelog_false_by_default",
+        ),
     ],
 )
 def test_package_config_parse(raw, expected):
