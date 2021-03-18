@@ -208,6 +208,8 @@ class JobMetadataSchema(Schema):
     preserve_project = fields.Boolean()
     additional_packages = fields.List(fields.String(), missing=None)
     additional_repos = fields.List(fields.String(), missing=None)
+    fmf_url = fields.String(missing=None)
+    fmf_ref = fields.String(missing=None)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
