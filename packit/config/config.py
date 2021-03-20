@@ -52,7 +52,6 @@ class Config:
     def __init__(
         self,
         debug: bool = False,
-        dry_run: bool = False,
         fas_user: Optional[str] = None,
         keytab_path: Optional[str] = None,
         upstream_git_remote: Optional[str] = None,
@@ -68,7 +67,6 @@ class Config:
         self.fas_user: Optional[str] = fas_user
         self.keytab_path: Optional[str] = keytab_path
         self.kerberos_realm = kerberos_realm
-        self.dry_run: bool = dry_run
         self.upstream_git_remote = upstream_git_remote
 
         self.services: Set[GitService] = set()
