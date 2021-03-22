@@ -26,14 +26,16 @@ from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import clone_centos_package
+from packit.utils.repo import clone_centos_8_package, clone_centos_9_package
 
 logger = logging.getLogger(__name__)
 
 
-# TODO: we'll need to distinct b/w 8 and 9 - 9 will follow Fedora
-class CentOSDistGit(DistGit):
-    """ CentOS dist-git layout implementation """
+class CentOS8DistGit(DistGit):
+    """
+    CentOS dist-git layout implementation for 8: CentOS Linux 8 and CentOS Stream 8
+    which lives in git.centos.org
+    """
 
     # spec files are stored in this dir in dist-git
     spec_dir_name = "SPECS"
@@ -49,8 +51,35 @@ class CentOSDistGit(DistGit):
         package_config: CommonPackageConfig,
         path: Path,
         branch: str = None,
-    ) -> "CentOSDistGit":
-        clone_centos_package(
+    ) -> "CentOS8DistGit":
+        clone_centos_8_package(
+            package_config.downstream_package_name, path, branch=branch
+        )
+        lp = LocalProject(working_dir=path)
+        return cls(config, package_config, local_project=lp)
+
+
+class CentOS9DistGit(DistGit):
+    """
+    CentOS dist-git layout implementation for CentOS Stream 9
+    which lives in gitlab.com/redhat/centos-stream/rpms
+    """
+
+    # spec files are stored in this dir in dist-git
+    spec_dir_name = ""
+
+    # sources are stored in this dir in dist-git
+    source_dir_name = ""
+
+    @classmethod
+    def clone(
+        cls,
+        config: Config,
+        package_config: CommonPackageConfig,
+        path: Path,
+        branch: str = None,
+    ) -> "CentOS9DistGit":
+        clone_centos_9_package(
             package_config.downstream_package_name, path, branch=branch
         )
         lp = LocalProject(working_dir=path)
@@ -242,11 +271,20 @@ class SourceGitGenerator:
         For given package names, clone the dist-git repo in the given directory
         and return the DistGit class
 
-        :return: DistGit instance (CentOSDistGit if centos_package is set)
+        :return: DistGit instance
         """
         if self.centos_package:
             self.dist_git_branch = self.dist_git_branch or "c9s"
-            return CentOSDistGit.clone(
+            # let's be sure to cover anything 9 related,
+            # even though "c9" will probably never be a thing
+            if "c9" in self.dist_git_branch:
+                return CentOS9DistGit.clone(
+                    config=self.config,
+                    package_config=self.package_config,
+                    path=self.dist_git_path,
+                    branch=self.dist_git_branch,
+                )
+            return CentOS8DistGit.clone(
                 config=self.config,
                 package_config=self.package_config,
                 path=self.dist_git_path,
