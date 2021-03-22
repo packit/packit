@@ -8,7 +8,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.10.0
+    rev: v2.11.0
     hooks:
       - id: pyupgrade
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -43,7 +43,7 @@ repos:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
   - repo: https://github.com/packit/pre-commit-hooks
-    rev: eb1d35dc59f1b3e35a7fe5512fbd8b0539f5f92e
+    rev: bec7c9ff9a985ececa53ac8078dc60ca9603f9d7
     hooks:
       - id: check-rebase
         args:
