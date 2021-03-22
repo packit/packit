@@ -125,6 +125,10 @@ class SourceGitGenerator:
         self._upstream_ref: Optional[str] = upstream_ref
         self.dist_git_branch = dist_git_branch
 
+        logger.info(
+            f"The source-git repo is going to be created in {local_project.working_dir}."
+        )
+
         if dist_git_path:
             (
                 self._dist_git,
@@ -140,12 +144,16 @@ class SourceGitGenerator:
                 self.package_config = PackageConfig(
                     downstream_package_name=centos_package
                 )
-            else:
+            elif fedora_package:
                 self.fedora_package = (
                     self.fedora_package or local_project.working_dir.name
                 )
                 self.package_config = PackageConfig(
                     downstream_package_name=fedora_package
+                )
+            else:
+                raise PackitException(
+                    "Please tell us the name of the package in the downstream."
                 )
             self.dist_git_path = self.tmpdir.joinpath(
                 self.package_config.downstream_package_name
