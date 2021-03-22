@@ -7,7 +7,7 @@ from flexmock import flexmock
 from packit.config import Config
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
-from packit.source_git import SourceGitGenerator, CentOSDistGit
+from packit.source_git import SourceGitGenerator, CentOS8DistGit
 from packit.utils.repo import create_new_repo
 
 
@@ -26,7 +26,7 @@ def test_centos_conf(cronie, tmp_path: Path):
     )
 
     dg = sgg.dist_git
-    assert isinstance(dg, CentOSDistGit)
+    assert isinstance(dg, CentOS8DistGit)
 
     flexmock(
         DistGit,
