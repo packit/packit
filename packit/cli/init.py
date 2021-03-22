@@ -36,7 +36,7 @@ from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import get_context_settings
 from packit.config.config import pass_config
 from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, PackitNotAGitRepoException
 
 logger = logging.getLogger(__name__)
 
@@ -117,9 +117,18 @@ def init(
             "Generating source-git repositories is experimental, "
             "please give us feedback if it does things differently than you expect."
         )
-        api = get_packit_api(
-            config=config, local_project=path_or_url, load_packit_yaml=False
-        )
+        try:
+            api = get_packit_api(
+                config=config, local_project=path_or_url, load_packit_yaml=False
+            )
+        except PackitNotAGitRepoException:
+            logger.error(
+                "The init command is expected to be run in a git repository. "
+                "Current branch in the repo will be turned into a source-git repo. "
+                "We suggest to run the command "
+                "in a blank git repository or in a new branch of the upstream project."
+            )
+            raise
         dg_path = Path(dist_git_path) if dist_git_path else None
         api.create_sourcegit_from_upstream(
             upstream_url=upstream_url,
