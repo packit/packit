@@ -233,7 +233,7 @@ class SourceGitGenerator:
         :return: DistGit instance (CentOSDistGit if centos_package is set)
         """
         if self.centos_package:
-            self.dist_git_branch = self.dist_git_branch or "c8s"
+            self.dist_git_branch = self.dist_git_branch or "c9s"
             return CentOSDistGit.clone(
                 config=self.config,
                 package_config=self.package_config,
