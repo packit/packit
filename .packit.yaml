@@ -14,6 +14,9 @@ actions:
   get-current-version:
     - "python3 setup.py --version"
 
+allowed_gpg_keys:
+  - 5DE3E0509C47EA3CF04A42D34AEE18F83AFDEB23
+
 jobs:
   - job: propose_downstream
     trigger: release
