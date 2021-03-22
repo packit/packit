@@ -16,7 +16,12 @@ from git import GitCommandError
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.config import Config
 from packit.config.package_config import PackageConfig
-from packit.constants import RPM_MACROS_FOR_PREP
+from packit.constants import (
+    RPM_MACROS_FOR_PREP,
+    FEDORA_DOMAIN,
+    CENTOS_DOMAIN,
+    CENTOS_STREAM_GITLAB,
+)
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
@@ -61,12 +66,15 @@ def get_distgit_kls_from_repo(
     path = Path(repo_path)
     pc = PackageConfig(downstream_package_name=path.name)
     lp = LocalProject(working_dir=path)
-    if "fedoraproject.org" in lp.git_url:
+    if FEDORA_DOMAIN in lp.git_url:
         return DistGit(config, pc, local_project=lp), None, path.name
-    elif "centos.org" in lp.git_url:
-        return CentOSDistGit(config, pc, local_project=lp), path.name, None
+    elif CENTOS_DOMAIN in lp.git_url:
+        return CentOS8DistGit(config, pc, local_project=lp), path.name, None
+    elif CENTOS_STREAM_GITLAB in lp.git_url:
+        return CentOS9DistGit(config, pc, local_project=lp), path.name, None
     raise PackitException(
-        f"Dist-git URL {lp.git_url} not recognized, we expected centos.org or fedoraproject.org"
+        f"Dist-git URL {lp.git_url} not recognized, we expected one of: "
+        f"{FEDORA_DOMAIN}, {CENTOS_DOMAIN} or {CENTOS_STREAM_GITLAB}"
     )
 
 
