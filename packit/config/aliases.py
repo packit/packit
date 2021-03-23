@@ -46,6 +46,14 @@ ARCHITECTURE_LIST: List[str] = [
     "s390x",
     "x86_64",
 ]
+
+DEPRECATED_TARGET_MAP = {"centos-stream": "centos-stream-8"}
+DEPRECATED_TARGET_MAP = {
+    f"{k}-{x}": f"{v}-{x}"
+    for k, v in DEPRECATED_TARGET_MAP.items()
+    for x in ARCHITECTURE_LIST
+}
+
 DEFAULT_VERSION = "fedora-stable"
 
 logger = logging.getLogger(__name__)
@@ -91,6 +99,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
             # => cannot guess anything other than rawhide
             if "rawhide" in one_name:
                 sys_name, version, architecture = "fedora", "rawhide", "x86_64"
+
             else:
                 err_msg = (
                     "Cannot get build target from '{one_name}'"
@@ -119,6 +128,11 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
                 for sys_and_version in get_versions(f"{sys_name}-{version}")
             }
         )
+    possible_sys_and_versions = {
+        DEPRECATED_TARGET_MAP.get(target, target)
+        for target in possible_sys_and_versions
+    }
+
     return possible_sys_and_versions
 
 

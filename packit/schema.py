@@ -38,6 +38,7 @@ from packit.config.package_config import NotificationsConfig
 from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.sync import SyncFilesItem
+from packit.config.aliases import DEPRECATED_TARGET_MAP
 
 logger = getLogger(__name__)
 
@@ -194,10 +195,26 @@ class SyncFilesConfigSchema(Schema):
             return data
 
 
+class TargetField(fields.String):
+    def _deserialize(
+        self,
+        target,
+        *args,
+        **kwargs,
+    ):
+        if target in DEPRECATED_TARGET_MAP:
+            logger.warning(
+                f"Target '{target}' is deprecated. Please update your configuration "
+                f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead."
+            )
+
+        return super()._deserialize(target, *args, **kwargs)
+
+
 class JobMetadataSchema(Schema):
     """ Jobs metadata. """
 
-    targets = fields.List(fields.String(), missing=None)
+    targets = fields.List(TargetField(), missing=None)
     timeout = fields.Integer()
     owner = fields.String(missing=None)
     project = fields.String(missing=None)
@@ -224,6 +241,7 @@ class JobMetadataSchema(Schema):
             if isinstance(data.get(key), str):
                 # allow key value being specified as string, convert to list
                 data[key] = [data.pop(key)]
+
         return data
 
     @post_load
