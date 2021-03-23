@@ -52,7 +52,7 @@ class TestGetVersions:
             ("fedora-stable", {"fedora-31", "fedora-32"}),
             ("fedora-development", {"fedora-33", "fedora-rawhide"}),
             ("fedora-all", {"fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"}),
-            ("centos-stream", {"centos-stream"}),
+            ("centos-stream-8", {"centos-stream-8"}),
         ],
     )
     def test_get_versions(self, name, versions, mock_get_aliases):
@@ -87,8 +87,10 @@ class TestGetBuildTargets:
             ("fedora-rawhide", {"fedora-rawhide-x86_64"}),
             ("openmandriva-rolling", {"openmandriva-rolling-x86_64"}),
             ("opensuse-leap-15.0", {"opensuse-leap-15.0-x86_64"}),
-            ("centos-stream", {"centos-stream-x86_64"}),
-            ("centos-stream-x86_64", {"centos-stream-x86_64"}),
+            ("centos-stream", {"centos-stream-8-x86_64"}),
+            ("centos-stream-x86_64", {"centos-stream-8-x86_64"}),
+            ("centos-stream-8", {"centos-stream-8-x86_64"}),
+            ("centos-stream-8-x86_64", {"centos-stream-8-x86_64"}),
             ("fedora-stable", {"fedora-31-x86_64", "fedora-32-x86_64"}),
             ("fedora-development", {"fedora-33-x86_64", "fedora-rawhide-x86_64"}),
             ("fedora-29-x86_64", {"fedora-29-x86_64"}),
