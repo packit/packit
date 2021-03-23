@@ -14,8 +14,6 @@ jobs:
         include:
           - dockerfile: Dockerfile
             image: packit
-          - dockerfile: Dockerfile.tests
-            image: packit-tests
 
     steps:
       - uses: actions/checkout@v2
