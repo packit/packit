@@ -265,16 +265,6 @@ class CommonConfigSchema(Schema):
     copy_upstream_release_description = fields.Bool(default=False)
     sources = fields.List(fields.Nested(SourceSchema), missing=None)
 
-    # For backwards compatibility with packit-service. Should be removed once
-    # packit-service uses dump method.
-    def dump_config(self, *args, **kwargs):
-        return self.dump(*args, **kwargs)
-
-    # For backwards compatibility with packit-service. Should be removed once
-    # packit-service uses load method.
-    def load_config(self, *args, **kwargs):
-        return self.load(*args, **kwargs)
-
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
         return value.spec_source_id
@@ -426,16 +416,6 @@ class UserConfigSchema(Schema):
     command_handler_image_reference = fields.String()
     command_handler_k8s_namespace = fields.String()
     kerberos_realm = fields.String()
-
-    # For backwards compatibility with packit-service. Should be removed once
-    # packit-service uses dump method.
-    def dump_config(self, *args, **kwargs):
-        return self.dump(*args, **kwargs)
-
-    # For backwards compatibility with packit-service. Should be removed once
-    # packit-service uses load method.
-    def load_config(self, *args, **kwargs):
-        return self.load(*args, **kwargs)
 
     @post_load
     def make_instance(self, data, **kwargs):
