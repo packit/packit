@@ -112,3 +112,7 @@ class PackitFailedToCreateRPMException(PackitRPMException):
 
 class PackitGitException(PackitException):
     """ Operation with a git repo failed """
+
+
+class PackitNotAGitRepoException(PackitGitException):
+    """ Target directory is not a git repository as we expected """

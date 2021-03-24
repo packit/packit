@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from packit.constants import CENTOS_DOMAIN, CENTOS_STREAM_GITLAB
 from packit.fedpkg import FedPKG
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
@@ -199,7 +200,12 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
 
 
 @pytest.mark.slow
-def test_centos_cronie(api_instance_source_git, tmp_path: Path):
+@pytest.mark.parametrize(
+    "dist_git_branch,upstream_ref", (("c8s", "cronie-1.5.2"), ("c9s", "cronie-1.5.5"))
+)
+def test_centos_cronie(
+    dist_git_branch, upstream_ref, api_instance_source_git, tmp_path: Path
+):
     source_git_path = tmp_path.joinpath("cronie-sg")
     # create src-git
     source_git_path.mkdir()
@@ -208,12 +214,18 @@ def test_centos_cronie(api_instance_source_git, tmp_path: Path):
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,
         "https://github.com/cronie-crond/cronie",
-        upstream_ref="cronie-1.5.2",
+        upstream_ref=upstream_ref,
         centos_package="cronie",
+        dist_git_branch=dist_git_branch,
     )
     sgg.create_from_upstream()
 
+    if dist_git_branch == "c8s":
+        assert CENTOS_DOMAIN in sgg.dist_git.local_project.git_url
+    else:
+        assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
+
     # verify it
     subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
-    srpm_path = list(source_git_path.glob("cronie-1.5.2-*.src.rpm"))[0]
+    srpm_path = list(source_git_path.glob("cronie-*.src.rpm"))[0]
     assert srpm_path.is_file()
