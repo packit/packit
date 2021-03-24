@@ -16,19 +16,26 @@ from git import GitCommandError
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.config import Config
 from packit.config.package_config import PackageConfig
-from packit.constants import RPM_MACROS_FOR_PREP
+from packit.constants import (
+    RPM_MACROS_FOR_PREP,
+    FEDORA_DOMAIN,
+    CENTOS_DOMAIN,
+    CENTOS_STREAM_GITLAB,
+)
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import clone_centos_package
+from packit.utils.repo import clone_centos_8_package, clone_centos_9_package
 
 logger = logging.getLogger(__name__)
 
 
-# TODO: we'll need to distinct b/w 8 and 9 - 9 will follow Fedora
-class CentOSDistGit(DistGit):
-    """ CentOS dist-git layout implementation """
+class CentOS8DistGit(DistGit):
+    """
+    CentOS dist-git layout implementation for 8: CentOS Linux 8 and CentOS Stream 8
+    which lives in git.centos.org
+    """
 
     # spec files are stored in this dir in dist-git
     spec_dir_name = "SPECS"
@@ -44,8 +51,35 @@ class CentOSDistGit(DistGit):
         package_config: CommonPackageConfig,
         path: Path,
         branch: str = None,
-    ) -> "CentOSDistGit":
-        clone_centos_package(
+    ) -> "CentOS8DistGit":
+        clone_centos_8_package(
+            package_config.downstream_package_name, path, branch=branch
+        )
+        lp = LocalProject(working_dir=path)
+        return cls(config, package_config, local_project=lp)
+
+
+class CentOS9DistGit(DistGit):
+    """
+    CentOS dist-git layout implementation for CentOS Stream 9
+    which lives in gitlab.com/redhat/centos-stream/rpms
+    """
+
+    # spec files are stored in this dir in dist-git
+    spec_dir_name = ""
+
+    # sources are stored in this dir in dist-git
+    source_dir_name = ""
+
+    @classmethod
+    def clone(
+        cls,
+        config: Config,
+        package_config: CommonPackageConfig,
+        path: Path,
+        branch: str = None,
+    ) -> "CentOS9DistGit":
+        clone_centos_9_package(
             package_config.downstream_package_name, path, branch=branch
         )
         lp = LocalProject(working_dir=path)
@@ -61,12 +95,15 @@ def get_distgit_kls_from_repo(
     path = Path(repo_path)
     pc = PackageConfig(downstream_package_name=path.name)
     lp = LocalProject(working_dir=path)
-    if "fedoraproject.org" in lp.git_url:
+    if FEDORA_DOMAIN in lp.git_url:
         return DistGit(config, pc, local_project=lp), None, path.name
-    elif "centos.org" in lp.git_url:
-        return CentOSDistGit(config, pc, local_project=lp), path.name, None
+    elif CENTOS_DOMAIN in lp.git_url:
+        return CentOS8DistGit(config, pc, local_project=lp), path.name, None
+    elif CENTOS_STREAM_GITLAB in lp.git_url:
+        return CentOS9DistGit(config, pc, local_project=lp), path.name, None
     raise PackitException(
-        f"Dist-git URL {lp.git_url} not recognized, we expected centos.org or fedoraproject.org"
+        f"Dist-git URL {lp.git_url} not recognized, we expected one of: "
+        f"{FEDORA_DOMAIN}, {CENTOS_DOMAIN} or {CENTOS_STREAM_GITLAB}"
     )
 
 
@@ -125,6 +162,10 @@ class SourceGitGenerator:
         self._upstream_ref: Optional[str] = upstream_ref
         self.dist_git_branch = dist_git_branch
 
+        logger.info(
+            f"The source-git repo is going to be created in {local_project.working_dir}."
+        )
+
         if dist_git_path:
             (
                 self._dist_git,
@@ -140,12 +181,16 @@ class SourceGitGenerator:
                 self.package_config = PackageConfig(
                     downstream_package_name=centos_package
                 )
-            else:
+            elif fedora_package:
                 self.fedora_package = (
                     self.fedora_package or local_project.working_dir.name
                 )
                 self.package_config = PackageConfig(
                     downstream_package_name=fedora_package
+                )
+            else:
+                raise PackitException(
+                    "Please tell us the name of the package in the downstream."
                 )
             self.dist_git_path = self.tmpdir.joinpath(
                 self.package_config.downstream_package_name
@@ -180,6 +225,10 @@ class SourceGitGenerator:
     def dist_git(self) -> DistGit:
         if not self._dist_git:
             self._dist_git = self._get_dist_git()
+            # we need to parse the spec twice
+            # https://github.com/rebase-helper/rebase-helper/issues/848
+            self._dist_git.download_remote_sources()
+            self._dist_git.specfile.reload()
         return self._dist_git
 
     @property
@@ -222,11 +271,20 @@ class SourceGitGenerator:
         For given package names, clone the dist-git repo in the given directory
         and return the DistGit class
 
-        :return: DistGit instance (CentOSDistGit if centos_package is set)
+        :return: DistGit instance
         """
         if self.centos_package:
-            self.dist_git_branch = self.dist_git_branch or "c8s"
-            return CentOSDistGit.clone(
+            self.dist_git_branch = self.dist_git_branch or "c9s"
+            # let's be sure to cover anything 9 related,
+            # even though "c9" will probably never be a thing
+            if "c9" in self.dist_git_branch:
+                return CentOS9DistGit.clone(
+                    config=self.config,
+                    package_config=self.package_config,
+                    path=self.dist_git_path,
+                    branch=self.dist_git_branch,
+                )
+            return CentOS8DistGit.clone(
                 config=self.config,
                 package_config=self.package_config,
                 path=self.dist_git_path,
@@ -381,7 +439,7 @@ class SourceGitGenerator:
         self._pull_upstream_ref()
         self._put_downstream_sources()
         self._add_packit_config()
-        if self.dist_git.specfile.patches:
+        if self.dist_git.specfile.get_applied_patches():
             self._run_prep()
             self._rebase_patches("master")
             # TODO: patches which are defined but not applied should be copied

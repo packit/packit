@@ -35,7 +35,7 @@ from packit.config.package_config import PackageConfig
 from packit.api import PackitAPI
 from packit.config import Config, get_local_package_config
 from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
@@ -135,7 +135,9 @@ def get_packit_api(
         )
 
     if not local_project.git_repo:
-        raise PackitException(f"{local_project.working_dir!r} is not a git repository.")
+        raise PackitNotAGitRepoException(
+            f"{local_project.working_dir!r} is not a git repository."
+        )
 
     remote_urls: List[str] = []
     for remote in local_project.git_repo.remotes:

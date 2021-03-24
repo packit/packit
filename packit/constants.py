@@ -38,12 +38,16 @@ DEFAULT_ARCHIVE_EXT = ".tar.gz"
 
 DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
-PROD_DISTGIT_HOSTNAME = "src.fedoraproject.org"
+FEDORA_DOMAIN = "fedoraproject.org"
+CENTOS_DOMAIN = "centos.org"
+CENTOS_STREAM_GITLAB = "gitlab.com/redhat/centos-stream"
+
+PROD_DISTGIT_HOSTNAME = f"src.{FEDORA_DOMAIN}"
 PROD_DISTGIT_URL = f"https://{PROD_DISTGIT_HOSTNAME}/"
 
-ALTERNATIVE_PROD_DG_HOSTNAME = "pkgs.fedoraproject.org"
-STG_DISTGIT_HOSTNAME = "src.stg.fedoraproject.org"
-ALTERNATIVE_STG_DG_HOSTNAME = "pkgs.stg.fedoraproject.org"
+ALTERNATIVE_PROD_DG_HOSTNAME = f"pkgs.{FEDORA_DOMAIN}"
+STG_DISTGIT_HOSTNAME = f"src.stg.{FEDORA_DOMAIN}"
+ALTERNATIVE_STG_DG_HOSTNAME = f"pkgs.stg.{FEDORA_DOMAIN}"
 
 DIST_GIT_HOSTNAME_CANDIDATES = (
     PROD_DISTGIT_HOSTNAME,
