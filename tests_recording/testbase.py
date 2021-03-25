@@ -64,7 +64,6 @@ class PackitTest(unittest.TestCase):
                 self._config = Config.get_user_config()
             except PackitException:
                 self._config = Config()
-            self._config.dry_run = True
         return self._config
 
     @property

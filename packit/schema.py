@@ -417,7 +417,6 @@ class UserConfigSchema(Schema):
     """
 
     debug = fields.Bool()
-    dry_run = fields.Bool()
     fas_user = fields.String()
     keytab_path = fields.String()
     upstream_git_remote = fields.String()
