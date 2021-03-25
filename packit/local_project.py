@@ -510,5 +510,9 @@ class LocalProject:
         """ git reset --hard $ref """
         self.git_repo.head.reset(ref, index=True, working_tree=True)
 
+    @property
+    def head_branch(self) -> str:
+        return self.git_repo.head.name
+
     def __del__(self):
         self.clean()
