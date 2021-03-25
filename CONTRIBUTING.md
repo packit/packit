@@ -31,6 +31,10 @@ Tests are stored in [tests](/tests) directory:
     for remote communication => offline in the CI
   - prefer [requre](https://github.com/packit/requre) instead of mocking
 
+To build the container image used to run the tests:
+
+    make tests_image
+
 Running tests locally:
 
     make check_in_container
@@ -39,6 +43,14 @@ To select a subset of the whole test suite, set `TESTS_TARGET`.
 For example to run only the unit tests use:
 
     TESTS_TARGET=tests/unit make check_in_container
+
+Some tests require `packit` to be installed. This is why the
+`check_in_container` target runs `pip install` before running the tests. In
+case this is not needed (the subset of the tests executed does not require
+`packit` to be installed), installation can be disabled by setting
+`PIP_INSTALL` to an empty string:
+
+    TESTS_TARGET=tests/unit/test_api.py PIP_INSTALL="" make check_in_container
 
 Tests use pre-generated responses stored in [tests_recording/test_data/](tests_recording/test_data).
 To (re-)generate response file(s):
