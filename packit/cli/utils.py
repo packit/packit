@@ -119,6 +119,7 @@ def get_packit_api(
             local_project.working_dir,
             repo_name=local_project.repo_name,
             try_local_dir_last=True,
+            package_config_path=config.package_config_path,
         )
     else:
         package_config = PackageConfig()
