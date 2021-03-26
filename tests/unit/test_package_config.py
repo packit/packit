@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pathlib import Path
+from pathlib import Path, PosixPath
 from typing import Optional
 
 import pytest
@@ -41,7 +41,9 @@ from packit.config.package_config import (
     get_specfile_path_from_repo,
     PackageConfig,
     get_local_specfile_path,
+    get_local_package_config,
 )
+import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
@@ -1196,6 +1198,37 @@ def test_notifications_section():
 def test_get_local_specfile_path():
     assert str(get_local_specfile_path(UP_OSBUILD)) == "osbuild.spec"
     assert not get_local_specfile_path(SYNC_FILES)
+
+
+@pytest.mark.parametrize(
+    "directory, local_first,local_last,config_file_name,res_pc_path",
+    [
+        ([], False, True, None, Path.cwd() / ".packit.yaml"),
+        ([], False, False, "different_conf.yaml", "different_conf.yaml"),
+    ],
+)
+def test_get_local_package_config_path(
+    directory, local_first, local_last, config_file_name, res_pc_path
+):
+
+    flexmock(PosixPath).should_receive("is_file").and_return(True)
+
+    (
+        flexmock(packit.config.package_config)
+        .should_receive("load_packit_yaml")
+        .with_args(Path(res_pc_path))
+        .and_return(None)
+    )
+
+    (
+        flexmock(packit.config.package_config)
+        .should_receive("parse_loaded_config")
+        .and_return(None)
+    )
+
+    get_local_package_config(
+        try_local_dir_last=local_last, package_config_path=config_file_name
+    )
 
 
 @pytest.mark.parametrize(

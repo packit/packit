@@ -55,11 +55,17 @@ class AliasedGroup(click.Group):
         "If this is not specified, default to the first remote."
     ),
 )
+@click.option(
+    "-c",
+    "--config",
+    "package_config_path",
+    help="Path to package configuration file (defaults to .packit.yaml or packit.yaml)",
+)
 @click.version_option(
     version=get_distribution("packitos").version, message="%(version)s"
 )
 @click.pass_context
-def packit_base(ctx, debug, fas_user, keytab, remote):
+def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):
     """Integrate upstream open source projects into Fedora operating system."""
     if debug:
         # to be able to logger.debug() also in get_user_config()
@@ -70,6 +76,7 @@ def packit_base(ctx, debug, fas_user, keytab, remote):
     c.fas_user = fas_user or c.fas_user
     c.keytab_path = keytab or c.keytab_path
     c.upstream_git_remote = remote or c.upstream_git_remote
+    c.package_config_path = package_config_path or c.package_config_path
     ctx.obj = c
 
     if ctx.obj.debug:
