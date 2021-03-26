@@ -60,6 +60,20 @@ def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
         return False
 
 
+def get_default_branch() -> str:
+    """
+    Returns default branch for newly created repos on the local system.
+
+    Returns:
+        Default branch for new repos, if not supported or not configured returns
+        `master`.
+    """
+    output = run_command(
+        ["git", "config", "init.defaultBranch"], output=True, fail=False
+    )
+    return output.strip() if output else "master"
+
+
 def git_remote_url_to_https_url(inp: str) -> str:
     """
     turn provided git remote URL to https URL:
