@@ -373,4 +373,11 @@ def test_download_remote_sources(source, package_config, expected_url, tmp_path:
 
     base_git.download_remote_sources()
 
+    flexmock(DownloadHelper).should_receive("download_file").and_raise(
+        Exception(
+            "This should not be called second time since the source is present already."
+        )
+    )
+    base_git.download_remote_sources()
+
     assert expected_path.exists()
