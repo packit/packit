@@ -410,9 +410,11 @@ class PackitRepositoryBase:
         """
         # Fetch all sources defined in packit.yaml -> sources
         for source in self.package_config.sources:
-            logger.info(f"Downloading source {source.path!r}.")
-            DownloadHelper.download_file(
-                source.url,
-                str(Path(self.specfile.sources_location).joinpath(source.path)),
-            )
+            source_path = Path(self.specfile.sources_location).joinpath(source.path)
+            if not source_path.is_file():
+                logger.info(f"Downloading source {source.path!r}.")
+                DownloadHelper.download_file(
+                    source.url,
+                    str(source_path),
+                )
         self.specfile.download_remote_sources()
