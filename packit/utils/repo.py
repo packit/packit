@@ -60,18 +60,22 @@ def is_a_git_ref(repo: git.Repo, ref: str) -> bool:
         return False
 
 
-def get_default_branch() -> str:
+def get_default_branch(repository: git.Repo) -> str:
     """
-    Returns default branch for newly created repos on the local system.
+    Returns default branch for newly created repos in the parent directory of
+    passed in repository. Accepts `repository` to ensure the closest override of
+    git configuration is used.
+
+    Args:
+        repository (git.Repo): Git repository closest to the directory where
+            the configuration is applied.
 
     Returns:
         Default branch for new repos, if not supported or not configured returns
         `master`.
     """
-    output = run_command(
-        ["git", "config", "init.defaultBranch"], output=True, fail=False
-    )
-    return output.strip() if output else "master"
+    config = repository.config_reader()
+    return config.get_value("init", "defaultBranch", "master")
 
 
 def git_remote_url_to_https_url(inp: str) -> str:

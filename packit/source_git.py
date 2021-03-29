@@ -445,5 +445,9 @@ class SourceGitGenerator:
         self._add_packit_config()
         if self.dist_git.specfile.get_applied_patches():
             self._run_prep()
-            self._rebase_patches(get_default_branch())
+            self._rebase_patches(
+                get_default_branch(
+                    LocalProject(working_dir=self.get_BUILD_dir()).git_repo
+                )
+            )
             # TODO: patches which are defined but not applied should be copied
