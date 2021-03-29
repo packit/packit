@@ -26,7 +26,11 @@ from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import clone_centos_8_package, clone_centos_9_package
+from packit.utils.repo import (
+    clone_centos_8_package,
+    clone_centos_9_package,
+    get_default_branch,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -441,5 +445,9 @@ class SourceGitGenerator:
         self._add_packit_config()
         if self.dist_git.specfile.get_applied_patches():
             self._run_prep()
-            self._rebase_patches("master")
+            self._rebase_patches(
+                get_default_branch(
+                    LocalProject(working_dir=self.get_BUILD_dir()).git_repo
+                )
+            )
             # TODO: patches which are defined but not applied should be copied
