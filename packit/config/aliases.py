@@ -33,6 +33,7 @@ from packit.utils.decorators import fallback_return_value
 
 ALIASES: Dict[str, List[str]] = {
     "fedora-development": ["fedora-34", "fedora-rawhide"],
+    "fedora-latest": ["fedora-34"],
     "fedora-stable": ["fedora-32", "fedora-33"],
     "fedora-all": ["fedora-32", "fedora-33", "fedora-34", "fedora-rawhide"],
     "epel-all": ["el-6", "epel-7", "epel-8"],
@@ -233,7 +234,8 @@ def get_all_koji_targets() -> List[str]:
 @fallback_return_value(ALIASES)
 def get_aliases() -> Dict[str, List[str]]:
     """
-    Function to automatically determine fedora-all, fedora-stable, fedora-development and epel-all
+    Function to automatically determine fedora-all, fedora-stable, fedora-development,
+    fedora-latest and epel-all
     aliases.
     Current data are fetched via bodhi client, with default base url
     `https://bodhi.fedoraproject.org/'.
@@ -257,12 +259,20 @@ def get_aliases() -> Dict[str, List[str]]:
             name = release.name.lower()
             aliases["epel-all"].append(name)
 
-    if aliases.get("fedora-development"):
+    if "fedora-development" in aliases:
         aliases["fedora-development"].sort(key=lambda x: int(x.rsplit("-")[-1]))
         # The Fedora with the highest version is "rawhide", but
         # Bodhi always uses release names, and has no concept of "rawhide".
         aliases["fedora-development"][-1] = "fedora-rawhide"
 
-    aliases["fedora-all"] = aliases["fedora-development"] + aliases["fedora-stable"]
+    if "fedora-stable" in aliases:
+        aliases["fedora-stable"].sort(key=lambda x: int(x.rsplit("-")[-1]))
+
+    aliases["fedora-all"] = aliases["fedora-stable"] + aliases["fedora-development"]
+
+    # fedora-rawhide is the last release, we want the second latest (the latest
+    # non rawhide release)
+    if len(aliases["fedora-all"]) >= 2:
+        aliases["fedora-latest"] = aliases["fedora-all"][-2]
 
     return aliases
