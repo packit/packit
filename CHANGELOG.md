@@ -1,3 +1,20 @@
+# 0.28.0
+
+- Remove the no-op `--dry-run` option.
+- Handle `centos-stream` targets as `centos-stream-8`, in order to help with
+  the name change in Copr.
+- `fmf_url` and `fmf_ref` can be used in a job's `metadata` to specify an
+  external repository and reference to be used to test the package.
+- Introduce a `fedora-latest` alias for the latest _branched_ version of
+  Fedora Linux.
+- Add a top-level option `-c, --config` to specify a custom path for the
+  package configuration (aka `packit.yaml`).
+- Source-git: enable using CentOS Stream 9 dist-git as a source.
+- Source-git: rename the subdirectory to store downstream packaging files from
+  `fedora` to the more general `.distro`.
+- Source-git: fix creating source-git repositories when Git is configured to
+  call the default branch something other then `master`.
+
 # 0.27.0
 
 - (Source-git) Several improvements of history linearization.
