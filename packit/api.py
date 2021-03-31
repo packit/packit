@@ -805,10 +805,9 @@ class PackitAPI:
             logger.debug(f"Bodhi response:\n{response}")
             response = response["update"]
             logger.info(
-                f"Bodhi update {response['alias']} pushed to stable:\n"
+                f"Bodhi update {response['alias']} ({response['title']}) pushed to stable:\n"
                 f"- {response['url']}\n"
-                f"- stable_karma: {response['stable_karma']}\n"
-                f"- unstable_karma: {response['unstable_karma']}\n"
+                f"- karma: {response['karma']}\n"
                 f"- notes:\n{response['notes']}\n"
             )
         except UpdateNotFound:
