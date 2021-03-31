@@ -9,7 +9,7 @@ import shlex
 import shutil
 import tarfile
 from pathlib import Path
-from typing import Optional, List, Tuple, Union
+from typing import Dict, Optional, List, Tuple, Union
 
 import git
 from packaging import version
@@ -283,115 +283,7 @@ class Upstream(PackitRepositoryBase):
         return ver
 
     def create_archive(self, version: str = None) -> str:
-        """
-        Create archive, using `git archive` by default, from the content of the upstream
-        repository, only committed changes are present in the archive.
-        """
-        version = version or self.get_current_version()
-
-        package_name = (
-            self.package_config.upstream_package_name
-            or self.package_config.downstream_package_name
-        )
-        dir_name = f"{package_name}-{version}"
-        logger.debug(f"Name + version = {dir_name}")
-
-        env = {
-            "PACKIT_PROJECT_VERSION": version,
-            "PACKIT_PROJECT_NAME_VERSION": dir_name,
-        }
-        if self.has_action(action=ActionName.create_archive):
-            outputs = self.get_output_from_action(
-                action=ActionName.create_archive, env=env
-            )
-            if not outputs:
-                raise PackitException("No output from create-archive action.")
-
-            archive_path = self._get_archive_path_from_output(outputs)
-            if not archive_path:
-                raise PackitException(
-                    "The create-archive action did not output a path to the generated archive. "
-                    "Please make sure that you have valid path in the single line of the output."
-                )
-            self._add_link_to_archive_from_specdir_if_needed(archive_path)
-            return archive_path.name
-
-        return self._create_archive_using_default_way(dir_name, env, version)
-
-    def _create_archive_using_default_way(self, dir_name, env, version) -> str:
-        """
-        Create an archive using git archive or the configured command.
-        Archive will be places in the specfile_directory.
-
-        :return: name of the archive
-        """
-        archive_name = f"{dir_name}{DEFAULT_ARCHIVE_EXT}"
-        relative_archive_path = (self.absolute_specfile_dir / archive_name).relative_to(
-            self.local_project.working_dir
-        )
-        if self.package_config.create_tarball_command:
-            archive_cmd = self.package_config.create_tarball_command
-        else:
-            archive_cmd = [
-                "git",
-                "archive",
-                "--output",
-                str(relative_archive_path),
-                "--prefix",
-                f"{dir_name}/",
-                "HEAD",
-            ]
-        self.command_handler.run_command(archive_cmd, return_output=True, env=env)
-        return archive_name
-
-    def _add_link_to_archive_from_specdir_if_needed(self, archive_path: Path) -> None:
-        """
-        Create a relative symlink to the archive from in the specfile directory.
-
-        :param archive_path: relative path to the archive from the specfile dir
-        """
-        if archive_path.parent.absolute() != self.absolute_specfile_dir:
-            archive_in_spec_dir = self.absolute_specfile_dir / archive_path.name
-            relative_archive_path = archive_path.relative_to(self.absolute_specfile_dir)
-
-            logger.info(
-                "Linking to the specfile directory:"
-                f" {archive_in_spec_dir} -> {relative_archive_path}"
-                f" (given path to archive: {archive_path})"
-            )
-            archive_in_spec_dir.symlink_to(relative_archive_path)
-
-    def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
-        """
-        Parse the archive name from the output in the reverse order.
-        - Check if the line is a path and if it exists.
-
-        :param outputs: given output of the custom command
-        :return: Path to the archive if we found any.
-        """
-        for output in reversed(outputs):
-            for archive_name in reversed(output.splitlines()):
-                try:
-                    archive_path = Path(archive_name.strip())
-
-                    if not archive_path.is_absolute():
-                        archive_path = self._local_project.working_dir / archive_path
-
-                    if archive_path.is_file():
-                        archive_path_absolute = archive_path.absolute()
-                        logger.info("Created archive:")
-                        logger.info(f"\tparsed   path: {archive_path}")
-                        logger.info(f"\tabsolute path: {archive_path_absolute}")
-                        return archive_path_absolute
-                except OSError as ex:
-                    # File too long
-                    if ex.errno == 36:
-                        logger.error(
-                            "Skipping long output command output while getting archive name."
-                        )
-                        continue
-                    raise ex
-        return None
+        return ArchiveCreator(self, version or self.get_current_version()).create()
 
     def get_last_tag(self, before: str = None) -> Optional[str]:
         """
@@ -1094,3 +986,150 @@ class SRPMBuilder:
             ) from ex
 
         return self.get_path(out)
+
+
+class ArchiveCreator:
+    def __init__(self, upstream: Upstream, version: str):
+        self.upstream = upstream
+        self.version = version
+
+    def create(self):
+        """
+        Create archive, using `git archive` by default, from the content of the upstream
+        repository, only committed changes are present in the archive.
+        """
+        package_name = (
+            self.upstream.package_config.upstream_package_name
+            or self.upstream.package_config.downstream_package_name
+        )
+        dir_name = f"{package_name}-{self.version}"
+        logger.debug(f"Name + version = {dir_name}")
+
+        env = {
+            "PACKIT_PROJECT_VERSION": self.version,
+            "PACKIT_PROJECT_NAME_VERSION": dir_name,
+        }
+        if self.upstream.has_action(action=ActionName.create_archive):
+            outputs = self.upstream.get_output_from_action(
+                action=ActionName.create_archive, env=env
+            )
+            if not outputs:
+                raise PackitException("No output from create-archive action.")
+
+            archive_path = self._get_archive_path_from_output(outputs)
+            if not archive_path:
+                raise PackitException(
+                    "The create-archive action did not output a path to the generated archive. "
+                    "Please make sure that you have valid path in the single line of the output."
+                )
+            self._add_link_to_archive_from_specdir_if_needed(archive_path)
+            return archive_path.name
+
+        return self._create_archive_using_default_way(dir_name, env)
+
+    def _get_archive_path_from_line(self, line: str) -> Optional[Path]:
+        """
+        Get path to the created archive from one line of the output.
+
+        Args:
+            line (str): Line of output produced while creating the archive.
+
+        Returns:
+            Path to the archive as string, `None` if cannot be parsed.
+        """
+        try:
+            archive_path = Path(line.strip())
+
+            if not archive_path.is_absolute():
+                archive_path = self.upstream._local_project.working_dir / archive_path
+
+            if archive_path.is_file():
+                archive_path_absolute = archive_path.absolute()
+                logger.info("Created archive:")
+                logger.info(f"\tparsed   path: {archive_path}")
+                logger.info(f"\tabsolute path: {archive_path_absolute}")
+                return archive_path_absolute
+        except OSError as ex:
+            # File too long
+            if ex.errno == 36:
+                logger.error(
+                    "Skipping long output command output while getting archive name."
+                )
+                return None
+            raise ex
+
+        return None
+
+    def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
+        """
+        Parse the archive name from the output in the reverse order.
+        Check if the line is a path and if it exists.
+
+        Args:
+            outputs (List[str]): Outputs produced by creating the archive.
+
+        Returns:
+            Path to the archive if found, `None` otherwise.
+        """
+        for output in reversed(outputs):
+            for line in reversed(output.splitlines()):
+                archive_path = self._get_archive_path_from_line(line)
+                if archive_path:
+                    return archive_path
+        return None
+
+    def _add_link_to_archive_from_specdir_if_needed(self, archive_path: Path) -> None:
+        """
+        Create a relative symlink to the archive from in the specfile directory
+        if necessary.
+
+        Args:
+            archive_path (Path): Relative path to the archive from the specfile dir.
+        """
+        absolute_specfile_dir = self.upstream.absolute_specfile_dir
+
+        if archive_path.parent.absolute() != absolute_specfile_dir:
+            archive_in_spec_dir = absolute_specfile_dir / archive_path.name
+            relative_archive_path = archive_path.relative_to(absolute_specfile_dir)
+
+            logger.info(
+                "Linking to the specfile directory:"
+                f" {archive_in_spec_dir} -> {relative_archive_path}"
+                f" (given path to archive: {archive_path})"
+            )
+            archive_in_spec_dir.symlink_to(relative_archive_path)
+
+    def _create_archive_using_default_way(
+        self, dir_name: str, env: Dict[str, str]
+    ) -> str:
+        """
+        Create an archive using git archive or the configured command.
+        Archive will be placed in the specfile_directory.
+
+        Args:
+            dir_name (str): Name of the directory from which the archive is created.
+            env (Dict[str, str]): Environment variables passed to the action.
+
+        Returns:
+            Name of the archive as a string.
+        """
+        archive_name = f"{dir_name}{DEFAULT_ARCHIVE_EXT}"
+        relative_archive_path = (
+            self.upstream.absolute_specfile_dir / archive_name
+        ).relative_to(self.upstream.local_project.working_dir)
+        if self.upstream.package_config.create_tarball_command:
+            archive_cmd = self.upstream.package_config.create_tarball_command
+        else:
+            archive_cmd = [
+                "git",
+                "archive",
+                "--output",
+                str(relative_archive_path),
+                "--prefix",
+                f"{dir_name}/",
+                "HEAD",
+            ]
+        self.upstream.command_handler.run_command(
+            archive_cmd, return_output=True, env=env
+        )
+        return archive_name
