@@ -277,6 +277,7 @@ def get_local_package_config(
     repo_name: str = None,
     try_local_dir_first=False,
     try_local_dir_last=False,
+    package_config_path: str = None,
 ) -> PackageConfig:
     """
     find packit.yaml in provided dirs, load it and return PackageConfig
@@ -285,13 +286,19 @@ def get_local_package_config(
     :param repo_name: name of the git repository (default for project name)
     :param try_local_dir_first: try in cwd first
     :param try_local_dir_last: try cwd last
+    :param package_config_path: Path to package configuration file
     :return: local PackageConfig
     """
-    config_file_name = find_packit_yaml(
-        *directory,
-        try_local_dir_first=try_local_dir_first,
-        try_local_dir_last=try_local_dir_last,
-    )
+
+    if package_config_path:
+        config_file_name = Path(package_config_path)
+    else:
+        config_file_name = find_packit_yaml(
+            *directory,
+            try_local_dir_first=try_local_dir_first,
+            try_local_dir_last=try_local_dir_last,
+        )
+
     loaded_config = load_packit_yaml(config_file_name)
     return parse_loaded_config(
         loaded_config=loaded_config,
