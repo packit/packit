@@ -803,6 +803,7 @@ class PackitAPI:
         try:
             response = b.request(update=update_alias, request="stable")
             logger.debug(f"Bodhi response:\n{response}")
+            response = response["update"]
             logger.info(
                 f"Bodhi update {response['alias']} pushed to stable:\n"
                 f"- {response['url']}\n"
