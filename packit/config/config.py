@@ -61,6 +61,7 @@ class Config:
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
+        package_config_path=None,
         **kwargs,
     ):
         self.debug: bool = debug
@@ -95,6 +96,7 @@ class Config:
         self.github_requests_log_path: str = ""
 
         self.services = Config.load_authentication(kwargs)
+        self.package_config_path = package_config_path
 
         # because of current load_authentication implementation it will generate false warnings
         # if kwargs:
