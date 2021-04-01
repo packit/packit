@@ -6,7 +6,6 @@
   tasks:
     - include_tasks: tasks/rpm-test-deps.yaml
     - include_tasks: tasks/install-packit.yaml
-    - include_tasks: tasks/configure-git.yaml
     - include_tasks: tasks/sandcastle.yaml
     - name: Run unit, integration and functional tests
       command: make check
