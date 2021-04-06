@@ -440,7 +440,7 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
     assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
 
 
-def test_copr_build_existing_project_munch_do_not_remove_present_chroots(
+def test_copr_build_existing_project_munch_remove_present_chroots(
     cwd_upstream_or_distgit, api_instance
 ):
     u, d, api = api_instance
@@ -472,7 +472,7 @@ def test_copr_build_existing_project_munch_do_not_remove_present_chroots(
         )
     )
 
-    flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
+    flexmock(ProjectProxy).should_receive("edit").and_return()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
