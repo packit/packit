@@ -17,6 +17,8 @@ from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
     git_patch_ish,
+    get_metadata_from_message,
+    get_message_from_metadata,
 )
 from packit.utils.commands import run_command
 
@@ -279,3 +281,97 @@ def test_sanitize_branch(inp, exp, exp_rpm):
 )
 def test_git_patch_ish(inp, outp):
     assert git_patch_ish(inp) == outp
+
+
+@pytest.mark.parametrize(
+    "source, result",
+    [
+        pytest.param("", None, id="empty message"),
+        pytest.param("One sentence", None, id="one sentence"),
+        pytest.param("One sentence\n", None, id="one sentence with end-line"),
+        pytest.param(
+            "One sentence\n\n", None, id="one sentence with multiple end-lines"
+        ),
+        pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
+        pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
+        pytest.param(
+            "key: value",
+            {"key": "value"},
+            id="one key-value",
+        ),
+        pytest.param(
+            "key: value\n",
+            {"key": "value"},
+            id="one key-value with empty-line",
+        ),
+        pytest.param(
+            "key: value\nsecond_key: value",
+            {"key": "value", "second_key": "value"},
+            id="two key-values",
+        ),
+        pytest.param(
+            "One sentence\nkey: value\n",
+            {"key": "value"},
+            id="one sentence and one key-value with empty-line",
+        ),
+        pytest.param(
+            "Once sentence\nSecond sentence.\nkey: value",
+            {"key": "value"},
+            id="two sentences and one key-value",
+        ),
+        pytest.param(
+            "Once sentence\n\nSecond sentence.\n\n\nkey: value",
+            {"key": "value"},
+            id="two sentences and one key-value with few empty lines",
+        ),
+        pytest.param(
+            "Once sentence\nSecond sentence.\nkey: value\nother: key",
+            {"key": "value", "other": "key"},
+            id="two sentences and one key-value",
+        ),
+        pytest.param(
+            "key: value\nsentence at the end",
+            None,
+            id="sentence at the end",
+        ),
+        pytest.param(
+            "key: [a,b,c]",
+            {"key": ["a", "b", "c"]},
+            id="list as a value",
+        ),
+        pytest.param(
+            "key:\n- a\n- b\n- c",
+            {"key": ["a", "b", "c"]},
+            id="list as a value in separate lines",
+        ),
+        pytest.param(
+            "Sentence: with colon\nanother sentence without colon",
+            None,
+            id="colon in the sentence",
+        ),
+        pytest.param(
+            "Sentence with colon: in the middle\nanother sentence without colon",
+            None,
+            id="colon in the sentence in the middle",
+        ),
+    ],
+)
+def test_get_metadata_from_message(source, result):
+    assert get_metadata_from_message(commit=flexmock(message=source)) == result
+
+
+@pytest.mark.parametrize(
+    "metadata, header, result",
+    [
+        pytest.param({}, None, "", id="empty dict"),
+        pytest.param({"key": "value"}, None, "key: value\n", id="single key-value"),
+        pytest.param(
+            {"key": "value", "other": "value"},
+            None,
+            "key: value\nother: value\n",
+            id="multiple key-values",
+        ),
+    ],
+)
+def test_get_message_from_metadata(metadata, header, result):
+    assert get_message_from_metadata(metadata, header) == result
