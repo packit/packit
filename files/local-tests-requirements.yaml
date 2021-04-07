@@ -5,7 +5,6 @@
     project_dir: "{{ playbook_dir }}/.."
   tasks:
     - include_tasks: tasks/rpm-test-deps.yaml
-    - include_tasks: tasks/configure-git.yaml
     - include_tasks: tasks/ogr.yaml
     - include_tasks: tasks/sandcastle.yaml
     # To (re-)generate tests_recording/test_data/

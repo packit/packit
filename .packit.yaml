@@ -1,7 +1,13 @@
 ---
 synced_files:
-  - src: fedora-tests/
+  - src: tests/
     dest: tests/
+  - src: plans/
+    dest: plans/
+  - src: .fmf/
+    dest: .fmf/
+  - src: tests_recording/
+    dest: tests_recording/
 # packit was already taken on PyPI
 upstream_package_name: packitos
 upstream_project_url: https://github.com/packit/packit

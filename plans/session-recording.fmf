@@ -1,9 +1,18 @@
-summary:
-  Tests using pre-recorded responses from external services.
-prepare:
-  how: ansible
-  playbooks:
-  - files/packit-testing-farm-prepare-session-recording.yaml
+summary: Session recording testcases
+discover:
+  how: fmf
+  filter: tier:2
 execute:
-  script:
-  - make check TESTS_TARGET=tests_recording
+  how: tmt
+adjust:
+  when: "distro <= rhel-8 or distro <= centos-8"
+  prepare:
+    - how: install
+      name: ensure_copr_plugin
+      order: 10
+      package:
+        - dnf-plugins-core
+    - how: shell
+      name: requre_copr
+      order: 20
+      script: 'dnf -y copr enable packit/packit-requre-main'

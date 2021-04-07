@@ -1,0 +1,24 @@
+require:
+  - python3-flexmock
+  - python3-pytest
+  - python3-setuptools_scm_git_archive
+  - python3-setuptools_scm
+  - python3-distro
+  - python3-devel
+  - packit
+  - python3-packit
+  - python3-pytest-cov
+  - rpm-build
+  - rpmdevtools
+  - python3-bodhi-client
+  - fedpkg
+  - git
+  - make
+  #- rpmautospec-rpm-macros
+component:
+  - packit
+tier: 1
+tag:
+  - basic
+test: pytest-3 -v .
+duration: 30m
