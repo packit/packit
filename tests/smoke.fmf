@@ -1,0 +1,8 @@
+require:
+  - packit
+  - python3-packit
+summary: Basic smoke test
+test: ./smoke.sh
+tag:
+  - smoke
+tier: 0

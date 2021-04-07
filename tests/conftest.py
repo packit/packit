@@ -23,6 +23,8 @@
 import shutil
 from pathlib import Path
 from typing import Tuple
+import subprocess
+import tempfile
 
 import pytest
 from flexmock import flexmock
@@ -39,6 +41,20 @@ from tests.spellbook import (
     UPSTREAM_WITH_MUTLIPLE_SOURCES,
     UPSTREAM_WEIRD_SOURCES,
 )
+
+
+# define own tmp_path fixture for older version of pytest (Centos)
+try:
+    from _pytest import tmpdir
+
+    _ = tmpdir.tmp_path
+except (ImportError, AttributeError, KeyError):
+
+    @pytest.fixture()
+    def tmp_path():
+        TMP_DIR = "/tmp/pytest_tmp_path/"
+        Path(TMP_DIR).mkdir(exist_ok=True, parents=True)
+        return Path(tempfile.mkdtemp(prefix=TMP_DIR))
 
 
 def get_git_repo_and_remote(
@@ -187,3 +203,20 @@ def copr_client_mock(get_list_return=None):
 
     copr_mock = flexmock(mock_chroot_proxy=flexmock(get_list=lambda: get_list_return))
     return copr_mock
+
+
+@pytest.fixture(autouse=True, scope="function")
+def configure_git():
+    CMDS = [
+        ["git", "config", "--global", "user.email", "packit@redhat.com"],
+        ["git", "config", "--global", "user.name", "Packit Test"],
+    ]
+    # verify that git is already configured
+    try:
+        output = subprocess.check_output(["git", "config", "-l", "--global"])
+    except subprocess.CalledProcessError:
+        output = ""
+    if "user.name" in output if isinstance(output, str) else output.decode():
+        return
+    for item in CMDS:
+        subprocess.call(item)

@@ -1,0 +1,13 @@
+require:
+  - python3-flexmock
+  - python3-requre
+  - python3-pytest
+  - packit
+  - python3-packit
+component:
+  - packit
+tier: 2
+tag:
+  - requre
+test: pytest-3 -v .
+duration: 10m

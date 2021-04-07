@@ -8,6 +8,21 @@ import shutil
 from pathlib import Path
 from packit.patches import PatchGenerator, PatchMetadata
 
+TESTS_DIR = str(Path(__file__).parent.parent)
+
+
+def check_copytree_dirs_exists_support():
+    """
+    Old version of shutil.copytree does not support
+    dirs_exist_ok parameter.
+    """
+    if (
+        hasattr(shutil.copytree, "__defaults__")
+        and len(shutil.copytree.__defaults__) >= 5
+    ):
+        return True
+    return False
+
 
 @pytest.fixture
 def git_repo(tmpdir):
@@ -18,20 +33,25 @@ def git_repo(tmpdir):
     """
     repo = git.Repo.init(tmpdir)
     shutil.copytree(
-        src="tests/data/patches/previous/",
+        src=f"{TESTS_DIR}/data/patches/previous/",
         dst=repo.working_tree_dir,
         dirs_exist_ok=True,
     )
     repo.git.add(repo.working_tree_dir)
     repo.git.commit("-mInitial patches")
     shutil.copytree(
-        src="tests/data/patches/regenerated/",
+        src=f"{TESTS_DIR}/data/patches/regenerated/",
         dst=repo.working_tree_dir,
         dirs_exist_ok=True,
     )
     return repo
 
 
+@pytest.mark.skipif(
+    not check_copytree_dirs_exists_support(),
+    reason="Old python version does not support copytree exists dirs parameter"
+    " https://github.com/packit/packit/issues/1160",
+)
 def test_undo_identical(git_repo):
     """
     Check that identical patches are correctly detected and changes
