@@ -43,8 +43,6 @@ from tests.spellbook import (
 )
 
 
-TMP_DIR = "/tmp/pytest_tmp_path/"
-
 # define own tmp_path fixture for older version of pytest (Centos)
 try:
     from _pytest import tmpdir
@@ -54,6 +52,7 @@ except (ImportError, AttributeError, KeyError):
 
     @pytest.fixture()
     def tmp_path():
+        TMP_DIR = "/tmp/pytest_tmp_path/"
         Path(TMP_DIR).mkdir(exist_ok=True, parents=True)
         return Path(tempfile.mkdtemp(prefix=TMP_DIR))
 
@@ -206,7 +205,7 @@ def copr_client_mock(get_list_return=None):
     return copr_mock
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="function")
 def configure_git():
     CMDS = [
         ["git", "config", "--global", "user.email", "packit@redhat.com"],

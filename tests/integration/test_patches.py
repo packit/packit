@@ -49,7 +49,8 @@ def git_repo(tmpdir):
 
 @pytest.mark.skipif(
     not check_copytree_dirs_exists_support(),
-    reason="Old python version does not support copytree exists dirs parameter",
+    reason="Old python version does not support copytree exists dirs parameter"
+    " https://github.com/packit/packit/issues/1160",
 )
 def test_undo_identical(git_repo):
     """
