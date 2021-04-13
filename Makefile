@@ -42,3 +42,16 @@ check_in_container_regenerate_data: tests_image
 		--security-opt label=disable \
 		$(TESTS_IMAGE) \
 		bash -c "pip3 install .; make check"
+
+
+clean_fmf_files:
+	echo "description: Functional test" > tests/functional/main.fmf
+	echo "description: Integration test" > tests/integration/main.fmf
+	echo "description: Unit test" > tests/unit/main.fmf
+	cp tests_recording/main.fmf.backup tests_recording/main.fmf
+
+regenerate_fmf: clean_fmf_files
+	# Install project for test fmf metadata regeneration:
+	# https://github.com/jscotka/fmf_metadata/
+	fmf_metadata -u --pytest $(TESTS_TARGET)
+	fmf_metadata -u --pytest $(TESTS_RECORDING_PATH)
