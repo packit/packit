@@ -283,7 +283,7 @@ class Upstream(PackitRepositoryBase):
         return ver
 
     def create_archive(self, version: str = None) -> str:
-        return ArchiveCreator(self, version or self.get_current_version()).create()
+        return Archive(self, version).create()
 
     def get_last_tag(self, before: str = None) -> Optional[str]:
         """
@@ -435,7 +435,9 @@ class Upstream(PackitRepositoryBase):
             )
             return
 
-        archive_root_dir = self.get_archive_root_dir(archive)
+        archive_root_dir = Archive(self, self.get_version()).get_archive_root_dir(
+            archive
+        )
 
         new_setup_line = m[1]
         # replace -n with our -n because it's better
@@ -497,70 +499,7 @@ class Upstream(PackitRepositoryBase):
 
         :param upstream_ref: str, needed for the sourcegit mode
         """
-        current_git_describe_version = self.get_current_version()
-        upstream_ref = self._expand_git_ref(
-            upstream_ref or self.package_config.upstream_ref
-        )
-
-        if upstream_ref:
-            self.prepare_upstream_using_source_git(upstream_ref)
-        else:
-            created_archive = self.create_archive(version=current_git_describe_version)
-            self.fix_specfile_to_use_local_archive(
-                archive=created_archive, archive_version=current_git_describe_version
-            )
-
-        # https://github.com/packit/packit-service/issues/314
-        if Path(self.local_project.working_dir).joinpath("sources").exists():
-            logger.warning('The upstream repo contains "sources" file or a directory.')
-            logger.warning(
-                "We are unable to download remote sources from spec-file "
-                "because the file contains links to archives in Fedora downstream."
-            )
-            logger.warning("Therefore skipping downloading of remote sources.")
-        else:
-            self.download_remote_sources()
-
-    def fix_specfile_to_use_local_archive(self, archive, archive_version) -> None:
-        """
-        Update specfile to use the archive with the right version.
-
-        :param archive: path to the archive
-        :param archive_version: package version of the archive
-        """
-        current_commit = self.local_project.commit_hexsha
-        env = {
-            "PACKIT_PROJECT_VERSION": archive_version,
-            "PACKIT_PROJECT_COMMIT": current_commit,
-            "PACKIT_PROJECT_ARCHIVE": archive,
-        }
-        if self.with_action(action=ActionName.fix_spec, env=env):
-            self.fix_spec(
-                archive=archive, version=archive_version, commit=current_commit
-            )
-
-    def prepare_upstream_using_source_git(self, upstream_ref):
-        """
-        Fetch the tarball and don't check out the upstream ref.
-
-        :param upstream_ref: the base git ref for the source git
-        :return: the source directory where we can build the SRPM
-        """
-        self.fetch_upstream_archive()
-        self.create_patches_and_update_specfile(upstream_ref)
-        old_release = self.specfile.get_release_number()
-        try:
-            old_release_int = int(old_release)
-            new_release = str(old_release_int + 1)
-        except ValueError:
-            new_release = str(old_release)
-
-        current_commit = self.local_project.commit_hexsha
-        release_to_update = f"{new_release}.g{current_commit}"
-        msg = f"Downstream changes ({current_commit})"
-        self.specfile.set_spec_version(
-            release=release_to_update, changelog_entry=f"- {msg}"
-        )
+        PrepareForSRPM(upstream=self, ref=upstream_ref).prepare()
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
         """
@@ -766,106 +705,6 @@ class Upstream(PackitRepositoryBase):
 
         return tag
 
-    def get_archive_root_dir(self, archive: str) -> Union[str, None]:
-        """
-        Returns archive root dir.
-        It uses 2 techniques:
-        1. tries to extract it directly from archive.
-        2. will generate name based on archive_root_dir_template
-
-        Currently supported archives:
-        * tar including compression (for details check python tarfile module doc)
-
-        :param archive: name of archive
-        :return: archive top level directory or None
-
-        .. raises:: PackitException if failed - all used methods returned None
-        """
-
-        archive_root_dir = None
-
-        logger.debug("Trying to extract archive_root_dir from known archives")
-        if tarfile.is_tarfile(f"{self.absolute_specfile_dir}/{archive}"):
-            logger.debug(f"Archive {archive} is tar.")
-            archive_root_dir = self.get_archive_root_dir_from_tar(archive)
-        else:
-            logger.debug(f"Archive {archive} is not tar.")
-
-        if archive_root_dir is None:
-            logger.debug(
-                "Using archive_root_dir_template config option. If not set it defaults to "
-                "{{upstream_pkg_name}}-{{version}}. Check "
-                "https://packit.dev/docs/configuration/#archive_root_dir_template for more details."
-            )
-            archive_root_dir = self.get_archive_root_dir_from_template()
-
-        return archive_root_dir
-
-    def get_archive_root_dir_from_tar(self, archive: str) -> Union[str, None]:
-        """
-        Returns tar archive top-level directory, if there is exactly one.
-
-        :param archive: name of tar/compressed tar archive
-        :return: archive top level directory if exactly one is found
-                None in other cases
-        """
-
-        tar = tarfile.open(f"{self.absolute_specfile_dir}/{archive}")
-        root_dirs = set()
-        for tar_item in tar.getmembers():
-            if tar_item.isdir() and "/" not in tar_item.name:
-                root_dirs.add(tar_item.name)
-            # required for archives where top-level dir was added using tar --transform
-            # option - in that case, tar archive will not contain dir related entry
-            if tar_item.isfile() and "/" in tar_item.name:
-                root_dirs.add(tar_item.name.split("/")[0])
-
-        root_dirs_count = len(root_dirs)
-        archive_root_items_count = len(
-            {i.name for i in tar.getmembers() if "/" not in i.name}
-        )
-
-        if root_dirs_count == 1:
-            root_dir = root_dirs.pop()
-            logger.debug(f"Directory {root_dir} found in archive {archive}")
-            return root_dir
-        elif root_dirs_count == 0:
-            logger.warning(f"No directory found in archive {archive}.")
-        elif root_dirs_count >= 2:
-            logger.warning(
-                f"Archive {archive} contains multiple directories on the top level: "
-                f"the common practice in the industry is to have only one in the "
-                f'following format: "PACKAGE-VERSION"'
-            )
-        elif archive_root_items_count > 1:
-            logger.warning(
-                f"Archive f{archive} contains multiple root items. It can be "
-                f"intentional or can signal incorrect archive structure."
-            )
-        return None
-
-    def get_archive_root_dir_from_template(self) -> Union[str, None]:
-        """
-        Generates archive root dir based on archive_root_dir_template.
-        archive_root_dir_template default value is "{upstream_pkg_name}-{version}"
-
-        :returns: archive root dir name based on template
-        """
-        template = self.package_config.archive_root_dir_template
-        logger.debug(
-            f"archive_root_dir_template is set or defaults to if not set to: {template}"
-        )
-        archive_root_dir = template.replace(
-            "{upstream_pkg_name}", self.package_config.upstream_package_name
-        ).replace("{version}", self.get_version())
-        not_replaced = re.findall("{.*?}", archive_root_dir)
-        if not_replaced:
-            logger.warning(
-                f"Probably not all archive_root_dir_template tags were "
-                f"replaced: {' ,'.join(not_replaced)}"
-            )
-        return archive_root_dir
-
 
 class SRPMBuilder:
     def __init__(
@@ -988,15 +827,111 @@ class SRPMBuilder:
         return self.get_path(out)
 
 
-class ArchiveCreator:
-    def __init__(self, upstream: Upstream, version: str):
+class PrepareForSRPM:
+    def __init__(self, upstream: Upstream, ref: Optional[str] = None) -> None:
         self.upstream = upstream
-        self.version = version
+        self.current_git_describe_version = upstream.get_current_version()
+        self.upstream_ref = upstream._expand_git_ref(
+            ref or upstream.package_config.upstream_ref
+        )
 
-    def create(self):
+    def _prepare_upstream_using_source_git(self):
         """
-        Create archive, using `git archive` by default, from the content of the upstream
-        repository, only committed changes are present in the archive.
+        Fetch the tarball and don't check out the upstream ref.
+
+        :param upstream_ref: the base git ref for the source git
+        :return: the source directory where we can build the SRPM
+        """
+        self.upstream.fetch_upstream_archive()
+        self.upstream.create_patches_and_update_specfile(self.upstream_ref)
+        old_release = self.upstream.specfile.get_release_number()
+        try:
+            old_release_int = int(old_release)
+            new_release = str(old_release_int + 1)
+        except ValueError:
+            new_release = str(old_release)
+
+        current_commit = self.upstream.local_project.commit_hexsha
+        release_to_update = f"{new_release}.g{current_commit}"
+        msg = f"Downstream changes ({current_commit})"
+        self.upstream.specfile.set_spec_version(
+            release=release_to_update, changelog_entry=f"- {msg}"
+        )
+
+    def _fix_specfile_to_use_local_archive(self, archive):
+        """
+        Update specfile to use the archive with the right version.
+
+        :param archive: path to the archive
+        :param archive_version: package version of the archive
+        """
+        current_commit = self.upstream.local_project.commit_hexsha
+        env = {
+            "PACKIT_PROJECT_VERSION": self.current_git_describe_version,
+            "PACKIT_PROJECT_COMMIT": current_commit,
+            "PACKIT_PROJECT_ARCHIVE": archive,
+        }
+        if self.upstream.with_action(action=ActionName.fix_spec, env=env):
+            self.upstream.fix_spec(
+                archive=archive,
+                version=self.current_git_describe_version,
+                commit=current_commit,
+            )
+
+    def prepare(self):
+        if self.upstream_ref:
+            self._prepare_upstream_using_source_git()
+        else:
+            created_archive = self.upstream.create_archive(
+                version=self.current_git_describe_version
+            )
+            self._fix_specfile_to_use_local_archive(archive=created_archive)
+
+        # https://github.com/packit/packit-service/issues/314
+        if Path(self.upstream.local_project.working_dir).joinpath("sources").exists():
+            logger.warning('The upstream repo contains "sources" file or a directory.')
+            logger.warning(
+                "We are unable to download remote sources from spec-file "
+                "because the file contains links to archives in Fedora downstream."
+            )
+            logger.warning("Therefore skipping downloading of remote sources.")
+        else:
+            self.upstream.download_remote_sources()
+
+
+class Archive:
+    def __init__(self, upstream: Upstream, version: Optional[str] = None) -> None:
+        """
+        Creates an instance of `Archive`.
+
+        Args:
+            upstream (Upstream): Instance of Upstream class.
+            version (Optional[str]): Version of the archive.
+
+                Defaults to `None`.
+        """
+        self.upstream = upstream
+        self._version = version
+
+    @property
+    def version(self):
+        """
+        Version of the archive. If not given through constructor, initialized with
+        `get_current_version` from `Upstream` class.
+        """
+        if not self._version:
+            self._version = self.upstream.get_current_version()
+        return self._version
+
+    def create(self) -> str:
+        """
+        Create archive from the content of the upstream repository, only committed
+        changes are present in the archive.
+
+        Uses `git archive` by default, unless `create_archive` action is defined.
+
+        Returns:
+            Name of the archive.
         """
         package_name = (
             self.upstream.package_config.upstream_package_name
@@ -1103,8 +1038,9 @@ class ArchiveCreator:
         self, dir_name: str, env: Dict[str, str]
     ) -> str:
         """
-        Create an archive using git archive or the configured command.
-        Archive will be placed in the specfile_directory.
+        Create an archive using `git archive`, unless `create_tarball_command` is
+        configured.
+        Archive will be placed in the `specfile_directory`.
 
         Args:
             dir_name (str): Name of the directory from which the archive is created.
@@ -1133,3 +1069,115 @@ class ArchiveCreator:
             archive_cmd, return_output=True, env=env
         )
         return archive_name
+
+    def get_archive_root_dir(self, archive: str) -> Optional[str]:
+        """
+        Get archive's root directory.
+
+        It uses 2 techniques:
+        1. tries to extract it directly from archive.
+        2. will generate name based on `archive_root_dir_template`
+
+        Currently supported archives:
+        * tar including compression (for details check python tarfile module doc)
+
+        Args:
+            archive (str): Name of the archive.
+        :return: archive top level directory or None
+
+        Returns:
+            Archive's top-level directory or `None`.
+
+        Raises:
+            PackitException: If failed, i.e. all methods used for deduction returned
+                `None`.
+        """
+
+        archive_root_dir = None
+
+        logger.debug("Trying to extract archive_root_dir from known archives")
+        if tarfile.is_tarfile(f"{self.upstream.absolute_specfile_dir}/{archive}"):
+            logger.debug(f"Archive {archive} is tar.")
+            archive_root_dir = self.get_archive_root_dir_from_tar(archive)
+        else:
+            logger.debug(f"Archive {archive} is not tar.")
+
+        if archive_root_dir is None:
+            logger.debug(
+                "Using archive_root_dir_template config option. If not set it defaults to "
+                "{{upstream_pkg_name}}-{{version}}. Check "
+                "https://packit.dev/docs/configuration/#archive_root_dir_template for more details."
+            )
+            archive_root_dir = self.get_archive_root_dir_from_template()
+
+        return archive_root_dir
+
+    def get_archive_root_dir_from_tar(self, archive: str) -> Optional[str]:
+        """
+        Returns tar archive's top-level directory, if there is exactly one.
+
+        Args:
+            archive (str): Name of the tar archive.
+
+        Returns:
+            Archive's top level directory if there is exactly one, `None` otherwise.
+        """
+
+        tar = tarfile.open(f"{self.upstream.absolute_specfile_dir}/{archive}")
+        root_dirs = set()
+        for tar_item in tar.getmembers():
+            if tar_item.isdir() and "/" not in tar_item.name:
+                root_dirs.add(tar_item.name)
+            # required for archives where top-level dir was added using tar --transform
+            # option - in that case, tar archive will not contain dir related entry
+            if tar_item.isfile() and "/" in tar_item.name:
+                root_dirs.add(tar_item.name.split("/")[0])
+
+        root_dirs_count = len(root_dirs)
+        archive_root_items_count = len(
+            {i.name for i in tar.getmembers() if "/" not in i.name}
+        )
+
+        if root_dirs_count == 1:
+            root_dir = root_dirs.pop()
+            logger.debug(f"Directory {root_dir} found in archive {archive}")
+            return root_dir
+
+        if root_dirs_count == 0:
+            logger.warning(f"No directory found in archive {archive}.")
+        elif root_dirs_count > 1:
+            logger.warning(
+                f"Archive {archive} contains multiple directories on the top level: "
+                f"the common practice in the industry is to have only one in the "
+                f'following format: "PACKAGE-VERSION"'
+            )
+        elif archive_root_items_count > 1:
+            logger.warning(
+                f"Archive f{archive} contains multiple root items. It can be "
+                f"intentional or can signal incorrect archive structure."
+            )
+
+        return None
+
+    def get_archive_root_dir_from_template(self) -> Optional[str]:
+        """
+        Generates archive's root directory based on the `archive_root_dir_template`.
+        `archive_root_dir_template`'s default value is `{upstream_pkg_name}-{version}`
+
+        Returns:
+            Archive's root directory name based on the template.
+        """
+        template = self.upstream.package_config.archive_root_dir_template
+        logger.debug(
+            f"archive_root_dir_template is set or defaults to if not set to: {template}"
+        )
+        archive_root_dir = template.replace(
+            "{upstream_pkg_name}", self.upstream.package_config.upstream_package_name
+        ).replace("{version}", self.version)
+        not_replaced = re.findall("{.*?}", archive_root_dir)
+        if not_replaced:
+            logger.warning(
+                f"Probably not all archive_root_dir_template tags were "
+                f"replaced: {' ,'.join(not_replaced)}"
+            )
+        return archive_root_dir
