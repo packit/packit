@@ -448,6 +448,7 @@ class LocalProject:
         rem.fetch(f"{remote_ref}:{local_ref}")
         self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
         self.git_repo.branches[local_branch].checkout()
+        logger.info(f"Checked out commit {self.git_repo.head.commit}")
 
     def checkout_release(self, tag: str) -> None:
         logger.info(f"Checking out upstream version {tag}.")
