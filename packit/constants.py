@@ -128,10 +128,10 @@ RPM_MACROS_FOR_PREP = [
     "-D",
     "__scm_apply_git_am(qp:m:) "
     "%{__git} am %{-q} %{-p:-p%{-p*}} && "
-    "patch_name=`basename %{1}` "
-    "commit_msg=`%{__git} log --format=%B -n1` "
+    "patch_name=`basename %{1}` && "
+    "commit_msg=`%{__git} log --format=%B -n1` && "
     r'metadata_commit_msg=`printf "patch_name: $patch_name\\n'
-    r'present_in_specfile: true\\nsquash_commits: true"` '
+    r'present_in_specfile: true\\nsquash_commits: true"` && '
     '%{__git} commit --amend -m "$commit_msg" -m "$metadata_commit_msg"',
     # do the same of %autosetup -Sgit
     # that is, apply packit patch metadata to the patch commit
@@ -139,7 +139,7 @@ RPM_MACROS_FOR_PREP = [
     "-D",
     "__scm_apply_git(qp:m:) "
     "%{__git} apply --index %{-p:-p%{-p*}} - && "
-    "patch_name=`basename %{1}` "
-    r'metadata_commit_msg=`printf "patch_name: $patch_name\\npresent_in_specfile: true\\n"` '
-    '%{__git} commit %{-q} -m %{-m*} -m "$metadata_commit_msg" --author "%{__scm_author}"',
+    "patch_name=`basename %{1}` && "
+    r'metadata_commit_msg=`printf "patch_name: $patch_name\\npresent_in_specfile: true\\n"` && '
+    '%{__git} commit %{-q} -m %{-m*} -m "${metadata_commit_msg}" --author "%{__scm_author}"',
 ]
