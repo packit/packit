@@ -1,6 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import requests
+from pathlib import Path
+
 from packit.utils.commands import run_command, run_command_remote, cwd
 from packit.utils.extensions import assert_existence, nested_get
 from packit.utils.logging import (
@@ -59,3 +62,16 @@ def sanitize_branch_name_for_rpm(branch_name: str) -> str:
     for o in offenders:
         branch_name = branch_name.replace(o, "")
     return branch_name.replace("-", ".")
+
+
+def download(url: str, dest: Path):
+    """Download content from <url> and save it to <dest>
+
+    Arguments:
+        url: URL of the content to download.
+        dest: Path where the content should be saved.
+    """
+    with requests.get(url, stream=True) as req:
+        with open(dest, "wb") as fp:
+            for chunk in req.iter_content(chunk_size=1024 ** 2):
+                fp.write(chunk)

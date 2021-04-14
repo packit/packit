@@ -29,6 +29,8 @@ BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
 BuildRequires:  python3-bodhi-client
+BuildRequires:  python3-validators
+BuildRequires:  python3-sh
 # new-sources
 Requires:       fedpkg
 # bumpspec
