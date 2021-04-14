@@ -222,7 +222,7 @@ class Upstream(PackitRepositoryBase):
             self.package_config.patch_generation_ignore_paths + sync_files_to_ignore
         )
 
-        pg = PatchGenerator(self.local_project)
+        pg = PatchGenerator(self.local_project.git_repo)
         return pg.create_patches(upstream, destination, files_to_ignore=files_to_ignore)
 
     def get_latest_released_version(self) -> str:

@@ -16,9 +16,13 @@ import yaml
 
 from packit.constants import DATETIME_FORMAT
 from packit.exceptions import PackitException, PackitGitException
-from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import is_a_git_ref, git_patch_ish, get_metadata_from_message
+from packit.utils.repo import (
+    is_a_git_ref,
+    git_patch_ish,
+    current_rev,
+    get_metadata_from_message,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -163,8 +167,8 @@ class PatchGenerator:
     Generate .patch files from git
     """
 
-    def __init__(self, lp: LocalProject):
-        self.lp = lp
+    def __init__(self, repo: git.Repo):
+        self.repo = repo
 
     def are_child_commits_contained(self, git_ref: str) -> bool:
         r"""
@@ -226,18 +230,17 @@ class PatchGenerator:
             "Therefore we are going to make the history linear on a dedicated branch \n"
             "to make sure the patches will be able to be applied."
         )
-        if self.lp.git_repo.is_dirty():
+        if self.repo.is_dirty():
             raise PackitGitException(
                 "The source-git repo is dirty which means we won't be able to do a linear history. "
                 "Please commit the changes to resolve the issue. If you are changing the content "
                 "of the repository in an action, you can commit those as well."
             )
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-        initial_branch = self.lp.ref
+        initial_rev = current_rev(self.repo)
         target_branch = f"packit-patches-{current_time}"
         logger.info(f"Switch branch to {target_branch!r}.")
-        ref = self.lp.create_branch(target_branch)
-        ref.checkout()
+        self.repo.git.checkout("-b", target_branch)
         target = f"{git_ref}..HEAD"
         logger.debug(f"Linearize history {target}.")
         # https://stackoverflow.com/a/17994534/909579
@@ -262,11 +265,11 @@ class PatchGenerator:
                 # this env var prevents it from printing
                 env={"FILTER_BRANCH_SQUELCH_WARNING": "1"},
                 print_live=True,
-                cwd=self.lp.working_dir,
+                cwd=self.repo.working_dir,
             )
         finally:
             # check out the former branch
-            self.lp.checkout_ref(initial_branch)
+            self.repo.git.checkout(initial_rev)
             # we could also delete the newly created branch,
             # but let's not do that so that user can inspect it
         return target_branch
@@ -303,7 +306,7 @@ class PatchGenerator:
         ] + [f":(exclude){file_to_ignore}" for file_to_ignore in files_to_ignore]
         return run_command(
             cmd=git_f_p_cmd,
-            cwd=self.lp.working_dir,
+            cwd=self.repo.working_dir,
             output=True,
             decode=True,
         ).strip()
@@ -558,22 +561,23 @@ class PatchGenerator:
         :param no_merge_commits: do not include merge commits in the list if True
         :return: list of commits (last commit on the current branch)
         """
-        if is_a_git_ref(repo=self.lp.git_repo, ref=git_ref):
+        if is_a_git_ref(repo=self.repo, ref=git_ref):
             upstream_ref = git_ref
         else:
             upstream_ref = f"origin/{git_ref}"
-            if upstream_ref not in self.lp.git_repo.refs:
+            if upstream_ref not in self.repo.refs:
                 raise PackitException(
                     f"Couldn't not find upstream branch {upstream_ref!r} and tag {git_ref!r}."
                 )
+        rev = current_rev(self.repo)
         commits = self.get_commits_in_range(
-            revision_range=f"{git_ref}..{self.lp.ref}",
+            revision_range=f"{git_ref}..{rev}",
             no_merge_commits=no_merge_commits,
         )
         if add_upstream_head_commit:
-            commits.insert(0, self.lp.git_repo.commit(upstream_ref))
+            commits.insert(0, self.repo.commit(upstream_ref))
 
-        logger.debug(f"Delta ({upstream_ref}..{self.lp.ref}): {len(commits)}")
+        logger.debug(f"Delta ({upstream_ref}..{rev}): {len(commits)}")
         return commits
 
     def get_commits_in_range(
@@ -587,7 +591,7 @@ class PatchGenerator:
         :return: list of commits (last commit on the current branch)
         """
         return list(
-            self.lp.git_repo.iter_commits(
+            self.repo.iter_commits(
                 rev=revision_range,
                 reverse=True,
                 no_merges=no_merge_commits,  # do not include merge commits in the list

@@ -495,7 +495,7 @@ def test_linearization(api_instance_source_git):
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, ref)
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     with cwd("/"):  # let's mimic p-s by having different cwd than the project
-        pg = PatchGenerator(api_instance_source_git.upstream_local_project)
+        pg = PatchGenerator(api_instance_source_git.upstream_local_project.git_repo)
         pg.create_patches(ref, sg_path / DISTRO_DIR)
     assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-sourcegit-content.patch",

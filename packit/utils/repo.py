@@ -310,3 +310,22 @@ def get_metadata_from_message(commit: git.Commit) -> Optional[dict]:
             return loaded_part
 
     return None
+
+
+def current_rev(repo: git.Repo) -> str:
+    """Return the currently checked out revision in repo
+
+    In case head is not detached, return the name of the currently
+    checked out branch.
+
+    If head is detached, return the tag of the current commit, if
+    any, as found by 'git describe'. Otherwise return the commit SHA.
+    """
+    if repo.head.is_detached:
+        try:
+            return repo.git.describe("--tags", "--exact-match")
+        except git.GitCommandError:
+            # there is not tag on this commit
+            return repo.head.commit.hexsha
+    else:
+        return repo.active_branch.name
