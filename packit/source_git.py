@@ -10,8 +10,13 @@ import tarfile
 import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
+import configparser
 
 from git import GitCommandError
+
+from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
+from rebasehelper.exceptions import LookasideCacheError
+
 
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.config import Config
@@ -395,14 +400,56 @@ class SourceGitGenerator:
         self.local_project.stage(self.dist_git.source_git_downstream_suffix)
         self.local_project.commit(message="add downstream distribution sources")
 
+    def _get_sources_url(self, tool):
+        try:
+            config = LookasideCacheHelper._read_config(tool)
+            base_url = config["lookaside"]
+        except (configparser.Error, KeyError) as e:
+            raise LookasideCacheError("Failed to read rpkg configuration") from e
+
+        package = self.dist_git.package_config.downstream_package_name
+        basepath = self.dist_git.local_project.working_dir
+
+        sources = list()
+        for source in LookasideCacheHelper._read_sources(basepath):
+
+            if tool == "fedpkg":
+                url = "{0}/{1}/{2}/{3}/{4}/{2}".format(
+                    base_url,
+                    package,
+                    source["filename"],
+                    source["hashtype"],
+                    source["hash"],
+                )
+            else:
+                url = "{0}/{1}/{2}/{3}/{2}".format(
+                    base_url, package, source["filename"], source["hash"]
+                )
+
+            path = source["filename"]
+            sources.append({"path": path, "url": url})
+
+        return sources
+
     def _add_packit_config(self):
-        packit_yaml_path = self.local_project.working_dir.joinpath(".packit.yaml")
-        packit_yaml_path.write_text(
+
+        config_str = (
             "---\n"
             f'specfile_path: "{self.specfile_path.relative_to(self.local_project.working_dir)}"\n'
             f'upstream_ref: "{self.upstream_ref}"\n'
             f'patch_generation_ignore_paths: ["{self.dist_git.source_git_downstream_suffix}"]\n\n'
         )
+
+        sources = self._get_sources_url("fedpkg")
+        if sources:
+            config_str += "sources:\n"
+            for source in sources:
+                config_str += f"  - path: {source['path']}\n"
+                config_str += f"    url: {source['url']}\n"
+
+        packit_yaml_path = self.local_project.working_dir.joinpath(".packit.yaml")
+        packit_yaml_path.write_text(config_str)
+
         self.local_project.stage(".packit.yaml")
         self.local_project.commit("add packit.yaml")
 

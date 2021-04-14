@@ -3,6 +3,7 @@
 import fileinput
 import subprocess
 from pathlib import Path
+import yaml
 
 import pytest
 
@@ -88,6 +89,54 @@ def test_run_prep(
     assert build_dir.exists()
     project_dir = next(build_dir.glob("fuse-overlayfs-*"))
     assert project_dir.joinpath(".git")
+
+
+def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
+    """
+    use requre to create a source-git out of it in an empty git repo - packit
+    will pull upstream git history
+    """
+    # requre lookaside_cache_url
+    requre_tar_url = (
+        "https://src.fedoraproject.org/repo/pkgs/python-requre/"
+        "requre-0.4.0.tar.gz/sha512/85293577f56e19dd0fad13bb5e118ac2ab39d7"
+        "570d640a754b9d8d8054078c89c949d4695ef018915b17a2f2428f1635032352d"
+        "cf3c9a036a2d633013cc35dd9/requre-0.4.0.tar.gz"
+    )
+    requre_tar_path = "requre-0.4.0.tar.gz"
+
+    # clone dist-git
+    pkg = "python-requre"
+    dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
+    dist_git_path = tmp_path.joinpath(pkg)
+    source_git_path = tmp_path.joinpath("requre-sg")
+    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+
+    # check out specific ref
+    subprocess.check_call(["git", "reset", "--hard", dist_git_ref], cwd=dist_git_path)
+
+    # create src-git
+    source_git_path.mkdir()
+    create_new_repo(Path(source_git_path), [])
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
+        "https://github.com/packit/requre",
+        upstream_ref="0.4.0",
+        dist_git_path=dist_git_path,
+    )
+    sgg.create_from_upstream()
+
+    config_file = open(source_git_path / ".packit.yaml", "r")
+    packit_yaml = yaml.load(config_file, Loader=yaml.FullLoader)
+    config_file.close()
+    assert packit_yaml.get("sources")
+    assert len(packit_yaml["sources"]) > 0
+    assert packit_yaml["sources"][0].get("url")
+    assert packit_yaml["sources"][0].get("path")
+
+    assert packit_yaml["sources"][0]["url"] == requre_tar_url
+    assert packit_yaml["sources"][0]["path"] == requre_tar_path
 
 
 REQURE_PATCH = r"""\
