@@ -1,5 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+import fileinput
 import subprocess
 from pathlib import Path
 
@@ -11,8 +12,7 @@ from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.source_git import SourceGitGenerator
 from packit.specfile import Specfile
-from packit.utils.repo import create_new_repo
-
+from packit.utils.repo import create_new_repo, clone_centos_9_package
 from tests.spellbook import initiate_git_repo
 
 UNIVERSAL_PACKAGE_NAME = "redhat-rpm-config"
@@ -229,3 +229,48 @@ def test_centos_cronie(
     subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
     srpm_path = list(source_git_path.glob("cronie-*.src.rpm"))[0]
     assert srpm_path.is_file()
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("apply_option", ("git", "git_am"))
+def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Path):
+    """ manipulate acl's dist-git to use -Sgit and -Sgit_am so we can verify it works """
+    dist_git_branch = "c9s"
+    package_name = "acl"
+    source_git_path = tmp_path.joinpath("acl-sg")
+    # dist-git tools expect: dir name == package name
+    dist_git_path = tmp_path.joinpath(package_name)
+
+    # create src-git
+    source_git_path.mkdir()
+    create_new_repo(source_git_path, [])
+
+    # fetch dist-git and change %autosetup
+    clone_centos_9_package(
+        package_name,
+        dist_git_path=dist_git_path,
+        branch=dist_git_branch,
+    )
+    for line in fileinput.input(
+        dist_git_path.joinpath(f"{package_name}.spec"), inplace=True
+    ):
+        if "%autosetup" in line:
+            line = f"%autosetup -p1 -S{apply_option}"
+        print(line, end="")  # \n would make double-newlines here
+
+    # run conversion
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
+        "https://git.savannah.nongnu.org/git/acl.git",
+        upstream_ref="v2.3.1",
+        centos_package=package_name,
+        dist_git_branch=dist_git_branch,
+        dist_git_path=dist_git_path,
+    )
+    sgg.create_from_upstream()
+
+    # verify the patch commit has metadata
+    patch_commit_message = sgg.local_project.git_repo.head.commit.message
+    assert "present_in_specfile: true" in patch_commit_message
+    assert "patch_name: 0001-acl-2.2.53-test-runwrapper.patch" in patch_commit_message
