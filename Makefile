@@ -50,7 +50,7 @@ clean_fmf_files:
 	echo "description: Unit test" > tests/unit/main.fmf
 	cp tests_recording/main.fmf.backup tests_recording/main.fmf
 
-regenerate_fmf: clean_fmf_files
+regenerate_fmf:
 	# Install project for test fmf metadata regeneration:
 	# https://github.com/jscotka/fmf_metadata/
 	fmf_metadata -u --pytest $(TESTS_TARGET)

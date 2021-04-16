@@ -20,14 +20,14 @@ duration: 10m
             summary: Bump version two times and see if the changelog is synced
             description: "        Bump version two times and see if the changelog\
                 \ is synced\n        when it's configured to do so.\n        "
-            test: python3 -m pytest -v test_api.py::ProposeUpdate::test_changelog_sync
+            test: python3 -m pytest -m '' -v test_api.py::ProposeUpdate::test_changelog_sync
         /test_comment_in_spec:
             __generated: true
             summary: change specfile little bit to have there some change, do not
                 increase version
             description: "        change specfile little bit to have there some change,\
                 \ do not increase version\n        "
-            test: python3 -m pytest -v test_api.py::ProposeUpdate::test_comment_in_spec
+            test: python3 -m pytest -m '' -v test_api.py::ProposeUpdate::test_comment_in_spec
         /test_version_change_exception:
             __generated: true
             summary: check if it raises exception, because sources are not uploaded
@@ -35,7 +35,7 @@ duration: 10m
             description: "        check if it raises exception, because sources are\
                 \ not uploaded in distgit\n        Downgrade rebasehelper to version\
                 \ < 0.24.0\n        "
-            test: python3 -m pytest -v test_api.py::ProposeUpdate::test_version_change_exception
+            test: python3 -m pytest -m '' -v test_api.py::ProposeUpdate::test_version_change_exception
         /test_version_change_exception_new_rebase_helper:
             __generated: true
             summary: check if it raises exception, because sources are not uploaded
@@ -44,13 +44,13 @@ duration: 10m
                 \ not uploaded in distgit\n        New version raises same error,\
                 \ but it raises it on another place\n        Upgrade rebase helper\
                 \ >= 0.24.0\n        "
-            test: python3 -m pytest -v test_api.py::ProposeUpdate::test_version_change_exception_new_rebase_helper
+            test: python3 -m pytest -m '' -v test_api.py::ProposeUpdate::test_version_change_exception_new_rebase_helper
         /test_version_change_mocked:
             __generated: true
             summary: version is not not uploaded, so skip in this test
             description: "        version is not not uploaded, so skip in this test\n\
                 \        "
-            test: python3 -m pytest -v test_api.py::ProposeUpdate::test_version_change_mocked
+            test: python3 -m pytest -m '' -v test_api.py::ProposeUpdate::test_version_change_mocked
 /test_base_git.py:
     __generated: true
     /ProposeUpdate:
@@ -61,7 +61,7 @@ duration: 10m
             description: "        Use case: package_config.sources and Source0 are\
                 \ out of sync,\n        make sure packit downloads correct archive\
                 \ specifiec in the spec file\n        "
-            test: python3 -m pytest -v test_base_git.py::ProposeUpdate::test_download_remote_sources_via_spec
+            test: python3 -m pytest -m '' -v test_base_git.py::ProposeUpdate::test_download_remote_sources_via_spec
 /test_status.py:
     __generated: true
     /TestStatus:
@@ -69,28 +69,28 @@ duration: 10m
         /test_copr_builds:
             __generated: true
             summary: test_status.py TestStatus test_copr_builds
-            test: python3 -m pytest -v test_status.py::TestStatus::test_copr_builds
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_copr_builds
         /test_distgen_versions:
             __generated: true
             summary: test_status.py TestStatus test_distgen_versions
-            test: python3 -m pytest -v test_status.py::TestStatus::test_distgen_versions
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_distgen_versions
         /test_dowstream_pr:
             __generated: true
             summary: test_status.py TestStatus test_dowstream_pr
-            test: python3 -m pytest -v test_status.py::TestStatus::test_dowstream_pr
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_dowstream_pr
         /test_koji_builds:
             __generated: true
             summary: test_status.py TestStatus test_koji_builds
-            test: python3 -m pytest -v test_status.py::TestStatus::test_koji_builds
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_koji_builds
         /test_status:
             __generated: true
             summary: test_status.py TestStatus test_status
-            test: python3 -m pytest -v test_status.py::TestStatus::test_status
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_status
         /test_up_releases:
             __generated: true
             summary: test_status.py TestStatus test_up_releases
-            test: python3 -m pytest -v test_status.py::TestStatus::test_up_releases
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_up_releases
         /test_updates:
             __generated: true
             summary: test_status.py TestStatus test_updates
-            test: python3 -m pytest -v test_status.py::TestStatus::test_updates
+            test: python3 -m pytest -m '' -v test_status.py::TestStatus::test_updates
