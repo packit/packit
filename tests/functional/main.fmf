@@ -1,129 +1,96 @@
 description: Functional test
 /test_local_build.py:
-    __generated: true
     /test_rpm_command:
-        __generated: true
         summary: test_local_build.py test_rpm_command
         test: python3 -m pytest -m '' -v test_local_build.py::test_rpm_command
     /test_local_build_with_remote_good:
-        __generated: true
         summary: test_local_build.py test_local_build_with_remote_good
         test: python3 -m pytest -m '' -v test_local_build.py::test_local_build_with_remote_good
     /test_local_build_with_remote_bad:
-        __generated: true
         summary: test_local_build.py test_local_build_with_remote_bad
         test: python3 -m pytest -m '' -v test_local_build.py::test_local_build_with_remote_bad
     /test_rpm_command_for_path:
-        __generated: true
         summary: test_local_build.py test_rpm_command_for_path
         description: 'skipif: (cond: (False,)) -> {''reason'': ''No rpmautospec-rpm-macros
             installed''}'
         test: python3 -m pytest -m '' -v test_local_build.py::test_rpm_command_for_path
 /test_srpm.py:
-    __generated: true
     /test_srpm_command_for_path_upstream_:
-        __generated: true
         summary: test_srpm.py test_srpm_command_for_path[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_command_for_path[upstream]'
     /test_srpm_command_for_path_ogr_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_command_for_path[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_command_for_path[ogr-distgit]'
     /test_srpm_command_for_path_with_multiple_sources:
-        __generated: true
         summary: test_srpm.py test_srpm_command_for_path_with_multiple_sources
         test: python3 -m pytest -m '' -v test_srpm.py::test_srpm_command_for_path_with_multiple_sources
     /test_srpm_command_upstream_:
-        __generated: true
         summary: test_srpm.py test_srpm_command[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_command[upstream]'
     /test_srpm_command_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_command[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_command[distgit]'
     /test_srpm_command_ogr_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_command[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_command[ogr-distgit]'
     /test_srpm_command_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_srpm.py test_srpm_command[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_command[upstream-with-multiple-sources]'
     /test_action_output:
-        __generated: true
         summary: test_srpm.py test_action_output
         test: python3 -m pytest -m '' -v test_srpm.py::test_action_output
     /test_srpm_spec_not_in_root:
-        __generated: true
         summary: test_srpm.py test_srpm_spec_not_in_root
         test: python3 -m pytest -m '' -v test_srpm.py::test_srpm_spec_not_in_root
     /test_srpm_weird_sources:
-        __generated: true
         summary: test_srpm.py test_srpm_weird_sources
         test: python3 -m pytest -m '' -v test_srpm.py::test_srpm_weird_sources
     /test_srpm_custom_path_upstream_:
-        __generated: true
         summary: test_srpm.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_custom_path[upstream]'
     /test_srpm_custom_path_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_custom_path[distgit]'
     /test_srpm_custom_path_ogr_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_custom_path[ogr-distgit]'
     /test_srpm_custom_path_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_srpm.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_custom_path[upstream-with-multiple-sources]'
     /test_srpm_twice_with_custom_name_upstream_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice_with_custom_name[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice_with_custom_name[upstream]'
     /test_srpm_twice_with_custom_name_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice_with_custom_name[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice_with_custom_name[distgit]'
     /test_srpm_twice_with_custom_name_ogr_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice_with_custom_name[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice_with_custom_name[ogr-distgit]'
     /test_srpm_twice_with_custom_name_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice_with_custom_name[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice_with_custom_name[upstream-with-multiple-sources]'
     /test_srpm_twice_upstream_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice[upstream]'
     /test_srpm_twice_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice[distgit]'
     /test_srpm_twice_ogr_distgit_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice[ogr-distgit]'
     /test_srpm_twice_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_srpm.py test_srpm_twice[upstream]
         test: python3 -m pytest -m '' -v 'test_srpm.py::test_srpm_twice[upstream-with-multiple-sources]'
     /test_srpm_symlinking_relative_path:
-        __generated: true
         summary: test_srpm.py test_srpm_symlinking_relative_path
         test: python3 -m pytest -m '' -v test_srpm.py::test_srpm_symlinking_relative_path
     /test_srpm_symlinking_absolute_path:
-        __generated: true
         summary: test_srpm.py test_srpm_symlinking_absolute_path
         test: python3 -m pytest -m '' -v test_srpm.py::test_srpm_symlinking_absolute_path
 /test_validate_config.py:
-    __generated: true
     /test_srpm_command_for_path_upstream_:
-        __generated: true
         summary: test_validate_config.py test_srpm_command_for_path[upstream]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_srpm_command_for_path[upstream]'
     /test_srpm_command_for_path_ogr_distgit_:
-        __generated: true
         summary: test_validate_config.py test_srpm_command_for_path[upstream]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_srpm_command_for_path[ogr-distgit]'

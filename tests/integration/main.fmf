@@ -1,366 +1,278 @@
 description: Integration test
 /test_actions.py:
-    __generated: true
     /test_with_action_ActionName.fix_spec_true_env_vars0_False_:
-        __generated: true
         summary: test_actions.py test_with_action[ActionName.fix_spec-true-env_vars0-False]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_with_action[ActionName.fix_spec-true-env_vars0-False]'
     /test_with_action_ActionName.fix_spec_git_this_is_not_a_command_env_vars1_True_:
-        __generated: true
         summary: test_actions.py test_with_action[ActionName.fix_spec-true-env_vars0-False]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_with_action[ActionName.fix_spec-git
             this-is-not-a-command-env_vars1-True]'
     /test_with_action_ActionName.fix_spec_printenv_E_env_vars2_False_:
-        __generated: true
         summary: test_actions.py test_with_action[ActionName.fix_spec-true-env_vars0-False]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_with_action[ActionName.fix_spec-printenv
             E-env_vars2-False]'
     /test_with_action_ActionName.fix_spec_printenv_E_env_vars3_True_:
-        __generated: true
         summary: test_actions.py test_with_action[ActionName.fix_spec-true-env_vars0-False]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_with_action[ActionName.fix_spec-printenv
             E-env_vars3-True]'
     /test_get_output_from_action_ActionName.post_upstream_clone_true_env_vars0_False__:
-        __generated: true
         summary: test_actions.py test_get_output_from_action[ActionName.post_upstream_clone-true-env_vars0-False-]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_get_output_from_action[ActionName.post_upstream_clone-true-env_vars0-False-]'
     /test_get_output_from_action_ActionName.post_upstream_clone_git_this_is_not_a_command_env_vars1_True__:
-        __generated: true
         summary: test_actions.py test_get_output_from_action[ActionName.post_upstream_clone-true-env_vars0-False-]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_get_output_from_action[ActionName.post_upstream_clone-git
             this-is-not-a-command-env_vars1-True-]'
     /test_get_output_from_action_ActionName.post_upstream_clone_printenv_E_env_vars2_False_e_n_:
-        __generated: true
         summary: test_actions.py test_get_output_from_action[ActionName.post_upstream_clone-true-env_vars0-False-]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_get_output_from_action[ActionName.post_upstream_clone-printenv
             E-env_vars2-False-e\n]'
     /test_get_output_from_action_ActionName.post_upstream_clone_printenv_E_env_vars3_True__:
-        __generated: true
         summary: test_actions.py test_get_output_from_action[ActionName.post_upstream_clone-true-env_vars0-False-]
         test: python3 -m pytest -m '' -v 'test_actions.py::test_get_output_from_action[ActionName.post_upstream_clone-printenv
             E-env_vars3-True-]'
 /test_api.py:
-    __generated: true
     /test_srpm_upstream_:
-        __generated: true
         summary: test_api.py test_srpm[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm[upstream]'
     /test_srpm_distgit_:
-        __generated: true
         summary: test_api.py test_srpm[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm[distgit]'
     /test_srpm_ogr_distgit_:
-        __generated: true
         summary: test_api.py test_srpm[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm[ogr-distgit]'
     /test_srpm_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_api.py test_srpm[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm[upstream-with-multiple-sources]'
     /test_srpm_custom_path_upstream_:
-        __generated: true
         summary: test_api.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm_custom_path[upstream]'
     /test_srpm_custom_path_distgit_:
-        __generated: true
         summary: test_api.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm_custom_path[distgit]'
     /test_srpm_custom_path_ogr_distgit_:
-        __generated: true
         summary: test_api.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm_custom_path[ogr-distgit]'
     /test_srpm_custom_path_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_api.py test_srpm_custom_path[upstream]
         test: python3 -m pytest -m '' -v 'test_api.py::test_srpm_custom_path[upstream-with-multiple-sources]'
 /test_base_git.py:
-    __generated: true
     /test_get_output_from_action_defined_echo__hello_world__expected_output0_:
-        __generated: true
         summary: test_base_git.py test_get_output_from_action_defined[echo 'hello
             world'-expected_output0]
         test: python3 -m pytest -m '' -v 'test_base_git.py::test_get_output_from_action_defined[echo
             '"'"'hello world'"'"'-expected_output0]'
     /test_get_output_from_action_defined_echo_cmd1_expected_output1_:
-        __generated: true
         summary: test_base_git.py test_get_output_from_action_defined[echo 'hello
             world'-expected_output0]
         test: python3 -m pytest -m '' -v 'test_base_git.py::test_get_output_from_action_defined[echo_cmd1-expected_output1]'
     /test_get_output_from_action_defined_in_sandcastle:
-        __generated: true
         summary: test_base_git.py test_get_output_from_action_defined_in_sandcastle
         description: 'skipif: (cond: (False,)) -> {''reason'': ''sandcastle is not
             installed''}'
         test: python3 -m pytest -m '' -v test_base_git.py::test_get_output_from_action_defined_in_sandcastle
     /test_run_in_sandbox:
-        __generated: true
         summary: test_base_git.py test_run_in_sandbox
         enabled: false
         test: python3 -m pytest -m '' -v test_base_git.py::test_run_in_sandbox
     /test_base_push_bad:
-        __generated: true
         summary: test_base_git.py test_base_push_bad
         test: python3 -m pytest -m '' -v test_base_git.py::test_base_push_bad
     /test_base_push_good:
-        __generated: true
         summary: test_base_git.py test_base_push_good
         test: python3 -m pytest -m '' -v test_base_git.py::test_base_push_good
 /test_build.py:
-    __generated: true
     /test_basic_build_upstream_:
-        __generated: true
         summary: test_build.py test_basic_build[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_basic_build[upstream]'
     /test_basic_build_distgit_:
-        __generated: true
         summary: test_build.py test_basic_build[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_basic_build[distgit]'
     /test_basic_build_ogr_distgit_:
-        __generated: true
         summary: test_build.py test_basic_build[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_basic_build[ogr-distgit]'
     /test_basic_build_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_build.py test_basic_build[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_basic_build[upstream-with-multiple-sources]'
     /test_build_from_upstream_upstream_:
-        __generated: true
         summary: test_build.py test_build_from_upstream[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_build_from_upstream[upstream]'
     /test_build_from_upstream_distgit_:
-        __generated: true
         summary: test_build.py test_build_from_upstream[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_build_from_upstream[distgit]'
     /test_build_from_upstream_ogr_distgit_:
-        __generated: true
         summary: test_build.py test_build_from_upstream[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_build_from_upstream[ogr-distgit]'
     /test_build_from_upstream_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_build.py test_build_from_upstream[upstream]
         test: python3 -m pytest -m '' -v 'test_build.py::test_build_from_upstream[upstream-with-multiple-sources]'
 /test_copr_build.py:
-    __generated: true
     /test_copr_build_existing_project_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project[upstream]'
     /test_copr_build_existing_project_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project[distgit]'
     /test_copr_build_existing_project_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project[ogr-distgit]'
     /test_copr_build_existing_project_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_change_settings_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_change_settings[upstream]'
     /test_copr_build_existing_project_change_settings_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_change_settings[distgit]'
     /test_copr_build_existing_project_change_settings_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_change_settings[ogr-distgit]'
     /test_copr_build_existing_project_change_settings_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_change_settings[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_no_settings_change_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_no_settings_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_no_settings_change[upstream]'
     /test_copr_build_existing_project_munch_no_settings_change_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_no_settings_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_no_settings_change[distgit]'
     /test_copr_build_existing_project_munch_no_settings_change_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_no_settings_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_no_settings_change[ogr-distgit]'
     /test_copr_build_existing_project_munch_no_settings_change_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_no_settings_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_no_settings_change[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_chroot_change_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_chroot_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_chroot_change[upstream]'
     /test_copr_build_existing_project_munch_chroot_change_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_chroot_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_chroot_change[distgit]'
     /test_copr_build_existing_project_munch_chroot_change_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_chroot_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_chroot_change[ogr-distgit]'
     /test_copr_build_existing_project_munch_chroot_change_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_chroot_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_chroot_change[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_additional_repos_change_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_additional_repos_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_additional_repos_change[upstream]'
     /test_copr_build_existing_project_munch_additional_repos_change_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_additional_repos_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_additional_repos_change[distgit]'
     /test_copr_build_existing_project_munch_additional_repos_change_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_additional_repos_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_additional_repos_change[ogr-distgit]'
     /test_copr_build_existing_project_munch_additional_repos_change_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_additional_repos_change[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_additional_repos_change[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_list_on_homepage_change_upstream_:
-        __generated: true
         summary: We don't get that value from Copr. => We can't check the change.
             => No edit.
         description: "    We don't get that value from Copr. => We can't check the\
             \ change. => No edit.\n    "
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_list_on_homepage_change[upstream]'
     /test_copr_build_existing_project_munch_list_on_homepage_change_distgit_:
-        __generated: true
         summary: We don't get that value from Copr. => We can't check the change.
             => No edit.
         description: "    We don't get that value from Copr. => We can't check the\
             \ change. => No edit.\n    "
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_list_on_homepage_change[distgit]'
     /test_copr_build_existing_project_munch_list_on_homepage_change_ogr_distgit_:
-        __generated: true
         summary: We don't get that value from Copr. => We can't check the change.
             => No edit.
         description: "    We don't get that value from Copr. => We can't check the\
             \ change. => No edit.\n    "
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_list_on_homepage_change[ogr-distgit]'
     /test_copr_build_existing_project_munch_list_on_homepage_change_upstream_with_multiple_sources_:
-        __generated: true
         summary: We don't get that value from Copr. => We can't check the change.
             => No edit.
         description: "    We don't get that value from Copr. => We can't check the\
             \ change. => No edit.\n    "
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_list_on_homepage_change[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_do_not_update_booleans_by_default_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_do_not_update_booleans_by_default[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_do_not_update_booleans_by_default[upstream]'
     /test_copr_build_existing_project_munch_do_not_update_booleans_by_default_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_do_not_update_booleans_by_default[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_do_not_update_booleans_by_default[distgit]'
     /test_copr_build_existing_project_munch_do_not_update_booleans_by_default_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_do_not_update_booleans_by_default[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_do_not_update_booleans_by_default[ogr-distgit]'
     /test_copr_build_existing_project_munch_do_not_update_booleans_by_default_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_do_not_update_booleans_by_default[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_do_not_update_booleans_by_default[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_remove_present_chroots_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_remove_present_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_remove_present_chroots[upstream]'
     /test_copr_build_existing_project_munch_remove_present_chroots_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_remove_present_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_remove_present_chroots[distgit]'
     /test_copr_build_existing_project_munch_remove_present_chroots_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_remove_present_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_remove_present_chroots[ogr-distgit]'
     /test_copr_build_existing_project_munch_remove_present_chroots_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_remove_present_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_remove_present_chroots[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_munch_append_chroots_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_append_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_append_chroots[upstream]'
     /test_copr_build_existing_project_munch_append_chroots_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_append_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_append_chroots[distgit]'
     /test_copr_build_existing_project_munch_append_chroots_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_append_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_append_chroots[ogr-distgit]'
     /test_copr_build_existing_project_munch_append_chroots_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_munch_append_chroots[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_munch_append_chroots[upstream-with-multiple-sources]'
     /test_copr_build_existing_project_error_on_change_settings_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_error_on_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_error_on_change_settings[upstream]'
     /test_copr_build_existing_project_error_on_change_settings_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_error_on_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_error_on_change_settings[distgit]'
     /test_copr_build_existing_project_error_on_change_settings_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_error_on_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_error_on_change_settings[ogr-distgit]'
     /test_copr_build_existing_project_error_on_change_settings_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_existing_project_error_on_change_settings[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_existing_project_error_on_change_settings[upstream-with-multiple-sources]'
     /test_copr_build_non_existing_project_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_non_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_non_existing_project[upstream]'
     /test_copr_build_non_existing_project_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_non_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_non_existing_project[distgit]'
     /test_copr_build_non_existing_project_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_non_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_non_existing_project[ogr-distgit]'
     /test_copr_build_non_existing_project_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_non_existing_project[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_non_existing_project[upstream-with-multiple-sources]'
     /test_copr_build_no_owner_upstream_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_no_owner[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_no_owner[upstream]'
     /test_copr_build_no_owner_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_no_owner[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_no_owner[distgit]'
     /test_copr_build_no_owner_ogr_distgit_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_no_owner[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_no_owner[ogr-distgit]'
     /test_copr_build_no_owner_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_copr_build.py test_copr_build_no_owner[upstream]
         test: python3 -m pytest -m '' -v 'test_copr_build.py::test_copr_build_no_owner[upstream-with-multiple-sources]'
     /test_copr_build_cli_no_project_configured:
-        __generated: true
         summary: test_copr_build.py test_copr_build_cli_no_project_configured
         test: python3 -m pytest -m '' -v test_copr_build.py::test_copr_build_cli_no_project_configured
     /test_copr_build_cli_project_set_via_cli:
-        __generated: true
         summary: test_copr_build.py test_copr_build_cli_project_set_via_cli
         test: python3 -m pytest -m '' -v test_copr_build.py::test_copr_build_cli_project_set_via_cli
     /test_copr_build_cli_project_set_from_config:
-        __generated: true
         summary: test_copr_build.py test_copr_build_cli_project_set_from_config
         test: python3 -m pytest -m '' -v test_copr_build.py::test_copr_build_cli_project_set_from_config
 /test_create_update.py:
-    __generated: true
     /test_basic_bodhi_update_f30_enhancement_This_is_the_best_upstream_release_ever___version__koji_builds0_:
-        __generated: true
         summary: 'test_create_update.py test_basic_bodhi_update[f30-enhancement-This
             is the best upstream release ever: {version}-koji_builds0]'
         description: 'skipif: (cond: (False,)) -> {''reason'': ''bodhi not present,
@@ -368,7 +280,6 @@ description: Integration test
         test: 'python3 -m pytest -m '''' -v ''test_create_update.py::test_basic_bodhi_update[f30-enhancement-This
             is the best upstream release ever: {version}-koji_builds0]'''
     /test_basic_bodhi_update_f30_enhancement_This_is_the_best_upstream_release_ever___version__None_:
-        __generated: true
         summary: 'test_create_update.py test_basic_bodhi_update[f30-enhancement-This
             is the best upstream release ever: {version}-koji_builds0]'
         description: 'skipif: (cond: (False,)) -> {''reason'': ''bodhi not present,
@@ -376,349 +287,269 @@ description: Integration test
         test: 'python3 -m pytest -m '''' -v ''test_create_update.py::test_basic_bodhi_update[f30-enhancement-This
             is the best upstream release ever: {version}-None]'''
 /test_distgit.py:
-    __generated: true
     /test_distgit_commit_empty:
-        __generated: true
         summary: test_distgit.py test_distgit_commit_empty
         test: python3 -m pytest -m '' -v test_distgit.py::test_distgit_commit_empty
 /test_generate.py:
-    __generated: true
     /test_generate_pass:
-        __generated: true
         summary: test_generate.py test_generate_pass
         test: python3 -m pytest -m '' -v test_generate.py::test_generate_pass
     /test_generate_fail_upstream_:
-        __generated: true
         summary: test_generate.py test_generate_fail[upstream]
         test: python3 -m pytest -m '' -v 'test_generate.py::test_generate_fail[upstream]'
     /test_generate_fail_distgit_:
-        __generated: true
         summary: test_generate.py test_generate_fail[upstream]
         test: python3 -m pytest -m '' -v 'test_generate.py::test_generate_fail[distgit]'
     /test_generate_fail_ogr_distgit_:
-        __generated: true
         summary: test_generate.py test_generate_fail[upstream]
         test: python3 -m pytest -m '' -v 'test_generate.py::test_generate_fail[ogr-distgit]'
     /test_generate_fail_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_generate.py test_generate_fail[upstream]
         test: python3 -m pytest -m '' -v 'test_generate.py::test_generate_fail[upstream-with-multiple-sources]'
 /test_get_api.py:
-    __generated: true
     /test_is_upstream:
-        __generated: true
         summary: test_get_api.py test_is_upstream
         test: python3 -m pytest -m '' -v test_get_api.py::test_is_upstream
     /test_is_downstream:
-        __generated: true
         summary: test_get_api.py test_is_downstream
         test: python3 -m pytest -m '' -v test_get_api.py::test_is_downstream
     /test_url_is_downstream:
-        __generated: true
         summary: test_get_api.py test_url_is_downstream
         test: python3 -m pytest -m '' -v test_get_api.py::test_url_is_downstream
     /test_url_is_upstream:
-        __generated: true
         summary: test_get_api.py test_url_is_upstream
         test: python3 -m pytest -m '' -v test_get_api.py::test_url_is_upstream
     /test_get_api_remotes0_package_config0_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes0-package_config0-True]'
     /test_get_api_remotes1_package_config1_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes1-package_config1-True]'
     /test_get_api_remotes2_package_config2_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes2-package_config2-True]'
     /test_get_api_remotes3_package_config3_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes3-package_config3-True]'
     /test_get_api_remotes4_package_config4_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes4-package_config4-True]'
     /test_get_api_remotes5_package_config5_False_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes5-package_config5-False]'
     /test_get_api_remotes6_package_config6_False_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes6-package_config6-False]'
     /test_get_api_remotes7_package_config7_False_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes7-package_config7-False]'
     /test_get_api_remotes8_package_config8_False_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes8-package_config8-False]'
     /test_get_api_remotes9_package_config9_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes9-package_config9-True]'
     /test_get_api_remotes10_package_config10_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes10-package_config10-True]'
     /test_get_api_remotes11_package_config11_True_:
-        __generated: true
         summary: test_get_api.py test_get_api[remotes0-package_config0-True]
         test: python3 -m pytest -m '' -v 'test_get_api.py::test_get_api[remotes11-package_config11-True]'
 /test_local_project.py:
-    __generated: true
     /test_pr_id_and_ref:
-        __generated: true
         summary: p-s passes both ref and pr_id, we want to check out PR
         description: ' p-s passes both ref and pr_id, we want to check out PR '
         test: python3 -m pytest -m '' -v test_local_project.py::test_pr_id_and_ref
     /test_pr_id_and_ref_gitlab:
-        __generated: true
         summary: p-s passes both ref and pr_id, we want to check out PR
         description: ' p-s passes both ref and pr_id, we want to check out PR '
         test: python3 -m pytest -m '' -v test_local_project.py::test_pr_id_and_ref_gitlab
 /test_pagure.py:
-    __generated: true
     /test_basic_distgit_workflow:
-        __generated: true
         summary: test_pagure.py test_basic_distgit_workflow
         description: 'skipif: (cond: ()) -> {''condition'': True, ''reason'': "Don''t
             interact with a real pagure instance by default"}'
         test: python3 -m pytest -m '' -v test_pagure.py::test_basic_distgit_workflow
 /test_patches.py:
-    __generated: true
     /test_undo_identical:
-        __generated: true
         summary: Check that identical patches are correctly detected and changes
         description: 'skipif: (cond: (False,)) -> {''reason'': ''Old python version
             does not support copytree exists dirs parameter https://github.com/packit/packit/issues/1160''}'
         test: python3 -m pytest -m '' -v test_patches.py::test_undo_identical
 /test_push_updates.py:
-    __generated: true
     /test_push_updates_upstream_:
-        __generated: true
         summary: test_push_updates.py test_push_updates[upstream]
         description: 'skipif: (cond: (False,)) -> {''reason'': ''bodhi not present,
             skipping''}'
         test: python3 -m pytest -m '' -v 'test_push_updates.py::test_push_updates[upstream]'
     /test_push_updates_distgit_:
-        __generated: true
         summary: test_push_updates.py test_push_updates[upstream]
         description: 'skipif: (cond: (False,)) -> {''reason'': ''bodhi not present,
             skipping''}'
         test: python3 -m pytest -m '' -v 'test_push_updates.py::test_push_updates[distgit]'
     /test_push_updates_ogr_distgit_:
-        __generated: true
         summary: test_push_updates.py test_push_updates[upstream]
         description: 'skipif: (cond: (False,)) -> {''reason'': ''bodhi not present,
             skipping''}'
         test: python3 -m pytest -m '' -v 'test_push_updates.py::test_push_updates[ogr-distgit]'
     /test_push_updates_upstream_with_multiple_sources_:
-        __generated: true
         summary: test_push_updates.py test_push_updates[upstream]
         description: 'skipif: (cond: (False,)) -> {''reason'': ''bodhi not present,
             skipping''}'
         test: python3 -m pytest -m '' -v 'test_push_updates.py::test_push_updates[upstream-with-multiple-sources]'
 /test_security.py:
-    __generated: true
     /test_allowed_gpg_keys_none:
-        __generated: true
         summary: test_security.py test_allowed_gpg_keys_none
         test: python3 -m pytest -m '' -v test_security.py::test_allowed_gpg_keys_none
     /test_allowed_gpg_keys_not_allowed_allowed_gpg_keys0_:
-        __generated: true
         summary: test_security.py test_allowed_gpg_keys_not_allowed[allowed_gpg_keys0]
         test: python3 -m pytest -m '' -v 'test_security.py::test_allowed_gpg_keys_not_allowed[allowed_gpg_keys0]'
     /test_allowed_gpg_keys_not_allowed_allowed_gpg_keys1_:
-        __generated: true
         summary: test_security.py test_allowed_gpg_keys_not_allowed[allowed_gpg_keys0]
         test: python3 -m pytest -m '' -v 'test_security.py::test_allowed_gpg_keys_not_allowed[allowed_gpg_keys1]'
     /test_allowed_gpg_keys_allowed:
-        __generated: true
         summary: test_security.py test_allowed_gpg_keys_allowed
         test: python3 -m pytest -m '' -v test_security.py::test_allowed_gpg_keys_allowed
     /test_allowed_gpg_keys_not_existing_key:
-        __generated: true
         summary: test_security.py test_allowed_gpg_keys_not_existing_key
         test: python3 -m pytest -m '' -v test_security.py::test_allowed_gpg_keys_not_existing_key
 /test_source_git.py:
-    __generated: true
     /test_basic_local_update_without_patching:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v test_source_git.py::test_basic_local_update_without_patching
     /test_basic_local_update_empty_patch_None_:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_basic_local_update_empty_patch[None]'
     /test_basic_local_update_empty_patch_0.1.0_:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_basic_local_update_empty_patch[0.1.0]'
     /test_basic_local_update_empty_patch_0.1__:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_basic_local_update_empty_patch[0.1*]'
     /test_basic_local_update_empty_patch_0.__:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_basic_local_update_empty_patch[0.*]'
     /test_basic_local_update_patch_content:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v test_source_git.py::test_basic_local_update_patch_content
     /test_basic_local_update_patch_content_with_metadata:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v test_source_git.py::test_basic_local_update_patch_content_with_metadata
     /test_basic_local_update_patch_content_with_metadata_and_patch_ignored:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v test_source_git.py::test_basic_local_update_patch_content_with_metadata_and_patch_ignored
     /test_basic_local_update_patch_content_with_downstream_patch:
-        __generated: true
         summary: 'propose-update for sourcegit test: mock remote API, use local upstream
             and dist-git'
         description: ' propose-update for sourcegit test: mock remote API, use local
             upstream and dist-git '
         test: python3 -m pytest -m '' -v test_source_git.py::test_basic_local_update_patch_content_with_downstream_patch
     /test_srpm_0.1.0_:
-        __generated: true
         summary: test_source_git.py test_srpm[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm[0.1.0]'
     /test_srpm_0.1__:
-        __generated: true
         summary: test_source_git.py test_srpm[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm[0.1*]'
     /test_srpm_0.__:
-        __generated: true
         summary: test_source_git.py test_srpm[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm[0.*]'
     /test_srpm_merge_storm_0.1.0_:
-        __generated: true
         summary: test_source_git.py test_srpm_merge_storm[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_merge_storm[0.1.0]'
     /test_srpm_merge_storm_0.1__:
-        __generated: true
         summary: test_source_git.py test_srpm_merge_storm[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_merge_storm[0.1*]'
     /test_srpm_merge_storm_0.__:
-        __generated: true
         summary: test_source_git.py test_srpm_merge_storm[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_merge_storm[0.*]'
     /test_srpm_merge_storm_dirty:
-        __generated: true
         summary: verify the linearization is halted when a source-git repo si dirty
         description: ' verify the linearization is halted when a source-git repo si
             dirty '
         test: python3 -m pytest -m '' -v test_source_git.py::test_srpm_merge_storm_dirty
     /test_linearization:
-        __generated: true
         summary: test_source_git.py test_linearization
         test: python3 -m pytest -m '' -v test_source_git.py::test_linearization
     /test_srpm_git_am_0.1.0_:
-        __generated: true
         summary: test_source_git.py test_srpm_git_am[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_git_am[0.1.0]'
     /test_srpm_git_am_0.1__:
-        __generated: true
         summary: test_source_git.py test_srpm_git_am[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_git_am[0.1*]'
     /test_srpm_git_am_0.__:
-        __generated: true
         summary: test_source_git.py test_srpm_git_am[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_git_am[0.*]'
     /test_srpm_git_no_prefix_patches_0.1.0_:
-        __generated: true
         summary: test_source_git.py test_srpm_git_no_prefix_patches[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_git_no_prefix_patches[0.1.0]'
     /test_srpm_git_no_prefix_patches_0.1__:
-        __generated: true
         summary: test_source_git.py test_srpm_git_no_prefix_patches[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_git_no_prefix_patches[0.1*]'
     /test_srpm_git_no_prefix_patches_0.__:
-        __generated: true
         summary: test_source_git.py test_srpm_git_no_prefix_patches[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_git_no_prefix_patches[0.*]'
     /test_srpm_empty_patch_0.1.0_:
-        __generated: true
         summary: test_source_git.py test_srpm_empty_patch[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_empty_patch[0.1.0]'
     /test_srpm_empty_patch_0.1__:
-        __generated: true
         summary: test_source_git.py test_srpm_empty_patch[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_empty_patch[0.1*]'
     /test_srpm_empty_patch_0.__:
-        __generated: true
         summary: test_source_git.py test_srpm_empty_patch[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_empty_patch[0.*]'
     /test_srpm_patch_non_conseq_indices_0.1.0_:
-        __generated: true
         summary: test_source_git.py test_srpm_patch_non_conseq_indices[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_patch_non_conseq_indices[0.1.0]'
     /test_srpm_patch_non_conseq_indices_0.1__:
-        __generated: true
         summary: test_source_git.py test_srpm_patch_non_conseq_indices[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_patch_non_conseq_indices[0.1*]'
     /test_srpm_patch_non_conseq_indices_0.__:
-        __generated: true
         summary: test_source_git.py test_srpm_patch_non_conseq_indices[0.1.0]
         test: python3 -m pytest -m '' -v 'test_source_git.py::test_srpm_patch_non_conseq_indices[0.*]'
 /test_source_git_generator.py:
-    __generated: true
     /test_distgit_cloning_redhat_rpm_config_None_main_:
-        __generated: true
         summary: test_source_git_generator.py test_distgit_cloning[redhat-rpm-config-None-main]
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_distgit_cloning[redhat-rpm-config-None-main]'
     /test_distgit_cloning_None_redhat_rpm_config_c8s_:
-        __generated: true
         summary: test_source_git_generator.py test_distgit_cloning[redhat-rpm-config-None-main]
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_distgit_cloning[None-redhat-rpm-config-c8s]'
     /test_fetch_upstream_ref:
-        __generated: true
         summary: test_source_git_generator.py test_fetch_upstream_ref
         test: python3 -m pytest -m '' -v test_source_git_generator.py::test_fetch_upstream_ref
     /test_run_prep_fuse_overlayfs_None_main_:
-        __generated: true
         summary: test_source_git_generator.py test_run_prep[fuse-overlayfs-None-main]
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_run_prep[fuse-overlayfs-None-main]'
     /test_create_srcgit_requre_clean:
-        __generated: true
         summary: use requre to create a source-git out of it in an empty git repo
             - packit
         description: "    use requre to create a source-git out of it in an empty\
             \ git repo - packit\n    will pull upstream git history\n    "
         test: python3 -m pytest -m '' -v test_source_git_generator.py::test_create_srcgit_requre_clean
     /test_create_srcgit_requre_populated:
-        __generated: true
         summary: use requre to create a source-git out of it in a branch with upstream
             git history
         description: "    use requre to create a source-git out of it in a branch\
@@ -726,21 +557,18 @@ description: Integration test
             \ on top\n    "
         test: python3 -m pytest -m '' -v test_source_git_generator.py::test_create_srcgit_requre_populated
     /test_centos_cronie_c8s_cronie_1.5.2_:
-        __generated: true
         summary: test_source_git_generator.py test_centos_cronie[c8s-cronie-1.5.2]
         tag:
         - slow
         - slow
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_centos_cronie[c8s-cronie-1.5.2]'
     /test_centos_cronie_c9s_cronie_1.5.5_:
-        __generated: true
         summary: test_source_git_generator.py test_centos_cronie[c8s-cronie-1.5.2]
         tag:
         - slow
         - slow
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_centos_cronie[c9s-cronie-1.5.5]'
     /test_acl_with_git_git_am_git_:
-        __generated: true
         summary: manipulate acl's dist-git to use -Sgit and -Sgit_am so we can verify
             it works
         description: ' manipulate acl''s dist-git to use -Sgit and -Sgit_am so we
@@ -750,7 +578,6 @@ description: Integration test
         - slow
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_acl_with_git_git_am[git]'
     /test_acl_with_git_git_am_git_am_:
-        __generated: true
         summary: manipulate acl's dist-git to use -Sgit and -Sgit_am so we can verify
             it works
         description: ' manipulate acl''s dist-git to use -Sgit and -Sgit_am so we
@@ -760,54 +587,41 @@ description: Integration test
         - slow
         test: python3 -m pytest -m '' -v 'test_source_git_generator.py::test_acl_with_git_git_am[git_am]'
 /test_spec.py:
-    __generated: true
     /test_write_spec_content:
-        __generated: true
         summary: test_spec.py test_write_spec_content
         test: python3 -m pytest -m '' -v test_spec.py::test_write_spec_content
 /test_sync_files.py:
-    __generated: true
     /test_raw_files_to_sync_packit_files0_expected0_:
-        __generated: true
         summary: test_sync_files.py test_raw_files_to_sync[packit_files0-expected0]
         test: python3 -m pytest -m '' -v 'test_sync_files.py::test_raw_files_to_sync[packit_files0-expected0]'
     /test_raw_files_to_sync_packit_files1_expected1_:
-        __generated: true
         summary: test_sync_files.py test_raw_files_to_sync[packit_files0-expected0]
         test: python3 -m pytest -m '' -v 'test_sync_files.py::test_raw_files_to_sync[packit_files1-expected1]'
     /test_raw_files_to_sync_packit_files2_expected2_:
-        __generated: true
         summary: test_sync_files.py test_raw_files_to_sync[packit_files0-expected0]
         test: python3 -m pytest -m '' -v 'test_sync_files.py::test_raw_files_to_sync[packit_files2-expected2]'
     /test_raw_files_to_sync_packit_files3_expected3_:
-        __generated: true
         summary: test_sync_files.py test_raw_files_to_sync[packit_files0-expected0]
         test: python3 -m pytest -m '' -v 'test_sync_files.py::test_raw_files_to_sync[packit_files3-expected3]'
     /test_raw_files_to_sync_packit_files4_expected4_:
-        __generated: true
         summary: test_sync_files.py test_raw_files_to_sync[packit_files0-expected0]
         test: python3 -m pytest -m '' -v 'test_sync_files.py::test_raw_files_to_sync[packit_files4-expected4]'
     /test_raw_files_to_sync_packit_files5_expected5_:
-        __generated: true
         summary: test_sync_files.py test_raw_files_to_sync[packit_files0-expected0]
         test: python3 -m pytest -m '' -v 'test_sync_files.py::test_raw_files_to_sync[packit_files5-expected5]'
 /test_update.py:
-    __generated: true
     /test_basic_local_update:
-        __generated: true
         summary: 'basic propose-update test: mock remote API, use local upstream and
             dist-git'
         description: ' basic propose-update test: mock remote API, use local upstream
             and dist-git '
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update
     /test_basic_local_update_reset_after_exception:
-        __generated: true
         summary: check whether the distgit repo is not dirty after exception is raised
         description: ' check whether the distgit repo is not dirty after exception
             is raised '
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update_reset_after_exception
     /test_basic_local_update_copy_upstream_release_description:
-        __generated: true
         summary: 'basic propose-update test: mock remote API, use local upstream and
             dist-git,'
         description: |-
@@ -815,216 +629,162 @@ description: Integration test
                 set copy_upstream_release_description in package config to True
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update_copy_upstream_release_description
     /test_basic_local_update_using_distgit:
-        __generated: true
         summary: 'basic propose-update test: mock remote API, use local upstream and
             dist-git'
         description: ' basic propose-update test: mock remote API, use local upstream
             and dist-git '
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update_using_distgit
     /test_basic_local_update_direct_push:
-        __generated: true
         summary: 'basic propose-update test: mock remote API, use local upstream and
             dist-git'
         description: ' basic propose-update test: mock remote API, use local upstream
             and dist-git '
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update_direct_push
     /test_basic_local_update_direct_push_no_dg_spec:
-        __generated: true
         summary: test_update.py test_basic_local_update_direct_push_no_dg_spec
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update_direct_push_no_dg_spec
     /test_basic_local_update_from_downstream:
-        __generated: true
         summary: test_update.py test_basic_local_update_from_downstream
         test: python3 -m pytest -m '' -v test_update.py::test_basic_local_update_from_downstream
     /test_local_update_with_specified_tag_template:
-        __generated: true
         summary: test_update.py test_local_update_with_specified_tag_template
         test: python3 -m pytest -m '' -v test_update.py::test_local_update_with_specified_tag_template
 /test_upstream.py:
-    __generated: true
     /test_get_spec_version:
-        __generated: true
         summary: test_upstream.py test_get_spec_version
         test: python3 -m pytest -m '' -v test_upstream.py::test_get_spec_version
     /test_get_current_version_no_command_pure_version_valid_template_:
-        __generated: true
         summary: test_upstream.py test_get_current_version[no_command-pure_version-valid_template]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_current_version[no_command-pure_version-valid_template]'
     /test_get_current_version_no_command_valid_tag_valid_template_:
-        __generated: true
         summary: test_upstream.py test_get_current_version[no_command-pure_version-valid_template]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_current_version[no_command-valid_tag-valid_template]'
     /test_get_current_version_with_command_output_:
-        __generated: true
         summary: test_upstream.py test_get_current_version[no_command-pure_version-valid_template]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_current_version[with_command_output]'
     /test_get_version_1.1000.1000000_1.1000.1000000_:
-        __generated: true
         summary: test_upstream.py test_get_version[1.1000.1000000-1.1000.1000000]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_version[1.1000.1000000-1.1000.1000000]'
     /test_get_version_None_0.1.0_:
-        __generated: true
         summary: test_upstream.py test_get_version[1.1000.1000000-1.1000.1000000]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_version[None-0.1.0]'
     /test_get_version_0.0.3_0.1.0_:
-        __generated: true
         summary: test_upstream.py test_get_version[1.1000.1000000-1.1000.1000000]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_version[0.0.3-0.1.0]'
     /test_get_version_176_176_:
-        __generated: true
         summary: test_upstream.py test_get_version[1.1000.1000000-1.1000.1000000]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_version[176-176]'
     /test_get_version_macro:
-        __generated: true
         summary: test_upstream.py test_get_version_macro
         test: python3 -m pytest -m '' -v test_upstream.py::test_get_version_macro
     /test_set_spec_ver:
-        __generated: true
         summary: test_upstream.py test_set_spec_ver
         test: python3 -m pytest -m '' -v test_upstream.py::test_set_spec_ver
     /test_set_spec_macro_source:
-        __generated: true
         summary: test_upstream.py test_set_spec_macro_source
         test: python3 -m pytest -m '' -v test_upstream.py::test_set_spec_macro_source
     /test_set_spec_ver_empty_changelog:
-        __generated: true
         summary: test_upstream.py test_set_spec_ver_empty_changelog
         test: python3 -m pytest -m '' -v test_upstream.py::test_set_spec_ver_empty_changelog
     /test_create_archive_.tar.gz_:
-        __generated: true
         summary: test_upstream.py test_create_archive[.tar.gz]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_create_archive[.tar.gz]'
     /test_create_archive_.tar.bz2_:
-        __generated: true
         summary: test_upstream.py test_create_archive[.tar.gz]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_create_archive[.tar.bz2]'
     /test_create_uncommon_archive:
-        __generated: true
         summary: test_upstream.py test_create_uncommon_archive
         test: python3 -m pytest -m '' -v test_upstream.py::test_create_uncommon_archive
     /test_fix_spec:
-        __generated: true
         summary: test_upstream.py test_fix_spec
         test: python3 -m pytest -m '' -v test_upstream.py::test_fix_spec
     /test__fix_spec_source_Source_:
-        __generated: true
         summary: test_upstream.py test__fix_spec_source[Source]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test__fix_spec_source[Source]'
     /test__fix_spec_source_Source0_:
-        __generated: true
         summary: test_upstream.py test__fix_spec_source[Source]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test__fix_spec_source[Source0]'
     /test__fix_spec_source_Source100_:
-        __generated: true
         summary: test_upstream.py test__fix_spec_source[Source]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test__fix_spec_source[Source100]'
     /test_create_srpm:
-        __generated: true
         summary: test_upstream.py test_create_srpm
         test: python3 -m pytest -m '' -v test_upstream.py::test_create_srpm
     /test_create_srpm_git_desc_release:
-        __generated: true
         summary: test_upstream.py test_create_srpm_git_desc_release
         test: python3 -m pytest -m '' -v test_upstream.py::test_create_srpm_git_desc_release
     /test_github_app:
-        __generated: true
         summary: test_upstream.py test_github_app
         test: python3 -m pytest -m '' -v test_upstream.py::test_github_app
     /test_get_last_tag:
-        __generated: true
         summary: test_upstream.py test_get_last_tag
         test: python3 -m pytest -m '' -v test_upstream.py::test_get_last_tag
     /test_get_archive_root_dir_default_:
-        __generated: true
         summary: test_upstream.py test_get_archive_root_dir[default]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_archive_root_dir[default]'
     /test_get_archive_root_dir_ver_pkg_name_:
-        __generated: true
         summary: test_upstream.py test_get_archive_root_dir[default]
         test: python3 -m pytest -m '' -v 'test_upstream.py::test_get_archive_root_dir[ver-pkg_name]'
 /test_using_cockpit.py:
-    __generated: true
     /test_update_on_cockpit_ostree:
-        __generated: true
         summary: test_using_cockpit.py test_update_on_cockpit_ostree
         test: python3 -m pytest -m '' -v test_using_cockpit.py::test_update_on_cockpit_ostree
     /test_srpm_on_cockpit_ostree:
-        __generated: true
         summary: test_using_cockpit.py test_srpm_on_cockpit_ostree
         test: python3 -m pytest -m '' -v test_using_cockpit.py::test_srpm_on_cockpit_ostree
 /test_using_examples.py:
-    __generated: true
     /test_srpm_on_example_example_repo0_:
-        __generated: true
         summary: test_using_examples.py test_srpm_on_example[example_repo0]
         test: python3 -m pytest -m '' -v 'test_using_examples.py::test_srpm_on_example[example_repo0]'
     /test_srpm_on_example_example_repo1_:
-        __generated: true
         summary: test_using_examples.py test_srpm_on_example[example_repo0]
         test: python3 -m pytest -m '' -v 'test_using_examples.py::test_srpm_on_example[example_repo1]'
     /test_srpm_on_example_example_repo2_:
-        __generated: true
         summary: test_using_examples.py test_srpm_on_example[example_repo0]
         test: python3 -m pytest -m '' -v 'test_using_examples.py::test_srpm_on_example[example_repo2]'
     /test_srpm_on_example_example_repo3_:
-        __generated: true
         summary: test_using_examples.py test_srpm_on_example[example_repo0]
         test: python3 -m pytest -m '' -v 'test_using_examples.py::test_srpm_on_example[example_repo3]'
     /test_srpm_on_example_example_repo4_:
-        __generated: true
         summary: test_using_examples.py test_srpm_on_example[example_repo0]
         test: python3 -m pytest -m '' -v 'test_using_examples.py::test_srpm_on_example[example_repo4]'
 /test_validate_config.py:
-    __generated: true
     /test_schema_validation_valid_1_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[valid_1]'
     /test_schema_validation_notif_succ_build_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[notif_succ_build]'
     /test_schema_validation_empty_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[empty]'
     /test_schema_validation_valid_2_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[valid_2]'
     /test_schema_validation_synced_files_src_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[synced_files_src]'
     /test_schema_validation_synced_files_dest_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[synced_files_dest]'
     /test_schema_validation_valid_3_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[valid_3]'
     /test_schema_validation_downstream_name_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[downstream_name]'
     /test_schema_validation_create_pr_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[create_pr]'
     /test_schema_validation_valid_4_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[valid_4]'
     /test_schema_validation_allowed_gpg_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[allowed_gpg]'
     /test_schema_validation_create_tarball_1_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[create_tarball_1]'
     /test_schema_validation_create_tarball_2_:
-        __generated: true
         summary: test_validate_config.py test_schema_validation[valid_1]
         test: python3 -m pytest -m '' -v 'test_validate_config.py::test_schema_validation[create_tarball_2]'
