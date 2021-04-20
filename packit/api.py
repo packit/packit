@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 """
 This is the official python interface for packit.
@@ -230,11 +211,6 @@ class PackitAPI:
                 self.dg.create_branch(local_pr_branch)
                 self.dg.checkout_branch(local_pr_branch)
 
-            description = (
-                f"Upstream tag: {upstream_tag}\n"
-                f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
-            )
-
             readme_path = self.dg.local_project.working_dir / "README.packit"
             logger.debug(f"README: {readme_path}")
             readme_path.write_text(
@@ -255,26 +231,29 @@ class PackitAPI:
                     upstream_tag=upstream_tag,
                 )
                 sync_files(raw_files_to_sync)
-                if upstream_ref and self.up.with_action(
-                    action=ActionName.create_patches
-                ):
-                    patches = self.up.create_patches(
-                        upstream=upstream_ref,
-                        destination=str(self.dg.absolute_specfile_dir),
-                    )
-                    patches = PatchGenerator.undo_identical(
-                        patches, self.dg.local_project.git_repo
-                    )
-                    self.dg.specfile_add_patches(patches)
-                self._handle_sources(
-                    add_new_sources=True, force_new_sources=force_new_sources
-                )
 
             # when the action is defined, we still need to copy the files
             if self.up.has_action(action=ActionName.prepare_files):
-
                 sync_files(raw_sync_files)
 
+            if upstream_ref and self.up.with_action(action=ActionName.create_patches):
+                patches = self.up.create_patches(
+                    upstream=upstream_ref,
+                    destination=str(self.dg.absolute_specfile_dir),
+                )
+                patches = PatchGenerator.undo_identical(
+                    patches, self.dg.local_project.git_repo
+                )
+                self.dg.specfile_add_patches(patches)
+
+            self._handle_sources(
+                add_new_sources=True, force_new_sources=force_new_sources
+            )
+
+            description = (
+                f"Upstream tag: {upstream_tag}\n"
+                f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
+            )
             self.dg.commit(title=f"{version} upstream release", msg=description)
 
             new_pr = None
