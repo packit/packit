@@ -116,14 +116,69 @@ class PackitAPI:
             )
         return self._copr_helper
 
+    def update_dist_git(
+        self,
+        version: Optional[str],
+        upstream_ref: Optional[str],
+        force_new_sources: bool,
+        upstream_tag: str,
+        commit_msg: str,
+    ):
+        """Update a dist-git repo from an upstream (aka source-git) repo
+
+        - copy files to be synced to dist-git
+        - generate and update patch files and the spec-file
+        - upload source archives to the lookaside cache
+
+        Args:
+            version: Upstream version to update in Fedora.
+            upstream_ref: For a source-git repo, use this ref as the latest upstream commit.
+            force_new_sources: Don't check the lookaside cache and perform new-sources.
+            upstream_tag: Use the message of the commit referenced by this tag to update the
+                changelog in the spec-file, if requested.
+            commit_msg: Use this commit message in dist-git.
+        """
+        raw_sync_files = (
+            self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
+                self.up.local_project.working_dir,
+                self.dg.local_project.working_dir,
+            )
+        )
+
+        if self.up.with_action(action=ActionName.prepare_files):
+            raw_files_to_sync = self._prepare_files_to_sync(
+                raw_sync_files=raw_sync_files,
+                full_version=version,
+                upstream_tag=upstream_tag,
+            )
+            sync_files(raw_files_to_sync)
+
+        # when the action is defined, we still need to copy the files
+        if self.up.has_action(action=ActionName.prepare_files):
+            sync_files(raw_sync_files)
+
+        if upstream_ref and self.up.with_action(action=ActionName.create_patches):
+            patches = self.up.create_patches(
+                upstream=upstream_ref,
+                destination=str(self.dg.absolute_specfile_dir),
+            )
+            patches = PatchGenerator.undo_identical(
+                patches, self.dg.local_project.git_repo
+            )
+            self.dg.specfile_add_patches(patches)
+
+        self._handle_sources(add_new_sources=True, force_new_sources=force_new_sources)
+
+        self.dg.commit(title=f"{version} upstream release", msg=commit_msg)
+
     def sync_release(
         self,
-        dist_git_branch: str = None,
-        version: str = None,
-        tag: str = None,
+        dist_git_branch: Optional[str] = None,
+        version: Optional[str] = None,
+        tag: Optional[str] = None,
         use_local_content=False,
         force_new_sources=False,
-        upstream_ref: str = None,
+        upstream_ref: Optional[str] = None,
         create_pr: bool = True,
         force: bool = False,
         create_sync_note: bool = True,
@@ -220,44 +275,17 @@ class PackitAPI:
                     SYNCING_NOTE.format(packit_version=get_packit_version())
                 )
 
-            raw_sync_files = (
-                self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
-                )
-            )
-
-            if self.up.with_action(action=ActionName.prepare_files):
-                raw_files_to_sync = self._prepare_files_to_sync(
-                    raw_sync_files=raw_sync_files,
-                    full_version=version,
-                    upstream_tag=upstream_tag,
-                )
-                sync_files(raw_files_to_sync)
-
-            # when the action is defined, we still need to copy the files
-            if self.up.has_action(action=ActionName.prepare_files):
-                sync_files(raw_sync_files)
-
-            if upstream_ref and self.up.with_action(action=ActionName.create_patches):
-                patches = self.up.create_patches(
-                    upstream=upstream_ref,
-                    destination=str(self.dg.absolute_specfile_dir),
-                )
-                patches = PatchGenerator.undo_identical(
-                    patches, self.dg.local_project.git_repo
-                )
-                self.dg.specfile_add_patches(patches)
-
-            self._handle_sources(
-                add_new_sources=True, force_new_sources=force_new_sources
-            )
-
             description = (
                 f"Upstream tag: {upstream_tag}\n"
                 f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
-            self.dg.commit(title=f"{version} upstream release", msg=description)
+            self.update_dist_git(
+                version,
+                upstream_ref,
+                force_new_sources,
+                upstream_tag,
+                commit_msg=description,
+            )
 
             new_pr = None
             if create_pr:
