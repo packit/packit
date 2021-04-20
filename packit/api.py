@@ -126,6 +126,7 @@ class PackitAPI:
         upstream_ref: str = None,
         create_pr: bool = True,
         force: bool = False,
+        create_sync_note: bool = True,
     ) -> Optional[PullRequest]:
         """
         Update given package in Fedora
@@ -138,6 +139,7 @@ class PackitAPI:
         :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
         :param create_pr: create a pull request if set to True
         :param force: ignore changes in the git index
+        :param create_sync_note: whether to create a note about the sync in the dist-git repo
 
         :return created PullRequest if create_pr is True, else None
         """
@@ -211,11 +213,12 @@ class PackitAPI:
                 self.dg.create_branch(local_pr_branch)
                 self.dg.checkout_branch(local_pr_branch)
 
-            readme_path = self.dg.local_project.working_dir / "README.packit"
-            logger.debug(f"README: {readme_path}")
-            readme_path.write_text(
-                SYNCING_NOTE.format(packit_version=get_packit_version())
-            )
+            if create_sync_note:
+                readme_path = self.dg.local_project.working_dir / "README.packit"
+                logger.debug(f"README: {readme_path}")
+                readme_path.write_text(
+                    SYNCING_NOTE.format(packit_version=get_packit_version())
+                )
 
             raw_sync_files = (
                 self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
