@@ -474,7 +474,10 @@ class PatchGenerator:
         """
         ret: List[PatchMetadata] = []
         for patch in patch_list:
-            relative_patch_path = patch.path.relative_to(repo.working_dir)
+            # Path of the patch, relative to the repo directory.
+            # patch.path might be a relative path, so it needs to be resolved before
+            # made relative to the repo dir (which is always an absolute path).
+            relative_patch_path = patch.path.resolve().relative_to(repo.working_dir)
             logger.debug(f"Processing {relative_patch_path} ...")
             new_patch = str(relative_patch_path) in repo.untracked_files
             if new_patch:
