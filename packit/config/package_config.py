@@ -212,9 +212,9 @@ class PackageConfig(CommonPackageConfig):
 
 
 def find_packit_yaml(
-    *directory,
-    try_local_dir_first=False,
-    try_local_dir_last=False,
+    *directory: Union[Path, str],
+    try_local_dir_first: bool = False,
+    try_local_dir_last: bool = False,
 ) -> Path:
     """
     find packit.yaml in provided directories: if a file matches, it's picked
@@ -266,11 +266,11 @@ def load_packit_yaml(config_file_path: Path) -> Dict:
 
 
 def get_local_package_config(
-    *directory,
-    repo_name: str = None,
-    try_local_dir_first=False,
-    try_local_dir_last=False,
-    package_config_path: str = None,
+    *directory: Union[Path, str],
+    repo_name: Optional[str] = None,
+    try_local_dir_first: bool = False,
+    try_local_dir_last: bool = False,
+    package_config_path: Optional[str] = None,
 ) -> PackageConfig:
     """
     find packit.yaml in provided dirs, load it and return PackageConfig
