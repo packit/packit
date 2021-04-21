@@ -120,25 +120,37 @@ class PackitAPI:
         self,
         version: Optional[str],
         upstream_ref: Optional[str],
+        add_new_sources: bool,
         force_new_sources: bool,
-        upstream_tag: str,
+        upstream_tag: Optional[str],
+        commit_title: str,
         commit_msg: str,
+        sync_default_files: bool = True,
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
         - copy files to be synced to dist-git
         - generate and update patch files and the spec-file
         - upload source archives to the lookaside cache
+        - commit the changes to dist-git, if a commit title is defined
 
         Args:
             version: Upstream version to update in Fedora.
             upstream_ref: For a source-git repo, use this ref as the latest upstream commit.
+            add_new_sources: Download and upload source archives.
             force_new_sources: Don't check the lookaside cache and perform new-sources.
             upstream_tag: Use the message of the commit referenced by this tag to update the
                 changelog in the spec-file, if requested.
+            commit_title: Commit message title (aka subject-line) in dist-git.
+                Do not commit if this is false-ish.
             commit_msg: Use this commit message in dist-git.
+            sync_default_files: Whether to sync the default files, that is: packit.yaml and
+                the spec-file.
         """
-        synced_files = self.package_config.get_all_files_to_sync()
+        if sync_default_files:
+            synced_files = self.package_config.get_all_files_to_sync()
+        else:
+            synced_files = self.package_config.synced_files
         # Make all paths absolute and check that they are within
         # the working directories of the repositories.
         for item in synced_files:
@@ -161,14 +173,17 @@ class PackitAPI:
                 upstream=upstream_ref,
                 destination=str(self.dg.absolute_specfile_dir),
             )
-            patches = PatchGenerator.undo_identical(
-                patches, self.dg.local_project.git_repo
-            )
+            # Undo identical patches, but don't remove them
+            # from the list, so that they are added to the spec-file.
+            PatchGenerator.undo_identical(patches, self.dg.local_project.git_repo)
             self.dg.specfile_add_patches(patches)
 
-        self._handle_sources(add_new_sources=True, force_new_sources=force_new_sources)
+        self._handle_sources(
+            add_new_sources=add_new_sources, force_new_sources=force_new_sources
+        )
 
-        self.dg.commit(title=f"{version} upstream release", msg=commit_msg)
+        if commit_title:
+            self.dg.commit(title=commit_title, msg=commit_msg, prefix="")
 
     def sync_release(
         self,
@@ -281,8 +296,10 @@ class PackitAPI:
             self.update_dist_git(
                 version,
                 upstream_ref,
-                force_new_sources,
-                upstream_tag,
+                add_new_sources=True,
+                force_new_sources=force_new_sources,
+                upstream_tag=upstream_tag,
+                commit_title=f"[packit] {version} upstream release",
                 commit_msg=description,
             )
 
