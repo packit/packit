@@ -56,6 +56,8 @@ DIST_GIT_HOSTNAME_CANDIDATES = (
     ALTERNATIVE_STG_DG_HOSTNAME,
 )
 
+KOJI_STG_CONFIG = "/etc/koji.conf.d/stg.conf"
+
 COPR2GITHUB_STATE = {
     "running": ("pending", "The RPM build was triggered."),
     "pending": ("pending", "The RPM build has started."),

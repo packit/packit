@@ -36,7 +36,7 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
-from packit.constants import DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
+from packit.constants import DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT, KOJI_STG_CONFIG
 from packit.exceptions import (
     PackitException,
     PackitSRPMNotFoundException,
@@ -63,6 +63,7 @@ class Upstream(PackitRepositoryBase):
         config: Config,
         package_config: CommonPackageConfig,
         local_project: LocalProject,
+        stage: bool = False,
     ):
         """
         :param config: global configuration
@@ -73,6 +74,7 @@ class Upstream(PackitRepositoryBase):
         super().__init__(config=config, package_config=package_config)
         self.config = config
         self.package_config = package_config
+        self.stage = stage
 
     def __repr__(self):
         return (
@@ -773,13 +775,17 @@ class Upstream(PackitRepositoryBase):
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
         :param srpm_path: use selected SRPM for build, not dist-git repo & ref
+        :param stage: should the staging koji instance be used?
         """
         if not koji_target:
             raise PackitException(
                 "koji target needs to be set when building directly from upstream"
             )
         # we can't use fedpkg b/c upstream repo is not dist-git
-        cmd = ["koji", "build"]
+        cmd = ["koji"]
+        if self.stage:
+            cmd += ["-c", KOJI_STG_CONFIG]
+        cmd.append("build")
         if scratch:
             cmd.append("--scratch")
         if nowait:
