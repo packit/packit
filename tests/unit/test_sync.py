@@ -1,69 +1,144 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 from pathlib import Path
+from contextlib import contextmanager
 
 import pytest
-from flexmock import flexmock
 
-from packit.sync import get_raw_files, SyncFilesItem, RawSyncFilesItem
+# from flexmock import flexmock
+
+from packit.sync import check_subpath, SyncFilesItem
+from packit.exceptions import PackitException
+
+
+@contextmanager
+def return_result(result):
+    yield result
 
 
 @pytest.mark.parametrize(
-    "file,glob_files,result",
+    "subpath,path,result",
     [
+        (Path("./test/this"), Path("."), return_result(Path("./test/this").resolve())),
+        (Path("test/this"), Path("."), return_result(Path("test/this").resolve())),
+        (Path("../test/this"), Path("."), pytest.raises(PackitException)),
+        (Path("test/../../this"), Path("."), pytest.raises(PackitException)),
+    ],
+)
+def test_check_subpath(subpath, path, result):
+    with result as r:
+        assert check_subpath(subpath, path) == r
+
+
+@pytest.mark.parametrize(
+    "item,drop,result",
+    [
+        (SyncFilesItem(["a", "b"], "dest"), {"src": "b"}, SyncFilesItem(["a"], "dest")),
+        (SyncFilesItem(["a"], "dest"), {"src": Path("a")}, None),
         (
-            SyncFilesItem(src="file/*", dest="dest"),
-            [Path("file/a"), Path("file/b")],
-            [
-                RawSyncFilesItem(Path("file/a"), Path("dest"), False),
-                RawSyncFilesItem(Path("file/b"), Path("dest"), False),
-            ],
+            SyncFilesItem(["a", "b"], "dest"),
+            {"src": "c"},
+            SyncFilesItem(["a", "b"], "dest"),
         ),
         (
-            SyncFilesItem(src="file/*", dest="dest/"),
-            [Path("file/a"), Path("file/b")],
-            [
-                RawSyncFilesItem(Path("file/a"), Path("dest"), True),
-                RawSyncFilesItem(Path("file/b"), Path("dest"), True),
-            ],
-        ),
-        (
-            SyncFilesItem(src=["a"], dest="dest/"),
-            [Path("a")],
-            [RawSyncFilesItem(Path("a"), Path("dest"), True)],
-        ),
-        (
-            SyncFilesItem(src=["*.md"], dest="dest"),
-            [Path("a.md"), Path("b.md")],
-            [
-                RawSyncFilesItem(Path("a.md"), Path("dest"), False),
-                RawSyncFilesItem(Path("b.md"), Path("dest"), False),
-            ],
+            SyncFilesItem(["src/a", "src/b"], "dest"),
+            {"src": "a", "criteria": lambda x, y: x.name == y},
+            SyncFilesItem(["src/b"], "dest"),
         ),
     ],
 )
-def test_get_raw_files(file, glob_files, result):
-    flexmock(Path, glob=lambda x: glob_files)
+def test_drop_src(item, drop, result):
+    """Check dropping a item from the src-list
 
-    files = get_raw_files(Path("."), Path("."), file)
-    assert files == result
+    The 'src' argument can be a string or Path.
+    When used in 'criteria' as 'y', there is no type conversion,
+    so if the caller defines a custem 'criteria', it falls on them,
+    to make sure the types of 'src' and 'y' match.
+    """
+    assert result == item.drop_src(**drop)
+
+
+@pytest.mark.parametrize(
+    "item,args,result",
+    [
+        (
+            SyncFilesItem(["a", "b"], "dest"),
+            {},
+            return_result(
+                SyncFilesItem(
+                    [Path(Path.cwd() / "a"), Path(Path.cwd() / "b")],
+                    Path(Path.cwd() / "dest"),
+                )
+            ),
+        ),
+        (
+            SyncFilesItem(["a", "b"], "dest"),
+            {"src_base": Path("src").resolve(), "dest_base": Path("dest")},
+            return_result(
+                SyncFilesItem(
+                    [Path(Path.cwd() / "src" / "a"), Path(Path.cwd() / "src" / "b")],
+                    Path(Path.cwd() / "dest" / "dest"),
+                )
+            ),
+        ),
+        (
+            SyncFilesItem(["../a", "b"], "dest"),
+            {"src_base": Path("src"), "dest_base": Path("dest").resolve()},
+            pytest.raises(PackitException),
+        ),
+    ],
+)
+def test_resolve(item, args, result):
+    with result as r:
+        item.resolve(**args)
+        assert r == item
+
+
+@pytest.mark.parametrize(
+    "item,args,result",
+    [
+        (
+            SyncFilesItem(["a", "b"], "dest"),
+            {},
+            "rsync --archive --ignore-missing-args a b dest".split(),
+        ),
+        (
+            SyncFilesItem(["a", "b"], "dest2"),
+            {"fail_on_missing": True},
+            "rsync --archive a b dest2".split(),
+        ),
+        (
+            SyncFilesItem(["c", "d"], "dest", mkpath=True),
+            {},
+            "rsync --archive --mkpath --ignore-missing-args c d dest".split(),
+        ),
+        (
+            SyncFilesItem(["c/*"], "dest", mkpath=True),
+            {},
+            "rsync --archive --mkpath --ignore-missing-args c/* dest".split(),
+        ),
+    ],
+)
+def test_command(item, args, result):
+    assert result == item.command(**args)
+
+
+def test_command_globs(tmp_path):
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    (src_dir / "file1").touch()
+    (src_dir / "file2").touch()
+    item = SyncFilesItem(["src/*"], "dest")
+    item.resolve(src_base=tmp_path, dest_base=tmp_path)
+    command = item.command()
+    # The return value of glob.glob() is unordered
+    command = command[:-3] + sorted(command[-3:-1]) + command[-1:]
+    assert [
+        "rsync",
+        "--archive",
+        "--ignore-missing-args",
+        f"{tmp_path}/src/file1",
+        f"{tmp_path}/src/file2",
+        f"{tmp_path}/dest",
+    ] == command
