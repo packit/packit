@@ -1,3 +1,6 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
 from pathlib import Path
 
 import pytest
@@ -58,7 +61,7 @@ def package_config_mock():
         patch_generation_ignore_paths=[],
     )
     mock.should_receive("current_version_command")
-    mock.should_receive("get_all_files_to_sync.get_raw_files_to_sync").and_return([])
+    mock.should_receive("get_all_files_to_sync").and_return([])
     return mock
 
 

@@ -18,7 +18,7 @@ from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
 from packit.actions import ActionName
-from packit.config import Config, SyncFilesConfig
+from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -37,7 +37,7 @@ from packit.local_project import LocalProject
 from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
-from packit.sync import RawSyncFilesItem, sync_files
+from packit.sync import sync_files, SyncFilesItem
 from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.extensions import assert_existence
@@ -138,24 +138,23 @@ class PackitAPI:
                 changelog in the spec-file, if requested.
             commit_msg: Use this commit message in dist-git.
         """
-        raw_sync_files = (
-            self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
-                self.up.local_project.working_dir,
-                self.dg.local_project.working_dir,
+        synced_files = self.package_config.get_all_files_to_sync()
+        # Make all paths absolute and check that they are within
+        # the working directories of the repositories.
+        for item in synced_files:
+            item.resolve(
+                src_base=self.up.local_project.working_dir,
+                dest_base=self.dg.local_project.working_dir,
             )
-        )
 
         if self.up.with_action(action=ActionName.prepare_files):
-            raw_files_to_sync = self._prepare_files_to_sync(
-                raw_sync_files=raw_sync_files,
+            synced_files = self._prepare_files_to_sync(
+                synced_files=synced_files,
                 full_version=version,
                 upstream_tag=upstream_tag,
             )
-            sync_files(raw_files_to_sync)
 
-        # when the action is defined, we still need to copy the files
-        if self.up.has_action(action=ActionName.prepare_files):
-            sync_files(raw_sync_files)
+        sync_files(synced_files)
 
         if upstream_ref and self.up.with_action(action=ActionName.create_patches):
             patches = self.up.create_patches(
@@ -307,10 +306,23 @@ class PackitAPI:
         return new_pr
 
     def _prepare_files_to_sync(
-        self, raw_sync_files, full_version, upstream_tag
-    ) -> List[RawSyncFilesItem]:
+        self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
+    ) -> List[SyncFilesItem]:
+        """Update the spec-file by setting the version and updating the changelog
+
+        Skip everything if the changelog should be synced from upstream.
+
+        Args:
+            synced_files: A list of SyncFilesItem.
+            full_version: Version to be set in the spec-file.
+            upstream_tag: The commit message of this commit is going to be used
+                to update the changelog in the spec-file.
+
+        Returns:
+            The list of synced files with the spec-file removed if it was updated.
+        """
         if self.package_config.sync_changelog:
-            return raw_sync_files
+            return synced_files
         comment = (
             self.up.local_project.git_project.get_release(name=full_version).body
             if self.package_config.copy_upstream_release_description
@@ -332,7 +344,11 @@ class PackitAPI:
             )
 
         # exclude spec, we have special plans for it
-        return [x for x in raw_sync_files if x.src != self.up.absolute_specfile_path]
+        return list(
+            filter(
+                None, [x.drop_src(self.up.absolute_specfile_path) for x in synced_files]
+            )
+        )
 
     def sync_from_downstream(
         self,
@@ -383,22 +399,26 @@ class PackitAPI:
             self.up.checkout_branch(local_pr_branch)
 
         files = (
-            SyncFilesConfig([self.package_config.get_specfile_sync_files_item()])
+            [self.package_config.get_specfile_sync_files_item()]
             if sync_only_specfile
             else self.package_config.synced_files
         )
 
-        raw_sync_files = files.get_raw_files_to_sync(
-            dest_dir=self.dg.local_project.working_dir,
-            src_dir=self.up.local_project.working_dir,
-        )
-
-        reverse_raw_sync_files = [
-            raw_file.reversed()
-            for raw_file in raw_sync_files
-            if Path(raw_file.dest).name not in exclude_files
-        ]
-        sync_files(reverse_raw_sync_files, fail_on_missing=False)
+        # Drop files to be excluded from the sync.
+        for ef in exclude_files:
+            files = [
+                f.drop_src(ef, criteria=lambda x, y: x.name == y)
+                for f in files
+                if f is not None
+            ]
+        # Make paths absolute and check if they are within the
+        # working directories.
+        for file in files:
+            file.resolve(
+                src_base=self.dg.local_project.working_dir,
+                dest_base=self.up.local_project.working_dir,
+            )
+        sync_files(files)
 
         if not no_pr:
             description = f"Downstream commit: {self.dg.local_project.commit_hexsha}\n"
