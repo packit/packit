@@ -100,6 +100,18 @@ class PackageConfig(CommonPackageConfig):
         )
         self.jobs: List[JobConfig] = jobs or []
 
+        if current_version_command:
+            logger.warning(
+                "current_version_command is deprecated and will be removed. Please "
+                "switch to the `get-current-version` action: https://packit.dev/docs/actions/"
+            )
+
+        if create_tarball_command:
+            logger.warning(
+                "create_tarball_command is deprecated and will be removed. Please"
+                "switch to the `create-archive` action: https://packit.dev/docs/actions/"
+            )
+
     def __repr__(self):
         return (
             "PackageConfig("
