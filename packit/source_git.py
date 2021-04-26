@@ -26,6 +26,8 @@ from packit.constants import (
     FEDORA_DOMAIN,
     CENTOS_DOMAIN,
     CENTOS_STREAM_GITLAB,
+    CENTOS_STREAM_GITLAB_DOMAIN,
+    CENTOS_STREAM_GITLAB_NAMESPACE,
 )
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -36,6 +38,8 @@ from packit.utils.repo import (
     clone_centos_9_package,
     get_default_branch,
 )
+
+from ogr.parsing import parse_git_repo
 
 logger = logging.getLogger(__name__)
 
@@ -104,11 +108,17 @@ def get_distgit_kls_from_repo(
     path = Path(repo_path)
     pc = PackageConfig(downstream_package_name=path.name)
     lp = LocalProject(working_dir=path)
-    if FEDORA_DOMAIN in lp.git_url:
+
+    lp_git_repo = parse_git_repo(lp.git_url)
+
+    if FEDORA_DOMAIN in lp_git_repo.hostname:
         return DistGit(config, pc, local_project=lp), None, path.name
-    elif CENTOS_DOMAIN in lp.git_url:
+    elif CENTOS_DOMAIN in lp_git_repo.hostname:
         return CentOS8DistGit(config, pc, local_project=lp), path.name, None
-    elif CENTOS_STREAM_GITLAB in lp.git_url:
+    elif (
+        CENTOS_STREAM_GITLAB_DOMAIN == lp_git_repo.hostname
+        and lp_git_repo.namespace.find(CENTOS_STREAM_GITLAB_NAMESPACE) == 0
+    ):
         return CentOS9DistGit(config, pc, local_project=lp), path.name, None
     raise PackitException(
         f"Dist-git URL {lp.git_url} not recognized, we expected one of: "
