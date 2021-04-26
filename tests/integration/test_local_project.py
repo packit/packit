@@ -11,7 +11,7 @@ from tests.spellbook import initiate_git_repo
 
 
 def test_pr_id_and_ref(tmp_path: Path):
-    """ p-s passes both ref and pr_id, we want to check out PR """
+    """p-s passes both ref and pr_id, we want to check out PR"""
     remote = tmp_path / "remote"
     remote.mkdir()
     create_new_repo(remote, ["--bare"])
@@ -52,7 +52,7 @@ def test_pr_id_and_ref(tmp_path: Path):
 
 
 def test_pr_id_and_ref_gitlab(tmp_path: Path):
-    """ p-s passes both ref and pr_id, we want to check out PR """
+    """p-s passes both ref and pr_id, we want to check out PR"""
     remote = tmp_path / "remote"
     remote.mkdir()
     create_new_repo(remote, ["--bare"])

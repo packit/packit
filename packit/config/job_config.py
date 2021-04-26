@@ -36,7 +36,7 @@ logger = getLogger(__name__)
 
 
 class JobType(Enum):
-    """ Type of the job used by users in the config """
+    """Type of the job used by users in the config"""
 
     propose_downstream = "propose_downstream"
     build = "build"

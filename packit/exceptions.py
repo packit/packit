@@ -26,7 +26,7 @@ from deprecated import deprecated
 
 
 def ensure_str(inp: Union[bytes, str]) -> str:
-    """ decode bytes on input or just return the string """
+    """decode bytes on input or just return the string"""
     # yes, this func doesn't have anything to do with exceptions
     # but it needs to be placed in a leaf module
     # utils import from exceptions hence it can't be there
@@ -38,7 +38,7 @@ class PackitException(Exception):
 
 
 class PackitCommandFailedError(PackitException):
-    """ A command failed """
+    """A command failed"""
 
     def __init__(
         self,
@@ -78,41 +78,41 @@ class PackitCoprSettingsException(PackitException):
 
 
 class PackitInvalidConfigException(PackitConfigException):
-    """ provided configuration file is not valid """
+    """provided configuration file is not valid"""
 
 
 @deprecated(reason="Use the PackitFailedToCreateSRPMException instead.")
 class FailedCreateSRPM(PackitException):
-    """ Failed to create SRPM """
+    """Failed to create SRPM"""
 
 
 class PackitSRPMException(PackitException):
-    """ Problem with the SRPM """
+    """Problem with the SRPM"""
 
 
 class PackitSRPMNotFoundException(PackitSRPMException):
-    """ SRPM created but not found """
+    """SRPM created but not found"""
 
 
 class PackitFailedToCreateSRPMException(PackitSRPMException):
-    """ Failed to create SRPM """
+    """Failed to create SRPM"""
 
 
 class PackitRPMException(PackitException):
-    """ Problem with the RPM """
+    """Problem with the RPM"""
 
 
 class PackitRPMNotFoundException(PackitRPMException):
-    """ RPM created but not found """
+    """RPM created but not found"""
 
 
 class PackitFailedToCreateRPMException(PackitRPMException):
-    """ Failed to create RPM """
+    """Failed to create RPM"""
 
 
 class PackitGitException(PackitException):
-    """ Operation with a git repo failed """
+    """Operation with a git repo failed"""
 
 
 class PackitNotAGitRepoException(PackitGitException):
-    """ Target directory is not a git repository as we expected """
+    """Target directory is not a git repository as we expected"""

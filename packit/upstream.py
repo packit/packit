@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 
 
 class Upstream(PackitRepositoryBase):
-    """ interact with upstream project """
+    """interact with upstream project"""
 
     def __init__(
         self,
@@ -241,7 +241,7 @@ class Upstream(PackitRepositoryBase):
         return version
 
     def get_specfile_version(self) -> str:
-        """ provide version from specfile """
+        """provide version from specfile"""
         version = self.specfile.get_version()
         logger.info(f"Version in spec file is {version!r}.")
         return version

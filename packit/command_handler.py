@@ -72,7 +72,7 @@ class CommandHandler:
         raise NotImplementedError("This should be implemented")
 
     def clean(self):
-        """ clean up the mess after we're done """
+        """clean up the mess after we're done"""
         logger.info("Nothing to clean.")
 
 
@@ -122,7 +122,7 @@ class SandcastleCommandHandler(CommandHandler):
 
     @property
     def sandcastle(self):
-        """ initialize Sandcastle lazily """
+        """initialize Sandcastle lazily"""
         if self._sandcastle is None:
             # we import here so that packit does not depend on sandcastle (and thus python-kube)
             from sandcastle.api import Sandcastle, MappedDir

@@ -234,7 +234,7 @@ def test_centos_cronie(
 @pytest.mark.slow
 @pytest.mark.parametrize("apply_option", ("git", "git_am"))
 def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Path):
-    """ manipulate acl's dist-git to use -Sgit and -Sgit_am so we can verify it works """
+    """manipulate acl's dist-git to use -Sgit and -Sgit_am so we can verify it works"""
     dist_git_branch = "c9s"
     package_name = "acl"
     source_git_path = tmp_path.joinpath("acl-sg")

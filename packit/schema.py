@@ -149,7 +149,7 @@ class SourceSchema(Schema):
 
 
 class PullRequestNotificationsSchema(Schema):
-    """ Configuration of commenting on pull requests. """
+    """Configuration of commenting on pull requests."""
 
     successful_build = fields.Bool(default=False)
 
@@ -159,7 +159,7 @@ class PullRequestNotificationsSchema(Schema):
 
 
 class NotificationsSchema(Schema):
-    """ Configuration of notifications. """
+    """Configuration of notifications."""
 
     pull_request = fields.Nested(PullRequestNotificationsSchema)
 
@@ -212,7 +212,7 @@ class TargetField(fields.String):
 
 
 class JobMetadataSchema(Schema):
-    """ Jobs metadata. """
+    """Jobs metadata."""
 
     targets = fields.List(TargetField(), missing=None)
     timeout = fields.Integer()

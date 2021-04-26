@@ -139,7 +139,7 @@ def distgit_mock(local_project_mock, config_mock, package_config_mock):
 
 @pytest.fixture
 def cronie(tmp_path: Path):
-    """ c8s dist-git repo with cronie """
+    """c8s dist-git repo with cronie"""
     remote_url = "https://git.centos.org/rpms/cronie"
     d = tmp_path / "cronie"
     initiate_git_repo(
