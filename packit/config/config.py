@@ -56,6 +56,8 @@ class Config:
         keytab_path: Optional[str] = None,
         upstream_git_remote: Optional[str] = None,
         kerberos_realm: Optional[str] = "FEDORAPROJECT.ORG",
+        koji_build_command: Optional[str] = "koji build",
+        fedpkg_exec: Optional[str] = "fedpkg",
         command_handler: str = None,
         command_handler_work_dir: str = SANDCASTLE_WORK_DIR,
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
@@ -68,6 +70,8 @@ class Config:
         self.fas_user: Optional[str] = fas_user
         self.keytab_path: Optional[str] = keytab_path
         self.kerberos_realm = kerberos_realm
+        self.koji_build_command = koji_build_command
+        self.fedpkg_exec = fedpkg_exec
         self.upstream_git_remote = upstream_git_remote
 
         self.services: Set[GitService] = set()
@@ -108,6 +112,9 @@ class Config:
             f"debug='{self.debug}', "
             f"fas_user='{self.fas_user}', "
             f"keytab_path='{self.keytab_path}', "
+            f"kerberos_realm='{self.kerberos_realm}', "
+            f"koji_build_command='{self.koji_build_command}', "
+            f"fedpkg_exec='{self.fedpkg_exec}', "
             f"upstream_git_remote='{self.upstream_git_remote}', "
             f"command_handler='{self.command_handler}', "
             f"command_handler_work_dir='{self.command_handler_work_dir}', "
