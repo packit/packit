@@ -436,6 +436,8 @@ class UserConfigSchema(Schema):
     package_config_path = fields.String(default=None)
     koji_build_command = fields.String()
     fedpkg_exec = fields.String()
+    repository_cache = fields.String(default=None)
+    add_repositories_to_repository_cache = fields.Bool(default=True)
 
     @post_load
     def make_instance(self, data, **kwargs):
