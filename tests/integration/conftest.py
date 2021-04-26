@@ -104,7 +104,7 @@ def mock_spec_download_remote_s(
     spec_dir_path = spec_dir_path or repo_path
 
     def mock_download_remote_sources():
-        """ mock download of the remote archive and place it into dist-git repo """
+        """mock download of the remote archive and place it into dist-git repo"""
         archive_cmd = [
             "git",
             "archive",

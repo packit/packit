@@ -12,7 +12,7 @@ from packit.utils.repo import create_new_repo
 
 
 def test_centos_conf(cronie, tmp_path: Path):
-    """ make sure the centos-specific configuration is correct """
+    """make sure the centos-specific configuration is correct"""
     source_git_path = tmp_path.joinpath("cronie-sg")
     # create src-git
     source_git_path.mkdir()

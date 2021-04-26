@@ -416,7 +416,7 @@ class SourceGitGenerator:
         return build_dirs[0]
 
     def _rebase_patches(self, from_branch):
-        """Rebase current branch against the from_branch """
+        """Rebase current branch against the from_branch"""
         to_branch = "dist-git-commits"  # temporary branch to store the dist-git history
         logger.info(f"Rebase patches from dist-git {from_branch}.")
         BUILD_dir = self.get_BUILD_dir()
