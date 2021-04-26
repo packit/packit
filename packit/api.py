@@ -124,7 +124,6 @@ class PackitAPI:
                 config=self.config,
                 package_config=self.package_config,
                 local_project=self.downstream_local_project,
-                stage=self.stage,
             )
         return self._dg
 

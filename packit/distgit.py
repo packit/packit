@@ -78,14 +78,12 @@ class DistGit(PackitRepositoryBase):
         config: Config,
         package_config: CommonPackageConfig,
         local_project: LocalProject = None,
-        stage: bool = False,
     ):
         super().__init__(config=config, package_config=package_config)
 
         self._local_project = local_project
 
         self.fas_user = self.config.fas_user
-        self.stage = stage
         self._downstream_config: Optional[PackageConfig] = None
 
     def __repr__(self):
@@ -132,7 +130,9 @@ class DistGit(PackitRepositoryBase):
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
                 f = FedPKG(
-                    fas_username=self.fas_user, directory=tmpdir, stage=self.stage
+                    fas_username=self.fas_user,
+                    directory=tmpdir,
+                    fedpkg_exec=self.config.fedpkg_exec,
                 )
                 f.clone(
                     self.package_config.downstream_package_name,
@@ -320,7 +320,7 @@ class DistGit(PackitRepositoryBase):
         f = FedPKG(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            stage=self.stage,
+            fedpkg_exec=self.config.fedpkg_exec,
         )
         try:
             f.new_sources(sources=archive_path)
@@ -369,7 +369,7 @@ class DistGit(PackitRepositoryBase):
         fpkg = FedPKG(
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
-            stage=self.stage,
+            fedpkg_exec=self.config.fedpkg_exec,
         )
         fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
