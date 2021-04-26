@@ -115,7 +115,7 @@ class DistGit(PackitRepositoryBase):
 
     @property
     def local_project(self):
-        """ return an instance of LocalProject """
+        """return an instance of LocalProject"""
         if self._local_project is None:
             dist_git_project = self.config.get_project(
                 url=self.package_config.dist_git_package_url
@@ -168,7 +168,7 @@ class DistGit(PackitRepositoryBase):
         return self._downstream_config
 
     def get_absolute_specfile_path(self) -> Path:
-        """ provide the path, don't check it """
+        """provide the path, don't check it"""
         return (
             self.local_project.working_dir
             / self.spec_dir_name
@@ -177,7 +177,7 @@ class DistGit(PackitRepositoryBase):
 
     @property
     def absolute_source_dir(self) -> Path:
-        """ absoulute path to directory with spec-file sources """
+        """absoulute path to directory with spec-file sources"""
         return self.local_project.working_dir / self.source_dir_name
 
     @property
@@ -189,7 +189,7 @@ class DistGit(PackitRepositoryBase):
         return self._specfile_path
 
     def get_root_downstream_dir_for_source_git(self, root_dir: Path) -> Path:
-        """ root directory within a source-git repo where all the downstream files are stored """
+        """root directory within a source-git repo where all the downstream files are stored"""
         return root_dir.joinpath(self.source_git_downstream_suffix)
 
     def update_branch(self, branch_name: str):

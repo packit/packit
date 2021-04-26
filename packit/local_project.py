@@ -393,7 +393,7 @@ class LocalProject:
             return self.git_repo.active_branch.name
 
     def checkout_ref(self, ref: str):
-        """ Check out selected ref in the git repo"""
+        """Check out selected ref in the git repo"""
         logger.info(f"Checking out ref {ref!r}.")
         self.git_repo.git.checkout(ref)
         logger.debug(f"Current commit is '{self.git_repo.commit()}'")
@@ -481,7 +481,7 @@ class LocalProject:
     def commit(
         self, message: str, body: Optional[str] = None, allow_empty: bool = True
     ):
-        """ Commit staged changes """
+        """Commit staged changes"""
         other_message_kwargs = {"message": body} if body else {}
         # some of the commits may be empty and it's not an error,
         # e.g. extra source files
@@ -508,7 +508,7 @@ class LocalProject:
         self.git_repo.git.rebase(ref)
 
     def reset(self, ref: str):
-        """ git reset --hard $ref """
+        """git reset --hard $ref"""
         self.git_repo.head.reset(ref, index=True, working_tree=True)
 
     def __del__(self):
