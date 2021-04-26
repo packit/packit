@@ -90,6 +90,7 @@ class Upstream(PackitRepositoryBase):
             self._local_project = LocalProject(
                 git_url=self.package_config.upstream_project_url,
                 repo_name=self.package_config.upstream_package_name,
+                cache=self.repository_cache,
             )
         if self._local_project.git_project is None:
             if not self.package_config.upstream_project_url:

@@ -10,7 +10,7 @@ from typing import Tuple, Optional, Union, List
 import git
 import yaml
 import subprocess
-from ogr.parsing import parse_git_repo
+from ogr.parsing import RepoUrl, parse_git_repo
 
 from packit.constants import CENTOS_DOMAIN, CENTOS_STREAM_GITLAB
 from packit.utils.commands import run_command
@@ -18,6 +18,68 @@ from packit.utils.commands import run_command
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
+
+
+class RepositoryCache:
+    """
+    Cache for git repositories base on the reference option of `git clone`.
+
+    * The cache is located in the specified directory
+      and contains separate git repository for each project.
+    * Project name is used to match the git project in the cache.
+    """
+
+    def __init__(self, cache_path: Path, add_new=False) -> None:
+        self.cache_path = cache_path
+        self.add_new = add_new
+
+    @property
+    def cached_projects(self) -> List[str]:
+        """Project names we have in the cache."""
+        if not self.cache_path.is_dir():
+            self.cache_path.mkdir(parents=True)
+        return [f.name for f in self.cache_path.iterdir() if f.is_dir()]
+
+    def _clone(self, **kwargs) -> git.Repo:
+        """Wrapper around git function so we are able to check the call in tests more easily."""
+        return git.repo.Repo.clone_from(**kwargs)
+
+    def get_repo(
+        self,
+        url: str,
+        directory: Union[Path, str] = None,
+    ) -> git.Repo:
+        """
+        Clone the repository.
+        * If we have this repository in a cache, use the cached repo as a reference when cloning.
+        * If we don't have this repository in a cache and {add_new} is True,
+          clone the repository to cache first and then use it as a reference.
+
+        :param url: will be used to clone the repo
+        :param directory: target path for cloning the repository
+        :return: cloned repository
+        """
+        directory = str(directory) if directory else tempfile.mkdtemp()
+
+        if is_git_repo(directory=directory):
+            logger.debug(f"Repo already exists in {directory}.")
+            return git.repo.Repo(directory)
+
+        logger.debug(f"Cloning repo {url} -> {directory}")
+
+        project_name = RepoUrl.parse(url).repo
+        reference_repo = self.cache_path.joinpath(project_name)
+        if project_name not in self.cached_projects and self.add_new:
+            logger.debug(f"Creating reference repo: {reference_repo}")
+            self._clone(url=url, to_path=str(reference_repo), tags=True)
+
+        if self.add_new or project_name in self.cached_projects:
+            logger.debug(f"Using reference repo: {reference_repo}")
+            return self._clone(
+                url=url, to_path=directory, tags=True, reference=str(reference_repo)
+            )
+
+        return self._clone(url=url, to_path=directory, tags=True)
 
 
 def is_git_repo(directory: Union[Path, str]) -> bool:

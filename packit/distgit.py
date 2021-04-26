@@ -126,6 +126,7 @@ class DistGit(PackitRepositoryBase):
                     namespace=self.package_config.dist_git_namespace,
                     repo_name=self.package_config.downstream_package_name,
                     git_project=dist_git_project,
+                    cache=self.repository_cache,
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
@@ -145,6 +146,7 @@ class DistGit(PackitRepositoryBase):
                     namespace=self.package_config.dist_git_namespace,
                     repo_name=self.package_config.downstream_package_name,
                     git_project=dist_git_project,
+                    cache=self.repository_cache,
                 )
                 self._local_project.working_dir_temporary = True
             self._local_project.refresh_the_arguments()
