@@ -790,7 +790,7 @@ class PackitAPI:
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
     ) -> str:
-        """ returns copr build state """
+        """returns copr build state"""
         return self.copr_helper.watch_copr_build(
             build_id=build_id, timeout=timeout, report_func=report_func
         )
@@ -885,7 +885,7 @@ class PackitAPI:
         )
 
     def clean(self):
-        """ clean up stuff once all the work is done """
+        """clean up stuff once all the work is done"""
         # this is called in p-s: Handler.clean
         if self.up.is_command_handler_set():
             self.up.command_handler.clean()
@@ -894,7 +894,7 @@ class PackitAPI:
 
     @staticmethod
     def validate_package_config(working_dir: Path) -> str:
-        """ validate .packit.yaml on the provided path and return human readable report """
+        """validate .packit.yaml on the provided path and return human readable report"""
         config_path = find_packit_yaml(
             working_dir,
             try_local_dir_last=True,

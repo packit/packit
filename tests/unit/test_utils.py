@@ -131,7 +131,7 @@ class TestFallbackReturnValue:
 
         @fallback_return_value(fallback_value, exceptions=decorator_exceptions)
         def simple_function(exc=None):
-            """ Simple test function. """
+            """Simple test function."""
             if exc is not None:
                 raise exc
             return 42

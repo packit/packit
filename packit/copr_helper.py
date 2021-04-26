@@ -67,7 +67,7 @@ class CoprHelper:
         return self.copr_client.config.get("username")
 
     def copr_web_build_url(self, build: Munch) -> str:
-        """ Construct web frontend url because build.repo_url is not much user-friendly."""
+        """Construct web frontend url because build.repo_url is not much user-friendly."""
         copr_url = self.copr_client.config.get("copr_url")
         return f"{copr_url}/coprs/build/{build.id}/"
 
@@ -301,7 +301,7 @@ class CoprHelper:
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
     ) -> str:
-        """ returns copr build state """
+        """returns copr build state"""
         watch_end = datetime.now() + timedelta(seconds=timeout)
         logger.debug(f"Watching copr build {build_id}.")
         state_reported = ""

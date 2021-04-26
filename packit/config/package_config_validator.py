@@ -30,14 +30,14 @@ from packit.exceptions import PackitConfigException
 
 
 class PackageConfigValidator:
-    """ validate content of .packit.yaml """
+    """validate content of .packit.yaml"""
 
     def __init__(self, config_file_path: Path, config_content: Dict):
         self.config_file_path = config_file_path
         self.content = config_content
 
     def validate(self) -> str:
-        """ Create output for PackageConfig validation."""
+        """Create output for PackageConfig validation."""
         schema_errors: Union[List[Any], Dict[Any, Any]] = None
         try:
             PackageConfig.get_from_dict(

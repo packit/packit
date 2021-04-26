@@ -76,16 +76,16 @@ class PackitRepositoryBase:
         return self._command_handler
 
     def is_command_handler_set(self) -> bool:
-        """ return True when command_handler is initialized """
+        """return True when command_handler is initialized"""
         return bool(self._command_handler)
 
     def running_in_service(self) -> bool:
-        """ are we running in packit service? """
+        """are we running in packit service?"""
         return self.command_handler.name == RunCommandType.sandcastle
 
     @property
     def absolute_specfile_dir(self) -> Path:
-        """ get dir where the spec file is"""
+        """get dir where the spec file is"""
         return self.absolute_specfile_path.parent
 
     @property
@@ -372,11 +372,11 @@ class PackitRepositoryBase:
         self._specfile = None
 
     def is_dirty(self) -> bool:
-        """ is the git repo dirty? """
+        """is the git repo dirty?"""
         return self.local_project.git_repo.is_dirty()
 
     def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
-        """ push selected refspec to a git remote """
+        """push selected refspec to a git remote"""
         logger.info(
             f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}."
         )

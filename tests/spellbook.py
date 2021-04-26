@@ -334,7 +334,7 @@ def run_prep_for_srpm(srpm_path: Path):
 
 
 def can_a_module_be_imported(module_name):
-    """ can a module be imported? """
+    """can a module be imported?"""
     try:
         __import__(module_name)
         return True

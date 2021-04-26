@@ -44,7 +44,7 @@ def get_job_config_dict_simple(**update):
 
 
 def get_job_config_simple(**kwargs):
-    """ pass kwargs to JobConfig constructor """
+    """pass kwargs to JobConfig constructor"""
     return JobConfig(type=JobType.build, trigger=JobConfigTriggerType.release, **kwargs)
 
 
@@ -62,12 +62,12 @@ def get_job_config_dict_full():
 
 
 def get_job_config_full(**kwargs):
-    """ pass kwargs to JobConfig constructor """
+    """pass kwargs to JobConfig constructor"""
     return JobConfig(
         type=JobType.propose_downstream,
         trigger=JobConfigTriggerType.pull_request,
         metadata=JobMetadataConfig(dist_git_branches=["master"]),
-        **kwargs
+        **kwargs,
     )
 
 
@@ -85,35 +85,35 @@ def get_job_config_dict_build_for_branch():
 
 
 def get_job_config_build_for_branch(**kwargs):
-    """ pass kwargs to JobConfig constructor """
+    """pass kwargs to JobConfig constructor"""
     return JobConfig(
         type=JobType.copr_build,
         trigger=JobConfigTriggerType.commit,
         metadata=JobMetadataConfig(branch="build-branch", scratch=True),
-        **kwargs
+        **kwargs,
     )
 
 
 def get_default_job_config(**kwargs):
-    """ pass kwargs to JobConfig constructor """
+    """pass kwargs to JobConfig constructor"""
     return [
         JobConfig(
             type=JobType.copr_build,
             trigger=JobConfigTriggerType.pull_request,
             metadata=JobMetadataConfig(targets=["fedora-stable"]),
-            **kwargs
+            **kwargs,
         ),
         JobConfig(
             type=JobType.tests,
             trigger=JobConfigTriggerType.pull_request,
             metadata=JobMetadataConfig(targets=["fedora-stable"]),
-            **kwargs
+            **kwargs,
         ),
         JobConfig(
             type=JobType.propose_downstream,
             trigger=JobConfigTriggerType.release,
             metadata=JobMetadataConfig(dist_git_branches=["fedora-all"]),
-            **kwargs
+            **kwargs,
         ),
     ]
 
