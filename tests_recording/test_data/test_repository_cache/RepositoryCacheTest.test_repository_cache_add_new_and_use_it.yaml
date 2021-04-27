@@ -1,0 +1,81 @@
+X:
+  file:
+    tar:
+      StoreFiles:
+        RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml:
+          to_path:
+          - metadata:
+              latency: 0
+            output: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.python-requre_1.tar.xz
+          - metadata:
+              latency: 0
+            output: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.clone1_1.tar.xz
+          - metadata:
+              latency: 0
+            output: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.clone2_1.tar.xz
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+git.repo.base:
+  clone_from:
+  - metadata:
+      latency: 2.3867199420928955
+      module_call_list:
+      - unittest.case
+      - requre.online_replacing
+      - tests_recording.test_repository_cache
+      - packit.utils.repo
+      - flexmock
+      - packit.utils.repo
+      - requre.helpers.files
+      - requre.objects
+      - requre.cassette
+      - git.repo.base
+      - clone_from
+    output:
+      _bare: false
+      _common_dir: null
+      _working_tree_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/cache/python-requre
+      git_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/cache/python-requre/.git
+      working_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/cache/python-requre
+  - metadata:
+      latency: 0.9626212120056152
+      module_call_list:
+      - unittest.case
+      - requre.online_replacing
+      - tests_recording.test_repository_cache
+      - packit.utils.repo
+      - flexmock
+      - packit.utils.repo
+      - requre.helpers.files
+      - requre.objects
+      - requre.cassette
+      - git.repo.base
+      - clone_from
+    output:
+      _bare: false
+      _common_dir: null
+      _working_tree_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone1
+      git_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone1/.git
+      working_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone1
+  - metadata:
+      latency: 1.0281100273132324
+      module_call_list:
+      - unittest.case
+      - requre.online_replacing
+      - tests_recording.test_repository_cache
+      - packit.utils.repo
+      - flexmock
+      - packit.utils.repo
+      - requre.helpers.files
+      - requre.objects
+      - requre.cassette
+      - git.repo.base
+      - clone_from
+    output:
+      _bare: false
+      _common_dir: null
+      _working_tree_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone2
+      git_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone2/.git
+      working_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone2
