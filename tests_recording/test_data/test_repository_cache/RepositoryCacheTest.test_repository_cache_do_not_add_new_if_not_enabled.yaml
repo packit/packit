@@ -1,0 +1,35 @@
+X:
+  file:
+    tar:
+      StoreFiles:
+        RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml:
+          to_path:
+          - metadata:
+              latency: 0
+            output: RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml.clone1_1.tar.xz
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+git.repo.base:
+  clone_from:
+  - metadata:
+      latency: 1.6896820068359375
+      module_call_list:
+      - unittest.case
+      - requre.online_replacing
+      - tests_recording.test_repository_cache
+      - packit.utils.repo
+      - flexmock
+      - packit.utils.repo
+      - requre.helpers.files
+      - requre.objects
+      - requre.cassette
+      - git.repo.base
+      - clone_from
+    output:
+      _bare: false
+      _common_dir: null
+      _working_tree_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml/static_tmp_1/clone1
+      git_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml/static_tmp_1/clone1/.git
+      working_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml/static_tmp_1/clone1
