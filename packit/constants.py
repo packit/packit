@@ -40,7 +40,11 @@ DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
 FEDORA_DOMAIN = "fedoraproject.org"
 CENTOS_DOMAIN = "centos.org"
-CENTOS_STREAM_GITLAB = "gitlab.com/redhat/centos-stream"
+CENTOS_STREAM_GITLAB_DOMAIN = "gitlab.com"
+CENTOS_STREAM_GITLAB_NAMESPACE = "redhat/centos-stream"
+CENTOS_STREAM_GITLAB = (
+    CENTOS_STREAM_GITLAB_DOMAIN + "/" + CENTOS_STREAM_GITLAB_NAMESPACE
+)
 
 PROD_DISTGIT_HOSTNAME = f"src.{FEDORA_DOMAIN}"
 PROD_DISTGIT_URL = f"https://{PROD_DISTGIT_HOSTNAME}/"
