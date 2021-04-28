@@ -127,9 +127,11 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
     )
     sgg.create_from_upstream()
 
-    config_file = open(source_git_path / ".packit.yaml", "r")
-    packit_yaml = yaml.load(config_file, Loader=yaml.FullLoader)
-    config_file.close()
+    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    # black sucks here :/ we are making sure here the yaml looks nice
+    assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
+    assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
+    packit_yaml = yaml.load(config_file)
     assert packit_yaml.get("sources")
     assert len(packit_yaml["sources"]) > 0
     assert packit_yaml["sources"][0].get("url")
