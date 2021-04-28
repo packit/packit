@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Optional, Tuple, List, Dict, Union
 import configparser
 
+import yaml
 from git import GitCommandError
 
 from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
@@ -141,6 +142,14 @@ def get_tarball_comment(tarball_path: str) -> Optional[str]:
     except Exception as ex:
         logger.debug(f"Could not get 'comment' header from the tarball: {ex}")
         return None
+
+
+# https://stackoverflow.com/questions/13518819/avoid-references-in-pyyaml
+# mypy hated the suggestion from the SA ^, hence an override like this
+class SafeDumperWithoutAliases(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        # no aliases/anchors in the dumped yaml text
+        return True
 
 
 class SourceGitGenerator:
@@ -454,21 +463,34 @@ class SourceGitGenerator:
         """
         Add .packit.yaml config to the sources-git repo
         """
-        config_str = (
-            "---\n"
-            f'specfile_path: "{self.specfile_path.relative_to(self.local_project.working_dir)}"\n'
-            f'upstream_ref: "{self.upstream_ref}"\n'
-            f'patch_generation_ignore_paths: ["{self.dist_git.source_git_downstream_suffix}"]\n\n'
-        )
+        # mypy wanted this type annotation -_-
+        default_packit_yaml: Dict[str, Union[str, List[str], List[Dict[str, str]]]] = {
+            "specfile_path": f"{self.specfile_path.relative_to(self.local_project.working_dir)}",
+            "upstream_ref": self.upstream_ref,
+            "patch_generation_ignore_paths": [
+                self.dist_git.source_git_downstream_suffix
+            ],
+        }
 
         if lookaside_sources:
-            config_str += "sources:\n"
-            for source in lookaside_sources:
-                config_str += f"  - path: {source['path']}\n"
-                config_str += f"    url: {source['url']}\n"
+            default_packit_yaml["sources"] = lookaside_sources
 
         packit_yaml_path = self.local_project.working_dir.joinpath(".packit.yaml")
-        packit_yaml_path.write_text(config_str)
+        packit_yaml_path.write_text(
+            yaml.dump_all(
+                [default_packit_yaml],
+                Dumper=SafeDumperWithoutAliases,
+                # default_flow_style=False dumps things into a block instead of ugly inline
+                # inline example:
+                #   key: {key1: value1, key2: value2}
+                # block example:
+                #   key:
+                #     key1: value1
+                #     key2: value1
+                # True in el8, False in the latest pyyaml
+                default_flow_style=False,
+            )
+        )
 
         self.local_project.stage(".packit.yaml")
         self.local_project.commit("add packit.yaml")
