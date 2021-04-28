@@ -40,19 +40,18 @@ class FedPKG:
         self,
         fas_username: str = None,
         directory: Union[Path, str] = None,
-        stage: bool = False,
+        fedpkg_exec: str = "fedpkg",
     ):
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
-        self.stage = stage
-        self.fedpkg_exec = "fedpkg-stage" if stage else "fedpkg"
+        self.fedpkg_exec = fedpkg_exec
 
     def __repr__(self):
         return (
             "FedPKG("
             f"fas_username='{self.fas_username}', "
             f"directory='{self.directory}', "
-            f"stage='{self.stage}')"
+            f"fedpkg_exec='{self.fedpkg_exec}')"
         )
 
     def new_sources(self, sources="", fail=True):

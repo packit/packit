@@ -24,6 +24,7 @@ import datetime
 import logging
 import os
 import re
+import shlex
 import shutil
 import tarfile
 from pathlib import Path
@@ -779,7 +780,7 @@ class Upstream(PackitRepositoryBase):
                 "koji target needs to be set when building directly from upstream"
             )
         # we can't use fedpkg b/c upstream repo is not dist-git
-        cmd = ["koji", "build"]
+        cmd = shlex.split(self.config.koji_build_command)
         if scratch:
             cmd.append("--scratch")
         if nowait:
