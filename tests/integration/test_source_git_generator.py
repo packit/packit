@@ -198,6 +198,19 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
     assert srpm_path.is_file()
     # requre needs sphinx, so SRPM is fine
 
+    # verify the archive is not committed in the source-git
+    with pytest.raises(subprocess.CalledProcessError) as exc:
+        subprocess.check_call(
+            [
+                "git",
+                "ls-files",
+                "--error-unmatch",
+                f"{sgg.dist_git.source_git_downstream_suffix}/{spec.get_archive()}",
+            ],
+            cwd=source_git_path,
+        )
+    assert exc.value.returncode == 1
+
 
 def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path):
     """
