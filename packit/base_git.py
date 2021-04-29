@@ -38,6 +38,7 @@ from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
 from packit.specfile import Specfile
 from packit.utils.commands import cwd
+from packit.utils.repo import RepositoryCache
 
 logger = getLogger(__name__)
 
@@ -46,7 +47,11 @@ class PackitRepositoryBase:
     # mypy complains when this is a property
     local_project: LocalProject
 
-    def __init__(self, config: Config, package_config: CommonPackageConfig) -> None:
+    def __init__(
+        self,
+        config: Config,
+        package_config: CommonPackageConfig,
+    ) -> None:
         """
         :param config: global configuration
         :param package_config: configuration of the upstream project
@@ -74,6 +79,15 @@ class PackitRepositoryBase:
                 local_project=self.local_project, config=self.config
             )
         return self._command_handler
+
+    @property
+    def repository_cache(self) -> Optional[RepositoryCache]:
+        if self.config.repository_cache:
+            return RepositoryCache(
+                cache_path=self.config.repository_cache,
+                add_new=self.config.add_repositories_to_repository_cache,
+            )
+        return None
 
     def is_command_handler_set(self) -> bool:
         """return True when command_handler is initialized"""

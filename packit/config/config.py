@@ -64,6 +64,8 @@ class Config:
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
         package_config_path=None,
+        repository_cache=None,
+        add_repositories_to_repository_cache=True,
         **kwargs,
     ):
         self.debug: bool = debug
@@ -101,6 +103,8 @@ class Config:
 
         self.services = Config.load_authentication(kwargs)
         self.package_config_path = package_config_path
+        self.repository_cache = repository_cache
+        self.add_repositories_to_repository_cache = add_repositories_to_repository_cache
 
         # because of current load_authentication implementation it will generate false warnings
         # if kwargs:
@@ -120,7 +124,8 @@ class Config:
             f"command_handler_work_dir='{self.command_handler_work_dir}', "
             f"command_handler_pvc_env_var='{self.command_handler_pvc_env_var}', "
             f"command_handler_image_reference='{self.command_handler_image_reference}', "
-            f"command_handler_k8s_namespace='{self.command_handler_k8s_namespace}')"
+            f"command_handler_k8s_namespace='{self.command_handler_k8s_namespace}', "
+            f"repository_cache='{self.repository_cache}')"
         )
 
     @classmethod
