@@ -475,6 +475,9 @@ class SourceGitGenerator:
         if lookaside_sources:
             default_packit_yaml["sources"] = lookaside_sources
 
+        if self.upstream_lp.git_url:
+            default_packit_yaml["upstream_project_url"] = self.upstream_lp.git_url
+
         packit_yaml_path = self.local_project.working_dir.joinpath(".packit.yaml")
         packit_yaml_path.write_text(
             yaml.dump_all(
