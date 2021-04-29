@@ -32,7 +32,7 @@ from ogr.abstract import GitProject, GitService
 from ogr.parsing import parse_git_repo
 
 from packit.exceptions import PackitException
-from packit.utils.repo import is_git_repo, get_repo, is_a_git_ref
+from packit.utils.repo import RepositoryCache, is_git_repo, get_repo, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,7 @@ class LocalProject:
         refresh: bool = True,
         remote: str = "",
         pr_id: Optional[str] = None,
+        cache: Optional[RepositoryCache] = None,
     ) -> None:
         """
 
@@ -101,6 +102,7 @@ class LocalProject:
         self.namespace = namespace
         self.offline = offline
         self.remote = remote
+        self.cache = cache
 
         logger.debug(
             "Arguments received in the init method of the LocalProject class: \n"
@@ -249,7 +251,9 @@ class LocalProject:
                 return True
 
             elif self.git_url and not self.offline:
-                self.git_repo = get_repo(url=self.git_url, directory=self.working_dir)
+                self.git_repo = self._get_repo(
+                    url=self.git_url, directory=self.working_dir
+                )
                 logger.debug(
                     f"We just cloned git repo {self.git_url} to {self.working_dir}."
                 )
@@ -307,7 +311,7 @@ class LocalProject:
             and not self.git_repo
             and not self.offline
         ):
-            self.git_repo = get_repo(url=self.git_url)
+            self.git_repo = self._get_repo(url=self.git_url)
             self.working_dir_temporary = True
             logger.debug(f"Parsed repo {self.git_repo} from url {self.git_url!r}.")
             return True
@@ -391,6 +395,11 @@ class LocalProject:
             return self.git_repo.head.commit.hexsha
         else:
             return self.git_repo.active_branch.name
+
+    def _get_repo(self, url, directory=None):
+        if self.cache:
+            return self.cache.get_repo(url, directory=directory)
+        return get_repo(url=url, directory=directory)
 
     def checkout_ref(self, ref: str):
         """Check out selected ref in the git repo"""

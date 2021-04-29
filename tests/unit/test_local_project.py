@@ -29,6 +29,7 @@ from flexmock import flexmock
 from packit import local_project
 from packit.local_project import LocalProject
 from packit.utils import repo
+from packit.utils.repo import RepositoryCache
 
 
 def test_parse_repo_name_and_namespace_from_namespace():
@@ -138,7 +139,7 @@ def test_parse_working_dir_from_git_repo():
 
 def test_parse_git_repo_from_git_url():
     flexmock(local_project).should_receive("get_repo").with_args(
-        "http://some.example/url/reponame"
+        url="http://some.example/url/reponame", directory=None
     ).and_return(flexmock())
     project = LocalProject(git_url="http://some.example/url/reponame", refresh=False)
     changed = project._parse_git_repo_from_git_url()
@@ -389,3 +390,196 @@ def test_offline_no_clone_no_temp_dir():
     assert project.git_url == "http://some.example/url/reponame"
     assert not project.git_repo
     assert not project.working_dir
+
+
+def test_clone_using_empty_cache():
+    cache_path_mock = flexmock(
+        is_dir=lambda: True,
+        iterdir=lambda: [],
+        joinpath=lambda x: "/reference/repo/package_name",
+    )
+    repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=False)
+
+    flexmock(git.Repo).should_receive("clone_from").with_args(
+        url="https://server.git/my_namespace/package_name",
+        to_path="some/temp/dir",
+        tags=True,
+    ).and_return(
+        flexmock(
+            active_branch=flexmock(name="branch"),
+            working_dir="some/temp/dir",
+            head=flexmock(is_detached=False),
+        )
+    )
+
+    flexmock(tempfile).should_receive("mkdtemp").and_return("some/temp/dir")
+
+    project = LocalProject(
+        git_url="https://server.git/my_namespace/package_name",
+        repo_name="package_name",
+        git_service=flexmock()
+        .should_receive("get_project")
+        .and_return(flexmock())
+        .mock(),
+        cache=repo_cache,
+    )
+
+    assert project
+    assert project.working_dir == Path("some/temp/dir")
+    assert project.git_url == "https://server.git/my_namespace/package_name"
+    assert project.namespace == "my_namespace"
+    assert project.repo_name == "package_name"
+    assert project.git_service
+    assert project.git_project
+    assert project.git_repo
+    assert project.ref == "branch"
+
+
+def test_clone_using_cache_present():
+    reference_repo = flexmock(
+        is_dir=lambda: True, __str__="/reference/repo/package_name", name="package_name"
+    )
+    cache_path_mock = flexmock(
+        is_dir=lambda: True,
+        iterdir=lambda: [reference_repo],
+        joinpath=lambda x: "/reference/repo/package_name",
+    )
+    repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=False)
+
+    flexmock(git.Repo).should_receive("clone_from").with_args(
+        url="https://server.git/my_namespace/package_name",
+        reference="/reference/repo/package_name",
+        to_path="some/temp/dir",
+        tags=True,
+    ).and_return(
+        flexmock(
+            active_branch=flexmock(name="branch"),
+            working_dir="some/temp/dir",
+            head=flexmock(is_detached=False),
+        )
+    )
+
+    flexmock(tempfile).should_receive("mkdtemp").and_return("some/temp/dir")
+
+    project = LocalProject(
+        git_url="https://server.git/my_namespace/package_name",
+        repo_name="package_name",
+        git_service=flexmock()
+        .should_receive("get_project")
+        .and_return(flexmock())
+        .mock(),
+        cache=repo_cache,
+    )
+
+    assert project
+    assert project.working_dir == Path("some/temp/dir")
+    assert project.git_url == "https://server.git/my_namespace/package_name"
+    assert project.namespace == "my_namespace"
+    assert project.repo_name == "package_name"
+    assert project.git_service
+    assert project.git_project
+    assert project.git_repo
+    assert project.ref == "branch"
+
+
+def test_clone_using_cache_not_present():
+    reference_repo = flexmock(
+        is_dir=lambda: True,
+        __str__="/reference/repo/different_package",
+        name="different_package",
+    )
+    cache_path_mock = flexmock(
+        is_dir=lambda: True,
+        iterdir=lambda: [reference_repo],
+        joinpath=lambda x: "/reference/repo/package_name",
+    )
+    repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=False)
+
+    flexmock(git.Repo).should_receive("clone_from").with_args(
+        url="https://server.git/my_namespace/package_name",
+        to_path="some/temp/dir",
+        tags=True,
+    ).and_return(
+        flexmock(
+            active_branch=flexmock(name="branch"),
+            working_dir="some/temp/dir",
+            head=flexmock(is_detached=False),
+        )
+    )
+
+    flexmock(tempfile).should_receive("mkdtemp").and_return("some/temp/dir")
+
+    project = LocalProject(
+        git_url="https://server.git/my_namespace/package_name",
+        repo_name="package_name",
+        git_service=flexmock()
+        .should_receive("get_project")
+        .and_return(flexmock())
+        .mock(),
+        cache=repo_cache,
+    )
+
+    assert project
+    assert project.working_dir == Path("some/temp/dir")
+    assert project.git_url == "https://server.git/my_namespace/package_name"
+    assert project.namespace == "my_namespace"
+    assert project.repo_name == "package_name"
+    assert project.git_service
+    assert project.git_project
+    assert project.git_repo
+    assert project.ref == "branch"
+
+
+def test_clone_and_add_to_cache():
+    cache_path_mock = flexmock(
+        is_dir=lambda: True,
+        iterdir=lambda: [],
+        joinpath=lambda x: "/reference/repo/package_name",
+    )
+    repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=True)
+
+    flexmock(git.Repo).should_receive("clone_from").with_args(
+        url="https://server.git/my_namespace/package_name",
+        to_path="/reference/repo/package_name",
+        tags=True,
+    ).and_return(
+        flexmock(
+            active_branch=flexmock(name="branch"),
+            working_dir="some/temp/dir",
+            head=flexmock(is_detached=False),
+        )
+    )
+    flexmock(git.Repo).should_receive("clone_from").with_args(
+        url="https://server.git/my_namespace/package_name",
+        reference="/reference/repo/package_name",
+        to_path="some/temp/dir",
+        tags=True,
+    ).and_return(
+        flexmock(
+            active_branch=flexmock(name="branch"),
+            working_dir="some/temp/dir",
+            head=flexmock(is_detached=False),
+        )
+    )
+
+    flexmock(tempfile).should_receive("mkdtemp").and_return("some/temp/dir")
+
+    project = LocalProject(
+        git_url="https://server.git/my_namespace/package_name",
+        repo_name="package_name",
+        git_service=flexmock()
+        .should_receive("get_project")
+        .and_return(flexmock())
+        .mock(),
+        cache=repo_cache,
+    )
+
+    assert project
+    assert project.working_dir == Path("some/temp/dir")
+    assert project.git_url == "https://server.git/my_namespace/package_name"
+    assert project.namespace == "my_namespace"
+    assert project.repo_name == "package_name"
+    assert project.git_service
+    assert project.git_project
+    assert project.git_repo
+    assert project.ref == "branch"
