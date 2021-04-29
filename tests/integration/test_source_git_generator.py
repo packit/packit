@@ -127,9 +127,11 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
     )
     sgg.create_from_upstream()
 
-    config_file = open(source_git_path / ".packit.yaml", "r")
-    packit_yaml = yaml.load(config_file, Loader=yaml.FullLoader)
-    config_file.close()
+    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    # black sucks here :/ we are making sure here the yaml looks nice
+    assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
+    assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
+    packit_yaml = yaml.load(config_file)
     assert packit_yaml.get("sources")
     assert len(packit_yaml["sources"]) > 0
     assert packit_yaml["sources"][0].get("url")
@@ -197,6 +199,19 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
     srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
     # requre needs sphinx, so SRPM is fine
+
+    # verify the archive is not committed in the source-git
+    with pytest.raises(subprocess.CalledProcessError) as exc:
+        subprocess.check_call(
+            [
+                "git",
+                "ls-files",
+                "--error-unmatch",
+                f"{sgg.dist_git.source_git_downstream_suffix}/{spec.get_archive()}",
+            ],
+            cwd=source_git_path,
+        )
+    assert exc.value.returncode == 1
 
 
 def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path):
