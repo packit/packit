@@ -91,6 +91,46 @@ def test_run_prep(
     assert project_dir.joinpath(".git")
 
 
+def test_create_packit_yaml_upstream_project_url(
+    api_instance_source_git, tmp_path: Path
+):
+    """
+    use requre to create a source-git out of it in an empty git repo - packit
+    will pull upstream git history
+    """
+    # requre upstream_project_url
+    upstream_project_url = "https://github.com/packit/requre.git"
+
+    # clone dist-git
+    pkg = "python-requre"
+    dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
+    dist_git_path = tmp_path.joinpath(pkg)
+    source_git_path = tmp_path.joinpath("requre-sg")
+    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+
+    # check out specific ref
+    subprocess.check_call(["git", "reset", "--hard", dist_git_ref], cwd=dist_git_path)
+
+    # create src-git
+    source_git_path.mkdir()
+    create_new_repo(Path(source_git_path), [])
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
+        upstream_project_url,
+        upstream_ref="0.4.0",
+        dist_git_path=dist_git_path,
+    )
+    sgg.create_from_upstream()
+
+    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    # black sucks here :/ we are making sure here the yaml looks nice
+    assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
+    assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
+    packit_yaml = yaml.load(config_file)
+    assert packit_yaml.get("upstream_project_url") == upstream_project_url
+
+
 def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
     """
     use requre to create a source-git out of it in an empty git repo - packit
