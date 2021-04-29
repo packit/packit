@@ -9,9 +9,10 @@ import shutil
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Dict, Union
 import configparser
 
+import yaml
 from git import GitCommandError
 
 from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
@@ -141,6 +142,14 @@ def get_tarball_comment(tarball_path: str) -> Optional[str]:
     except Exception as ex:
         logger.debug(f"Could not get 'comment' header from the tarball: {ex}")
         return None
+
+
+# https://stackoverflow.com/questions/13518819/avoid-references-in-pyyaml
+# mypy hated the suggestion from the SA ^, hence an override like this
+class SafeDumperWithoutAliases(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        # no aliases/anchors in the dumped yaml text
+        return True
 
 
 class SourceGitGenerator:
@@ -383,7 +392,7 @@ class SourceGitGenerator:
             print_live=True,
         )
 
-    def _put_downstream_sources(self):
+    def _put_downstream_sources(self, lookaside_sources: List[str]):
         """
         place sources from the downstream into the source-git repository
         """
@@ -403,6 +412,11 @@ class SourceGitGenerator:
 
         # we may not want to copy the primary archive - it's worth a debate
         for source in self.dist_git.specfile.get_sources():
+            if Path(source).name in lookaside_sources:
+                logger.debug(
+                    f"Source {source} will be fetched from the lookaside cache."
+                )
+                continue
             source_dest = root_downstream_dir / Path(source).name
             logger.debug(f"copying {source} to {source_dest}")
             shutil.copy2(source, source_dest)
@@ -410,9 +424,13 @@ class SourceGitGenerator:
         self.local_project.stage(self.dist_git.source_git_downstream_suffix)
         self.local_project.commit(message="add downstream distribution sources")
 
-    def _get_sources_url(self, tool):
+    def _get_lookasisde_sources(self) -> List[Dict[str, str]]:
+        """
+        Read "sources" file from the dist-git repo and return a list of dicts
+        with path and url to sources stored in the lookaside cache
+        """
         try:
-            config = LookasideCacheHelper._read_config(tool)
+            config = LookasideCacheHelper._read_config(self.config.fedpkg_exec)
             base_url = config["lookaside"]
         except (configparser.Error, KeyError) as e:
             raise LookasideCacheError("Failed to read rpkg configuration") from e
@@ -423,7 +441,7 @@ class SourceGitGenerator:
         sources = list()
         for source in LookasideCacheHelper._read_sources(basepath):
 
-            if tool == "fedpkg":
+            if self.config.fedpkg_exec == "fedpkg":
                 url = "{0}/{1}/{2}/{3}/{4}/{2}".format(
                     base_url,
                     package,
@@ -431,7 +449,7 @@ class SourceGitGenerator:
                     source["hashtype"],
                     source["hash"],
                 )
-            else:
+            else:  # centpkg
                 url = "{0}/{1}/{2}/{3}/{2}".format(
                     base_url, package, source["filename"], source["hash"]
                 )
@@ -441,24 +459,38 @@ class SourceGitGenerator:
 
         return sources
 
-    def _add_packit_config(self):
+    def _add_packit_config(self, lookaside_sources: List[Dict[str, str]]):
+        """
+        Add .packit.yaml config to the sources-git repo
+        """
+        # mypy wanted this type annotation -_-
+        default_packit_yaml: Dict[str, Union[str, List[str], List[Dict[str, str]]]] = {
+            "specfile_path": f"{self.specfile_path.relative_to(self.local_project.working_dir)}",
+            "upstream_ref": self.upstream_ref,
+            "patch_generation_ignore_paths": [
+                self.dist_git.source_git_downstream_suffix
+            ],
+        }
 
-        config_str = (
-            "---\n"
-            f'specfile_path: "{self.specfile_path.relative_to(self.local_project.working_dir)}"\n'
-            f'upstream_ref: "{self.upstream_ref}"\n'
-            f'patch_generation_ignore_paths: ["{self.dist_git.source_git_downstream_suffix}"]\n\n'
-        )
-
-        sources = self._get_sources_url("fedpkg")
-        if sources:
-            config_str += "sources:\n"
-            for source in sources:
-                config_str += f"  - path: {source['path']}\n"
-                config_str += f"    url: {source['url']}\n"
+        if lookaside_sources:
+            default_packit_yaml["sources"] = lookaside_sources
 
         packit_yaml_path = self.local_project.working_dir.joinpath(".packit.yaml")
-        packit_yaml_path.write_text(config_str)
+        packit_yaml_path.write_text(
+            yaml.dump_all(
+                [default_packit_yaml],
+                Dumper=SafeDumperWithoutAliases,
+                # default_flow_style=False dumps things into a block instead of ugly inline
+                # inline example:
+                #   key: {key1: value1, key2: value2}
+                # block example:
+                #   key:
+                #     key1: value1
+                #     key2: value1
+                # True in el8, False in the latest pyyaml
+                default_flow_style=False,
+            )
+        )
 
         self.local_project.stage(".packit.yaml")
         self.local_project.commit("add packit.yaml")
@@ -498,8 +530,9 @@ class SourceGitGenerator:
         create a source-git repo from upstream
         """
         self._pull_upstream_ref()
-        self._put_downstream_sources()
-        self._add_packit_config()
+        lookaside_sources = self._get_lookasisde_sources()
+        self._put_downstream_sources([di["path"] for di in lookaside_sources])
+        self._add_packit_config(lookaside_sources)
         if self.dist_git.specfile.get_applied_patches():
             self._run_prep()
             self._rebase_patches(
