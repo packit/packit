@@ -164,7 +164,8 @@ class CommonPackageConfig:
 
     def get_all_files_to_sync(self):
         """
-        Adds the default files (config file, spec file) to synced files when doing propose-update.
+        Adds the default files (config file, spec file) to synced files
+        when doing propose-downstream.
         :return: SyncFilesConfig with default files
         """
         files = self.synced_files.files_to_sync

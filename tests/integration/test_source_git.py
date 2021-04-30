@@ -51,7 +51,7 @@ def test_basic_local_update_without_patching(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-update for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -75,7 +75,7 @@ def test_basic_local_update_empty_patch(
     api_instance_source_git,
     ref,
 ):
-    """propose-update for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
     distgit, _ = distgit_and_remote
     mock_spec_download_remote_s(distgit)
@@ -103,7 +103,7 @@ def test_basic_local_update_patch_content(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-update for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -273,7 +273,7 @@ def test_basic_local_update_patch_content_with_metadata(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-update for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -328,7 +328,7 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-update for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -376,7 +376,7 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-update for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote

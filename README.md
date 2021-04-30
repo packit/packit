@@ -29,7 +29,7 @@ The [Contributing Guidelines](CONTRIBUTING.md) hosts all information you need to
 
 This list contains workflows covered by packit tool and links to the documentation.
 
-- [Update Fedora dist-git with an upstream release.](https://packit.dev/docs/cli/propose-update/)
+- [Update Fedora dist-git with an upstream release.](https://packit.dev/docs/cli/propose-downstream/)
 - [Build content of a Fedora dist-git branch in koji.](https://packit.dev/docs/cli/build/)
 - [Create a bodhi update.](https://packit.dev/docs/cli/create-bodhi-update/)
 - [Create a SRPM from the current content in the upstream repository.](https://packit.dev/docs/cli/srpm/)
