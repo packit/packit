@@ -1,3 +1,14 @@
+# 0.29.0
+
+- Source-git: add info about sources to packit.yaml when initiating a new source-git repo
+  and don't commit dist-git sources from the lookaside cache. (#1208, #1216)
+- Source-git: fix SRPM creation failing with duplicate Patch IDs. (#1206)
+- Support git repository cache. (#1214)
+- Reflect removed COPR chroots in a COPR project. (#1197)
+- Deprecate current_version_command and create_tarball_command. (#1212)
+- Fix crashing push-updates command. (#1170)
+- Improve fmf/tmt tests configuration. (#1192)
+
 # 0.28.0
 
 - Remove the no-op `--dry-run` option.
