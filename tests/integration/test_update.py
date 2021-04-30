@@ -59,7 +59,7 @@ def github_release_webhook():
 def test_basic_local_update(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
-    """basic propose-update test: mock remote API, use local upstream and dist-git"""
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
@@ -93,7 +93,7 @@ def test_basic_local_update_reset_after_exception(
 def test_basic_local_update_copy_upstream_release_description(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
-    """basic propose-update test: mock remote API, use local upstream and dist-git,
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git,
     set copy_upstream_release_description in package config to True"""
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
@@ -124,7 +124,7 @@ Some description of the upstream release
 def test_basic_local_update_using_distgit(
     cwd_upstream, api_instance, mock_remote_functionality_upstream
 ):
-    """basic propose-update test: mock remote API, use local upstream and dist-git"""
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
 
@@ -152,7 +152,7 @@ def test_basic_local_update_using_distgit(
 def test_basic_local_update_direct_push(
     cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
 ):
-    """basic propose-update test: mock remote API, use local upstream and dist-git"""
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)

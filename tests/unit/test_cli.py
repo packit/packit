@@ -49,7 +49,7 @@ def test_base_subcommand_direct(cmd_function):
     assert result.exit_code == 0
 
 
-@pytest.mark.parametrize("subcommand", ["propose-update", "build", "create-update"])
+@pytest.mark.parametrize("subcommand", ["propose-downstream", "build", "create-update"])
 def test_base_subcommand_help(subcommand):
     result = call_packit(packit_base, parameters=[subcommand, "--help"])
     assert result.exit_code == 0
