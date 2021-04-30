@@ -46,7 +46,7 @@
 
 # 0.25.0
 
-- `propose-update` command now respects requested dist-git branches. ([#1094](https://github.com/packit/packit/pull/1094))
+- `propose-downstream` command now respects requested dist-git branches. ([#1094](https://github.com/packit/packit/pull/1094))
 - Improve the way how patches are added to spec file. ([#1100](https://github.com/packit/packit/pull/1100))
 - `--koji-target` option of the `build` command now accepts aliases. ([#1052](https://github.com/packit/packit/pull/1052))
 - `propose-downstream` on source-git repositories now always uses `--local-content`. ([#1093](https://github.com/packit/packit/pull/1093))
