@@ -273,6 +273,6 @@ def get_aliases() -> Dict[str, List[str]]:
     # fedora-rawhide is the last release, we want the second latest (the latest
     # non rawhide release)
     if len(aliases["fedora-all"]) >= 2:
-        aliases["fedora-latest"] = aliases["fedora-all"][-2]
+        aliases["fedora-latest"] = [aliases["fedora-all"][-2]]
 
     return aliases
