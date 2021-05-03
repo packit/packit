@@ -4,11 +4,11 @@
 
 repos:
   - repo: https://github.com/psf/black
-    rev: 21.4b0
+    rev: 21.4b2
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.13.0
+    rev: v2.14.0
     hooks:
       - id: pyupgrade
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -43,7 +43,7 @@ repos:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
   - repo: https://github.com/packit/pre-commit-hooks
-    rev: 83d3ac601119495d984b75ad77f3bf190b03e71f
+    rev: 8efb6416e04616b2263e75eebbee79c38d7057cb
     hooks:
       - id: check-rebase
         args:
