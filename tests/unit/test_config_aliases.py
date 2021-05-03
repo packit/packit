@@ -315,6 +315,9 @@ class TestGetAliases:
             expected_return["fedora-development"]
         )
         assert Counter(aliases["fedora-all"]) == Counter(expected_return["fedora-all"])
+        assert Counter(aliases["fedora-latest"]) == Counter(
+            expected_return["fedora-latest"]
+        )
         assert Counter(aliases["epel-all"]) == Counter(expected_return["epel-all"])
 
 
