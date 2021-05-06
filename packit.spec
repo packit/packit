@@ -31,6 +31,8 @@ BuildRequires:  python3dist(setuptools-scm-git-archive)
 BuildRequires:  python3-bodhi-client
 # new-sources
 Requires:       fedpkg
+# Copying files between repositories
+Requires:       rsync
 # bumpspec
 Requires:       rpmdevtools
 Requires:       python3-%{real_name} = %{version}-%{release}
