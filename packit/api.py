@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 """
 This is the official python interface for packit.
@@ -37,7 +18,7 @@ from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
 from packit.actions import ActionName
-from packit.config import Config, SyncFilesConfig
+from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -56,7 +37,7 @@ from packit.local_project import LocalProject
 from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
-from packit.sync import RawSyncFilesItem, sync_files
+from packit.sync import sync_files, SyncFilesItem
 from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.extensions import assert_existence
@@ -135,16 +116,71 @@ class PackitAPI:
             )
         return self._copr_helper
 
+    def update_dist_git(
+        self,
+        version: Optional[str],
+        upstream_ref: Optional[str],
+        force_new_sources: bool,
+        upstream_tag: str,
+        commit_msg: str,
+    ):
+        """Update a dist-git repo from an upstream (aka source-git) repo
+
+        - copy files to be synced to dist-git
+        - generate and update patch files and the spec-file
+        - upload source archives to the lookaside cache
+
+        Args:
+            version: Upstream version to update in Fedora.
+            upstream_ref: For a source-git repo, use this ref as the latest upstream commit.
+            force_new_sources: Don't check the lookaside cache and perform new-sources.
+            upstream_tag: Use the message of the commit referenced by this tag to update the
+                changelog in the spec-file, if requested.
+            commit_msg: Use this commit message in dist-git.
+        """
+        synced_files = self.package_config.get_all_files_to_sync()
+        # Make all paths absolute and check that they are within
+        # the working directories of the repositories.
+        for item in synced_files:
+            item.resolve(
+                src_base=self.up.local_project.working_dir,
+                dest_base=self.dg.local_project.working_dir,
+            )
+
+        if self.up.with_action(action=ActionName.prepare_files):
+            synced_files = self._prepare_files_to_sync(
+                synced_files=synced_files,
+                full_version=version,
+                upstream_tag=upstream_tag,
+            )
+
+        sync_files(synced_files)
+
+        if upstream_ref and self.up.with_action(action=ActionName.create_patches):
+            patches = self.up.create_patches(
+                upstream=upstream_ref,
+                destination=str(self.dg.absolute_specfile_dir),
+            )
+            patches = PatchGenerator.undo_identical(
+                patches, self.dg.local_project.git_repo
+            )
+            self.dg.specfile_add_patches(patches)
+
+        self._handle_sources(add_new_sources=True, force_new_sources=force_new_sources)
+
+        self.dg.commit(title=f"{version} upstream release", msg=commit_msg)
+
     def sync_release(
         self,
-        dist_git_branch: str = None,
-        version: str = None,
-        tag: str = None,
+        dist_git_branch: Optional[str] = None,
+        version: Optional[str] = None,
+        tag: Optional[str] = None,
         use_local_content=False,
         force_new_sources=False,
-        upstream_ref: str = None,
+        upstream_ref: Optional[str] = None,
         create_pr: bool = True,
         force: bool = False,
+        create_sync_note: bool = True,
     ) -> Optional[PullRequest]:
         """
         Update given package in Fedora
@@ -157,6 +193,7 @@ class PackitAPI:
         :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
         :param create_pr: create a pull request if set to True
         :param force: ignore changes in the git index
+        :param create_sync_note: whether to create a note about the sync in the dist-git repo
 
         :return created PullRequest if create_pr is True, else None
         """
@@ -230,52 +267,24 @@ class PackitAPI:
                 self.dg.create_branch(local_pr_branch)
                 self.dg.checkout_branch(local_pr_branch)
 
+            if create_sync_note:
+                readme_path = self.dg.local_project.working_dir / "README.packit"
+                logger.debug(f"README: {readme_path}")
+                readme_path.write_text(
+                    SYNCING_NOTE.format(packit_version=get_packit_version())
+                )
+
             description = (
                 f"Upstream tag: {upstream_tag}\n"
                 f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
-
-            readme_path = self.dg.local_project.working_dir / "README.packit"
-            logger.debug(f"README: {readme_path}")
-            readme_path.write_text(
-                SYNCING_NOTE.format(packit_version=get_packit_version())
+            self.update_dist_git(
+                version,
+                upstream_ref,
+                force_new_sources,
+                upstream_tag,
+                commit_msg=description,
             )
-
-            raw_sync_files = (
-                self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
-                    self.up.local_project.working_dir,
-                    self.dg.local_project.working_dir,
-                )
-            )
-
-            if self.up.with_action(action=ActionName.prepare_files):
-                raw_files_to_sync = self._prepare_files_to_sync(
-                    raw_sync_files=raw_sync_files,
-                    full_version=version,
-                    upstream_tag=upstream_tag,
-                )
-                sync_files(raw_files_to_sync)
-                if upstream_ref and self.up.with_action(
-                    action=ActionName.create_patches
-                ):
-                    patches = self.up.create_patches(
-                        upstream=upstream_ref,
-                        destination=str(self.dg.absolute_specfile_dir),
-                    )
-                    patches = PatchGenerator.undo_identical(
-                        patches, self.dg.local_project.git_repo
-                    )
-                    self.dg.specfile_add_patches(patches)
-                self._handle_sources(
-                    add_new_sources=True, force_new_sources=force_new_sources
-                )
-
-            # when the action is defined, we still need to copy the files
-            if self.up.has_action(action=ActionName.prepare_files):
-
-                sync_files(raw_sync_files)
-
-            self.dg.commit(title=f"{version} upstream release", msg=description)
 
             new_pr = None
             if create_pr:
@@ -297,10 +306,23 @@ class PackitAPI:
         return new_pr
 
     def _prepare_files_to_sync(
-        self, raw_sync_files, full_version, upstream_tag
-    ) -> List[RawSyncFilesItem]:
+        self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
+    ) -> List[SyncFilesItem]:
+        """Update the spec-file by setting the version and updating the changelog
+
+        Skip everything if the changelog should be synced from upstream.
+
+        Args:
+            synced_files: A list of SyncFilesItem.
+            full_version: Version to be set in the spec-file.
+            upstream_tag: The commit message of this commit is going to be used
+                to update the changelog in the spec-file.
+
+        Returns:
+            The list of synced files with the spec-file removed if it was updated.
+        """
         if self.package_config.sync_changelog:
-            return raw_sync_files
+            return synced_files
         comment = (
             self.up.local_project.git_project.get_release(name=full_version).body
             if self.package_config.copy_upstream_release_description
@@ -322,7 +344,11 @@ class PackitAPI:
             )
 
         # exclude spec, we have special plans for it
-        return [x for x in raw_sync_files if x.src != self.up.absolute_specfile_path]
+        return list(
+            filter(
+                None, [x.drop_src(self.up.absolute_specfile_path) for x in synced_files]
+            )
+        )
 
     def sync_from_downstream(
         self,
@@ -373,22 +399,26 @@ class PackitAPI:
             self.up.checkout_branch(local_pr_branch)
 
         files = (
-            SyncFilesConfig([self.package_config.get_specfile_sync_files_item()])
+            [self.package_config.get_specfile_sync_files_item()]
             if sync_only_specfile
             else self.package_config.synced_files
         )
 
-        raw_sync_files = files.get_raw_files_to_sync(
-            dest_dir=self.dg.local_project.working_dir,
-            src_dir=self.up.local_project.working_dir,
-        )
-
-        reverse_raw_sync_files = [
-            raw_file.reversed()
-            for raw_file in raw_sync_files
-            if Path(raw_file.dest).name not in exclude_files
-        ]
-        sync_files(reverse_raw_sync_files, fail_on_missing=False)
+        # Drop files to be excluded from the sync.
+        for ef in exclude_files:
+            files = [
+                f.drop_src(ef, criteria=lambda x, y: x.name == y)
+                for f in files
+                if f is not None
+            ]
+        # Make paths absolute and check if they are within the
+        # working directories.
+        for file in files:
+            file.resolve(
+                src_base=self.dg.local_project.working_dir,
+                dest_base=self.up.local_project.working_dir,
+            )
+        sync_files(files)
 
         if not no_pr:
             description = f"Downstream commit: {self.dg.local_project.commit_hexsha}\n"

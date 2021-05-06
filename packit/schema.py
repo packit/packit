@@ -1,33 +1,14 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 from logging import getLogger
-from typing import Dict, Any, Optional, Mapping, Union
+from typing import Dict, Any, Optional, Mapping, Union, List
 
 from marshmallow import Schema, fields, post_load, pre_load, ValidationError
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
-from packit.config import PackageConfig, Config, SyncFilesConfig
+from packit.config import PackageConfig, Config
 from packit.config.job_config import (
     JobType,
     JobConfig,
@@ -43,14 +24,41 @@ from packit.config.aliases import DEPRECATED_TARGET_MAP
 logger = getLogger(__name__)
 
 
+class StringOrListOfStringsField(fields.Field):
+    """Field type expecting a string or a list"""
+
+    def _serialize(self, value, attr, obj, **kwargs) -> List[str]:
+        return [str(item) for item in value]
+
+    def _deserialize(self, value, attr, data, **kwargs) -> List[str]:
+        if isinstance(value, list) and all(isinstance(v, str) for v in value):
+            return value
+        elif isinstance(value, str):
+            return [value]
+        else:
+            raise ValidationError(
+                f"Expected 'list[str]' or 'str', got {type(value)!r}."
+            )
+
+
+class SyncFilesItemSchema(Schema):
+    """Schema for SyncFilesItem"""
+
+    src = StringOrListOfStringsField()
+    dest = fields.String()
+    mkpath = fields.Boolean(default=False)
+
+
 class FilesToSyncField(fields.Field):
     """
-    Field class representing SyncFilesItem.
-    Accepts str or dict  {'src': str, 'dest':str}
+    Field type representing SyncFilesItem
+
+    This is needed in order to handle entries which are strings, instead
+    of a dict matching SyncFilesItemSchema.
     """
 
-    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs):
-        return {"src": value.src, "dest": value.dest}
+    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs) -> List[dict]:
+        return SyncFilesItemSchema().dump(value)
 
     def _deserialize(
         self,
@@ -60,22 +68,11 @@ class FilesToSyncField(fields.Field):
         **kwargs,
     ) -> SyncFilesItem:
         if isinstance(value, dict):
-            try:
-                if not isinstance(value["src"], str):
-                    raise ValidationError("Field `src` should have type str.")
-                if not isinstance(value["dest"], str):
-                    raise ValidationError("Field `dest` should have type str.")
-                file_to_sync = SyncFilesItem(src=value["src"], dest=value["dest"])
-            except KeyError as e:
-                raise ValidationError(e.__repr__())
-
+            return SyncFilesItem(**SyncFilesItemSchema().load(value))
         elif isinstance(value, str):
-            file_to_sync = SyncFilesItem(src=value, dest=value)
-
+            return SyncFilesItem(src=[value], dest=value)
         else:
-            raise ValidationError(f"'dict' or 'str' required, got {type(value)!r}.")
-
-        return file_to_sync
+            raise ValidationError(f"Expected 'dict' or 'str', got {type(value)!r}.")
 
 
 class ActionField(fields.Field):
@@ -168,33 +165,6 @@ class NotificationsSchema(Schema):
         return NotificationsConfig(**data)
 
 
-class SyncFilesConfigSchema(Schema):
-    """
-    Schema for processing SyncFilesConfig config data.
-    """
-
-    files_to_sync = fields.List(FilesToSyncField(allow_none=False), allow_none=True)
-
-    @post_load
-    def make_instance(self, data, **kwargs):
-        return SyncFilesConfig(**data)
-
-    @pre_load
-    def list_to_dict(self, data, **kwargs):
-        """
-        If files are provided as list[str] not as schema dict, input data format is modified
-        to follow schema layout
-
-        ex.
-        [f1,f2,..] -> {"files_to_sync": [f1, f2, f3, ...]}
-        """
-
-        if isinstance(data, list):
-            return {"files_to_sync": data}
-        else:
-            return data
-
-
 class TargetField(fields.String):
     def _deserialize(
         self,
@@ -274,7 +244,7 @@ class CommonConfigSchema(Schema):
     spec_source_id = fields.Method(
         deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
     )
-    synced_files = fields.Nested(SyncFilesConfigSchema)
+    synced_files = fields.List(FilesToSyncField())
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     sync_changelog = fields.Bool(default=False)

@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import datetime
 import logging
@@ -52,6 +33,7 @@ from packit.specfile import Specfile
 from packit.utils import commands, sanitize_branch_name_for_rpm
 from packit.utils.commands import run_command
 from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
+from packit.sync import iter_srcs
 
 logger = logging.getLogger(__name__)
 
@@ -198,7 +180,7 @@ class Upstream(PackitRepositoryBase):
             logger.info(f"PR created: {upstream_pr.url}")
 
     def create_patches(
-        self, upstream: str = None, destination: str = None
+        self, upstream: str = None, destination: Union[str, Path] = None
     ) -> List[PatchMetadata]:
         """
         Create patches from downstream commits.
@@ -208,24 +190,27 @@ class Upstream(PackitRepositoryBase):
         :return: [PatchMetadata, ...] list of patches
         """
         upstream = upstream or self.get_specfile_version()
-        destination = destination or self.local_project.working_dir
+        destination = Path(destination) or self.local_project.working_dir
 
-        sync_files_to_ignore = [
-            str(sf.src.relative_to(self.local_project.working_dir))
-            for sf in self.package_config.get_all_files_to_sync().get_raw_files_to_sync(
-                self.local_project.working_dir,
-                Path(
-                    # dest (downstream) is not important, we only care about src (upstream)
-                    destination
-                ),
+        sync_files_to_ignore = self.package_config.get_all_files_to_sync()
+        for file in sync_files_to_ignore:
+            file.resolve(
+                src_base=self.local_project.working_dir,
+                # dest (downstream) is not important, we only care about src (upstream)
+                dest_base=destination,
             )
+        sync_files_to_ignore = [
+            str(file.relative_to(self.local_project.working_dir))
+            for file in iter_srcs(sync_files_to_ignore)
         ]
         files_to_ignore = (
             self.package_config.patch_generation_ignore_paths + sync_files_to_ignore
         )
 
         pg = PatchGenerator(self.local_project)
-        return pg.create_patches(upstream, destination, files_to_ignore=files_to_ignore)
+        return pg.create_patches(
+            upstream, str(destination), files_to_ignore=files_to_ignore
+        )
 
     def get_latest_released_version(self) -> str:
         """

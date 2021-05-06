@@ -12,12 +12,15 @@ jobs:
   - job: propose_downstream
     trigger: release
     metadata:
-      dist_git_branch: master
+      dist_git_branches:
+        - master
   - job: propose_downstream
     trigger: release
     metadata:
-      dist_git_branch: f30
+      dist_git_branches:
+        - f30
   - job: propose_downstream
     trigger: release
     metadata:
-      dist_git_branch: f29
+      dist_git_branches:
+        - f29

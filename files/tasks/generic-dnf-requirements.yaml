@@ -9,4 +9,5 @@
       - rpmdevtools
       - python3-bodhi-client
       - fedpkg
+      - rsync
   become: true

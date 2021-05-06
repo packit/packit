@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 from copy import deepcopy
 from enum import Enum
@@ -29,7 +10,7 @@ from packit.actions import ActionName
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.notifications import NotificationsConfig
 from packit.config.sources import SourcesItem
-from packit.config.sync_files_config import SyncFilesConfig
+from packit.sync import SyncFilesItem
 from packit.exceptions import PackitConfigException
 
 logger = getLogger(__name__)
@@ -153,7 +134,7 @@ class JobConfig(CommonPackageConfig):
         metadata: JobMetadataConfig = None,
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
-        synced_files: Optional[SyncFilesConfig] = None,
+        synced_files: Optional[List[SyncFilesItem]] = None,
         dist_git_namespace: str = None,
         upstream_project_url: str = None,  # can be URL or path
         upstream_package_name: str = None,
