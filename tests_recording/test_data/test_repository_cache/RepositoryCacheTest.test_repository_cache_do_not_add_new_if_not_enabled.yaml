@@ -14,7 +14,7 @@ _requre:
 git.repo.base:
   clone_from:
   - metadata:
-      latency: 1.6896820068359375
+      latency: 1.0798571109771729
       module_call_list:
       - unittest.case
       - requre.online_replacing

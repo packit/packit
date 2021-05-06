@@ -7,7 +7,7 @@ requests.sessions:
     GET:
       https://example.org/:
       - metadata:
-          latency: 0.48049330711364746
+          latency: 0.6054730415344238
           module_call_list:
           - unittest.case
           - requre.online_replacing
@@ -23,20 +23,20 @@ requests.sessions:
           __store_indicator: 0
           _content: false
           _next: null
-          elapsed: 0.480354
+          elapsed: 0.605336
           encoding: UTF-8
           headers:
             Accept-Ranges: bytes
-            Age: '183759'
+            Age: '70389'
             Cache-Control: max-age=604800
             Content-Encoding: gzip
             Content-Length: '648'
             Content-Type: text/html; charset=UTF-8
-            Date: Fri, 05 Mar 2021 13:08:49 GMT
-            Etag: '"3147526947+ident"'
-            Expires: Fri, 12 Mar 2021 13:08:49 GMT
+            Date: Fri, 07 May 2021 09:26:13 GMT
+            Etag: '"3147526947"'
+            Expires: Fri, 14 May 2021 09:26:13 GMT
             Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
-            Server: ECS (dcb/7EA2)
+            Server: ECS (dcb/7F39)
             Vary: Accept-Encoding
             X-Cache: HIT
           raw: !!binary |
@@ -56,7 +56,7 @@ requests.sessions:
           status_code: 200
       https://httpbin.org/anything/rsync-3.1.3.tar.gz:
       - metadata:
-          latency: 1.0003538131713867
+          latency: 0.6605002880096436
           module_call_list:
           - unittest.case
           - requre.online_replacing
@@ -73,7 +73,7 @@ requests.sessions:
           __store_indicator: 0
           _content: false
           _next: null
-          elapsed: 1.000207
+          elapsed: 0.660403
           encoding: null
           headers:
             Access-Control-Allow-Credentials: 'true'
@@ -81,16 +81,16 @@ requests.sessions:
             Connection: keep-alive
             Content-Length: '414'
             Content-Type: application/json
-            Date: Fri, 05 Mar 2021 13:08:50 GMT
+            Date: Fri, 07 May 2021 09:26:14 GMT
             Server: gunicorn/19.9.0
           raw: !!binary |
             ewogICJhcmdzIjoge30sIAogICJkYXRhIjogIiIsIAogICJmaWxlcyI6IHt9LCAKICAiZm9ybSI6
             IHt9LCAKICAiaGVhZGVycyI6IHsKICAgICJBY2NlcHQiOiAiKi8qIiwgCiAgICAiQWNjZXB0LUVu
             Y29kaW5nIjogImd6aXAsIGRlZmxhdGUiLCAKICAgICJIb3N0IjogImh0dHBiaW4ub3JnIiwgCiAg
             ICAiVXNlci1BZ2VudCI6ICJweXRob24tcmVxdWVzdHMvMi4yNC4wIiwgCiAgICAiWC1BbXpuLVRy
-            YWNlLUlkIjogIlJvb3Q9MS02MDQyMmQ2MS0xYWNhODc2MTcxYzRmODg1MTdmNTc5ZWQiCiAgfSwg
-            CiAgImpzb24iOiBudWxsLCAKICAibWV0aG9kIjogIkdFVCIsIAogICJvcmlnaW4iOiAiOTQuMTEy
-            LjIyOS40OSIsIAogICJ1cmwiOiAiaHR0cHM6Ly9odHRwYmluLm9yZy9hbnl0aGluZy9yc3luYy0z
+            YWNlLUlkIjogIlJvb3Q9MS02MDk1MDdiNi03Yzc2ZjE1ZDJmODA4ODgyNmI3YzgyN2QiCiAgfSwg
+            CiAgImpzb24iOiBudWxsLCAKICAibWV0aG9kIjogIkdFVCIsIAogICJvcmlnaW4iOiAiOTQuNzQu
+            MjQyLjE3OSIsIAogICJ1cmwiOiAiaHR0cHM6Ly9odHRwYmluLm9yZy9hbnl0aGluZy9yc3luYy0z
             LjEuMy50YXIuZ3oiCn0K
           reason: OK
           status_code: 200

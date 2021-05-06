@@ -133,7 +133,6 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release(force=True)
 
-    @unittest.skip("Recordings are broken")
     def test_comment_in_spec(self):
         """
         change specfile little bit to have there some change, do not increase version
@@ -149,7 +148,6 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release()
 
-    @unittest.skip("Recordings are broken")
     def test_changelog_sync(self):
         """
         Bump version two times and see if the changelog is synced
@@ -185,7 +183,6 @@ class ProposeUpdate(PackitTest):
         int(getattr(rebasehelper, "VERSION", "0.18.0").split(".")[1]) < 24,
         "New version of rebasehelper >=24",
     )
-    @unittest.skip("Recordings are broken")
     def test_version_change_exception_new_rebase_helper(self):
         """
         check if it raises exception, because sources are not uploaded in distgit
@@ -194,7 +191,6 @@ class ProposeUpdate(PackitTest):
         """
         self.assertRaises(RebaseHelperError, self.check_version_increase)
 
-    @unittest.skip("Recordings are broken")
     def test_version_change_mocked(self):
         """
         version is not not uploaded, so skip in this test

@@ -20,7 +20,7 @@ _requre:
 git.repo.base:
   clone_from:
   - metadata:
-      latency: 2.3867199420928955
+      latency: 1.1207067966461182
       module_call_list:
       - unittest.case
       - requre.online_replacing
@@ -40,7 +40,7 @@ git.repo.base:
       git_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/cache/python-requre/.git
       working_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/cache/python-requre
   - metadata:
-      latency: 0.9626212120056152
+      latency: 0.7282047271728516
       module_call_list:
       - unittest.case
       - requre.online_replacing
@@ -60,7 +60,7 @@ git.repo.base:
       git_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone1/.git
       working_dir: /tmp/packit_tmp_repository_cache/RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml/static_tmp_1/clone1
   - metadata:
-      latency: 1.0281100273132324
+      latency: 0.7375242710113525
       module_call_list:
       - unittest.case
       - requre.online_replacing
