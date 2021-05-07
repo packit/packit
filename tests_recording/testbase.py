@@ -19,15 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-
+import os
 import shutil
-from os import makedirs
 from subprocess import check_output, CalledProcessError
 import unittest
-from requre.helpers.tempfile import TempFile
 from pathlib import Path
-
+import tempfile
 import packit.distgit
 import packit.upstream
 from packit.config import Config, get_package_config_from_repo
@@ -41,10 +38,7 @@ def socket_guard(*args, **kwargs):
 
 class PackitTest(unittest.TestCase):
     def setUp(self):
-        self.static_tmp = "/tmp/packit_tmp"
-        makedirs(self.static_tmp, exist_ok=True)
-        TempFile.root = self.static_tmp
-
+        self._static_tmp = None
         self._config = None
         self._project = None
         self._project_url = "https://github.com/packit/requre"
@@ -55,7 +49,14 @@ class PackitTest(unittest.TestCase):
         self._upstream = None
 
     def tearDown(self):
-        shutil.rmtree(self.static_tmp)
+        shutil.rmtree(os.path.dirname(self.static_tmp), ignore_errors=True)
+
+    @property
+    def static_tmp(self):
+        if not self._static_tmp:
+            self._static_tmp = tempfile.mkdtemp()
+        os.makedirs(self._static_tmp, exist_ok=True)
+        return self._static_tmp
 
     @property
     def config(self):
