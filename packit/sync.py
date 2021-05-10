@@ -53,6 +53,8 @@ class SyncFilesItem:
         src: List of paths to sync.
         dest: Destination to sync to.
         mkpath: Create the destination's path component.
+        delete: Delete extra files from dest dirs.
+        filters: List of rsync filters used for syncing.
     """
 
     def __init__(
@@ -60,6 +62,8 @@ class SyncFilesItem:
         src: Sequence[Union[str, Path]],
         dest: Union[str, Path],
         mkpath: bool = False,
+        delete: bool = False,
+        filters: Optional[List[str]] = None,
     ):
         # pathlib.Path has no support for trailing slashes, but
         # a trailing slash has a meaning for rsync.
@@ -68,6 +72,8 @@ class SyncFilesItem:
         self.src = [str(s) for s in src]
         self.dest = str(dest)
         self.mkpath = mkpath
+        self.delete = delete
+        self.filters = filters or []
 
     def __repr__(self):
         return f"SyncFilesItem(src={self.src}, dest={self.dest}, mkpath={self.mkpath})"
@@ -92,6 +98,10 @@ class SyncFilesItem:
             The command to do the sync, as a list of strings.
         """
         command = ["rsync", "--archive"]
+        if self.delete:
+            command += ["--delete"]
+        for filter_ in self.filters:
+            command += ["--filter", filter_]
         if self.mkpath:
             command += ["--mkpath"]
         if not fail_on_missing:
@@ -164,4 +174,6 @@ def sync_files(synced_files: Sequence[SyncFilesItem]):
     Copy files b/w upstream and downstream repo.
     """
     for item in synced_files:
-        run_command(item.command(), print_live=True)
+        command = item.command()
+        logger.debug(f"Running {command!r} ...")
+        run_command(command, print_live=True)
