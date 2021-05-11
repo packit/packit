@@ -18,17 +18,33 @@ def return_result(result):
 
 
 @pytest.mark.parametrize(
-    "subpath,path,result",
+    "subpath,path,trailing_slash,result",
     [
-        (Path("./test/this"), Path("."), return_result(Path("./test/this").resolve())),
-        (Path("test/this"), Path("."), return_result(Path("test/this").resolve())),
-        (Path("../test/this"), Path("."), pytest.raises(PackitException)),
-        (Path("test/../../this"), Path("."), pytest.raises(PackitException)),
+        (
+            Path("./test/this"),
+            Path("."),
+            False,
+            return_result(str(Path("./test/this").resolve())),
+        ),
+        (
+            Path("test/this"),
+            Path("."),
+            False,
+            return_result(str(Path("test/this").resolve())),
+        ),
+        (
+            Path("test/this"),
+            Path("."),
+            True,
+            return_result(str(Path("test/this").resolve()) + "/"),
+        ),
+        (Path("../test/this"), Path("."), False, pytest.raises(PackitException)),
+        (Path("test/../../this"), Path("."), False, pytest.raises(PackitException)),
     ],
 )
-def test_check_subpath(subpath, path, result):
+def test_check_subpath(subpath, path, trailing_slash, result):
     with result as r:
-        assert check_subpath(subpath, path) == r
+        assert check_subpath(subpath, path, trailing_slash) == r
 
 
 @pytest.mark.parametrize(
@@ -43,7 +59,7 @@ def test_check_subpath(subpath, path, result):
         ),
         (
             SyncFilesItem(["src/a", "src/b"], "dest"),
-            {"src": "a", "criteria": lambda x, y: x.name == y},
+            {"src": "a", "criteria": lambda x, y: Path(x).name == y},
             SyncFilesItem(["src/b"], "dest"),
         ),
     ],

@@ -200,7 +200,7 @@ class Upstream(PackitRepositoryBase):
                 dest_base=destination,
             )
         sync_files_to_ignore = [
-            str(file.relative_to(self.local_project.working_dir))
+            str(Path(file).relative_to(self.local_project.working_dir))
             for file in iter_srcs(sync_files_to_ignore)
         ]
         files_to_ignore = (

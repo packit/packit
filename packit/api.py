@@ -424,7 +424,7 @@ class PackitAPI:
         # Drop files to be excluded from the sync.
         for ef in exclude_files:
             files = [
-                f.drop_src(ef, criteria=lambda x, y: x.name == y)
+                f.drop_src(ef, criteria=lambda x, y: Path(x).name == y)
                 for f in files
                 if f is not None
             ]
