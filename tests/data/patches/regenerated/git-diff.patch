@@ -5,7 +5,6 @@ Subject: [PATCH 07/20] Apply patch glibc-rh819430.patch
 
 patch_name: glibc-rh819430.patch
 present_in_specfile: true
-location_in_specfile: 7
 ---
  posix/fnmatch.c | 33 +++++++++++++--------------------
  1 file changed, 13 insertions(+), 20 deletions(-)
