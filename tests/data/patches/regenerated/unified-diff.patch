@@ -5,7 +5,6 @@ Subject: [PATCH 11/20] Apply patch glibc-cs-path.patch
 
 patch_name: glibc-cs-path.patch
 present_in_specfile: true
-location_in_specfile: 11
 ---
  sysdeps/unix/confstr.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

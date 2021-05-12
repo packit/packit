@@ -5,7 +5,6 @@ Subject: [PATCH 09/20] Apply patch glibc-rh1070416.patch
 
 patch_name: glibc-rh1070416.patch
 present_in_specfile: true
-location_in_specfile: 9
 ---
  nscd/nscd.service | 2 ++
  nscd/nscd.socket  | 8 ++++++++
