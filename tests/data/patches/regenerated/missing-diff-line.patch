@@ -5,7 +5,6 @@ Subject: [PATCH 05/20] Apply patch glibc-fedora-manual-dircategory.patch
 
 patch_name: glibc-fedora-manual-dircategory.patch
 present_in_specfile: true
-location_in_specfile: 5
 ---
  manual/libc.texinfo | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -28,7 +28,6 @@ class PatchMetadata:
         self,
         name: Optional[str] = None,
         path: Optional[Path] = None,
-        location_in_specfile: Optional[str] = None,
         description: Optional[str] = None,
         commit: Optional[git.Commit] = None,
         present_in_specfile: bool = False,
@@ -42,7 +41,6 @@ class PatchMetadata:
 
         :param name: name of the patch file
         :param path: Path of the patch file
-        :param location_in_specfile: index of the patch in spec-file
         :param description: will be attached as a comment above path in spec-file
                             (if present_in_specfile=False)
         :param commit: git.Commit relevant to this patch file
@@ -59,7 +57,6 @@ class PatchMetadata:
         """
         self.name = name
         self.path = path
-        self.location_in_specfile = location_in_specfile
         self.description = description
         self.commit = commit
         self.present_in_specfile = present_in_specfile
@@ -88,9 +85,6 @@ class PatchMetadata:
 
         if self.name:
             msg += f"\npatch_name: {self.name}"
-
-        if self.location_in_specfile:
-            msg += f"\nlocation_in_specfile: {self.location_in_specfile}"
 
         if self.description:
             msg += f"\ndescription: {self.description}"
@@ -146,7 +140,6 @@ class PatchMetadata:
             path=patch_path,
             description=metadata.get("description"),
             present_in_specfile=metadata.get("present_in_specfile"),
-            location_in_specfile=metadata.get("location_in_specfile"),
             ignore=metadata.get("ignore"),
             commit=commit,
             squash_commits=metadata.get("squash_commits"),
