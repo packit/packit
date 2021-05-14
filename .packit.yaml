@@ -1,13 +1,15 @@
 ---
-synced_files:
-  - src: tests/
-    dest: tests/
-  - src: plans/
-    dest: plans/
-  - src: .fmf/
-    dest: .fmf/
-  - src: tests_recording/
-    dest: tests_recording/
+# Don't sync the test files to dist-git, until we figure
+# out how to do it the right way.
+# synced_files:
+#   - src: tests/
+#     dest: tests/
+#   - src: plans/
+#     dest: plans/
+#   - src: .fmf/
+#     dest: .fmf/
+#   - src: tests_recording/
+#     dest: tests_recording/
 # packit was already taken on PyPI
 upstream_package_name: packitos
 upstream_project_url: https://github.com/packit/packit
