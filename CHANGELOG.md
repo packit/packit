@@ -1,3 +1,7 @@
+# 0.30.1
+
+- Fixed a bug caused by new click release. (#1238)
+
 # 0.30.0
 
 - Patching: removed location_in_specfile from commit metadata. (#1229)
