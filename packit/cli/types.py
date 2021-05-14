@@ -46,6 +46,9 @@ class LocalProjectParameter(click.ParamType):
         self.branch_param_name = branch_param_name
 
     def convert(self, value, param, ctx):
+        if isinstance(value, LocalProject):
+            return value
+
         try:
             branch_name = None
             if self.branch_param_name:
