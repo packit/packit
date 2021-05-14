@@ -1,3 +1,9 @@
+# 0.30.0
+
+- Patching: removed location_in_specfile from commit metadata. (#1229)
+- Refactored and extended the synced_files mechanism. (#1211)
+- Fixed a bug regarding the fedora-latest alias. (#1222)
+
 # 0.29.0
 
 - Source-git: add info about sources to packit.yaml when initiating a new source-git repo
