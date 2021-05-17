@@ -1,0 +1,1178 @@
+X:
+  file:
+    tar:
+      StoreFiles:
+        TestStatus.test_up_releases.yaml:
+          to_path:
+            all:
+              metadata:
+                latency: 0
+              output:
+                filename: TestStatus.test_up_releases.yaml.tmp7ncabnh5_1.tar.xz
+                return_value:
+                  _bare: false
+                  _common_dir: null
+                  _working_tree_dir: /tmp/tmp7ncabnh5
+                  git_dir: /tmp/tmp7ncabnh5/.git
+                  working_dir: /tmp/tmp7ncabnh5
+                target_path: /tmp/tmp7ncabnh5
+_requre:
+  DataTypes: 3
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+requests.sessions:
+  send:
+    GET:
+      https://api.github.com:443/repos/packit/requre:
+        all:
+          metadata:
+            latency: 0.3432655334472656
+            module_call_list:
+            - unittest.case
+            - requre.online_replacing
+            - tests_recording.test_status
+            - tests_recording.testbase
+            - packit.config.package_config
+            - ogr.services.github.project
+            - github.MainClass
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              allow_merge_commit: true
+              allow_rebase_merge: true
+              allow_squash_merge: true
+              archive_url: https://api.github.com/repos/packit/requre/{archive_format}{/ref}
+              archived: false
+              assignees_url: https://api.github.com/repos/packit/requre/assignees{/user}
+              blobs_url: https://api.github.com/repos/packit/requre/git/blobs{/sha}
+              branches_url: https://api.github.com/repos/packit/requre/branches{/branch}
+              clone_url: https://github.com/packit/requre.git
+              collaborators_url: https://api.github.com/repos/packit/requre/collaborators{/collaborator}
+              comments_url: https://api.github.com/repos/packit/requre/comments{/number}
+              commits_url: https://api.github.com/repos/packit/requre/commits{/sha}
+              compare_url: https://api.github.com/repos/packit/requre/compare/{base}...{head}
+              contents_url: https://api.github.com/repos/packit/requre/contents/{+path}
+              contributors_url: https://api.github.com/repos/packit/requre/contributors
+              created_at: '2019-09-11T09:49:47Z'
+              default_branch: main
+              delete_branch_on_merge: false
+              deployments_url: https://api.github.com/repos/packit/requre/deployments
+              description: Library for testing python code what allows store output
+                of various objects and use stored data for testing
+              disabled: false
+              downloads_url: https://api.github.com/repos/packit/requre/downloads
+              events_url: https://api.github.com/repos/packit/requre/events
+              fork: false
+              forks: 9
+              forks_count: 9
+              forks_url: https://api.github.com/repos/packit/requre/forks
+              full_name: packit/requre
+              git_commits_url: https://api.github.com/repos/packit/requre/git/commits{/sha}
+              git_refs_url: https://api.github.com/repos/packit/requre/git/refs{/sha}
+              git_tags_url: https://api.github.com/repos/packit/requre/git/tags{/sha}
+              git_url: git://github.com/packit/requre.git
+              has_downloads: true
+              has_issues: true
+              has_pages: false
+              has_projects: true
+              has_wiki: true
+              homepage: null
+              hooks_url: https://api.github.com/repos/packit/requre/hooks
+              html_url: https://github.com/packit/requre
+              id: 207778319
+              issue_comment_url: https://api.github.com/repos/packit/requre/issues/comments{/number}
+              issue_events_url: https://api.github.com/repos/packit/requre/issues/events{/number}
+              issues_url: https://api.github.com/repos/packit/requre/issues{/number}
+              keys_url: https://api.github.com/repos/packit/requre/keys{/key_id}
+              labels_url: https://api.github.com/repos/packit/requre/labels{/name}
+              language: Python
+              languages_url: https://api.github.com/repos/packit/requre/languages
+              license:
+                key: mit
+                name: MIT License
+                node_id: MDc6TGljZW5zZTEz
+                spdx_id: MIT
+                url: https://api.github.com/licenses/mit
+              merges_url: https://api.github.com/repos/packit/requre/merges
+              milestones_url: https://api.github.com/repos/packit/requre/milestones{/number}
+              mirror_url: null
+              name: requre
+              network_count: 9
+              node_id: MDEwOlJlcG9zaXRvcnkyMDc3NzgzMTk=
+              notifications_url: https://api.github.com/repos/packit/requre/notifications{?since,all,participating}
+              open_issues: 8
+              open_issues_count: 8
+              organization:
+                avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
+                events_url: https://api.github.com/users/packit/events{/privacy}
+                followers_url: https://api.github.com/users/packit/followers
+                following_url: https://api.github.com/users/packit/following{/other_user}
+                gists_url: https://api.github.com/users/packit/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/packit
+                id: 46870917
+                login: packit
+                node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                organizations_url: https://api.github.com/users/packit/orgs
+                received_events_url: https://api.github.com/users/packit/received_events
+                repos_url: https://api.github.com/users/packit/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/packit/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/packit/subscriptions
+                type: Organization
+                url: https://api.github.com/users/packit
+              owner:
+                avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
+                events_url: https://api.github.com/users/packit/events{/privacy}
+                followers_url: https://api.github.com/users/packit/followers
+                following_url: https://api.github.com/users/packit/following{/other_user}
+                gists_url: https://api.github.com/users/packit/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/packit
+                id: 46870917
+                login: packit
+                node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                organizations_url: https://api.github.com/users/packit/orgs
+                received_events_url: https://api.github.com/users/packit/received_events
+                repos_url: https://api.github.com/users/packit/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/packit/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/packit/subscriptions
+                type: Organization
+                url: https://api.github.com/users/packit
+              permissions:
+                admin: true
+                pull: true
+                push: true
+              private: false
+              pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
+              pushed_at: '2021-05-12T10:52:13Z'
+              releases_url: https://api.github.com/repos/packit/requre/releases{/id}
+              size: 743
+              ssh_url: git@github.com:packit/requre.git
+              stargazers_count: 6
+              stargazers_url: https://api.github.com/repos/packit/requre/stargazers
+              statuses_url: https://api.github.com/repos/packit/requre/statuses/{sha}
+              subscribers_count: 9
+              subscribers_url: https://api.github.com/repos/packit/requre/subscribers
+              subscription_url: https://api.github.com/repos/packit/requre/subscription
+              svn_url: https://github.com/packit/requre
+              tags_url: https://api.github.com/repos/packit/requre/tags
+              teams_url: https://api.github.com/repos/packit/requre/teams
+              temp_clone_token: ''
+              trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
+              updated_at: '2021-05-11T06:51:46Z'
+              url: https://api.github.com/repos/packit/requre
+              watchers: 6
+              watchers_count: 6
+            _next: null
+            elapsed: 0.342567
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, Deprecation, Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Thu, 13 May 2021 12:40:59 GMT
+              ETag: W/"de9f66b2c902c34a93c072401ca6abadd745779d37b22f65846ddbbc23da3df8"
+              Last-Modified: Tue, 11 May 2021 06:51:46 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: repo
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: D978:1457:EDE4143:F1E065F:609D1E5B
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4962'
+              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '38'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=main:
+        all:
+          metadata:
+            latency: 0.19930505752563477
+            module_call_list:
+            - unittest.case
+            - requre.online_replacing
+            - tests_recording.test_status
+            - tests_recording.testbase
+            - packit.config.package_config
+            - ogr.services.github.project
+            - github.Repository
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/cbe935692a16074ce7abdf68ccaa9f24170ee4da
+                html: https://github.com/packit/requre/blob/main/.packit.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
+              content: 'LS0tCnNwZWNmaWxlX3BhdGg6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMK
+
+                IyBodHRwczovL3BhY2tpdC5kZXYvZG9jcy9jb25maWd1cmF0aW9uLyN0b3At
+
+                bGV2ZWwta2V5cwpkb3duc3RyZWFtX3BhY2thZ2VfbmFtZTogcHl0aG9uLXJl
+
+                cXVyZQp1cHN0cmVhbV9wcm9qZWN0X3VybDogaHR0cHM6Ly9naXRodWIuY29t
+
+                L3BhY2tpdC9yZXF1cmUKIyB3ZSBhcmUgc2V0dGluZyB0aGlzIHNvIHdlIGNh
+
+                biB1c2UgcGFja2l0IGZyb20gcmVxdXJlJ3MgZGlzdC1naXQKIyBwYWNraXQg
+
+                Y2FuJ3Qga25vdyB3aGF0J3MgdGhlIHVwc3RyZWFtIG5hbWUgd2hlbiBydW5u
+
+                aW5nIGZyb20gZGlzdGdpdAp1cHN0cmVhbV9wYWNrYWdlX25hbWU6IHJlcXVy
+
+                ZQojIFVzZSByZWxlYXNlIGRlc2NyaXB0aW9uIGZyb20gR2l0SHViIHdoZW4g
+
+                dXBkYXRpbmcgdGhlCiMgY2hhbmdlbG9nIGluIEZlZG9yYS4KY29weV91cHN0
+
+                cmVhbV9yZWxlYXNlX2Rlc2NyaXB0aW9uOiB0cnVlCmFjdGlvbnM6CiAgIyB3
+
+                ZSBuZWVkIHRoaXMgYi9jIGBnaXQgYXJjaGl2ZWAgZG9lc24ndCBwdXQgYWxs
+
+                IHRoZSBtZXRhZGF0YSBpbiB0aGUgdGFyYmFsbDoKICAjICAgTG9va3VwRXJy
+
+                b3I6IHNldHVwdG9vbHMtc2NtIHdhcyB1bmFibGUgdG8gZGV0ZWN0IHZlcnNp
+
+                b24gZm9yICcvYnVpbGRkaXIvYnVpbGQvQlVJTEQvcmVxdXJlLTAuMTEuMScu
+
+                CiAgIyAgIE1ha2Ugc3VyZSB5b3UncmUgZWl0aGVyIGJ1aWxkaW5nIGZyb20g
+
+                YSBmdWxseSBpbnRhY3QgZ2l0IHJlcG9zaXRvcnkgb3IgUHlQSSB0YXJiYWxs
+
+                cy4KICBjcmVhdGUtYXJjaGl2ZToKICAgIC0gcHl0aG9uMyBzZXR1cC5weSBz
+
+                ZGlzdCAtLWRpc3QtZGlyIC4vZmVkb3JhLwogICAgLSBiYXNoIC1jICJscyAt
+
+                MXQgLi9mZWRvcmEvKi50YXIuZ3ogfCBoZWFkIC1uIDEiCiAgZ2V0LWN1cnJl
+
+                bnQtdmVyc2lvbjogcHl0aG9uMyBzZXR1cC5weSAtLXZlcnNpb24Kam9iczoK
+
+                ICAtIGpvYjogc3luY19mcm9tX2Rvd25zdHJlYW0KICAgIHRyaWdnZXI6IGNv
+
+                bW1pdAogIC0gam9iOiBwcm9wb3NlX2Rvd25zdHJlYW0KICAgIHRyaWdnZXI6
+
+                IHJlbGVhc2UKICAgIG1ldGFkYXRhOgogICAgICBkaXN0X2dpdF9icmFuY2hl
+
+                czogZmVkb3JhLWFsbAogIC0gam9iOiBjb3ByX2J1aWxkCiAgICB0cmlnZ2Vy
+
+                OiBwdWxsX3JlcXVlc3QKICAgIG1ldGFkYXRhOgogICAgICB0YXJnZXRzOgog
+
+                ICAgICAgIC0gZmVkb3JhLWFsbAogICAgICAgIC0gZXBlbC04CiAgLSBqb2I6
+
+                IGNvcHJfYnVpbGQKICAgIHRyaWdnZXI6IGNvbW1pdAogICAgbWV0YWRhdGE6
+
+                CiAgICAgIGJyYW5jaDogbWFpbgogICAgICB0YXJnZXRzOgogICAgICAgIC0g
+
+                ZmVkb3JhLWFsbAogICAgICAgIC0gZXBlbC04CiAgICAgIGxpc3Rfb25faG9t
+
+                ZXBhZ2U6IFRydWUKICAgICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQogIC0g
+
+                am9iOiBjb3ByX2J1aWxkCiAgICB0cmlnZ2VyOiByZWxlYXNlCiAgICBtZXRh
+
+                ZGF0YToKICAgICAgdGFyZ2V0czoKICAgICAgICAtIGZlZG9yYS1hbGwKICAg
+
+                ICAgICAtIGVwZWwtOAogICAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAg
+
+                ICAgIHByZXNlcnZlX3Byb2plY3Q6IFRydWUK
+
+                '
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
+              encoding: base64
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/cbe935692a16074ce7abdf68ccaa9f24170ee4da
+              html_url: https://github.com/packit/requre/blob/main/.packit.yaml
+              name: .packit.yaml
+              path: .packit.yaml
+              sha: cbe935692a16074ce7abdf68ccaa9f24170ee4da
+              size: 1557
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
+            _next: null
+            elapsed: 0.198699
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, Deprecation, Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Thu, 13 May 2021 12:40:59 GMT
+              ETag: W/"cbe935692a16074ce7abdf68ccaa9f24170ee4da"
+              Last-Modified: Tue, 11 May 2021 06:51:43 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: ''
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: D978:1457:EDE41D3:F1E06E7:609D1E5B
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4961'
+              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '39'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://api.github.com:443/repos/packit/requre/contents/?ref=main:
+        all:
+          metadata:
+            latency: 0.16589784622192383
+            module_call_list:
+            - unittest.case
+            - requre.online_replacing
+            - tests_recording.test_status
+            - tests_recording.testbase
+            - packit.config.package_config
+            - ogr.services.github.project
+            - github.Repository
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/da4f8c060b406e9defead62fcfdccfa4871f81f4
+                html: https://github.com/packit/requre/tree/main/.github
+                self: https://api.github.com/repos/packit/requre/contents/.github?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/da4f8c060b406e9defead62fcfdccfa4871f81f4
+              html_url: https://github.com/packit/requre/tree/main/.github
+              name: .github
+              path: .github
+              sha: da4f8c060b406e9defead62fcfdccfa4871f81f4
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/.github?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/894a44cc066a027465cd26d634948d56d13af9af
+                html: https://github.com/packit/requre/blob/main/.gitignore
+                self: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.gitignore
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/894a44cc066a027465cd26d634948d56d13af9af
+              html_url: https://github.com/packit/requre/blob/main/.gitignore
+              name: .gitignore
+              path: .gitignore
+              sha: 894a44cc066a027465cd26d634948d56d13af9af
+              size: 1203
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/cbe935692a16074ce7abdf68ccaa9f24170ee4da
+                html: https://github.com/packit/requre/blob/main/.packit.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/cbe935692a16074ce7abdf68ccaa9f24170ee4da
+              html_url: https://github.com/packit/requre/blob/main/.packit.yaml
+              name: .packit.yaml
+              path: .packit.yaml
+              sha: cbe935692a16074ce7abdf68ccaa9f24170ee4da
+              size: 1557
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/f14940237c2cddbb29c096e135822441f4bae54d
+                html: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-config.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/f14940237c2cddbb29c096e135822441f4bae54d
+              html_url: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
+              name: .pre-commit-config.yaml
+              path: .pre-commit-config.yaml
+              sha: f14940237c2cddbb29c096e135822441f4bae54d
+              size: 1225
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
+                html: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-hooks.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
+              html_url: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
+              name: .pre-commit-hooks.yaml
+              path: .pre-commit-hooks.yaml
+              sha: c84199ac2bf81c70e53aaf6701997b0d475e80ff
+              size: 1608
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
+                html: https://github.com/packit/requre/blob/main/.zuul.yaml
+                self: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/.zuul.yaml
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
+              html_url: https://github.com/packit/requre/blob/main/.zuul.yaml
+              name: .zuul.yaml
+              path: .zuul.yaml
+              sha: 335ba23e10490725ed7ff9d1ab8c4e2e7495be9c
+              size: 593
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
+                html: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
+                self: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/CONTRIBUTING.md
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
+              html_url: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
+              name: CONTRIBUTING.md
+              path: CONTRIBUTING.md
+              sha: 2b19dfb12887fa5a9e3f1595912cf589231ea39a
+              size: 159
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/8201f992154a14a7fcd95a5937d5c40c610990c9
+                html: https://github.com/packit/requre/blob/main/DCO
+                self: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/DCO
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/8201f992154a14a7fcd95a5937d5c40c610990c9
+              html_url: https://github.com/packit/requre/blob/main/DCO
+              name: DCO
+              path: DCO
+              sha: 8201f992154a14a7fcd95a5937d5c40c610990c9
+              size: 1421
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
+                html: https://github.com/packit/requre/blob/main/Dockerfile.tests
+                self: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/Dockerfile.tests
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
+              html_url: https://github.com/packit/requre/blob/main/Dockerfile.tests
+              name: Dockerfile.tests
+              path: Dockerfile.tests
+              sha: 3e3a7a6fc84303c6f3ec70f204430899eaec0a40
+              size: 206
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/5cb23a21a2a206185ec1b62429baec88b5198821
+                html: https://github.com/packit/requre/blob/main/LICENSE
+                self: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/LICENSE
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/5cb23a21a2a206185ec1b62429baec88b5198821
+              html_url: https://github.com/packit/requre/blob/main/LICENSE
+              name: LICENSE
+              path: LICENSE
+              sha: 5cb23a21a2a206185ec1b62429baec88b5198821
+              size: 1063
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
+                html: https://github.com/packit/requre/blob/main/Makefile
+                self: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/Makefile
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
+              html_url: https://github.com/packit/requre/blob/main/Makefile
+              name: Makefile
+              path: Makefile
+              sha: cd564a3994f077b6f9193e8322c93851395a8fa2
+              size: 604
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/8a35ca1dce7c51573d66259bf3538051ea2e4171
+                html: https://github.com/packit/requre/blob/main/README.md
+                self: https://api.github.com/repos/packit/requre/contents/README.md?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/README.md
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/8a35ca1dce7c51573d66259bf3538051ea2e4171
+              html_url: https://github.com/packit/requre/blob/main/README.md
+              name: README.md
+              path: README.md
+              sha: 8a35ca1dce7c51573d66259bf3538051ea2e4171
+              size: 965
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/README.md?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/3332f2db67e65b2f48961dc799202177bcafc07f
+                html: https://github.com/packit/requre/blob/main/ci.fmf
+                self: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/ci.fmf
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/3332f2db67e65b2f48961dc799202177bcafc07f
+              html_url: https://github.com/packit/requre/blob/main/ci.fmf
+              name: ci.fmf
+              path: ci.fmf
+              sha: 3332f2db67e65b2f48961dc799202177bcafc07f
+              size: 225
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/ci.fmf?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/5de824e80e6717d8e48be6390d414ffcf5850fcf
+                html: https://github.com/packit/requre/tree/main/docs
+                self: https://api.github.com/repos/packit/requre/contents/docs?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/5de824e80e6717d8e48be6390d414ffcf5850fcf
+              html_url: https://github.com/packit/requre/tree/main/docs
+              name: docs
+              path: docs
+              sha: 5de824e80e6717d8e48be6390d414ffcf5850fcf
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/docs?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/b00df103b0b2fd4a878943e39b6084ad512a0ac3
+                html: https://github.com/packit/requre/tree/main/examples
+                self: https://api.github.com/repos/packit/requre/contents/examples?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/b00df103b0b2fd4a878943e39b6084ad512a0ac3
+              html_url: https://github.com/packit/requre/tree/main/examples
+              name: examples
+              path: examples
+              sha: b00df103b0b2fd4a878943e39b6084ad512a0ac3
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/examples?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/664c2cd3a774c05f71f9670a38cf33f90cd66e30
+                html: https://github.com/packit/requre/tree/main/fedora
+                self: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/664c2cd3a774c05f71f9670a38cf33f90cd66e30
+              html_url: https://github.com/packit/requre/tree/main/fedora
+              name: fedora
+              path: fedora
+              sha: 664c2cd3a774c05f71f9670a38cf33f90cd66e30
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/d8b65751a6f22f834993f18391dea189ab7c30d4
+                html: https://github.com/packit/requre/tree/main/files
+                self: https://api.github.com/repos/packit/requre/contents/files?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/d8b65751a6f22f834993f18391dea189ab7c30d4
+              html_url: https://github.com/packit/requre/tree/main/files
+              name: files
+              path: files
+              sha: d8b65751a6f22f834993f18391dea189ab7c30d4
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/files?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/db01b49954b57c2cd1f9a7b8cd33d35f4e8a4a89
+                html: https://github.com/packit/requre/tree/main/requre
+                self: https://api.github.com/repos/packit/requre/contents/requre?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/db01b49954b57c2cd1f9a7b8cd33d35f4e8a4a89
+              html_url: https://github.com/packit/requre/tree/main/requre
+              name: requre
+              path: requre
+              sha: db01b49954b57c2cd1f9a7b8cd33d35f4e8a4a89
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/requre?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
+                html: https://github.com/packit/requre/blob/main/setup.cfg
+                self: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/setup.cfg
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
+              html_url: https://github.com/packit/requre/blob/main/setup.cfg
+              name: setup.cfg
+              path: setup.cfg
+              sha: 71615dbb8e91325f049c3822645862c06c4d4e0d
+              size: 1197
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/blobs/3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
+                html: https://github.com/packit/requre/blob/main/setup.py
+                self: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
+              download_url: https://raw.githubusercontent.com/packit/requre/main/setup.py
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
+              html_url: https://github.com/packit/requre/blob/main/setup.py
+              name: setup.py
+              path: setup.py
+              sha: 3a63b8938864feaa6b8c4e2e0653eb0050bd32b6
+              size: 1191
+              type: file
+              url: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
+            - _links:
+                git: https://api.github.com/repos/packit/requre/git/trees/bf76064a16fe10336378195aaa97d69674d4ade7
+                html: https://github.com/packit/requre/tree/main/tests
+                self: https://api.github.com/repos/packit/requre/contents/tests?ref=main
+              download_url: null
+              git_url: https://api.github.com/repos/packit/requre/git/trees/bf76064a16fe10336378195aaa97d69674d4ade7
+              html_url: https://github.com/packit/requre/tree/main/tests
+              name: tests
+              path: tests
+              sha: bf76064a16fe10336378195aaa97d69674d4ade7
+              size: 0
+              type: dir
+              url: https://api.github.com/repos/packit/requre/contents/tests?ref=main
+            _next: null
+            elapsed: 0.165112
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, Deprecation, Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Thu, 13 May 2021 12:40:59 GMT
+              ETag: W/"d4a91ffa8d60c18e6678d88267b78e242135dd3e"
+              Last-Modified: Tue, 11 May 2021 06:51:46 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: ''
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: D978:1457:EDE422D:F1E0744:609D1E5B
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4960'
+              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '40'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://api.github.com:443/repos/packit/requre/releases:
+        all:
+          metadata:
+            latency: 0.31209301948547363
+            module_call_list:
+            - unittest.case
+            - requre.online_replacing
+            - tests_recording.test_status
+            - packit.status
+            - ogr.services.github.project
+            - github.PaginatedList
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/42599607/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/20214043?v=4
+                events_url: https://api.github.com/users/lachmanfrantisek/events{/privacy}
+                followers_url: https://api.github.com/users/lachmanfrantisek/followers
+                following_url: https://api.github.com/users/lachmanfrantisek/following{/other_user}
+                gists_url: https://api.github.com/users/lachmanfrantisek/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/lachmanfrantisek
+                id: 20214043
+                login: lachmanfrantisek
+                node_id: MDQ6VXNlcjIwMjE0MDQz
+                organizations_url: https://api.github.com/users/lachmanfrantisek/orgs
+                received_events_url: https://api.github.com/users/lachmanfrantisek/received_events
+                repos_url: https://api.github.com/users/lachmanfrantisek/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/lachmanfrantisek/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/lachmanfrantisek/subscriptions
+                type: User
+                url: https://api.github.com/users/lachmanfrantisek
+              body: "- New decorators for handling temporary files (MkTemp) and directories\
+                \ (MkDTemp) in a more transparent way.\r\n- The old implementation\
+                \ based on static paths and counter has been deprecated. "
+              created_at: '2021-05-07T12:01:45Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.8.0
+              id: 42599607
+              name: 0.8.0
+              node_id: MDc6UmVsZWFzZTQyNTk5NjA3
+              prerelease: false
+              published_at: '2021-05-07T12:07:41Z'
+              tag_name: 0.8.0
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.8.0
+              target_commitish: main
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/42599607/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/42599607
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.8.0
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/42260931/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/11816497?v=4
+                events_url: https://api.github.com/users/csomh/events{/privacy}
+                followers_url: https://api.github.com/users/csomh/followers
+                following_url: https://api.github.com/users/csomh/following{/other_user}
+                gists_url: https://api.github.com/users/csomh/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/csomh
+                id: 11816497
+                login: csomh
+                node_id: MDQ6VXNlcjExODE2NDk3
+                organizations_url: https://api.github.com/users/csomh/orgs
+                received_events_url: https://api.github.com/users/csomh/received_events
+                repos_url: https://api.github.com/users/csomh/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/csomh/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/csomh/subscriptions
+                type: User
+                url: https://api.github.com/users/csomh
+              body: '- Fix a performance issue when detecting cassettes following
+                the old naming format.'
+              created_at: '2021-04-30T11:39:02Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.7.1
+              id: 42260931
+              name: 0.7.1
+              node_id: MDc6UmVsZWFzZTQyMjYwOTMx
+              prerelease: false
+              published_at: '2021-04-30T11:45:56Z'
+              tag_name: 0.7.1
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.7.1
+              target_commitish: main
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/42260931/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/42260931
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.7.1
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/39703809/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/8735467?v=4
+                events_url: https://api.github.com/users/jscotka/events{/privacy}
+                followers_url: https://api.github.com/users/jscotka/followers
+                following_url: https://api.github.com/users/jscotka/following{/other_user}
+                gists_url: https://api.github.com/users/jscotka/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/jscotka
+                id: 8735467
+                login: jscotka
+                node_id: MDQ6VXNlcjg3MzU0Njc=
+                organizations_url: https://api.github.com/users/jscotka/orgs
+                received_events_url: https://api.github.com/users/jscotka/received_events
+                repos_url: https://api.github.com/users/jscotka/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/jscotka/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/jscotka/subscriptions
+                type: User
+                url: https://api.github.com/users/jscotka
+              body: ''
+              created_at: '2021-03-12T09:20:21Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.7.0
+              id: 39703809
+              name: New release 0.7.0
+              node_id: MDc6UmVsZWFzZTM5NzAzODA5
+              prerelease: false
+              published_at: '2021-03-12T09:21:10Z'
+              tag_name: 0.7.0
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.7.0
+              target_commitish: main
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/39703809/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/39703809
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.7.0
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/39059118/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/8735467?v=4
+                events_url: https://api.github.com/users/jscotka/events{/privacy}
+                followers_url: https://api.github.com/users/jscotka/followers
+                following_url: https://api.github.com/users/jscotka/following{/other_user}
+                gists_url: https://api.github.com/users/jscotka/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/jscotka
+                id: 8735467
+                login: jscotka
+                node_id: MDQ6VXNlcjg3MzU0Njc=
+                organizations_url: https://api.github.com/users/jscotka/orgs
+                received_events_url: https://api.github.com/users/jscotka/received_events
+                repos_url: https://api.github.com/users/jscotka/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/jscotka/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/jscotka/subscriptions
+                type: User
+                url: https://api.github.com/users/jscotka
+              body: ' - python `tuple` support as base type'
+              created_at: '2021-03-01T15:03:17Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.6.1
+              id: 39059118
+              name: New release 0.6.1
+              node_id: MDc6UmVsZWFzZTM5MDU5MTE4
+              prerelease: false
+              published_at: '2021-03-01T15:05:01Z'
+              tag_name: 0.6.1
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.6.1
+              target_commitish: main
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/39059118/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/39059118
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.6.1
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/38096083/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/8735467?v=4
+                events_url: https://api.github.com/users/jscotka/events{/privacy}
+                followers_url: https://api.github.com/users/jscotka/followers
+                following_url: https://api.github.com/users/jscotka/following{/other_user}
+                gists_url: https://api.github.com/users/jscotka/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/jscotka
+                id: 8735467
+                login: jscotka
+                node_id: MDQ6VXNlcjg3MzU0Njc=
+                organizations_url: https://api.github.com/users/jscotka/orgs
+                received_events_url: https://api.github.com/users/jscotka/received_events
+                repos_url: https://api.github.com/users/jscotka/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/jscotka/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/jscotka/subscriptions
+                type: User
+                url: https://api.github.com/users/jscotka
+              body: ''
+              created_at: '2021-02-16T08:54:55Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.6.0
+              id: 38096083
+              name: new version 0.6.0
+              node_id: MDc6UmVsZWFzZTM4MDk2MDgz
+              prerelease: false
+              published_at: '2021-02-16T08:55:59Z'
+              tag_name: 0.6.0
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.6.0
+              target_commitish: main
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/38096083/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/38096083
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.6.0
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/34976048/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/8735467?v=4
+                events_url: https://api.github.com/users/jscotka/events{/privacy}
+                followers_url: https://api.github.com/users/jscotka/followers
+                following_url: https://api.github.com/users/jscotka/following{/other_user}
+                gists_url: https://api.github.com/users/jscotka/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/jscotka
+                id: 8735467
+                login: jscotka
+                node_id: MDQ6VXNlcjg3MzU0Njc=
+                organizations_url: https://api.github.com/users/jscotka/orgs
+                received_events_url: https://api.github.com/users/jscotka/received_events
+                repos_url: https://api.github.com/users/jscotka/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/jscotka/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/jscotka/subscriptions
+                type: User
+                url: https://api.github.com/users/jscotka
+              body: "Features\r\n - default decorator if not given\r\n - guess output\
+                \ decorator class\r\n - class shortcut decorators"
+              created_at: '2020-12-08T10:16:26Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.5.0
+              id: 34976048
+              name: simplify user experience
+              node_id: MDc6UmVsZWFzZTM0OTc2MDQ4
+              prerelease: false
+              published_at: '2020-12-08T10:41:27Z'
+              tag_name: 0.5.0
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.5.0
+              target_commitish: master
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/34976048/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/34976048
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.5.0
+            - assets: []
+              assets_url: https://api.github.com/repos/packit/requre/releases/31639402/assets
+              author:
+                avatar_url: https://avatars.githubusercontent.com/u/8735467?v=4
+                events_url: https://api.github.com/users/jscotka/events{/privacy}
+                followers_url: https://api.github.com/users/jscotka/followers
+                following_url: https://api.github.com/users/jscotka/following{/other_user}
+                gists_url: https://api.github.com/users/jscotka/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/jscotka
+                id: 8735467
+                login: jscotka
+                node_id: MDQ6VXNlcjg3MzU0Njc=
+                organizations_url: https://api.github.com/users/jscotka/orgs
+                received_events_url: https://api.github.com/users/jscotka/received_events
+                repos_url: https://api.github.com/users/jscotka/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/jscotka/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/jscotka/subscriptions
+                type: User
+                url: https://api.github.com/users/jscotka
+              body: ''
+              created_at: '2020-09-22T07:43:42Z'
+              draft: false
+              html_url: https://github.com/packit/requre/releases/tag/0.4.0
+              id: 31639402
+              name: new version 0.4.0
+              node_id: MDc6UmVsZWFzZTMxNjM5NDAy
+              prerelease: false
+              published_at: '2020-09-22T07:46:14Z'
+              tag_name: 0.4.0
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/0.4.0
+              target_commitish: master
+              upload_url: https://uploads.github.com/repos/packit/requre/releases/31639402/assets{?name,label}
+              url: https://api.github.com/repos/packit/requre/releases/31639402
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/0.4.0
+            _next: null
+            elapsed: 0.311299
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, Deprecation, Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Thu, 13 May 2021 12:41:01 GMT
+              ETag: W/"5daf44c5ec625079dd204e8f5383af78c6dd54575bb4c83a33b354319e4616db"
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: repo
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: D978:1457:EDE44E7:F1E0A47:609D1E5C
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4959'
+              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '41'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://api.github.com:443/repos/packit/requre/tags:
+        all:
+          metadata:
+            latency: 0.2456047534942627
+            module_call_list:
+            - unittest.case
+            - requre.online_replacing
+            - tests_recording.test_status
+            - packit.status
+            - ogr.services.github.project
+            - github.PaginatedList
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+            - commit:
+                sha: 2d2ffbad49fe24c419533fc4e34a785af244780f
+                url: https://api.github.com/repos/packit/requre/commits/2d2ffbad49fe24c419533fc4e34a785af244780f
+              name: push
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy9wdXNo
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/push
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/push
+            - commit:
+                sha: ca41957efb4c09d6a6a1088e71de195a71fa1f42
+                url: https://api.github.com/repos/packit/requre/commits/ca41957efb4c09d6a6a1088e71de195a71fa1f42
+              name: 0.8.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjguMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.8.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.8.0
+            - commit:
+                sha: 4488fbabcda329dde82587244768a69f6ee8bb4a
+                url: https://api.github.com/repos/packit/requre/commits/4488fbabcda329dde82587244768a69f6ee8bb4a
+              name: 0.7.1
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjcuMQ==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.7.1
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.7.1
+            - commit:
+                sha: ecc1fbc529800b534cb5b62711737028c43af906
+                url: https://api.github.com/repos/packit/requre/commits/ecc1fbc529800b534cb5b62711737028c43af906
+              name: 0.7.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjcuMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.7.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.7.0
+            - commit:
+                sha: 93ee9b3ffe79698b2a753b92007c8ce024f8d563
+                url: https://api.github.com/repos/packit/requre/commits/93ee9b3ffe79698b2a753b92007c8ce024f8d563
+              name: 0.6.1
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjYuMQ==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.6.1
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.6.1
+            - commit:
+                sha: 0bfe327b5409b16d7bd289e031ec37067fc7ae4b
+                url: https://api.github.com/repos/packit/requre/commits/0bfe327b5409b16d7bd289e031ec37067fc7ae4b
+              name: 0.6.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjYuMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.6.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.6.0
+            - commit:
+                sha: 39d951a0ca6187245ea21f6dd7e4c5d0aca43dde
+                url: https://api.github.com/repos/packit/requre/commits/39d951a0ca6187245ea21f6dd7e4c5d0aca43dde
+              name: 0.5.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjUuMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.5.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.5.0
+            - commit:
+                sha: 6957453b95919ae5268e5292c19a26b081eaeb53
+                url: https://api.github.com/repos/packit/requre/commits/6957453b95919ae5268e5292c19a26b081eaeb53
+              name: 0.4.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjQuMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.4.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.4.0
+            - commit:
+                sha: 4ae2c5053427f6c27816266081ca270ff9b220e8
+                url: https://api.github.com/repos/packit/requre/commits/4ae2c5053427f6c27816266081ca270ff9b220e8
+              name: 0.3.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjMuMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.3.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.3.0
+            - commit:
+                sha: b2975db3f2a9236acea5d302b8593a80fcb8c22e
+                url: https://api.github.com/repos/packit/requre/commits/b2975db3f2a9236acea5d302b8593a80fcb8c22e
+              name: 0.2.5
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjIuNQ==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.2.5
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.2.5
+            - commit:
+                sha: 412639374794034d5a4db1eebbb36a2d11a12ee3
+                url: https://api.github.com/repos/packit/requre/commits/412639374794034d5a4db1eebbb36a2d11a12ee3
+              name: 0.2.4
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjIuNA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.2.4
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.2.4
+            - commit:
+                sha: 7cbf0e7fdc97b02d392d35fabe97a08c99c1d025
+                url: https://api.github.com/repos/packit/requre/commits/7cbf0e7fdc97b02d392d35fabe97a08c99c1d025
+              name: 0.2.2
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjIuMg==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.2.2
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.2.2
+            - commit:
+                sha: 7cbf0e7fdc97b02d392d35fabe97a08c99c1d025
+                url: https://api.github.com/repos/packit/requre/commits/7cbf0e7fdc97b02d392d35fabe97a08c99c1d025
+              name: 0.2.1
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjIuMQ==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.2.1
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.2.1
+            - commit:
+                sha: 2d2ffbad49fe24c419533fc4e34a785af244780f
+                url: https://api.github.com/repos/packit/requre/commits/2d2ffbad49fe24c419533fc4e34a785af244780f
+              name: 0.2.0
+              node_id: MDM6UmVmMjA3Nzc4MzE5OnJlZnMvdGFncy8wLjIuMA==
+              tarball_url: https://api.github.com/repos/packit/requre/tarball/refs/tags/0.2.0
+              zipball_url: https://api.github.com/repos/packit/requre/zipball/refs/tags/0.2.0
+            _next: null
+            elapsed: 0.245083
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, Deprecation, Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Thu, 13 May 2021 12:41:02 GMT
+              ETag: W/"64232a27a884d3f93ecea37f4a40215f71ffeb22d2c95b5d6455b9ab8a2ee184"
+              Last-Modified: Tue, 11 May 2021 06:51:46 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: ''
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: D978:1457:EDE4934:F1E0E94:609D1E5E
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4952'
+              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '48'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+tempfile:
+  mkdtemp:
+    all:
+      metadata:
+        latency: 0.0001347064971923828
+        module_call_list:
+        - unittest.case
+        - requre.online_replacing
+        - tests_recording.test_status
+        - tests_recording.testbase
+        - packit.local_project
+        - packit.utils.repo
+        - requre.objects
+        - requre.cassette
+        - tempfile
+        - mkdtemp
+      output: /tmp/tmp7ncabnh5
