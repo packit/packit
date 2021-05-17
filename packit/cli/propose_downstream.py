@@ -58,7 +58,7 @@ def get_dg_branches(api, dist_git_branch):
 @click.option(
     "--dist-git-branch",
     help="Comma separated list of target branches in dist-git to release into. "
-    "(defaults to repo's default branch)",
+    "(defaults to all branches)",
 )
 @click.option(
     "--dist-git-path",
