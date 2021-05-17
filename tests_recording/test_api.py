@@ -23,26 +23,26 @@
 from subprocess import check_output
 import unittest
 from flexmock import flexmock
-import rebasehelper
-from rebasehelper.exceptions import RebaseHelperError
 from requre.cassette import DataTypes
 from requre.online_replacing import (
     apply_decorator_to_all_methods,
-    record_requests_for_all_methods,
     replace_module_match,
 )
-from requre.helpers.tempfile import TempFile
 from requre.helpers.simple_object import Simple
 from requre.helpers.files import StoreFiles
-from requre.helpers.git.pushinfo import PushInfoStorageList
-from requre.helpers.git.fetchinfo import FetchInfoStorageList
-from requre.helpers.git.repo import Repo
-
+from ogr.exceptions import GithubAPIException
 from packit.api import PackitAPI
 from tests_recording.testbase import PackitTest
+from requre.modules_decorate_all_methods import (
+    record_requests_module,
+    record_tempfile_module,
+    record_git_module,
+)
 
 
-@record_requests_for_all_methods()
+@record_tempfile_module
+@record_requests_module
+@record_git_module
 @apply_decorator_to_all_methods(
     replace_module_match(
         what="packit.utils.run_command_remote", decorate=Simple.decorator_plain()
@@ -56,33 +56,6 @@ from tests_recording.testbase import PackitTest
         ),
     )
 )
-@apply_decorator_to_all_methods(
-    replace_module_match(
-        what="git.repo.base.Repo.clone_from",
-        decorate=StoreFiles.where_arg_references(
-            key_position_params_dict={"to_path": 2},
-            return_decorator=Repo.decorator_plain,
-        ),
-    )
-)
-@apply_decorator_to_all_methods(
-    replace_module_match(
-        what="git.remote.Remote.push", decorate=PushInfoStorageList.decorator_plain()
-    )
-)
-@apply_decorator_to_all_methods(
-    replace_module_match(
-        what="git.remote.Remote.fetch", decorate=FetchInfoStorageList.decorator_plain()
-    )
-)
-@apply_decorator_to_all_methods(
-    replace_module_match(what="tempfile.mkdtemp", decorate=TempFile.mkdtemp())
-)
-@apply_decorator_to_all_methods(
-    replace_module_match(what="tempfile.mktemp", decorate=TempFile.mktemp())
-)
-# Be aware that decorator stores login and token to test_data, replace it by some value.
-# Default precommit hook doesn't do that for copr.v3.helpers, see README.md
 @apply_decorator_to_all_methods(
     replace_module_match(
         what="copr.v3.helpers.config_from_file", decorate=Simple.decorator_plain()
@@ -133,7 +106,6 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release(force=True)
 
-    @unittest.skip("Recordings are broken")
     def test_comment_in_spec(self):
         """
         change specfile little bit to have there some change, do not increase version
@@ -149,7 +121,6 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release()
 
-    @unittest.skip("Recordings are broken")
     def test_changelog_sync(self):
         """
         Bump version two times and see if the changelog is synced
@@ -170,31 +141,14 @@ class ProposeUpdate(PackitTest):
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
 
-    @unittest.skipIf(
-        int(getattr(rebasehelper, "VERSION", "0.18.0").split(".")[1]) >= 24,
-        "Old version of RebaseHelper raises exception",
-    )
     def test_version_change_exception(self):
         """
         check if it raises exception, because sources are not uploaded in distgit
         Downgrade rebasehelper to version < 0.24.0
         """
-        self.assertRaises(RebaseHelperError, self.check_version_increase)
+        self.assertRaises(GithubAPIException, self.check_version_increase)
 
-    @unittest.skipIf(
-        int(getattr(rebasehelper, "VERSION", "0.18.0").split(".")[1]) < 24,
-        "New version of rebasehelper >=24",
-    )
-    @unittest.skip("Recordings are broken")
-    def test_version_change_exception_new_rebase_helper(self):
-        """
-        check if it raises exception, because sources are not uploaded in distgit
-        New version raises same error, but it raises it on another place
-        Upgrade rebase helper >= 0.24.0
-        """
-        self.assertRaises(RebaseHelperError, self.check_version_increase)
-
-    @unittest.skip("Recordings are broken")
+    @unittest.skip("This is broken, because have to flexmock anther part ")
     def test_version_change_mocked(self):
         """
         version is not not uploaded, so skip in this test
