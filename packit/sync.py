@@ -29,7 +29,9 @@ def check_subpath(subpath: Path, path: Path) -> Path:
     Raises:
         PackitException, if 'subpath' is not a subpath of 'path'.
     """
-    if not subpath.resolve().is_relative_to(path.resolve()):
+    try:
+        subpath.resolve().relative_to(path.resolve())
+    except ValueError:
         raise PackitException(
             f"Sync files: Illegal path! {subpath} is not in the subpath of {path}."
         )
