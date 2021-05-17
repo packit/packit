@@ -5,10 +5,11 @@
 Functions and classes dealing with syncing files between repositories
 """
 
+import os
 import glob
 import logging
 from pathlib import Path
-from typing import List, Optional, Union, Sequence
+from typing import List, Optional, Union, Sequence, Iterator
 
 from packit.exceptions import PackitException
 from packit.utils import run_command
@@ -16,7 +17,9 @@ from packit.utils import run_command
 logger = logging.getLogger(__name__)
 
 
-def check_subpath(subpath: Path, path: Path) -> Path:
+def check_subpath(
+    subpath: Path, path: Path, ensure_trailing_slash: bool = False
+) -> str:
     """Check if 'subpath' is a subpath of 'path'
 
     Args:
@@ -35,7 +38,10 @@ def check_subpath(subpath: Path, path: Path) -> Path:
         raise PackitException(
             f"Sync files: Illegal path! {subpath} is not in the subpath of {path}."
         )
-    return subpath.resolve()
+    ret = str(subpath.resolve())
+    if ensure_trailing_slash:
+        ret += os.sep
+    return ret
 
 
 class SyncFilesItem:
@@ -47,6 +53,8 @@ class SyncFilesItem:
         src: List of paths to sync.
         dest: Destination to sync to.
         mkpath: Create the destination's path component.
+        delete: Delete extra files from dest dirs.
+        filters: List of rsync filters used for syncing.
     """
 
     def __init__(
@@ -54,10 +62,18 @@ class SyncFilesItem:
         src: Sequence[Union[str, Path]],
         dest: Union[str, Path],
         mkpath: bool = False,
+        delete: bool = False,
+        filters: Optional[List[str]] = None,
     ):
-        self.src = [Path(s) for s in src]
-        self.dest = Path(dest)
+        # pathlib.Path has no support for trailing slashes, but
+        # a trailing slash has a meaning for rsync.
+        # Store all paths as strings internally to keep trailing
+        # slashes.
+        self.src = [str(s) for s in src]
+        self.dest = str(dest)
         self.mkpath = mkpath
+        self.delete = delete
+        self.filters = filters or []
 
     def __repr__(self):
         return f"SyncFilesItem(src={self.src}, dest={self.dest}, mkpath={self.mkpath})"
@@ -82,12 +98,16 @@ class SyncFilesItem:
             The command to do the sync, as a list of strings.
         """
         command = ["rsync", "--archive"]
+        if self.delete:
+            command += ["--delete"]
+        for filter_ in self.filters:
+            command += ["--filter", filter_]
         if self.mkpath:
             command += ["--mkpath"]
         if not fail_on_missing:
             command += ["--ignore-missing-args"]
         for src in self.src:
-            globs = glob.glob(str(src))
+            globs = glob.glob(src)
             if globs:
                 command += globs
             else:
@@ -95,8 +115,8 @@ class SyncFilesItem:
                 # render the 'rsync' command meaningless.
                 # Make sure 'src' is part of the command in these cases,
                 # and let --ignore-missing-args handle the rest.
-                command += [str(src)]
-        command += [str(self.dest)]
+                command += [src]
+        command += [self.dest]
         return command
 
     def resolve(self, src_base: Path = Path.cwd(), dest_base: Path = Path.cwd()):
@@ -106,11 +126,16 @@ class SyncFilesItem:
             src_base: Base directory for all src items.
             dest_base: Base directory for dest.
         """
-        self.src = [check_subpath(src_base / path, src_base) for path in self.src]
-        self.dest = check_subpath(dest_base / self.dest, dest_base)
+        self.src = [
+            check_subpath(src_base / path, src_base, path.endswith(os.sep))
+            for path in self.src
+        ]
+        self.dest = check_subpath(
+            dest_base / self.dest, dest_base, self.dest.endswith(os.sep)
+        )
 
     def drop_src(
-        self, src: Union[str, Path], criteria=lambda x, y: x == Path(y)
+        self, src: Union[str, Path], criteria=lambda x, y: x == str(y)
     ) -> Optional["SyncFilesItem"]:
         """Remove 'src' from the list of src-s
 
@@ -131,7 +156,7 @@ class SyncFilesItem:
             return None
 
 
-def iter_srcs(synced_files: Sequence[SyncFilesItem]):
+def iter_srcs(synced_files: Sequence[SyncFilesItem]) -> Iterator[str]:
     """Iterate over all the src-s in a list of SyncFilesItem
 
     Args:
@@ -149,4 +174,6 @@ def sync_files(synced_files: Sequence[SyncFilesItem]):
     Copy files b/w upstream and downstream repo.
     """
     for item in synced_files:
-        run_command(item.command(), print_live=True)
+        command = item.command()
+        logger.debug(f"Running {command!r} ...")
+        run_command(command, print_live=True)

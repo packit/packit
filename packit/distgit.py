@@ -79,6 +79,14 @@ class DistGit(PackitRepositoryBase):
         package_config: CommonPackageConfig,
         local_project: LocalProject = None,
     ):
+        """
+        Args:
+            config: User configuration of Packit.
+            package_config: Packit configuration of the package
+                related to this dist-git repo.
+            local_project: LocalProject object.
+            stage: Use fedpkg-stage when working with source archives.
+        """
         super().__init__(config=config, package_config=package_config)
 
         self._local_project = local_project
