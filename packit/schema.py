@@ -47,6 +47,8 @@ class SyncFilesItemSchema(Schema):
     src = StringOrListOfStringsField()
     dest = fields.String()
     mkpath = fields.Boolean(default=False)
+    delete = fields.Boolean(default=False)
+    filters = fields.List(fields.String(), missing=None)
 
 
 class FilesToSyncField(fields.Field):

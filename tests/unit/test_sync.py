@@ -18,17 +18,33 @@ def return_result(result):
 
 
 @pytest.mark.parametrize(
-    "subpath,path,result",
+    "subpath,path,trailing_slash,result",
     [
-        (Path("./test/this"), Path("."), return_result(Path("./test/this").resolve())),
-        (Path("test/this"), Path("."), return_result(Path("test/this").resolve())),
-        (Path("../test/this"), Path("."), pytest.raises(PackitException)),
-        (Path("test/../../this"), Path("."), pytest.raises(PackitException)),
+        (
+            Path("./test/this"),
+            Path("."),
+            False,
+            return_result(str(Path("./test/this").resolve())),
+        ),
+        (
+            Path("test/this"),
+            Path("."),
+            False,
+            return_result(str(Path("test/this").resolve())),
+        ),
+        (
+            Path("test/this"),
+            Path("."),
+            True,
+            return_result(str(Path("test/this").resolve()) + "/"),
+        ),
+        (Path("../test/this"), Path("."), False, pytest.raises(PackitException)),
+        (Path("test/../../this"), Path("."), False, pytest.raises(PackitException)),
     ],
 )
-def test_check_subpath(subpath, path, result):
+def test_check_subpath(subpath, path, trailing_slash, result):
     with result as r:
-        assert check_subpath(subpath, path) == r
+        assert check_subpath(subpath, path, trailing_slash) == r
 
 
 @pytest.mark.parametrize(
@@ -43,7 +59,7 @@ def test_check_subpath(subpath, path, result):
         ),
         (
             SyncFilesItem(["src/a", "src/b"], "dest"),
-            {"src": "a", "criteria": lambda x, y: x.name == y},
+            {"src": "a", "criteria": lambda x, y: Path(x).name == y},
             SyncFilesItem(["src/b"], "dest"),
         ),
     ],
@@ -101,22 +117,51 @@ def test_resolve(item, args, result):
         (
             SyncFilesItem(["a", "b"], "dest"),
             {},
-            "rsync --archive --ignore-missing-args a b dest".split(),
+            ["rsync", "--archive", "--ignore-missing-args", "a", "b", "dest"],
         ),
         (
             SyncFilesItem(["a", "b"], "dest2"),
             {"fail_on_missing": True},
-            "rsync --archive a b dest2".split(),
+            ["rsync", "--archive", "a", "b", "dest2"],
         ),
         (
-            SyncFilesItem(["c", "d"], "dest", mkpath=True),
+            SyncFilesItem(["c", "d"], "dest", mkpath=True, delete=True),
             {},
-            "rsync --archive --mkpath --ignore-missing-args c d dest".split(),
+            [
+                "rsync",
+                "--archive",
+                "--delete",
+                "--mkpath",
+                "--ignore-missing-args",
+                "c",
+                "d",
+                "dest",
+            ],
         ),
         (
             SyncFilesItem(["c/*"], "dest", mkpath=True),
             {},
-            "rsync --archive --mkpath --ignore-missing-args c/* dest".split(),
+            ["rsync", "--archive", "--mkpath", "--ignore-missing-args", "c/*", "dest"],
+        ),
+        (
+            SyncFilesItem(
+                ["src/"],
+                "dest",
+                delete=True,
+                filters=["protect .git*", "protect sources"],
+            ),
+            {"fail_on_missing": True},
+            [
+                "rsync",
+                "--archive",
+                "--delete",
+                "--filter",
+                "protect .git*",
+                "--filter",
+                "protect sources",
+                "src/",
+                "dest",
+            ],
         ),
     ],
 )

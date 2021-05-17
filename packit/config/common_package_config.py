@@ -6,7 +6,6 @@ Common package config attributes so they can be imported both in PackageConfig a
 """
 import os
 from typing import Dict, List, Optional, Union
-from pathlib import Path
 
 from packit.actions import ActionName
 from packit.config.notifications import (
@@ -151,12 +150,10 @@ class CommonPackageConfig:
         """
         files = self.synced_files
 
-        if Path(self.specfile_path) not in iter_srcs(files):
+        if self.specfile_path not in iter_srcs(files):
             files.append(self.get_specfile_sync_files_item())
 
-        if Path(self.config_file_path) and self.config_file_path not in iter_srcs(
-            files
-        ):
+        if self.config_file_path and self.config_file_path not in iter_srcs(files):
             # this relative because of glob: "Non-relative patterns are unsupported"
             files.append(
                 SyncFilesItem(src=[self.config_file_path], dest=self.config_file_path)
