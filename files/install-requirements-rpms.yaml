@@ -11,4 +11,3 @@
       dnf:
         name: python3-requre
       become: true
-    - include_tasks: tasks/requre.yaml
