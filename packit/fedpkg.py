@@ -62,6 +62,7 @@ class FedPKG:
             cmd=[self.fedpkg_exec, "new-sources", sources],
             cwd=self.directory,
             error_message="Adding new sources failed:",
+            print_live=True,
             fail=fail,
         )
 
