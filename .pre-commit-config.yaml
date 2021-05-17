@@ -8,7 +8,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.15.0
+    rev: v2.16.0
     hooks:
       - id: pyupgrade
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -17,7 +17,7 @@ repos:
       - id: prettier
         exclude: tests_recording/test_data/
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
       - id: check-added-large-files
         exclude: tests_recording/test_data/test_api/
