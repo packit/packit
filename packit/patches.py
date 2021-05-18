@@ -71,15 +71,15 @@ class PatchMetadata:
 
     @property
     def specfile_comment(self) -> str:
-        if self.commit:
+        if self.description:
+            comment = self.description
+        elif self.commit:
             comment = (
                 f"{self.commit.summary}\n"
                 f"Author: {self.commit.author.name} <{self.commit.author.email}>"
             )
         else:
             comment = f'Patch "{self.name}"'
-        if self.description:
-            comment += f"\n{self.description}"
         return comment
 
     @property
