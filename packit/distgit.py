@@ -85,7 +85,6 @@ class DistGit(PackitRepositoryBase):
             package_config: Packit configuration of the package
                 related to this dist-git repo.
             local_project: LocalProject object.
-            stage: Use fedpkg-stage when working with source archives.
         """
         super().__init__(config=config, package_config=package_config)
 
@@ -112,6 +111,17 @@ class DistGit(PackitRepositoryBase):
         path: Path,
         branch: str = None,
     ) -> "DistGit":
+        """
+        Clone dist-git repo for selected package and return this class
+
+        Args:
+            config: global packit config
+            package_config: package config: downstream_package_name is utilized for cloning
+            path: clone the repo to this path
+            branch: optionally, check out this branch
+
+        Returns: instance of the DistGit class
+        """
         # TODO: use fedpkg for this, or even better, the lp property below
         clone_fedora_package(
             package_config.downstream_package_name, path, branch=branch
