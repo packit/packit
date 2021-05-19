@@ -10,6 +10,7 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
+from packit.local_project import LocalProject
 from packit.patches import PatchGenerator
 
 
@@ -123,3 +124,21 @@ def test_sync_release_version_tag_processing(
         api_mock.sync_release(
             version=version or get_version_return, tag=tag, dist_git_branch="_"
         )
+
+
+@pytest.mark.parametrize(
+    "path, downstream_package_name, expectation",
+    [
+        pytest.param("/systemd", "systemd", "systemd", id="both_set"),
+        pytest.param(None, "systemd", "systemd", id="both_set"),
+        pytest.param("/systemd", None, "systemd", id="both_set"),
+        pytest.param(None, None, None, id="none_set"),
+    ],
+)
+def test_dg_downstream_package_name_is_set(
+    api_mock, path, downstream_package_name, expectation
+):
+    api_mock._dg = None
+    api_mock.package_config.downstream_package_name = downstream_package_name
+    api_mock.downstream_local_project = LocalProject(working_dir=path)
+    assert api_mock.dg.package_config.downstream_package_name == expectation
