@@ -179,6 +179,11 @@ class DistGit(PackitRepositoryBase):
 
     def get_absolute_specfile_path(self) -> Path:
         """provide the path, don't check it"""
+        if not self.package_config.downstream_package_name:
+            raise PackitException(
+                "Unable to find specfile in dist-git: "
+                "please set downstream_package_name in your .packit.yaml"
+            )
         return (
             self.local_project.working_dir
             / self.spec_dir_name
