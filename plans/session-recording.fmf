@@ -1,9 +1,6 @@
 summary: Session recording testcases
-discover:
-  how: fmf
+discover+:
   filter: tier:2
-execute:
-  how: tmt
 prepare:
   # woraround until new requre will be shipped
   how: shell
