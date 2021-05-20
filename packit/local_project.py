@@ -119,6 +119,7 @@ class LocalProject:
             f"refresh {refresh}\n"
             f"remote: {remote}\n"
             f"pr_id: {pr_id}\n"
+            f"cache: {cache}\n"
         )
 
         if refresh:
