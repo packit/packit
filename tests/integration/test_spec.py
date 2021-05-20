@@ -44,6 +44,7 @@ def test_write_spec_content():
         spec.spec_content = SpecContent(content)
         spec.write_spec_content()
 
+
 def test_changelog_non_c_locale():
     (fd, specfile) = tempfile.mkstemp(prefix="packittest", suffix=".spec")
     shutil.copyfile(SPECFILE, specfile)
