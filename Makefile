@@ -4,7 +4,7 @@ TESTS_IMAGE=packit-tests
 CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
 TESTS_RECORDING_PATH=tests_recording
 TESTS_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
-CONTAINER_RUN_WITH_OPTS=$(CONTAINER_ENGINE) run --rm -ti --env TESTS_TARGET=$(TESTS_RECORDING_PATH) -v $(CURDIR):/src --security-opt label=disable
+CONTAINER_RUN_WITH_OPTS=$(CONTAINER_ENGINE) run --rm -ti -v $(CURDIR):/src --security-opt label=disable
 CONTAINER_TEST_COMMAND=bash -c "pip3 install .; make check"
 
 # In case you don't want to use pre-built image
@@ -31,12 +31,12 @@ requre_data_cleanup:
 
 # example: TESTS_TARGET=tests/unit/test_api.py make check_in_container
 check_in_container: tests_image
-	$(CONTAINER_RUN_WITH_OPTS) $(TESTS_IMAGE) $(CONTAINER_TEST_COMMAND)
+	$(CONTAINER_RUN_WITH_OPTS) --env TESTS_TARGET $(TESTS_IMAGE) $(CONTAINER_TEST_COMMAND)
 
 # Mounts your ~/.config/ where .packit.yaml with your github/gitlab tokens is expected
 # Mounts ssh connfig dir, to have ssh keys for fedpkg cloning
 # create random tmpdir and mount into /tmp to avoid issues with creating temporary dirs via python
 check_in_container_regenerate_data: tests_image
 	$(eval RANDOM_TMP_DIR = $(shell mktemp -d))
-	$(CONTAINER_RUN_WITH_OPTS) -v $(RANDOM_TMP_DIR):/tmp -v $(HOME)/.ssh:/root/.ssh -v $(HOME)/.config:/root/.config $(TESTS_IMAGE) $(CONTAINER_TEST_COMMAND)
+	$(CONTAINER_RUN_WITH_OPTS) --env TESTS_TARGET="$(TESTS_RECORDING_PATH)" -v $(RANDOM_TMP_DIR):/tmp -v $(HOME)/.ssh:/root/.ssh -v $(HOME)/.config:/root/.config $(TESTS_IMAGE) $(CONTAINER_TEST_COMMAND)
 	rm -fr $(RANDOM_TMP_DIR)
