@@ -12,6 +12,13 @@ Please follow common guidelines for our projects [here](https://github.com/packi
 
 If you want to update documentation, create a PR against [packit.dev](https://github.com/packit/packit.dev).
 
+## Running
+
+To run the `packit` tool on your local Linux system, with your own modifications, use the following
+command:
+
+    $ pip3 install --user --editable .
+
 ## Testing
 
 Tests are stored in [tests](/tests) directory:
