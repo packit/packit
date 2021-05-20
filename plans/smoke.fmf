@@ -1,6 +1,3 @@
 summary: Basic simple tests
-discover:
-  how: fmf
+discover+:
   filter: tier:0
-execute:
-  how: tmt
