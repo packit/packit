@@ -32,6 +32,10 @@ class RepositoryCache:
     def __init__(self, cache_path: Path, add_new=False) -> None:
         self.cache_path = cache_path
         self.add_new = add_new
+        logger.debug(
+            f"Instantiation of the repository cache at {self.cache_path}. "
+            f"New project will {'not ' if not self.add_new else ''}be added."
+        )
 
     @property
     def cached_projects(self) -> List[str]:
@@ -65,15 +69,22 @@ class RepositoryCache:
             logger.debug(f"Repo already exists in {directory}.")
             return git.repo.Repo(directory)
 
-        logger.debug(f"Cloning repo {url} -> {directory}")
+        logger.debug(
+            f"Cloning repo {url} -> {directory} using repository cache at {self.cache_path}"
+        )
+        cached_projects = self.cached_projects
+        cached_projects_str = "\n".join(f"- {project}" for project in cached_projects)
+        logger.debug(
+            f"Repositories in the cache ({len(cached_projects)} project(s)):\n{cached_projects_str}"
+        )
 
         project_name = RepoUrl.parse(url).repo
         reference_repo = self.cache_path.joinpath(project_name)
-        if project_name not in self.cached_projects and self.add_new:
+        if project_name not in cached_projects and self.add_new:
             logger.debug(f"Creating reference repo: {reference_repo}")
             self._clone(url=url, to_path=str(reference_repo), tags=True)
 
-        if self.add_new or project_name in self.cached_projects:
+        if self.add_new or project_name in cached_projects:
             logger.debug(f"Using reference repo: {reference_repo}")
             return self._clone(
                 url=url, to_path=directory, tags=True, reference=str(reference_repo)
