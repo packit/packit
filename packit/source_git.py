@@ -422,7 +422,7 @@ class SourceGitGenerator:
         self.local_project.stage(self.dist_git.source_git_downstream_suffix)
         self.local_project.commit(message="add downstream distribution sources")
 
-    def _get_lookasisde_sources(self) -> List[Dict[str, str]]:
+    def _get_lookaside_sources(self) -> List[Dict[str, str]]:
         """
         Read "sources" file from the dist-git repo and return a list of dicts
         with path and url to sources stored in the lookaside cache
@@ -436,7 +436,7 @@ class SourceGitGenerator:
         package = self.dist_git.package_config.downstream_package_name
         basepath = self.dist_git.local_project.working_dir
 
-        sources = list()
+        sources = []
         for source in LookasideCacheHelper._read_sources(basepath):
 
             if self.config.fedpkg_exec == "fedpkg":
@@ -546,7 +546,7 @@ class SourceGitGenerator:
         create a source-git repo from upstream
         """
         self._pull_upstream_ref()
-        lookaside_sources = self._get_lookasisde_sources()
+        lookaside_sources = self._get_lookaside_sources()
         self._put_downstream_sources([di["path"] for di in lookaside_sources])
         self._add_packit_config(lookaside_sources)
         if self.dist_git.specfile.get_applied_patches():

@@ -324,7 +324,7 @@ class DistGit(PackitRepositoryBase):
         """
         Fetch archive for the current upstream release defined in dist-git's spec
 
-        :return: str, path to the archive
+        :return: path to the archive
         """
         with cwd(self.local_project.working_dir):
             self.download_remote_sources()
@@ -340,7 +340,7 @@ class DistGit(PackitRepositoryBase):
         """
         Upload files (archive) to the lookaside cache.
         """
-        # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
+        # TODO: can we check if the tarball is already uploaded so we don't have to re-upload?
         logger.info("About to upload to lookaside cache.")
         f = FedPKG(
             fas_username=self.config.fas_user,
@@ -351,7 +351,7 @@ class DistGit(PackitRepositoryBase):
             f.new_sources(sources=archive_path)
         except Exception as ex:
             logger.error(
-                f"The 'fedpkg new-sources' command failed for the following reason: {ex!r}"
+                f"'{f.fedpkg_exec} new-sources' failed for the following reason: {ex!r}"
             )
             raise PackitException(ex)
 

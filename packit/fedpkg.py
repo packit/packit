@@ -56,7 +56,7 @@ class FedPKG:
 
     def new_sources(self, sources="", fail=True):
         if not self.directory.is_dir():
-            raise Exception("Cannot access fedpkg repository:")
+            raise Exception(f"Cannot access {self.fedpkg_exec} repository:")
 
         return commands.run_command_remote(
             cmd=[self.fedpkg_exec, "new-sources", sources],
@@ -107,7 +107,7 @@ class FedPKG:
                 in ex.stderr_output
             ):
                 logger.info(
-                    "The 'fedpkg build' command crashed which is a known issue: "
+                    f"'{self.fedpkg_exec} build' crashed. It is a known issue: "
                     "the build is submitted in koji anyway."
                 )
                 logger.debug(ex.stdout_output)
