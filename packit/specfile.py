@@ -194,10 +194,27 @@ class Specfile(SpecFile):
             patch_number_offset = max(x.index for x in self.get_applied_patches())
         except ValueError:
             logger.debug("There are no patches in the spec.")
-            patch_number_offset = 0
+            # 0 is a valid patch index
+            patch_number_offset = -1
+
+        if patch_metadata.patch_id is not None:
+            if patch_metadata.patch_id <= patch_number_offset:
+                raise PackitException(
+                    f"The 'patch_id' requested ({patch_metadata.patch_id}) for patch "
+                    f"{patch_metadata.name} is less than or equal to the last used patch ID "
+                    f"({patch_number_offset}). Re-ordering the patches using 'patch_id' is "
+                    "not allowed - if you want to change the order of those patches, "
+                    "please reorder the commits in your source-git repository."
+                )
+            patch_id = patch_metadata.patch_id
+        else:
+            # 0 is a valid patch index, but let's start with 1 which is more common, e.g.
+            # https://src.fedoraproject.org/rpms/glibc/blob/f6682c9bac5872385b3caae0cd51fe3dbfcbb88f/f/glibc.spec#_158
+            # https://src.fedoraproject.org/rpms/python3.10/blob/ac9a5093cb9f534ef2f65cbd1f50684c88b91eec/f/python3.10.spec#_267
+            patch_id = max(patch_number_offset + 1, 1)
 
         new_content = "\n# " + "\n# ".join(patch_metadata.specfile_comment.split("\n"))
-        new_content += f"\nPatch{(1 + patch_number_offset):04d}: {patch_metadata.name}"
+        new_content += f"\nPatch{patch_id:04d}: {patch_metadata.name}"
 
         if self.get_applied_patches():
             last_source_tag_line = [
