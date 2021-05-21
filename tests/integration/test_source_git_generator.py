@@ -139,7 +139,7 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
     """
     # requre lookaside_cache_url
     requre_tar_url = (
-        "https://src.fedoraproject.org/repo/pkgs/python-requre/"
+        "https://src.fedoraproject.org/repo/pkgs/rpms/python-requre/"
         "requre-0.4.0.tar.gz/sha512/85293577f56e19dd0fad13bb5e118ac2ab39d7"
         "570d640a754b9d8d8054078c89c949d4695ef018915b17a2f2428f1635032352d"
         "cf3c9a036a2d633013cc35dd9/requre-0.4.0.tar.gz"

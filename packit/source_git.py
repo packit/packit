@@ -439,19 +439,13 @@ class SourceGitGenerator:
 
         sources = []
         for source in LookasideCacheHelper._read_sources(basepath):
-
-            if self.config.fedpkg_exec == "fedpkg":
-                url = "{0}/{1}/{2}/{3}/{4}/{2}".format(
-                    base_url,
-                    package,
-                    source["filename"],
-                    source["hashtype"],
-                    source["hash"],
-                )
-            else:  # centpkg
-                url = "{0}/{1}/{2}/{3}/{2}".format(
-                    base_url, package, source["filename"], source["hash"]
-                )
+            url = "{0}/rpms/{1}/{2}/{3}/{4}/{2}".format(
+                base_url,
+                package,
+                source["filename"],
+                source["hashtype"],
+                source["hash"],
+            )
 
             path = source["filename"]
             sources.append({"path": path, "url": url})
