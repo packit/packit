@@ -29,12 +29,14 @@ class RepositoryCache:
     * Project name is used to match the git project in the cache.
     """
 
-    def __init__(self, cache_path: Path, add_new=False) -> None:
-        self.cache_path = cache_path
+    def __init__(self, cache_path: Union[str, Path], add_new=False) -> None:
+        self.cache_path = (
+            Path(cache_path) if isinstance(cache_path, str) else cache_path
+        )
         self.add_new = add_new
         logger.debug(
             f"Instantiation of the repository cache at {self.cache_path}. "
-            f"New project will {'not ' if not self.add_new else ''}be added."
+            f"New projects will {'not ' if not self.add_new else ''}be added."
         )
 
     @property
