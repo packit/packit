@@ -64,3 +64,25 @@ class RepositoryCacheTest(unittest.TestCase):
 
         assert repo_cache.get_repo(url=TEST_PROJECT_URL_TO_CLONE, directory=clone_path)
         assert repo_cache.cached_projects == []
+
+    def test_repository_cache_accept_str(self):
+        tmp_path = Path(tempfile.mkdtemp())
+        cache_path = tmp_path / "cache"
+        clone1_path = tmp_path / "clone1"
+        flexmock(RepositoryCache).should_call("_clone").with_args(
+            url=TEST_PROJECT_URL_TO_CLONE,
+            to_path=str(cache_path / TEST_PROJECT_NAME),
+            tags=True,
+        )
+        flexmock(RepositoryCache).should_call("_clone").with_args(
+            url=TEST_PROJECT_URL_TO_CLONE,
+            to_path=str(clone1_path),
+            reference=str(cache_path / TEST_PROJECT_NAME),
+            tags=True,
+        )
+
+        repo_cache = RepositoryCache(cache_path=str(cache_path), add_new=True)
+        assert repo_cache.cached_projects == []
+
+        assert repo_cache.get_repo(url=TEST_PROJECT_URL_TO_CLONE, directory=clone1_path)
+        assert repo_cache.cached_projects == [TEST_PROJECT_NAME]
