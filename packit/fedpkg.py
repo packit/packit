@@ -31,9 +31,7 @@ from packit.utils.logging import logger
 
 class FedPKG:
     """
-    Part of the code is from release-bot:
-
-    https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
+    Wrapper around fedpkg/centpkg which are wrappers around rpkg.
     """
 
     def __init__(
