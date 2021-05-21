@@ -427,8 +427,9 @@ class SourceGitGenerator:
         Read "sources" file from the dist-git repo and return a list of dicts
         with path and url to sources stored in the lookaside cache
         """
+        pkg_tool = "centpkg" if self.centos_package else "fedpkg"
         try:
-            config = LookasideCacheHelper._read_config(self.config.fedpkg_exec)
+            config = LookasideCacheHelper._read_config(pkg_tool)
             base_url = config["lookaside"]
         except (configparser.Error, KeyError) as e:
             raise LookasideCacheError("Failed to read rpkg configuration") from e
