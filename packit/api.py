@@ -140,6 +140,7 @@ class PackitAPI:
         commit_title: str,
         commit_msg: str,
         sync_default_files: bool = True,
+        pkg_tool: str = "",
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
@@ -160,6 +161,7 @@ class PackitAPI:
             commit_msg: Use this commit message in dist-git.
             sync_default_files: Whether to sync the default files, that is: packit.yaml and
                 the spec-file.
+            pkg_tool: what tool (fedpkg/centpkg) to use upload to lookaside cache
         """
         if sync_default_files:
             synced_files = self.package_config.get_all_files_to_sync()
@@ -195,7 +197,9 @@ class PackitAPI:
             )
 
         self._handle_sources(
-            add_new_sources=add_new_sources, force_new_sources=force_new_sources
+            add_new_sources=add_new_sources,
+            force_new_sources=force_new_sources,
+            pkg_tool=pkg_tool,
         )
 
         if commit_title:
@@ -488,7 +492,18 @@ class PackitAPI:
             target_branch=dist_git_branch,
         )
 
-    def _handle_sources(self, add_new_sources, force_new_sources):
+    def _handle_sources(
+        self, add_new_sources: bool, force_new_sources: bool, pkg_tool: str = ""
+    ):
+        """Download upstream archive and upload it to dist-git lookaside cache.
+
+        Args:
+            add_new_sources: Download and upload source archives.
+            (TODO: why? Can we just not call this method in such case?)
+            force_new_sources: Don't check the lookaside cache and perform new-sources.
+            (TODO: why? the rpkg tool won't upload it anyway if it's already there)
+            pkg_tool: fedpkg or centpkg
+        """
         if not (add_new_sources or force_new_sources):
             return
 
@@ -506,7 +521,9 @@ class PackitAPI:
         if make_new_sources:
             archive = self.dg.download_upstream_archive()
             self.init_kerberos_ticket()
-            self.dg.upload_to_lookaside_cache(str(archive))
+            self.dg.upload_to_lookaside_cache(
+                archive_path=str(archive), pkg_tool=pkg_tool
+            )
 
     def build(
         self,

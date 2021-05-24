@@ -70,7 +70,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,
         is_archive_in_lookaside_cache=lambda archive_path: False,
-        upload_to_lookaside_cache=lambda path: None,
+        upload_to_lookaside_cache=lambda archive_path, pkg_tool: None,
         download_upstream_archive=lambda: "the-archive",
     )
     flexmock(

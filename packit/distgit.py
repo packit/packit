@@ -336,16 +336,23 @@ class DistGit(PackitRepositoryBase):
         logger.info(f"Downloaded archive: {archive}")
         return archive
 
-    def upload_to_lookaside_cache(self, archive_path: str) -> None:
+    def upload_to_lookaside_cache(self, archive_path: str, pkg_tool: str = "") -> None:
+        """Upload files (archive) to the lookaside cache.
+
+        If the archive is already uploaded, the rpkg tool doesn't do anything.
+
+        Args:
+            archive_path: Path to archive to upload to lookaside cache.
+            pkg_tool: optional, rpkg tool (fedpkg/centpkg) to use to upload.
+
+        Raises:
+            PackitException, if the upload fails.
         """
-        Upload files (archive) to the lookaside cache.
-        """
-        # TODO: can we check if the tarball is already uploaded so we don't have to re-upload?
         logger.info("About to upload to lookaside cache.")
         f = FedPKG(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            fedpkg_exec=self.config.fedpkg_exec,
+            fedpkg_exec=pkg_tool or self.config.fedpkg_exec,
         )
         try:
             f.new_sources(sources=archive_path)
