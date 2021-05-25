@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from packit.exceptions import PackitException
-from packit.patches import PatchGenerator
+from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
 from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
@@ -641,3 +641,77 @@ def test_srpm_patch_non_conseq_indices(
         "0004-Wei-bier-Summer-is-coming.patch",
     }
     assert sg_path.joinpath(DISTRO_DIR, "saaz.patch").read_text() == ""
+
+
+@pytest.mark.parametrize("starting_patch_id", [0, 1, 100])
+def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
+    """check that patches with patch_id set are added to spec correctly"""
+    spec_dir = api_instance_source_git.up.absolute_specfile_dir
+    spec: Specfile = api_instance_source_git.up.specfile
+
+    # we want to add this patch to the spec
+    good_patch_name1 = "hello.patch"
+    # we need to create the patch file so that rebase-helper can find it and process it
+    good_patch_path1 = spec_dir.joinpath(good_patch_name1)
+    good_patch_path1.write_text("")
+    good_patch1 = PatchMetadata(
+        name=good_patch_name1,
+        path=good_patch_path1,
+        present_in_specfile=False,
+        patch_id=starting_patch_id,
+    )
+    spec.add_patch(good_patch1)
+
+    assert spec.get_applied_patches()[0].index == starting_patch_id
+
+    # add another, this time without patch_id
+    good_patch_name2 = "hello2.patch"
+    good_patch_path2 = spec_dir.joinpath(good_patch_name2)
+    good_patch_path2.write_text("")
+    good_patch2 = PatchMetadata(
+        name=good_patch_name2, path=good_patch_path2, present_in_specfile=False
+    )
+    spec.add_patch(good_patch2)
+
+    # check that index of the second patch is (starting + 1)
+    assert spec.get_applied_patches()[1].index == starting_patch_id + 1
+
+    # and now another with an index lower or equal than the last one and check if
+    # an exc is thrown b/c that's not supported
+    # to change order of patches (people should reorder the git history instead)
+    patch_name = "nope.patch"
+    if starting_patch_id <= 1:
+        bad_patch_id = starting_patch_id + 1
+    else:
+        bad_patch_id = starting_patch_id - 1
+    bad_patch = PatchMetadata(
+        name=patch_name, present_in_specfile=False, patch_id=bad_patch_id
+    )
+    with pytest.raises(PackitException) as exc:
+        spec.add_patch(bad_patch)
+
+    assert (
+        f"The 'patch_id' requested ({bad_patch.patch_id}) for patch "
+        f"{bad_patch.name} is less"
+    ) in str(exc.value)
+    assert f"to the last used patch ID ({starting_patch_id + 1})" in str(exc.value)
+
+
+def test_add_patch_first_id_1(api_instance_source_git):
+    """check that add_patch sets the first patch id to 1"""
+    spec_dir = api_instance_source_git.up.absolute_specfile_dir
+    spec: Specfile = api_instance_source_git.up.specfile
+
+    # we want to add this patch to the spec
+    good_patch_name1 = "hello.patch"
+    # we need to create the patch file so that rebase-helper can find it and process it
+    good_patch_path1 = spec_dir.joinpath(good_patch_name1)
+    good_patch_path1.write_text("")
+    good_patch1 = PatchMetadata(
+        name=good_patch_name1,
+        path=good_patch_path1,
+        present_in_specfile=False,
+    )
+    spec.add_patch(good_patch1)
+
+    assert spec.get_applied_patches()[0].index == 1

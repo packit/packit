@@ -489,14 +489,18 @@ class LocalProject:
         self.git_repo.git.add(path, force=force)
 
     def commit(
-        self, message: str, body: Optional[str] = None, allow_empty: bool = True
+        self,
+        message: str,
+        body: Optional[str] = None,
+        allow_empty: bool = True,
+        amend: bool = False,
     ):
         """Commit staged changes"""
         other_message_kwargs = {"message": body} if body else {}
         # some of the commits may be empty and it's not an error,
         # e.g. extra source files
         self.git_repo.git.commit(
-            allow_empty=allow_empty, m=message, **other_message_kwargs
+            allow_empty=allow_empty, m=message, amend=amend, **other_message_kwargs
         )
 
     def get_commits(self, ref: str = "HEAD") -> Iterator[git.Commit]:

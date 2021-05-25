@@ -24,6 +24,26 @@ logger = logging.getLogger(__name__)
 
 
 class PatchMetadata:
+    """
+    Metadata about patch files and relation to the respective commit.
+
+    Attributes:
+        name: name of the patch file (patch_name is the actual metadata key)
+        path: Path of the patch file
+        description: will be attached as a comment above Patch spec definition
+                     (if present_in_specfile=False)
+        commit: git.Commit relevant to this patch file
+        present_in_specfile: if the patch is already in the spec-file
+                             and we don't need to add it there
+        ignore: this patch will not be processed.
+        squash_commits: squash commits into a single patch file
+                        until next commits with squash_commits=True
+                        (git-am patches do this)
+        patch_id: the number from definition PatchNNNN in the spec
+        no_prefix: do not prepend a/ and b/ when generating the patch file
+        metadata_defined: are any of the metadata defined in a commit message
+    """
+
     def __init__(
         self,
         name: Optional[str] = None,
@@ -33,28 +53,10 @@ class PatchMetadata:
         present_in_specfile: bool = False,
         ignore: bool = False,
         squash_commits: bool = False,
+        patch_id: Optional[int] = None,
         no_prefix: bool = False,
         metadata_defined: bool = None,
     ) -> None:
-        """
-        Metadata about patch files and relation to the respective commit.
-
-        :param name: name of the patch file
-        :param path: Path of the patch file
-        :param description: will be attached as a comment above path in spec-file
-                            (if present_in_specfile=False)
-        :param commit: git.Commit relevant to this patch file
-        :param present_in_specfile: if the patch is already in the spec-file
-                                    and we don't need to add it there
-        :param ignore: We don't want to process this commit
-                        when we convert source-git commits to patches.
-                        This patch will be skipped.
-        :param squash_commits: squash commits into a single patch file
-                               until next commits with squash_commits=True
-                               (git-am patches do this)
-        :param no_prefix: do not prepend a/ and b/ when generating the patch file
-        :param metadata_defined: are any of the metadata defined in a commit message
-        """
         self.name = name
         self.path = path
         self.description = description
@@ -62,6 +64,7 @@ class PatchMetadata:
         self.present_in_specfile = present_in_specfile
         self.ignore = ignore
         self.squash_commits = squash_commits
+        self.patch_id = patch_id
         self.no_prefix = no_prefix
         # this is set during PatchMetadata.from_commit()
         self.metadata_defined = metadata_defined
@@ -97,6 +100,9 @@ class PatchMetadata:
 
         if self.squash_commits:
             msg += "\nsquash_commits: true"
+
+        if self.patch_id is not None:
+            msg += f"\npatch_id: {self.patch_id}"
 
         if self.no_prefix:
             msg += "\nno_prefix: true"
@@ -143,6 +149,7 @@ class PatchMetadata:
             ignore=metadata.get("ignore"),
             commit=commit,
             squash_commits=metadata.get("squash_commits"),
+            patch_id=metadata.get("patch_id", None),
             no_prefix=metadata.get("no_prefix"),
             metadata_defined=metadata_defined,
         )
