@@ -196,11 +196,11 @@ class PackitAPI:
                 patches, self.package_config.patch_generation_patch_id_digits
             )
 
-        self._handle_sources(
-            add_new_sources=add_new_sources,
-            force_new_sources=force_new_sources,
-            pkg_tool=pkg_tool,
-        )
+        if add_new_sources or force_new_sources:
+            self._handle_sources(
+                force_new_sources=force_new_sources,
+                pkg_tool=pkg_tool,
+            )
 
         if commit_title:
             self.dg.commit(title=commit_title, msg=commit_msg, prefix="")
@@ -494,39 +494,41 @@ class PackitAPI:
 
     def _handle_sources(
         self,
-        add_new_sources: bool,
         force_new_sources: bool,
         pkg_tool: str = "",
     ):
         """Download upstream archive and upload it to dist-git lookaside cache.
 
         Args:
-            add_new_sources: Download and upload source archives.
-            (TODO: why? Can we just not call this method in such case?)
-            force_new_sources: Don't check the lookaside cache and perform new-sources.
-            (TODO: why? the rpkg tool won't upload it anyway if it's already there)
-            pkg_tool: fedpkg or centpkg to upload sources
+            force_new_sources: Download/upload the archive even if it's
+                name is already in the cache or in sources file.
+                Actually, fedpkg/centpkg won't upload it if archive with the same
+                name & hash is already there, so this might be useful only if
+                you want to upload archive with the same name but different hash.
+            pkg_tool: Tool to upload sources.
         """
-        if not (add_new_sources or force_new_sources):
-            return
 
-        make_new_sources = False
         # btw this is really naive: the name could be the same but the hash can be different
         # TODO: we should do something when such situation happens
-        if force_new_sources or not self.dg.is_archive_in_lookaside_cache(
+        archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
             self.dg.upstream_archive_name
+        )
+        sources_file = self.dg.local_project.working_dir / "sources"
+        archive_name_in_sources_file = (
+            sources_file.is_file()
+            and self.dg.upstream_archive_name in sources_file.read_text()
+        )
+
+        if (
+            archive_name_in_cache
+            and archive_name_in_sources_file
+            and not force_new_sources
         ):
-            make_new_sources = True
-        else:
-            sources_file = self.dg.local_project.working_dir / "sources"
-            if self.dg.upstream_archive_name not in sources_file.read_text():
-                make_new_sources = True
-        if make_new_sources:
-            archive = self.dg.download_upstream_archive()
-            self.init_kerberos_ticket()
-            self.dg.upload_to_lookaside_cache(
-                archive_path=str(archive), pkg_tool=pkg_tool
-            )
+            return
+
+        archive = self.dg.download_upstream_archive()
+        self.init_kerberos_ticket()
+        self.dg.upload_to_lookaside_cache(archive_path=str(archive), pkg_tool=pkg_tool)
 
     def build(
         self,
