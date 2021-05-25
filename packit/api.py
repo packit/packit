@@ -493,7 +493,10 @@ class PackitAPI:
         )
 
     def _handle_sources(
-        self, add_new_sources: bool, force_new_sources: bool, pkg_tool: str = ""
+        self,
+        add_new_sources: bool,
+        force_new_sources: bool,
+        pkg_tool: str = "",
     ):
         """Download upstream archive and upload it to dist-git lookaside cache.
 
@@ -502,7 +505,7 @@ class PackitAPI:
             (TODO: why? Can we just not call this method in such case?)
             force_new_sources: Don't check the lookaside cache and perform new-sources.
             (TODO: why? the rpkg tool won't upload it anyway if it's already there)
-            pkg_tool: fedpkg or centpkg
+            pkg_tool: fedpkg or centpkg to upload sources
         """
         if not (add_new_sources or force_new_sources):
             return

@@ -40,7 +40,7 @@ from packit.config import (
 )
 from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
-from packit.fedpkg import FedPKG
+from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
 from packit.utils.commands import cwd
 from packit.utils.repo import clone_fedora_package
@@ -148,12 +148,12 @@ class DistGit(PackitRepositoryBase):
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
-                f = FedPKG(
+                pkg_tool = PkgTool(
                     fas_username=self.fas_user,
                     directory=tmpdir,
-                    fedpkg_exec=self.config.fedpkg_exec,
+                    tool=self.config.pkg_tool,
                 )
-                f.clone(
+                pkg_tool.clone(
                     self.package_config.downstream_package_name,
                     tmpdir,
                     anonymous=not cccolutils.has_creds(),
@@ -349,16 +349,16 @@ class DistGit(PackitRepositoryBase):
             PackitException, if the upload fails.
         """
         logger.info("About to upload to lookaside cache.")
-        f = FedPKG(
+        pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            fedpkg_exec=pkg_tool or self.config.fedpkg_exec,
+            tool=pkg_tool or self.config.pkg_tool,
         )
         try:
-            f.new_sources(sources=archive_path)
+            pkg_tool_.new_sources(sources=archive_path)
         except Exception as ex:
             logger.error(
-                f"'{f.fedpkg_exec} new-sources' failed for the following reason: {ex!r}"
+                f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
             )
             raise PackitException(ex)
 
@@ -398,12 +398,12 @@ class DistGit(PackitRepositoryBase):
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
         """
-        fpkg = FedPKG(
+        pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
-            fedpkg_exec=self.config.fedpkg_exec,
+            tool=self.config.pkg_tool,
         )
-        fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_bodhi_update(
         self,
