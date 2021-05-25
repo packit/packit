@@ -251,6 +251,9 @@ class CommonConfigSchema(Schema):
     create_pr = fields.Bool(default=True)
     sync_changelog = fields.Bool(default=False)
     patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
+    patch_generation_patch_id_digits = fields.Integer(
+        missing=4, default=4, validate=lambda x: x >= 0
+    )
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
     sources = fields.List(fields.Nested(SourceSchema), missing=None)
