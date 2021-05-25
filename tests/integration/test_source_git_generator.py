@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 import fileinput
+import re
 import subprocess
 from pathlib import Path
 import yaml
@@ -378,3 +379,4 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
     patch_commit_message = sgg.local_project.git_repo.head.commit.message
     assert "present_in_specfile: true" in patch_commit_message
     assert "patch_name: 0001-acl-2.2.53-test-runwrapper.patch" in patch_commit_message
+    assert re.findall(r"patch_id: \d", patch_commit_message)

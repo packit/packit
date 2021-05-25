@@ -3,6 +3,7 @@
 """
 packit started as source-git and we're making a source-git module after such a long time, weird
 """
+import configparser
 import logging
 import os
 import shutil
@@ -10,14 +11,12 @@ import tarfile
 import tempfile
 from pathlib import Path
 from typing import Optional, Tuple, List, Dict, Union
-import configparser
 
 import yaml
 from git import GitCommandError
-
-from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
+from ogr.parsing import parse_git_repo
 from rebasehelper.exceptions import LookasideCacheError
-
+from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
 
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.config import Config
@@ -33,14 +32,13 @@ from packit.constants import (
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
+from packit.patches import PatchMetadata
 from packit.utils.commands import run_command
 from packit.utils.repo import (
     clone_centos_8_package,
     clone_centos_9_package,
     get_default_branch,
 )
-
-from ogr.parsing import parse_git_repo
 
 logger = logging.getLogger(__name__)
 
@@ -514,18 +512,33 @@ class SourceGitGenerator:
         BUILD_dir = self.get_BUILD_dir()
         self.local_project.fetch(BUILD_dir, f"+{from_branch}:{to_branch}")
 
-        # shorter format for better readability in case of an error
-        commits_to_cherry_pick = [
-            c.hexsha[:8]
-            for c in LocalProject(working_dir=BUILD_dir).get_commits(from_branch)
-        ][-2::-1]
-        if commits_to_cherry_pick:
+        # transform into {patch_name: patch_id}
+        patch_ids = {
+            Path(p.path).name: p.index
+            for p in self.dist_git.specfile.patches.get("applied", [])
+        }
+
+        # -2 - drop first commit which represents tarball unpacking
+        # -1 - reverse order, HEAD is last in the sequence
+        patch_commits = list(
+            LocalProject(working_dir=BUILD_dir).get_commits(from_branch)
+        )[-2::-1]
+
+        for commit in patch_commits:
             self.local_project.git_repo.git.cherry_pick(
-                *commits_to_cherry_pick,
+                commit.hexsha,
                 keep_redundant_commits=True,
                 allow_empty=True,
                 strategy_option="theirs",
             )
+
+            # Annotate commits in the source-git repo with patch_id. This info is not provided
+            # during the rpm patching process so we need to do it here.
+            metadata = PatchMetadata.from_commit(commit=commit)
+            # commit.message already ends with \n
+            message = f"{commit.message}patch_id: {patch_ids[metadata.name]}"
+            self.local_project.commit(message, amend=True)
+
         self.local_project.git_repo.git.branch("-D", to_branch)
 
     def create_from_upstream(self):
