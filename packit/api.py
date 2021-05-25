@@ -528,7 +528,7 @@ class PackitAPI:
 
         archive = self.dg.download_upstream_archive()
         self.init_kerberos_ticket()
-        self.dg.upload_to_lookaside_cache(archive_path=str(archive), pkg_tool=pkg_tool)
+        self.dg.upload_to_lookaside_cache(archive=archive, pkg_tool=pkg_tool)
 
     def build(
         self,
