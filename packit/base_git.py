@@ -1,24 +1,6 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 import shlex
 from logging import getLogger
 from pathlib import Path
@@ -319,16 +301,20 @@ class PackitRepositoryBase:
             )
         return outputs
 
-    def specfile_add_patches(self, patch_list: List[PatchMetadata]) -> None:
+    def specfile_add_patches(
+        self, patch_list: List[PatchMetadata], patch_id_digits: int = 4
+    ) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
 
         :param patch_list: [PatchMetadata, ...]
+        :param patch_id_digits: Number of digits of the generated patch ID.
+            This is used to control whether to have 'Patch1' or 'Patch0001'.
         """
         if not patch_list:
             return
 
-        self.specfile.set_patches(patch_list)
+        self.specfile.set_patches(patch_list, patch_id_digits)
 
         self.local_project.git_repo.index.write()
 
