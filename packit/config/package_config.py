@@ -50,6 +50,7 @@ class PackageConfig(CommonPackageConfig):
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
         patch_generation_ignore_paths: List[str] = None,
+        patch_generation_patch_id_digits: int = 4,
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
@@ -75,6 +76,7 @@ class PackageConfig(CommonPackageConfig):
             upstream_tag_template=upstream_tag_template,
             archive_root_dir_template=archive_root_dir_template,
             patch_generation_ignore_paths=patch_generation_ignore_paths,
+            patch_generation_patch_id_digits=patch_generation_patch_id_digits,
             notifications=notifications,
             copy_upstream_release_description=copy_upstream_release_description,
             sources=sources,
@@ -117,6 +119,7 @@ class PackageConfig(CommonPackageConfig):
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"archive_root_dir_template={self.archive_root_dir_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}', "
+            f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}', "
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
             f"sources='{self.sources}')"
         )

@@ -52,6 +52,7 @@ class CommonPackageConfig:
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
         patch_generation_ignore_paths: List[str] = None,
+        patch_generation_patch_id_digits: int = 4,
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
@@ -60,6 +61,7 @@ class CommonPackageConfig:
         self.specfile_path: Optional[str] = specfile_path
         self.synced_files: List[SyncFilesItem] = synced_files or []
         self.patch_generation_ignore_paths = patch_generation_ignore_paths or []
+        self.patch_generation_patch_id_digits = patch_generation_patch_id_digits
         self.dist_git_namespace: str = dist_git_namespace or "rpms"
         self.upstream_project_url: Optional[str] = upstream_project_url
         self.upstream_package_name: Optional[str] = upstream_package_name
@@ -113,6 +115,7 @@ class CommonPackageConfig:
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"
+            f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}',"
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
             f"sources='{self.sources}')"
         )
