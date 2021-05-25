@@ -190,7 +190,9 @@ class PackitAPI:
             # Undo identical patches, but don't remove them
             # from the list, so that they are added to the spec-file.
             PatchGenerator.undo_identical(patches, self.dg.local_project.git_repo)
-            self.dg.specfile_add_patches(patches)
+            self.dg.specfile_add_patches(
+                patches, self.package_config.patch_generation_patch_id_digits
+            )
 
         self._handle_sources(
             add_new_sources=add_new_sources, force_new_sources=force_new_sources

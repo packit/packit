@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import inspect
 import re
@@ -144,11 +125,15 @@ class Specfile(SpecFile):
         return re.sub(r"([0-9.]*[0-9]+).*", r"\1", release)
 
     @saves
-    def set_patches(self, patch_list: List[PatchMetadata]) -> None:
+    def set_patches(
+        self, patch_list: List[PatchMetadata], patch_id_digits: int = 4
+    ) -> None:
         """
         Set given patches in the spec file
 
         :param patch_list: [PatchMetadata]
+        :param patch_id_digits: Number of digits of the generated patch ID.
+            This is used to control whether to have 'Patch1' or 'Patch0001'.
         """
         if not patch_list:
             return
@@ -180,15 +165,20 @@ class Specfile(SpecFile):
                 )
                 continue
 
-            self.add_patch(patch_metadata)
+            self.add_patch(patch_metadata, patch_id_digits)
 
-    def add_patch(self, patch_metadata: PatchMetadata):
+    def add_patch(self, patch_metadata: PatchMetadata, patch_id_digits: int = 4):
         """
         Add provided patch to the spec file:
          * Set Patch index to be +1 than the highest index of an existing specfile patch
          * The Patch placement logic works like this:
            * If there already are patches, then the patch is added after them
            * If there are no existing patches, the patch is added after Source definitions
+
+        Args:
+            patch_metadata: Metadata of the patch to be added.
+            patch_id_digits: Number of digits of the generated patch ID. This is used to
+                control whether to have 'Patch1' or 'Patch0001'.
         """
         try:
             patch_number_offset = max(x.index for x in self.get_applied_patches())
@@ -214,7 +204,7 @@ class Specfile(SpecFile):
             patch_id = max(patch_number_offset + 1, 1)
 
         new_content = "\n# " + "\n# ".join(patch_metadata.specfile_comment.split("\n"))
-        new_content += f"\nPatch{patch_id:04d}: {patch_metadata.name}"
+        new_content += f"\nPatch{patch_id:0{patch_id_digits}d}: {patch_metadata.name}"
 
         if self.get_applied_patches():
             last_source_tag_line = [

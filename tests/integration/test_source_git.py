@@ -295,8 +295,6 @@ def test_basic_local_update_patch_content_with_metadata(
 +# Author: Packit Test Suite <test@example.com>
 +Patch0002: 0002-actually-let-s-do-citra.patch
 +
-+# source change
-+# Author: Packit Test Suite <test@example.com>
 +# Few words for info.
 +Patch0003: testing.patch
 +
