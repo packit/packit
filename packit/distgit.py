@@ -336,14 +336,14 @@ class DistGit(PackitRepositoryBase):
         logger.info(f"Downloaded archive: {archive}")
         return archive
 
-    def upload_to_lookaside_cache(self, archive_path: str, pkg_tool: str = "") -> None:
+    def upload_to_lookaside_cache(self, archive: Path, pkg_tool: str = "") -> None:
         """Upload files (archive) to the lookaside cache.
 
         If the archive is already uploaded, the rpkg tool doesn't do anything.
 
         Args:
-            archive_path: Path to archive to upload to lookaside cache.
-            pkg_tool: optional, rpkg tool (fedpkg/centpkg) to use to upload.
+            archive: Path to archive to upload to lookaside cache.
+            pkg_tool: Optional, rpkg tool (fedpkg/centpkg) to use to upload.
 
         Raises:
             PackitException, if the upload fails.
@@ -355,7 +355,7 @@ class DistGit(PackitRepositoryBase):
             tool=pkg_tool or self.config.pkg_tool,
         )
         try:
-            pkg_tool_.new_sources(sources=archive_path)
+            pkg_tool_.new_sources(sources=archive)
         except Exception as ex:
             logger.error(
                 f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
