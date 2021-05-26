@@ -6,6 +6,8 @@ Update a dist-git repo from a source-git repo
 """
 
 import pathlib
+from shutil import which
+
 import click
 
 from typing import Optional
@@ -100,6 +102,10 @@ def update_dist_git(
     """
     if message and file:
         raise click.BadOptionUsage("-m", "Option -m cannot be combined with -F.")
+    if not which(pkg_tool):
+        raise click.BadOptionUsage(
+            "--pkg-tool", f"{pkg_tool} is not executable or in any path"
+        )
     if file:
         with click.open_file(file, "r") as fp:
             message = fp.read()
