@@ -27,6 +27,7 @@ import warnings
 from enum import Enum
 from functools import lru_cache, partial
 from pathlib import Path
+from shutil import which
 from typing import Optional, Set
 
 import click
@@ -73,6 +74,8 @@ class Config:
         self.keytab_path: Optional[str] = keytab_path
         self.kerberos_realm = kerberos_realm
         self.koji_build_command = koji_build_command
+        if not which(pkg_tool):
+            raise PackitConfigException(f"{pkg_tool} is not executable or in any path")
         self.pkg_tool: str = pkg_tool
         self.upstream_git_remote = upstream_git_remote
 

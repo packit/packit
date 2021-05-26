@@ -187,7 +187,6 @@ def test_get_user_config(tmp_path):
         "kerberos_realm: STG.FEDORAPROJECT.ORG\n"
         "github_token: GITHUB_TOKEN\n"
         "pagure_user_token: PAGURE_TOKEN\n"
-        "pkg_tool: fedpkg-stage\n"
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
         str(tmp_path)
@@ -197,7 +196,7 @@ def test_get_user_config(tmp_path):
     assert config.fas_user == "rambo"
     assert config.keytab_path == "./rambo.keytab"
     assert config.kerberos_realm == "STG.FEDORAPROJECT.ORG"
-    assert config.pkg_tool == "fedpkg-stage"
+    assert config.pkg_tool == "fedpkg"
 
     assert GithubService(token="GITHUB_TOKEN") in config.services
     assert PagureService(token="PAGURE_TOKEN") in config.services
