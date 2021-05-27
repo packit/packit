@@ -102,7 +102,7 @@ def update_dist_git(
     """
     if message and file:
         raise click.BadOptionUsage("-m", "Option -m cannot be combined with -F.")
-    if not which(pkg_tool):
+    if pkg_tool and not which(pkg_tool):
         raise click.BadOptionUsage(
             "--pkg-tool", f"{pkg_tool} is not executable or in any path"
         )
