@@ -9,7 +9,7 @@ import yaml
 import pytest
 
 from packit.constants import CENTOS_DOMAIN, CENTOS_STREAM_GITLAB
-from packit.fedpkg import FedPKG
+from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.source_git import SourceGitGenerator
@@ -107,7 +107,7 @@ def test_create_packit_yaml_upstream_project_url(
     dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
     dist_git_path = tmp_path.joinpath(pkg)
     source_git_path = tmp_path.joinpath("requre-sg")
-    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+    PkgTool().clone(pkg, str(dist_git_path), anonymous=True)
 
     # check out specific ref
     subprocess.check_call(["git", "reset", "--hard", dist_git_ref], cwd=dist_git_path)
@@ -139,7 +139,7 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
     """
     # requre lookaside_cache_url
     requre_tar_url = (
-        "https://src.fedoraproject.org/repo/pkgs/python-requre/"
+        "https://src.fedoraproject.org/repo/pkgs/rpms/python-requre/"
         "requre-0.4.0.tar.gz/sha512/85293577f56e19dd0fad13bb5e118ac2ab39d7"
         "570d640a754b9d8d8054078c89c949d4695ef018915b17a2f2428f1635032352d"
         "cf3c9a036a2d633013cc35dd9/requre-0.4.0.tar.gz"
@@ -151,7 +151,7 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
     dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
     dist_git_path = tmp_path.joinpath(pkg)
     source_git_path = tmp_path.joinpath("requre-sg")
-    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+    PkgTool().clone(pkg, str(dist_git_path), anonymous=True)
 
     # check out specific ref
     subprocess.check_call(["git", "reset", "--hard", dist_git_ref], cwd=dist_git_path)
@@ -206,7 +206,7 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
     dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
     dist_git_path = tmp_path.joinpath(pkg)
     source_git_path = tmp_path.joinpath("requre-sg")
-    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+    PkgTool().clone(pkg, str(dist_git_path), anonymous=True)
     dg_lp = LocalProject(working_dir=dist_git_path)
 
     # check out specific ref
@@ -265,7 +265,7 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     dist_git_ref = "6b27ffacda06289ca2d546e15b3c96845243005f"
     dist_git_path = tmp_path.joinpath(pkg)
     source_git_path = tmp_path.joinpath("requre-sg")
-    FedPKG().clone(pkg, str(dist_git_path), anonymous=True)
+    PkgTool().clone(pkg, str(dist_git_path), anonymous=True)
     dg_lp = LocalProject(working_dir=dist_git_path)
 
     # check out specific ref

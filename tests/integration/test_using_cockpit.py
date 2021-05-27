@@ -32,7 +32,7 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
-from packit.fedpkg import FedPKG
+from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
 from packit.utils import repo
 from packit.utils.commands import cwd
@@ -63,14 +63,14 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         if not Path(sources).is_file():
             raise RuntimeError("archive does not exist")
 
-    flexmock(FedPKG, new_sources=mocked_new_sources)
+    flexmock(PkgTool, new_sources=mocked_new_sources)
     flexmock(PackitAPI, init_kerberos_ticket=lambda: None)
 
     flexmock(
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,
         is_archive_in_lookaside_cache=lambda archive_path: False,
-        upload_to_lookaside_cache=lambda path: None,
+        upload_to_lookaside_cache=lambda archive, pkg_tool: None,
         download_upstream_archive=lambda: "the-archive",
     )
     flexmock(

@@ -196,6 +196,7 @@ def test_get_user_config(tmp_path):
     assert config.fas_user == "rambo"
     assert config.keytab_path == "./rambo.keytab"
     assert config.kerberos_realm == "STG.FEDORAPROJECT.ORG"
+    assert config.pkg_tool == "fedpkg"
 
     assert GithubService(token="GITHUB_TOKEN") in config.services
     assert PagureService(token="PAGURE_TOKEN") in config.services

@@ -29,37 +29,36 @@ from packit.utils import commands  # so we can mock utils
 from packit.utils.logging import logger
 
 
-class FedPKG:
+class PkgTool:
     """
-    Part of the code is from release-bot:
-
-    https://github.com/user-cont/release-bot/blob/master/release_bot/fedora.py
+    Wrapper around fedpkg/centpkg.
     """
 
     def __init__(
         self,
         fas_username: str = None,
         directory: Union[Path, str] = None,
-        fedpkg_exec: str = "fedpkg",
+        tool: str = "fedpkg",
     ):
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
-        self.fedpkg_exec = fedpkg_exec
+        self.tool = tool
 
     def __repr__(self):
         return (
-            "FedPKG("
+            "PkgTool("
             f"fas_username='{self.fas_username}', "
             f"directory='{self.directory}', "
-            f"fedpkg_exec='{self.fedpkg_exec}')"
+            f"tool='{self.tool}')"
         )
 
-    def new_sources(self, sources="", fail=True):
+    def new_sources(self, sources: Optional[Path] = None, fail: bool = True):
         if not self.directory.is_dir():
-            raise Exception("Cannot access fedpkg repository:")
+            raise Exception(f"Cannot access {self.tool} repository: {self.directory}")
 
+        sources_ = str(sources) if sources else ""
         return commands.run_command_remote(
-            cmd=[self.fedpkg_exec, "new-sources", sources],
+            cmd=[self.tool, "new-sources", sources_],
             cwd=self.directory,
             error_message="Adding new sources failed:",
             print_live=True,
@@ -80,9 +79,8 @@ class FedPKG:
         :param nowait: False == wait for the build to finish
         :param koji_target: koji target to build in (`koji list-targets`)
         :param srpm_path: use selected SRPM for build, not dist-git repo & ref
-        :return:
         """
-        cmd = [self.fedpkg_exec, "build"]
+        cmd = [self.tool, "build"]
         if scratch:
             cmd.append("--scratch")
         if nowait:
@@ -107,7 +105,7 @@ class FedPKG:
                 in ex.stderr_output
             ):
                 logger.info(
-                    "The 'fedpkg build' command crashed which is a known issue: "
+                    f"'{self.tool} build' crashed. It is a known issue: "
                     "the build is submitted in koji anyway."
                 )
                 logger.debug(ex.stdout_output)
@@ -120,7 +118,7 @@ class FedPKG:
         clone a dist-git repo; this has to be done in current env
         b/c we don't have the keytab in sandbox
         """
-        cmd = [self.fedpkg_exec]
+        cmd = [self.tool]
         if self.fas_username:
             cmd += ["--user", self.fas_username]
         cmd += ["-q", "clone"]

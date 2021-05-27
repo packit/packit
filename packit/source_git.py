@@ -422,13 +422,14 @@ class SourceGitGenerator:
         self.local_project.stage(self.dist_git.source_git_downstream_suffix)
         self.local_project.commit(message="add downstream distribution sources")
 
-    def _get_lookasisde_sources(self) -> List[Dict[str, str]]:
+    def _get_lookaside_sources(self) -> List[Dict[str, str]]:
         """
         Read "sources" file from the dist-git repo and return a list of dicts
         with path and url to sources stored in the lookaside cache
         """
+        pkg_tool = "centpkg" if self.centos_package else "fedpkg"
         try:
-            config = LookasideCacheHelper._read_config(self.config.fedpkg_exec)
+            config = LookasideCacheHelper._read_config(pkg_tool)
             base_url = config["lookaside"]
         except (configparser.Error, KeyError) as e:
             raise LookasideCacheError("Failed to read rpkg configuration") from e
@@ -436,21 +437,15 @@ class SourceGitGenerator:
         package = self.dist_git.package_config.downstream_package_name
         basepath = self.dist_git.local_project.working_dir
 
-        sources = list()
+        sources = []
         for source in LookasideCacheHelper._read_sources(basepath):
-
-            if self.config.fedpkg_exec == "fedpkg":
-                url = "{0}/{1}/{2}/{3}/{4}/{2}".format(
-                    base_url,
-                    package,
-                    source["filename"],
-                    source["hashtype"],
-                    source["hash"],
-                )
-            else:  # centpkg
-                url = "{0}/{1}/{2}/{3}/{2}".format(
-                    base_url, package, source["filename"], source["hash"]
-                )
+            url = "{0}/rpms/{1}/{2}/{3}/{4}/{2}".format(
+                base_url,
+                package,
+                source["filename"],
+                source["hashtype"],
+                source["hash"],
+            )
 
             path = source["filename"]
             sources.append({"path": path, "url": url})
@@ -546,7 +541,7 @@ class SourceGitGenerator:
         create a source-git repo from upstream
         """
         self._pull_upstream_ref()
-        lookaside_sources = self._get_lookasisde_sources()
+        lookaside_sources = self._get_lookaside_sources()
         self._put_downstream_sources([di["path"] for di in lookaside_sources])
         self._add_packit_config(lookaside_sources)
         if self.dist_git.specfile.get_applied_patches():

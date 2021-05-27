@@ -6,6 +6,8 @@ Update a dist-git repo from a source-git repo
 """
 
 import pathlib
+from shutil import which
+
 import click
 
 from typing import Optional
@@ -29,10 +31,6 @@ from packit.local_project import LocalProject
     type=str,
     help="""Name or path of the packaging tool used to work with
     sources in the dist-git repo. A variant of 'rpkg'.
-
-    Currently the implementation of this option is incomplete and
-    'fedpkg' is used to work with sources, regardless of the value given
-    to this option.
 
     Skip retrieving and uploading source archives to the lookaside cache
     if not specified.
@@ -82,8 +80,7 @@ def update_dist_git(
 
     The source archives are retrieved from the upstream URLs specified in
     the spec-file and uploaded to the lookaside cache in dist-git only if
-    '--pkg-tool' is specified. Note that the implementation of this option
-    is incomplete so 'fedpkg' is used, regardless of the value specified.
+    '--pkg-tool' is specified.
 
     Examples:
 
@@ -105,6 +102,10 @@ def update_dist_git(
     """
     if message and file:
         raise click.BadOptionUsage("-m", "Option -m cannot be combined with -F.")
+    if not which(pkg_tool):
+        raise click.BadOptionUsage(
+            "--pkg-tool", f"{pkg_tool} is not executable or in any path"
+        )
     if file:
         with click.open_file(file, "r") as fp:
             message = fp.read()
@@ -125,12 +126,11 @@ def update_dist_git(
         version=None,
         upstream_ref=upstream_ref or package_config.upstream_ref,
         # Add new sources if a pkg_tool was specified.
-        # This uses fedpkg for now,
-        # TODO make the pkg_tool used configurable
         add_new_sources=bool(pkg_tool),
         force_new_sources=False,
         upstream_tag=None,
         commit_title=title,
         commit_msg=message,
         sync_default_files=False,
+        pkg_tool=pkg_tool,
     )

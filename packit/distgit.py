@@ -40,7 +40,7 @@ from packit.config import (
 )
 from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
-from packit.fedpkg import FedPKG
+from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
 from packit.utils.commands import cwd
 from packit.utils.repo import clone_fedora_package
@@ -148,12 +148,12 @@ class DistGit(PackitRepositoryBase):
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
-                f = FedPKG(
+                pkg_tool = PkgTool(
                     fas_username=self.fas_user,
                     directory=tmpdir,
-                    fedpkg_exec=self.config.fedpkg_exec,
+                    tool=self.config.pkg_tool,
                 )
-                f.clone(
+                pkg_tool.clone(
                     self.package_config.downstream_package_name,
                     tmpdir,
                     anonymous=not cccolutils.has_creds(),
@@ -324,7 +324,7 @@ class DistGit(PackitRepositoryBase):
         """
         Fetch archive for the current upstream release defined in dist-git's spec
 
-        :return: str, path to the archive
+        :return: path to the archive
         """
         with cwd(self.local_project.working_dir):
             self.download_remote_sources()
@@ -336,22 +336,29 @@ class DistGit(PackitRepositoryBase):
         logger.info(f"Downloaded archive: {archive}")
         return archive
 
-    def upload_to_lookaside_cache(self, archive_path: str) -> None:
+    def upload_to_lookaside_cache(self, archive: Path, pkg_tool: str = "") -> None:
+        """Upload files (archive) to the lookaside cache.
+
+        If the archive is already uploaded, the rpkg tool doesn't do anything.
+
+        Args:
+            archive: Path to archive to upload to lookaside cache.
+            pkg_tool: Optional, rpkg tool (fedpkg/centpkg) to use to upload.
+
+        Raises:
+            PackitException, if the upload fails.
         """
-        Upload files (archive) to the lookaside cache.
-        """
-        # TODO: can we check if the tarball is already uploaded so we don't have ot re-upload?
         logger.info("About to upload to lookaside cache.")
-        f = FedPKG(
+        pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            fedpkg_exec=self.config.fedpkg_exec,
+            tool=pkg_tool or self.config.pkg_tool,
         )
         try:
-            f.new_sources(sources=archive_path)
+            pkg_tool_.new_sources(sources=archive)
         except Exception as ex:
             logger.error(
-                f"The 'fedpkg new-sources' command failed for the following reason: {ex!r}"
+                f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
             )
             raise PackitException(ex)
 
@@ -391,12 +398,12 @@ class DistGit(PackitRepositoryBase):
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
         """
-        fpkg = FedPKG(
+        pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
-            fedpkg_exec=self.config.fedpkg_exec,
+            tool=self.config.pkg_tool,
         )
-        fpkg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_bodhi_update(
         self,
