@@ -1,3 +1,11 @@
+# 0.31.0
+
+- Downstream package name is set when dist-git path is provided. (#1246)
+- A bug with older Python present on Fedora Linux 32 and EPEL 8 is fixed. (#1240)
+- There is a new `update-dist-git` subcommand that is
+  an improved offline version of `propose-downstream`. (#1228)
+- Source-git: Commit metadata newly includes `patch_id`. (#1252)
+
 # 0.30.1
 
 - Fixed a bug caused by new click release. (#1238)
