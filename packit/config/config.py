@@ -75,7 +75,7 @@ class Config:
         self.kerberos_realm = kerberos_realm
         self.koji_build_command = koji_build_command
         if not which(pkg_tool):
-            raise PackitConfigException(f"{pkg_tool} is not executable or in any path")
+            logger.warning(f"{pkg_tool} is not executable or in any path")
         self.pkg_tool: str = pkg_tool
         self.upstream_git_remote = upstream_git_remote
 
