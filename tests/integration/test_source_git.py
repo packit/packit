@@ -490,11 +490,6 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
-    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
-        "Patch1: citra.patch",
-        "Patch2: malt.patch",
-        "Patch8: 0001-m04r-malt.patch",
-    )
     autosetup_line = api_instance_source_git.up.specfile.spec_content.section("%prep")[
         0
     ]
