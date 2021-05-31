@@ -210,14 +210,14 @@ def create_git_am_style_history(sg: Path):
 
     hops.write_text("Citra\n")
     meta = PatchMetadata(
-        name="citra.patch", squash_commits=True, present_in_specfile=True
+        name="citra.patch", squash_commits=True, present_in_specfile=False, patch_id=10
     )
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
     malt = sg.joinpath("malt")
     malt.write_text("Munich\n")
     meta = PatchMetadata(
-        name="malt.patch", squash_commits=True, present_in_specfile=True
+        name="malt.patch", squash_commits=True, present_in_specfile=False
     )
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
@@ -229,7 +229,10 @@ def create_git_am_style_history(sg: Path):
 
     malt.write_text("Weyermann\n")
     meta = PatchMetadata(
-        name="0001-m04r-malt.patch", squash_commits=True, present_in_specfile=True
+        name="0001-m04r-malt.patch",
+        squash_commits=True,
+        present_in_specfile=False,
+        patch_id=100,
     )
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
