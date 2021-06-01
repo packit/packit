@@ -98,7 +98,9 @@ class CommitVerifier:
         raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
 
     def check_signature_of_commit(
-        self, commit: git.Commit, possible_key_fingerprints: List[str]
+        self,
+        commit: git.Commit,
+        possible_key_fingerprints: List[str],
     ) -> bool:
         """
         Check the validity of the commit signature
@@ -165,7 +167,8 @@ class CommitVerifier:
             return commit.repo.git.show(commit.hexsha, pretty=f"format:{pretty_format}")
         except git.GitCommandError as error:
             raise PackitException(
-                f"Cannot find commit {commit.hexsha!r} to check its signature.", error
+                f"Cannot find commit {commit.hexsha!r} to check its signature.",
+                error,
             )
 
 

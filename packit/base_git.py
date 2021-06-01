@@ -58,7 +58,8 @@ class PackitRepositoryBase:
     def command_handler(self) -> CommandHandler:
         if self._command_handler is None:
             self._command_handler = self.handler_kls(
-                local_project=self.local_project, config=self.config
+                local_project=self.local_project,
+                config=self.config,
             )
         return self._command_handler
 
@@ -99,7 +100,8 @@ class PackitRepositoryBase:
     def specfile(self) -> Specfile:
         if self._specfile is None:
             self._specfile = Specfile(
-                self.absolute_specfile_path, self.absolute_source_dir
+                self.absolute_specfile_path,
+                self.absolute_source_dir,
             )
         return self._specfile
 
@@ -112,7 +114,10 @@ class PackitRepositoryBase:
         return self.absolute_specfile_dir
 
     def create_branch(
-        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+        self,
+        branch_name: str,
+        base: str = "HEAD",
+        setup_tracking: bool = False,
     ) -> git.Head:
         """
         Create a new git branch in dist-git
@@ -125,7 +130,9 @@ class PackitRepositoryBase:
         """
         # keeping the method in this class to preserve compatibility
         return self.local_project.create_branch(
-            branch_name=branch_name, base=base, setup_tracking=setup_tracking
+            branch_name=branch_name,
+            base=base,
+            setup_tracking=setup_tracking,
         )
 
     def checkout_branch(self, git_ref: str = None):
@@ -153,7 +160,7 @@ class PackitRepositoryBase:
         self.local_project.git_repo.git.add("-A")
         if not self.local_project.git_repo.is_dirty():
             raise PackitException(
-                "No changes are present in the dist-git repo: nothing to commit."
+                "No changes are present in the dist-git repo: nothing to commit.",
             )
         self.local_project.git_repo.index.write()
         commit_args = ["-s", "-m", main_msg]
@@ -231,7 +238,7 @@ class PackitRepositoryBase:
         if not isinstance(configured_action, list):
             raise ValueError(
                 f"Expecting 'str' or 'list' as a command, got '{type(configured_action)}'. "
-                f"The value: {configured_action}"
+                f"The value: {configured_action}",
             )
 
         parsed_commands = []
@@ -243,7 +250,7 @@ class PackitRepositoryBase:
             else:
                 raise ValueError(
                     f"Expecting 'str' or 'list' as a command, got '{type(cmd)}'. "
-                    f"The value: {cmd}"
+                    f"The value: {cmd}",
                 )
         return parsed_commands
 
@@ -281,7 +288,9 @@ class PackitRepositoryBase:
         return True
 
     def get_output_from_action(
-        self, action: ActionName, env: Optional[Dict] = None
+        self,
+        action: ActionName,
+        env: Optional[Dict] = None,
     ) -> Optional[List[str]]:
         """
         Run self.actions[action] command(s) and return their outputs.
@@ -296,13 +305,18 @@ class PackitRepositoryBase:
         for cmd in commands_to_run:
             outputs.append(
                 self.command_handler.run_command(
-                    cmd, return_output=True, env=env, print_live=True
-                )
+                    cmd,
+                    return_output=True,
+                    env=env,
+                    print_live=True,
+                ),
             )
         return outputs
 
     def specfile_add_patches(
-        self, patch_list: List[PatchMetadata], patch_id_digits: int = 4
+        self,
+        patch_list: List[PatchMetadata],
+        patch_id_digits: int = 4,
     ) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
@@ -340,7 +354,8 @@ class PackitRepositoryBase:
         ver = CommitVerifier()
         last_commit = self.local_project.git_repo.head.commit
         valid = ver.check_signature_of_commit(
-            commit=last_commit, possible_key_fingerprints=self.allowed_gpg_keys
+            commit=last_commit,
+            possible_key_fingerprints=self.allowed_gpg_keys,
         )
         if not valid:
             msg = f"Last commit {last_commit.hexsha!r} not signed by the authorized gpg key."
@@ -378,10 +393,12 @@ class PackitRepositoryBase:
     def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
         """push selected refspec to a git remote"""
         logger.info(
-            f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}."
+            f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}.",
         )
         push_infos_list: Iterable[PushInfo] = self.local_project.push(
-            refspec, remote_name=remote_name, force=force
+            refspec,
+            remote_name=remote_name,
+            force=force,
         )
         for pi in push_infos_list:
             logger.info(f"Push summary: {pi.summary}")
@@ -399,7 +416,7 @@ class PackitRepositoryBase:
             if any(push_failed):
                 logger.debug(f"Push flags: {pi.flags}")
                 raise PackitException(
-                    f"We were unable to push to dist-git: {pi.summary}."
+                    f"We were unable to push to dist-git: {pi.summary}.",
                 )
 
     def download_remote_sources(self):

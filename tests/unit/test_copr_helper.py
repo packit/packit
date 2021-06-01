@@ -17,10 +17,10 @@ class TestCoprHelper:
     def test_get_avilable_chroots(self, get_list_keys, expected_return):
         copr_client_mock = flexmock(mock_chroot_proxy=flexmock())
         copr_client_mock.mock_chroot_proxy.should_receive("get_list.keys").and_return(
-            get_list_keys
+            get_list_keys,
         )
         flexmock(packit.copr_helper.CoprClient).should_receive(
-            "create_from_config_file"
+            "create_from_config_file",
         ).and_return(copr_client_mock)
 
         copr_helper = CoprHelper("_upstream_local_project")
@@ -45,7 +45,7 @@ class TestCoprHelper:
         copr_client_mock = flexmock(config={"copr_url": "https://fedoracloud.org"})
 
         flexmock(packit.copr_helper.CoprClient).should_receive(
-            "create_from_config_file"
+            "create_from_config_file",
         ).and_return(copr_client_mock)
         copr_helper = CoprHelper("_upstream_local_project")
 

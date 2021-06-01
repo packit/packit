@@ -37,7 +37,7 @@ class StringOrListOfStringsField(fields.Field):
             return [value]
         else:
             raise ValidationError(
-                f"Expected 'list[str]' or 'str', got {type(value)!r}."
+                f"Expected 'list[str]' or 'str', got {type(value)!r}.",
             )
 
 
@@ -177,7 +177,7 @@ class TargetField(fields.String):
         if target in DEPRECATED_TARGET_MAP:
             logger.warning(
                 f"Target '{target}' is deprecated. Please update your configuration "
-                f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead."
+                f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead.",
             )
 
         return super()._deserialize(target, *args, **kwargs)
@@ -206,7 +206,7 @@ class JobMetadataSchema(Schema):
             if key in data:
                 logger.warning(
                     f"Job metadata key {key!r} has been renamed to 'dist_git_branches', "
-                    f"please update your configuration file."
+                    f"please update your configuration file.",
                 )
                 data["dist_git_branches"] = data.pop(key)
         for key in ("targets", "dist_git_branches"):
@@ -244,7 +244,8 @@ class CommonConfigSchema(Schema):
     current_version_command = fields.List(fields.String(), missing=None)
     allowed_gpg_keys = fields.List(fields.String(), missing=None)
     spec_source_id = fields.Method(
-        deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
+        deserialize="spec_source_id_fm",
+        serialize="spec_source_id_serialize",
     )
     synced_files = fields.List(FilesToSyncField())
     actions = ActionField(default={})
@@ -252,7 +253,9 @@ class CommonConfigSchema(Schema):
     sync_changelog = fields.Bool(default=False)
     patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
     patch_generation_patch_id_digits = fields.Integer(
-        missing=4, default=4, validate=lambda x: x >= 0
+        missing=4,
+        default=4,
+        validate=lambda x: x >= 0,
     )
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
@@ -346,7 +349,7 @@ class PackageConfigSchema(CommonConfigSchema):
             if old_key_value:
                 logger.warning(
                     f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
-                    f" please update your configuration file."
+                    f" please update your configuration file.",
                 )
                 new_key_value = data.get(new_key_name, None)
                 if not new_key_value:
@@ -372,12 +375,12 @@ class PackageConfigSchema(CommonConfigSchema):
             if downstream_package_name:
                 data["specfile_path"] = f"{downstream_package_name}.spec"
                 logger.debug(
-                    f'Setting `specfile_path` to "./{downstream_package_name}.spec".'
+                    f'Setting `specfile_path` to "./{downstream_package_name}.spec".',
                 )
             else:
                 # guess it?
                 logger.debug(
-                    "Neither `specfile_path` nor `downstream_package_name` set."
+                    "Neither `specfile_path` nor `downstream_package_name` set.",
                 )
         return data
 

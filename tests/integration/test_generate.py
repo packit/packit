@@ -39,7 +39,8 @@ def test_generate_pass(upstream_without_config):
 
 def test_generate_fail(cwd_upstream_or_distgit):
     result = call_packit(
-        parameters=["generate"], working_dir=str(cwd_upstream_or_distgit)
+        parameters=["generate"],
+        working_dir=str(cwd_upstream_or_distgit),
     )
 
     assert result.exit_code == 2  # packit config already exists --force needed

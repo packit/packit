@@ -130,7 +130,14 @@ def run_command_remote(
         call kinit of some ticket
     """
     return run_command(
-        cmd, error_message, cwd, fail, output, env, decode=decode, print_live=print_live
+        cmd,
+        error_message,
+        cwd,
+        fail,
+        output,
+        env,
+        decode=decode,
+        print_live=print_live,
     )
 
 

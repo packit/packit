@@ -81,7 +81,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                         "We've encountered an error while talking to GitHub API, please make sure"
                         " that you pass GitHub API token and it has correct permissions, \n"
                         f"precise error message: {exc} \n"
-                        "https://github.com/packit/packit/tree/master/docs\n"
+                        "https://github.com/packit/packit/tree/master/docs\n",
                     )
                 sys.exit(exit_code or 3)
             except Exception as exc:
@@ -137,7 +137,7 @@ def get_packit_api(
 
     if not local_project.git_repo:
         raise PackitNotAGitRepoException(
-            f"{local_project.working_dir!r} is not a git repository."
+            f"{local_project.working_dir!r} is not a git repository.",
         )
 
     remote_urls: List[str] = []

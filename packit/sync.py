@@ -18,7 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 def check_subpath(
-    subpath: Path, path: Path, ensure_trailing_slash: bool = False
+    subpath: Path,
+    path: Path,
+    ensure_trailing_slash: bool = False,
 ) -> str:
     """Check if 'subpath' is a subpath of 'path'
 
@@ -36,7 +38,7 @@ def check_subpath(
         subpath.resolve().relative_to(path.resolve())
     except ValueError:
         raise PackitException(
-            f"Sync files: Illegal path! {subpath} is not in the subpath of {path}."
+            f"Sync files: Illegal path! {subpath} is not in the subpath of {path}.",
         )
     ret = str(subpath.resolve())
     if ensure_trailing_slash:
@@ -131,11 +133,15 @@ class SyncFilesItem:
             for path in self.src
         ]
         self.dest = check_subpath(
-            dest_base / self.dest, dest_base, self.dest.endswith(os.sep)
+            dest_base / self.dest,
+            dest_base,
+            self.dest.endswith(os.sep),
         )
 
     def drop_src(
-        self, src: Union[str, Path], criteria=lambda x, y: x == str(y)
+        self,
+        src: Union[str, Path],
+        criteria=lambda x, y: x == str(y),
     ) -> Optional["SyncFilesItem"]:
         """Remove 'src' from the list of src-s
 

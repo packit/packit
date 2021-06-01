@@ -45,7 +45,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                    )
+                    ),
                 ],
             ),
             None,
@@ -61,7 +61,7 @@ from packit.config.job_config import JobMetadataConfig
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
                         metadata=JobMetadataConfig(dist_git_branches=["file"]),
-                    )
+                    ),
                 ],
             ),
             None,
@@ -76,7 +76,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                    )
+                    ),
                 ],
             ),
             "cmdline",
@@ -92,7 +92,7 @@ from packit.config.job_config import JobMetadataConfig
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
                         metadata=JobMetadataConfig(dist_git_branches=["file"]),
-                    )
+                    ),
                 ],
             ),
             "cmdline",
@@ -108,9 +108,9 @@ from packit.config.job_config import JobMetadataConfig
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
                         metadata=JobMetadataConfig(
-                            dist_git_branches=["file1", "file2"]
+                            dist_git_branches=["file1", "file2"],
                         ),
-                    )
+                    ),
                 ],
             ),
             None,
@@ -126,7 +126,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                    )
+                    ),
                 ],
             ),
             "cmdline1,cmdline2",
@@ -142,7 +142,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                    )
+                    ),
                 ],
             ),
             "rawhide",
@@ -158,7 +158,7 @@ from packit.config.job_config import JobMetadataConfig
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
                         metadata=JobMetadataConfig(dist_git_branches=["rawhide"]),
-                    )
+                    ),
                 ],
             ),
             None,
@@ -174,9 +174,9 @@ from packit.config.job_config import JobMetadataConfig
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
                         metadata=JobMetadataConfig(
-                            dist_git_branches=["file1", "rawhide"]
+                            dist_git_branches=["file1", "rawhide"],
                         ),
-                    )
+                    ),
                 ],
             ),
             None,
@@ -192,7 +192,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                    )
+                    ),
                 ],
             ),
             "cmdline1,rawhide",

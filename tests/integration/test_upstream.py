@@ -83,7 +83,11 @@ def test_get_spec_version(upstream_instance):
     ],
 )
 def test_get_current_version(
-    tag, tag_template, current_version_command_out, expected_output, upstream_instance
+    tag,
+    tag_template,
+    current_version_command_out,
+    expected_output,
+    upstream_instance,
 ):
     u, ups = upstream_instance
     flexmock(ups)
@@ -91,7 +95,7 @@ def test_get_current_version(
     # just to simulate current_vesrsion_command set/notset
     ups.package_config.current_version_command = current_version_command_out
     ups.should_receive("command_handler.run_command").and_return(
-        current_version_command_out
+        current_version_command_out,
     )
     ups.should_receive("get_last_tag").and_return(tag)
 
@@ -218,7 +222,9 @@ def change_source_ext(upstream, extension):
 
 
 @pytest.mark.parametrize(
-    "extension", [".tar.gz", ".tar.bz2"], ids=[".tar.gz", ".tar.bz2"]
+    "extension",
+    [".tar.gz", ".tar.bz2"],
+    ids=[".tar.gz", ".tar.bz2"],
 )
 def test_create_archive(upstream_instance, extension):
     u, ups = upstream_instance
@@ -331,7 +337,8 @@ def test_create_srpm_git_desc_release(upstream_instance):
     assert srpm.exists()
     build_srpm(srpm)
     assert re.match(
-        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.(fc\d{2}|el\d).src.rpm$", str(srpm)
+        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.(fc\d{2}|el\d).src.rpm$",
+        str(srpm),
     )
 
     changelog = ups.specfile.spec_content.section("%changelog")
@@ -350,15 +357,16 @@ def test_github_app(upstream_instance, tmp_path):
         f"authentication:\n"
         f"    github.com:\n"
         f"        github_app_private_key_path: {fake_cert_path}\n"
-        f"        github_app_id: qwe\n"
+        f"        github_app_id: qwe\n",
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmp_path)
+        str(tmp_path),
     )
     ups.config = Config.get_user_config()
     assert (
         GithubService(
-            github_app_private_key_path=str(fake_cert_path), github_app_id="qwe"
+            github_app_private_key_path=str(fake_cert_path),
+            github_app_id="qwe",
         )
         in ups.config.services
     )
@@ -374,7 +382,9 @@ def test_get_last_tag(upstream_instance):
     [
         pytest.param("{upstream_pkg_name}-{version}", "beerware-0.1.0", id="default"),
         pytest.param(
-            "{version}-{upstream_pkg_name}", "0.1.0-beerware", id="ver-pkg_name"
+            "{version}-{upstream_pkg_name}",
+            "0.1.0-beerware",
+            id="ver-pkg_name",
         ),
     ],
 )

@@ -44,7 +44,7 @@ class PackageConfigValidator:
                 self.content,
                 config_file_path=str(self.config_file_path),
                 spec_file_path=str(
-                    get_local_specfile_path(self.config_file_path.parent)
+                    get_local_specfile_path(self.config_file_path.parent),
                 ),
             )
         except ValidationError as e:
@@ -79,7 +79,10 @@ class PackageConfigValidator:
         return field_output
 
     def validate_get_field_item_output(
-        self, errors: dict, field_name: str, level: int
+        self,
+        errors: dict,
+        field_name: str,
+        level: int,
     ) -> str:
         index_output = f"{level * '*'} field {field_name} has an incorrect value:\n"
         level += 1

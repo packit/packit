@@ -190,7 +190,7 @@ class TestGetBranches:
     )
     def test_get_branches_from_multiple_values(self, names, versions):
         flexmock(packit.config.aliases).should_receive("get_versions").and_return(
-            versions
+            versions,
         )
         assert get_branches(*names) == versions
 
@@ -301,7 +301,7 @@ class TestGetAliases:
     def test_get_aliases(self, releases_list, expected_return, bodhi_client_response):
         bodhi_instance_mock = flexmock()
         bodhi_instance_mock.should_receive("get_releases").and_return(
-            bodhi_client_response(releases_list)
+            bodhi_client_response(releases_list),
         )
         flexmock(bodhi.client.bindings.BodhiClient).new_instances(bodhi_instance_mock)
 
@@ -309,14 +309,14 @@ class TestGetAliases:
         aliases = get_aliases()
 
         assert Counter(aliases["fedora-stable"]) == Counter(
-            expected_return["fedora-stable"]
+            expected_return["fedora-stable"],
         )
         assert Counter(aliases["fedora-development"]) == Counter(
-            expected_return["fedora-development"]
+            expected_return["fedora-development"],
         )
         assert Counter(aliases["fedora-all"]) == Counter(expected_return["fedora-all"])
         assert Counter(aliases["fedora-latest"]) == Counter(
-            expected_return["fedora-latest"]
+            expected_return["fedora-latest"],
         )
         assert Counter(aliases["epel-all"]) == Counter(expected_return["epel-all"])
 
@@ -333,10 +333,10 @@ class TestGetAliases:
 )
 def test_get_valid_build_targets(targets, chroots, expected_result):
     flexmock(packit.config.aliases).should_receive("get_build_targets").and_return(
-        targets
+        targets,
     )
     flexmock(packit.config.aliases.CoprHelper).should_receive(
-        "get_available_chroots"
+        "get_available_chroots",
     ).and_return(chroots)
 
     assert get_valid_build_targets() == expected_result
@@ -356,6 +356,6 @@ def test_get_valid_build_targets_get_aliases_call(name, default):
         *name, **default
     ).and_return(set())
     flexmock(packit.config.aliases.CoprHelper).should_receive(
-        "get_available_chroots"
+        "get_available_chroots",
     ).and_return(set())
     get_valid_build_targets(*name, **default)

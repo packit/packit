@@ -65,7 +65,9 @@ class CentOS8DistGit(DistGit):
         branch: str = None,
     ) -> "CentOS8DistGit":
         clone_centos_8_package(
-            package_config.downstream_package_name, path, branch=branch
+            package_config.downstream_package_name,
+            path,
+            branch=branch,
         )
         lp = LocalProject(working_dir=path)
         return cls(config, package_config, local_project=lp)
@@ -92,14 +94,17 @@ class CentOS9DistGit(DistGit):
         branch: str = None,
     ) -> "CentOS9DistGit":
         clone_centos_9_package(
-            package_config.downstream_package_name, path, branch=branch
+            package_config.downstream_package_name,
+            path,
+            branch=branch,
         )
         lp = LocalProject(working_dir=path)
         return cls(config, package_config, local_project=lp)
 
 
 def get_distgit_kls_from_repo(
-    repo_path: Path, config: Config
+    repo_path: Path,
+    config: Config,
 ) -> Tuple[DistGit, Optional[str], Optional[str]]:
     """
     :return: DistGit instance, centos package name, fedora package name
@@ -121,7 +126,7 @@ def get_distgit_kls_from_repo(
         return CentOS9DistGit(config, pc, local_project=lp), path.name, None
     raise PackitException(
         f"Dist-git URL {lp.git_url} not recognized, we expected one of: "
-        f"{FEDORA_DOMAIN}, {CENTOS_DOMAIN} or {CENTOS_STREAM_GITLAB}"
+        f"{FEDORA_DOMAIN}, {CENTOS_DOMAIN} or {CENTOS_STREAM_GITLAB}",
     )
 
 
@@ -189,7 +194,7 @@ class SourceGitGenerator:
         self.dist_git_branch = dist_git_branch
 
         logger.info(
-            f"The source-git repo is going to be created in {local_project.working_dir}."
+            f"The source-git repo is going to be created in {local_project.working_dir}.",
         )
 
         if dist_git_path:
@@ -205,35 +210,36 @@ class SourceGitGenerator:
             self.fedora_package = fedora_package
             if centos_package:
                 self.package_config = PackageConfig(
-                    downstream_package_name=centos_package
+                    downstream_package_name=centos_package,
                 )
             elif fedora_package:
                 self.fedora_package = (
                     self.fedora_package or local_project.working_dir.name
                 )
                 self.package_config = PackageConfig(
-                    downstream_package_name=fedora_package
+                    downstream_package_name=fedora_package,
                 )
             else:
                 raise PackitException(
-                    "Please tell us the name of the package in the downstream."
+                    "Please tell us the name of the package in the downstream.",
                 )
             self.dist_git_path = self.tmpdir.joinpath(
-                self.package_config.downstream_package_name
+                self.package_config.downstream_package_name,
             )
 
         if upstream_url:
             if Path(upstream_url).is_dir():
                 self.upstream_repo_path: Path = Path(upstream_url)
                 self.upstream_lp: LocalProject = LocalProject(
-                    working_dir=self.upstream_repo_path
+                    working_dir=self.upstream_repo_path,
                 )
             else:
                 self.upstream_repo_path = self.tmpdir.joinpath(
-                    f"{self.package_config.downstream_package_name}-upstream"
+                    f"{self.package_config.downstream_package_name}-upstream",
                 )
                 self.upstream_lp = LocalProject(
-                    git_url=upstream_url, working_dir=self.upstream_repo_path
+                    git_url=upstream_url,
+                    working_dir=self.upstream_repo_path,
                 )
         else:
             # $CWD is the upstream repo and we just need to pick
@@ -264,7 +270,7 @@ class SourceGitGenerator:
             if self._upstream_ref:
                 logger.info(
                     "upstream base ref was not set, "
-                    f"discovered it from the archive: {self._upstream_ref}"
+                    f"discovered it from the archive: {self._upstream_ref}",
                 )
             else:
                 # fallback to HEAD
@@ -276,18 +282,18 @@ class SourceGitGenerator:
                         "the top commit. We need to set upstream_ref in packit.yaml to "
                         "distinct between upstream and downstream changes. "
                         "Please set --upstream-ref or pull the upstream git history yourself. "
-                        f"Error: {ex}"
+                        f"Error: {ex}",
                     )
                 logger.info(
                     "upstream base ref was not set, "
-                    f"falling back to the HEAD commit: {self._upstream_ref}"
+                    f"falling back to the HEAD commit: {self._upstream_ref}",
                 )
         return self._upstream_ref
 
     @property
     def specfile_path(self) -> Path:
         return self.dist_git.get_root_downstream_dir_for_source_git(
-            self.local_project.working_dir
+            self.local_project.working_dir,
         ).joinpath(self.dist_git.absolute_specfile_path.name)
 
     def _get_dist_git(
@@ -337,7 +343,8 @@ class SourceGitGenerator:
         # if upstream_ref is a commit, we need to fetch everything
         # if it's a tag or branch, we can only fetch that ref
         self.local_project.fetch(
-            str(self.upstream_lp.working_dir), "+refs/heads/*:refs/remotes/origin/*"
+            str(self.upstream_lp.working_dir),
+            "+refs/heads/*:refs/remotes/origin/*",
         )
         self.local_project.fetch(
             str(self.upstream_lp.working_dir),
@@ -362,10 +369,10 @@ class SourceGitGenerator:
             raise PackitException(
                 "We are trying to unpack a dist-git archive and lay patches on top "
                 'by running `rpmbuild -bp` but we cannot find "_packitpatch" command on PATH: '
-                "please install packit as an RPM."
+                "please install packit as an RPM.",
             )
         logger.info(
-            f"expanding %prep section in {self.dist_git.local_project.working_dir}"
+            f"expanding %prep section in {self.dist_git.local_project.working_dir}",
         )
 
         rpmbuild_args = [
@@ -398,21 +405,21 @@ class SourceGitGenerator:
             self.dist_git.checkout_branch(self.dist_git_branch)
         self.dist_git.download_upstream_archive()
         root_downstream_dir = self.dist_git.get_root_downstream_dir_for_source_git(
-            self.local_project.working_dir
+            self.local_project.working_dir,
         )
         os.makedirs(root_downstream_dir, exist_ok=True)
 
         shutil.copy2(self.dist_git.absolute_specfile_path, root_downstream_dir)
 
         logger.info(
-            f"Copy all sources from {self.dist_git.absolute_source_dir} to {root_downstream_dir}."
+            f"Copy all sources from {self.dist_git.absolute_source_dir} to {root_downstream_dir}.",
         )
 
         # we may not want to copy the primary archive - it's worth a debate
         for source in self.dist_git.specfile.get_sources():
             if Path(source).name in lookaside_sources:
                 logger.debug(
-                    f"Source {source} will be fetched from the lookaside cache."
+                    f"Source {source} will be fetched from the lookaside cache.",
                 )
                 continue
             source_dest = root_downstream_dir / Path(source).name
@@ -461,7 +468,7 @@ class SourceGitGenerator:
             "specfile_path": f"{self.specfile_path.relative_to(self.local_project.working_dir)}",
             "upstream_ref": self.upstream_ref,
             "patch_generation_ignore_paths": [
-                self.dist_git.source_git_downstream_suffix
+                self.dist_git.source_git_downstream_suffix,
             ],
         }
 
@@ -485,7 +492,7 @@ class SourceGitGenerator:
                 #     key2: value1
                 # True in el8, False in the latest pyyaml
                 default_flow_style=False,
-            )
+            ),
         )
 
         self.local_project.stage(".packit.yaml")
@@ -516,7 +523,7 @@ class SourceGitGenerator:
         # -2 - drop first commit which represents tarball unpacking
         # -1 - reverse order, HEAD is last in the sequence
         patch_commits = list(
-            LocalProject(working_dir=BUILD_dir).get_commits(from_branch)
+            LocalProject(working_dir=BUILD_dir).get_commits(from_branch),
         )[-2::-1]
 
         for commit in patch_commits:
@@ -548,7 +555,7 @@ class SourceGitGenerator:
             self._run_prep()
             self._rebase_patches(
                 get_default_branch(
-                    LocalProject(working_dir=self.get_BUILD_dir()).git_repo
-                )
+                    LocalProject(working_dir=self.get_BUILD_dir()).git_repo,
+                ),
             )
             # TODO: patches which are defined but not applied should be copied

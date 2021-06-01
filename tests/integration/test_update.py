@@ -57,7 +57,9 @@ def github_release_webhook():
 
 
 def test_basic_local_update(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -77,7 +79,9 @@ def test_basic_local_update(
 
 
 def test_basic_local_update_reset_after_exception(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """check whether the distgit repo is not dirty after exception is raised"""
     u, d, api = api_instance
@@ -91,7 +95,9 @@ def test_basic_local_update_reset_after_exception(
 
 
 def test_basic_local_update_copy_upstream_release_description(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git,
     set copy_upstream_release_description in package config to True"""
@@ -122,7 +128,9 @@ Some description of the upstream release
 
 
 def test_basic_local_update_using_distgit(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -150,7 +158,10 @@ def test_basic_local_update_using_distgit(
 
 
 def test_basic_local_update_direct_push(
-    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -171,7 +182,10 @@ def test_basic_local_update_direct_push(
 
 
 def test_basic_local_update_direct_push_no_dg_spec(
-    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
     d.joinpath("beer.spec").unlink()
@@ -196,7 +210,9 @@ def test_basic_local_update_direct_push_no_dg_spec(
 
 
 def test_basic_local_update_from_downstream(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
     u, d, api = api_instance
@@ -219,7 +235,7 @@ def test_local_update_with_specified_tag_template():
             "downstream_package_name": "beer",
             "upstream_tag_template": "v{version}",
             "create_pr": False,
-        }
+        },
     )
     api = PackitAPI(c, pc)
 

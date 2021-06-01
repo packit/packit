@@ -104,7 +104,8 @@ def update_dist_git(
         raise click.BadOptionUsage("-m", "Option -m cannot be combined with -F.")
     if pkg_tool and not which(pkg_tool):
         raise click.BadOptionUsage(
-            "--pkg-tool", f"{pkg_tool} is not executable or in any path"
+            "--pkg-tool",
+            f"{pkg_tool} is not executable or in any path",
         )
     if file:
         with click.open_file(file, "r") as fp:
@@ -113,7 +114,8 @@ def update_dist_git(
     source_git_path = pathlib.Path(source_git).resolve()
     dist_git_path = pathlib.Path(dist_git).resolve()
     package_config = get_local_package_config(
-        source_git_path, package_config_path=config.package_config_path
+        source_git_path,
+        package_config_path=config.package_config_path,
     )
     api = PackitAPI(
         config=config,

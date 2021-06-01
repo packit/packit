@@ -29,7 +29,9 @@ from packit.utils import commands
 
 
 def test_basic_build(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
@@ -44,7 +46,9 @@ def test_basic_build(
 
 
 def test_build_from_upstream(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
 

@@ -65,7 +65,12 @@ logger = logging.getLogger(__name__)
 @pass_config
 @cover_packit_exception
 def create_update(
-    config, dist_git_branch, koji_build, update_notes, update_type, path_or_url
+    config,
+    dist_git_branch,
+    koji_build,
+    update_notes,
+    update_type,
+    path_or_url,
 ):
     """
     Create a bodhi update for the selected upstream project
@@ -80,7 +85,7 @@ def create_update(
         *dist_git_branch.split(","), default_dg_branch=default_dg_branch
     )
     click.echo(
-        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}"
+        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}",
     )
 
     if branches_to_update:

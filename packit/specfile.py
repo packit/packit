@@ -27,7 +27,9 @@ class Specfile(SpecFile):
         s = inspect.signature(SpecFile)
         if "changelog_entry" in s.parameters:
             super().__init__(
-                path=str(path), sources_location=str(sources_dir), changelog_entry=""
+                path=str(path),
+                sources_location=str(sources_dir),
+                changelog_entry="",
             )
         else:
             super().__init__(path=str(path), sources_location=str(sources_dir))
@@ -53,7 +55,10 @@ class Specfile(SpecFile):
             self.save()
 
     def set_spec_version(
-        self, version: str = None, release: str = None, changelog_entry: str = None
+        self,
+        version: str = None,
+        release: str = None,
+        changelog_entry: str = None,
     ):
         """
         Set version in spec, release and add a changelog_entry (if they are presented).
@@ -72,7 +77,9 @@ class Specfile(SpecFile):
             if release:
                 # using set_tag instead of set_release to turn off preserving macros
                 self.set_tag(
-                    "Release", "{}%{{?dist}}".format(release), preserve_macros=False
+                    "Release",
+                    "{}%{{?dist}}".format(release),
+                    preserve_macros=False,
                 )
 
             if not changelog_entry:
@@ -80,7 +87,7 @@ class Specfile(SpecFile):
 
             if not self.spec_content.section("%changelog"):
                 logger.debug(
-                    "The specfile doesn't have any %changelog, will not set it."
+                    "The specfile doesn't have any %changelog, will not set it.",
                 )
                 return
 
@@ -126,7 +133,9 @@ class Specfile(SpecFile):
 
     @saves
     def set_patches(
-        self, patch_list: List[PatchMetadata], patch_id_digits: int = 4
+        self,
+        patch_list: List[PatchMetadata],
+        patch_id_digits: int = 4,
     ) -> None:
         """
         Set given patches in the spec file
@@ -140,7 +149,7 @@ class Specfile(SpecFile):
 
         if all(p.present_in_specfile for p in patch_list):
             logger.debug(
-                "All patches are present in the spec file, nothing to do here 🚀"
+                "All patches are present in the spec file, nothing to do here 🚀",
             )
             return
 
@@ -155,13 +164,13 @@ class Specfile(SpecFile):
         for patch_metadata in patch_list:
             if patch_metadata.present_in_specfile:
                 logger.debug(
-                    f"Patch {patch_metadata.name} is already present in the spec file."
+                    f"Patch {patch_metadata.name} is already present in the spec file.",
                 )
                 continue
 
             if patch_metadata.name in applied_patches:
                 logger.debug(
-                    f"Patch {patch_metadata.name} is already defined in the spec file."
+                    f"Patch {patch_metadata.name} is already defined in the spec file.",
                 )
                 continue
 
@@ -194,7 +203,7 @@ class Specfile(SpecFile):
                     f"{patch_metadata.name} is less than or equal to the last used patch ID "
                     f"({patch_number_offset}). Re-ordering the patches using 'patch_id' is "
                     "not allowed - if you want to change the order of those patches, "
-                    "please reorder the commits in your source-git repository."
+                    "please reorder the commits in your source-git repository.",
                 )
             patch_id = patch_metadata.patch_id
         else:

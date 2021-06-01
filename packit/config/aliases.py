@@ -127,7 +127,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
             {
                 f"{sys_and_version}-{architecture}"
                 for sys_and_version in get_versions(f"{sys_name}-{version}")
-            }
+            },
         )
     possible_sys_and_versions = {
         DEPRECATED_TARGET_MAP.get(target, target)

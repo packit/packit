@@ -111,7 +111,8 @@ class PatchMetadata:
 
     @staticmethod
     def from_commit(
-        commit: git.Commit, patch_path: Optional[Path] = None
+        commit: git.Commit,
+        patch_path: Optional[Path] = None,
     ) -> "PatchMetadata":
         """
         Load PatchMetadata from an existing git.Commit
@@ -125,7 +126,7 @@ class PatchMetadata:
         if metadata:
             logger.debug(
                 f"Commit {commit.hexsha:.8} metadata:\n"
-                f"{yaml.dump(metadata, indent=4, default_flow_style=False)}"
+                f"{yaml.dump(metadata, indent=4, default_flow_style=False)}",
             )
             metadata_defined = True
         else:
@@ -192,7 +193,9 @@ class PatchGenerator:
                  within the set of git_ref children commits
         """
         commits = self.get_commits_since_ref(
-            git_ref, add_upstream_head_commit=True, no_merge_commits=False
+            git_ref,
+            add_upstream_head_commit=True,
+            no_merge_commits=False,
         )
         for commit in islice(commits, 1, None):  # 0 = upstream, don't check that one
             for parent_commit in commit.parents:
@@ -224,13 +227,13 @@ class PatchGenerator:
             "When git history is too complex with merge commits having parents \n"
             "across a wide range, git is known to produce patches which cannot be applied. \n"
             "Therefore we are going to make the history linear on a dedicated branch \n"
-            "to make sure the patches will be able to be applied."
+            "to make sure the patches will be able to be applied.",
         )
         if self.lp.git_repo.is_dirty():
             raise PackitGitException(
                 "The source-git repo is dirty which means we won't be able to do a linear history. "
                 "Please commit the changes to resolve the issue. If you are changing the content "
-                "of the repository in an action, you can commit those as well."
+                "of the repository in an action, you can commit those as well.",
             )
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         initial_branch = self.lp.ref
@@ -343,7 +346,7 @@ class PatchGenerator:
                     raise PackitException(
                         f"Empty commit {commit} is referencing a patch which is present in spec"
                         " file but the name is not defined in the commit metadata"
-                        " - please define it."
+                        " - please define it.",
                     )
                 patch_list.append(patch)
 
@@ -357,12 +360,13 @@ class PatchGenerator:
                 if commit.hexsha.encode() in patch_content:
                     path = Path(patch_name)
                     patch_metadata = PatchMetadata.from_commit(
-                        commit=commit, patch_path=path
+                        commit=commit,
+                        patch_path=path,
                     )
 
                     if patch_metadata.ignore:
                         logger.debug(
-                            f"[IGNORED: {patch_metadata.name}] {commit.summary}"
+                            f"[IGNORED: {patch_metadata.name}] {commit.summary}",
                         )
                     else:
                         logger.debug(f"[{patch_metadata.name}] {commit.summary}")
@@ -379,8 +383,9 @@ class PatchGenerator:
                             )
                             patch_list.append(
                                 PatchMetadata.from_commit(
-                                    commit=commit, patch_path=Path(git_f_p_out)
-                                )
+                                    commit=commit,
+                                    patch_path=Path(git_f_p_out),
+                                ),
                             )
                         else:
                             patch_list.append(patch_metadata)
@@ -406,7 +411,7 @@ class PatchGenerator:
         """
         if not any(commit.squash_commits for commit in patch_list):
             logger.debug(
-                "any of the commits has squash_commits=True, not the git-am style of patches"
+                "any of the commits has squash_commits=True, not the git-am style of patches",
             )
             return patch_list
 
@@ -444,7 +449,7 @@ class PatchGenerator:
             else:
                 logger.debug(f"Appending commit {patch} to {top_patch}.")
                 top_patch.path.write_text(
-                    patch.path.read_text() + top_patch.path.read_text()
+                    patch.path.read_text() + top_patch.path.read_text(),
                 )
                 patch.path.unlink()
             # we are draining rest of the iterator here
@@ -527,7 +532,9 @@ class PatchGenerator:
 
         # this is a string, separated by new-lines, with the names of patch files
         git_format_patch_out = self.run_git_format_patch(
-            destination, files_to_ignore, patches_revision_range
+            destination,
+            files_to_ignore,
+            patches_revision_range,
         )
 
         if git_format_patch_out:
@@ -538,7 +545,10 @@ class PatchGenerator:
             }
             commits = self.get_commits_in_range(patches_revision_range)
             patch_list = self.process_patches(
-                patches, commits, destination, files_to_ignore
+                patches,
+                commits,
+                destination,
+                files_to_ignore,
             )
             patch_list = self.process_git_am_style_patches(patch_list)
         else:
@@ -566,7 +576,7 @@ class PatchGenerator:
             upstream_ref = f"origin/{git_ref}"
             if upstream_ref not in self.lp.git_repo.refs:
                 raise PackitException(
-                    f"Couldn't not find upstream branch {upstream_ref!r} and tag {git_ref!r}."
+                    f"Couldn't not find upstream branch {upstream_ref!r} and tag {git_ref!r}.",
                 )
         commits = self.get_commits_in_range(
             revision_range=f"{git_ref}..{self.lp.ref}",
@@ -579,7 +589,9 @@ class PatchGenerator:
         return commits
 
     def get_commits_in_range(
-        self, revision_range: str, no_merge_commits: bool = True
+        self,
+        revision_range: str,
+        no_merge_commits: bool = True,
     ) -> List[git.Commit]:
         """
         provide a list of git.Commit objects in a given git range
@@ -593,5 +605,5 @@ class PatchGenerator:
                 rev=revision_range,
                 reverse=True,
                 no_merges=no_merge_commits,  # do not include merge commits in the list
-            )
+            ),
         )

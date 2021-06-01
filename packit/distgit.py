@@ -124,7 +124,9 @@ class DistGit(PackitRepositoryBase):
         """
         # TODO: use fedpkg for this, or even better, the lp property below
         clone_fedora_package(
-            package_config.downstream_package_name, path, branch=branch
+            package_config.downstream_package_name,
+            path,
+            branch=branch,
         )
         lp = LocalProject(working_dir=path)
         return cls(config, package_config, local_project=lp)
@@ -134,7 +136,7 @@ class DistGit(PackitRepositoryBase):
         """return an instance of LocalProject"""
         if self._local_project is None:
             dist_git_project = self.config.get_project(
-                url=self.package_config.dist_git_package_url
+                url=self.package_config.dist_git_package_url,
             )
 
             if self.package_config.dist_git_clone_path:
@@ -170,7 +172,7 @@ class DistGit(PackitRepositoryBase):
             self._local_project.refresh_the_arguments()
         elif not self._local_project.git_project:
             self._local_project.git_project = self.config.get_project(
-                url=self.package_config.dist_git_package_url
+                url=self.package_config.dist_git_package_url,
             )
             self._local_project.refresh_the_arguments()
         return self._local_project
@@ -192,7 +194,7 @@ class DistGit(PackitRepositoryBase):
         if not self.package_config.downstream_package_name:
             raise PackitException(
                 "Unable to find specfile in dist-git: "
-                "please set downstream_package_name in your .packit.yaml"
+                "please set downstream_package_name in your .packit.yaml",
             )
         return (
             self.local_project.working_dir
@@ -234,12 +236,15 @@ class DistGit(PackitRepositoryBase):
             remote_ref = origin.refs[branch_name]
         except IndexError:
             raise PackitException(
-                f"Branch {branch_name} does not exist in the origin remote."
+                f"Branch {branch_name} does not exist in the origin remote.",
             )
         head.set_commit(remote_ref)
 
     def push_to_fork(
-        self, branch_name: str, fork_remote_name: str = "fork", force: bool = False
+        self,
+        branch_name: str,
+        fork_remote_name: str = "fork",
+        force: bool = False,
     ):
         """
         push changes to a fork of the dist-git repo; they need to be committed!
@@ -250,7 +255,7 @@ class DistGit(PackitRepositoryBase):
         """
         logger.debug(
             f"About to {'force ' if force else ''}push changes to branch {branch_name!r} "
-            f"of a fork {fork_remote_name!r} of the dist-git repo."
+            f"of a fork {fork_remote_name!r} of the dist-git repo.",
         )
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
@@ -262,11 +267,12 @@ class DistGit(PackitRepositoryBase):
             if not fork:
                 raise PackitException(
                     "Unable to create a fork of repository "
-                    f"{self.local_project.git_project.full_repo_name}"
+                    f"{self.local_project.git_project.full_repo_name}",
                 )
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
-                name=fork_remote_name, url=fork_urls["ssh"]
+                name=fork_remote_name,
+                url=fork_urls["ssh"],
             )
 
         try:
@@ -279,14 +285,18 @@ class DistGit(PackitRepositoryBase):
             raise PackitException(msg)
 
     def create_pull(
-        self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
+        self,
+        pr_title: str,
+        pr_description: str,
+        source_branch: str,
+        target_branch: str,
     ) -> PullRequest:
         """
         Create dist-git pull request using the requested branches
         """
         logger.debug(
             "About to create dist-git pull request "
-            f"from {source_branch!r} to {target_branch!r}."
+            f"from {source_branch!r} to {target_branch!r}.",
         )
         project = self.local_project.git_project
 
@@ -331,7 +341,7 @@ class DistGit(PackitRepositoryBase):
         archive = self.absolute_source_dir / self.upstream_archive_name
         if not archive.exists():
             raise PackitException(
-                "Upstream archive was not downloaded, something is wrong."
+                "Upstream archive was not downloaded, something is wrong.",
             )
         logger.info(f"Downloaded archive: {archive}")
         return archive
@@ -358,7 +368,7 @@ class DistGit(PackitRepositoryBase):
             pkg_tool_.new_sources(sources=archive)
         except Exception as ex:
             logger.error(
-                f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
+                f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}",
             )
             raise PackitException(ex)
 
@@ -367,17 +377,17 @@ class DistGit(PackitRepositoryBase):
         try:
             res = requests.head(
                 f"{self.package_config.dist_git_base_url}lookaside/pkgs/"
-                f"{self.package_config.downstream_package_name}/{archive_name}/"
+                f"{self.package_config.downstream_package_name}/{archive_name}/",
             )
             if res.ok:
                 logger.info(
-                    f"Archive {archive_name!r} found in lookaside cache (skipping upload)."
+                    f"Archive {archive_name!r} found in lookaside cache (skipping upload).",
                 )
                 return True
             logger.debug(f"Archive {archive_name!r} not found in the lookaside cache.")
         except requests.exceptions.HTTPError:
             logger.warning(
-                f"Error trying to find {archive_name!r} in the lookaside cache."
+                f"Error trying to find {archive_name!r} in the lookaside cache.",
             )
         return False
 
@@ -413,7 +423,7 @@ class DistGit(PackitRepositoryBase):
         koji_builds: Sequence[str] = None,
     ):
         logger.debug(
-            f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
+            f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}",
         )
         # https://github.com/fedora-infra/bodhi/issues/3058
         from bodhi.client.bindings import BodhiClient, BodhiClientException
@@ -427,7 +437,7 @@ class DistGit(PackitRepositoryBase):
             builds_str = "\n".join(f" - {b}" for b in builds_d)
             logger.debug(
                 "Koji builds for package "
-                f"{self.package_config.downstream_package_name!r}: \n{builds_str}"
+                f"{self.package_config.downstream_package_name!r}: \n{builds_str}",
             )
 
             # EPEL uses "testing-candidate" instead of "updates-candidate"
@@ -439,12 +449,12 @@ class DistGit(PackitRepositoryBase):
                 logger.info(
                     "Koji builds for package "
                     f"{self.package_config.downstream_package_name!r} and koji tag {koji_tag}:"
-                    f"\n{koji_builds_str}"
+                    f"\n{koji_builds_str}",
                 )
             except KeyError:
                 raise PackitException(
                     f"There is no build for {self.package_config.downstream_package_name!r} "
-                    f"in koji tag {koji_tag}"
+                    f"in koji tag {koji_tag}",
                 )
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
@@ -457,7 +467,7 @@ class DistGit(PackitRepositoryBase):
                 f"- {result['url']}\n"
                 f"- stable_karma: {result['stable_karma']}\n"
                 f"- unstable_karma: {result['unstable_karma']}\n"
-                f"- notes:\n{result['notes']}\n"
+                f"- notes:\n{result['notes']}\n",
             )
             if "caveats" in result:
                 for cav in result["caveats"]:
@@ -466,7 +476,7 @@ class DistGit(PackitRepositoryBase):
         except BodhiClientException as ex:
             logger.error(ex)
             raise PackitException(
-                f"There is a problem with creating the bodhi update:\n{ex}"
+                f"There is a problem with creating the bodhi update:\n{ex}",
             )
         return result["alias"]
 
@@ -485,5 +495,5 @@ class DistGit(PackitRepositoryBase):
                     and pr.target_branch == branch
                 )
                 for pr in distgit_prs
-            ]
+            ],
         )

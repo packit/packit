@@ -53,7 +53,8 @@ def test_get_output_from_action_defined(echo_cmd, expected_output):
 
 
 @pytest.mark.skipif(
-    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+    not can_a_module_be_imported("sandcastle"),
+    reason="sandcastle is not installed",
 )
 def test_get_output_from_action_defined_in_sandcastle():
     from sandcastle.api import Sandcastle
@@ -64,7 +65,8 @@ def test_get_output_from_action_defined_in_sandcastle():
     c = Config()
     c.command_handler = RunCommandType.sandcastle
     packit_repository_base = PackitRepositoryBase(
-        config=c, package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd})
+        config=c,
+        package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd}),
     )
     packit_repository_base.local_project = LocalProject(working_dir="/tmp")
 
@@ -76,7 +78,7 @@ def test_get_output_from_action_defined_in_sandcastle():
 
 
 @pytest.mark.skip(
-    reason="Skipping since we don't have an OpenShift cluster by default."
+    reason="Skipping since we don't have an OpenShift cluster by default.",
 )
 def test_run_in_sandbox():
     packit_repository_base = PackitRepositoryBase(
@@ -95,12 +97,13 @@ def test_base_push_bad(distgit_and_remote):
 
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
-        working_dir=distgit, git_url="https://github.com/packit/lol"
+        working_dir=distgit,
+        git_url="https://github.com/packit/lol",
     )
     flexmock(
         LocalProject,
         push=lambda *args, **kwargs: [
-            PushInfo(PushInfo.REMOTE_REJECTED, None, None, None, None)
+            PushInfo(PushInfo.REMOTE_REJECTED, None, None, None, None),
         ],
     )
     with pytest.raises(PackitException) as e:
@@ -113,12 +116,13 @@ def test_base_push_good(distgit_and_remote):
 
     b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
     b.local_project = LocalProject(
-        working_dir=distgit, git_url="https://github.com/packit/lol"
+        working_dir=distgit,
+        git_url="https://github.com/packit/lol",
     )
     flexmock(
         LocalProject,
         push=lambda *args, **kwargs: [
-            PushInfo(PushInfo.FAST_FORWARD, None, None, None, None)
+            PushInfo(PushInfo.FAST_FORWARD, None, None, None, None),
         ],
     )
     b.push("master")

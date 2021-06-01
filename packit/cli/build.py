@@ -53,10 +53,14 @@ logger = logging.getLogger(__name__)
     default=False,
 )
 @click.option(
-    "--koji-target", help="Koji target to build inside (see `koji list-targets`)."
+    "--koji-target",
+    help="Koji target to build inside (see `koji list-targets`).",
 )
 @click.option(
-    "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
+    "--scratch",
+    is_flag=True,
+    default=False,
+    help="Submit a scratch koji build",
 )
 @click.option("--nowait", is_flag=True, default=False, help="Don't wait on build")
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
@@ -83,7 +87,9 @@ def build(
     it defaults to the current working directory
     """
     api = get_packit_api(
-        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+        config=config,
+        dist_git_path=dist_git_path,
+        local_project=path_or_url,
     )
 
     default_dg_branch = api.dg.local_project.git_project.default_branch
@@ -101,7 +107,7 @@ def build(
     if len(targets_to_build) > 1 and len(branches_to_build) > 1:
         raise PackitConfigException(
             "Parameters --dist-git-branch and --koji-target cannot have "
-            "multiple values at the same time."
+            "multiple values at the same time.",
         )
 
     for target in targets_to_build:

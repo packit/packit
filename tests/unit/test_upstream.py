@@ -42,7 +42,8 @@ def spec_mock():
         spec_content_mock = flexmock()
         spec_content_mock.should_receive("section").and_return(setup_line)
         spec_content_mock.should_receive("replace_section").with_args(
-            "%prep", setup_line
+            "%prep",
+            setup_line,
         ).and_return(flexmock())
 
         spec_mock = flexmock(
@@ -127,7 +128,8 @@ def test_create_pull(upstream_mock, upstream_pr_mock, fork_username):
 def test_get_commands_for_actions(action_config, result):
     ups = Upstream(
         package_config=flexmock(
-            actions={ActionName.create_archive: action_config}, synced_files=flexmock()
+            actions={ActionName.create_archive: action_config},
+            synced_files=flexmock(),
         ),
         config=flexmock(),
         local_project=flexmock(),
@@ -143,22 +145,27 @@ def test_get_commands_for_actions(action_config, result):
             ["%setup -q -n %{srcname}-%{version}"],
             ["%setup -q -n test_pkg_name-0.42"],
             id="test1",
-        )
+        ),
     ],
 )
 def test_fix_spec__setup_line(
-    inner_archive_dir, orig_setup_line, new_setup_line, upstream_mock, spec_mock
+    inner_archive_dir,
+    orig_setup_line,
+    new_setup_line,
+    upstream_mock,
+    spec_mock,
 ):
     flexmock(packit.upstream).should_receive("run_command").and_return("mocked")
 
     upstream_mock.should_receive("_fix_spec_source")
     upstream_mock.should_receive("get_archive_root_dir").and_return(inner_archive_dir)
     upstream_mock.should_receive("specfile").and_return(
-        spec_mock(setup_line=orig_setup_line)
+        spec_mock(setup_line=orig_setup_line),
     )
 
     upstream_mock.specfile.spec_content.should_receive("replace_section").with_args(
-        "%prep", new_setup_line
+        "%prep",
+        new_setup_line,
     ).once().and_return(flexmock())
 
     upstream_mock.fix_spec("_archive", "_version", "_commit1234")
@@ -168,7 +175,11 @@ def test_fix_spec__setup_line(
     "action_output, current_version_command, version, expected_result",
     [
         pytest.param(
-            ("some_action_output", "1.0.1"), None, "_", "1.0.1", id="with_action_output"
+            ("some_action_output", "1.0.1"),
+            None,
+            "_",
+            "1.0.1",
+            id="with_action_output",
         ),
         pytest.param(None, "1.0.2", "_", "1.0.2", id="command_valid_version"),
         pytest.param(None, "1.0-3", "_", "1.0.3", id="command_version_with_dash"),
@@ -177,14 +188,18 @@ def test_fix_spec__setup_line(
     ],
 )
 def test_get_current_version(
-    action_output, current_version_command, version, expected_result, upstream_mock
+    action_output,
+    current_version_command,
+    version,
+    expected_result,
+    upstream_mock,
 ):
     flexmock(packit.upstream.os).should_receive("listdir").and_return("mocked")
     upstream_mock.should_receive("get_output_from_action").and_return(action_output)
     # just to simulate if is configured or not
     upstream_mock.package_config.current_version_command = current_version_command
     upstream_mock.should_receive("command_handler.run_command").and_return(
-        current_version_command
+        current_version_command,
     )
     upstream_mock.should_receive("get_last_tag").and_return("_mocked")
     upstream_mock.should_receive("get_version_from_tag").and_return(version)
@@ -225,7 +240,11 @@ def test_get_current_version(
     ],
 )
 def test_get_version_from_tag(
-    tag, tag_template, expected_output, expectation, upstream_mock
+    tag,
+    tag_template,
+    expected_output,
+    expectation,
+    upstream_mock,
 ):
     with expectation:
         upstream_mock.package_config.upstream_tag_template = tag_template
@@ -243,12 +262,12 @@ def test_get_archive_root_dir(archive_type, return_value, upstream_mock, tar_moc
     if archive_type == "tar":
         tar_mock(is_tarfile=True)
         upstream_mock.should_receive("get_archive_root_dir_from_tar").and_return(
-            return_value
+            return_value,
         ).with_args("_archive").once()
         assert upstream_mock.get_archive_root_dir("_archive") == return_value
     elif archive_type == "unknown":
         upstream_mock.should_receive("get_archive_root_dir_from_template").and_return(
-            return_value
+            return_value,
         )
         tar_mock(is_tarfile=False)
         assert upstream_mock.get_archive_root_dir("_archive") == return_value
@@ -289,17 +308,23 @@ def test_get_tar_archive_dir(archive_items, expected_result, upstream_mock, tar_
     "template, expected_return_value",
     [
         pytest.param(
-            "{upstream_pkg_name}-{version}", "test_package_name-1.0", id="default"
+            "{upstream_pkg_name}-{version}",
+            "test_package_name-1.0",
+            id="default",
         ),
         pytest.param(
-            "{version}-{upstream_pkg_name}", "1.0-test_package_name", id="custom"
+            "{version}-{upstream_pkg_name}",
+            "1.0-test_package_name",
+            id="custom",
         ),
         pytest.param("{unknown}-{version}", "{unknown}-1.0", id="unknown_tag"),
         pytest.param("static_string", "static_string", id="static_template"),
     ],
 )
 def test_get_archive_root_dir_from_template(
-    template, expected_return_value, upstream_mock
+    template,
+    expected_return_value,
+    upstream_mock,
 ):
     upstream_mock.should_receive("get_version").and_return("1.0")
     upstream_mock.package_config.archive_root_dir_template = template
@@ -310,7 +335,11 @@ def test_get_archive_root_dir_from_template(
     "version, tag_template, expected_output, expectation",
     [
         pytest.param(
-            "1.0.0", "{version}", "1.0.0", does_not_raise(), id="valid_template"
+            "1.0.0",
+            "{version}",
+            "1.0.0",
+            does_not_raise(),
+            id="valid_template",
         ),
         pytest.param(
             "1.0.0",
@@ -322,7 +351,11 @@ def test_get_archive_root_dir_from_template(
     ],
 )
 def test_convert_version_to_tag(
-    version, tag_template, expected_output, expectation, upstream_mock
+    version,
+    tag_template,
+    expected_output,
+    expectation,
+    upstream_mock,
 ):
     with expectation:
         upstream_mock.package_config.upstream_tag_template = tag_template

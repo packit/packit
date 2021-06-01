@@ -85,7 +85,7 @@ def test_drop_src(item, drop, result):
                 SyncFilesItem(
                     [Path(Path.cwd() / "a"), Path(Path.cwd() / "b")],
                     Path(Path.cwd() / "dest"),
-                )
+                ),
             ),
         ),
         (
@@ -95,7 +95,7 @@ def test_drop_src(item, drop, result):
                 SyncFilesItem(
                     [Path(Path.cwd() / "src" / "a"), Path(Path.cwd() / "src" / "b")],
                     Path(Path.cwd() / "dest" / "dest"),
-                )
+                ),
             ),
         ),
         (

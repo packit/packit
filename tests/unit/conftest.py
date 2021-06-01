@@ -42,7 +42,7 @@ def mock_get_aliases():
             "fedora-stable": ["fedora-31", "fedora-32"],
             "fedora-development": ["fedora-33", "fedora-rawhide"],
             "epel-all": ["epel-6", "epel-7", "epel-8"],
-        }
+        },
     )
 
 

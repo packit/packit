@@ -78,7 +78,7 @@ BODHI_UPDATES = Munch(
                             "state": "current",
                             "composed_by_bodhi": True,
                             "composes": [],
-                        }
+                        },
                     ),
                     "comments": [
                         Munch(
@@ -104,9 +104,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -133,9 +133,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -161,9 +161,9 @@ BODHI_UPDATES = Munch(
                                         "ededf02d13a93a7626477350e45?s=24&d=retro",
                                         "openid": "lachmanfrantisek.id.fedoraproject.org",
                                         "groups": [Munch({"name": "packager"})],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -187,9 +187,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -215,9 +215,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -242,9 +242,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -268,9 +268,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -294,9 +294,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                     ],
                     "builds": [
@@ -308,8 +308,8 @@ BODHI_UPDATES = Munch(
                                 "ci_url": None,
                                 "type": "rpm",
                                 "epoch": 0,
-                            }
-                        )
+                            },
+                        ),
                     ],
                     "compose": None,
                     "bugs": [],
@@ -327,14 +327,14 @@ BODHI_UPDATES = Munch(
                                 Munch({"name": "provenpackager"}),
                                 Munch({"name": "packager"}),
                             ],
-                        }
+                        },
                     ),
                     "updateid": "FEDORA-2019-7006fbed73",
                     "submitter": "ttomecek",
                     "karma": 1,
                     "content_type": "rpm",
                     "test_cases": [],
-                }
+                },
             ),
             Munch(
                 {
@@ -389,7 +389,7 @@ BODHI_UPDATES = Munch(
                             "state": "current",
                             "composed_by_bodhi": True,
                             "composes": [],
-                        }
+                        },
                     ),
                     "comments": [
                         Munch(
@@ -415,9 +415,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -444,9 +444,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -472,9 +472,9 @@ BODHI_UPDATES = Munch(
                                         "ededf02d13a93a7626477350e45?s=24&d=retro",
                                         "openid": "lachmanfrantisek.id.fedoraproject.org",
                                         "groups": [Munch({"name": "packager"})],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -498,9 +498,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -526,9 +526,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -553,9 +553,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -579,9 +579,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -605,9 +605,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                     ],
                     "builds": [
@@ -619,8 +619,8 @@ BODHI_UPDATES = Munch(
                                 "ci_url": None,
                                 "type": "rpm",
                                 "epoch": 0,
-                            }
-                        )
+                            },
+                        ),
                     ],
                     "compose": None,
                     "bugs": [],
@@ -638,14 +638,14 @@ BODHI_UPDATES = Munch(
                                 Munch({"name": "provenpackager"}),
                                 Munch({"name": "packager"}),
                             ],
-                        }
+                        },
                     ),
                     "updateid": "FEDORA-2019-cb1e057344",
                     "submitter": "ttomecek",
                     "karma": 1,
                     "content_type": "rpm",
                     "test_cases": [],
-                }
+                },
             ),
             Munch(
                 {
@@ -700,7 +700,7 @@ BODHI_UPDATES = Munch(
                             "state": "current",
                             "composed_by_bodhi": True,
                             "composes": [],
-                        }
+                        },
                     ),
                     "comments": [
                         Munch(
@@ -726,9 +726,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -755,9 +755,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -781,9 +781,9 @@ BODHI_UPDATES = Munch(
                                         "icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -809,9 +809,9 @@ BODHI_UPDATES = Munch(
                                         "img/icons/bodhi-24.png",
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                     ],
                     "builds": [
@@ -823,8 +823,8 @@ BODHI_UPDATES = Munch(
                                 "ci_url": None,
                                 "type": "rpm",
                                 "epoch": 0,
-                            }
-                        )
+                            },
+                        ),
                     ],
                     "compose": None,
                     "bugs": [],
@@ -842,14 +842,14 @@ BODHI_UPDATES = Munch(
                                 Munch({"name": "provenpackager"}),
                                 Munch({"name": "packager"}),
                             ],
-                        }
+                        },
                     ),
                     "updateid": "FEDORA-2019-7223843531",
                     "submitter": "ttomecek",
                     "karma": 0,
                     "content_type": "rpm",
                     "test_cases": [],
-                }
+                },
             ),
         ],
         "page": 1,
@@ -861,5 +861,5 @@ BODHI_UPDATES = Munch(
         "display_request": True,
         "package": "colin",
         "active_releases": False,
-    }
+    },
 )

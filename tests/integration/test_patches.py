@@ -73,5 +73,5 @@ def test_undo_identical(git_repo):
     # patch-ids to be different.
     # Is there any safe way to handle this?
     assert [item.a_path for item in git_repo.index.diff(None)] == [
-        "weird-identical.patch"
+        "weird-identical.patch",
     ]

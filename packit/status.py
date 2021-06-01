@@ -83,7 +83,9 @@ class Status:
         for branch in branches:
             try:
                 self.dg.create_branch(
-                    branch, base=f"remotes/origin/{branch}", setup_tracking=False
+                    branch,
+                    base=f"remotes/origin/{branch}",
+                    setup_tracking=False,
                 )
                 self.dg.checkout_branch(branch)
                 self.dg.specfile.update_spec()
@@ -125,7 +127,7 @@ class Status:
         """
         session = ClientSession(baseurl="https://koji.fedoraproject.org/kojihub")
         package_id = session.getPackageID(
-            self.dg.package_config.downstream_package_name
+            self.dg.package_config.downstream_package_name,
         )
         # This method returns only latest builds,
         # so we don't need to get whole build history from Koji,
@@ -180,5 +182,5 @@ class Status:
 
     def get_copr_builds(self, number_of_builds: int = 5) -> List:
         return CoprHelper(upstream_local_project=self.up.local_project).get_copr_builds(
-            number_of_builds=number_of_builds
+            number_of_builds=number_of_builds,
         )

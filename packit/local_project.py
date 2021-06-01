@@ -119,7 +119,7 @@ class LocalProject:
             f"refresh {refresh}\n"
             f"remote: {remote}\n"
             f"pr_id: {pr_id}\n"
-            f"cache: {cache}\n"
+            f"cache: {cache}\n",
         )
 
         if refresh:
@@ -206,19 +206,19 @@ class LocalProject:
         current_head = self._get_ref_from_git_repo()
         if ref:
             logger.debug(
-                f"Leaving old ref {current_head!r} and checkout new ref {ref!r}"
+                f"Leaving old ref {current_head!r} and checkout new ref {ref!r}",
             )
             if ref not in self.git_repo.refs:
                 if not is_a_git_ref(self.git_repo, ref):
                     raise PackitException(
-                        f"Git ref {ref!r} not found, cannot checkout."
+                        f"Git ref {ref!r} not found, cannot checkout.",
                     )
                 ref = self.git_repo.commit(ref).hexsha
             self.git_repo.git.checkout(ref)
         yield
         if ref:
             logger.debug(
-                f"Leaving new ref {ref!r} and checkout old ref {current_head!r}"
+                f"Leaving new ref {ref!r} and checkout old ref {current_head!r}",
             )
             self.git_repo.git.checkout(current_head)
 
@@ -244,7 +244,7 @@ class LocalProject:
         """
         if self.working_dir and not self.git_repo:
             logger.debug(
-                "`working_dir` is set and `git_repo` is not: let's discover..."
+                "`working_dir` is set and `git_repo` is not: let's discover...",
             )
             if is_git_repo(directory=self.working_dir):
                 logger.debug("It's a git repo!")
@@ -253,10 +253,11 @@ class LocalProject:
 
             elif self.git_url and not self.offline:
                 self.git_repo = self._get_repo(
-                    url=self.git_url, directory=self.working_dir
+                    url=self.git_url,
+                    directory=self.working_dir,
                 )
                 logger.debug(
-                    f"We just cloned git repo {self.git_url} to {self.working_dir}."
+                    f"We just cloned git repo {self.git_url} to {self.working_dir}.",
                 )
                 return True
 
@@ -274,7 +275,8 @@ class LocalProject:
             and not self.offline
         ):
             self.git_project = self.git_service.get_project(
-                repo=self.repo_name, namespace=self.namespace
+                repo=self.repo_name,
+                namespace=self.namespace,
             )
             logger.debug(f"Parsed project '{self.namespace}/{self.repo_name}'.")
             return True
@@ -284,7 +286,7 @@ class LocalProject:
         if not (self.git_project is None or self.git_service or self.offline):
             self.git_service = self.git_project.service
             logger.debug(
-                f"Parsed service {self.git_service} from the project {self.git_project}."
+                f"Parsed service {self.git_service} from the project {self.git_project}.",
             )
             return True
         return False
@@ -300,7 +302,7 @@ class LocalProject:
         if self.git_repo and not self.working_dir:
             self.working_dir = Path(self.git_repo.working_dir)
             logger.debug(
-                f"Parsed working directory {self.working_dir} from the repo {self.git_repo}."
+                f"Parsed working directory {self.working_dir} from the repo {self.git_repo}.",
             )
             return True
         return False
@@ -322,7 +324,7 @@ class LocalProject:
         if self.git_project and not self.git_url and not self.offline:
             self.git_url = self.git_project.get_git_urls()["git"]
             logger.debug(
-                f"Parsed remote url {self.git_url!r} from the project {self.git_project}."
+                f"Parsed remote url {self.git_url!r} from the project {self.git_project}.",
             )
             return True
         return False
@@ -332,10 +334,10 @@ class LocalProject:
             self.repo_name = self.git_project.repo
             if not self.repo_name:
                 raise PackitException(
-                    "Repo name should have been set but isn't, this is bug!"
+                    "Repo name should have been set but isn't, this is bug!",
                 )
             logger.debug(
-                f"Parsed repo name {self.repo_name!r} from the git project {self.git_project}."
+                f"Parsed repo name {self.repo_name!r} from the git project {self.git_project}.",
             )
             return True
         return False
@@ -344,7 +346,7 @@ class LocalProject:
         if self.git_project and not self.namespace:
             self.namespace = self.git_project.namespace
             logger.debug(
-                f"Parsed namespace {self.namespace!r} from the project {self.git_project}."
+                f"Parsed namespace {self.namespace!r} from the project {self.git_project}.",
             )
             return True
         return False
@@ -368,7 +370,7 @@ class LocalProject:
             # Repo has no remotes
             return False
         logger.debug(
-            f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}."
+            f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}.",
         )
         return True
 
@@ -386,7 +388,7 @@ class LocalProject:
             )
             logger.debug(
                 f"Parsed namespace and repo name ({self.namespace}, {self.repo_name}) "
-                f"from url {self.git_url!r}."
+                f"from url {self.git_url!r}.",
             )
             return True
         return False
@@ -409,7 +411,10 @@ class LocalProject:
         logger.debug(f"Current commit is '{self.git_repo.commit()}'")
 
     def create_branch(
-        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+        self,
+        branch_name: str,
+        base: str = "HEAD",
+        setup_tracking: bool = False,
     ) -> git.Head:
         """
         Create a new git branch in git
@@ -423,7 +428,7 @@ class LocalProject:
         # it's not an error if the branch already exists
         if branch_name in self.git_repo.branches:
             logger.debug(
-                f"It seems that branch {branch_name!r} already exists, checking it out."
+                f"It seems that branch {branch_name!r} already exists, checking it out.",
             )
             head = self.git_repo.branches[branch_name]
         else:
@@ -435,7 +440,7 @@ class LocalProject:
                 remote_ref = origin.refs[branch_name]
             else:
                 raise PackitException(
-                    f"Remote origin doesn't have ref {branch_name!r}."
+                    f"Remote origin doesn't have ref {branch_name!r}.",
                 )
             # this is important to fedpkg: build can't find the tracking branch otherwise
             head.set_tracking_branch(remote_ref)
@@ -451,7 +456,8 @@ class LocalProject:
         remote_name = self.remote or "origin"
         rem: git.Remote = self.git_repo.remotes[remote_name]
         remote_ref = "+refs/{}/{}/head".format(
-            "merge-requests" if is_gitlab else "pull", pr_id
+            "merge-requests" if is_gitlab else "pull",
+            pr_id,
         )
         local_ref = f"refs/remotes/{remote_name}/pr/{pr_id}"
         local_branch = f"pr/{pr_id}"
@@ -468,7 +474,10 @@ class LocalProject:
             raise PackitException(f"Cannot checkout release tag: {ex!r}.")
 
     def push(
-        self, refspec: str, remote_name: str = "origin", force: bool = False
+        self,
+        refspec: str,
+        remote_name: str = "origin",
+        force: bool = False,
     ) -> Iterable[git.PushInfo]:
         """
         push changes to a remote using provided refspec

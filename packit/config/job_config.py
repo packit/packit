@@ -100,7 +100,7 @@ class JobMetadataConfig:
     def __eq__(self, other: object):
         if not isinstance(other, JobMetadataConfig):
             raise PackitConfigException(
-                "Provided object is not a JobMetadataConfig instance."
+                "Provided object is not a JobMetadataConfig instance.",
             )
         return (
             self.targets == other.targets
@@ -276,5 +276,5 @@ def get_default_jobs() -> List[Dict]:
                 "trigger": "release",
                 "metadata": {"dist_git_branches": "fedora-all"},
             },
-        ]
+        ],
     )

@@ -91,7 +91,7 @@ def test_run_command_w_env():
 
 def test_get_packit_version_not_installed():
     flexmock(sys.modules["packit.api"]).should_receive("get_distribution").and_raise(
-        DistributionNotFound
+        DistributionNotFound,
     )
     assert get_packit_version() == "NOT_INSTALLED"
 
@@ -111,7 +111,8 @@ def test_ensure_str(inp, exp):
 
 
 @pytest.mark.parametrize(
-    "to,from_,exp", (("/", "/", "."), ("/a", "/a/b", ".."), ("/a", "/c", "../a"))
+    "to,from_,exp",
+    (("/", "/", "."), ("/a", "/a/b", ".."), ("/a", "/c", "../a")),
 )
 def test_relative_to(to, from_, exp):
     assert os.path.relpath(to, from_) == exp
@@ -199,7 +200,7 @@ def test_sanitize_branch(inp, exp, exp_rpm):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             textwrap.dedent(
                 """
@@ -223,7 +224,7 @@ def test_sanitize_branch(inp, exp, exp_rpm):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             id="remove-timestamps",
         ),
@@ -249,7 +250,7 @@ def test_sanitize_branch(inp, exp, exp_rpm):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             textwrap.dedent(
                 """
@@ -273,7 +274,7 @@ def test_sanitize_branch(inp, exp, exp_rpm):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             id="add-missing-diff",
         ),
@@ -290,7 +291,9 @@ def test_git_patch_ish(inp, outp):
         pytest.param("One sentence", None, id="one sentence"),
         pytest.param("One sentence\n", None, id="one sentence with end-line"),
         pytest.param(
-            "One sentence\n\n", None, id="one sentence with multiple end-lines"
+            "One sentence\n\n",
+            None,
+            id="one sentence with multiple end-lines",
         ),
         pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
         pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),

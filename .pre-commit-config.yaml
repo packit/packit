@@ -7,6 +7,10 @@ repos:
     rev: v2.19.0
     hooks:
       - id: pyupgrade
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.1.0
+    hooks:
+      - id: add-trailing-comma # also removes unnecessary ones
   - repo: https://github.com/psf/black
     rev: 21.5b2
     hooks:

@@ -86,13 +86,13 @@ class PackageConfig(CommonPackageConfig):
         if current_version_command:
             logger.warning(
                 "current_version_command is deprecated and will be removed. Please "
-                "switch to the `get-current-version` action: https://packit.dev/docs/actions/"
+                "switch to the `get-current-version` action: https://packit.dev/docs/actions/",
             )
 
         if create_tarball_command:
             logger.warning(
                 "create_tarball_command is deprecated and will be removed. Please"
-                "switch to the `create-archive` action: https://packit.dev/docs/actions/"
+                "switch to the `create-archive` action: https://packit.dev/docs/actions/",
             )
 
     def __repr__(self):
@@ -175,7 +175,7 @@ class PackageConfig(CommonPackageConfig):
             logger.warning(
                 f"You have defined multiple copr projects to build in, we are going "
                 f"to pick the first one: {projects_list[0]}, reorder the job definitions"
-                f" if this is not the one you want."
+                f" if this is not the one you want.",
             )
         return projects_list[0]
 
@@ -233,7 +233,7 @@ def find_packit_yaml(
 
     if try_local_dir_first and try_local_dir_last:
         logger.error(
-            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'."
+            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'.",
         )
 
     if try_local_dir_first:
@@ -305,12 +305,15 @@ def get_local_package_config(
 
 
 def get_package_config_from_repo(
-    project: GitProject, ref: str = None, spec_file_path: Optional[str] = None
+    project: GitProject,
+    ref: str = None,
+    spec_file_path: Optional[str] = None,
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
             config_file_content = project.get_file_content(
-                path=config_file_name, ref=ref
+                path=config_file_name,
+                ref=ref,
             )
         except FileNotFoundError:
             # do nothing
@@ -319,13 +322,13 @@ def get_package_config_from_repo(
             logger.debug(
                 f"Found a config file {config_file_name!r} "
                 f"on ref {ref!r} "
-                f"of the {project.full_repo_name!r} repository."
+                f"of the {project.full_repo_name!r} repository.",
             )
             break
     else:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
-            f"of the {project.full_repo_name!r} repository."
+            f"of the {project.full_repo_name!r} repository.",
         )
         return None
 
@@ -334,7 +337,7 @@ def get_package_config_from_repo(
     except Exception as ex:
         logger.error(f"Cannot load package config {config_file_name!r}. {ex}")
         raise PackitConfigException(
-            f"Cannot load package config {config_file_name!r}. {ex}"
+            f"Cannot load package config {config_file_name!r}. {ex}",
         )
     if not spec_file_path:
         spec_file_path = get_specfile_path_from_repo(project=project, ref=ref)

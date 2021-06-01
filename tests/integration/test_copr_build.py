@@ -55,14 +55,14 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
-        )
+        ),
     )
 
     # no change in settings => no edit
     flexmock(ProjectProxy).should_receive("edit").times(0)
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -84,7 +84,8 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
 
 
 def test_copr_build_existing_project_change_settings(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -101,11 +102,11 @@ def test_copr_build_existing_project_change_settings(
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
-        )
+        ),
     )
 
     flexmock(ProjectProxy).should_receive(
-        "edit"
+        "edit",
         # ).with_args(
         # ownername="the-owner",
         # projectname="project-name",
@@ -132,7 +133,7 @@ def test_copr_build_existing_project_change_settings(
     ).and_return().once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -154,7 +155,8 @@ def test_copr_build_existing_project_change_settings(
 
 
 def test_copr_build_existing_project_munch_no_settings_change(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -178,14 +180,14 @@ def test_copr_build_existing_project_munch_no_settings_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -210,7 +212,8 @@ def test_copr_build_existing_project_munch_no_settings_change(
 
 
 def test_copr_build_existing_project_munch_chroot_change(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -234,14 +237,14 @@ def test_copr_build_existing_project_munch_chroot_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     flexmock(ProjectProxy).should_receive("edit").and_return().once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -266,7 +269,8 @@ def test_copr_build_existing_project_munch_chroot_change(
 
 
 def test_copr_build_existing_project_munch_additional_repos_change(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -290,14 +294,14 @@ def test_copr_build_existing_project_munch_additional_repos_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     flexmock(ProjectProxy).should_receive("edit").and_return().once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -322,7 +326,8 @@ def test_copr_build_existing_project_munch_additional_repos_change(
 
 
 def test_copr_build_existing_project_munch_list_on_homepage_change(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     """
     We don't get that value from Copr. => We can't check the change. => No edit.
@@ -350,15 +355,15 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     # We don't get that value from Copr. => We can't check the change. => No edit.
     flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -383,7 +388,8 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
 
 
 def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -408,15 +414,15 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     # Even if we receive this info from Copr, we can't edit that value if it is `None`.
     flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -441,7 +447,8 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
 
 
 def test_copr_build_existing_project_munch_remove_present_chroots(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -468,14 +475,14 @@ def test_copr_build_existing_project_munch_remove_present_chroots(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     flexmock(ProjectProxy).should_receive("edit").and_return()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -500,7 +507,8 @@ def test_copr_build_existing_project_munch_remove_present_chroots(
 
 
 def test_copr_build_existing_project_munch_append_chroots(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -527,14 +535,14 @@ def test_copr_build_existing_project_munch_append_chroots(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
-            }
-        )
+            },
+        ),
     )
 
     flexmock(ProjectProxy).should_receive("edit").and_return().times(1)
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -559,7 +567,8 @@ def test_copr_build_existing_project_munch_append_chroots(
 
 
 def test_copr_build_existing_project_error_on_change_settings(
-    cwd_upstream_or_distgit, api_instance
+    cwd_upstream_or_distgit,
+    api_instance,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -576,19 +585,22 @@ def test_copr_build_existing_project_error_on_change_settings(
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
-        )
+        ),
     )
 
     flexmock(ProjectProxy).should_receive("request_permissions").with_args(
-        ownername=owner, projectname=project, permissions={"admin": True}
+        ownername=owner,
+        projectname=project,
+        permissions={"admin": True},
     ).and_return()
 
     flexmock(ProjectProxy).should_receive("edit").and_raise(
-        CoprRequestException, "Only owners and admins may update their projects."
+        CoprRequestException,
+        "Only owners and admins may update their projects.",
     ).once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
 
     build = flexmock(
@@ -607,7 +619,7 @@ def test_copr_build_existing_project_error_on_change_settings(
             instructions=instructions,
         )
     assert e_info.value.fields_to_change == {
-        "description": ("some description", "different description")
+        "description": ("some description", "different description"),
     }
 
 
@@ -617,15 +629,16 @@ def test_copr_build_non_existing_project(cwd_upstream_or_distgit, api_instance):
     project = "project-name"
 
     flexmock(ProjectProxy).should_receive("get").and_raise(
-        CoprNoResultException, "project not found"
+        CoprNoResultException,
+        "project not found",
     )
     flexmock(ProjectProxy).should_receive("edit").and_return(None).times(0)
     flexmock(ProjectProxy).should_receive("add").and_return(None)
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
         Client(
-            config={"copr_url": "https://copr.fedorainfracloud.org", "username": owner}
-        )
+            config={"copr_url": "https://copr.fedorainfracloud.org", "username": owner},
+        ),
     )
 
     build = flexmock(id="1", ownername=owner, projectname=project)
@@ -645,7 +658,7 @@ def test_copr_build_non_existing_project(cwd_upstream_or_distgit, api_instance):
 def test_copr_build_no_owner(cwd_upstream_or_distgit, api_instance):
     u, d, api = api_instance
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
+        Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
     )
     with pytest.raises(PackitCoprException) as ex:
         api.run_copr_build(
@@ -674,7 +687,7 @@ def test_copr_build_cli_no_project_configured(upstream_and_remote, copr_client_m
     ).and_return(("id", "url")).once()
 
     flexmock(packit.copr_helper.CoprClient).should_receive(
-        "create_from_config_file"
+        "create_from_config_file",
     ).and_return(copr_client_mock)
     CoprHelper.get_available_chroots.cache_clear()
 
@@ -697,12 +710,13 @@ def test_copr_build_cli_project_set_via_cli(upstream_and_remote, copr_client_moc
     ).and_return(("id", "url")).once()
 
     flexmock(packit.copr_helper.CoprClient).should_receive(
-        "create_from_config_file"
+        "create_from_config_file",
     ).and_return(copr_client_mock)
     CoprHelper.get_available_chroots.cache_clear()
 
     run_packit(
-        ["copr-build", "--nowait", "--project", "the-project"], working_dir=upstream
+        ["copr-build", "--nowait", "--project", "the-project"],
+        working_dir=upstream,
     )
 
 
@@ -710,10 +724,10 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
     upstream, _ = upstream_and_remote
 
     flexmock(PackageConfig).should_receive("get_copr_build_project_value").and_return(
-        "some-project"
+        "some-project",
     )
     flexmock(packit.copr_helper.CoprClient).should_receive(
-        "create_from_config_file"
+        "create_from_config_file",
     ).and_return(copr_client_mock)
     CoprHelper.get_available_chroots.cache_clear()
 

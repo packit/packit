@@ -34,7 +34,9 @@ logger = logging.getLogger("packit")
 
 @click.command("srpm", context_settings=get_context_settings())
 @click.option(
-    "--output", metavar="FILE", help="Write the SRPM to FILE instead of current dir."
+    "--output",
+    metavar="FILE",
+    help="Write the SRPM to FILE instead of current dir.",
 )
 @click.option(
     "--upstream-ref",

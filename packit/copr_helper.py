@@ -72,7 +72,10 @@ class CoprHelper:
         return f"{copr_url}/coprs/build/{build.id}/"
 
     def get_copr_settings_url(
-        self, owner: str, project: str, section: Optional[str] = None
+        self,
+        owner: str,
+        project: str,
+        section: Optional[str] = None,
     ):
         copr_url = self.copr_client.config.get("copr_url")
         section = section or "edit"
@@ -103,16 +106,17 @@ class CoprHelper:
         """
         logger.info(
             f"Trying to get {owner}/{project} Copr project. "
-            "The project will be created if it does not exist."
+            "The project will be created if it does not exist.",
         )
         try:
             copr_proj = self.copr_client.project_proxy.get(
-                ownername=owner, projectname=project
+                ownername=owner,
+                projectname=project,
             )
         except CoprNoResultException as ex:
             if owner != self.configured_owner:
                 raise PackitCoprProjectException(
-                    f"Copr project {owner}/{project} not found."
+                    f"Copr project {owner}/{project} not found.",
                 ) from ex
 
             logger.info(f"Copr project '{owner}/{project}' not found. Creating new.")
@@ -131,7 +135,7 @@ class CoprHelper:
         except CoprRequestException as ex:
             logger.debug(repr(ex))
             logger.error(
-                f"We were not able to get copr project {owner}/{project}: {ex}"
+                f"We were not able to get copr project {owner}/{project}: {ex}",
             )
             raise
 
@@ -168,7 +172,8 @@ class CoprHelper:
                         logger.info(
                             f"Admin permissions are required "
                             f"in order to be able to edit project settings. "
-                            f"Requesting the admin rights for the copr '{owner}/{project}' project."
+                            f"Requesting the admin rights "
+                            f"for the copr '{owner}/{project}' project.",
                         )
                         self.copr_client.project_proxy.request_permissions(
                             ownername=owner,
@@ -180,7 +185,7 @@ class CoprHelper:
                             f"Admin permissions are required for copr '{owner}/{project}' project"
                             f"in order to be able to edit project settings. "
                             f"You can make a request by specifying --request-admin-if-needed "
-                            f"when using Packit CLI."
+                            f"when using Packit CLI.",
                         )
                 raise PackitCoprSettingsException(
                     f"Copr project update failed for '{owner}/{project}' project.",
@@ -211,7 +216,7 @@ class CoprHelper:
             if "instructions" not in copr_proj:
                 logger.debug(
                     "The `instructions` key was not received from Copr. "
-                    "We can't check that value to see if the update is needed."
+                    "We can't check that value to see if the update is needed.",
                 )
             elif copr_proj.instructions != instructions:
                 fields_to_change["instructions"] = (
@@ -223,7 +228,7 @@ class CoprHelper:
             if "unlisted_on_hp" not in copr_proj:
                 logger.debug(
                     "The `unlisted_on_hp` key was not received from Copr. "
-                    "We can't check that value to see if the update is needed."
+                    "We can't check that value to see if the update is needed.",
                 )
             elif copr_proj.unlisted_on_hp != (not list_on_homepage):
                 fields_to_change["unlisted_on_hp"] = (
@@ -235,7 +240,7 @@ class CoprHelper:
             if "delete_after_days" not in copr_proj:
                 logger.debug(
                     "The `delete_after_days` key was not received from Copr. "
-                    "We can't check that value to see if the update is needed."
+                    "We can't check that value to see if the update is needed.",
                 )
             elif copr_proj.delete_after_days != delete_after_days:
                 fields_to_change["delete_after_days"] = (
@@ -244,7 +249,7 @@ class CoprHelper:
                 )
 
         if additional_repos is not None and set(copr_proj.additional_repos) != set(
-            additional_repos
+            additional_repos,
         ):
             fields_to_change["additional_repos"] = (
                 copr_proj.additional_repos,
@@ -299,7 +304,10 @@ class CoprHelper:
             raise PackitCoprProjectException(error, ex)
 
     def watch_copr_build(
-        self, build_id: int, timeout: int, report_func: Callable = None
+        self,
+        build_id: int,
+        timeout: int,
+        report_func: Callable = None,
     ) -> str:
         """returns copr build state"""
         watch_end = datetime.now() + timedelta(seconds=timeout)
@@ -343,14 +351,15 @@ class CoprHelper:
             project.name
             for project in reversed(client.project_proxy.get_list(ownername="packit"))
             if project.name.startswith(
-                f"{self.upstream_local_project.namespace}-{self.upstream_local_project.repo_name}-"
+                f"{self.upstream_local_project.namespace}-{self.upstream_local_project.repo_name}-",
             )
         ][:5]
 
         builds: List = []
         for project in projects:
             builds += client.build_proxy.get_list(
-                ownername="packit", projectname=project
+                ownername="packit",
+                projectname=project,
             )
 
         logger.debug("Copr builds fetched.")
@@ -372,5 +381,5 @@ class CoprHelper:
             filter(
                 lambda chroot: not chroot.startswith("_"),
                 client.mock_chroot_proxy.get_list().keys(),
-            )
+            ),
         )

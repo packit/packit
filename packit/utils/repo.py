@@ -36,7 +36,7 @@ class RepositoryCache:
         self.add_new = add_new
         logger.debug(
             f"Instantiation of the repository cache at {self.cache_path}. "
-            f"New projects will {'not ' if not self.add_new else ''}be added."
+            f"New projects will {'not ' if not self.add_new else ''}be added.",
         )
 
     @property
@@ -72,12 +72,13 @@ class RepositoryCache:
             return git.repo.Repo(directory)
 
         logger.debug(
-            f"Cloning repo {url} -> {directory} using repository cache at {self.cache_path}"
+            f"Cloning repo {url} -> {directory} using repository cache at {self.cache_path}",
         )
         cached_projects = self.cached_projects
         cached_projects_str = "\n".join(f"- {project}" for project in cached_projects)
         logger.debug(
-            f"Repositories in the cache ({len(cached_projects)} project(s)):\n{cached_projects_str}"
+            f"Repositories in the cache ({len(cached_projects)} project(s)):\n"
+            f"{cached_projects_str}",
         )
 
         project_name = RepoUrl.parse(url).repo
@@ -89,7 +90,10 @@ class RepositoryCache:
         if self.add_new or project_name in cached_projects:
             logger.debug(f"Using reference repo: {reference_repo}")
             return self._clone(
-                url=url, to_path=directory, tags=True, reference=str(reference_repo)
+                url=url,
+                to_path=directory,
+                tags=True,
+                reference=str(reference_repo),
             )
 
         return self._clone(url=url, to_path=directory, tags=True)
@@ -123,7 +127,7 @@ def get_namespace_and_repo_name(url: str) -> Tuple[Optional[str], str]:
     parsed_git_repo = parse_git_repo(url)
     if parsed_git_repo is None or not parsed_git_repo.repo:
         raise PackitException(
-            f"Invalid URL format, can't obtain namespace and repository name: {url}"
+            f"Invalid URL format, can't obtain namespace and repository name: {url}",
         )
     return parsed_git_repo.namespace, parsed_git_repo.repo
 
@@ -171,7 +175,10 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
     optional_suffix = ".git" if inp.endswith(".git") else ""
     url_str = "https://{}/{}/{}{}".format(
-        parsed_repo.hostname, parsed_repo.namespace, parsed_repo.repo, optional_suffix
+        parsed_repo.hostname,
+        parsed_repo.namespace,
+        parsed_repo.repo,
+        optional_suffix,
     )
 
     logger.debug(f"URL {inp!r} turned into HTTPS {url_str!r}")
@@ -179,7 +186,8 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
 
 def get_current_version_command(
-    glob_pattern: str, refs: Optional[str] = "tags"
+    glob_pattern: str,
+    refs: Optional[str] = "tags",
 ) -> List[str]:
     """
     Returns command that find latest git reference matching given pattern.
@@ -219,7 +227,7 @@ def clone_centos_8_package(
             branch,
             f"https://git{'.stg' if stg else ''}.{CENTOS_DOMAIN}/{namespace}/{package_name}.git",
             str(dist_git_path),
-        ]
+        ],
     )
 
 
@@ -243,7 +251,7 @@ def clone_centos_9_package(
             branch,
             f"https://{CENTOS_STREAM_GITLAB}/{namespace}/{package_name}.git",
             str(dist_git_path),
-        ]
+        ],
     )
 
 
@@ -276,7 +284,8 @@ def create_new_repo(cwd: Path, switches: List[str]):
         subprocess.check_call(["git", "checkout", "-b", "main"], cwd=cwd)
     else:
         subprocess.check_call(
-            ["git", "symbolic-ref", "HEAD", "refs/heads/main"], cwd=cwd
+            ["git", "symbolic-ref", "HEAD", "refs/heads/main"],
+            cwd=cwd,
         )
 
 
@@ -312,7 +321,7 @@ def git_patch_ish(patch: str) -> str:
 def get_message_from_metadata(metadata: dict, header: Optional[str] = None) -> str:
     if not isinstance(metadata, dict):
         raise PackitException(
-            f"We can save only dictionaries to metadata. Not {metadata}"
+            f"We can save only dictionaries to metadata. Not {metadata}",
         )
 
     content = (

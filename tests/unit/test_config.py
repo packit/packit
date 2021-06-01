@@ -186,10 +186,10 @@ def test_get_user_config(tmp_path):
         "keytab_path: './rambo.keytab'\n"
         "kerberos_realm: STG.FEDORAPROJECT.ORG\n"
         "github_token: GITHUB_TOKEN\n"
-        "pagure_user_token: PAGURE_TOKEN\n"
+        "pagure_user_token: PAGURE_TOKEN\n",
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmp_path)
+        str(tmp_path),
     )
     config = Config.get_user_config()
     assert config.debug and isinstance(config.debug, bool)
@@ -214,10 +214,10 @@ def test_get_user_config_new_authentication(tmp_path):
         "        token: GITHUB_TOKEN\n"
         "    pagure:\n"
         "        token: PAGURE_TOKEN\n"
-        '        instance_url: "https://my.pagure.org"\n'
+        '        instance_url: "https://my.pagure.org"\n',
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmp_path)
+        str(tmp_path),
     )
     config = Config.get_user_config()
     assert config.debug and isinstance(config.debug, bool)
@@ -235,10 +235,10 @@ def test_get_user_config_new_authentication(tmp_path):
 def test_user_config_fork_token(tmp_path, recwarn):
     user_config_file_path = tmp_path / ".packit.yaml"
     user_config_file_path.write_text(
-        "---\n" "pagure_fork_token: yes-is-true-in-yaml-are-you-kidding-me?\n"
+        "---\n" "pagure_fork_token: yes-is-true-in-yaml-are-you-kidding-me?\n",
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmp_path)
+        str(tmp_path),
     )
     Config.get_user_config()
     w = recwarn.pop(UserWarning)

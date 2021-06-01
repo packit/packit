@@ -41,7 +41,7 @@ def build_dict(copr_url, id):
             "state": "succeeded",
             "submitted_on": 1566377764,
             "submitter": "packit",
-        }
+        },
     )
 
 
@@ -97,10 +97,18 @@ class TestPackitAPI:
         pytest.param("1.1.1", None, None, does_not_raise(), id="version_set"),
         pytest.param(None, "v1.1.1", None, does_not_raise(), id="tag_set"),
         pytest.param(
-            "1.1", "v1.1.1", None, pytest.raises(PackitException), id="both_set"
+            "1.1",
+            "v1.1.1",
+            None,
+            pytest.raises(PackitException),
+            id="both_set",
         ),
         pytest.param(
-            None, None, "1.1", does_not_raise(), id="none_set-get_version_exists"
+            None,
+            None,
+            "1.1",
+            does_not_raise(),
+            id="none_set-get_version_exists",
         ),
         pytest.param(
             None,
@@ -112,17 +120,25 @@ class TestPackitAPI:
     ],
 )
 def test_sync_release_version_tag_processing(
-    version, tag, get_version_return, expectation, api_mock
+    version,
+    tag,
+    get_version_return,
+    expectation,
+    api_mock,
 ):
     api_mock.up.package_config.upstream_tag_template = "v{version}"
     api_mock.up.should_receive("get_version").and_return(get_version_return)
     api_mock.should_receive("_prepare_files_to_sync").with_args(
-        synced_files=[], full_version=version, upstream_tag=tag
+        synced_files=[],
+        full_version=version,
+        upstream_tag=tag,
     )
     flexmock(PatchGenerator).should_receive("undo_identical")
     with expectation:
         api_mock.sync_release(
-            version=version or get_version_return, tag=tag, dist_git_branch="_"
+            version=version or get_version_return,
+            tag=tag,
+            dist_git_branch="_",
         )
 
 
@@ -136,7 +152,10 @@ def test_sync_release_version_tag_processing(
     ],
 )
 def test_dg_downstream_package_name_is_set(
-    api_mock, path, downstream_package_name, expectation
+    api_mock,
+    path,
+    downstream_package_name,
+    expectation,
 ):
     api_mock._dg = None
     api_mock.package_config.downstream_package_name = downstream_package_name

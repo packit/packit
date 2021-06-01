@@ -28,7 +28,11 @@ UNIVERSAL_PACKAGE_NAME = "redhat-rpm-config"
     ),
 )
 def test_distgit_cloning(
-    api_instance_source_git, fedora_package, centos_package, branch, tmp_path: Path
+    api_instance_source_git,
+    fedora_package,
+    centos_package,
+    branch,
+    tmp_path: Path,
 ):
     sgg = SourceGitGenerator(
         api_instance_source_git.upstream_local_project,
@@ -73,7 +77,11 @@ def test_fetch_upstream_ref(api_instance_source_git, tmp_path: Path):
     (("fuse-overlayfs", None, "main"),),
 )
 def test_run_prep(
-    api_instance_source_git, fedora_package, centos_package, branch, tmp_path: Path
+    api_instance_source_git,
+    fedora_package,
+    centos_package,
+    branch,
+    tmp_path: Path,
 ):
     sgg = SourceGitGenerator(
         api_instance_source_git.upstream_local_project,
@@ -93,7 +101,8 @@ def test_run_prep(
 
 
 def test_create_packit_yaml_upstream_project_url(
-    api_instance_source_git, tmp_path: Path
+    api_instance_source_git,
+    tmp_path: Path,
 ):
     """
     use requre to create a source-git out of it in an empty git repo - packit
@@ -285,10 +294,11 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     # create src-git
     source_git_path.mkdir()
     subprocess.check_call(
-        ["git", "clone", "https://github.com/packit/requre", str(source_git_path)]
+        ["git", "clone", "https://github.com/packit/requre", str(source_git_path)],
     )
     subprocess.check_call(
-        ["git", "checkout", "-B", "source-git-0.4.0", "0.4.0"], cwd=source_git_path
+        ["git", "checkout", "-B", "source-git-0.4.0", "0.4.0"],
+        cwd=source_git_path,
     )
     sgg = SourceGitGenerator(
         LocalProject(working_dir=source_git_path),
@@ -306,10 +316,14 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    "dist_git_branch,upstream_ref", (("c8s", "cronie-1.5.2"), ("c9s", "cronie-1.5.5"))
+    "dist_git_branch,upstream_ref",
+    (("c8s", "cronie-1.5.2"), ("c9s", "cronie-1.5.5")),
 )
 def test_centos_cronie(
-    dist_git_branch, upstream_ref, api_instance_source_git, tmp_path: Path
+    dist_git_branch,
+    upstream_ref,
+    api_instance_source_git,
+    tmp_path: Path,
 ):
     source_git_path = tmp_path.joinpath("cronie-sg")
     # create src-git
@@ -357,7 +371,8 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
         branch=dist_git_branch,
     )
     for line in fileinput.input(
-        dist_git_path.joinpath(f"{package_name}.spec"), inplace=True
+        dist_git_path.joinpath(f"{package_name}.spec"),
+        inplace=True,
     ):
         if "%autosetup" in line:
             line = f"%autosetup -p1 -S{apply_option}"

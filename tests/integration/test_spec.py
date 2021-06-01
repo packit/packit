@@ -62,6 +62,6 @@ def test_add_patch(specfile, patch_id_digits):
         # This needs to be added because of
         # Bug 22
         Patch{2:0{patch_id_digits.get('patch_id_digits', 4)}d}: 0002-an-even-smarter.patch
-        """
+        """,
     )
     assert patch_lines in specfile.read_text()

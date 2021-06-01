@@ -63,7 +63,8 @@ class AliasedGroup(click.Group):
     help="Path to package configuration file (defaults to .packit.yaml or packit.yaml)",
 )
 @click.version_option(
-    version=get_distribution("packitos").version, message="%(version)s"
+    version=get_distribution("packitos").version,
+    message="%(version)s",
 )
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):

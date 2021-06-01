@@ -113,7 +113,7 @@ class PackitAPI:
                     )
                     logger.info(
                         "Package name was not set, we've got it from dist-git's "
-                        f"directory name: {self.package_config.downstream_package_name}"
+                        f"directory name: {self.package_config.downstream_package_name}",
                     )
             self._dg = DistGit(
                 config=self.config,
@@ -126,7 +126,7 @@ class PackitAPI:
     def copr_helper(self) -> CoprHelper:
         if self._copr_helper is None:
             self._copr_helper = CoprHelper(
-                upstream_local_project=self.upstream_local_project
+                upstream_local_project=self.upstream_local_project,
             )
         return self._copr_helper
 
@@ -193,7 +193,8 @@ class PackitAPI:
             # from the list, so that they are added to the spec-file.
             PatchGenerator.undo_identical(patches, self.dg.local_project.git_repo)
             self.dg.specfile_add_patches(
-                patches, self.package_config.patch_generation_patch_id_digits
+                patches,
+                self.package_config.patch_generation_patch_id_digits,
             )
 
         if add_new_sources or force_new_sources:
@@ -238,13 +239,13 @@ class PackitAPI:
         # process version and tag parameters
         if version and tag:
             raise PackitException(
-                "Function parameters version and tag are mutually exclusive."
+                "Function parameters version and tag are mutually exclusive.",
             )
         elif not tag:
             version = version or self.up.get_version()
             if not version:
                 raise PackitException(
-                    "Could not figure out version of latest upstream release."
+                    "Could not figure out version of latest upstream release.",
                 )
             upstream_tag = self.up.convert_version_to_tag(version)
         else:
@@ -256,17 +257,17 @@ class PackitAPI:
         if self.dg.is_dirty():
             raise PackitException(
                 f"The distgit repository {self.dg.local_project.working_dir} is dirty."
-                f"This is not supported."
+                f"This is not supported.",
             )
         if not force and self.up.is_dirty() and not use_local_content:
             raise PackitException(
-                "The repository is dirty, will not discard the changes. Use --force to bypass."
+                "The repository is dirty, will not discard the changes. Use --force to bypass.",
             )
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
         upstream_ref = self.up._expand_git_ref(
-            upstream_ref or self.package_config.upstream_ref
+            upstream_ref or self.package_config.upstream_ref,
         )
         create_pr = create_pr and self.package_config.create_pr
         self.up.run_action(actions=ActionName.post_upstream_clone)
@@ -278,7 +279,7 @@ class PackitAPI:
             if upstream_ref:
                 logger.info(
                     "We will not check out the upstream tag "
-                    "because this is a source-git repo."
+                    "because this is a source-git repo.",
                 )
             elif not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
@@ -306,7 +307,7 @@ class PackitAPI:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
                 logger.debug(f"README: {readme_path}")
                 readme_path.write_text(
-                    SYNCING_NOTE.format(packit_version=get_packit_version())
+                    SYNCING_NOTE.format(packit_version=get_packit_version()),
                 )
 
             description = (
@@ -343,7 +344,10 @@ class PackitAPI:
         return new_pr
 
     def _prepare_files_to_sync(
-        self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
+        self,
+        synced_files: List[SyncFilesItem],
+        full_version: str,
+        upstream_tag: str,
     ) -> List[SyncFilesItem]:
         """Update the spec-file by setting the version and updating the changelog
 
@@ -364,7 +368,8 @@ class PackitAPI:
             self.up.local_project.git_project.get_release(name=full_version).body
             if self.package_config.copy_upstream_release_description
             else self.up.get_commit_messages(
-                after=self.up.get_last_tag(upstream_tag), before=upstream_tag
+                after=self.up.get_last_tag(upstream_tag),
+                before=upstream_tag,
             )
         )
         try:
@@ -373,7 +378,7 @@ class PackitAPI:
             # no downstream spec file: this is either a mistake or
             # there is no spec file in dist-git yet, hence warning
             logger.warning(
-                f"There is not spec file downstream: {ex}, copying the one from upstream."
+                f"There is not spec file downstream: {ex}, copying the one from upstream.",
             )
             shutil.copy2(
                 self.up.absolute_specfile_path,
@@ -383,8 +388,9 @@ class PackitAPI:
         # exclude spec, we have special plans for it
         return list(
             filter(
-                None, [x.drop_src(self.up.absolute_specfile_path) for x in synced_files]
-            )
+                None,
+                [x.drop_src(self.up.absolute_specfile_path) for x in synced_files],
+            ),
         )
 
     def sync_from_downstream(
@@ -421,7 +427,7 @@ class PackitAPI:
 
         if not force and self.up.is_dirty():
             raise PackitException(
-                "The repository is dirty, will not discard the changes. Use --force to bypass."
+                "The repository is dirty, will not discard the changes. Use --force to bypass.",
             )
         self.dg.update_branch(dist_git_branch)
         self.dg.checkout_branch(dist_git_branch)
@@ -481,7 +487,10 @@ class PackitAPI:
             )
 
     def push_and_create_pr(
-        self, pr_title: str, pr_description: str, dist_git_branch: str
+        self,
+        pr_title: str,
+        pr_description: str,
+        dist_git_branch: str,
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
         self.dg.push_to_fork(self.dg.local_project.ref, force=True)
@@ -511,7 +520,7 @@ class PackitAPI:
         # btw this is really naive: the name could be the same but the hash can be different
         # TODO: we should do something when such situation happens
         archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-            self.dg.upstream_archive_name
+            self.dg.upstream_archive_name,
         )
         sources_file = self.dg.local_project.working_dir / "sources"
         archive_name_in_sources_file = (
@@ -587,7 +596,7 @@ class PackitAPI:
         """
         logger.debug(
             f"Create bodhi update, "
-            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}"
+            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}",
         )
         self.dg.create_bodhi_update(
             koji_builds=koji_builds,
@@ -616,7 +625,7 @@ class PackitAPI:
             self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
         except Exception as ex:
             raise PackitSRPMException(
-                f"Preparation of the repository for creation of an SRPM failed: {ex}"
+                f"Preparation of the repository for creation of an SRPM failed: {ex}",
             ) from ex
         try:
             srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
@@ -624,12 +633,12 @@ class PackitAPI:
             raise
         except Exception as ex:
             raise PackitSRPMException(
-                f"An unexpected error occurred when creating the SRPM: {ex}"
+                f"An unexpected error occurred when creating the SRPM: {ex}",
             ) from ex
 
         if not srpm_path.exists():
             raise PackitSRPMNotFoundException(
-                f"SRPM was created successfully, but can't be found at {srpm_path}"
+                f"SRPM was created successfully, but can't be found at {srpm_path}",
             )
         return srpm_path
 
@@ -647,7 +656,7 @@ class PackitAPI:
             self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
         except Exception as ex:
             raise PackitRPMException(
-                f"Preparing of the upstream to the RPM build failed: {ex}"
+                f"Preparing of the upstream to the RPM build failed: {ex}",
             ) from ex
 
         try:
@@ -656,13 +665,13 @@ class PackitAPI:
             raise
         except Exception as ex:
             raise PackitRPMException(
-                f"An unexpected error occurred when creating the RPMs: {ex}"
+                f"An unexpected error occurred when creating the RPMs: {ex}",
             ) from ex
 
         for rpm_path in rpm_paths:
             if not rpm_path.exists():
                 raise PackitRPMNotFoundException(
-                    f"RPM was created successfully, but can't be found at {rpm_path}"
+                    f"RPM was created successfully, but can't be found at {rpm_path}",
                 )
         return rpm_paths
 
@@ -755,7 +764,7 @@ class PackitAPI:
                         self.status_get_koji_builds(status),
                         self.status_get_copr_builds(status),
                         self.status_get_updates(status),
-                    )
+                    ),
                 )
             finally:
                 asyncio.set_event_loop(None)
@@ -801,7 +810,7 @@ class PackitAPI:
         if copr_builds:
             logger.info("\nLatest Copr builds:")
             logger.info(
-                tabulate(copr_builds, headers=["Build ID", "Project name", "Status"])
+                tabulate(copr_builds, headers=["Build ID", "Project name", "Status"]),
             )
         else:
             logger.info("\nNo Copr builds found.")
@@ -839,13 +848,14 @@ class PackitAPI:
         :return: id of the created build and url to the build web page
         """
         srpm_path = self.create_srpm(
-            upstream_ref=upstream_ref, srpm_dir=self.up.local_project.working_dir
+            upstream_ref=upstream_ref,
+            srpm_dir=self.up.local_project.working_dir,
         )
 
         owner = owner or self.copr_helper.configured_owner
         if not owner:
             raise PackitCoprException(
-                "Copr owner not set. Use Copr config file or `--owner` when calling packit CLI."
+                "Copr owner not set. Use Copr config file or `--owner` when calling packit CLI.",
             )
         logger.info(f"We will operate with COPR owner {owner}.")
 
@@ -863,20 +873,27 @@ class PackitAPI:
         )
         logger.debug(
             f"Submitting a build to copr build system,"
-            f"owner={owner}, project={project}, path={srpm_path}"
+            f"owner={owner}, project={project}, path={srpm_path}",
         )
 
         build = self.copr_helper.copr_client.build_proxy.create_from_file(
-            ownername=owner, projectname=project, path=srpm_path
+            ownername=owner,
+            projectname=project,
+            path=srpm_path,
         )
         return build.id, self.copr_helper.copr_web_build_url(build)
 
     def watch_copr_build(
-        self, build_id: int, timeout: int, report_func: Callable = None
+        self,
+        build_id: int,
+        timeout: int,
+        report_func: Callable = None,
     ) -> str:
         """returns copr build state"""
         return self.copr_helper.watch_copr_build(
-            build_id=build_id, timeout=timeout, report_func=report_func
+            build_id=build_id,
+            timeout=timeout,
+            report_func=report_func,
         )
 
     @staticmethod
@@ -892,7 +909,7 @@ class PackitAPI:
                 f"Bodhi update {response['alias']} ({response['title']}) pushed to stable:\n"
                 f"- {response['url']}\n"
                 f"- karma: {response['karma']}\n"
-                f"- notes:\n{response['notes']}\n"
+                f"- notes:\n{response['notes']}\n",
             )
         except UpdateNotFound:
             logger.error("Update was not found.")
@@ -914,7 +931,8 @@ class PackitAPI:
     def days_in_testing(update) -> int:
         if update.get("date_testing"):
             date_testing = datetime.strptime(
-                update["date_testing"], "%Y-%m-%d %H:%M:%S"
+                update["date_testing"],
+                "%Y-%m-%d %H:%M:%S",
             )
             return (datetime.utcnow() - date_testing).days
         return 0

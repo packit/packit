@@ -21,7 +21,7 @@ from packit.local_project import LocalProject
                     title="Update",
                     target_branch="f31",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
-                )
+                ),
             ],
             True,
         ),
@@ -34,7 +34,7 @@ from packit.local_project import LocalProject
                     title="Update",
                     target_branch="f31",
                     description="Upstream tag: 0.4.0\nUpstream commit: 8957453b",
-                )
+                ),
             ],
             False,
         ),
@@ -47,7 +47,7 @@ from packit.local_project import LocalProject
                     title="Update",
                     target_branch="f31",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
-                )
+                ),
             ],
             False,
         ),

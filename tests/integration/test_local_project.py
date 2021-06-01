@@ -43,7 +43,8 @@ def test_pr_id_and_ref(tmp_path: Path):
 
     assert (
         subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=upstream_git
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=upstream_git,
         )
         .strip()
         .decode()
@@ -89,7 +90,8 @@ def test_pr_id_and_ref_gitlab(tmp_path: Path):
 
     assert (
         subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=upstream_git
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=upstream_git,
         )
         .strip()
         .decode()

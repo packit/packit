@@ -76,7 +76,9 @@ def test_url_is_upstream():
         (
             [],
             flexmock(
-                upstream_project_url=None, dist_git_base_url=None, synced_files=None
+                upstream_project_url=None,
+                dist_git_base_url=None,
+                synced_files=None,
             ),
             True,
         ),
@@ -197,7 +199,7 @@ def test_get_api(tmp_path, remotes, package_config, is_upstream):
     initiate_git_repo(repo, remotes=remotes)
 
     flexmock(utils).should_receive("get_local_package_config").and_return(
-        package_config
+        package_config,
     )
 
     c = get_test_config()

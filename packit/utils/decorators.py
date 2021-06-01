@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 def fallback_return_value(
-    fallback_value, exceptions: Union[Exception, Tuple[Exception]] = Exception()
+    fallback_value,
+    exceptions: Union[Exception, Tuple[Exception]] = Exception(),
 ):
     """
     The function of this decorator is to return some fallback value in case an exception was raised
@@ -27,7 +28,7 @@ def fallback_return_value(
                 logger.warning(
                     f"Fallback return value used while calling {func.__name__} because of "
                     f"{type(e).__name__}"
-                    f"{': ' + str(e) if str(e) else ''} "
+                    f"{': ' + str(e) if str(e) else ''} ",
                 )
                 return fallback_value
 

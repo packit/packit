@@ -70,11 +70,13 @@ class LocalProjectParameter(click.ParamType):
             elif git_remote_url_to_https_url(value):
                 logger.debug(f"Input is a URL to a git repo: {value}")
                 local_project = LocalProject(
-                    git_url=value, ref=branch_name, remote=ctx.obj.upstream_git_remote
+                    git_url=value,
+                    ref=branch_name,
+                    remote=ctx.obj.upstream_git_remote,
                 )
             else:
                 self.fail(
-                    "Provided input path_or_url is not a directory nor an URL of a git repo."
+                    "Provided input path_or_url is not a directory nor an URL of a git repo.",
                 )
 
             if not (local_project.working_dir or local_project.git_url):

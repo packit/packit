@@ -109,7 +109,8 @@ def test_basic_local_update_patch_content(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     assert (
@@ -284,7 +285,8 @@ def test_basic_local_update_patch_content_with_metadata(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     patches = """
@@ -335,7 +337,8 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     patches = """
@@ -376,7 +379,8 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     patches = """
@@ -403,12 +407,13 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref)
     assert srpm_path.is_file()
     build_srpm(srpm_path)
     branches = subprocess.check_output(
-        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"], cwd=sg_path
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"],
+        cwd=sg_path,
     ).split(b"\n")
     for b in branches:
         if b and b.startswith(b"packit-patches-"):
             raise AssertionError(
-                "packit-patches- branch was found - the history shouldn't have been linearized"
+                "packit-patches- branch was found - the history shouldn't have been linearized",
             )
     assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-switching-to-amarillo-hops.patch",
@@ -418,7 +423,9 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref)
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_merge_storm(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -435,14 +442,15 @@ def test_srpm_merge_storm(
     assert srpm_path.is_file()
     build_srpm(srpm_path)
     branches = subprocess.check_output(
-        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"], cwd=sg_path
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"],
+        cwd=sg_path,
     ).split(b"\n")
     for b in branches:
         if b and b.startswith(b"packit-patches-"):
             break
     else:
         raise AssertionError(
-            "packit-patches- branch was not found - this should trigger the linearization"
+            "packit-patches- branch was not found - this should trigger the linearization",
         )
     # make sure we are on the main branch
     assert (
@@ -521,7 +529,9 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_git_no_prefix_patches(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -557,7 +567,9 @@ def test_srpm_git_no_prefix_patches(
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_empty_patch(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -590,7 +602,9 @@ def test_srpm_empty_patch(
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_patch_non_conseq_indices(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -618,7 +632,7 @@ def test_srpm_patch_non_conseq_indices(
     assert last_patch.name == "Patch6"
     assert (
         os.path.basename(
-            api_instance_source_git.up.specfile.get_applied_patches()[-1].path
+            api_instance_source_git.up.specfile.get_applied_patches()[-1].path,
         )
         == "0004-Wei-bier-Summer-is-coming.patch"
     )
@@ -663,7 +677,9 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
     good_patch_path2 = spec_dir.joinpath(good_patch_name2)
     good_patch_path2.write_text("")
     good_patch2 = PatchMetadata(
-        name=good_patch_name2, path=good_patch_path2, present_in_specfile=False
+        name=good_patch_name2,
+        path=good_patch_path2,
+        present_in_specfile=False,
     )
     spec.add_patch(good_patch2)
 
@@ -679,7 +695,9 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
     else:
         bad_patch_id = starting_patch_id - 1
     bad_patch = PatchMetadata(
-        name=patch_name, present_in_specfile=False, patch_id=bad_patch_id
+        name=patch_name,
+        present_in_specfile=False,
+        patch_id=bad_patch_id,
     )
     with pytest.raises(PackitException) as exc:
         spec.add_patch(bad_patch)
@@ -712,7 +730,8 @@ def test_add_patch_first_id_1(api_instance_source_git):
 
 
 def test_srpm_add_patch_with_ids(
-    mock_remote_functionality_sourcegit, api_instance_source_git
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
 ):
     ref = "0.1.0"
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)

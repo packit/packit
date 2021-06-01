@@ -81,7 +81,7 @@ def bodhi_response():
                     "state": "pending",
                     "composed_by_bodhi": True,
                     "composes": [],
-                }
+                },
             ),
             "comments": [
                 Munch(
@@ -106,9 +106,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -132,9 +132,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -159,9 +159,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -185,9 +185,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -211,9 +211,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
             ],
             "builds": [
@@ -225,8 +225,8 @@ def bodhi_response():
                         "ci_url": None,
                         "type": "rpm",
                         "epoch": 0,
-                    }
-                )
+                    },
+                ),
             ],
             "compose": None,
             "bugs": [],
@@ -244,20 +244,21 @@ def bodhi_response():
                         Munch({"name": "provenpackager"}),
                         Munch({"name": "packager"}),
                     ],
-                }
+                },
             ),
             "updateid": "FEDORA-2019-0c53f2476d",
             "submitter": "ttomecek",
             "karma": 0,
             "content_type": "rpm",
             "test_cases": [],
-        }
+        },
     )
 
 
 # FIXME: https://github.com/fedora-infra/bodhi/issues/3058
 @pytest.mark.skipif(
-    not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
+    not can_a_module_be_imported("bodhi"),
+    reason="bodhi not present, skipping",
 )
 @pytest.mark.parametrize(
     "branch,update_type,update_notes,koji_builds",

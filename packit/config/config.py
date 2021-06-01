@@ -191,7 +191,7 @@ class Config:
                 "        token: PAGURE_TOKEN\n"
                 '        instance_url: "https://src.fedoraproject.org"\n'
                 "See our documentation for more information "
-                "http://packit.dev/docs/configuration/#user-configuration-file. "
+                "http://packit.dev/docs/configuration/#user-configuration-file. ",
             )
             github_app_id = raw_dict.get("github_app_id")
             github_app_cert_path = raw_dict.get("github_app_cert_path")
@@ -201,19 +201,23 @@ class Config:
                     token=github_token,
                     github_app_id=github_app_id,
                     github_app_private_key_path=github_app_cert_path,
-                )
+                ),
             )
             pagure_user_token = raw_dict.get("pagure_user_token")
             pagure_instance_url = raw_dict.get(
-                "pagure_instance_url", "https://src.fedoraproject.org"
+                "pagure_instance_url",
+                "https://src.fedoraproject.org",
             )
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(
                     "packit no longer accepts 'pagure_fork_token'"
-                    " value (https://github.com/packit/packit/issues/495)"
+                    " value (https://github.com/packit/packit/issues/495)",
                 )
             services.add(
-                PagureService(token=pagure_user_token, instance_url=pagure_instance_url)
+                PagureService(
+                    token=pagure_user_token,
+                    instance_url=pagure_instance_url,
+                ),
             )
 
         return services

@@ -99,7 +99,9 @@ def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote
 
 
 def mock_spec_download_remote_s(
-    repo_path: Path, spec_dir_path: Optional[Path] = None, archive_ref: str = "HEAD"
+    repo_path: Path,
+    spec_dir_path: Optional[Path] = None,
+    archive_ref: str = "HEAD",
 ):
     spec_dir_path = spec_dir_path or repo_path
 
@@ -138,7 +140,10 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
     flexmock(
         GithubService,
         get_project=lambda repo, namespace: GithubProject(
-            "also-not", github_service, "set", github_repo=flexmock()
+            "also-not",
+            github_service,
+            "set",
+            github_repo=flexmock(),
         ),
     )
     flexmock(
@@ -203,7 +208,8 @@ def sourcegit_and_remote(tmp_path):
     shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
     initiate_git_repo(sourcegit_dir, tag=SOURCE_GIT_RELEASE_TAG)
     subprocess.check_call(
-        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path], cwd=sourcegit_remote
+        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path],
+        cwd=sourcegit_remote,
     )
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
@@ -254,7 +260,9 @@ def upstream_instance_with_two_commits(upstream_instance):
 
 @pytest.fixture()
 def distgit_instance(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+    upstream_and_remote,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
@@ -344,7 +352,8 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
 
     if key_fingerprint in gnupg_instance.list_keys(secret=True).fingerprints:
         remove_gpg_key_pair(
-            gpg_binary=gnupg_instance.gpgbinary, fingerprint=key_fingerprint
+            gpg_binary=gnupg_instance.gpgbinary,
+            fingerprint=key_fingerprint,
         )
 
 
