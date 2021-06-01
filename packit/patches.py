@@ -453,6 +453,8 @@ class PatchGenerator:
             except StopIteration:
                 break
 
+        # we need to reverse it back to be consistent with the order
+        new_patch_list.reverse()
         return new_patch_list
 
     @staticmethod
