@@ -21,6 +21,7 @@ from tests.spellbook import (
     create_patch_mixed_history,
     create_history_with_empty_commit,
     run_prep_for_srpm,
+    create_history_with_patch_ids,
 )
 
 
@@ -489,11 +490,6 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
-    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
-        "Patch1: citra.patch",
-        "Patch2: malt.patch",
-        "Patch8: 0001-m04r-malt.patch",
-    )
     autosetup_line = api_instance_source_git.up.specfile.spec_content.section("%prep")[
         0
     ]
@@ -713,3 +709,33 @@ def test_add_patch_first_id_1(api_instance_source_git):
     spec.add_patch(good_patch1)
 
     assert spec.get_applied_patches()[0].index == 1
+
+
+def test_srpm_add_patch_with_ids(
+    mock_remote_functionality_sourcegit, api_instance_source_git
+):
+    ref = "0.1.0"
+    sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
+    mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, ref)
+
+    create_history_with_patch_ids(sg_path)
+
+    with cwd(sg_path):
+        api_instance_source_git.create_srpm(upstream_ref=ref)
+
+    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    assert srpm_path.is_file()
+    build_srpm(srpm_path)
+
+    assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
+        "amarillo.patch",
+        "citra.patch",
+        "malt.patch",
+    }
+    applied_patches = api_instance_source_git.up.specfile.get_applied_patches()
+    assert Path(applied_patches[0].path).name == "amarillo.patch"
+    assert applied_patches[0].index == 3
+    assert Path(applied_patches[1].path).name == "citra.patch"
+    assert applied_patches[1].index == 4
+    assert Path(applied_patches[2].path).name == "malt.patch"
+    assert applied_patches[2].index == 100
