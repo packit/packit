@@ -26,14 +26,7 @@ logger = logging.getLogger("packit")
 
 class AliasedGroup(click.Group):
     def get_command(self, ctx, cmd_name):
-        if cmd_name == "generate":
-            click.secho(
-                "WARNING: 'packit generate' is deprecated and it "
-                "is going to be removed. Use 'packit init' instead.",
-                fg="yellow",
-            )
-            return click.Group.get_command(self, ctx, "init")
-        elif cmd_name == "propose-update":
+        if cmd_name == "propose-update":
             click.secho(
                 "WARNING: 'packit propose-update' is deprecated and will be removed. "
                 "Use 'packit propose-downstream' instead.",
