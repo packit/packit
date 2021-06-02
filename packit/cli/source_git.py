@@ -6,6 +6,7 @@
 import click
 
 from packit.cli.update_dist_git import update_dist_git
+from packit.cli.source_git_init import source_git_init
 
 
 @click.group("source-git")
@@ -15,3 +16,4 @@ def source_git():
 
 
 source_git.add_command(update_dist_git)
+source_git.add_command(source_git_init)
