@@ -21,7 +21,7 @@ command:
 
 ## Testing
 
-Tests are stored in [tests](/tests) directory:
+Tests are stored in the [tests](/tests) directory:
 
 - `tests/unit`
   - testing small units/parts of the code
@@ -38,14 +38,24 @@ Tests are stored in [tests](/tests) directory:
     for remote communication => offline in the CI
   - prefer [requre](https://github.com/packit/requre) instead of mocking
 
-Running tests locally:
+Running tests:
 
-    make check_in_container
+We recommend running tests in a container. You need to have `podman` or
+`docker` installed for this.
 
-To select a subset of the whole test suite, set `TESTS_TARGET`.
+To build the test image run:
+
+    make build-test-image
+
+You can run the test now with:
+
+    make check-in-container
+
+To select a subset of the whole test suite, set `TEST_TARGET`.
 For example to run only the unit tests use:
 
-    TESTS_TARGET=tests/unit make check_in_container
+    TEST_TARGET=tests/unit make check-in-container
+    (or TEST_TARGET=tests/unit make check)
 
 Tests use pre-generated responses stored in [tests_recording/test_data/](tests_recording/test_data).
 To (re-)generate response file(s):
@@ -53,7 +63,7 @@ To (re-)generate response file(s):
 - [add requre to test image](files/local-tests-requirements.yaml)
 - remove files from [tests_recording/test_data/](tests_recording/test_data) you want to re-generate
 - set tokens in your [~/.config/.packit.yaml](https://packit.dev/docs/configuration/#user-configuration-file)
-- `make check_in_container_regenerate_data`
+- `make check-in-container-regenerate-data`
 - commit changed/new files
 
 See also [tests_recording/README.md](tests_recording/README.md)
@@ -70,6 +80,12 @@ PersistentObjectStorage().storage_file = response_file
 
 As a CI we use [Zuul](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit) with a configuration in [.zuul.yaml](.zuul.yaml).
 If you want to re-run CI/tests in a pull request, just include `recheck` in a PR comment.
+
+`make check` is also available to run the tests in the environment of your
+choice, but first you'll need to make sure to install all the package and test
+dependencies, starting with python3-pytest, python3-requre, and python3-flexmock.
+For now it is up to the reader to figure out how to do this on
+their system.
 
 ### Additional configuration for development purposes
 
