@@ -62,9 +62,6 @@ class DistGit(PackitRepositoryBase):
     and methods of this class interact with the local copy.
     """
 
-    # we store downstream content in source-git in this subdir
-    source_git_downstream_suffix = ".distro"
-
     # spec files are stored in this dir in dist-git
     # this applies to Fedora and CentOS Stream 9
     spec_dir_name = ""
@@ -213,10 +210,6 @@ class DistGit(PackitRepositoryBase):
                 raise FileNotFoundError(f"Specfile {self._specfile_path} not found.")
         return self._specfile_path
 
-    def get_root_downstream_dir_for_source_git(self, root_dir: Path) -> Path:
-        """root directory within a source-git repo where all the downstream files are stored"""
-        return root_dir.joinpath(self.source_git_downstream_suffix)
-
     def update_branch(self, branch_name: str):
         """
         Fetch latest commits to the selected branch; tracking needs to be set up
@@ -335,6 +328,23 @@ class DistGit(PackitRepositoryBase):
             )
         logger.info(f"Downloaded archive: {archive}")
         return archive
+
+    def download_source_files(self, pkg_tool: str = ""):
+        """Download source files from the lookaside cache
+
+        Use the pkg_tool that was specified.
+
+        Args:
+            pkg_tool: Name of the executable to be used to fetch
+                the sources.
+        """
+        logger.info("Downloading source files from the lookaside cache...")
+        pkg_tool_ = PkgTool(
+            fas_username=self.config.fas_user,
+            directory=self.local_project.working_dir,
+            tool=pkg_tool or self.config.pkg_tool,
+        )
+        pkg_tool_.sources()
 
     def upload_to_lookaside_cache(self, archive: Path, pkg_tool: str = "") -> None:
         """Upload files (archive) to the lookaside cache.

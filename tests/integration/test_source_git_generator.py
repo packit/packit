@@ -1,5 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+
 import fileinput
 import re
 import subprocess
@@ -84,7 +85,7 @@ def test_run_prep(
         dist_git_branch=branch,
         tmpdir=tmp_path,
     )
-    assert sgg.primary_archive.exists()  # making sure this is downloaded
+    sgg.dist_git.download_source_files()
     sgg._run_prep()
     build_dir = sgg.dist_git.local_project.working_dir.joinpath("BUILD")
     assert build_dir.exists()
@@ -92,7 +93,7 @@ def test_run_prep(
     assert project_dir.joinpath(".git")
 
 
-def test_create_packit_yaml_upstream_project_url(
+def test_source_git_config_upstream_project_url(
     api_instance_source_git, tmp_path: Path
 ):
     """
@@ -121,10 +122,11 @@ def test_create_packit_yaml_upstream_project_url(
         upstream_project_url,
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    config_file = Path(source_git_path / ".distro/source-git.yaml").read_text()
     # black sucks here :/ we are making sure here the yaml looks nice
     assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
     assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
@@ -132,7 +134,7 @@ def test_create_packit_yaml_upstream_project_url(
     assert packit_yaml.get("upstream_project_url") == upstream_project_url
 
 
-def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
+def test_source_git_config_sources(api_instance_source_git, tmp_path: Path):
     """
     use requre to create a source-git out of it in an empty git repo - packit
     will pull upstream git history
@@ -165,21 +167,18 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    config_file = Path(source_git_path / ".distro/source-git.yaml").read_text()
     # black sucks here :/ we are making sure here the yaml looks nice
     assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
     assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
     packit_yaml = yaml.safe_load(config_file)
-    assert packit_yaml.get("sources")
-    assert len(packit_yaml["sources"]) > 0
-    assert packit_yaml["sources"][0].get("url")
-    assert packit_yaml["sources"][0].get("path")
-
-    assert packit_yaml["sources"][0]["url"] == requre_tar_url
-    assert packit_yaml["sources"][0]["path"] == requre_tar_path
+    assert len(packit_yaml.get("sources", {})) > 0
+    assert packit_yaml["sources"][0].get("url") == requre_tar_url
+    assert packit_yaml["sources"][0].get("path") == requre_tar_path
 
 
 REQURE_PATCH = r"""\
@@ -222,6 +221,9 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
     dg_lp.stage()
     dg_lp.commit("add the hello patch")
     subprocess.check_call(["fedpkg", "prep"], cwd=dist_git_path)
+    # Clean the dist-git repo before initializing a source-git repo from it
+    # so that only checked-in content ends up in source-git.
+    dg_lp.git_repo.git.clean("-xdff")
 
     # create src-git
     source_git_path.mkdir()
@@ -232,11 +234,16 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
     # verify it
-    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
+    # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
+    # dist-git with 'packit source-git update-dist-git' would make more sense.
+    subprocess.check_call(
+        ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
+    )
     srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
     # requre needs sphinx, so SRPM is fine
@@ -248,7 +255,7 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
                 "git",
                 "ls-files",
                 "--error-unmatch",
-                f"{sgg.dist_git.source_git_downstream_suffix}/{spec.get_archive()}",
+                f".distro/{spec.get_archive()}",
             ],
             cwd=source_git_path,
         )
@@ -294,11 +301,16 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
     # verify it
-    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
+    # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
+    # dist-git with 'packit source-git update-dist-git' would make more sense.
+    subprocess.check_call(
+        ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
+    )
     srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
     # requre needs sphinx, so SRPM is fine
@@ -322,6 +334,7 @@ def test_centos_cronie(
         upstream_ref=upstream_ref,
         centos_package="cronie",
         dist_git_branch=dist_git_branch,
+        package_name="cronie",
     )
     sgg.create_from_upstream()
 
@@ -331,7 +344,11 @@ def test_centos_cronie(
         assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
 
     # verify it
-    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
+    # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
+    # dist-git with 'packit source-git update-dist-git' would make more sense.
+    subprocess.check_call(
+        ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
+    )
     srpm_path = list(source_git_path.glob("cronie-*.src.rpm"))[0]
     assert srpm_path.is_file()
 

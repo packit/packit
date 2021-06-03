@@ -22,6 +22,21 @@ from packit.exceptions import PackitException
 logger = getLogger(__name__)
 
 
+class Patch(PatchObject):
+    """A downstream patch
+
+    This extends rebasehelper.specfile.PatchObject to add a new attribute
+    for the comment lines belonging to the patch.
+
+    Attributes:
+        comments: List of comment lines belonging to the patch.
+    """
+
+    def __init__(self, patch: PatchObject, comments: Optional[List[str]] = None):
+        super().__init__(patch.path, patch.index, patch.strip)
+        self.comments = comments
+
+
 class Specfile(SpecFile):
     def __init__(self, path: Union[str, Path], sources_dir: Union[str, Path] = ""):
         s = inspect.signature(SpecFile)
@@ -240,3 +255,43 @@ class Specfile(SpecFile):
         # sanitize the name, this will also add index if there isn't one
         source_name, *_ = Tags._sanitize_tag(source_name, 0, 0)
         return next(self.tags.filter(name=source_name, valid=None), None)
+
+    def read_patch_comments(self):
+        """Read the spec again, detect comment lines right above a patch-line
+        and save it as an attribute to the patch for later retrieval.
+
+        Match patch-lines with the patch-data from rebase-helper on the name of
+        the patches.
+        """
+        comment = []
+        patch_comments = {}
+        for line in self.spec_content.section("%package"):
+            if not line.strip():
+                comment = []
+            if line.startswith("#"):
+                comment.append(line.removeprefix("#").strip())
+            if line.lower().startswith("patch"):
+                patch_name = Path(line.split(":", 1)[1].strip()).name
+                patch_comments[patch_name] = comment
+                comment = []
+        for kind in ["applied", "not_applied"]:
+            self.patches[kind] = [
+                Patch(patch, patch_comments.get(patch.get_patch_name(), []))
+                for patch in self.patches[kind]
+            ]
+
+    def remove_patches(self):
+        """Remove all patch-lines from the spec file"""
+        content = []
+        stretch = []
+        for line in self.spec_content.section("%package"):
+            stretch.append(line)
+            if not line.strip():
+                content += stretch
+                stretch = []
+            if line.lower().startswith("patch"):
+                stretch = []
+                if not content[-1].strip():
+                    content.pop()
+        self.spec_content.replace_section("%package", content)
+        self.save()
