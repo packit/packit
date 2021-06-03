@@ -359,14 +359,12 @@ class PackitRepositoryBase:
         :param version: version to set in self.specfile
         :param comment: new comment for the version in %changelog
         """
-        this_changelog = self.specfile.spec_content.section("%changelog")
-        this_version = self.specfile.get_version()
+        provided_changelog = specfile.spec_content.section("%changelog")
         self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
-        self.specfile.save()
-        self.specfile.spec_content.replace_section("%changelog", this_changelog)
-        self.specfile.set_version(this_version)
+        self.specfile.spec_content.replace_section("%changelog", provided_changelog)
         self.specfile.save()
         self.specfile.set_spec_version(version=version, changelog_entry=comment)
+        self.specfile.save()
 
     def refresh_specfile(self):
         self._specfile = None

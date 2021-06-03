@@ -146,10 +146,7 @@ Source0:        %{upstream_name}-%{version}.tar.gz
 
     assert (
         """ - 0.1.0-1
-+- commit with data (Packit Test Suite)
-+- empty commit #2 (Packit Test Suite)
-+- empty commit #1 (Packit Test Suite)
-+- empty commit #0 (Packit Test Suite)
++- Initial brewing
 +
  * Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1
  - No brewing, yet."""
