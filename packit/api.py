@@ -995,6 +995,7 @@ class PackitAPI:
         dist_git_branch: Optional[str] = None,
         fedora_package: Optional[str] = None,
         centos_package: Optional[str] = None,
+        package_name: Optional[str] = None,
     ):
         """
         generate a source-git repo from provided upstream repo
@@ -1006,6 +1007,7 @@ class PackitAPI:
         :param centos_package: pick up specfile and downstream sources from this centos package
         :param dist_git_branch: branch in dist-git to use
         :param dist_git_path: path to a local clone of a dist-git repo
+        :param package_name: name of the package in the distro
         """
         sgg = SourceGitGenerator(
             config=self.config,
@@ -1016,5 +1018,6 @@ class PackitAPI:
             dist_git_branch=dist_git_branch,
             fedora_package=fedora_package,
             centos_package=centos_package,
+            package_name=package_name,
         )
         sgg.create_from_upstream()

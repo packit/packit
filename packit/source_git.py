@@ -5,12 +5,12 @@ packit started as source-git and we're making a source-git module after such a l
 """
 import configparser
 import logging
-import os
 import shutil
 import tarfile
 import tempfile
+import textwrap
 from pathlib import Path
-from typing import Optional, Tuple, List, Dict, Union
+from typing import Optional, Tuple, List, Dict
 
 import yaml
 from git import GitCommandError
@@ -33,12 +33,13 @@ from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
-from packit.utils.commands import run_command
-from packit.utils.repo import (
+from packit.utils import (
+    run_command,
     clone_centos_8_package,
     clone_centos_9_package,
     get_default_branch,
 )
+from packit.specfile import Specfile
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +157,9 @@ class SourceGitGenerator:
     and a corresponding package in Fedora/CentOS ecosystem
     """
 
+    # we store downstream content in source-git in this subdir
+    DISTRO_DIR = ".distro"
+
     def __init__(
         self,
         local_project: LocalProject,
@@ -166,6 +170,7 @@ class SourceGitGenerator:
         dist_git_branch: Optional[str] = None,
         fedora_package: Optional[str] = None,
         centos_package: Optional[str] = None,
+        package_name: Optional[str] = None,
         tmpdir: Optional[Path] = None,
     ):
         """
@@ -177,6 +182,7 @@ class SourceGitGenerator:
         :param dist_git_branch: branch in dist-git to use
         :param fedora_package: pick up specfile and downstream sources from this fedora package
         :param centos_package: pick up specfile and downstream sources from this centos package
+        :param package_name: name of the package in the distro
         :param tmpdir: path to a directory where temporary repos (upstream,
                        dist-git) will be cloned
         """
@@ -187,6 +193,8 @@ class SourceGitGenerator:
         self._primary_archive: Optional[Path] = None
         self._upstream_ref: Optional[str] = upstream_ref
         self.dist_git_branch = dist_git_branch
+        self.distro_dir = Path(self.local_project.working_dir, self.DISTRO_DIR)
+        self.package_name = package_name
 
         logger.info(
             f"The source-git repo is going to be created in {local_project.working_dir}."
@@ -283,12 +291,6 @@ class SourceGitGenerator:
                     f"falling back to the HEAD commit: {self._upstream_ref}"
                 )
         return self._upstream_ref
-
-    @property
-    def specfile_path(self) -> Path:
-        return self.dist_git.get_root_downstream_dir_for_source_git(
-            self.local_project.working_dir
-        ).joinpath(self.dist_git.absolute_specfile_path.name)
 
     def _get_dist_git(
         self,
@@ -390,38 +392,6 @@ class SourceGitGenerator:
             print_live=True,
         )
 
-    def _put_downstream_sources(self, lookaside_sources: List[str]):
-        """
-        place sources from the downstream into the source-git repository
-        """
-        if self.dist_git_branch:
-            self.dist_git.checkout_branch(self.dist_git_branch)
-        self.dist_git.download_upstream_archive()
-        root_downstream_dir = self.dist_git.get_root_downstream_dir_for_source_git(
-            self.local_project.working_dir
-        )
-        os.makedirs(root_downstream_dir, exist_ok=True)
-
-        shutil.copy2(self.dist_git.absolute_specfile_path, root_downstream_dir)
-
-        logger.info(
-            f"Copy all sources from {self.dist_git.absolute_source_dir} to {root_downstream_dir}."
-        )
-
-        # we may not want to copy the primary archive - it's worth a debate
-        for source in self.dist_git.specfile.get_sources():
-            if Path(source).name in lookaside_sources:
-                logger.debug(
-                    f"Source {source} will be fetched from the lookaside cache."
-                )
-                continue
-            source_dest = root_downstream_dir / Path(source).name
-            logger.debug(f"copying {source} to {source_dest}")
-            shutil.copy2(source, source_dest)
-
-        self.local_project.stage(self.dist_git.source_git_downstream_suffix)
-        self.local_project.commit(message="add downstream distribution sources")
-
     def _get_lookaside_sources(self) -> List[Dict[str, str]]:
         """
         Read "sources" file from the dist-git repo and return a list of dicts
@@ -451,45 +421,6 @@ class SourceGitGenerator:
             sources.append({"path": path, "url": url})
 
         return sources
-
-    def _add_packit_config(self, lookaside_sources: List[Dict[str, str]]):
-        """
-        Add .packit.yaml config to the sources-git repo
-        """
-        # mypy wanted this type annotation -_-
-        default_packit_yaml: Dict[str, Union[str, List[str], List[Dict[str, str]]]] = {
-            "specfile_path": f"{self.specfile_path.relative_to(self.local_project.working_dir)}",
-            "upstream_ref": self.upstream_ref,
-            "patch_generation_ignore_paths": [
-                self.dist_git.source_git_downstream_suffix
-            ],
-        }
-
-        if lookaside_sources:
-            default_packit_yaml["sources"] = lookaside_sources
-
-        if self.upstream_lp.git_url:
-            default_packit_yaml["upstream_project_url"] = self.upstream_lp.git_url
-
-        packit_yaml_path = self.local_project.working_dir.joinpath(".packit.yaml")
-        packit_yaml_path.write_text(
-            yaml.dump_all(
-                [default_packit_yaml],
-                Dumper=SafeDumperWithoutAliases,
-                # default_flow_style=False dumps things into a block instead of ugly inline
-                # inline example:
-                #   key: {key1: value1, key2: value2}
-                # block example:
-                #   key:
-                #     key1: value1
-                #     key2: value1
-                # True in el8, False in the latest pyyaml
-                default_flow_style=False,
-            )
-        )
-
-        self.local_project.stage(".packit.yaml")
-        self.local_project.commit("add packit.yaml")
 
     def get_BUILD_dir(self):
         path = self.dist_git.local_project.working_dir
@@ -536,19 +467,110 @@ class SourceGitGenerator:
 
         self.local_project.git_repo.git.branch("-D", to_branch)
 
+    def _populate_distro_dir(self):
+        """Copy files used in the distro to package and test the software to .distro."""
+        # TODO(csomh): Check that the dist-git working directory is pristine,
+        # that is, it's not dirty and has nothing git clean -xd would remove.
+        # Error out, if it's not the case, we don't want to copy untracked content
+        # to .distro.
+        command = ["rsync", "--archive", "--delete"]
+        for exclude in ["*.patch", "sources", ".git*"]:
+            command += ["--filter", f"exclude {exclude}"]
+
+        command += [
+            str(self.dist_git.local_project.working_dir) + "/",
+            str(self.distro_dir),
+        ]
+
+        self.distro_dir.mkdir(parents=True)
+        run_command(command)
+
+    def _reset_gitignore(self):
+        reset_rules = textwrap.dedent(
+            """\
+            # Reset gitignore rules
+            !*
+            """
+        )
+        Path(self.distro_dir, ".gitignore").write_text(reset_rules)
+
+    def _configure_syncing(self):
+        """Populate source-git.yaml"""
+        package_config = {}
+        if self.upstream_lp.git_url:
+            package_config["upstream_project_url"] = self.upstream_lp.git_url
+        package_config.update(
+            {
+                "upstream_ref": self.upstream_ref,
+                "downstream_package_name": self.package_name,
+                "specfile_path": f"{self.DISTRO_DIR}/{self.package_name}.spec",
+                "patch_generation_ignore_paths": [self.DISTRO_DIR],
+                "patch_generation_patch_id_digits": 0,
+                "sync_changelog": True,
+                "synced_files": [
+                    {
+                        # The trailing-slash is important, as we want to
+                        # sync the content of the directory, not the directory
+                        # as a whole.
+                        "src": f"{self.DISTRO_DIR}/",
+                        "dest": ".",
+                        "delete": True,
+                        "filters": [
+                            "protect .git*",
+                            "protect sources",
+                            "exclude source-git.yaml",
+                            "exclude .gitignore",
+                        ],
+                    }
+                ],
+            }
+        )
+        lookaside_sources = self._get_lookaside_sources()
+        if lookaside_sources:
+            package_config["sources"] = lookaside_sources
+
+        Path(self.distro_dir, "source-git.yaml").write_text(
+            yaml.dump(
+                package_config,
+                Dumper=SafeDumperWithoutAliases,
+                default_flow_style=False,
+                sort_keys=False,
+            )
+        )
+
+    def _adjust_specfile(self):
+        """Remove patches from the spec-file
+
+        They are added back when transforming source-git to dist-git.
+        """
+        spec = Specfile(
+            f"{self.distro_dir}/{self.package_name}.spec",
+            sources_dir=self.dist_git.local_project.working_dir,
+        )
+        spec.read_patch_comments()
+        spec.remove_patches()
+
+    def _download_source_files(self):
+        """Download the source-files from the lookaside cache
+
+        Use the specified package-tool for this.
+        """
+
     def create_from_upstream(self):
         """
         create a source-git repo from upstream
         """
         self._pull_upstream_ref()
-        lookaside_sources = self._get_lookaside_sources()
-        self._put_downstream_sources([di["path"] for di in lookaside_sources])
-        self._add_packit_config(lookaside_sources)
-        if self.dist_git.specfile.get_applied_patches():
-            self._run_prep()
-            self._rebase_patches(
-                get_default_branch(
-                    LocalProject(working_dir=self.get_BUILD_dir()).git_repo
-                )
-            )
-            # TODO: patches which are defined but not applied should be copied
+        self._populate_distro_dir()
+        self._reset_gitignore()
+        self._configure_syncing()
+        self._adjust_specfile()
+        self.local_project.stage(path=self.DISTRO_DIR, force=False)
+        self.local_project.commit(
+            message="Initialize as a source-git repository", allow_empty=False
+        )
+        self.dist_git.download_source_files()
+        self._run_prep()
+        self._rebase_patches(
+            get_default_branch(LocalProject(working_dir=self.get_BUILD_dir()).git_repo)
+        )
