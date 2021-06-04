@@ -373,7 +373,7 @@ class PackitAPI:
             # no downstream spec file: this is either a mistake or
             # there is no spec file in dist-git yet, hence warning
             logger.warning(
-                f"There is not spec file downstream: {ex}, copying the one from upstream."
+                f"Unable to find a spec file in downstream: {ex}, copying the one from upstream."
             )
             shutil.copy2(
                 self.up.absolute_specfile_path,
