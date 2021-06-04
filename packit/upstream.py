@@ -431,6 +431,12 @@ class Upstream(PackitRepositoryBase):
         # ambiguous argument '0.1.0..HEAD': unknown revision or path not in the working tree.
         # Use '--' to separate paths from revisions, like this
         commits_range = f"{after}..{before}" if after else before
+        if not before:
+            raise PackitException(
+                "Unable to get a list of commit messages in range "
+                f"{commits_range} because the upper bound is not "
+                f"defined ({before!r})."
+            )
         cmd = [
             "git",
             "log",

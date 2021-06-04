@@ -26,6 +26,7 @@ from typing import List, Optional, Dict, Union
 import pytest
 from flexmock import flexmock
 from rebasehelper.helpers.download_helper import DownloadHelper
+from rebasehelper.specfile import SpecFile
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
@@ -381,3 +382,63 @@ def test_download_remote_sources(source, package_config, expected_url, tmp_path:
     base_git.download_remote_sources()
 
     assert expected_path.exists()
+
+
+def test_set_spec_content(tmp_path):
+    specfile_content = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1.0\n"
+        "Release: 1\n"
+        "Source0: foo.bar\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n"
+    )
+
+    new_specfile_content = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1.0\n"
+        "Release: 1\n"
+        "Source0: foo.bor\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+
+    spec_path = tmp_path / "life.spec"
+    spec_path.write_text(specfile_content)
+
+    new_spec_path = tmp_path / "e-life.spec"
+    new_spec_path.write_text(new_specfile_content)
+    new_specfile = Specfile(new_spec_path, sources_dir=tmp_path)
+
+    base_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    base_git._specfile_path = spec_path
+
+    base_git.set_specfile_content(new_specfile, None, None)
+    assert [
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+        "- Initial package.",
+    ] == base_git.specfile.spec_content.section("%changelog")
+    assert "1.0" == base_git.specfile.get_version()
+
+    new_log = [
+        "* Wed Jun 02 2021 John Fou <john-fou@example.com> - 1.1-1",
+        "- 1.1 upstream release",
+    ]
+    flexmock(SpecFile).should_receive("get_new_log").with_args(
+        "1.1 upstream release"
+    ).and_return(new_log)
+    base_git.set_specfile_content(new_specfile, "1.1", "1.1 upstream release")
+    assert (
+        new_log
+        + [
+            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+            "- Initial package.",
+        ]
+        == base_git.specfile.spec_content.section("%changelog")
+    )
+    assert "1.1" == base_git.specfile.get_version()
