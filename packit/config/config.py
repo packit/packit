@@ -28,7 +28,7 @@ from enum import Enum
 from functools import lru_cache, partial
 from pathlib import Path
 from shutil import which
-from typing import Optional, Set
+from typing import Dict, List, Optional, Set
 
 import click
 from lazy_object_proxy import Proxy
@@ -64,6 +64,7 @@ class Config:
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
+        command_handler_pvc_volume_specs: List[Dict[str, str]] = None,
         package_config_path=None,
         repository_cache=None,
         add_repositories_to_repository_cache=True,
@@ -99,6 +100,12 @@ class Config:
         self.command_handler_image_reference: str = command_handler_image_reference
         # do I really need to explain this?
         self.command_handler_k8s_namespace: str = command_handler_k8s_namespace
+        # To be able to mount other volumes (like repository cache) to the sandcastle pod.
+        # The keys are not checked by marshmallow to support any argument supported by Sandcastle.
+        # e.g. you can set `path` and `pvc`/`pvc_from_env`
+        self.command_handler_pvc_volume_specs: List[Dict[str, str]] = (
+            command_handler_pvc_volume_specs or []
+        )
 
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users
@@ -128,6 +135,7 @@ class Config:
             f"command_handler_pvc_env_var='{self.command_handler_pvc_env_var}', "
             f"command_handler_image_reference='{self.command_handler_image_reference}', "
             f"command_handler_k8s_namespace='{self.command_handler_k8s_namespace}', "
+            f"command_handler_pvc_volume_specs='{self.command_handler_pvc_volume_specs}', "
             f"repository_cache='{self.repository_cache}')"
         )
 
