@@ -17,7 +17,7 @@ from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.propose_downstream import propose_downstream
 from packit.cli.validate_config import validate_config
-from packit.cli.update_dist_git import update_dist_git
+from packit.cli.source_git import source_git
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
 
@@ -98,7 +98,7 @@ packit_base.add_command(status)
 packit_base.add_command(init)
 packit_base.add_command(local_build)
 packit_base.add_command(validate_config)
-packit_base.add_command(update_dist_git)
+packit_base.add_command(source_git)
 
 if __name__ == "__main__":
     packit_base()
