@@ -29,12 +29,6 @@ BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
 BuildRequires:  python3-bodhi-client
-# new-sources
-Requires:       fedpkg
-# Copying files between repositories
-Requires:       rsync
-# bumpspec
-Requires:       rpmdevtools
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %description
@@ -43,6 +37,12 @@ projects into Fedora operating system.
 
 %package -n     python3-%{real_name}
 Summary:        %{summary}
+# new-sources
+Requires:       fedpkg
+# Copying files between repositories
+Requires:       rsync
+# bumpspec
+Requires:       rpmdevtools
 # See setup.cfg for details
 Requires:       python3-koji
 %{?python_provide:%python_provide python3-%{real_name}}
