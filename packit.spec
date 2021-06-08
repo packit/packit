@@ -37,6 +37,9 @@ projects into Fedora operating system.
 
 %package -n     python3-%{real_name}
 Summary:        %{summary}
+Requires:       git
+# rpmbuild
+Requires:       rpm-build
 # new-sources
 Requires:       fedpkg
 # Copying files between repositories
