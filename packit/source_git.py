@@ -505,7 +505,7 @@ class SourceGitGenerator:
                 "downstream_package_name": self.package_name,
                 "specfile_path": f"{self.DISTRO_DIR}/{self.package_name}.spec",
                 "patch_generation_ignore_paths": [self.DISTRO_DIR],
-                "patch_generation_patch_id_digits": 0,
+                "patch_generation_patch_id_digits": self.dist_git.specfile.patch_id_digits,
                 "sync_changelog": True,
                 "synced_files": [
                     {

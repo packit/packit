@@ -46,6 +46,7 @@ class Specfile(SpecFile):
             )
         else:
             super().__init__(path=str(path), sources_location=str(sources_dir))
+        self._patch_id_digits: Optional[int] = None
 
     def update_spec(self):
         if hasattr(self, "update"):
@@ -279,6 +280,28 @@ class Specfile(SpecFile):
                 Patch(patch, patch_comments.get(patch.get_patch_name(), []))
                 for patch in self.patches[kind]
             ]
+
+    @property
+    def patch_id_digits(self) -> int:
+        """Detect and return the number of digits used in patch IDs (indices).
+
+        Look for the first patch-line, and use that as a reference.
+
+        Returns:
+            Number of digits used on the first patch-line, or 0 if there is
+            no patch-line found.
+        """
+        if self._patch_id_digits is not None:
+            return self._patch_id_digits
+
+        self._patch_id_digits = 0
+        for line in self.spec_content.section("%package"):
+            if line.lower().startswith("patch"):
+                match = re.match(r"^patch(\d*)\s*:.+", line, flags=re.IGNORECASE)
+                self._patch_id_digits = len(match[1]) if match[1].startswith("0") else 0
+                break
+
+        return self._patch_id_digits
 
     def remove_patches(self):
         """Remove all patch-lines from the spec file"""
