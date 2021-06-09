@@ -9,7 +9,7 @@ import yaml
 
 import pytest
 
-from packit.constants import CENTOS_DOMAIN, CENTOS_STREAM_GITLAB
+from packit.constants import CENTOS_STREAM_GITLAB
 from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
@@ -317,9 +317,7 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize(
-    "dist_git_branch,upstream_ref", (("c8s", "cronie-1.5.2"), ("c9s", "cronie-1.5.5"))
-)
+@pytest.mark.parametrize("dist_git_branch,upstream_ref", [("c9s", "cronie-1.5.5")])
 def test_centos_cronie(
     dist_git_branch, upstream_ref, api_instance_source_git, tmp_path: Path
 ):
@@ -338,10 +336,7 @@ def test_centos_cronie(
     )
     sgg.create_from_upstream()
 
-    if dist_git_branch == "c8s":
-        assert CENTOS_DOMAIN in sgg.dist_git.local_project.git_url
-    else:
-        assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
+    assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
 
     # verify it
     # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
@@ -389,6 +384,7 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
         centos_package=package_name,
         dist_git_branch=dist_git_branch,
         dist_git_path=dist_git_path,
+        package_name=package_name,
     )
     sgg.create_from_upstream()
 
