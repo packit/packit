@@ -1,0 +1,17 @@
+---
+- name: Enable Copr repo for centpkg
+  yum_repository:
+    name: "copr:copr.fedorainfracloud.org:james:centpkg"
+    file: "_copr:copr.fedorainfracloud.org:james:centpkg"
+    description: Copr repo for centpkg owned by james
+    baseurl: https://download.copr.fedorainfracloud.org/results/james/centpkg/fedora-$releasever-$basearch/
+    skip_if_unavailable: yes
+    gpgcheck: yes
+    gpgkey: https://download.copr.fedorainfracloud.org/results/james/centpkg/pubkey.gpg
+    enabled: yes
+  become: true
+- name: Install centpkg
+  dnf:
+    name:
+      - centpkg
+  become: true
