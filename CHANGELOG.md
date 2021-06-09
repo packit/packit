@@ -1,3 +1,13 @@
+# 0.32.0
+
+- Command `packit generate` was removed. It has been deprecated for a while
+  in favour of `packit init`. (#1269)
+- Packit now explicitly requires git and rpm-build. (#1276)
+- Source-git: Patch handling is more consistent. (#1263)
+- Source-git: Passing changelog from source-git repo to dist-git was fixed. (#1265)
+- Source-git: There is a new `source-git` subcommand, that groups source-git related
+  commands `init` and `update-dist-git`. (#1273)
+
 # 0.31.0
 
 - Downstream package name is set when dist-git path is provided. (#1246)
