@@ -238,15 +238,27 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
     )
     sgg.create_from_upstream()
 
-    # verify it
-    # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
-    # dist-git with 'packit source-git update-dist-git' would make more sense.
+    # Verify it!
+    # Updating the dist-git repo from this source-git one,
+    # should result in no changes.
+    # First make sure the dist-git repo is clean.
+    dg_lp.git_repo.git.clean("-xdff")
+    # Now convert.
     subprocess.check_call(
-        ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
+        [
+            "packit",
+            "--config",
+            ".distro/source-git.yaml",
+            "source-git",
+            "update-dist-git",
+            ".",
+            str(dist_git_path),
+        ],
+        cwd=source_git_path,
     )
-    srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
-    assert srpm_path.is_file()
-    # requre needs sphinx, so SRPM is fine
+    # There are no changes or untracked files.
+    dg_lp.git_repo.git.diff(exit_code=True)
+    assert not dg_lp.git_repo.git.clean("-xdn")
 
     # verify the archive is not committed in the source-git
     with pytest.raises(subprocess.CalledProcessError) as exc:
@@ -288,6 +300,9 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     dg_lp.stage()
     dg_lp.commit("add the hello patch")
     subprocess.check_call(["fedpkg", "prep"], cwd=dist_git_path)
+    # Clean the dist-git repo before initializing a source-git repo from it
+    # so that only checked-in content ends up in source-git.
+    dg_lp.git_repo.git.clean("-xdff")
 
     # create src-git
     source_git_path.mkdir()
@@ -300,20 +315,33 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     sgg = SourceGitGenerator(
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,
+        upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
         package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    # verify it
-    # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
-    # dist-git with 'packit source-git update-dist-git' would make more sense.
+    # Verify it!
+    # Updating the dist-git repo from this source-git one,
+    # should result in no changes.
+    # First make sure the dist-git repo is clean.
+    dg_lp.git_repo.git.clean("-xdff")
+    # Now convert.
     subprocess.check_call(
-        ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
+        [
+            "packit",
+            "--config",
+            ".distro/source-git.yaml",
+            "source-git",
+            "update-dist-git",
+            ".",
+            str(dist_git_path),
+        ],
+        cwd=source_git_path,
     )
-    srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
-    assert srpm_path.is_file()
-    # requre needs sphinx, so SRPM is fine
+    # There are no changes or untracked files.
+    dg_lp.git_repo.git.diff(exit_code=True)
+    assert not dg_lp.git_repo.git.clean("-xdn")
 
 
 @pytest.mark.slow
@@ -328,7 +356,7 @@ def test_centos_cronie(
     sgg = SourceGitGenerator(
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,
-        "https://github.com/cronie-crond/cronie",
+        upstream_url="https://github.com/cronie-crond/cronie",
         upstream_ref=upstream_ref,
         centos_package="cronie",
         dist_git_branch=dist_git_branch,
@@ -339,8 +367,9 @@ def test_centos_cronie(
     assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
 
     # verify it
-    # TODO(csomh): is 'packit srpm' the best way to do it. Maybe producing an update to
-    # dist-git with 'packit source-git update-dist-git' would make more sense.
+    # TODO: this should be updated to be verified with update-dist-git also. Unfortunately
+    # this currently produces some change in dist-git b/c of how the Patch is written in the
+    # spec-file.
     subprocess.check_call(
         ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
     )
