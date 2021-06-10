@@ -195,6 +195,7 @@ class SourceGitGenerator:
         self.dist_git_branch = dist_git_branch
         self.distro_dir = Path(self.local_project.working_dir, self.DISTRO_DIR)
         self.package_name = package_name
+        self._patch_comments: dict = {}
 
         logger.info(
             f"The source-git repo is going to be created in {local_project.working_dir}."
@@ -431,8 +432,15 @@ class SourceGitGenerator:
             raise RuntimeError(f"No subdirectory found in {path / 'BUILD'}")
         return build_dirs[0]
 
-    def _rebase_patches(self, from_branch):
-        """Rebase current branch against the from_branch"""
+    def _rebase_patches(self, from_branch: str, patch_comments: Dict[str, List[str]]):
+        """Rebase current branch against the from_branch
+
+        Args:
+            from_branch: Branch in the BUILD directory from which downstream
+                commits are fetched to the source-git repository.
+            patch_comments: dict to map patch names to comment lines serving
+                as a description of those patches.
+        """
         to_branch = "dist-git-commits"  # temporary branch to store the dist-git history
         logger.info(f"Rebase patches from dist-git {from_branch}.")
         BUILD_dir = self.get_BUILD_dir()
@@ -440,7 +448,7 @@ class SourceGitGenerator:
 
         # transform into {patch_name: patch_id}
         patch_ids = {
-            Path(p.path).name: p.index
+            p.get_patch_name(): p.index
             for p in self.dist_git.specfile.patches.get("applied", [])
         }
 
@@ -462,7 +470,12 @@ class SourceGitGenerator:
             # during the rpm patching process so we need to do it here.
             metadata = PatchMetadata.from_commit(commit=commit)
             # commit.message already ends with \n
-            message = f"{commit.message}patch_id: {patch_ids[metadata.name]}"
+            message = commit.message
+            message += f"patch_id: {patch_ids[metadata.name]}\n"
+            if patch_comments.get(metadata.name):
+                message += "description: |-\n"
+            for line in patch_comments.get(metadata.name, []):
+                message += f"    {line}\n"
             self.local_project.commit(message, amend=True)
 
         self.local_project.git_repo.git.branch("-D", to_branch)
@@ -538,24 +551,6 @@ class SourceGitGenerator:
             )
         )
 
-    def _adjust_specfile(self):
-        """Remove patches from the spec-file
-
-        They are added back when transforming source-git to dist-git.
-        """
-        spec = Specfile(
-            f"{self.distro_dir}/{self.package_name}.spec",
-            sources_dir=self.dist_git.local_project.working_dir,
-        )
-        spec.read_patch_comments()
-        spec.remove_patches()
-
-    def _download_source_files(self):
-        """Download the source-files from the lookaside cache
-
-        Use the specified package-tool for this.
-        """
-
     def create_from_upstream(self):
         """
         create a source-git repo from upstream
@@ -564,13 +559,22 @@ class SourceGitGenerator:
         self._populate_distro_dir()
         self._reset_gitignore()
         self._configure_syncing()
-        self._adjust_specfile()
+
+        spec = Specfile(
+            f"{self.distro_dir}/{self.package_name}.spec",
+            sources_dir=self.dist_git.local_project.working_dir,
+        )
+        patch_comments = spec.read_patch_comments()
+        spec.remove_patches()
+
         self.local_project.stage(path=self.DISTRO_DIR, force=False)
         self.local_project.commit(
             message="Initialize as a source-git repository", allow_empty=False
         )
+
         self.dist_git.download_source_files()
         self._run_prep()
         self._rebase_patches(
-            get_default_branch(LocalProject(working_dir=self.get_BUILD_dir()).git_repo)
+            get_default_branch(LocalProject(working_dir=self.get_BUILD_dir()).git_repo),
+            patch_comments,
         )
