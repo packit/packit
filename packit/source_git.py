@@ -481,11 +481,23 @@ class SourceGitGenerator:
         self.local_project.git_repo.git.branch("-D", to_branch)
 
     def _populate_distro_dir(self):
-        """Copy files used in the distro to package and test the software to .distro."""
-        # TODO(csomh): Check that the dist-git working directory is pristine,
-        # that is, it's not dirty and has nothing git clean -xd would remove.
-        # Error out, if it's not the case, we don't want to copy untracked content
-        # to .distro.
+        """Copy files used in the distro to package and test the software to .distro.
+
+        Raises:
+            PackitException, if the dist-git repository is not pristine, that is,
+            there are changed or untracked files in it.
+        """
+        dist_git_repo = self.dist_git.local_project.git_repo
+        dist_git_is_pristine = (
+            not dist_git_repo.git.diff() and not dist_git_repo.git.clean("-xdn")
+        )
+        if not dist_git_is_pristine:
+            raise PackitException(
+                "Cannot initialize a source-git repo. "
+                "The corresponding dist-git repository at "
+                f"{dist_git_repo.working_dir} is not pristine."
+            )
+
         command = ["rsync", "--archive", "--delete"]
         for exclude in ["*.patch", "sources", ".git*"]:
             command += ["--filter", f"exclude {exclude}"]
