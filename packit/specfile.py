@@ -134,7 +134,7 @@ class Specfile(SpecFile):
 
         :param patch_list: [PatchMetadata]
         :param patch_id_digits: Number of digits of the generated patch ID.
-            This is used to control whether to have 'Patch1' or 'Patch0001'.
+            This is used to control whether to have 'Patch' or 'Patch1' or 'Patch0001'.
         """
         if not patch_list:
             return
@@ -168,7 +168,9 @@ class Specfile(SpecFile):
 
             self.add_patch(patch_metadata, patch_id_digits)
 
-    def add_patch(self, patch_metadata: PatchMetadata, patch_id_digits: int = 4):
+    def add_patch(
+        self, patch_metadata: PatchMetadata, patch_id_digits: Optional[int] = 4
+    ):
         """
         Add provided patch to the spec file:
          * Set Patch index to be +1 than the highest index of an existing specfile patch
@@ -179,7 +181,7 @@ class Specfile(SpecFile):
         Args:
             patch_metadata: Metadata of the patch to be added.
             patch_id_digits: Number of digits of the generated patch ID. This is used to
-                control whether to have 'Patch1' or 'Patch0001'.
+                control whether to have 'Patch' or 'Patch1' or 'Patch0001'.
         """
         try:
             patch_number_offset = max(x.index for x in self.get_applied_patches())
@@ -205,7 +207,8 @@ class Specfile(SpecFile):
             patch_id = max(patch_number_offset + 1, 1)
 
         new_content = "\n# " + "\n# ".join(patch_metadata.specfile_comment.split("\n"))
-        new_content += f"\nPatch{patch_id:0{patch_id_digits}d}: {patch_metadata.name}"
+        patch_id_str = f"{patch_id:0{patch_id_digits}d}" if patch_id_digits > 0 else ""
+        new_content += f"\nPatch{patch_id_str}: {patch_metadata.name}"
 
         if self.get_applied_patches():
             last_source_tag_line = [
@@ -271,12 +274,15 @@ class Specfile(SpecFile):
                 comment = []
         return patch_comments
 
-    # TODO(csomh): test
     @property
     def patch_id_digits(self) -> int:
         """Detect and return the number of digits used in patch IDs (indices).
 
         Look for the first patch-line, and use that as a reference.
+
+        0 - no patch ID at all, just a bare "Patch"
+        1 - no leading zeros for patch IDs
+        2 or more - the minimum number of digits to be used for patch IDs.
 
         Returns:
             Number of digits used on the first patch-line, or 0 if there is
@@ -285,11 +291,14 @@ class Specfile(SpecFile):
         if self._patch_id_digits is not None:
             return self._patch_id_digits
 
-        self._patch_id_digits = 0
+        self._patch_id_digits = 1
         for line in self.spec_content.section("%package"):
             if line.lower().startswith("patch"):
                 match = re.match(r"^patch(\d*)\s*:.+", line, flags=re.IGNORECASE)
-                self._patch_id_digits = len(match[1]) if match[1].startswith("0") else 0
+                if not match[1]:
+                    self._patch_id_digits = 0
+                elif match[1].startswith("0"):
+                    self._patch_id_digits = len(match[1])
                 break
 
         return self._patch_id_digits

@@ -28,7 +28,7 @@ def test_write_spec_content(specfile):
     assert "new line 1" in specfile.read_text()
 
 
-@pytest.mark.parametrize("patch_id_digits", [{}, {"patch_id_digits": 0}])
+@pytest.mark.parametrize("patch_id_digits", [4, 1, 0])
 def test_add_patch(specfile, patch_id_digits):
     """Check adding patch lines to the spec-file.
 
@@ -43,25 +43,30 @@ def test_add_patch(specfile, patch_id_digits):
         patch_id=None,
     )
     Path(specfile.parent, "0001-a-clever.patch").touch()
-    spec.add_patch(patch_meta, **patch_id_digits)
+    spec.add_patch(patch_meta, patch_id_digits=patch_id_digits)
 
     patch_meta = flexmock(
-        name="0002-an-even-smarter.patch",
+        name="0022-an-even-smarter.patch",
         specfile_comment="This needs to be added because of\nBug 22",
-        patch_id=None,
+        patch_id=22,
     )
-    Path(specfile.parent, "0002-an-even-smarter.patch").touch()
-    spec.add_patch(patch_meta, **patch_id_digits)
+    Path(specfile.parent, "0022-an-even-smarter.patch").touch()
+    spec.add_patch(patch_meta, patch_id_digits=patch_id_digits)
 
+    patch_tags = (
+        [f"Patch{1:0{patch_id_digits}d}", f"Patch{22:0{patch_id_digits}d}"]
+        if patch_id_digits > 0
+        else ["Patch", "Patch"]
+    )
     patch_lines = textwrap.dedent(
         f"""\
         # This needs to be added because of
         # Bug 111
-        Patch{1:0{patch_id_digits.get('patch_id_digits', 4)}d}: 0001-a-clever.patch
+        {patch_tags[0]}: 0001-a-clever.patch
 
         # This needs to be added because of
         # Bug 22
-        Patch{2:0{patch_id_digits.get('patch_id_digits', 4)}d}: 0002-an-even-smarter.patch
+        {patch_tags[1]}: 0022-an-even-smarter.patch
         """
     )
     assert patch_lines in specfile.read_text()
