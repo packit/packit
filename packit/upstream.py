@@ -499,7 +499,7 @@ class Upstream(PackitRepositoryBase):
 
         :param upstream_ref: str, needed for the sourcegit mode
         """
-        PrepareForSRPM(upstream=self, ref=upstream_ref).prepare()
+        SRPMBuilder(upstream=self, ref=upstream_ref).prepare()
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
         """
@@ -712,9 +712,14 @@ class SRPMBuilder:
         upstream: Upstream,
         srpm_path: Union[Path, str] = None,
         srpm_dir: Union[Path, str] = None,
+        ref: Optional[str] = None,
     ) -> None:
         self.upstream = upstream
         self.srpm_path = srpm_path
+        self.__ref = ref
+
+        self._current_git_describe_version = None
+        self._upstream_ref = None
 
         if self.upstream.running_in_service():
             self.srpm_dir = Path(".")
@@ -725,12 +730,26 @@ class SRPMBuilder:
             self.srpm_dir = Path(srpm_dir) if srpm_dir else Path.cwd()
             self.rpmbuild_dir = self.upstream.absolute_specfile_dir
 
+    @property
+    def current_git_describe_version(self):
+        if self._current_git_describe_version is None:
+            self._current_git_describe_version = self.upstream.get_current_version()
+        return self._current_git_describe_version
+
+    @property
+    def upstream_ref(self):
+        if self._upstream_ref is None:
+            self._upstream_ref = self.upstream._expand_git_ref(
+                self.__ref or self.upstream.package_config.upstream_ref
+            )
+        return self._upstream_ref
+
     def _get_srpm_from_rpmbuild_output(self, output: str) -> str:
         """
         Try to find the SRPM file in the `rpmbuild -bs` command output.
 
         Args:
-            output (str): Output of the `rpmbuild -bs` command.
+            output: Output of the `rpmbuild -bs` command.
 
         Returns:
             Name of the SRPM file.
@@ -786,7 +805,7 @@ class SRPMBuilder:
         move it.
 
         Args:
-            out (str): Output of the `rpmbuild` command.
+            out: Output of the `rpmbuild` command.
 
         Returns:
             Path to the SRPM.
@@ -826,21 +845,9 @@ class SRPMBuilder:
 
         return self.get_path(out)
 
-
-class PrepareForSRPM:
-    def __init__(self, upstream: Upstream, ref: Optional[str] = None) -> None:
-        self.upstream = upstream
-        self.current_git_describe_version = upstream.get_current_version()
-        self.upstream_ref = upstream._expand_git_ref(
-            ref or upstream.package_config.upstream_ref
-        )
-
-    def _prepare_upstream_using_source_git(self):
+    def _prepare_upstream_using_source_git(self) -> None:
         """
         Fetch the tarball and don't check out the upstream ref.
-
-        :param upstream_ref: the base git ref for the source git
-        :return: the source directory where we can build the SRPM
         """
         self.upstream.fetch_upstream_archive()
         self.upstream.create_patches_and_update_specfile(self.upstream_ref)
@@ -858,12 +865,12 @@ class PrepareForSRPM:
             release=release_to_update, changelog_entry=f"- {msg}"
         )
 
-    def _fix_specfile_to_use_local_archive(self, archive):
+    def _fix_specfile_to_use_local_archive(self, archive: str) -> None:
         """
         Update specfile to use the archive with the right version.
 
-        :param archive: path to the archive
-        :param archive_version: package version of the archive
+        Args:
+            archive: Path to the archive.
         """
         current_commit = self.upstream.local_project.commit_hexsha
         env = {
@@ -905,8 +912,8 @@ class Archive:
         Creates an instance of `Archive`.
 
         Args:
-            upstream (Upstream): Instance of Upstream class.
-            version (Optional[str]): Version of the archive.
+            upstream: Instance of Upstream class.
+            version: Version of the archive.
 
                 Defaults to `None`.
         """
@@ -967,7 +974,7 @@ class Archive:
         Get path to the created archive from one line of the output.
 
         Args:
-            line (str): Line of output produced while creating the archive.
+            line: Line of output produced while creating the archive.
 
         Returns:
             Path to the archive as string, `None` if cannot be parsed.
@@ -1001,7 +1008,7 @@ class Archive:
         Check if the line is a path and if it exists.
 
         Args:
-            outputs (List[str]): Outputs produced by creating the archive.
+            outputs: Outputs produced by creating the archive.
 
         Returns:
             Path to the archive if found, `None` otherwise.
@@ -1019,7 +1026,7 @@ class Archive:
         if necessary.
 
         Args:
-            archive_path (Path): Relative path to the archive from the specfile dir.
+            archive_path: Relative path to the archive from the specfile dir.
         """
         absolute_specfile_dir = self.upstream.absolute_specfile_dir
 
@@ -1043,8 +1050,8 @@ class Archive:
         Archive will be placed in the `specfile_directory`.
 
         Args:
-            dir_name (str): Name of the directory from which the archive is created.
-            env (Dict[str, str]): Environment variables passed to the action.
+            dir_name: Name of the directory from which the archive is created.
+            env: Environment variables passed to the action.
 
         Returns:
             Name of the archive as a string.
@@ -1082,8 +1089,7 @@ class Archive:
         * tar including compression (for details check python tarfile module doc)
 
         Args:
-            archive (str): Name of the archive.
-        :return: archive top level directory or None
+            archive: Name of the archive.
 
         Returns:
             Archive's top-level directory or `None`.
@@ -1117,7 +1123,7 @@ class Archive:
         Returns tar archive's top-level directory, if there is exactly one.
 
         Args:
-            archive (str): Name of the tar archive.
+            archive: Name of the tar archive.
 
         Returns:
             Archive's top level directory if there is exactly one, `None` otherwise.
