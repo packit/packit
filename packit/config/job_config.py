@@ -49,6 +49,7 @@ class JobMetadataConfig:
         additional_repos: List[str] = None,
         fmf_url: str = None,
         fmf_ref: str = None,
+        use_internal_tf: bool = False,
     ):
         """
         :param targets: copr_build job, mock chroots where to build
@@ -62,6 +63,7 @@ class JobMetadataConfig:
         :param preserve_project: if set, project will not be created as temporary
         :param list additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
         :param list additional_repos: buildroot additional additional_repos
+        :param bool use_internal_tf: if we want to use internal instance for Testing Farm
         """
         self.targets: Set[str] = set(targets) if targets else set()
         self.timeout: int = timeout
@@ -78,6 +80,7 @@ class JobMetadataConfig:
         self.additional_repos: List[str] = additional_repos or []
         self.fmf_url = fmf_url
         self.fmf_ref = fmf_ref
+        self.use_internal_tf = use_internal_tf
 
     def __repr__(self):
         return (
@@ -94,7 +97,8 @@ class JobMetadataConfig:
             f"additional_packages={self.additional_packages}, "
             f"additional_repos={self.additional_repos}, "
             f"fmf_url={self.fmf_url}, "
-            f"fmf_ref={self.fmf_ref})"
+            f"fmf_ref={self.fmf_ref}, "
+            f"use_internal_tf={self.use_internal_tf})"
         )
 
     def __eq__(self, other: object):
@@ -116,6 +120,7 @@ class JobMetadataConfig:
             and self.additional_repos == other.additional_repos
             and self.fmf_url == other.fmf_url
             and self.fmf_ref == other.fmf_ref
+            and self.use_internal_tf == other.use_internal_tf
         )
 
 
