@@ -137,6 +137,7 @@ Patch0301: orange.patch
     ],
 )
 def test_read_patch_comments(specfile, lines, files, expectation):
+    """Check reading comment lines that belong to patches"""
     content = specfile.read_text()
     content = content.replace("### patches ###\n", lines)
     specfile.write_text(content)
@@ -145,3 +146,43 @@ def test_read_patch_comments(specfile, lines, files, expectation):
     spec = Specfile(specfile, sources_dir=specfile.parent)
     comments = spec.read_patch_comments()
     assert comments == expectation
+
+
+@pytest.mark.parametrize(
+    "lines,digits",
+    [
+        ("Patch0001 : some.patch\n", 4),
+        ("Patch003000 : some.patch\n", 6),
+        ("Patch: some.patch\n", 0),
+        ("Patch21: some.patch\n", 1),
+        ("Patch9: some.patch\n", 1),
+    ],
+)
+def test_patch_id_digits(specfile, lines, digits):
+    """Check detecting the number of digits used for patch IDs (indices)"""
+    content = specfile.read_text()
+    content = content.replace("### patches ###\n", lines)
+    specfile.write_text(content)
+    spec = Specfile(specfile, sources_dir=specfile.parent)
+    assert spec.patch_id_digits == digits
+
+
+def test_remove_patches(specfile):
+    """Check patches being removed from a specfile"""
+    no_patches = specfile.read_text().replace("\n### patches ###\n", "")
+    patches = specfile.read_text().replace(
+        "### patches ###\n",
+        """\
+# Some comment line to be removed
+Patch1: yellow.patch
+
+Patch2: blue.patch
+# One
+# Or more lines
+Patch : dark.patch
+""",
+    )
+    specfile.write_text(patches)
+    spec = Specfile(specfile, sources_dir=specfile.parent)
+    spec.remove_patches()
+    assert specfile.read_text() == no_patches

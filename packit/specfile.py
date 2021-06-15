@@ -245,7 +245,6 @@ class Specfile(SpecFile):
         source_name, *_ = Tags._sanitize_tag(source_name, 0, 0)
         return next(self.tags.filter(name=source_name, valid=None), None)
 
-    # TODO(csomh): test
     def read_patch_comments(self) -> dict:
         """Read the spec again, detect comment lines right above a patch-line
         and save it as an attribute to the patch for later retrieval.
@@ -303,7 +302,6 @@ class Specfile(SpecFile):
 
         return self._patch_id_digits
 
-    # TODO(csomh): test
     def remove_patches(self):
         """Remove all patch-lines from the spec file"""
         content = []
