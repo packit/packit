@@ -578,7 +578,7 @@ class SourceGitGenerator:
         patch_comments = spec.read_patch_comments()
         spec.remove_patches()
 
-        self.local_project.stage(path=self.DISTRO_DIR, force=False)
+        self.local_project.stage(path=self.DISTRO_DIR, force=True)
         self.local_project.commit(
             message="Initialize as a source-git repository", allow_empty=False
         )
