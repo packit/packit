@@ -262,7 +262,6 @@ class SourceGitGenerator:
             self._dist_git = self._get_dist_git()
             # we need to parse the spec twice
             # https://github.com/rebase-helper/rebase-helper/issues/848
-            self._dist_git.download_remote_sources()
             self._dist_git.specfile.reload()
         return self._dist_git
 
