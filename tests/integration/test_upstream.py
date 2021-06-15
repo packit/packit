@@ -38,7 +38,7 @@ from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
-from packit.upstream import Upstream
+from packit.upstream import Archive, Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 
@@ -384,6 +384,6 @@ def test_get_archive_root_dir(template, expected_output, upstream_instance):
     ups.package_config.archive_root_dir_template = template
 
     archive = ups.create_archive()
-    archive_root_dir = ups.get_archive_root_dir(archive)
+    archive_root_dir = Archive(ups, ups.get_version()).get_archive_root_dir(archive)
 
     assert archive_root_dir == expected_output
