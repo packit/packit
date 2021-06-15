@@ -28,7 +28,7 @@ from flexmock import flexmock
 import packit
 from packit.actions import ActionName
 from packit.exceptions import PackitException
-from packit.upstream import Upstream
+from packit.upstream import Archive, Upstream
 
 
 @pytest.fixture
@@ -152,7 +152,10 @@ def test_fix_spec__setup_line(
     flexmock(packit.upstream).should_receive("run_command").and_return("mocked")
 
     upstream_mock.should_receive("_fix_spec_source")
-    upstream_mock.should_receive("get_archive_root_dir").and_return(inner_archive_dir)
+    upstream_mock.should_receive("get_version").and_return("")
+    flexmock(Archive).should_receive("get_archive_root_dir").and_return(
+        inner_archive_dir
+    )
     upstream_mock.should_receive("specfile").and_return(
         spec_mock(setup_line=orig_setup_line)
     )
@@ -242,16 +245,20 @@ def test_get_version_from_tag(
 def test_get_archive_root_dir(archive_type, return_value, upstream_mock, tar_mock):
     if archive_type == "tar":
         tar_mock(is_tarfile=True)
-        upstream_mock.should_receive("get_archive_root_dir_from_tar").and_return(
+        flexmock(Archive).should_receive("get_archive_root_dir_from_tar").and_return(
             return_value
         ).with_args("_archive").once()
-        assert upstream_mock.get_archive_root_dir("_archive") == return_value
-    elif archive_type == "unknown":
-        upstream_mock.should_receive("get_archive_root_dir_from_template").and_return(
-            return_value
+        assert (
+            Archive(upstream_mock, "").get_archive_root_dir("_archive") == return_value
         )
+    elif archive_type == "unknown":
+        flexmock(Archive).should_receive(
+            "get_archive_root_dir_from_template"
+        ).and_return(return_value)
         tar_mock(is_tarfile=False)
-        assert upstream_mock.get_archive_root_dir("_archive") == return_value
+        assert (
+            Archive(upstream_mock, "").get_archive_root_dir("_archive") == return_value
+        )
 
 
 @pytest.mark.parametrize(
@@ -282,7 +289,10 @@ def test_get_archive_root_dir(archive_type, return_value, upstream_mock, tar_moc
 )
 def test_get_tar_archive_dir(archive_items, expected_result, upstream_mock, tar_mock):
     tar_mock(archive_items=archive_items)
-    assert upstream_mock.get_archive_root_dir_from_tar("_archive") == expected_result
+    assert (
+        Archive(upstream_mock).get_archive_root_dir_from_tar("_archive")
+        == expected_result
+    )
 
 
 @pytest.mark.parametrize(
@@ -301,9 +311,11 @@ def test_get_tar_archive_dir(archive_items, expected_result, upstream_mock, tar_
 def test_get_archive_root_dir_from_template(
     template, expected_return_value, upstream_mock
 ):
-    upstream_mock.should_receive("get_version").and_return("1.0")
     upstream_mock.package_config.archive_root_dir_template = template
-    assert upstream_mock.get_archive_root_dir_from_template() == expected_return_value
+    assert (
+        Archive(upstream_mock, "1.0").get_archive_root_dir_from_template()
+        == expected_return_value
+    )
 
 
 @pytest.mark.parametrize(
