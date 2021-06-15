@@ -32,6 +32,7 @@ class Specfile(SpecFile):
         else:
             super().__init__(path=str(path), sources_location=str(sources_dir))
         self._patch_id_digits: Optional[int] = None
+        self._uses_autosetup: Optional[bool] = None
 
     def update_spec(self):
         if hasattr(self, "update"):
@@ -301,6 +302,25 @@ class Specfile(SpecFile):
                 break
 
         return self._patch_id_digits
+
+    @property
+    def uses_autosetup(self) -> bool:
+        """Tell if the specfile uses %autosetup
+
+        Returns:
+            True if the file uses %autosetup, otherwise False.
+        """
+
+        if self._uses_autosetup is not None:
+            return self._uses_autosetup
+
+        self._uses_autosetup = False
+        for line in self.spec_content.section("%prep"):
+            if line.startswith("%autosetup"):
+                self._uses_autosetup = True
+                break
+
+        return self._uses_autosetup
 
     def remove_patches(self):
         """Remove all patch-lines from the spec file"""

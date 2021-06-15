@@ -566,6 +566,12 @@ class SourceGitGenerator:
         """
         create a source-git repo from upstream
         """
+        if not self.dist_git.specfile.uses_autosetup:
+            raise PackitException(
+                "Initializing source-git repos for packages "
+                "not using %autosetup is not supported."
+            )
+
         self._pull_upstream_ref()
         self._populate_distro_dir()
         self._reset_gitignore()

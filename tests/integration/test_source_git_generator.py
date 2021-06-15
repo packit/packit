@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 import pytest
+import git
 
 from packit.constants import CENTOS_STREAM_GITLAB
 from packit.pkgtool import PkgTool
@@ -16,6 +17,7 @@ from packit.patches import PatchMetadata
 from packit.source_git import SourceGitGenerator
 from packit.specfile import Specfile
 from packit.utils.repo import create_new_repo, clone_centos_9_package
+from packit.exceptions import PackitException
 from tests.spellbook import initiate_git_repo
 
 UNIVERSAL_PACKAGE_NAME = "redhat-rpm-config"
@@ -422,3 +424,65 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
     assert "present_in_specfile: true" in patch_commit_message
     assert "patch_name: 0001-acl-2.2.53-test-runwrapper.patch" in patch_commit_message
     assert re.findall(r"patch_id: \d", patch_commit_message)
+
+
+def test_check_for_autosetup(api_instance_source_git, tmp_path):
+    """Check if the package is using %autosetup before doing the conversion"""
+    package_name = "ed"
+    source_git_path = tmp_path / "src" / package_name
+    dist_git_path = tmp_path / "rpms" / package_name
+
+    source_git_path.mkdir(parents=True)
+    create_new_repo(source_git_path, [])
+
+    dist_git_path.mkdir(parents=True)
+    create_new_repo(dist_git_path, [])
+    dist_git_repo = git.Repo(dist_git_path)
+    dist_git_repo.git.remote(
+        "add", "origin", "https://gitlab.com/redhat/centos-stream/rpms/ed.git"
+    )
+
+    (dist_git_path / f"{package_name}.spec").write_text(
+        """\
+Summary: The GNU line editor
+Name: ed
+Version: 1.14.2
+Release: 11%{?dist}
+License: GPLv3+ and GFDL
+Source: %{name}-%{version}.tar.xz
+
+%description
+Ed is a line-oriented text editor, used to create, display, and modify
+
+%prep
+%setup -q
+
+%build
+%configure
+%make_build CFLAGS="%{optflags}" LDFLAGS="%{__global_ldflags}"
+
+%install
+%make_install
+rm -vrf %{buildroot}%{_infodir}/dir
+
+%files
+%license COPYING
+%doc ChangeLog NEWS README TODO AUTHORS
+%{_bindir}/ed
+%{_bindir}/red
+%{_mandir}/man1/ed.1*
+%{_mandir}/man1/red.1*
+%{_infodir}/ed.info*
+
+%changelog
+"""
+    )
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
+        centos_package=package_name,
+        dist_git_path=dist_git_path,
+        package_name=package_name,
+    )
+    with pytest.raises(PackitException):
+        sgg.create_from_upstream()
