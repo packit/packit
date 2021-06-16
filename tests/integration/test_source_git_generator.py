@@ -1,5 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+
 import fileinput
 import re
 import subprocess
@@ -7,14 +8,16 @@ from pathlib import Path
 import yaml
 
 import pytest
+import git
 
-from packit.constants import CENTOS_DOMAIN, CENTOS_STREAM_GITLAB
+from packit.constants import CENTOS_STREAM_GITLAB
 from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.source_git import SourceGitGenerator
 from packit.specfile import Specfile
 from packit.utils.repo import create_new_repo, clone_centos_9_package
+from packit.exceptions import PackitException
 from tests.spellbook import initiate_git_repo
 
 UNIVERSAL_PACKAGE_NAME = "redhat-rpm-config"
@@ -84,7 +87,7 @@ def test_run_prep(
         dist_git_branch=branch,
         tmpdir=tmp_path,
     )
-    assert sgg.primary_archive.exists()  # making sure this is downloaded
+    sgg.dist_git.download_source_files()
     sgg._run_prep()
     build_dir = sgg.dist_git.local_project.working_dir.joinpath("BUILD")
     assert build_dir.exists()
@@ -92,7 +95,7 @@ def test_run_prep(
     assert project_dir.joinpath(".git")
 
 
-def test_create_packit_yaml_upstream_project_url(
+def test_source_git_config_upstream_project_url(
     api_instance_source_git, tmp_path: Path
 ):
     """
@@ -121,10 +124,11 @@ def test_create_packit_yaml_upstream_project_url(
         upstream_project_url,
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    config_file = Path(source_git_path / ".distro/source-git.yaml").read_text()
     # black sucks here :/ we are making sure here the yaml looks nice
     assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
     assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
@@ -132,7 +136,7 @@ def test_create_packit_yaml_upstream_project_url(
     assert packit_yaml.get("upstream_project_url") == upstream_project_url
 
 
-def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
+def test_source_git_config_sources(api_instance_source_git, tmp_path: Path):
     """
     use requre to create a source-git out of it in an empty git repo - packit
     will pull upstream git history
@@ -165,21 +169,18 @@ def test_create_packit_yaml_sources(api_instance_source_git, tmp_path: Path):
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    config_file = Path(source_git_path / ".packit.yaml").read_text()
+    config_file = Path(source_git_path / ".distro/source-git.yaml").read_text()
     # black sucks here :/ we are making sure here the yaml looks nice
     assert "patch_generation_ignore_paths:\n- .distro\n" in config_file
     assert "sources:\n- path: requre-0.4.0.tar.gz\n" in config_file
     packit_yaml = yaml.safe_load(config_file)
-    assert packit_yaml.get("sources")
-    assert len(packit_yaml["sources"]) > 0
-    assert packit_yaml["sources"][0].get("url")
-    assert packit_yaml["sources"][0].get("path")
-
-    assert packit_yaml["sources"][0]["url"] == requre_tar_url
-    assert packit_yaml["sources"][0]["path"] == requre_tar_path
+    assert len(packit_yaml.get("sources", {})) > 0
+    assert packit_yaml["sources"][0].get("url") == requre_tar_url
+    assert packit_yaml["sources"][0].get("path") == requre_tar_path
 
 
 REQURE_PATCH = r"""\
@@ -222,6 +223,9 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
     dg_lp.stage()
     dg_lp.commit("add the hello patch")
     subprocess.check_call(["fedpkg", "prep"], cwd=dist_git_path)
+    # Clean the dist-git repo before initializing a source-git repo from it
+    # so that only checked-in content ends up in source-git.
+    dg_lp.git_repo.git.clean("-xdff")
 
     # create src-git
     source_git_path.mkdir()
@@ -232,14 +236,31 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    # verify it
-    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
-    srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
-    assert srpm_path.is_file()
-    # requre needs sphinx, so SRPM is fine
+    # Verify it!
+    # Updating the dist-git repo from this source-git one,
+    # should result in no changes.
+    # First make sure the dist-git repo is clean.
+    dg_lp.git_repo.git.clean("-xdff")
+    # Now convert.
+    subprocess.check_call(
+        [
+            "packit",
+            "--config",
+            ".distro/source-git.yaml",
+            "source-git",
+            "update-dist-git",
+            ".",
+            str(dist_git_path),
+        ],
+        cwd=source_git_path,
+    )
+    # There are no changes or untracked files.
+    dg_lp.git_repo.git.diff(exit_code=True)
+    assert not dg_lp.git_repo.git.clean("-xdn")
 
     # verify the archive is not committed in the source-git
     with pytest.raises(subprocess.CalledProcessError) as exc:
@@ -248,7 +269,7 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
                 "git",
                 "ls-files",
                 "--error-unmatch",
-                f"{sgg.dist_git.source_git_downstream_suffix}/{spec.get_archive()}",
+                f".distro/{spec.get_archive()}",
             ],
             cwd=source_git_path,
         )
@@ -281,6 +302,9 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     dg_lp.stage()
     dg_lp.commit("add the hello patch")
     subprocess.check_call(["fedpkg", "prep"], cwd=dist_git_path)
+    # Clean the dist-git repo before initializing a source-git repo from it
+    # so that only checked-in content ends up in source-git.
+    dg_lp.git_repo.git.clean("-xdff")
 
     # create src-git
     source_git_path.mkdir()
@@ -293,21 +317,37 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
     sgg = SourceGitGenerator(
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,
+        upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
+        package_name="python-requre",
     )
     sgg.create_from_upstream()
 
-    # verify it
-    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
-    srpm_path = list(source_git_path.glob("python-requre-0.4.0-2.*.src.rpm"))[0]
-    assert srpm_path.is_file()
-    # requre needs sphinx, so SRPM is fine
+    # Verify it!
+    # Updating the dist-git repo from this source-git one,
+    # should result in no changes.
+    # First make sure the dist-git repo is clean.
+    dg_lp.git_repo.git.clean("-xdff")
+    # Now convert.
+    subprocess.check_call(
+        [
+            "packit",
+            "--config",
+            ".distro/source-git.yaml",
+            "source-git",
+            "update-dist-git",
+            ".",
+            str(dist_git_path),
+        ],
+        cwd=source_git_path,
+    )
+    # There are no changes or untracked files.
+    dg_lp.git_repo.git.diff(exit_code=True)
+    assert not dg_lp.git_repo.git.clean("-xdn")
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize(
-    "dist_git_branch,upstream_ref", (("c8s", "cronie-1.5.2"), ("c9s", "cronie-1.5.5"))
-)
+@pytest.mark.parametrize("dist_git_branch,upstream_ref", [("c9s", "cronie-1.5.5")])
 def test_centos_cronie(
     dist_git_branch, upstream_ref, api_instance_source_git, tmp_path: Path
 ):
@@ -318,20 +358,23 @@ def test_centos_cronie(
     sgg = SourceGitGenerator(
         LocalProject(working_dir=source_git_path),
         api_instance_source_git.config,
-        "https://github.com/cronie-crond/cronie",
+        upstream_url="https://github.com/cronie-crond/cronie",
         upstream_ref=upstream_ref,
         centos_package="cronie",
         dist_git_branch=dist_git_branch,
+        package_name="cronie",
     )
     sgg.create_from_upstream()
 
-    if dist_git_branch == "c8s":
-        assert CENTOS_DOMAIN in sgg.dist_git.local_project.git_url
-    else:
-        assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
+    assert CENTOS_STREAM_GITLAB in sgg.dist_git.local_project.git_url
 
     # verify it
-    subprocess.check_call(["packit", "srpm"], cwd=source_git_path)
+    # TODO: this should be updated to be verified with update-dist-git also. Unfortunately
+    # this currently produces some change in dist-git b/c of how the Patch is written in the
+    # spec-file.
+    subprocess.check_call(
+        ["packit", "--config", ".distro/source-git.yaml", "srpm"], cwd=source_git_path
+    )
     srpm_path = list(source_git_path.glob("cronie-*.src.rpm"))[0]
     assert srpm_path.is_file()
 
@@ -372,6 +415,7 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
         centos_package=package_name,
         dist_git_branch=dist_git_branch,
         dist_git_path=dist_git_path,
+        package_name=package_name,
     )
     sgg.create_from_upstream()
 
@@ -380,3 +424,65 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
     assert "present_in_specfile: true" in patch_commit_message
     assert "patch_name: 0001-acl-2.2.53-test-runwrapper.patch" in patch_commit_message
     assert re.findall(r"patch_id: \d", patch_commit_message)
+
+
+def test_check_for_autosetup(api_instance_source_git, tmp_path):
+    """Check if the package is using %autosetup before doing the conversion"""
+    package_name = "ed"
+    source_git_path = tmp_path / "src" / package_name
+    dist_git_path = tmp_path / "rpms" / package_name
+
+    source_git_path.mkdir(parents=True)
+    create_new_repo(source_git_path, [])
+
+    dist_git_path.mkdir(parents=True)
+    create_new_repo(dist_git_path, [])
+    dist_git_repo = git.Repo(dist_git_path)
+    dist_git_repo.git.remote(
+        "add", "origin", "https://gitlab.com/redhat/centos-stream/rpms/ed.git"
+    )
+
+    (dist_git_path / f"{package_name}.spec").write_text(
+        """\
+Summary: The GNU line editor
+Name: ed
+Version: 1.14.2
+Release: 11%{?dist}
+License: GPLv3+ and GFDL
+Source: %{name}-%{version}.tar.xz
+
+%description
+Ed is a line-oriented text editor, used to create, display, and modify
+
+%prep
+%setup -q
+
+%build
+%configure
+%make_build CFLAGS="%{optflags}" LDFLAGS="%{__global_ldflags}"
+
+%install
+%make_install
+rm -vrf %{buildroot}%{_infodir}/dir
+
+%files
+%license COPYING
+%doc ChangeLog NEWS README TODO AUTHORS
+%{_bindir}/ed
+%{_bindir}/red
+%{_mandir}/man1/ed.1*
+%{_mandir}/man1/red.1*
+%{_infodir}/ed.info*
+
+%changelog
+"""
+    )
+    sgg = SourceGitGenerator(
+        LocalProject(working_dir=source_git_path),
+        api_instance_source_git.config,
+        centos_package=package_name,
+        dist_git_path=dist_git_path,
+        package_name=package_name,
+    )
+    with pytest.raises(PackitException):
+        sgg.create_from_upstream()

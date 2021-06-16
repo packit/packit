@@ -10,11 +10,14 @@ from packit.utils.logging import (
     commits_to_nice_str,
 )
 from packit.utils.repo import (
-    is_git_repo,
-    get_repo,
+    clone_centos_8_package,
+    clone_centos_9_package,
+    get_default_branch,
     get_namespace_and_repo_name,
-    is_a_git_ref,
+    get_repo,
     git_remote_url_to_https_url,
+    is_a_git_ref,
+    is_git_repo,
 )
 
 
@@ -33,6 +36,9 @@ __all__ = [
     get_namespace_and_repo_name.__name__,
     is_a_git_ref.__name__,
     git_remote_url_to_https_url.__name__,
+    clone_centos_8_package.__name__,
+    clone_centos_9_package.__name__,
+    get_default_branch.__name__,
 ]
 
 
