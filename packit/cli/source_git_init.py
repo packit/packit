@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
     help="Path to the dist-git repo to use. If this is defined, "
     "--fedora-package and --centos-package are ignored.",
 )
-@click.option("--package-name", help="The name of the package in the distro")
+@click.option("--pkg-name", help="The name of the package in the distro")
 @pass_config
 def source_git_init(
     config,
@@ -63,7 +63,7 @@ def source_git_init(
     centos_package,
     dist_git_branch,
     dist_git_path: Optional[str],
-    package_name: Optional[str],
+    pkg_name: Optional[str],
 ):
     """Initialize a source-git repository
 
@@ -95,5 +95,5 @@ def source_git_init(
         dist_git_branch=dist_git_branch,
         fedora_package=fedora_package,
         centos_package=centos_package,
-        package_name=package_name,
+        pkg_name=pkg_name,
     )

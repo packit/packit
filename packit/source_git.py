@@ -170,7 +170,7 @@ class SourceGitGenerator:
         dist_git_branch: Optional[str] = None,
         fedora_package: Optional[str] = None,
         centos_package: Optional[str] = None,
-        package_name: Optional[str] = None,
+        pkg_name: Optional[str] = None,
         tmpdir: Optional[Path] = None,
     ):
         """
@@ -182,7 +182,7 @@ class SourceGitGenerator:
         :param dist_git_branch: branch in dist-git to use
         :param fedora_package: pick up specfile and downstream sources from this fedora package
         :param centos_package: pick up specfile and downstream sources from this centos package
-        :param package_name: name of the package in the distro
+        :param pkg_name: name of the package in the distro
         :param tmpdir: path to a directory where temporary repos (upstream,
                        dist-git) will be cloned
         """
@@ -194,7 +194,7 @@ class SourceGitGenerator:
         self._upstream_ref: Optional[str] = upstream_ref
         self.dist_git_branch = dist_git_branch
         self.distro_dir = Path(self.local_project.working_dir, self.DISTRO_DIR)
-        self.package_name = package_name
+        self.pkg_name = pkg_name
         self._patch_comments: dict = {}
 
         logger.info(
@@ -526,8 +526,8 @@ class SourceGitGenerator:
         package_config.update(
             {
                 "upstream_ref": self.upstream_ref,
-                "downstream_package_name": self.package_name,
-                "specfile_path": f"{self.DISTRO_DIR}/{self.package_name}.spec",
+                "downstream_package_name": self.pkg_name,
+                "specfile_path": f"{self.DISTRO_DIR}/{self.pkg_name}.spec",
                 "patch_generation_ignore_paths": [self.DISTRO_DIR],
                 "patch_generation_patch_id_digits": self.dist_git.specfile.patch_id_digits,
                 "sync_changelog": True,
@@ -578,7 +578,7 @@ class SourceGitGenerator:
         self._configure_syncing()
 
         spec = Specfile(
-            f"{self.distro_dir}/{self.package_name}.spec",
+            f"{self.distro_dir}/{self.pkg_name}.spec",
             sources_dir=self.dist_git.local_project.working_dir,
         )
         patch_comments = spec.read_patch_comments()
