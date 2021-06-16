@@ -11,6 +11,8 @@ License:        Beerware
 Source:         %{upstream_name}-%{version}.tar.gz
 BuildArch:      noarch
 
+### patches ###
+
 %description
 ...but not too happy.
 

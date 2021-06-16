@@ -45,7 +45,6 @@ commit_message=$(cat << EOF
 Apply patch ${patch_name}
 
 patch_name: ${patch_name}
-present_in_specfile: true
 EOF
 )
 
