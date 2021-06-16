@@ -32,16 +32,6 @@ logger = logging.getLogger(__name__)
     "defaults to current tip of the git repository",
 )
 @click.option(
-    "--fedora-package",
-    help="Pick spec file from this Fedora Linux package; "
-    "implies creating a source-git repo",
-)
-@click.option(
-    "--centos-package",
-    help="Pick spec file from this CentOS Linux or CentOS Stream package; "
-    "implies creating a source-git repo",
-)
-@click.option(
     "--dist-git-branch",
     help="Get spec file from this downstream branch, "
     "for Fedora this defaults to main, for CentOS it's c9s. "
@@ -52,6 +42,11 @@ logger = logging.getLogger(__name__)
     help="Path to the dist-git repo to use. If this is defined, "
     "--fedora-package and --centos-package are ignored.",
 )
+@click.option(
+    "--pkg-tool",
+    help="Name or path of the packaging tool used to work "
+    "with sources in the dist-git repo. A variant of 'rpkg'.",
+)
 @click.option("--pkg-name", help="The name of the package in the distro")
 @pass_config
 def source_git_init(
@@ -59,10 +54,9 @@ def source_git_init(
     path_or_url,
     upstream_url,
     upstream_ref,
-    fedora_package,
-    centos_package,
     dist_git_branch,
     dist_git_path: Optional[str],
+    pkg_tool: Optional[str],
     pkg_name: Optional[str],
 ):
     """Initialize a source-git repository
@@ -93,7 +87,6 @@ def source_git_init(
         upstream_ref=upstream_ref,
         dist_git_path=dg_path,
         dist_git_branch=dist_git_branch,
-        fedora_package=fedora_package,
-        centos_package=centos_package,
+        pkg_tool=pkg_tool or config.pkg_tool,
         pkg_name=pkg_name,
     )

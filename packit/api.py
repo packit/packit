@@ -995,6 +995,7 @@ class PackitAPI:
         dist_git_branch: Optional[str] = None,
         fedora_package: Optional[str] = None,
         centos_package: Optional[str] = None,
+        pkg_tool: Optional[str] = None,
         pkg_name: Optional[str] = None,
     ):
         """
@@ -1007,6 +1008,8 @@ class PackitAPI:
         :param centos_package: pick up specfile and downstream sources from this centos package
         :param dist_git_branch: branch in dist-git to use
         :param dist_git_path: path to a local clone of a dist-git repo
+        :param pkg_tool: name or path of the packaging tool executable to be used to interact
+            with the lookaside cache
         :param pkg_name: name of the package in the distro
         """
         sgg = SourceGitGenerator(
@@ -1018,6 +1021,7 @@ class PackitAPI:
             dist_git_branch=dist_git_branch,
             fedora_package=fedora_package,
             centos_package=centos_package,
+            pkg_tool=pkg_tool,
             pkg_name=pkg_name,
         )
         sgg.create_from_upstream()
