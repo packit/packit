@@ -170,6 +170,7 @@ class SourceGitGenerator:
         dist_git_branch: Optional[str] = None,
         fedora_package: Optional[str] = None,
         centos_package: Optional[str] = None,
+        pkg_tool: Optional[str] = None,
         pkg_name: Optional[str] = None,
         tmpdir: Optional[Path] = None,
     ):
@@ -182,6 +183,8 @@ class SourceGitGenerator:
         :param dist_git_branch: branch in dist-git to use
         :param fedora_package: pick up specfile and downstream sources from this fedora package
         :param centos_package: pick up specfile and downstream sources from this centos package
+        :param pkg_tool: name or path of the packaging tool executable to be used to interact
+            with the lookaside cache
         :param pkg_name: name of the package in the distro
         :param tmpdir: path to a directory where temporary repos (upstream,
                        dist-git) will be cloned
@@ -194,6 +197,7 @@ class SourceGitGenerator:
         self._upstream_ref: Optional[str] = upstream_ref
         self.dist_git_branch = dist_git_branch
         self.distro_dir = Path(self.local_project.working_dir, self.DISTRO_DIR)
+        self.pkg_tool = pkg_tool
         self.pkg_name = pkg_name
         self._patch_comments: dict = {}
 
@@ -589,7 +593,7 @@ class SourceGitGenerator:
             message="Initialize as a source-git repository", allow_empty=False
         )
 
-        self.dist_git.download_source_files()
+        self.dist_git.download_source_files(pkg_tool=self.pkg_tool)
         self._run_prep()
         self._rebase_patches(
             get_default_branch(LocalProject(working_dir=self.get_BUILD_dir()).git_repo),
