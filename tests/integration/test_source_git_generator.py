@@ -124,7 +124,7 @@ def test_source_git_config_upstream_project_url(
         upstream_project_url,
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
-        package_name="python-requre",
+        pkg_name="python-requre",
     )
     sgg.create_from_upstream()
 
@@ -169,7 +169,7 @@ def test_source_git_config_sources(api_instance_source_git, tmp_path: Path):
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
-        package_name="python-requre",
+        pkg_name="python-requre",
     )
     sgg.create_from_upstream()
 
@@ -236,7 +236,7 @@ def test_create_srcgit_requre_clean(api_instance_source_git, tmp_path: Path):
         "https://github.com/packit/requre",
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
-        package_name="python-requre",
+        pkg_name="python-requre",
     )
     sgg.create_from_upstream()
 
@@ -319,7 +319,7 @@ def test_create_srcgit_requre_populated(api_instance_source_git, tmp_path: Path)
         api_instance_source_git.config,
         upstream_ref="0.4.0",
         dist_git_path=dist_git_path,
-        package_name="python-requre",
+        pkg_name="python-requre",
     )
     sgg.create_from_upstream()
 
@@ -362,7 +362,7 @@ def test_centos_cronie(
         upstream_ref=upstream_ref,
         centos_package="cronie",
         dist_git_branch=dist_git_branch,
-        package_name="cronie",
+        pkg_name="cronie",
     )
     sgg.create_from_upstream()
 
@@ -415,7 +415,7 @@ def test_acl_with_git_git_am(apply_option, api_instance_source_git, tmp_path: Pa
         centos_package=package_name,
         dist_git_branch=dist_git_branch,
         dist_git_path=dist_git_path,
-        package_name=package_name,
+        pkg_name=package_name,
     )
     sgg.create_from_upstream()
 
@@ -482,7 +482,7 @@ rm -vrf %{buildroot}%{_infodir}/dir
         api_instance_source_git.config,
         centos_package=package_name,
         dist_git_path=dist_git_path,
-        package_name=package_name,
+        pkg_name=package_name,
     )
     with pytest.raises(PackitException):
         sgg.create_from_upstream()
