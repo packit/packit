@@ -12,7 +12,6 @@ import yaml
 import subprocess
 from ogr.parsing import RepoUrl, parse_git_repo
 
-from packit.constants import CENTOS_DOMAIN, CENTOS_STREAM_GITLAB
 from packit.utils.commands import run_command
 
 from packit.exceptions import PackitException
@@ -199,52 +198,6 @@ def get_current_version_command(
         "--match",
         glob_pattern,
     ]
-
-
-def clone_centos_8_package(
-    package_name: str,
-    dist_git_path: Path,
-    branch: str = "c8s",
-    namespace: str = "rpms",
-    stg: bool = False,
-):
-    """
-    clone selected package from git.[stg.]centos.org
-    """
-    run_command(
-        [
-            "git",
-            "clone",
-            "-b",
-            branch,
-            f"https://git{'.stg' if stg else ''}.{CENTOS_DOMAIN}/{namespace}/{package_name}.git",
-            str(dist_git_path),
-        ]
-    )
-
-
-def clone_centos_9_package(
-    package_name: str,
-    dist_git_path: Path,
-    branch: str = "c9s",
-    namespace: str = "rpms",
-    stg: bool = None,
-):
-    """
-    clone selected package from git.[stg.]centos.org
-    """
-    if stg:
-        logger.warning("There is no staging instance for CentOS Stream 9 dist-git.")
-    run_command(
-        [
-            "git",
-            "clone",
-            "-b",
-            branch,
-            f"https://{CENTOS_STREAM_GITLAB}/{namespace}/{package_name}.git",
-            str(dist_git_path),
-        ]
-    )
 
 
 def clone_fedora_package(
