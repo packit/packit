@@ -4,89 +4,94 @@
 """Command to initialize a source-git repository"""
 
 import logging
-import os
-import pathlib
 from typing import Optional
 
 import click
+import git
 
-from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import get_packit_api
+from packit.cli.types import GitRepoParameter
+from packit.api import PackitAPI
 from packit.config.config import pass_config
 from packit.config import get_context_settings
-from packit.exceptions import PackitNotAGitRepoException
 
 logger = logging.getLogger(__name__)
 
 
 @click.command("init", context_settings=get_context_settings())
-@click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
+@click.argument("upstream_ref")
+@click.argument("source_git", type=GitRepoParameter(from_ref_param="upstream_ref"))
+@click.argument("dist_git", type=GitRepoParameter())
 @click.option(
     "--upstream-url",
-    help="URL or local path to the upstream project; "
-    "defaults to current git repository",
+    help="""Git URL of the upstream repository. It is saved
+    in the source-git configuration if it is specified.""",
 )
 @click.option(
-    "--upstream-ref",
-    help="Use this upstream git ref as a base for your source-git repo; "
-    "defaults to current tip of the git repository",
-)
-@click.option(
-    "--dist-git-branch",
-    help="Get spec file from this downstream branch, "
-    "for Fedora this defaults to main, for CentOS it's c9s. "
-    "When --dist-git-path is set, the default is the branch which is already checked out.",
-)
-@click.option(
-    "--dist-git-path",
-    help="Path to the dist-git repo to use. If this is defined, "
-    "--fedora-package and --centos-package are ignored.",
+    "--upstream-remote",
+    help="""Name of the remote pointing to the upstream repository.
+    If --upstream-url is not specified, the fetch URL of this remote
+    is saved in the source-git configuration as the Git URL of the
+    upstream project. Defaults to 'origin'.""",
 )
 @click.option(
     "--pkg-tool",
-    help="Name or path of the packaging tool used to work "
-    "with sources in the dist-git repo. A variant of 'rpkg'.",
+    help="""Name or path of the packaging tool used to work
+    with sources in the dist-git repo. A variant of 'rpkg'.
+    Defaults to 'fedpkg' or the tool configured in the Packit
+    configuration.""",
 )
-@click.option("--pkg-name", help="The name of the package in the distro")
+@click.option(
+    "--pkg-name",
+    help="""The name of the package in the distro.
+    Defaults to the directory name of DIST_GIT.""",
+)
 @pass_config
 def source_git_init(
     config,
-    path_or_url,
-    upstream_url,
-    upstream_ref,
-    dist_git_branch,
-    dist_git_path: Optional[str],
+    dist_git: git.Repo,
+    source_git: git.Repo,
+    upstream_ref: str,
+    upstream_url: Optional[str],
+    upstream_remote,
     pkg_tool: Optional[str],
     pkg_name: Optional[str],
 ):
-    """Initialize a source-git repository
+    """Initialize SOURCE_GIT as a source-git repo by applying downstream
+    patches from DIST_GIT as Git commits on top of UPSTREAM_REF.
+
+    UPSTREAM_REF is a tag, branch or commit from SOURCE_GIT.
+
+    SOURCE_GIT and DIST_GIT are paths to the source-git and dist-git
+    repos. Branch names can be specified, separated by colons.
+
+    If a branch name is specified for SOURCE_GIT, the branch is checked
+    out and reset to UPSTREAM_REF.
+
+    If a branch name is specified for DIST_GIT, the branch is checked
+    out before setting up the source-git repo. This branch is expected
+    to exist.
 
     To learn more about source-git, please check
 
         https://packit.dev/docs/source-git/
+
+    Examples:
+
+    \b
+        $ packit source-git init v2.3.1 src/acl:rawhide rpms/acl:rawhide
+        $ packit source-git init --pkg-tool centpkg v2.3.1 src/acl rpms/acl
     """
     logger.warning(
         "Generating source-git repositories is experimental, "
         "please give us feedback if it does things differently than you expect."
     )
-    try:
-        api = get_packit_api(
-            config=config, local_project=path_or_url, load_packit_yaml=False
-        )
-    except PackitNotAGitRepoException:
-        logger.error(
-            "The init command is expected to be run in a git repository. "
-            "Current branch in the repo will be turned into a source-git repo. "
-            "We suggest to run the command "
-            "in a blank git repository or in a new branch of the upstream project."
-        )
-        raise
-    dg_path = pathlib.Path(dist_git_path) if dist_git_path else None
-    api.create_sourcegit_from_upstream(
-        upstream_url=upstream_url,
+    api = PackitAPI(config=config, package_config=None)
+    api.init_source_git(
+        dist_git=dist_git,
+        source_git=source_git,
         upstream_ref=upstream_ref,
-        dist_git_path=dg_path,
-        dist_git_branch=dist_git_branch,
+        upstream_url=upstream_url,
+        upstream_remote=upstream_remote,
         pkg_tool=pkg_tool or config.pkg_tool,
         pkg_name=pkg_name,
     )

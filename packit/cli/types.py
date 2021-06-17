@@ -1,29 +1,12 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import logging
 import os
+from typing import Optional
 
 import click
+import git
 
 from packit.local_project import LocalProject
 from packit.utils.repo import git_remote_url_to_https_url
@@ -85,4 +68,64 @@ class LocalProjectParameter(click.ParamType):
                 )
             return local_project
         except Exception as ex:
+            self.fail(ex, param, ctx)
+
+
+class GitRepoParameter(click.ParamType):
+    """Parameter type to represent a Git repository on the local disk, and an
+    optional branch, in the format <path>:<branch>.
+
+    Attributes:
+        from_ref_param: Name of the CLI parameter which tells the start point of the branch
+            to be created, if the branch doesn't exist yet.
+    """
+
+    name = "git_repo"
+
+    def __init__(self, from_ref_param: Optional[str] = None):
+        super().__init__()
+        self.from_ref_param = from_ref_param
+
+    def convert(self, value, param, ctx) -> git.Repo:
+        if isinstance(value, git.Repo):
+            return value
+        if not isinstance(value, str):
+            self.fail(f"{value!r} is not a string")
+
+        try:
+            path, _, branch = value.partition(":")
+            repo = git.Repo(path)
+            if not branch:
+                return repo
+
+            branch_exists = True
+            try:
+                repo.rev_parse(branch)
+            except git.BadName:
+                branch_exists = False
+
+            if self.from_ref_param is not None:
+                if ctx.params.get(self.from_ref_param):
+                    repo.git.checkout("-B", branch, ctx.params[self.from_ref_param])
+                else:
+                    self.fail(
+                        f"Unable to create branch {branch!r} because "
+                        f"{self.from_ref_param!r} is not specified",
+                        param,
+                        ctx,
+                    )
+            elif branch_exists:
+                repo.git.checkout(branch)
+            else:
+                self.fail(
+                    f"Cannot check out branch {branch!r} because it does not exist",
+                    param,
+                    ctx,
+                )
+
+            return repo
+
+        except git.NoSuchPathError:
+            self.fail(f"{path!r} does not exist", param, ctx)
+        except git.GitCommandError as ex:
             self.fail(ex, param, ctx)

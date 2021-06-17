@@ -1,0 +1,9 @@
+diff --git a/hello.rs b/hello.rs
+index 47ad8c6..f8dbb5e 100644
+--- a/hello.rs
++++ b/hello.rs
+@@ -1,3 +1,3 @@
+ fn main() {
+-    println!("Hello World!");
++    println!("Hello Fedora!");
+ }

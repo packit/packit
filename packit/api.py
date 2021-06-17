@@ -13,6 +13,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional, Union
 
+import git
+
 from ogr.abstract import PullRequest
 from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
@@ -987,40 +989,39 @@ class PackitAPI:
         v = PackageConfigValidator(config_path, config_content)
         return v.validate()
 
-    def create_sourcegit_from_upstream(
+    def init_source_git(
         self,
+        dist_git: git.Repo,
+        source_git: git.Repo,
+        upstream_ref: str,
         upstream_url: Optional[str] = None,
-        upstream_ref: Optional[str] = None,
-        dist_git_path: Optional[Path] = None,
-        dist_git_branch: Optional[str] = None,
-        fedora_package: Optional[str] = None,
-        centos_package: Optional[str] = None,
+        upstream_remote: Optional[str] = None,
         pkg_tool: Optional[str] = None,
         pkg_name: Optional[str] = None,
     ):
         """
-        generate a source-git repo from provided upstream repo
-        and a corresponding package in Fedora/CentOS ecosystem
+        Initialize a source-git repo from dist-git, that is: add configuration, packaging files
+        needed by the distribution and transform the distribution patches into Git commits.
 
-        :param upstream_url: upstream repo URL we want to use as a base
-        :param upstream_ref: upstream git-ref to use as a base
-        :param fedora_package: pick up specfile and downstream sources from this fedora package
-        :param centos_package: pick up specfile and downstream sources from this centos package
-        :param dist_git_branch: branch in dist-git to use
-        :param dist_git_path: path to a local clone of a dist-git repo
-        :param pkg_tool: name or path of the packaging tool executable to be used to interact
-            with the lookaside cache
-        :param pkg_name: name of the package in the distro
+        Args:
+            dist_git: Dist-git repository to be used for initialization.
+            source_git: Git repository to be initialized as a source-git repo.
+            upstream_ref: Upstream ref which is going to be the starting point of the
+                source-git history. This can be a branch, tag or commit sha. It is expected
+                that the current HEAD and this ref point to the same commit.
+            upstream_url: Git URL to be saved in the source-git configuration.
+            upstream_remote: Name of the remote from which the fetch URL is taken as the Git URL
+                of the upstream project to be saved in the source-git configuration.
+            pkg_tool: Packaging tool to be used to interact with the dist-git repo.
+            pkg_name: Name of the package in dist-git.
         """
         sgg = SourceGitGenerator(
             config=self.config,
-            local_project=self.upstream_local_project,
-            upstream_url=upstream_url,
+            dist_git=dist_git,
+            source_git=source_git,
             upstream_ref=upstream_ref,
-            dist_git_path=dist_git_path,
-            dist_git_branch=dist_git_branch,
-            fedora_package=fedora_package,
-            centos_package=centos_package,
+            upstream_url=upstream_url,
+            upstream_remote=upstream_remote,
             pkg_tool=pkg_tool,
             pkg_name=pkg_name,
         )
