@@ -195,6 +195,7 @@ class JobMetadataSchema(Schema):
     scratch = fields.Boolean()
     list_on_homepage = fields.Boolean()
     preserve_project = fields.Boolean()
+    use_internal_tf = fields.Boolean()
     additional_packages = fields.List(fields.String(), missing=None)
     additional_repos = fields.List(fields.String(), missing=None)
     fmf_url = fields.String(missing=None)
