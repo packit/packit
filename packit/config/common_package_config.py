@@ -133,16 +133,25 @@ class CommonPackageConfig:
             f"{self.downstream_package_name}.git"
         )
 
-    def get_specfile_sync_files_item(self):
+    def get_specfile_sync_files_item(self, from_downstream: bool = False):
         """
         Get SyncFilesItem object for the specfile.
+        :param from_downstream: True when syncing from downstream
         :return: SyncFilesItem
         """
-        return SyncFilesItem(
-            src=[self.specfile_path],
-            dest=f"{self.downstream_package_name}.spec"
+        upstream_specfile_path = self.specfile_path
+        downstream_specfile_path = (
+            f"{self.downstream_package_name}.spec"
             if self.downstream_package_name
-            else self.specfile_path,
+            else self.specfile_path
+        )
+        return SyncFilesItem(
+            src=[
+                downstream_specfile_path if from_downstream else upstream_specfile_path
+            ],
+            dest=upstream_specfile_path
+            if from_downstream
+            else downstream_specfile_path,
         )
 
     def get_all_files_to_sync(self):
