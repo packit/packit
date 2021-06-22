@@ -436,7 +436,7 @@ class PackitAPI:
             self.up.checkout_branch(local_pr_branch)
 
         files = (
-            [self.package_config.get_specfile_sync_files_item()]
+            [self.package_config.get_specfile_sync_files_item(from_downstream=True)]
             if sync_only_specfile
             else self.package_config.synced_files
         )
