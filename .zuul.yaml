@@ -1,5 +1,6 @@
 ---
 - project:
+    default-branch: main
     check:
       jobs:
         - noop
