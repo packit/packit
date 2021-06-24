@@ -1,3 +1,11 @@
+# 0.33.1
+
+- Source-git: Updated the source-git format produced by `source-git init` (#1277)
+- Source-git: drop support of packages not using %autosetup
+- Source-git: Use --force when staging the .distro dir
+- Source-git init: Do not download remote sources
+- Source-git init: Raise an error if the dist-git repo is not pristine
+
 # 0.32.0
 
 - Command `packit generate` was removed. It has been deprecated for a while
