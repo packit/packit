@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import datetime
 import io
@@ -28,6 +9,7 @@ import tarfile
 from pathlib import Path
 from typing import Iterator, Optional
 
+import git
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
@@ -57,11 +39,13 @@ from tests.spellbook import (
     initiate_git_repo,
     DISTGIT,
     NAME_VERSION,
+    DATA_DIR,
 )
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
 UPSTREAM_PROJECT_URL = "https://github.com/also-not/set.git"
 SOURCE_GIT_RELEASE_TAG = "0.1.0"
+HELLO_RELEASE = "1.0.1"
 
 
 @pytest.fixture()
@@ -208,6 +192,42 @@ def sourcegit_and_remote(tmp_path):
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
     return sourcegit_dir, sourcegit_remote
+
+
+@pytest.fixture()
+def source_git_repo(sourcegit_and_remote):
+    source_git_dir, _ = sourcegit_and_remote
+    source_git_repo = git.Repo(source_git_dir)
+    return source_git_repo
+
+
+@pytest.fixture()
+def dist_git_repo(distgit_and_remote):
+    dist_git_dir, _ = distgit_and_remote
+    dist_git_repo = git.Repo(dist_git_dir)
+    return dist_git_repo
+
+
+@pytest.fixture()
+def hello_source_git_repo(tmp_path):
+    repo_dir = tmp_path / "src" / "hello"
+    shutil.copytree(DATA_DIR / "src" / "hello", repo_dir)
+    repo = git.Repo.init(repo_dir)
+    repo.git.add(".")
+    repo.git.commit(message="Initial commit")
+    repo.git.tag(HELLO_RELEASE)
+    repo.create_remote("origin", "https://example.com/hello.git")
+    return repo
+
+
+@pytest.fixture()
+def hello_dist_git_repo(tmp_path):
+    repo_dir = tmp_path / "rpms" / "hello"
+    shutil.copytree(DATA_DIR / "rpms" / "hello", repo_dir)
+    repo = git.Repo.init(repo_dir)
+    repo.git.add(".")
+    repo.git.commit(message="Initial commit")
+    return repo
 
 
 @pytest.fixture()
