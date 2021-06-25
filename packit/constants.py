@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 DG_PR_COMMENT_KEY_SG_PR = "Source-git pull request ID"
 DG_PR_COMMENT_KEY_SG_COMMIT = "Source-git commit"
@@ -39,12 +20,6 @@ DEFAULT_ARCHIVE_EXT = ".tar.gz"
 DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 
 FEDORA_DOMAIN = "fedoraproject.org"
-CENTOS_DOMAIN = "centos.org"
-CENTOS_STREAM_GITLAB_DOMAIN = "gitlab.com"
-CENTOS_STREAM_GITLAB_NAMESPACE = "redhat/centos-stream"
-CENTOS_STREAM_GITLAB = (
-    CENTOS_STREAM_GITLAB_DOMAIN + "/" + CENTOS_STREAM_GITLAB_NAMESPACE
-)
 
 PROD_DISTGIT_HOSTNAME = f"src.{FEDORA_DOMAIN}"
 PROD_DISTGIT_URL = f"https://{PROD_DISTGIT_HOSTNAME}/"
@@ -135,7 +110,7 @@ RPM_MACROS_FOR_PREP = [
     "patch_name=`basename %{1}` && "
     "commit_msg=`%{__git} log --format=%B -n1` && "
     r'metadata_commit_msg=`printf "patch_name: $patch_name\\n'
-    r'present_in_specfile: true\\nsquash_commits: true"` && '
+    r'squash_commits: true"` && '
     '%{__git} commit --amend -m "$commit_msg" -m "$metadata_commit_msg"',
     # do the same of %autosetup -Sgit
     # that is, apply packit patch metadata to the patch commit
@@ -144,6 +119,6 @@ RPM_MACROS_FOR_PREP = [
     "__scm_apply_git(qp:m:) "
     "%{__git} apply --index %{-p:-p%{-p*}} - && "
     "patch_name=`basename %{1}` && "
-    r'metadata_commit_msg=`printf "patch_name: $patch_name\\npresent_in_specfile: true\\n"` && '
+    r'metadata_commit_msg=`printf "patch_name: $patch_name\\n"` && '
     '%{__git} commit %{-q} -m %{-m*} -m "${metadata_commit_msg}" --author "%{__scm_author}"',
 ]
