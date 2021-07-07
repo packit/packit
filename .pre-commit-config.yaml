@@ -4,7 +4,7 @@
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.19.4
+    rev: v2.20.0
     hooks:
       - id: pyupgrade
   - repo: https://github.com/psf/black
@@ -52,7 +52,7 @@ repos:
             types-PyYAML,
           ]
   - repo: https://github.com/packit/pre-commit-hooks
-    rev: 169c6671b0175882f74acaf34ace2edf897dc375
+    rev: 77d2c91b31c161ccf9fb3b4259606f000f374c33
     hooks:
       - id: check-rebase
         args:
