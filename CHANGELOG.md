@@ -1,3 +1,7 @@
+# 0.34.0
+
+- Source-git: `source-git init` was refactored, which also changed and simplified the CLI.
+
 # 0.33.1
 
 - Source-git: Updated the source-git format produced by `source-git init` (#1277)
