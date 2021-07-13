@@ -4,7 +4,7 @@
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.20.0
+    rev: v2.21.0
     hooks:
       - id: pyupgrade
   - repo: https://github.com/psf/black
