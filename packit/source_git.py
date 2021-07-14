@@ -18,7 +18,7 @@ from rebasehelper.exceptions import LookasideCacheError
 from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
 
 from packit.config import Config
-from packit.constants import RPM_MACROS_FOR_PREP
+from packit.constants import RPM_MACROS_FOR_PREP, DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
 from packit.pkgtool import PkgTool
@@ -57,11 +57,7 @@ class SourceGitGenerator:
             of the upstream project to be saved in the source-git configuration.
         pkg_tool: Packaging tool to be used to interact with the dist-git repo.
         pkg_name: Name of the package in dist-git.
-        distr_dir: The path to the .distro directory in source-git created during set up.
     """
-
-    # we store downstream content in source-git in this subdir
-    DISTRO_DIR = ".distro"
 
     def __init__(
         self,
@@ -85,7 +81,7 @@ class SourceGitGenerator:
         self.pkg_name = pkg_name or Path(self.dist_git.working_dir).name
 
         self._dist_git_specfile: Optional[Specfile] = None
-        self.distro_dir = Path(self.source_git.working_dir, self.DISTRO_DIR)
+        self.distro_dir = Path(self.source_git.working_dir, DISTRO_DIR)
         self._dist_git: Optional[git.Repo] = None
         self._patch_comments: dict = {}
 
@@ -267,8 +263,8 @@ class SourceGitGenerator:
                 "upstream_project_url": self.upstream_url,
                 "upstream_ref": self.upstream_ref,
                 "downstream_package_name": self.pkg_name,
-                "specfile_path": f"{self.DISTRO_DIR}/{self.pkg_name}.spec",
-                "patch_generation_ignore_paths": [self.DISTRO_DIR],
+                "specfile_path": f"{DISTRO_DIR}/{self.pkg_name}.spec",
+                "patch_generation_ignore_paths": [DISTRO_DIR],
                 "patch_generation_patch_id_digits": self.dist_git_specfile.patch_id_digits,
                 "sync_changelog": True,
                 "synced_files": [
@@ -276,13 +272,13 @@ class SourceGitGenerator:
                         # The trailing-slash is important, as we want to
                         # sync the content of the directory, not the directory
                         # as a whole.
-                        "src": f"{self.DISTRO_DIR}/",
+                        "src": f"{DISTRO_DIR}/",
                         "dest": ".",
                         "delete": True,
                         "filters": [
                             "protect .git*",
                             "protect sources",
-                            "exclude source-git.yaml",
+                            f"exclude {SRC_GIT_CONFIG}",
                             "exclude .gitignore",
                         ],
                     }
@@ -293,7 +289,7 @@ class SourceGitGenerator:
         if lookaside_sources:
             package_config["sources"] = lookaside_sources
 
-        Path(self.distro_dir, "source-git.yaml").write_text(
+        Path(self.distro_dir, SRC_GIT_CONFIG).write_text(
             yaml.dump(
                 package_config,
                 Dumper=SafeDumperWithoutAliases,
@@ -329,7 +325,7 @@ class SourceGitGenerator:
         patch_comments = spec.read_patch_comments()
         spec.remove_patches()
 
-        self.source_git.git.stage(self.DISTRO_DIR, force=True)
+        self.source_git.git.stage(DISTRO_DIR, force=True)
         self.source_git.git.commit(message="Initialize as a source-git repository")
 
         pkg_tool = PkgTool(

@@ -7,6 +7,7 @@ import yaml
 
 from pathlib import Path
 
+from packit.constants import SRC_GIT_CONFIG, DISTRO_DIR
 from packit.exceptions import PackitException
 from packit.source_git import SourceGitGenerator
 from packit.pkgtool import PkgTool
@@ -104,7 +105,7 @@ def check_source_git_config(source_git_config):
     assert source_git_config["upstream_ref"] == HELLO_RELEASE
     assert source_git_config["downstream_package_name"] == "hello"
     assert source_git_config["specfile_path"] == ".distro/hello.spec"
-    assert source_git_config["patch_generation_ignore_paths"] == [".distro"]
+    assert source_git_config["patch_generation_ignore_paths"] == [DISTRO_DIR]
     assert source_git_config["sync_changelog"] is True
     assert source_git_config["synced_files"] == [
         {
@@ -114,7 +115,7 @@ def check_source_git_config(source_git_config):
             "filters": [
                 "protect .git*",
                 "protect sources",
-                "exclude source-git.yaml",
+                f"exclude {SRC_GIT_CONFIG}",
                 "exclude .gitignore",
             ],
         }
@@ -147,9 +148,7 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
     )
     sgg.create_from_upstream()
     source_git_config = yaml.safe_load(
-        Path(
-            hello_source_git_repo.working_dir, ".distro", "source-git.yaml"
-        ).read_text()
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text()
     )
     check_source_git_config(source_git_config)
     assert source_git_config["patch_generation_patch_id_digits"] == 1
@@ -171,22 +170,20 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     )
     sgg.create_from_upstream()
     source_git_config = yaml.safe_load(
-        Path(
-            hello_source_git_repo.working_dir, ".distro", "source-git.yaml"
-        ).read_text()
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text()
     )
     check_source_git_config(source_git_config)
     assert source_git_config["patch_generation_patch_id_digits"] == 0
 
     assert (
-        Path(hello_source_git_repo.working_dir, ".distro", ".gitignore").read_text()
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, ".gitignore").read_text()
         == """\
 # Reset gitignore rules
 !*
 """
     )
-    assert not Path(hello_source_git_repo.working_dir, ".distro", "sources").exists()
-    assert not Path(hello_source_git_repo.working_dir, ".distro", ".git").exists()
+    assert not Path(hello_source_git_repo.working_dir, DISTRO_DIR, "sources").exists()
+    assert not Path(hello_source_git_repo.working_dir, DISTRO_DIR, ".git").exists()
 
     assert (
         "Hello Fedora"
