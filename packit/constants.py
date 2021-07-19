@@ -3,7 +3,12 @@
 
 DG_PR_COMMENT_KEY_SG_PR = "Source-git pull request ID"
 DG_PR_COMMENT_KEY_SG_COMMIT = "Source-git commit"
+
+# we store downstream content in source-git in this subdir
+DISTRO_DIR = ".distro"
+SRC_GIT_CONFIG = "source-git.yaml"
 CONFIG_FILE_NAMES = [
+    f"{DISTRO_DIR}/{SRC_GIT_CONFIG}",
     ".packit.yaml",
     ".packit.yml",
     ".packit.json",

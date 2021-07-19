@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from packit.constants import DISTRO_DIR
 from packit.exceptions import PackitException
 from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
@@ -23,9 +24,6 @@ from tests.spellbook import (
     run_prep_for_srpm,
     create_history_with_patch_ids,
 )
-
-
-DISTRO_DIR = ".distro"
 
 
 def test_basic_local_update_without_patching(
