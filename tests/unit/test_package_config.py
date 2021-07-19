@@ -25,6 +25,7 @@ from packit.config.package_config import (
 )
 import packit.config.package_config
 from packit.config.sources import SourcesItem
+from packit.constants import CONFIG_FILE_NAMES
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -1121,7 +1122,7 @@ def test_get_local_specfile_path():
 @pytest.mark.parametrize(
     "directory, local_first,local_last,config_file_name,res_pc_path",
     [
-        ([], False, True, None, Path.cwd() / ".packit.yaml"),
+        ([], False, True, None, Path.cwd() / CONFIG_FILE_NAMES[0]),
         ([], False, False, "different_conf.yaml", "different_conf.yaml"),
     ],
 )
