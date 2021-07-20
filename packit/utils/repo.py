@@ -3,17 +3,15 @@
 
 import logging
 import re
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import Tuple, Optional, Union, List
 
 import git
 import yaml
-import subprocess
+
 from ogr.parsing import RepoUrl, parse_git_repo
-
-from packit.utils.commands import run_command
-
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -198,28 +196,6 @@ def get_current_version_command(
         "--match",
         glob_pattern,
     ]
-
-
-def clone_fedora_package(
-    package_name: str,
-    dist_git_path: Path,
-    branch: str = None,
-    namespace: str = "rpms",
-    stg: bool = False,
-):
-    """
-    clone selected package from Fedora's src.fedoraproject.org
-    """
-    command = [
-        "git",
-        "clone",
-        f"https://src{'.stg' if stg else ''}.fedoraproject.org/{namespace}/{package_name}.git",
-        str(dist_git_path),
-    ]
-    if branch:
-        command += ["-b", branch]
-
-    run_command(command)
 
 
 def create_new_repo(cwd: Path, switches: List[str]):

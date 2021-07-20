@@ -111,7 +111,13 @@ class PkgTool:
             else:
                 raise
 
-    def clone(self, package_name: str, target_path: str, anonymous: bool = False):
+    def clone(
+        self,
+        package_name: str,
+        target_path: Union[Path, str],
+        branch: str = None,
+        anonymous: bool = False,
+    ):
         """
         clone a dist-git repo; this has to be done in current env
         b/c we don't have the keytab in sandbox
@@ -120,12 +126,14 @@ class PkgTool:
         if self.fas_username:
             cmd += ["--user", self.fas_username]
         cmd += ["-q", "clone"]
+        if branch:
+            cmd += ["--branch", branch]
         if anonymous:
-            cmd += ["-a"]
-        cmd += [package_name, target_path]
+            cmd += ["--anonymous"]
+        cmd += [package_name, str(target_path)]
 
         error_msg = (
-            f"Packit failed to clone the repository {package_name}; "
+            f"{self.tool} failed to clone repository {package_name}; "
             "please make sure that you are authorized to clone repositories "
             "from Fedora dist-git - this may require SSH keys set up or "
             "Kerberos ticket being active."
