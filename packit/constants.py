@@ -57,11 +57,11 @@ COPR2GITHUB_STATE = {
 PACKIT_CONFIG_TEMPLATE = """# See the documentation for more information:
 # https://packit.dev/docs/configuration/
 
-specfile_path: {downstream_package_name}.spec
+specfile_path: {specfile_path}
 
 # add or remove files that should be synced
 synced_files:
-    - {downstream_package_name}.spec
+    - {specfile_path}
     - .packit.yaml
 
 # name in upstream package repository/registry (e.g. in PyPI)
