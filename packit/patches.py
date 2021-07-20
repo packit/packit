@@ -131,15 +131,7 @@ class PatchMetadata:
         else:
             logger.debug(f"Commit {commit.hexsha:.8} does not contain any metadata.")
 
-        name = metadata.get("patch_name")
-        if patch_path:
-            if name:
-                new_path = patch_path.parent / name
-                logger.debug(f"Renaming the patch: {patch_path.name} -> {new_path}")
-                patch_path.rename(new_path)
-                patch_path = new_path
-            else:
-                name = patch_path.name
+        name = metadata.get("patch_name") or (patch_path.name if patch_path else None)
 
         return PatchMetadata(
             name=name,
@@ -367,10 +359,12 @@ class PatchGenerator:
                     else:
                         logger.debug(f"[{patch_metadata.name}] {commit.summary}")
                         if patch_metadata.no_prefix:
-                            # sadly, we have work to do, the original patch is no good:
-                            # format-patch by default generates patches with prefixes a/ and b/
-                            # no-prefix means we don't want those: we need create the patch, again
+                            # Sadly, we have work to do, the original patch is no good:
+                            # 'format-patch' by default generates patches with prefixes a/ and b/.
+                            # 'no-prefix' means we don't want those: we need to delete and re-create
+                            # the patch without the prefixes.
                             # https://github.com/packit/dist-git-to-source-git/issues/85#issuecomment-698827925
+                            path.unlink()
                             git_f_p_out = self.run_git_format_patch(
                                 destination,
                                 files_to_ignore,
@@ -388,27 +382,29 @@ class PatchGenerator:
         return patch_list
 
     @staticmethod
-    def process_git_am_style_patches(
+    def squash_by_squash_commits(
         patch_list: List[PatchMetadata],
     ) -> List[PatchMetadata]:
-        """
-        When using `%autosetup -S git_am`, there is a case
-        where a single patch file contains multiple commits.
-        This is problematic for us since only the leading commit
-        is annotated. To make matters worse, we also want to support the fact
-        that leading commits would not follow the scheme - make contributions easier.
+        """Append commits to a single patch until 'squash_commits==True'
+        is found.
 
-        In this case, we need to:
-        1. detect this is happening - a commit has `squash_commits=True`
-        2. process every commit, reversed (patches[-1] is HEAD)
-        3. append commits to a single patch until `squash_commits=True`
-        4. return new patch list
+        Do this after reversing the list of commits, so that they are in a
+        newest-to-oldest order, that is HEAD is the first in the list.
+
+        Args:
+            patch_list: List of patch metadata objects, corresponding to commits,
+                from the oldest to the newest (that is, in the order 'git format-patch'
+                produces them)
+
+        Returns:
+            List of patch metadata objects, with commits squashed if required.
         """
-        if not any(commit.squash_commits for commit in patch_list):
-            logger.debug(
-                "any of the commits has squash_commits=True, not the git-am style of patches"
-            )
-            return patch_list
+        logger.warning(
+            "Squashing commits by 'squash_commits' metadata. "
+            "This mechanism is deprecated. Please, use an "
+            "identical 'patch_name' to merge multiple adjacent "
+            "commits in a single patch file, instead."
+        )
 
         new_patch_list: List[PatchMetadata] = []
 
@@ -456,6 +452,99 @@ class PatchGenerator:
         # we need to reverse it back to be consistent with the order
         new_patch_list.reverse()
         return new_patch_list
+
+    @staticmethod
+    def squash_by_patch_name(patch_list: List[PatchMetadata]) -> List[PatchMetadata]:
+        """Squash adjacent patches if they have identical names.
+
+        Squashing is done by appending the content of a patch to the previous patch
+        if the name of the patch matches the name of the previous patch, and removing
+        the corresponding PatchMetadata object from the list.
+
+        Note, that renaming the patch files so that their names matches the name
+        specified in the metadata is done in 'rename_patches()'.
+
+        Args:
+            patch_list: List of PatchMetadata objects, ordered from
+                the oldest to the newest commit.
+
+        Returns:
+            List of PatchMetadata objects after squashing the patches.
+
+        Raises:
+            PackitException if non-adjacent patches have the same name.
+        """
+        logger.debug("Squashing commits by 'patch_name'.")
+        squashed_patch_list: List[PatchMetadata] = []
+        seen_patch_names = set()
+        for patch in patch_list:
+            if squashed_patch_list and squashed_patch_list[-1].name == patch.name:
+                logger.debug(
+                    f"Appending patch {patch!r} to {squashed_patch_list[-1]!r}."
+                )
+                squashed_patch_list[-1].path.write_text(
+                    squashed_patch_list[-1].path.read_text() + patch.path.read_text()
+                )
+                patch.path.unlink()
+            else:
+                if patch.name in seen_patch_names:
+                    raise PackitException(
+                        f"Non-adjacent patches cannot have the same name: {patch.name}."
+                    )
+                seen_patch_names.add(patch.name)
+                squashed_patch_list.append(patch)
+        return squashed_patch_list
+
+    @staticmethod
+    def squash_patches(
+        patch_list: List[PatchMetadata],
+    ) -> List[PatchMetadata]:
+        """
+        When using `%autosetup -S git_am`, there is a case
+        where a single patch file contains multiple commits.
+        This is problematic for us since only the leading commit
+        is annotated. To make matters worse, we also want to support the fact
+        that leading commits would not follow the scheme - make contributions easier.
+
+        In this case, we need to append commits to a single patch, either by looking
+        at the 'squash_commits' metadata or by identical 'patch_name'-s, and return
+        the new list of patches.
+
+        Args:
+            patch_list: List of patch metadata objects, corresponding to commits,
+                from the oldest to the newest (that is, in the order 'git format-patch'
+                produces them)
+
+        Returns:
+            List of patch metadata objects, with commits squashed if required.
+        """
+        if any(commit.squash_commits for commit in patch_list):
+            return PatchGenerator.squash_by_squash_commits(patch_list)
+        else:
+            return PatchGenerator.squash_by_patch_name(patch_list)
+
+    @staticmethod
+    def rename_patches(patch_list: List[PatchMetadata]):
+        """Ensure that patch file names match 'patch_name', if defined.
+
+        Args:
+            patch_list: A list of PatchMetadata objects.
+        """
+        for patch in patch_list:
+            # Not all patches have a name.
+            # Empty patches don't have a path.
+            if not (patch.name and patch.path):
+                continue
+            if patch.name != patch.path.name:
+                new_path = patch.path.parent / patch.name
+                if new_path.exists():
+                    raise PackitException(
+                        f"Cannot rename {patch.path} to {new_path} "
+                        f"because the latter already exists."
+                    )
+                logger.debug(f"Renaming the patch: {patch.path} -> {new_path}")
+                patch.path.rename(new_path)
+                patch.path = new_path
 
     @staticmethod
     def undo_identical(
@@ -540,7 +629,8 @@ class PatchGenerator:
             patch_list = self.process_patches(
                 patches, commits, destination, files_to_ignore
             )
-            patch_list = self.process_git_am_style_patches(patch_list)
+            patch_list = self.squash_patches(patch_list)
+            self.rename_patches(patch_list)
         else:
             logger.info(f"No patches in range {patches_revision_range}")
 
