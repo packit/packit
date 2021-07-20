@@ -46,8 +46,10 @@ Requires:       fedpkg
 Requires:       rsync
 # bumpspec
 Requires:       rpmdevtools
-# See setup.cfg for details
+%if 0%{?rhel}
+# rhbz#1968618 still not fixed for epel-8
 Requires:       python3-koji
+%endif
 %{?python_provide:%python_provide python3-%{real_name}}
 
 %description -n python3-%{real_name}
@@ -59,6 +61,11 @@ check out packit package for the executable.
 %autosetup -n %{pypi_name}-%{version}
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
+
+%if 0%{?rhel}
+# rhbz#1968618 still not fixed for epel-8
+sed -i -e 's|koji|# koji|' setup.cfg
+%endif
 
 %build
 %py3_build
