@@ -212,7 +212,7 @@ class DistGit(PackitRepositoryBase):
 
     @property
     def absolute_source_dir(self) -> Path:
-        """absoulute path to directory with spec-file sources"""
+        """absolute path to directory with spec-file sources"""
         return self.local_project.working_dir / self.source_dir_name
 
     @property
@@ -310,12 +310,10 @@ class DistGit(PackitRepositoryBase):
             )
         except Exception as ex:
             logger.error(f"There was an error while creating the PR: {ex!r}")
-            if "Pull-Request have been deactivated" in str(ex):
-                logger.info("See https://github.com/packit/packit/issues/328")
             raise
-        else:
-            logger.info(f"PR created: {dist_git_pr.url}")
-            return dist_git_pr
+
+        logger.info(f"PR created: {dist_git_pr.url}")
+        return dist_git_pr
 
     @property
     def upstream_archive_name(self) -> str:
