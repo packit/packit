@@ -29,6 +29,7 @@ from typing import Optional, Sequence, List, Union
 import cccolutils
 import git
 import requests
+from bodhi.client.bindings import BodhiClient, BodhiClientException
 
 from ogr.abstract import PullRequest
 
@@ -436,8 +437,6 @@ class DistGit(PackitRepositoryBase):
         logger.debug(
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
-        # https://github.com/fedora-infra/bodhi/issues/3058
-        from bodhi.client.bindings import BodhiClient, BodhiClientException
 
         # bodhi will likely prompt for username and password if kerb ticket is not up
         b = BodhiClient()
