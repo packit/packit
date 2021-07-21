@@ -107,37 +107,33 @@ class DistGit(PackitRepositoryBase):
     def local_project(self):
         """return an instance of LocalProject"""
         if self._local_project is None:
-            dist_git_project = self.config.get_project(
-                url=self.package_config.dist_git_package_url
-            )
-
             if self.package_config.dist_git_clone_path:
-                self._local_project = LocalProject(
-                    working_dir=self.package_config.dist_git_clone_path,
-                    git_url=self.package_config.dist_git_package_url,
-                    namespace=self.package_config.dist_git_namespace,
-                    repo_name=self.package_config.downstream_package_name,
-                    git_project=dist_git_project,
-                    cache=self.repository_cache,
-                )
+                working_dir = self.package_config.dist_git_clone_path
+                working_dir_is_temporary = False
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
                 self.clone_package(target_path=tmpdir)
-                self._local_project = LocalProject(
-                    working_dir=tmpdir,
-                    git_url=self.package_config.dist_git_package_url,
-                    namespace=self.package_config.dist_git_namespace,
-                    repo_name=self.package_config.downstream_package_name,
-                    git_project=dist_git_project,
-                    cache=self.repository_cache,
-                )
-                self._local_project.working_dir_temporary = True
+                working_dir = tmpdir
+                working_dir_is_temporary = True
+
+            self._local_project = LocalProject(
+                working_dir=working_dir,
+                git_url=self.package_config.dist_git_package_url,
+                namespace=self.package_config.dist_git_namespace,
+                repo_name=self.package_config.downstream_package_name,
+                git_project=self.config.get_project(
+                    url=self.package_config.dist_git_package_url
+                ),
+                cache=self.repository_cache,
+            )
+            self._local_project.working_dir_temporary = working_dir_is_temporary
             self._local_project.refresh_the_arguments()
         elif not self._local_project.git_project:
             self._local_project.git_project = self.config.get_project(
                 url=self.package_config.dist_git_package_url
             )
             self._local_project.refresh_the_arguments()
+
         return self._local_project
 
     @property
