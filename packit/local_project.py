@@ -446,16 +446,15 @@ class LocalProject:
         """
         Fetch selected PR and check it out.
         """
-        is_gitlab = True if isinstance(self.git_service, GitlabService) else False
         logger.info(f"Checking out PR {pr_id}.")
-        remote_name = self.remote or "origin"
-        rem: git.Remote = self.git_repo.remotes[remote_name]
+        is_gitlab = isinstance(self.git_service, GitlabService)
         remote_ref = "+refs/{}/{}/head".format(
             "merge-requests" if is_gitlab else "pull", pr_id
         )
+        remote_name = self.remote or "origin"
         local_ref = f"refs/remotes/{remote_name}/pr/{pr_id}"
         local_branch = f"pr/{pr_id}"
-        rem.fetch(f"{remote_ref}:{local_ref}")
+        self.git_repo.remotes[remote_name].fetch(f"{remote_ref}:{local_ref}")
         self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
         self.git_repo.branches[local_branch].checkout()
         logger.info(f"Checked out commit {self.git_repo.head.commit}")
