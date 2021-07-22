@@ -22,9 +22,9 @@
 
 import logging
 from pathlib import Path
-from typing import Dict, Type, List, Optional, Union
+from typing import Dict, List, Optional, Type, Union
 
-from packit.config import RunCommandType, Config
+from packit.config import Config, RunCommandType
 from packit.local_project import LocalProject
 from packit.utils import commands
 
@@ -125,17 +125,23 @@ class SandcastleCommandHandler(CommandHandler):
         """initialize Sandcastle lazily"""
         if self._sandcastle is None:
             # we import here so that packit does not depend on sandcastle (and thus python-kube)
-            from sandcastle.api import Sandcastle, MappedDir
+            from sandcastle.api import Sandcastle, MappedDir, VolumeSpec
 
             self._mapped_dir = MappedDir(
                 local_dir=self.local_project.working_dir,
                 path=self.config.command_handler_work_dir,
                 with_interim_pvc=True,
             )
+            pvc_volume_specs = [
+                VolumeSpec(**vol_spec_dict)
+                for vol_spec_dict in self.config.command_handler_pvc_volume_specs
+            ]
+
             self._sandcastle = Sandcastle(
                 image_reference=self.config.command_handler_image_reference,
                 k8s_namespace_name=self.config.command_handler_k8s_namespace,
                 mapped_dir=self._mapped_dir,
+                volume_mounts=pvc_volume_specs,
             )
             logger.debug("running the sandcastle pod")
             self._sandcastle.run()
