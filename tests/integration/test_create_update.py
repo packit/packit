@@ -21,10 +21,9 @@
 # SOFTWARE.
 
 import pytest
+from bodhi.client.bindings import BodhiClient
 from flexmock import flexmock
 from munch import Munch
-
-from tests.spellbook import can_a_module_be_imported
 
 
 @pytest.fixture()
@@ -255,10 +254,6 @@ def bodhi_response():
     )
 
 
-# FIXME: https://github.com/fedora-infra/bodhi/issues/3058
-@pytest.mark.skipif(
-    not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
-)
 @pytest.mark.parametrize(
     "branch,update_type,update_notes,koji_builds",
     (
@@ -286,9 +281,6 @@ def test_basic_bodhi_update(
     koji_builds,
     bodhi_response,
 ):
-    # https://github.com/fedora-infra/bodhi/issues/3058
-    from bodhi.client.bindings import BodhiClient
-
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
