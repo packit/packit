@@ -24,7 +24,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional, Sequence, List
+from typing import Optional, Sequence, List, Union
 
 import cccolutils
 import git
@@ -40,10 +40,9 @@ from packit.config import (
 )
 from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
-from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
+from packit.pkgtool import PkgTool
 from packit.utils.commands import cwd
-from packit.utils.repo import clone_fedora_package
 
 logger = logging.getLogger(__name__)
 
@@ -110,21 +109,17 @@ class DistGit(PackitRepositoryBase):
     ) -> "DistGit":
         """
         Clone dist-git repo for selected package and return this class
-
         Args:
             config: global packit config
             package_config: package config: downstream_package_name is utilized for cloning
             path: clone the repo to this path
             branch: optionally, check out this branch
-
         Returns: instance of the DistGit class
         """
-        # TODO: use fedpkg for this, or even better, the lp property below
-        clone_fedora_package(
-            package_config.downstream_package_name, path, branch=branch
-        )
-        lp = LocalProject(working_dir=path)
-        return cls(config, package_config, local_project=lp)
+        dg = cls(config, package_config)
+        dg.clone_package(target_path=path, branch=branch)
+        dg._local_project = LocalProject(working_dir=path)
+        return dg
 
     @property
     def local_project(self):
@@ -145,16 +140,7 @@ class DistGit(PackitRepositoryBase):
                 )
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
-                pkg_tool = PkgTool(
-                    fas_username=self.fas_user,
-                    directory=tmpdir,
-                    tool=self.config.pkg_tool,
-                )
-                pkg_tool.clone(
-                    self.package_config.downstream_package_name,
-                    tmpdir,
-                    anonymous=not cccolutils.has_creds(),
-                )
+                self.clone_package(target_path=tmpdir)
                 self._local_project = LocalProject(
                     working_dir=tmpdir,
                     git_url=self.package_config.dist_git_package_url,
@@ -183,6 +169,33 @@ class DistGit(PackitRepositoryBase):
             except PackitConfigException:
                 return None
         return self._downstream_config
+
+    def clone_package(
+        self,
+        target_path: Union[Path, str],
+        branch: str = None,
+    ) -> None:
+        """
+        Clone package from dist-git, i.e. from:
+        - Fedora's src.[stg.]fedoraproject.org
+        - CentOS Stream's gitlab.com/redhat/centos-stream/rpms/
+        depending on configured pkg_tool: {fedpkg(default),fedpkg-stage,centpkg}
+
+        Args:
+            target_path: the name of a new directory to clone into
+            branch: optional, branch to checkout
+        """
+        pkg_tool = PkgTool(
+            fas_username=self.fas_user,
+            directory=target_path,
+            tool=self.config.pkg_tool,
+        )
+        pkg_tool.clone(
+            package_name=self.package_config.downstream_package_name,
+            target_path=target_path,
+            branch=branch,
+            anonymous=not cccolutils.has_creds(),
+        )
 
     def get_absolute_specfile_path(self) -> Path:
         """provide the path, don't check it"""
