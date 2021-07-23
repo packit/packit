@@ -24,6 +24,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Set
 
+from bodhi.client.bindings import BodhiClient
 from koji import ClientSession, BUILD_STATES
 
 from ogr.abstract import Release
@@ -148,9 +149,6 @@ class Status:
         :param number_of_updates: int
         :return: None
         """
-        # https://github.com/fedora-infra/bodhi/issues/3058
-        from bodhi.client.bindings import BodhiClient
-
         b = BodhiClient()
         results = b.query(packages=self.dg.package_config.downstream_package_name)[
             "updates"

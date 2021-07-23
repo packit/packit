@@ -21,10 +21,8 @@
 # SOFTWARE.
 
 import pytest
-from munch import Munch
-
 from flexmock import flexmock
-from tests.spellbook import can_a_module_be_imported
+from munch import Munch
 
 
 @pytest.fixture()
@@ -409,10 +407,6 @@ def request_response():
     )
 
 
-# FIXME: https://github.com/fedora-infra/bodhi/issues/3058
-@pytest.mark.skipif(
-    not can_a_module_be_imported("bodhi"), reason="bodhi not present, skipping"
-)
 def test_push_updates(
     cwd_upstream_or_distgit, api_instance, query_response, request_response
 ):

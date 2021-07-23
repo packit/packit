@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import logging
 import os
@@ -29,6 +10,7 @@ from typing import Optional, Sequence, List, Union
 import cccolutils
 import git
 import requests
+from bodhi.client.bindings import BodhiClient, BodhiClientException
 
 from ogr.abstract import PullRequest
 
@@ -125,37 +107,33 @@ class DistGit(PackitRepositoryBase):
     def local_project(self):
         """return an instance of LocalProject"""
         if self._local_project is None:
-            dist_git_project = self.config.get_project(
-                url=self.package_config.dist_git_package_url
-            )
-
             if self.package_config.dist_git_clone_path:
-                self._local_project = LocalProject(
-                    working_dir=self.package_config.dist_git_clone_path,
-                    git_url=self.package_config.dist_git_package_url,
-                    namespace=self.package_config.dist_git_namespace,
-                    repo_name=self.package_config.downstream_package_name,
-                    git_project=dist_git_project,
-                    cache=self.repository_cache,
-                )
+                working_dir = self.package_config.dist_git_clone_path
+                working_dir_is_temporary = False
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
                 self.clone_package(target_path=tmpdir)
-                self._local_project = LocalProject(
-                    working_dir=tmpdir,
-                    git_url=self.package_config.dist_git_package_url,
-                    namespace=self.package_config.dist_git_namespace,
-                    repo_name=self.package_config.downstream_package_name,
-                    git_project=dist_git_project,
-                    cache=self.repository_cache,
-                )
-                self._local_project.working_dir_temporary = True
+                working_dir = tmpdir
+                working_dir_is_temporary = True
+
+            self._local_project = LocalProject(
+                working_dir=working_dir,
+                git_url=self.package_config.dist_git_package_url,
+                namespace=self.package_config.dist_git_namespace,
+                repo_name=self.package_config.downstream_package_name,
+                git_project=self.config.get_project(
+                    url=self.package_config.dist_git_package_url
+                ),
+                cache=self.repository_cache,
+            )
+            self._local_project.working_dir_temporary = working_dir_is_temporary
             self._local_project.refresh_the_arguments()
         elif not self._local_project.git_project:
             self._local_project.git_project = self.config.get_project(
                 url=self.package_config.dist_git_package_url
             )
             self._local_project.refresh_the_arguments()
+
         return self._local_project
 
     @property
@@ -212,7 +190,7 @@ class DistGit(PackitRepositoryBase):
 
     @property
     def absolute_source_dir(self) -> Path:
-        """absoulute path to directory with spec-file sources"""
+        """absolute path to directory with spec-file sources"""
         return self.local_project.working_dir / self.source_dir_name
 
     @property
@@ -310,12 +288,10 @@ class DistGit(PackitRepositoryBase):
             )
         except Exception as ex:
             logger.error(f"There was an error while creating the PR: {ex!r}")
-            if "Pull-Request have been deactivated" in str(ex):
-                logger.info("See https://github.com/packit/packit/issues/328")
             raise
-        else:
-            logger.info(f"PR created: {dist_git_pr.url}")
-            return dist_git_pr
+
+        logger.info(f"PR created: {dist_git_pr.url}")
+        return dist_git_pr
 
     @property
     def upstream_archive_name(self) -> str:
@@ -438,8 +414,6 @@ class DistGit(PackitRepositoryBase):
         logger.debug(
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
-        # https://github.com/fedora-infra/bodhi/issues/3058
-        from bodhi.client.bindings import BodhiClient, BodhiClientException
 
         # bodhi will likely prompt for username and password if kerb ticket is not up
         b = BodhiClient()
@@ -501,12 +475,10 @@ class DistGit(PackitRepositoryBase):
     def pr_exists(self, title: str, description: str, branch: str):
         distgit_prs = self.local_project.git_project.get_pr_list()
         return any(
-            [
-                (
-                    pr.title == title
-                    and pr.description == description
-                    and pr.target_branch == branch
-                )
-                for pr in distgit_prs
-            ]
+            (
+                pr.title == title
+                and pr.description == description
+                and pr.target_branch == branch
+            )
+            for pr in distgit_prs
         )
