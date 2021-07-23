@@ -1,2 +1,4 @@
 *.py[co]
 .tox
+noarch/
+*.egg-info/
