@@ -37,15 +37,17 @@ projects into Fedora operating system.
 
 %package -n     python3-%{real_name}
 Summary:        %{summary}
-Requires:       git
-# rpmbuild
-Requires:       rpm-build
 # new-sources
 Requires:       fedpkg
-# Copying files between repositories
-Requires:       rsync
+Requires:       git
+# kinit
+Requires:       krb5-workstation
+# rpmbuild
+Requires:       rpm-build
 # bumpspec
 Requires:       rpmdevtools
+# Copying files between repositories
+Requires:       rsync
 %if 0%{?rhel}
 # rhbz#1968618 still not fixed for epel-8
 Requires:       python3-koji
