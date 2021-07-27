@@ -188,7 +188,7 @@ class LocalProject:
             change = (
                 self._parse_repo_name_full_name_and_namespace()
                 or self._parse_git_repo_from_working_dir()
-                or self._parse_git_project_from_repo_namespace_and_git_project()
+                or self._parse_git_project_from_repo_namespace_and_git_service()
                 or self._parse_git_service_from_git_project()
                 or self._parse_ref_from_git_repo()
                 or self._parse_working_dir_from_git_repo()
@@ -262,7 +262,7 @@ class LocalProject:
 
         return False
 
-    def _parse_git_project_from_repo_namespace_and_git_project(
+    def _parse_git_project_from_repo_namespace_and_git_service(
         self,
     ) -> bool:
 
