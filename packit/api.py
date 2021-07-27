@@ -939,6 +939,9 @@ class PackitAPI:
         """
         if self._kerberos_initialized:
             return
+        if not self.config.pkg_tool.startswith("fedpkg"):
+            # centpkg doesn't use kerberos
+            return
         self._run_kinit()
         self._kerberos_initialized = True
 
