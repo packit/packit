@@ -35,6 +35,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception
 from packit.config import get_context_settings
 from packit.config.config import pass_config
+from packit.config.package_config import get_local_specfile_path
 from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
 
@@ -71,9 +72,15 @@ def init(
         # Use default name
         config_path = working_dir / ".packit.yaml"
 
+    specfile_path = get_local_specfile_path(working_dir)
     template_data = {
         "upstream_package_name": path_or_url.repo_name,
         "downstream_package_name": path_or_url.repo_name,
+        "specfile_path": (
+            specfile_path
+            if specfile_path is not None
+            else f"{path_or_url.repo_name}.spec"
+        ),
     }
 
     generate_config(
@@ -101,12 +108,14 @@ def generate_config(
     {
         "upstream_package_name": "packitos",
         "downstream_package_name": "packit",
+        "specfile_path": packit.spec,
     }
     :return: str, generated config
     """
     output_config = PACKIT_CONFIG_TEMPLATE.format(
         downstream_package_name=template_data["downstream_package_name"],
         upstream_package_name=template_data["upstream_package_name"],
+        specfile_path=template_data["specfile_path"],
     )
 
     if write_to_file:

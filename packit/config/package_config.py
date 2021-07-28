@@ -337,6 +337,7 @@ def get_package_config_from_repo(
             f"Cannot load package config {config_file_name!r}. {ex}"
         )
     if not spec_file_path:
+        logger.warning(f"Spec file path is not specified in {config_file_name}.")
         spec_file_path = get_specfile_path_from_repo(project=project, ref=ref)
 
     return parse_loaded_config(
