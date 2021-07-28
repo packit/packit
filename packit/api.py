@@ -939,24 +939,24 @@ class PackitAPI:
         """
         if self._kerberos_initialized:
             return
+
         if not self.config.pkg_tool.startswith("fedpkg"):
             # centpkg doesn't use kerberos
             return
-        self._run_kinit()
-        self._kerberos_initialized = True
 
-    def _run_kinit(self) -> None:
-        """
-        Run `kinit` if we have fas_user and keytab_path configured.
-        """
         if (
             not self.config.fas_user
             or not self.config.keytab_path
             or not Path(self.config.keytab_path).is_file()
         ):
-            logger.info("Won't be doing kinit, no credentials provided.")
+            logger.warning("Won't be doing kinit, no credentials provided.")
             return
 
+        self._run_kinit()
+        self._kerberos_initialized = True
+
+    def _run_kinit(self) -> None:
+        """Run `kinit`"""
         cmd = [
             "kinit",
             f"{self.config.fas_user}@{self.config.kerberos_realm}",
