@@ -537,12 +537,10 @@ class PatchGenerator:
                 continue
             if patch.name != patch.path.name:
                 new_path = patch.path.parent / patch.name
-                if new_path.exists():
-                    raise PackitException(
-                        f"Cannot rename {patch.path} to {new_path} "
-                        f"because the latter already exists."
-                    )
-                logger.debug(f"Renaming the patch: {patch.path} -> {new_path}")
+                logger.debug(
+                    f"Renaming the patch: {patch.path} -> {new_path}"
+                    f"{' (already exists)' if new_path.exists() else ''}"
+                )
                 patch.path.rename(new_path)
                 patch.path = new_path
 
