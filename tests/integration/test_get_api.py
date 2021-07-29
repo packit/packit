@@ -206,6 +206,6 @@ def test_get_api(tmp_path, remotes, package_config, is_upstream):
     if is_upstream:
         assert api.upstream_local_project
     else:
-        flexmock(PackitAPI).should_receive("_run_kinit").once()
+        flexmock(PackitAPI).should_receive("init_kerberos_ticket").once()
         assert api.downstream_local_project
         assert api.dg

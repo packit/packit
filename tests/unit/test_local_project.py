@@ -71,7 +71,7 @@ def test_parse_git_repo_from_working_dir():
     assert not project.working_dir_temporary
 
 
-def test_parse_git_project_from_repo_namespace_and_git_project():
+def test_parse_git_project_from_repo_namespace_and_git_service():
     service_mock = (
         flexmock()
         .should_receive("get_project")
@@ -83,7 +83,7 @@ def test_parse_git_project_from_repo_namespace_and_git_project():
     project = LocalProject(
         git_service=service_mock, repo_name="repo", namespace="namespace", refresh=False
     )
-    changed = project._parse_git_project_from_repo_namespace_and_git_project()
+    changed = project._parse_git_project_from_repo_namespace_and_git_service()
 
     assert changed
     assert project.git_service
