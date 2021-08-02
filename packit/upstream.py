@@ -429,9 +429,9 @@ class Upstream(PackitRepositoryBase):
             if m:
                 break
         else:
-            logger.error(
-                "This package is not using %(auto)setup macro in prep, "
-                "packit can't work in this environment."
+            logger.warning(
+                "This package is not using %(auto)setup macro in prep. "
+                "Packit will not update the %prep section."
             )
             return
 
