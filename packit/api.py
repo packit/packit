@@ -612,28 +612,33 @@ class PackitAPI:
         :param srpm_dir: path to the directory where the srpm is meant to be placed
         :return: a path to the srpm
         """
-        self.up.run_action(actions=ActionName.post_upstream_clone)
-
         try:
-            self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
-        except Exception as ex:
-            raise PackitSRPMException(
-                f"Preparation of the repository for creation of an SRPM failed: {ex}"
-            ) from ex
-        try:
-            srpm_path = self.up.create_srpm(srpm_path=output_file, srpm_dir=srpm_dir)
-        except PackitSRPMException:
-            raise
-        except Exception as ex:
-            raise PackitSRPMException(
-                f"An unexpected error occurred when creating the SRPM: {ex}"
-            ) from ex
+            self.up.run_action(actions=ActionName.post_upstream_clone)
 
-        if not srpm_path.exists():
-            raise PackitSRPMNotFoundException(
-                f"SRPM was created successfully, but can't be found at {srpm_path}"
-            )
-        return srpm_path
+            try:
+                self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
+            except Exception as ex:
+                raise PackitSRPMException(
+                    f"Preparation of the repository for creation of an SRPM failed: {ex}"
+                ) from ex
+            try:
+                srpm_path = self.up.create_srpm(
+                    srpm_path=output_file, srpm_dir=srpm_dir
+                )
+            except PackitSRPMException:
+                raise
+            except Exception as ex:
+                raise PackitSRPMException(
+                    f"An unexpected error occurred when creating the SRPM: {ex}"
+                ) from ex
+
+            if not srpm_path.exists():
+                raise PackitSRPMNotFoundException(
+                    f"SRPM was created successfully, but can't be found at {srpm_path}"
+                )
+            return srpm_path
+        finally:
+            self.clean()
 
     def create_rpms(self, upstream_ref: str = None, rpm_dir: str = None) -> List[Path]:
         """
