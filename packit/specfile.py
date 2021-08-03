@@ -265,7 +265,7 @@ class Specfile(SpecFile):
                 comment = []
             # Remember a comment line.
             if line.startswith("#"):
-                comment.append(line.removeprefix("#").strip())
+                comment.append(line[1:].strip())
             # Associate comments with patches and clear the comments
             # collected.
             if line.lower().startswith("patch"):
