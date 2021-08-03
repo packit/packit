@@ -218,19 +218,26 @@ class PackitAPI:
         create_pr: bool = True,
         force: bool = False,
         create_sync_note: bool = True,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        sync_default_files: Optional[bool] = True,
     ) -> Optional[PullRequest]:
         """
-        Update given package in Fedora
+        Update given package in dist-git
 
         :param dist_git_branch: branch in dist-git, defaults to repo's default branch
         :param use_local_content: don't check out anything
-        :param version: upstream version to update in Fedora
+        :param version: upstream version to update in dist-git
         :param tag: upstream git tag
         :param force_new_sources: don't check the lookaside cache and perform new-sources
         :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
         :param create_pr: create a pull request if set to True
         :param force: ignore changes in the git index
         :param create_sync_note: whether to create a note about the sync in the dist-git repo
+        :param title: title (first line) of the commit & PR
+        :param description: description of the commit & PR
+        :param sync_default_files: Whether to sync the default files,
+                                   that is: packit.yaml and the spec-file.
 
         :return created PullRequest if create_pr is True, else None
         """
@@ -311,7 +318,7 @@ class PackitAPI:
                     SYNCING_NOTE.format(packit_version=get_packit_version())
                 )
 
-            description = (
+            description = description or (
                 f"Upstream tag: {upstream_tag}\n"
                 f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
             )
@@ -321,13 +328,14 @@ class PackitAPI:
                 add_new_sources=True,
                 force_new_sources=force_new_sources,
                 upstream_tag=upstream_tag,
-                commit_title=f"[packit] {version} upstream release",
+                commit_title=title or f"[packit] {version} upstream release",
                 commit_msg=description,
+                sync_default_files=sync_default_files,
             )
 
             new_pr = None
             if create_pr:
-                title = f"Update to upstream release {version}"
+                title = title or f"Update to upstream release {version}"
 
                 if not self.dg.pr_exists(title, description.rstrip(), dist_git_branch):
                     new_pr = self.push_and_create_pr(
