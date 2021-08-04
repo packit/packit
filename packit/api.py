@@ -337,12 +337,17 @@ class PackitAPI:
             if create_pr:
                 title = title or f"Update to upstream release {version}"
 
-                if not self.dg.pr_exists(title, description.rstrip(), dist_git_branch):
+                existing_pr = self.dg.existing_pr(
+                    title, description.rstrip(), dist_git_branch
+                )
+                if not existing_pr:
                     new_pr = self.push_and_create_pr(
                         pr_title=title,
                         pr_description=description,
                         dist_git_branch=dist_git_branch,
                     )
+                else:
+                    logger.debug(f"PR already exists: {existing_pr.url}")
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:

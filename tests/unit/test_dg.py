@@ -53,7 +53,7 @@ from packit.local_project import LocalProject
         ),
     ],
 )
-def test_pr_exists(title, description, branch, prs, exists):
+def test_existing_pr(title, description, branch, prs, exists):
     local_project = LocalProject(
         git_project=flexmock(service="something", get_pr_list=lambda: prs),
         refresh=False,
@@ -63,4 +63,8 @@ def test_pr_exists(title, description, branch, prs, exists):
         package_config=flexmock(PackageConfig()),
         local_project=local_project,
     )
-    assert distgit.pr_exists(title, description, branch) == exists
+    pr = distgit.existing_pr(title, description, branch)
+    if exists:
+        assert pr is not None
+    else:
+        assert pr is None
