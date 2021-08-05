@@ -472,13 +472,15 @@ class DistGit(PackitRepositoryBase):
             return self.downstream_config.allowed_gpg_keys
         return None
 
-    def pr_exists(self, title: str, description: str, branch: str):
+    def existing_pr(
+        self, title: str, description: str, branch: str
+    ) -> Optional[PullRequest]:
         distgit_prs = self.local_project.git_project.get_pr_list()
-        return any(
-            (
+        for pr in distgit_prs:
+            if (
                 pr.title == title
                 and pr.description == description
                 and pr.target_branch == branch
-            )
-            for pr in distgit_prs
-        )
+            ):
+                return pr
+        return None
