@@ -1,11 +1,6 @@
 summary: Session recording testcases
 discover+:
   filter: tier:2
-prepare:
-  # woraround until new requre will be shipped
-  how: shell
-  script: pip3 install git+https://github.com/packit/requre
-  order: 99
 adjust:
   when: "distro <= rhel-8 or distro <= centos-8"
   prepare:
