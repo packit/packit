@@ -123,6 +123,10 @@ def check_source_git_config(source_git_config):
     assert source_git_config["sources"][0]["path"] == f"hello-{HELLO_RELEASE}.tar.gz"
 
 
+@pytest.mark.skipif(
+    list(map(int, yaml.__version__.split("."))) < [5, 1],
+    reason="Requires PyYAML 5.1 or higher.",
+)
 def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_repo):
     """A source-git repo is properly initialized from a dist-git repo.
     - No downstream patches.
@@ -154,6 +158,10 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
     assert source_git_config["patch_generation_patch_id_digits"] == 1
 
 
+@pytest.mark.skipif(
+    list(map(int, yaml.__version__.split("."))) < [5, 1],
+    reason="Requires PyYAML 5.1 or higher.",
+)
 def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_repo):
     """A source-git repo is properly initialized from a dist-git repo.
     - A few downstream patches.
