@@ -1,3 +1,12 @@
+# 0.35.0
+
+- Propose-downstream: log when a PR already exists downstream (#1322).
+- `packit init` to set spec file path in the config if it's not defined (#1313).
+- Make it possible to clone packages from staging dist-git (#1306).
+- Source-git: squash patches by patch name - no need to have a dedicated attribute, `squash_commits`, for that (#1309).
+- Source-git: look for the config file in .distro/source-git.yaml as well (#1302).
+- Source-git: change logging from error to warning when %prep is not using %(auto)setup (#1317).
+
 # 0.34.0
 
 - Source-git: `source-git init` was refactored, which also changed and simplified the CLI.
