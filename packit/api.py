@@ -221,6 +221,7 @@ class PackitAPI:
         title: Optional[str] = None,
         description: Optional[str] = None,
         sync_default_files: Optional[bool] = True,
+        local_pr_branch_suffix: Optional[str] = "update",
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -238,6 +239,9 @@ class PackitAPI:
         :param description: description of the commit & PR
         :param sync_default_files: Whether to sync the default files,
                                    that is: packit.yaml and the spec-file.
+        :param local_pr_branch_suffix: When create_pr is True, we push into a newly created
+               branch and create a PR from it. This param specifies a suffix attached to the
+               created branch name, so that we can have more PRs for the same dg branch at one time.
 
         :return created PullRequest if create_pr is True, else None
         """
@@ -307,7 +311,9 @@ class PackitAPI:
             self.dg.checkout_branch(dist_git_branch)
 
             if create_pr:
-                local_pr_branch = f"{version}-{dist_git_branch}-update"
+                local_pr_branch = (
+                    f"{version}-{dist_git_branch}-{local_pr_branch_suffix}"
+                )
                 self.dg.create_branch(local_pr_branch)
                 self.dg.checkout_branch(local_pr_branch)
 
