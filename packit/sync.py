@@ -76,16 +76,40 @@ class SyncFilesItem:
         self.filters = filters or []
 
     def __repr__(self):
-        return f"SyncFilesItem(src={self.src}, dest={self.dest}, mkpath={self.mkpath})"
+        return (
+            f"SyncFilesItem(src={self.src}, "
+            f"dest={self.dest}, "
+            f"mkpath={self.mkpath}, "
+            f"delete={self.delete}, "
+            f"filters={self.filters})"
+        )
 
     def __str__(self):
         return " ".join(self.command())
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, SyncFilesItem):
+            raise NotImplementedError()
+
+        return (
+            self.src < other.src
+            and self.dest < other.dest
+            and self.mkpath < other.mkpath
+            and self.delete < other.delete
+            and self.filters < other.filters
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SyncFilesItem):
             raise NotImplementedError()
 
-        return self.src == other.src and self.dest == other.dest
+        return (
+            self.src == other.src
+            and self.dest == other.dest
+            and self.mkpath == other.mkpath
+            and self.delete == other.delete
+            and self.filters == other.filters
+        )
 
     def command(self, fail_on_missing: bool = False) -> List[str]:
         """Provide to command to do the sync
