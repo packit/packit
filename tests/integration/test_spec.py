@@ -5,6 +5,7 @@ import flexmock
 import pytest
 import textwrap
 import shutil
+import rpm
 
 from pathlib import Path
 
@@ -34,6 +35,13 @@ def test_add_patch(specfile, patch_id_digits):
 
     Change the number of digits, too, to see that it's considered.
     """
+    if list(map(int, rpm.__version__.split("."))) < [4, 16] and patch_id_digits == 0:
+        pytest.xfail(
+            "Versions before RPM 4.16 have incorrect patch indexing "
+            "when an index is not explicitly defined. "
+            "'patch_id_digits: 0' is not supported with these versions."
+        )
+
     assert "Patch" not in specfile.read_text()
 
     spec = Specfile(specfile, sources_dir=specfile.parent)
