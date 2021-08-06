@@ -36,24 +36,6 @@
     run: files/zuul-tests.yaml
 
 - job:
-    name: packit-tests-rpm-sess-rec
-    parent: packit-tests-rpm
-    description: Run session recording tests of packit with RPM deps
-    run: files/zuul-tests-session-recording.yaml
-
-- job:
-    name: packit-tests-pip-deps-sess-rec
-    parent: packit-tests-pip-deps
-    description: Run session recording tests of packit with deps from PyPI
-    run: files/zuul-tests-session-recording.yaml
-
-- job:
-    name: packit-tests-git-main-sess-rec
-    parent: packit-tests-git-main
-    description: Run session recording tests of packit with deps from git main & PyPI
-    run: files/zuul-tests-session-recording.yaml
-
-- job:
     name: reverse-dep-packit-service-tests
     parent: packit-tests-pip-deps
     description: Run packit-service tests to check we don't break it

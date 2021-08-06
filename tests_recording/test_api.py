@@ -21,8 +21,6 @@
 # SOFTWARE.
 
 from subprocess import check_output
-import unittest
-from flexmock import flexmock
 from requre.cassette import DataTypes
 from requre.online_replacing import (
     apply_decorator_to_all_methods,
@@ -147,11 +145,3 @@ class ProposeUpdate(PackitTest):
         Downgrade rebasehelper to version < 0.24.0
         """
         self.assertRaises(GithubAPIException, self.check_version_increase)
-
-    @unittest.skip("This is broken, because have to flexmock anther part ")
-    def test_version_change_mocked(self):
-        """
-        version is not not uploaded, so skip in this test
-        """
-        flexmock(self.api).should_receive("_handle_sources").and_return(None)
-        self.check_version_increase()
