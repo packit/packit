@@ -7,9 +7,9 @@
     - include_tasks: tasks/install-packit.yaml
     - include_tasks: tasks/sandcastle.yaml
     - name: Run session recorded tests
-      command: make check TESTS_TARGET=tests_recording
       # uncomment once https://github.com/packit/requre/issues/145 is resolved
       #      environment:
       #        REQURE_MODE: read
+      command: make check TEST_TARGET=tests_recording
       args:
         chdir: "{{ project_dir }}"
