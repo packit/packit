@@ -35,6 +35,8 @@ check-in-container:
 # Mounts your ~/.config/ where .packit.yaml with your github/gitlab tokens is expected
 # Mounts ssh connfig dir, to have ssh keys for fedpkg cloning
 # create random tmpdir and mount into /tmp to avoid issues with creating temporary dirs via python
+# if you are getting 'root@pkgs.fedoraproject.org: Permission denied (publickey)', you should initiatie a kerberos ticket in the container:
+#   export KRB5CCNAME=FILE:/tmp/k && kinit $USER@FEDORAPROJECT.ORG
 check-in-container-regenerate-data:
 	$(eval RANDOM_TMP_DIR = $(shell mktemp -d))
 	$(CONTAINER_RUN_WITH_OPTS) --env TEST_TARGET="$(TEST_RECORDING_PATH)" -v $(RANDOM_TMP_DIR):/tmp -v $(HOME)/.ssh:/root/.ssh -v $(HOME)/.config:/root/.config $(TEST_IMAGE) $(CONTAINER_TEST_COMMAND)
