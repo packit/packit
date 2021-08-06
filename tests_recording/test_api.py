@@ -147,11 +147,3 @@ class ProposeUpdate(PackitTest):
         Downgrade rebasehelper to version < 0.24.0
         """
         self.assertRaises(GithubAPIException, self.check_version_increase)
-
-    @unittest.skip("This is broken, because have to flexmock anther part ")
-    def test_version_change_mocked(self):
-        """
-        version is not not uploaded, so skip in this test
-        """
-        flexmock(self.api).should_receive("_handle_sources").and_return(None)
-        self.check_version_increase()
