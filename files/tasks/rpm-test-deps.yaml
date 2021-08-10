@@ -2,7 +2,7 @@
 - name: Install test rpm dependencies
   dnf:
     name:
-      - python3-flexmock
+      - python3-flexmock-0.10.4
       - python3-setuptools_scm_git_archive
       - python3-setuptools_scm
       - python3-distro
