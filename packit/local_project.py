@@ -184,7 +184,7 @@ class LocalProject:
     def clean(self):
         if self.working_dir_temporary:
             logger.debug(f"Cleaning: {self.working_dir}")
-            shutil.rmtree(self.working_dir)
+            shutil.rmtree(self.working_dir, ignore_errors=True)
             self.working_dir_temporary = False
 
     def refresh_the_arguments(self):
