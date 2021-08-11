@@ -135,7 +135,7 @@ class PackitRepositoryBase:
         :param git_ref: ref to check out, defaults to repo's default branch
         """
         git_ref = git_ref or self.local_project.git_project.default_branch
-        logger.info(f"Checking out branch {git_ref}.")
+        logger.debug(f"Checking out branch {git_ref}.")
         if git_ref in self.local_project.git_repo.heads:
             head = self.local_project.git_repo.heads[git_ref]
         else:
