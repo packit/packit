@@ -82,6 +82,15 @@ SYNCING_NOTE = (
     "The file was generated using packit {packit_version}.\n"
 )
 
+PATCH_META_TRAILER_TOKENS = {
+    "Patch-name",
+    "Patch-id",
+    "Patch-status",
+    "Patch-present-in-specfile",
+    "Ignore-patch",
+    "No-prefix",
+}
+
 # shell code wrapped in lua as a python constant, what could go wrong?
 # for real now: this horror is being used when creating source-git repos from upstream
 # these macros override RPM default macros for setup and patching so that
