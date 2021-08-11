@@ -6,6 +6,7 @@ This is the official python interface for packit.
 """
 
 import asyncio
+import click
 import logging
 import shutil
 import sys
@@ -699,7 +700,7 @@ class PackitAPI:
             return status.get_downstream_prs()
         except Exception as exc:
             # https://github.com/packit/ogr/issues/67 work-around
-            logger.error(f"Failed when getting downstream PRs: {exc}")
+            logger.debug(f"Failed when getting downstream PRs: {exc}")
             return []
 
     @staticmethod
@@ -708,7 +709,7 @@ class PackitAPI:
             await asyncio.sleep(0)
             return status.get_dg_versions()
         except Exception as exc:
-            logger.error(f"Failed when getting Dist-git versions: {exc}")
+            logger.debug(f"Failed when getting Dist-git versions: {exc}")
             return {}
 
     @staticmethod
@@ -717,7 +718,7 @@ class PackitAPI:
             await asyncio.sleep(0)
             return status.get_up_releases()
         except Exception as exc:
-            logger.error(f"Failed when getting upstream releases: {exc}")
+            logger.debug(f"Failed when getting upstream releases: {exc}")
             return []
 
     @staticmethod
@@ -726,7 +727,7 @@ class PackitAPI:
             await asyncio.sleep(0)
             return status.get_koji_builds()
         except Exception as exc:
-            logger.error(f"Failed when getting Koji builds: {exc}")
+            logger.debug(f"Failed when getting Koji builds: {exc}")
             return {}
 
     @staticmethod
@@ -735,7 +736,7 @@ class PackitAPI:
             await asyncio.sleep(0)
             return status.get_copr_builds()
         except Exception as exc:
-            logger.error(f"Failed when getting Copr builds: {exc}")
+            logger.debug(f"Failed when getting Copr builds: {exc}")
             return []
 
     @staticmethod
@@ -744,7 +745,7 @@ class PackitAPI:
             await asyncio.sleep(0)
             return status.get_updates()
         except Exception as exc:
-            logger.error(f"Failed when getting Bodhi updates: {exc}")
+            logger.debug(f"Failed when getting Bodhi updates: {exc}")
             return []
 
     @staticmethod
@@ -790,47 +791,47 @@ class PackitAPI:
         (ds_prs, dg_versions, up_releases, koji_builds, copr_builds, updates) = res
 
         if ds_prs:
-            logger.info("\nDownstream PRs:")
-            logger.info(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
+            click.echo("\nDownstream PRs:")
+            click.echo(tabulate(ds_prs, headers=["ID", "Title", "URL"]))
         else:
-            logger.info("\nNo downstream PRs found.")
+            click.echo("\nNo downstream PRs found.")
 
         if dg_versions:
-            logger.info("\nDist-git versions:")
+            click.echo("\nDist-git versions:")
             for branch, dg_version in dg_versions.items():
-                logger.info(f"{branch}: {dg_version}")
+                click.echo(f"{branch: <10} {dg_version}")
         else:
-            logger.info("\nNo Dist-git versions found.")
+            click.echo("\nNo Dist-git versions found.")
 
         if up_releases:
-            logger.info("\nUpstream releases:")
+            click.echo("\nUpstream releases:")
             upstream_releases_str = "\n".join(
                 f"{release.tag_name}" for release in up_releases
             )
-            logger.info(upstream_releases_str)
+            click.echo(upstream_releases_str)
         else:
-            logger.info("\nNo upstream releases found.")
+            click.echo("\nNo upstream releases found.")
 
         if updates:
-            logger.info("\nLatest Bodhi updates:")
-            logger.info(tabulate(updates, headers=["Update", "Karma", "status"]))
+            click.echo("\nLatest Bodhi updates:")
+            click.echo(tabulate(updates, headers=["Update", "Karma", "status"]))
         else:
-            logger.info("\nNo Bodhi updates found.")
+            click.echo("\nNo Bodhi updates found.")
 
         if koji_builds:
-            logger.info("\nLatest Koji builds:")
+            click.echo("\nLatest Koji builds:")
             for branch, branch_builds in koji_builds.items():
-                logger.info(f"{branch}: {branch_builds}")
+                click.echo(f"{branch: <8} {branch_builds}")
         else:
-            logger.info("\nNo Koji builds found.")
+            click.echo("\nNo Koji builds found.")
 
         if copr_builds:
-            logger.info("\nLatest Copr builds:")
-            logger.info(
+            click.echo("\nLatest Copr builds:")
+            click.echo(
                 tabulate(copr_builds, headers=["Build ID", "Project name", "Status"])
             )
         else:
-            logger.info("\nNo Copr builds found.")
+            click.echo("\nNo Copr builds found.")
 
     def run_copr_build(
         self,
