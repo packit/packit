@@ -1,0 +1,15 @@
+summary: Session recording testcases
+discover+:
+  filter: tier:2
+adjust:
+  when: "distro <= rhel-8 or distro <= centos-8"
+  prepare:
+    - how: install
+      name: ensure_copr_plugin
+      order: 10
+      package:
+        - dnf-plugins-core
+    - how: shell
+      name: requre_copr
+      order: 20
+      script: 'dnf -y copr enable packit/packit-requre-main'
