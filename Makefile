@@ -25,9 +25,8 @@ check:
 	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals $(TEST_TARGET)
 
 requre-data-cleanup:
-	requre-patch purge --replaces "copr.v3.helpers:login:str:somelogin" --replaces "copr.v3.helpers:token:str:sometoken" $(TEST_RECORDING_PATH)/test_data/*/*yaml
+	requre-patch purge --replaces ":set-cookie:str:a 'b';" --replaces "copr.v3.helpers:login:str:somelogin" --replaces "copr.v3.helpers:token:str:sometoken" $(TEST_RECORDING_PATH)/test_data/*/*yaml
 	requre-patch create-symlinks $(CURDIR)/$(TEST_RECORDING_PATH)/test_data/
-	requre-patch purge --replaces ":set-cookie:str:a 'b';" $(TEST_RECORDING_PATH)/test_data/*/*yaml
 
 # example: TEST_TARGET=tests/unit/test_api.py make check-in-container
 check-in-container:
