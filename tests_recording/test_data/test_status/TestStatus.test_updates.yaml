@@ -8,14 +8,14 @@ X:
               metadata:
                 latency: 0
               output:
-                filename: TestStatus.test_updates.yaml.tmpojlkg9j2_1.tar.xz
+                filename: TestStatus.test_updates.yaml.tmpdocnbowa_1.tar.xz
                 return_value:
                   _bare: false
                   _common_dir: null
-                  _working_tree_dir: /tmp/tmpojlkg9j2
-                  git_dir: /tmp/tmpojlkg9j2/.git
-                  working_dir: /tmp/tmpojlkg9j2
-                target_path: /tmp/tmpojlkg9j2
+                  _working_tree_dir: /tmp/tmpdocnbowa
+                  git_dir: /tmp/tmpdocnbowa/.git
+                  working_dir: /tmp/tmpdocnbowa
+                target_path: /tmp/tmpdocnbowa
 _requre:
   DataTypes: 3
   key_strategy: StorageKeysInspectSimple
@@ -26,10 +26,10 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.26673102378845215
+            latency: 0.22660040855407715
             module_call_list:
             - unittest.case
-            - requre.online_replacing
+            - requre.record_and_replace
             - tests_recording.test_status
             - tests_recording.testbase
             - packit.config.package_config
@@ -44,6 +44,7 @@ requests.sessions:
           output:
             __store_indicator: 2
             _content:
+              allow_auto_merge: false
               allow_merge_commit: true
               allow_rebase_merge: true
               allow_squash_merge: true
@@ -106,8 +107,8 @@ requests.sessions:
               network_count: 9
               node_id: MDEwOlJlcG9zaXRvcnkyMDc3NzgzMTk=
               notifications_url: https://api.github.com/repos/packit/requre/notifications{?since,all,participating}
-              open_issues: 8
-              open_issues_count: 8
+              open_issues: 3
+              open_issues_count: 3
               organization:
                 avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
                 events_url: https://api.github.com/users/packit/events{/privacy}
@@ -148,18 +149,20 @@ requests.sessions:
                 url: https://api.github.com/users/packit
               permissions:
                 admin: true
+                maintain: true
                 pull: true
                 push: true
+                triage: true
               private: false
               pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
-              pushed_at: '2021-05-12T10:52:13Z'
+              pushed_at: '2021-08-12T13:27:26Z'
               releases_url: https://api.github.com/repos/packit/requre/releases{/id}
-              size: 743
+              size: 1150
               ssh_url: git@github.com:packit/requre.git
               stargazers_count: 6
               stargazers_url: https://api.github.com/repos/packit/requre/stargazers
               statuses_url: https://api.github.com/repos/packit/requre/statuses/{sha}
-              subscribers_count: 9
+              subscribers_count: 10
               subscribers_url: https://api.github.com/repos/packit/requre/subscribers
               subscription_url: https://api.github.com/repos/packit/requre/subscription
               svn_url: https://github.com/packit/requre
@@ -167,12 +170,12 @@ requests.sessions:
               teams_url: https://api.github.com/repos/packit/requre/teams
               temp_clone_token: ''
               trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
-              updated_at: '2021-05-11T06:51:46Z'
+              updated_at: '2021-08-12T13:27:30Z'
               url: https://api.github.com/repos/packit/requre
               watchers: 6
               watchers_count: 6
             _next: null
-            elapsed: 0.266052
+            elapsed: 0.225917
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -184,9 +187,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Thu, 13 May 2021 12:41:03 GMT
-              ETag: W/"de9f66b2c902c34a93c072401ca6abadd745779d37b22f65846ddbbc23da3df8"
-              Last-Modified: Tue, 11 May 2021 06:51:46 GMT
+              Date: Fri, 13 Aug 2021 07:55:24 GMT
+              ETag: W/"eab9cd7537885d006f1e68e8119f4b53b7ff72b25b4fe1dcf0791e290e8b5d77"
+              Last-Modified: Thu, 12 Aug 2021 13:27:30 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
@@ -197,26 +200,84 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: D984:E697:C6BC930:CA56F09:609D1E5F
+              X-GitHub-Request-Id: DD94:110DA:CCD5C2:D0FE37:6116256B
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4951'
-              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Remaining: '4950'
+              X-RateLimit-Reset: '1628844792'
               X-RateLimit-Resource: core
-              X-RateLimit-Used: '49'
+              X-RateLimit-Used: '50'
               X-XSS-Protection: '0'
             raw: !!binary ""
             reason: OK
             status_code: 200
+      https://api.github.com:443/repos/packit/requre/contents/.distro/source-git.yaml?ref=main:
+        all:
+          metadata:
+            latency: 0.19174599647521973
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_status
+            - tests_recording.testbase
+            - packit.config.package_config
+            - ogr.services.github.project
+            - github.Repository
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              documentation_url: https://docs.github.com/rest/reference/repos#get-repository-content
+              message: Not Found
+            _next: null
+            elapsed: 0.191084
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, Deprecation, Sunset
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Fri, 13 Aug 2021 07:55:24 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept-Encoding, Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: ''
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: DD94:110DA:CCD619:D0FE8B:6116256C
+              X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
+                admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
+                write:discussion
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4949'
+              X-RateLimit-Reset: '1628844792'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '51'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: Not Found
+            status_code: 404
       https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=main:
         all:
           metadata:
-            latency: 0.19011807441711426
+            latency: 0.20693206787109375
             module_call_list:
             - unittest.case
-            - requre.online_replacing
+            - requre.record_and_replace
             - tests_recording.test_status
             - tests_recording.testbase
             - packit.config.package_config
@@ -317,7 +378,7 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             _next: null
-            elapsed: 0.189589
+            elapsed: 0.206238
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -329,9 +390,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Thu, 13 May 2021 12:41:03 GMT
+              Date: Fri, 13 Aug 2021 07:55:24 GMT
               ETag: W/"cbe935692a16074ce7abdf68ccaa9f24170ee4da"
-              Last-Modified: Tue, 11 May 2021 06:51:43 GMT
+              Last-Modified: Thu, 12 Aug 2021 13:27:26 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
@@ -342,15 +403,15 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: D984:E697:C6BC9CB:CA56F9E:609D1E5F
+              X-GitHub-Request-Id: DD94:110DA:CCD669:D0FED5:6116256C
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4950'
-              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Remaining: '4948'
+              X-RateLimit-Reset: '1628844792'
               X-RateLimit-Resource: core
-              X-RateLimit-Used: '50'
+              X-RateLimit-Used: '52'
               X-XSS-Protection: '0'
             raw: !!binary ""
             reason: OK
@@ -358,10 +419,10 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/?ref=main:
         all:
           metadata:
-            latency: 0.1780531406402588
+            latency: 0.15290117263793945
             module_call_list:
             - unittest.case
-            - requre.online_replacing
+            - requre.record_and_replace
             - tests_recording.test_status
             - tests_recording.testbase
             - packit.config.package_config
@@ -377,15 +438,15 @@ requests.sessions:
             __store_indicator: 2
             _content:
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/da4f8c060b406e9defead62fcfdccfa4871f81f4
+                git: https://api.github.com/repos/packit/requre/git/trees/debb3a3f0acdaa523646aee97ae539daf37a337c
                 html: https://github.com/packit/requre/tree/main/.github
                 self: https://api.github.com/repos/packit/requre/contents/.github?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/da4f8c060b406e9defead62fcfdccfa4871f81f4
+              git_url: https://api.github.com/repos/packit/requre/git/trees/debb3a3f0acdaa523646aee97ae539daf37a337c
               html_url: https://github.com/packit/requre/tree/main/.github
               name: .github
               path: .github
-              sha: da4f8c060b406e9defead62fcfdccfa4871f81f4
+              sha: debb3a3f0acdaa523646aee97ae539daf37a337c
               size: 0
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/.github?ref=main
@@ -416,16 +477,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/f14940237c2cddbb29c096e135822441f4bae54d
+                git: https://api.github.com/repos/packit/requre/git/blobs/967036961cf6a7d5691632ee3691cc6ed19c769b
                 html: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-config.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/f14940237c2cddbb29c096e135822441f4bae54d
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/967036961cf6a7d5691632ee3691cc6ed19c769b
               html_url: https://github.com/packit/requre/blob/main/.pre-commit-config.yaml
               name: .pre-commit-config.yaml
               path: .pre-commit-config.yaml
-              sha: f14940237c2cddbb29c096e135822441f4bae54d
-              size: 1225
+              sha: 967036961cf6a7d5691632ee3691cc6ed19c769b
+              size: 1400
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
             - _links:
@@ -455,16 +516,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.zuul.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
+                git: https://api.github.com/repos/packit/requre/git/blobs/3557cf09c84abbea493ebaeb4eb51580388de6c4
                 html: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
                 self: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/CONTRIBUTING.md
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/2b19dfb12887fa5a9e3f1595912cf589231ea39a
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/3557cf09c84abbea493ebaeb4eb51580388de6c4
               html_url: https://github.com/packit/requre/blob/main/CONTRIBUTING.md
               name: CONTRIBUTING.md
               path: CONTRIBUTING.md
-              sha: 2b19dfb12887fa5a9e3f1595912cf589231ea39a
-              size: 159
+              sha: 3557cf09c84abbea493ebaeb4eb51580388de6c4
+              size: 788
               type: file
               url: https://api.github.com/repos/packit/requre/contents/CONTRIBUTING.md?ref=main
             - _links:
@@ -481,16 +542,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/DCO?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
+                git: https://api.github.com/repos/packit/requre/git/blobs/bd077175af594938b9e88b0a5715ec55674d4946
                 html: https://github.com/packit/requre/blob/main/Dockerfile.tests
                 self: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/Dockerfile.tests
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/3e3a7a6fc84303c6f3ec70f204430899eaec0a40
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/bd077175af594938b9e88b0a5715ec55674d4946
               html_url: https://github.com/packit/requre/blob/main/Dockerfile.tests
               name: Dockerfile.tests
               path: Dockerfile.tests
-              sha: 3e3a7a6fc84303c6f3ec70f204430899eaec0a40
-              size: 206
+              sha: bd077175af594938b9e88b0a5715ec55674d4946
+              size: 297
               type: file
               url: https://api.github.com/repos/packit/requre/contents/Dockerfile.tests?ref=main
             - _links:
@@ -507,16 +568,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/LICENSE?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
+                git: https://api.github.com/repos/packit/requre/git/blobs/9fc340761c9d6a87170828c9182eabf54a505e64
                 html: https://github.com/packit/requre/blob/main/Makefile
                 self: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/Makefile
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/cd564a3994f077b6f9193e8322c93851395a8fa2
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/9fc340761c9d6a87170828c9182eabf54a505e64
               html_url: https://github.com/packit/requre/blob/main/Makefile
               name: Makefile
               path: Makefile
-              sha: cd564a3994f077b6f9193e8322c93851395a8fa2
-              size: 604
+              sha: 9fc340761c9d6a87170828c9182eabf54a505e64
+              size: 658
               type: file
               url: https://api.github.com/repos/packit/requre/contents/Makefile?ref=main
             - _links:
@@ -572,15 +633,15 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/examples?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/664c2cd3a774c05f71f9670a38cf33f90cd66e30
+                git: https://api.github.com/repos/packit/requre/git/trees/e2bb1407044d77c0e86de380944ef8b45b02b98c
                 html: https://github.com/packit/requre/tree/main/fedora
                 self: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/664c2cd3a774c05f71f9670a38cf33f90cd66e30
+              git_url: https://api.github.com/repos/packit/requre/git/trees/e2bb1407044d77c0e86de380944ef8b45b02b98c
               html_url: https://github.com/packit/requre/tree/main/fedora
               name: fedora
               path: fedora
-              sha: 664c2cd3a774c05f71f9670a38cf33f90cd66e30
+              sha: e2bb1407044d77c0e86de380944ef8b45b02b98c
               size: 0
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/fedora?ref=main
@@ -598,29 +659,29 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/files?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/db01b49954b57c2cd1f9a7b8cd33d35f4e8a4a89
+                git: https://api.github.com/repos/packit/requre/git/trees/d3fc06fe7226fc286d37b0c1d19f32e415773378
                 html: https://github.com/packit/requre/tree/main/requre
                 self: https://api.github.com/repos/packit/requre/contents/requre?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/db01b49954b57c2cd1f9a7b8cd33d35f4e8a4a89
+              git_url: https://api.github.com/repos/packit/requre/git/trees/d3fc06fe7226fc286d37b0c1d19f32e415773378
               html_url: https://github.com/packit/requre/tree/main/requre
               name: requre
               path: requre
-              sha: db01b49954b57c2cd1f9a7b8cd33d35f4e8a4a89
+              sha: d3fc06fe7226fc286d37b0c1d19f32e415773378
               size: 0
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/requre?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
+                git: https://api.github.com/repos/packit/requre/git/blobs/f7c7fc5b181502118650a5b358cfc730aa128ec3
                 html: https://github.com/packit/requre/blob/main/setup.cfg
                 self: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/setup.cfg
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/71615dbb8e91325f049c3822645862c06c4d4e0d
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/f7c7fc5b181502118650a5b358cfc730aa128ec3
               html_url: https://github.com/packit/requre/blob/main/setup.cfg
               name: setup.cfg
               path: setup.cfg
-              sha: 71615dbb8e91325f049c3822645862c06c4d4e0d
-              size: 1197
+              sha: f7c7fc5b181502118650a5b358cfc730aa128ec3
+              size: 1211
               type: file
               url: https://api.github.com/repos/packit/requre/contents/setup.cfg?ref=main
             - _links:
@@ -637,20 +698,20 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/setup.py?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/bf76064a16fe10336378195aaa97d69674d4ade7
+                git: https://api.github.com/repos/packit/requre/git/trees/a2174d8dabbe0fb17e62c127485b3a1b328e3dc5
                 html: https://github.com/packit/requre/tree/main/tests
                 self: https://api.github.com/repos/packit/requre/contents/tests?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/bf76064a16fe10336378195aaa97d69674d4ade7
+              git_url: https://api.github.com/repos/packit/requre/git/trees/a2174d8dabbe0fb17e62c127485b3a1b328e3dc5
               html_url: https://github.com/packit/requre/tree/main/tests
               name: tests
               path: tests
-              sha: bf76064a16fe10336378195aaa97d69674d4ade7
+              sha: a2174d8dabbe0fb17e62c127485b3a1b328e3dc5
               size: 0
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/tests?ref=main
             _next: null
-            elapsed: 0.177379
+            elapsed: 0.152487
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -662,9 +723,9 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Thu, 13 May 2021 12:41:03 GMT
-              ETag: W/"d4a91ffa8d60c18e6678d88267b78e242135dd3e"
-              Last-Modified: Tue, 11 May 2021 06:51:46 GMT
+              Date: Fri, 13 Aug 2021 07:55:24 GMT
+              ETag: W/"b4313e4e32b5fce4ac3c1fc1ff284c57b50baa61"
+              Last-Modified: Thu, 12 Aug 2021 13:27:30 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
               Server: GitHub.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
@@ -675,15 +736,15 @@ requests.sessions:
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: D984:E697:C6BCA49:CA5702C:609D1E5F
+              X-GitHub-Request-Id: DD94:110DA:CCD6C6:D0FF37:6116256C
               X-OAuth-Scopes: admin:gpg_key, admin:org, admin:org_hook, admin:public_key,
                 admin:repo_hook, delete_repo, gist, notifications, repo, user, workflow,
                 write:discussion
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4949'
-              X-RateLimit-Reset: '1620912063'
+              X-RateLimit-Remaining: '4947'
+              X-RateLimit-Reset: '1628844792'
               X-RateLimit-Resource: core
-              X-RateLimit-Used: '51'
+              X-RateLimit-Used: '53'
               X-XSS-Protection: '0'
             raw: !!binary ""
             reason: OK
@@ -691,10 +752,10 @@ requests.sessions:
       https://bodhi.fedoraproject.org/updates/?packages=python-requre:
         all:
           metadata:
-            latency: 3.318091869354248
+            latency: 3.103806734085083
             module_call_list:
             - unittest.case
-            - requre.online_replacing
+            - requre.record_and_replace
             - tests_recording.test_status
             - packit.status
             - bodhi.client.bindings
@@ -714,8 +775,1101 @@ requests.sessions:
               page: 1
               pages: 2
               rows_per_page: 20
-              total: 23
+              total: 29
               updates:
+              - alias: FEDORA-2021-63331f9029
+                autokarma: true
+                autotime: true
+                bugs: []
+                builds:
+                - epoch: 0
+                  nvr: python-requre-0.8.1-2.fc33
+                  release_id: 40
+                  signed: true
+                  type: rpm
+                close_bugs: true
+                comments:
+                - bug_feedback: []
+                  id: 2094739
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: 'This update has been submitted for testing by lachmanfrantisek. '
+                  timestamp: '2021-06-20 13:23:28'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094740
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-20 13:23:28'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094741
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'waiting'.
+                  timestamp: '2021-06-20 13:23:29'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094765
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-20 14:13:27'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094996
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been pushed to testing.
+                  timestamp: '2021-06-21 01:11:41'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2095182
+                  karma: 1
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: ''
+                  timestamp: '2021-06-21 07:31:53'
+                  update_id: 318850
+                  user:
+                    avatar: https://seccdn.libravatar.org/avatar/2098fd3a827c38e855bd76b1f6b75c85483b112f0e8f086257309df75dc04dc0?s=24&d=retro
+                    email: ttomecek@redhat.com
+                    groups:
+                    - name: provenpackager
+                    - name: packager
+                    id: 754
+                    name: ttomecek
+                    openid: ttomecek.id.fedoraproject.org
+                  user_id: 754
+                - bug_feedback: []
+                  id: 2095229
+                  karma: 1
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: works well
+                  timestamp: '2021-06-21 08:45:33'
+                  update_id: 318850
+                  user:
+                    avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
+                    email: jscotka@redhat.com
+                    groups:
+                    - name: packager
+                    id: 1348
+                    name: jscotka
+                    openid: jscotka.id.fedoraproject.org
+                  user_id: 1348
+                - bug_feedback: []
+                  id: 2095232
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update can be pushed to stable now if the maintainer
+                    wishes
+                  timestamp: '2021-06-21 08:48:22'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2095234
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: 'This update has been submitted for stable by lachmanfrantisek. '
+                  timestamp: '2021-06-21 08:48:57'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2096416
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been pushed to stable.
+                  timestamp: '2021-06-22 01:58:12'
+                  update_id: 318850
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                compose: null
+                content_type: rpm
+                critpath: false
+                date_approved: null
+                date_modified: null
+                date_pushed: '2021-06-22 01:57:46'
+                date_stable: '2021-06-22 01:57:46'
+                date_submitted: '2021-06-20 13:23:28'
+                date_testing: '2021-06-21 01:11:25'
+                display_name: ''
+                from_tag: null
+                karma: 2
+                locked: false
+                meets_testing_requirements: true
+                notes: 'New upstream release: 0.8.1'
+                pushed: true
+                release:
+                  branch: f33
+                  candidate_tag: f33-updates-candidate
+                  composed_by_bodhi: true
+                  composes: []
+                  create_automatic_updates: false
+                  dist_tag: f33
+                  id_prefix: FEDORA
+                  long_name: Fedora 33
+                  mail_template: fedora_errata_template
+                  name: F33
+                  override_tag: f33-override
+                  package_manager: dnf
+                  pending_signing_tag: f33-signing-pending
+                  pending_stable_tag: f33-updates-pending
+                  pending_testing_tag: f33-updates-testing-pending
+                  stable_tag: f33-updates
+                  state: current
+                  testing_repository: updates-testing
+                  testing_tag: f33-updates-testing
+                  version: '33'
+                request: null
+                require_bugs: true
+                require_testcases: true
+                requirements: ''
+                severity: unspecified
+                stable_days: 7
+                stable_karma: 3
+                status: stable
+                suggest: unspecified
+                test_cases: []
+                test_gating_status: ignored
+                title: python-requre-0.8.1-2.fc33
+                type: enhancement
+                unstable_karma: -3
+                updateid: FEDORA-2021-63331f9029
+                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-63331f9029
+                user:
+                  avatar: https://seccdn.libravatar.org/avatar/38deedcf02e4617a9a8a0c04b67fd4c7fcea9ededf02d13a93a7626477350e45?s=24&d=retro
+                  email: flachman@redhat.com
+                  groups:
+                  - name: packager
+                  id: 4222
+                  name: lachmanfrantisek
+                  openid: lachmanfrantisek.id.fedoraproject.org
+                version_hash: b0305011bc8db536229de40b1b2b4208f0b79e75
+              - alias: FEDORA-2021-ca3c9d9113
+                autokarma: true
+                autotime: true
+                bugs: []
+                builds:
+                - epoch: 0
+                  nvr: python-requre-0.8.1-2.fc34
+                  release_id: 47
+                  signed: true
+                  type: rpm
+                close_bugs: true
+                comments:
+                - bug_feedback: []
+                  id: 2094693
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: 'This update has been submitted for testing by lachmanfrantisek. '
+                  timestamp: '2021-06-20 12:01:52'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094694
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-20 12:01:52'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094695
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'waiting'.
+                  timestamp: '2021-06-20 12:01:52'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094696
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-20 12:14:55'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094973
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been pushed to testing.
+                  timestamp: '2021-06-21 01:04:50'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2095181
+                  karma: 1
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: Installation and importing was successful.
+                  timestamp: '2021-06-21 07:31:37'
+                  update_id: 318839
+                  user:
+                    avatar: https://seccdn.libravatar.org/avatar/2098fd3a827c38e855bd76b1f6b75c85483b112f0e8f086257309df75dc04dc0?s=24&d=retro
+                    email: ttomecek@redhat.com
+                    groups:
+                    - name: provenpackager
+                    - name: packager
+                    id: 754
+                    name: ttomecek
+                    openid: ttomecek.id.fedoraproject.org
+                  user_id: 754
+                - bug_feedback: []
+                  id: 2095230
+                  karma: 1
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: work well, used requre-patch command
+                  timestamp: '2021-06-21 08:46:29'
+                  update_id: 318839
+                  user:
+                    avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
+                    email: jscotka@redhat.com
+                    groups:
+                    - name: packager
+                    id: 1348
+                    name: jscotka
+                    openid: jscotka.id.fedoraproject.org
+                  user_id: 1348
+                - bug_feedback: []
+                  id: 2095231
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update can be pushed to stable now if the maintainer
+                    wishes
+                  timestamp: '2021-06-21 08:48:19'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2095235
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: 'This update has been submitted for stable by lachmanfrantisek. '
+                  timestamp: '2021-06-21 08:49:08'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2095334
+                  karma: 1
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: works as expected
+                  timestamp: '2021-06-21 10:56:47'
+                  update_id: 318839
+                  user:
+                    avatar: https://seccdn.libravatar.org/avatar/5ed589dd93c3ff16e0ea2fc0f186dc1f2de667f3d60c0e168cb18fbaf3455286?s=24&d=retro
+                    email: lnie@redhat.com
+                    groups:
+                    - name: packager
+                    id: 307
+                    name: lnie
+                    openid: lnie.id.fedoraproject.org
+                  user_id: 307
+                - bug_feedback: []
+                  id: 2096238
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been pushed to stable.
+                  timestamp: '2021-06-22 01:01:47'
+                  update_id: 318839
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                compose: null
+                content_type: rpm
+                critpath: false
+                date_approved: null
+                date_modified: null
+                date_pushed: '2021-06-22 01:01:06'
+                date_stable: '2021-06-22 01:01:06'
+                date_submitted: '2021-06-20 12:01:51'
+                date_testing: '2021-06-21 01:04:23'
+                display_name: ''
+                from_tag: null
+                karma: 3
+                locked: false
+                meets_testing_requirements: true
+                notes: 'New upstream release: 0.8.1'
+                pushed: true
+                release:
+                  branch: f34
+                  candidate_tag: f34-updates-candidate
+                  composed_by_bodhi: true
+                  composes: []
+                  create_automatic_updates: false
+                  dist_tag: f34
+                  id_prefix: FEDORA
+                  long_name: Fedora 34
+                  mail_template: fedora_errata_template
+                  name: F34
+                  override_tag: f34-override
+                  package_manager: dnf
+                  pending_signing_tag: f34-signing-pending
+                  pending_stable_tag: f34-updates-pending
+                  pending_testing_tag: f34-updates-testing-pending
+                  stable_tag: f34-updates
+                  state: current
+                  testing_repository: updates-testing
+                  testing_tag: f34-updates-testing
+                  version: '34'
+                request: null
+                require_bugs: true
+                require_testcases: true
+                requirements: ''
+                severity: unspecified
+                stable_days: 7
+                stable_karma: 3
+                status: stable
+                suggest: unspecified
+                test_cases: []
+                test_gating_status: ignored
+                title: python-requre-0.8.1-2.fc34
+                type: enhancement
+                unstable_karma: -3
+                updateid: FEDORA-2021-ca3c9d9113
+                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-ca3c9d9113
+                user:
+                  avatar: https://seccdn.libravatar.org/avatar/38deedcf02e4617a9a8a0c04b67fd4c7fcea9ededf02d13a93a7626477350e45?s=24&d=retro
+                  email: flachman@redhat.com
+                  groups:
+                  - name: packager
+                  id: 4222
+                  name: lachmanfrantisek
+                  openid: lachmanfrantisek.id.fedoraproject.org
+                version_hash: 6d4a1b245851bdf334860aa9192fa98f0e765315
+              - alias: FEDORA-2021-dac3fb45d0
+                autokarma: false
+                autotime: true
+                bugs: []
+                builds:
+                - epoch: 0
+                  nvr: python-requre-0.8.1-2.fc35
+                  release_id: 51
+                  signed: true
+                  type: rpm
+                close_bugs: true
+                comments:
+                - bug_feedback: []
+                  id: 2094689
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update was automatically created
+                  timestamp: '2021-06-20 11:46:13'
+                  update_id: 318838
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094690
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'waiting'.
+                  timestamp: '2021-06-20 11:46:16'
+                  update_id: 318838
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094691
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-20 11:46:16'
+                  update_id: 318838
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2094692
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been submitted for stable by bodhi
+                  timestamp: '2021-06-20 11:47:54'
+                  update_id: 318838
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                compose: null
+                content_type: rpm
+                critpath: false
+                date_approved: null
+                date_modified: null
+                date_pushed: '2021-06-20 11:47:53'
+                date_stable: '2021-06-20 11:47:53'
+                date_submitted: '2021-06-20 11:46:13'
+                date_testing: '2021-06-20 11:46:16'
+                display_name: ''
+                from_tag: null
+                karma: 0
+                locked: false
+                meets_testing_requirements: true
+                notes: Automatic update for python-requre-0.8.1-2.fc35.
+                pushed: true
+                release:
+                  branch: f35
+                  candidate_tag: f35-updates-candidate
+                  composed_by_bodhi: false
+                  composes: []
+                  create_automatic_updates: true
+                  dist_tag: f35
+                  id_prefix: FEDORA
+                  long_name: Fedora 35
+                  mail_template: fedora_errata_template
+                  name: F35
+                  override_tag: f35-override
+                  package_manager: unspecified
+                  pending_signing_tag: f35-signing-pending
+                  pending_stable_tag: f35-updates-pending
+                  pending_testing_tag: f35-updates-testing-pending
+                  stable_tag: f35
+                  state: pending
+                  testing_repository: null
+                  testing_tag: f35-updates-testing
+                  version: '35'
+                request: null
+                require_bugs: false
+                require_testcases: false
+                requirements: null
+                severity: unspecified
+                stable_days: 0
+                stable_karma: 3
+                status: stable
+                suggest: unspecified
+                test_cases: []
+                test_gating_status: ignored
+                title: python-requre-0.8.1-2.fc35
+                type: unspecified
+                unstable_karma: -3
+                updateid: FEDORA-2021-dac3fb45d0
+                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-dac3fb45d0
+                user:
+                  avatar: https://seccdn.libravatar.org/avatar/38deedcf02e4617a9a8a0c04b67fd4c7fcea9ededf02d13a93a7626477350e45?s=24&d=retro
+                  email: flachman@redhat.com
+                  groups:
+                  - name: packager
+                  id: 4222
+                  name: lachmanfrantisek
+                  openid: lachmanfrantisek.id.fedoraproject.org
+                version_hash: 6e1b1b11be5a3479da6e15d01672d163e0c3029d
+              - alias: FEDORA-2021-ca15f5d22f
+                autokarma: false
+                autotime: true
+                bugs: []
+                builds:
+                - epoch: 0
+                  nvr: python-requre-0.8.1-1.fc35
+                  release_id: 51
+                  signed: true
+                  type: rpm
+                close_bugs: true
+                comments:
+                - bug_feedback: []
+                  id: 2093054
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update was automatically created
+                  timestamp: '2021-06-18 16:24:16'
+                  update_id: 318564
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2093055
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'waiting'.
+                  timestamp: '2021-06-18 16:24:20'
+                  update_id: 318564
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2093056
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-18 16:24:20'
+                  update_id: 318564
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2093057
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been submitted for stable by bodhi
+                  timestamp: '2021-06-18 16:25:52'
+                  update_id: 318564
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                compose: null
+                content_type: rpm
+                critpath: false
+                date_approved: null
+                date_modified: null
+                date_pushed: '2021-06-18 16:25:52'
+                date_stable: '2021-06-18 16:25:52'
+                date_submitted: '2021-06-18 16:24:16'
+                date_testing: '2021-06-18 16:24:19'
+                display_name: ''
+                from_tag: null
+                karma: 0
+                locked: false
+                meets_testing_requirements: true
+                notes: 'Automatic update for python-requre-0.8.1-1.fc35.
+
+
+                  ##### **Changelog**
+
+
+                  ```
+
+                  * Fri Jun 18 2021 Packit Service <user-cont-team+packit-service@redhat.com>
+                  - 0.8.1-1
+
+                  - Fix the problem with kwarg decorators that causes the function
+                  body not to be executed.
+
+
+                  ```'
+                pushed: true
+                release:
+                  branch: f35
+                  candidate_tag: f35-updates-candidate
+                  composed_by_bodhi: false
+                  composes: []
+                  create_automatic_updates: true
+                  dist_tag: f35
+                  id_prefix: FEDORA
+                  long_name: Fedora 35
+                  mail_template: fedora_errata_template
+                  name: F35
+                  override_tag: f35-override
+                  package_manager: unspecified
+                  pending_signing_tag: f35-signing-pending
+                  pending_stable_tag: f35-updates-pending
+                  pending_testing_tag: f35-updates-testing-pending
+                  stable_tag: f35
+                  state: pending
+                  testing_repository: null
+                  testing_tag: f35-updates-testing
+                  version: '35'
+                request: null
+                require_bugs: false
+                require_testcases: false
+                requirements: null
+                severity: unspecified
+                stable_days: 0
+                stable_karma: 3
+                status: stable
+                suggest: unspecified
+                test_cases: []
+                test_gating_status: ignored
+                title: python-requre-0.8.1-1.fc35
+                type: unspecified
+                unstable_karma: -3
+                updateid: FEDORA-2021-ca15f5d22f
+                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-ca15f5d22f
+                user:
+                  avatar: https://seccdn.libravatar.org/avatar/38deedcf02e4617a9a8a0c04b67fd4c7fcea9ededf02d13a93a7626477350e45?s=24&d=retro
+                  email: flachman@redhat.com
+                  groups:
+                  - name: packager
+                  id: 4222
+                  name: lachmanfrantisek
+                  openid: lachmanfrantisek.id.fedoraproject.org
+                version_hash: f80355c9231882895428e7da9bce14c1008fd2c9
+              - alias: FEDORA-2021-dab9950882
+                autokarma: false
+                autotime: true
+                bugs: []
+                builds:
+                - epoch: 0
+                  nvr: python-requre-0.8.0-2.eln112
+                  release_id: 46
+                  signed: true
+                  type: rpm
+                close_bugs: true
+                comments:
+                - bug_feedback: []
+                  id: 2081406
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update was automatically created
+                  timestamp: '2021-06-11 21:00:40'
+                  update_id: 316580
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2082594
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-11 21:13:35'
+                  update_id: 316580
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2083209
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'waiting'.
+                  timestamp: '2021-06-11 21:19:41'
+                  update_id: 316580
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2083210
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-11 21:19:41'
+                  update_id: 316580
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2083479
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been submitted for stable by bodhi
+                  timestamp: '2021-06-11 21:22:42'
+                  update_id: 316580
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                compose: null
+                content_type: rpm
+                critpath: false
+                date_approved: null
+                date_modified: null
+                date_pushed: '2021-06-11 21:22:41'
+                date_stable: '2021-06-11 21:22:41'
+                date_submitted: '2021-06-11 21:00:40'
+                date_testing: '2021-06-11 21:19:41'
+                display_name: ''
+                from_tag: null
+                karma: 0
+                locked: false
+                meets_testing_requirements: true
+                notes: Automatic update for python-requre-0.8.0-2.eln112.
+                pushed: true
+                release:
+                  branch: eln
+                  candidate_tag: eln-updates-candidate
+                  composed_by_bodhi: false
+                  composes: []
+                  create_automatic_updates: true
+                  dist_tag: eln
+                  id_prefix: FEDORA
+                  long_name: Fedora ELN
+                  mail_template: fedora_errata_template
+                  name: ELN
+                  override_tag: eln-override
+                  package_manager: unspecified
+                  pending_signing_tag: eln-signing-pending
+                  pending_stable_tag: eln-updates-pending
+                  pending_testing_tag: eln-updates-testing-pending
+                  stable_tag: eln
+                  state: pending
+                  testing_repository: null
+                  testing_tag: eln-updates-testing
+                  version: eln
+                request: null
+                require_bugs: false
+                require_testcases: false
+                requirements: null
+                severity: unspecified
+                stable_days: 0
+                stable_karma: 3
+                status: stable
+                suggest: unspecified
+                test_cases: []
+                test_gating_status: ignored
+                title: python-requre-0.8.0-2.eln112
+                type: unspecified
+                unstable_karma: -3
+                updateid: FEDORA-2021-dab9950882
+                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-dab9950882
+                user:
+                  avatar: https://seccdn.libravatar.org/avatar/0929fed032bd0a481ef74c46023fefe443f3d1b72dbe3efd293b25ed4fc843fd?s=24&d=retro
+                  email: sgallagh@redhat.com
+                  groups:
+                  - name: provenpackager
+                  - name: packager
+                  - name: nodejs-sig
+                  id: 535
+                  name: sgallagh
+                  openid: sgallagh.id.fedoraproject.org
+                version_hash: a9e03641698ae49e0b548c81da5b37d1a8289f6b
+              - alias: FEDORA-2021-d53c5944c0
+                autokarma: false
+                autotime: true
+                bugs: []
+                builds:
+                - epoch: 0
+                  nvr: python-requre-0.8.0-2.eln111
+                  release_id: 46
+                  signed: true
+                  type: rpm
+                close_bugs: true
+                comments:
+                - bug_feedback: []
+                  id: 2066494
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update was automatically created
+                  timestamp: '2021-06-08 22:51:29'
+                  update_id: 313301
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2068436
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'waiting'.
+                  timestamp: '2021-06-08 23:16:16'
+                  update_id: 313301
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2068437
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update's test gating status has been changed to 'ignored'.
+                  timestamp: '2021-06-08 23:16:16'
+                  update_id: 313301
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2068991
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been submitted for stable by bodhi
+                  timestamp: '2021-06-08 23:19:33'
+                  update_id: 313301
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                compose: null
+                content_type: rpm
+                critpath: false
+                date_approved: null
+                date_modified: null
+                date_pushed: '2021-06-08 23:19:31'
+                date_stable: '2021-06-08 23:19:31'
+                date_submitted: '2021-06-08 22:51:29'
+                date_testing: '2021-06-08 23:16:16'
+                display_name: ''
+                from_tag: null
+                karma: 0
+                locked: false
+                meets_testing_requirements: true
+                notes: 'Automatic update for python-requre-0.8.0-2.eln111.
+
+
+                  ##### **Changelog**
+
+
+                  ```
+
+                  * Fri Jun  4 2021 Python Maint <python-maint@redhat.com> - 0.8.0-2
+
+                  - Rebuilt for Python 3.10
+
+
+                  ```'
+                pushed: true
+                release:
+                  branch: eln
+                  candidate_tag: eln-updates-candidate
+                  composed_by_bodhi: false
+                  composes: []
+                  create_automatic_updates: true
+                  dist_tag: eln
+                  id_prefix: FEDORA
+                  long_name: Fedora ELN
+                  mail_template: fedora_errata_template
+                  name: ELN
+                  override_tag: eln-override
+                  package_manager: unspecified
+                  pending_signing_tag: eln-signing-pending
+                  pending_stable_tag: eln-updates-pending
+                  pending_testing_tag: eln-updates-testing-pending
+                  stable_tag: eln
+                  state: pending
+                  testing_repository: null
+                  testing_tag: eln-updates-testing
+                  version: eln
+                request: null
+                require_bugs: false
+                require_testcases: false
+                requirements: null
+                severity: unspecified
+                stable_days: 0
+                stable_karma: 3
+                status: stable
+                suggest: unspecified
+                test_cases: []
+                test_gating_status: ignored
+                title: python-requre-0.8.0-2.eln111
+                type: unspecified
+                unstable_karma: -3
+                updateid: FEDORA-2021-d53c5944c0
+                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-d53c5944c0
+                user:
+                  avatar: https://seccdn.libravatar.org/avatar/0929fed032bd0a481ef74c46023fefe443f3d1b72dbe3efd293b25ed4fc843fd?s=24&d=retro
+                  email: sgallagh@redhat.com
+                  groups:
+                  - name: provenpackager
+                  - name: packager
+                  - name: nodejs-sig
+                  id: 535
+                  name: sgallagh
+                  openid: sgallagh.id.fedoraproject.org
+                version_hash: c3cad3f3dc17fcc4806ab38714f6dadb908a06fa
               - alias: FEDORA-2021-852405883e
                 autokarma: true
                 autotime: true
@@ -826,20 +1980,52 @@ requests.sessions:
                     name: ttomecek
                     openid: ttomecek.id.fedoraproject.org
                   user_id: 754
+                - bug_feedback: []
+                  id: 2029153
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: 'This update has been submitted for stable by bodhi. '
+                  timestamp: '2021-05-15 02:11:59'
+                  update_id: 304132
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
+                - bug_feedback: []
+                  id: 2029790
+                  karma: 0
+                  karma_critpath: 0
+                  testcase_feedback: []
+                  text: This update has been pushed to stable.
+                  timestamp: '2021-05-16 01:59:44'
+                  update_id: 304132
+                  user:
+                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
+                    email: null
+                    groups: []
+                    id: 91
+                    name: bodhi
+                    openid: bodhi.id.fedoraproject.org
+                  user_id: 91
                 compose: null
                 content_type: rpm
                 critpath: false
                 date_approved: null
                 date_modified: null
-                date_pushed: '2021-05-08 02:10:15'
-                date_stable: null
+                date_pushed: '2021-05-16 01:59:37'
+                date_stable: '2021-05-16 01:59:37'
                 date_submitted: '2021-05-07 14:50:34'
                 date_testing: '2021-05-08 02:10:15'
                 display_name: ''
                 from_tag: null
                 karma: 1
                 locked: false
-                meets_testing_requirements: false
+                meets_testing_requirements: true
                 notes: 'New upstream release: 0.8.0'
                 pushed: true
                 release:
@@ -859,7 +2045,7 @@ requests.sessions:
                   pending_stable_tag: f32-updates-pending
                   pending_testing_tag: f32-updates-testing-pending
                   stable_tag: f32-updates
-                  state: current
+                  state: archived
                   testing_repository: updates-testing
                   testing_tag: f32-updates-testing
                   version: '32'
@@ -870,7 +2056,7 @@ requests.sessions:
                 severity: unspecified
                 stable_days: 7
                 stable_karma: 3
-                status: testing
+                status: stable
                 suggest: unspecified
                 test_cases: []
                 test_gating_status: ignored
@@ -1481,7 +2667,7 @@ requests.sessions:
                   \ old naming format.\n\n```"
                 pushed: true
                 release:
-                  branch: rawhide
+                  branch: f35
                   candidate_tag: f35-updates-candidate
                   composed_by_bodhi: false
                   composes: []
@@ -1642,7 +2828,7 @@ requests.sessions:
                   \ (pre-commit-ci[bot])\n\n```"
                 pushed: true
                 release:
-                  branch: rawhide
+                  branch: f35
                   candidate_tag: f35-updates-candidate
                   composed_by_bodhi: false
                   composes: []
@@ -2267,7 +3453,7 @@ requests.sessions:
                   pending_stable_tag: f32-updates-pending
                   pending_testing_tag: f32-updates-testing-pending
                   stable_tag: f32-updates
-                  state: current
+                  state: archived
                   testing_repository: updates-testing
                   testing_tag: f32-updates-testing
                   version: '32'
@@ -2876,7 +4062,7 @@ requests.sessions:
                   pending_stable_tag: f32-updates-pending
                   pending_testing_tag: f32-updates-testing-pending
                   stable_tag: f32-updates
-                  state: current
+                  state: archived
                   testing_repository: updates-testing
                   testing_tag: f32-updates-testing
                   version: '32'
@@ -3036,7 +4222,7 @@ requests.sessions:
                   otka)\n\n```"
                 pushed: true
                 release:
-                  branch: rawhide
+                  branch: f35
                   candidate_tag: f35-updates-candidate
                   composed_by_bodhi: false
                   composes: []
@@ -3475,7 +4661,7 @@ requests.sessions:
                   pending_stable_tag: f32-updates-pending
                   pending_testing_tag: f32-updates-testing-pending
                   stable_tag: f32-updates
-                  state: current
+                  state: archived
                   testing_repository: updates-testing
                   testing_tag: f32-updates-testing
                   version: '32'
@@ -3504,1282 +4690,25 @@ requests.sessions:
                   name: jscotka
                   openid: jscotka.id.fedoraproject.org
                 version_hash: c98648fab29382255dfe53d62adfeb754b07276a
-              - alias: FEDORA-2021-f3b9296e12
-                autokarma: false
-                autotime: true
-                bugs: []
-                builds:
-                - epoch: 0
-                  nvr: python-requre-0.6.0-1.fc34
-                  release_id: 47
-                  signed: true
-                  type: rpm
-                close_bugs: true
-                comments:
-                - bug_feedback: []
-                  id: 1889468
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update was automatically created
-                  timestamp: '2021-02-16 13:42:32'
-                  update_id: 284237
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1889469
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'waiting'.
-                  timestamp: '2021-02-16 13:42:36'
-                  update_id: 284237
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1889470
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2021-02-16 13:42:37'
-                  update_id: 284237
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1889471
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update can be pushed to stable now if the maintainer
-                    wishes
-                  timestamp: '2021-02-16 13:43:39'
-                  update_id: 284237
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1889472
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been submitted for stable by bodhi
-                  timestamp: '2021-02-16 13:43:39'
-                  update_id: 284237
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                compose: null
-                content_type: rpm
-                critpath: false
-                date_approved: null
-                date_modified: null
-                date_pushed: '2021-02-16 13:43:39'
-                date_stable: '2021-02-16 13:43:39'
-                date_submitted: '2021-02-16 13:42:32'
-                date_testing: '2021-02-16 13:42:36'
-                display_name: ''
-                from_tag: null
-                karma: 0
-                locked: false
-                meets_testing_requirements: true
-                notes: "Automatic update for python-requre-0.6.0-1.fc34.\n\n#####\
-                  \ **Changelog**\n\n```\n* Tue Feb 16 2021 Jan \u0160\u010Dotka <jscotka@redhat.com>\
-                  \ - 0.6.0-1\n- release new version 0.6.0 (Jan \u0160\u010Dotka)\n\
-                  - Cleanup import system (#152) (jscotka)\n- improve failing test\
-                  \ (Jan \u0160\u010Dotka)\n- prepare code before next cleanup (Jan\
-                  \ \u0160\u010Dotka)\n- remove unused type of decoration and it was\
-                  \ outtaded (Jan \u0160\u010Dotka)\n- [pre-commit.ci] pre-commit\
-                  \ autoupdate (pre-commit-ci[bot])\n- Don't recommend to use 'pip'\
-                  \ with 'sudo' (Hunor Csomort\xE1ni)\n- Change 'master' to 'main'\
-                  \ (Hunor Csomort\xE1ni)\n- [pre-commit.ci] pre-commit autoupdate\
-                  \ (pre-commit-ci[bot])\n- small issue with setting up storage mode\
-                  \ debug (Jan \u0160\u010Dotka)\n- Bump Version in fedora/python-requre.spec\
-                  \ (Jiri Popelka)\n- [pre-commit.ci] pre-commit autoupdate (pre-commit-ci[bot])\n\
-                  - [pre-commit.ci] pre-commit autoupdate (pre-commit-ci[bot])\n-\
-                  \ [pre-commit.ci] pre-commit autoupdate (pre-commit-ci[bot])\n-\
-                  \ add backward compatibility to files (Jan \u0160\u010Dotka)\n-\
-                  \ improve file operations with guess if not given (Jan \u0160\u010D\
-                  otka)\n\n```"
-                pushed: true
-                release:
-                  branch: f34
-                  candidate_tag: f34-updates-candidate
-                  composed_by_bodhi: true
-                  composes: []
-                  create_automatic_updates: false
-                  dist_tag: f34
-                  id_prefix: FEDORA
-                  long_name: Fedora 34
-                  mail_template: fedora_errata_template
-                  name: F34
-                  override_tag: f34-override
-                  package_manager: dnf
-                  pending_signing_tag: f34-signing-pending
-                  pending_stable_tag: f34-updates-pending
-                  pending_testing_tag: f34-updates-testing-pending
-                  stable_tag: f34-updates
-                  state: current
-                  testing_repository: updates-testing
-                  testing_tag: f34-updates-testing
-                  version: '34'
-                request: null
-                require_bugs: false
-                require_testcases: false
-                requirements: null
-                severity: unspecified
-                stable_days: 0
-                stable_karma: 3
-                status: stable
-                suggest: unspecified
-                test_cases: []
-                test_gating_status: ignored
-                title: python-requre-0.6.0-1.fc34
-                type: unspecified
-                unstable_karma: -3
-                updateid: FEDORA-2021-f3b9296e12
-                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-f3b9296e12
-                user:
-                  avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
-                  email: jscotka@redhat.com
-                  groups:
-                  - name: packager
-                  id: 1348
-                  name: jscotka
-                  openid: jscotka.id.fedoraproject.org
-                version_hash: 9534786c7791f1f77c44aea6b419c10e3da3b14d
-              - alias: FEDORA-2021-01204fa520
-                autokarma: false
-                autotime: true
-                bugs: []
-                builds:
-                - epoch: 0
-                  nvr: python-requre-0.5.0-1.fc34
-                  release_id: 47
-                  signed: true
-                  type: rpm
-                close_bugs: true
-                comments:
-                - bug_feedback: []
-                  id: 1829013
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update was automatically created
-                  timestamp: '2021-01-21 15:23:10'
-                  update_id: 273702
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829014
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'waiting'.
-                  timestamp: '2021-01-21 15:23:17'
-                  update_id: 273702
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829015
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2021-01-21 15:23:17'
-                  update_id: 273702
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829020
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update can be pushed to stable now if the maintainer
-                    wishes
-                  timestamp: '2021-01-21 15:25:59'
-                  update_id: 273702
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829021
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been submitted for stable by bodhi
-                  timestamp: '2021-01-21 15:26:00'
-                  update_id: 273702
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                compose: null
-                content_type: rpm
-                critpath: false
-                date_approved: null
-                date_modified: null
-                date_pushed: '2021-01-21 15:25:59'
-                date_stable: '2021-01-21 15:25:59'
-                date_submitted: '2021-01-21 15:23:10'
-                date_testing: '2021-01-21 15:23:16'
-                display_name: ''
-                from_tag: null
-                karma: 0
-                locked: false
-                meets_testing_requirements: true
-                notes: "Automatic update for python-requre-0.5.0-1.fc34.\n\n#####\
-                  \ **Changelog**\n\n```\n* Tue Dec  8 2020 Packit Service <user-cont-team+packit-service@redhat.com>\
-                  \ - 0.5.0-1\n- apply PR suggestion (Jan \u0160\u010Dotka)\n- add\
-                  \ default decorator and test (Jan \u0160\u010Dotka)\n- guess proper\
-                  \ return object type based on  return value (Jan \u0160\u010Dotka)\n\
-                  - Link our common contribution guidelines (Matej Focko)\n- Fix mypy\
-                  \ remark (Matej Focko)\n- Move rebase check from pre-commit to pre-push\
-                  \ hook (Matej Focko)\n- Update docs/filter_format.rst (jscotka)\n\
-                  - Update docs/filter_format.rst (jscotka)\n- Update docs/filter_format.rst\
-                  \ (jscotka)\n- Update docs/filter_format.rst (jscotka)\n- Update\
-                  \ docs/filter_format.rst (jscotka)\n- Update docs/filter_format.rst\
-                  \ (jscotka)\n- update documentation (Jan \u0160\u010Dotka)\n- fix\
-                  \ examples (Jan \u0160\u010Dotka)\n- fix ip addr and DNS issue inside\
-                  \ tests (Jan \u0160\u010Dotka)\n- Do not skip bug and security issues\
-                  \ by stalebot (Frantisek Lachman)\n- Do not run tests for zuul gating\
-                  \ (Frantisek Lachman)\n- Add more specific type for __replace_module_match_with_multiple_decorators\
-                  \ (Frantisek Lachman)\n- fix mistake (Jan \u0160\u010Dotka)\n- Update\
-                  \ requre/modules_decorate_all_methods.py (jscotka)\n- apply PR suggestions\
-                  \ (Jan \u0160\u010Dotka)\n- Allow to use list as parameter for decoratos\
-                  \ and add common aliases for decorators. (Jan \u0160\u010Dotka)\n\
-                  - Update pre-commit configuration for prettier (Hunor Csomort\xE1\
-                  ni)\n- Copy modules when listing to avoid changes during execution\
-                  \ (Frantisek Lachman)\n- adapt PR review issues (Jan \u0160\u010D\
-                  otka)\n- optimise files handling, avoid duplication of stored files\
-                  \ in test_data files (Jan \u0160\u010Dotka)\n- Document installation\
-                  \ instructions in README (Frantisek Lachman)\n- Enable all fedora\
-                  \ targets for master/release copr builds (Frantisek Lachman)\n-\
-                  \ Use default packit COPR projects (Frantisek Lachman)\n\n```"
-                pushed: true
-                release:
-                  branch: f34
-                  candidate_tag: f34-updates-candidate
-                  composed_by_bodhi: true
-                  composes: []
-                  create_automatic_updates: false
-                  dist_tag: f34
-                  id_prefix: FEDORA
-                  long_name: Fedora 34
-                  mail_template: fedora_errata_template
-                  name: F34
-                  override_tag: f34-override
-                  package_manager: dnf
-                  pending_signing_tag: f34-signing-pending
-                  pending_stable_tag: f34-updates-pending
-                  pending_testing_tag: f34-updates-testing-pending
-                  stable_tag: f34-updates
-                  state: current
-                  testing_repository: updates-testing
-                  testing_tag: f34-updates-testing
-                  version: '34'
-                request: null
-                require_bugs: false
-                require_testcases: false
-                requirements: null
-                severity: unspecified
-                stable_days: 0
-                stable_karma: 3
-                status: stable
-                suggest: unspecified
-                test_cases: []
-                test_gating_status: ignored
-                title: python-requre-0.5.0-1.fc34
-                type: unspecified
-                unstable_karma: -3
-                updateid: FEDORA-2021-01204fa520
-                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-01204fa520
-                user:
-                  avatar: https://seccdn.libravatar.org/avatar/361588cc461dac33122e97f93df9b46d5401fc7f59e4be843887319b1f5be103?s=24&d=retro
-                  email: jpopelka@redhat.com
-                  groups:
-                  - name: packager
-                  id: 122
-                  name: jpopelka
-                  openid: jpopelka.id.fedoraproject.org
-                version_hash: 0ad2c48a6cf09f62b995b9e9869bac3ee0d0b385
-              - alias: FEDORA-2021-d5703e4aad
-                autokarma: true
-                autotime: true
-                bugs: []
-                builds:
-                - epoch: 0
-                  nvr: python-requre-0.5.0-1.fc32
-                  release_id: 35
-                  signed: true
-                  type: rpm
-                close_bugs: false
-                comments:
-                - bug_feedback: []
-                  id: 1829010
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for testing by jpopelka. '
-                  timestamp: '2021-01-21 15:21:56'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829011
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2021-01-21 15:21:57'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829012
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'waiting'.
-                  timestamp: '2021-01-21 15:21:57'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829151
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2021-01-21 16:02:04'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1830116
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to testing.
-                  timestamp: '2021-01-22 01:39:16'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1842985
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update can be pushed to stable now if the maintainer
-                    wishes
-                  timestamp: '2021-01-29 01:40:08'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1842986
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for stable by bodhi. '
-                  timestamp: '2021-01-29 01:40:08'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1844808
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to stable.
-                  timestamp: '2021-01-30 01:42:38'
-                  update_id: 273701
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                compose: null
-                content_type: rpm
-                critpath: false
-                date_approved: null
-                date_modified: null
-                date_pushed: '2021-01-30 01:42:12'
-                date_stable: '2021-01-30 01:42:12'
-                date_submitted: '2021-01-21 15:21:56'
-                date_testing: '2021-01-22 01:38:48'
-                display_name: ''
-                from_tag: null
-                karma: 0
-                locked: false
-                meets_testing_requirements: true
-                notes: New upstream release
-                pushed: true
-                release:
-                  branch: f32
-                  candidate_tag: f32-updates-candidate
-                  composed_by_bodhi: true
-                  composes: []
-                  create_automatic_updates: false
-                  dist_tag: f32
-                  id_prefix: FEDORA
-                  long_name: Fedora 32
-                  mail_template: fedora_errata_template
-                  name: F32
-                  override_tag: f32-override
-                  package_manager: dnf
-                  pending_signing_tag: f32-signing-pending
-                  pending_stable_tag: f32-updates-pending
-                  pending_testing_tag: f32-updates-testing-pending
-                  stable_tag: f32-updates
-                  state: current
-                  testing_repository: updates-testing
-                  testing_tag: f32-updates-testing
-                  version: '32'
-                request: null
-                require_bugs: false
-                require_testcases: false
-                requirements: ''
-                severity: unspecified
-                stable_days: 7
-                stable_karma: 3
-                status: stable
-                suggest: unspecified
-                test_cases: []
-                test_gating_status: ignored
-                title: python-requre-0.5.0-1.fc32
-                type: bugfix
-                unstable_karma: -2
-                updateid: FEDORA-2021-d5703e4aad
-                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-d5703e4aad
-                user:
-                  avatar: https://seccdn.libravatar.org/avatar/361588cc461dac33122e97f93df9b46d5401fc7f59e4be843887319b1f5be103?s=24&d=retro
-                  email: jpopelka@redhat.com
-                  groups:
-                  - name: packager
-                  id: 122
-                  name: jpopelka
-                  openid: jpopelka.id.fedoraproject.org
-                version_hash: ed6af20cd84306c6a62994b9658c6522312077dd
-              - alias: FEDORA-2021-ca999873e9
-                autokarma: true
-                autotime: true
-                bugs: []
-                builds:
-                - epoch: 0
-                  nvr: python-requre-0.5.0-1.fc33
-                  release_id: 40
-                  signed: true
-                  type: rpm
-                close_bugs: false
-                comments:
-                - bug_feedback: []
-                  id: 1829007
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for testing by jpopelka. '
-                  timestamp: '2021-01-21 15:21:44'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829008
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2021-01-21 15:21:44'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829009
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'waiting'.
-                  timestamp: '2021-01-21 15:21:44'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1829150
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2021-01-21 16:02:04'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1830220
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to testing.
-                  timestamp: '2021-01-22 02:13:13'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1843129
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update can be pushed to stable now if the maintainer
-                    wishes
-                  timestamp: '2021-01-29 02:13:27'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1843130
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for stable by bodhi. '
-                  timestamp: '2021-01-29 02:13:27'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1844838
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to stable.
-                  timestamp: '2021-01-30 01:54:52'
-                  update_id: 273700
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                compose: null
-                content_type: rpm
-                critpath: false
-                date_approved: null
-                date_modified: null
-                date_pushed: '2021-01-30 01:53:46'
-                date_stable: '2021-01-30 01:53:46'
-                date_submitted: '2021-01-21 15:21:44'
-                date_testing: '2021-01-22 02:12:13'
-                display_name: ''
-                from_tag: null
-                karma: 0
-                locked: false
-                meets_testing_requirements: true
-                notes: New upstream release
-                pushed: true
-                release:
-                  branch: f33
-                  candidate_tag: f33-updates-candidate
-                  composed_by_bodhi: true
-                  composes: []
-                  create_automatic_updates: false
-                  dist_tag: f33
-                  id_prefix: FEDORA
-                  long_name: Fedora 33
-                  mail_template: fedora_errata_template
-                  name: F33
-                  override_tag: f33-override
-                  package_manager: dnf
-                  pending_signing_tag: f33-signing-pending
-                  pending_stable_tag: f33-updates-pending
-                  pending_testing_tag: f33-updates-testing-pending
-                  stable_tag: f33-updates
-                  state: current
-                  testing_repository: updates-testing
-                  testing_tag: f33-updates-testing
-                  version: '33'
-                request: null
-                require_bugs: false
-                require_testcases: false
-                requirements: ''
-                severity: unspecified
-                stable_days: 7
-                stable_karma: 3
-                status: stable
-                suggest: unspecified
-                test_cases: []
-                test_gating_status: ignored
-                title: python-requre-0.5.0-1.fc33
-                type: bugfix
-                unstable_karma: -2
-                updateid: FEDORA-2021-ca999873e9
-                url: https://bodhi.fedoraproject.org/updates/FEDORA-2021-ca999873e9
-                user:
-                  avatar: https://seccdn.libravatar.org/avatar/361588cc461dac33122e97f93df9b46d5401fc7f59e4be843887319b1f5be103?s=24&d=retro
-                  email: jpopelka@redhat.com
-                  groups:
-                  - name: packager
-                  id: 122
-                  name: jpopelka
-                  openid: jpopelka.id.fedoraproject.org
-                version_hash: 36145ea90504b04bf9b89677fab3b8846f638d2a
-              - alias: FEDORA-2020-0fdbc06f0b
-                autokarma: true
-                autotime: true
-                bugs: []
-                builds:
-                - epoch: 0
-                  nvr: python-requre-0.4.0-1.fc32
-                  release_id: 35
-                  signed: true
-                  type: rpm
-                close_bugs: true
-                comments:
-                - bug_feedback: []
-                  id: 1640086
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for testing by jscotka. '
-                  timestamp: '2020-09-22 09:08:33'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640087
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2020-09-22 09:08:33'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640088
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'waiting'.
-                  timestamp: '2020-09-22 09:08:33'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640091
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: tested with packit project
-                  timestamp: '2020-09-22 09:10:20'
-                  update_id: 244073
-                  user:
-                    avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
-                    email: jscotka@redhat.com
-                    groups:
-                    - name: packager
-                    id: 1348
-                    name: jscotka
-                    openid: jscotka.id.fedoraproject.org
-                  user_id: 1348
-                - bug_feedback: []
-                  id: 1640103
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2020-09-22 09:23:38'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640105
-                  karma: 1
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'Tested with the build from koji:
-
-                    https://kojipkgs.fedoraproject.org//packages/python-requre/0.4.0/1.fc32/noarch/python3-requre-0.4.0-1.fc32.noarch.rpm'
-                  timestamp: '2020-09-22 09:23:39'
-                  update_id: 244073
-                  user:
-                    avatar: https://seccdn.libravatar.org/avatar/38deedcf02e4617a9a8a0c04b67fd4c7fcea9ededf02d13a93a7626477350e45?s=24&d=retro
-                    email: flachman@redhat.com
-                    groups:
-                    - name: packager
-                    id: 4222
-                    name: lachmanfrantisek
-                    openid: lachmanfrantisek.id.fedoraproject.org
-                  user_id: 4222
-                - bug_feedback: []
-                  id: 1642790
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to testing.
-                  timestamp: '2020-09-23 17:22:32'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1655628
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update can be pushed to stable now if the maintainer
-                    wishes
-                  timestamp: '2020-09-30 17:23:13'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1655629
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for stable by bodhi. '
-                  timestamp: '2020-09-30 17:23:13'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1656489
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to stable.
-                  timestamp: '2020-10-01 01:29:02'
-                  update_id: 244073
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                compose: null
-                content_type: rpm
-                critpath: false
-                date_approved: null
-                date_modified: null
-                date_pushed: '2020-10-01 01:27:47'
-                date_stable: '2020-10-01 01:27:47'
-                date_submitted: '2020-09-22 09:08:32'
-                date_testing: '2020-09-23 17:20:46'
-                display_name: ''
-                from_tag: null
-                karma: 1
-                locked: false
-                meets_testing_requirements: true
-                notes: 'New upstream release: 0.4.0'
-                pushed: true
-                release:
-                  branch: f32
-                  candidate_tag: f32-updates-candidate
-                  composed_by_bodhi: true
-                  composes: []
-                  create_automatic_updates: false
-                  dist_tag: f32
-                  id_prefix: FEDORA
-                  long_name: Fedora 32
-                  mail_template: fedora_errata_template
-                  name: F32
-                  override_tag: f32-override
-                  package_manager: dnf
-                  pending_signing_tag: f32-signing-pending
-                  pending_stable_tag: f32-updates-pending
-                  pending_testing_tag: f32-updates-testing-pending
-                  stable_tag: f32-updates
-                  state: current
-                  testing_repository: updates-testing
-                  testing_tag: f32-updates-testing
-                  version: '32'
-                request: null
-                require_bugs: true
-                require_testcases: true
-                requirements: ''
-                severity: unspecified
-                stable_days: 7
-                stable_karma: 3
-                status: stable
-                suggest: unspecified
-                test_cases: []
-                test_gating_status: ignored
-                title: python-requre-0.4.0-1.fc32
-                type: enhancement
-                unstable_karma: -3
-                updateid: FEDORA-2020-0fdbc06f0b
-                url: https://bodhi.fedoraproject.org/updates/FEDORA-2020-0fdbc06f0b
-                user:
-                  avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
-                  email: jscotka@redhat.com
-                  groups:
-                  - name: packager
-                  id: 1348
-                  name: jscotka
-                  openid: jscotka.id.fedoraproject.org
-                version_hash: 3e009b91767727b83a2c3ea5c7aba244fed58d9b
-              - alias: FEDORA-2020-f49010fbdf
-                autokarma: true
-                autotime: true
-                bugs: []
-                builds:
-                - epoch: 0
-                  nvr: python-requre-0.4.0-1.fc33
-                  release_id: 40
-                  signed: true
-                  type: rpm
-                close_bugs: true
-                comments:
-                - bug_feedback: []
-                  id: 1640082
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for testing by jscotka. '
-                  timestamp: '2020-09-22 09:00:14'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640083
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2020-09-22 09:00:14'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640084
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'waiting'.
-                  timestamp: '2020-09-22 09:00:14'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1640090
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: tested with packit project
-                  timestamp: '2020-09-22 09:10:12'
-                  update_id: 244072
-                  user:
-                    avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
-                    email: jscotka@redhat.com
-                    groups:
-                    - name: packager
-                    id: 1348
-                    name: jscotka
-                    openid: jscotka.id.fedoraproject.org
-                  user_id: 1348
-                - bug_feedback: []
-                  id: 1640095
-                  karma: 1
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'Tested with the build from koji:
-
-
-                    https://kojipkgs.fedoraproject.org//packages/python-requre/0.4.0/1.fc33/noarch/python3-requre-0.4.0-1.fc33.noarch.rpm'
-                  timestamp: '2020-09-22 09:21:06'
-                  update_id: 244072
-                  user:
-                    avatar: https://seccdn.libravatar.org/avatar/38deedcf02e4617a9a8a0c04b67fd4c7fcea9ededf02d13a93a7626477350e45?s=24&d=retro
-                    email: flachman@redhat.com
-                    groups:
-                    - name: packager
-                    id: 4222
-                    name: lachmanfrantisek
-                    openid: lachmanfrantisek.id.fedoraproject.org
-                  user_id: 4222
-                - bug_feedback: []
-                  id: 1640102
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update's test gating status has been changed to 'ignored'.
-                  timestamp: '2020-09-22 09:23:38'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1642391
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to testing.
-                  timestamp: '2020-09-23 15:28:11'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1642459
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update can be pushed to stable now if the maintainer
-                    wishes
-                  timestamp: '2020-09-23 15:30:14'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1657910
-                  karma: 1
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: Works
-                  timestamp: '2020-10-01 18:40:43'
-                  update_id: 244072
-                  user:
-                    avatar: https://seccdn.libravatar.org/avatar/cd6029d8d81108a2a69c38a2373d2a185c0e86224b8ee4971cd77bb6cdad7a20?s=24&d=retro
-                    email: walter.pete@yandex.com
-                    groups:
-                    - name: provenpackager
-                    - name: packager
-                    id: 491
-                    name: pwalter
-                    openid: pwalter.id.fedoraproject.org
-                  user_id: 491
-                - bug_feedback: []
-                  id: 1657918
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: 'This update has been submitted for stable by pwalter. '
-                  timestamp: '2020-10-01 18:41:59'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                - bug_feedback: []
-                  id: 1658331
-                  karma: 0
-                  karma_critpath: 0
-                  testcase_feedback: []
-                  text: This update has been pushed to stable.
-                  timestamp: '2020-10-02 00:35:23'
-                  update_id: 244072
-                  user:
-                    avatar: https://apps.fedoraproject.org/img/icons/bodhi-24.png
-                    email: null
-                    groups: []
-                    id: 91
-                    name: bodhi
-                    openid: bodhi.id.fedoraproject.org
-                  user_id: 91
-                compose: null
-                content_type: rpm
-                critpath: false
-                date_approved: null
-                date_modified: null
-                date_pushed: '2020-10-02 00:33:26'
-                date_stable: '2020-10-02 00:33:26'
-                date_submitted: '2020-09-22 09:00:13'
-                date_testing: '2020-09-23 15:24:23'
-                display_name: ''
-                from_tag: null
-                karma: 2
-                locked: false
-                meets_testing_requirements: true
-                notes: 'New upstream release: 0.4.0'
-                pushed: true
-                release:
-                  branch: f33
-                  candidate_tag: f33-updates-candidate
-                  composed_by_bodhi: true
-                  composes: []
-                  create_automatic_updates: false
-                  dist_tag: f33
-                  id_prefix: FEDORA
-                  long_name: Fedora 33
-                  mail_template: fedora_errata_template
-                  name: F33
-                  override_tag: f33-override
-                  package_manager: dnf
-                  pending_signing_tag: f33-signing-pending
-                  pending_stable_tag: f33-updates-pending
-                  pending_testing_tag: f33-updates-testing-pending
-                  stable_tag: f33-updates
-                  state: current
-                  testing_repository: updates-testing
-                  testing_tag: f33-updates-testing
-                  version: '33'
-                request: null
-                require_bugs: true
-                require_testcases: true
-                requirements: ''
-                severity: unspecified
-                stable_days: 3
-                stable_karma: 3
-                status: stable
-                suggest: unspecified
-                test_cases: []
-                test_gating_status: ignored
-                title: python-requre-0.4.0-1.fc33
-                type: enhancement
-                unstable_karma: -3
-                updateid: FEDORA-2020-f49010fbdf
-                url: https://bodhi.fedoraproject.org/updates/FEDORA-2020-f49010fbdf
-                user:
-                  avatar: https://seccdn.libravatar.org/avatar/04908843b5428b426e917affb88d9c8f2e4721c7212d051f646a2195c338819c?s=24&d=retro
-                  email: jscotka@redhat.com
-                  groups:
-                  - name: packager
-                  id: 1348
-                  name: jscotka
-                  openid: jscotka.id.fedoraproject.org
-                version_hash: 0b81fdd9d51e761226b1c8bb4f46ac8d11042b0d
             _next: null
-            elapsed: 2.770698
+            elapsed: 2.810608
             encoding: null
             headers:
-              AppTime: D=2194835
+              AppTime: D=2553862
               Cache-control: private
               Connection: Keep-Alive
-              Content-Length: '109939'
+              Content-Length: '104424'
               Content-Type: application/json
-              Date: Thu, 13 May 2021 12:41:07 GMT
+              Date: Fri, 13 Aug 2021 07:55:29 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: gunicorn/20.0.4
-              Set-Cookie: 1caa5c4232b1a1f24f8c4f6e0f496284=7481f373ce1a6f6458e0235cbfed8670;
+              Set-Cookie: 1caa5c4232b1a1f24f8c4f6e0f496284=78c75702b0c09464cd231de2eb2daa0a;
                 path=/; HttpOnly; Secure
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff, nosniff
-              X-Fedora-ProxyServer: proxy04.fedoraproject.org
-              X-Fedora-RequestID: YJ0eYU@jNozatingzKGuSgAAAMk
+              X-Fedora-ProxyServer: proxy02.fedoraproject.org
+              X-Fedora-RequestID: YRYlbt-Jnr3i1c6ijCs8JAAAAJY
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
             raw: !!binary ""
@@ -4789,10 +4718,10 @@ tempfile:
   mkdtemp:
     all:
       metadata:
-        latency: 0.00013685226440429688
+        latency: 8.153915405273438e-05
         module_call_list:
         - unittest.case
-        - requre.online_replacing
+        - requre.record_and_replace
         - tests_recording.test_status
         - tests_recording.testbase
         - packit.local_project
@@ -4801,4 +4730,4 @@ tempfile:
         - requre.cassette
         - tempfile
         - mkdtemp
-      output: /tmp/tmpojlkg9j2
+      output: /tmp/tmpdocnbowa

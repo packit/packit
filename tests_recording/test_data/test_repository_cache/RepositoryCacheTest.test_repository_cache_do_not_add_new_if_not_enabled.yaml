@@ -11,10 +11,10 @@ X:
               return_value:
                 _bare: false
                 _common_dir: null
-                _working_tree_dir: /tmp/tmp076it82_/clone1
-                git_dir: /tmp/tmp076it82_/clone1/.git
-                working_dir: /tmp/tmp076it82_/clone1
-              target_path: /tmp/tmp076it82_/clone1
+                _working_tree_dir: /tmp/tmpmg1mraeq/clone1
+                git_dir: /tmp/tmpmg1mraeq/clone1/.git
+                working_dir: /tmp/tmpmg1mraeq/clone1
+              target_path: /tmp/tmpmg1mraeq/clone1
 _requre:
   DataTypes: 1
   key_strategy: StorageKeysInspectSimple
@@ -22,13 +22,13 @@ _requre:
 tempfile:
   mkdtemp:
   - metadata:
-      latency: 5.602836608886719e-05
+      latency: 6.461143493652344e-05
       module_call_list:
       - unittest.case
-      - requre.online_replacing
+      - requre.record_and_replace
       - tests_recording.test_repository_cache
       - requre.objects
       - requre.cassette
       - tempfile
       - mkdtemp
-    output: /tmp/tmp076it82_
+    output: /tmp/tmpmg1mraeq
