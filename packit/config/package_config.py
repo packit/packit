@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
+import os
 import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union, Set
@@ -144,11 +145,13 @@ class PackageConfig(CommonPackageConfig):
             # we want default jobs to go through the proper parsing process
             raw_dict["jobs"] = get_default_jobs()
 
+        # verify that specfile is set and file is present 
         if not raw_dict.get("specfile_path", None):
-            if spec_file_path:
-                raw_dict["specfile_path"] = spec_file_path
-            else:
-                raise PackitConfigException("Spec file was not found!")
+            cls.validate_file_set_and_present(
+                    raw_dict=raw_dict, 
+                    item_key="specfile_path",
+                    file_path=spec_file_path
+                    )
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
@@ -157,6 +160,30 @@ class PackageConfig(CommonPackageConfig):
             raw_dict["downstream_package_name"] = repo_name
 
         return PackageConfigSchema().load(raw_dict)
+
+    @staticmethod
+    def validate_file_set_and_present(
+        raw_dict: dict,
+        item_key: str,
+        file_path: Union[str, None]
+        ) -> None:
+        '''
+        Checks if a file path is set(not none) 
+        and if the file itself is present under 
+        the specified path. Throws a 
+        PackitConfigException if the validation
+        fails.
+        '''
+        if file_path:
+            if os.path.isfile(file_path):
+                raw_dict[item_key] = file_path
+            else:
+                raise PackitConfigException("Spec file not found under " +
+                        file_path)
+
+        else:
+            raise PackitConfigException("Unable to find Spec file")
+
 
     def get_copr_build_project_value(self) -> Optional[str]:
         """
@@ -212,6 +239,7 @@ class PackageConfig(CommonPackageConfig):
             == other.copy_upstream_release_description
             and self.sources == other.sources
         )
+
 
 
 def find_packit_yaml(
