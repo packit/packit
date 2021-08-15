@@ -151,7 +151,9 @@ class PackageConfig(CommonPackageConfig):
             else:
                 raise PackitConfigException("Spec file was not found!")
        
-        cls.validate_specfile_present(raw_dict=raw_dict)
+        if not os.path.isfile(raw_dict["specfile_path"]):
+            raise PackitConfigException("Spec file not found under " +
+                    raw_dict["specfile_path"])
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
@@ -160,28 +162,6 @@ class PackageConfig(CommonPackageConfig):
             raw_dict["downstream_package_name"] = repo_name
 
         return PackageConfigSchema().load(raw_dict)
-
-
-    @staticmethod
-    def validate_specfile_present(raw_dict: dict) -> None:
-            """Checks if the specfile exists under the specified path
-
-            Args:
-                raw_dict: the config dict containing the path where
-                the spec file should be found
-
-            Returns:
-                None
-
-            Raises:
-                PackitException, if the specfile is not found under the
-                specified path
-            """
-
-            if not os.path.isfile(raw_dict["specfile_path"]):
-                raise PackitConfigException("Spec file not found under " +
-                        raw_dict["specfile_path"])
-
 
 
     def get_copr_build_project_value(self) -> Optional[str]:
