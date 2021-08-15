@@ -164,23 +164,23 @@ class PackageConfig(CommonPackageConfig):
 
     @staticmethod
     def validate_specfile_present(raw_dict: dict) -> None:
-        """Checks if the specfile exists under the specified path
+            """Checks if the specfile exists under the specified path
 
-        Args:
-            raw_dict: the config dict containing the path where
-            the spec file should be found
+            Args:
+                raw_dict: the config dict containing the path where
+                the spec file should be found
 
-        Returns:
-            None
+            Returns:
+                None
 
-        Raises:
-            PackitException, if the specfile is not found under the
-            specified path
-        """
+            Raises:
+                PackitException, if the specfile is not found under the
+                specified path
+            """
 
-        if not os.path.isfile(raw_dict["specfile_path"]):
-            raise PackitConfigException("Spec file not found under " +
-                    raw_dict["specfile_path"])
+            if not os.path.isfile(raw_dict["specfile_path"]):
+                raise PackitConfigException("Spec file not found under " +
+                        raw_dict["specfile_path"])
 
 
 
