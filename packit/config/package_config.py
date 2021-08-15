@@ -145,13 +145,13 @@ class PackageConfig(CommonPackageConfig):
             # we want default jobs to go through the proper parsing process
             raw_dict["jobs"] = get_default_jobs()
 
-        # verify that specfile is set and file is present 
         if not raw_dict.get("specfile_path", None):
-            cls.validate_file_set_and_present(
-                    raw_dict=raw_dict, 
-                    item_key="specfile_path",
-                    file_path=spec_file_path
-                    )
+            if spec_file_path:
+                raw_dict["specfile_path"] = spec_file_path
+            else:
+                raise PackitConfigException("Spec file was not found!")
+       
+        cls.validate_specfile_present(raw_dict=raw_dict)
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
@@ -161,12 +161,9 @@ class PackageConfig(CommonPackageConfig):
 
         return PackageConfigSchema().load(raw_dict)
 
+
     @staticmethod
-    def validate_file_set_and_present(
-        raw_dict: dict,
-        item_key: str,
-        file_path: Union[str, None]
-        ) -> None:
+    def validate_specfile_present(raw_dict: dict) -> None:
         '''
         Checks if a file path is set(not none) 
         and if the file itself is present under 
@@ -174,15 +171,26 @@ class PackageConfig(CommonPackageConfig):
         PackitConfigException if the validation
         fails.
         '''
-        if file_path:
-            if os.path.isfile(file_path):
-                raw_dict[item_key] = file_path
-            else:
-                raise PackitConfigException("Spec file not found under " +
-                        file_path)
+       
 
-        else:
-            raise PackitConfigException("Unable to find Spec file")
+        """Check if 'subpath' is a subpath of 'path'
+
+        Args:
+            raw_dict: the config dict containing the path where
+            the spec file should be found
+
+        Returns:
+            None
+
+        Raises:
+            PackitException, if the specfile is not found under the
+            specified path
+        """
+
+        if not os.path.isfile(raw_dict["specfile_path"]):
+            raise PackitConfigException("Spec file not found under " +
+                    raw_dict["specfile_path"])
+
 
 
     def get_copr_build_project_value(self) -> Optional[str]:
