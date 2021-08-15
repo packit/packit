@@ -164,16 +164,7 @@ class PackageConfig(CommonPackageConfig):
 
     @staticmethod
     def validate_specfile_present(raw_dict: dict) -> None:
-        '''
-        Checks if a file path is set(not none) 
-        and if the file itself is present under 
-        the specified path. Throws a 
-        PackitConfigException if the validation
-        fails.
-        '''
-       
-
-        """Check if 'subpath' is a subpath of 'path'
+        """Checks if the specfile exists under the specified path
 
         Args:
             raw_dict: the config dict containing the path where
