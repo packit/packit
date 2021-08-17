@@ -260,6 +260,21 @@ class PatchMetadata:
         )
 
     @staticmethod
+    def from_git_trailers(commit: git.Commit) -> "PatchMetadata":
+        """Read patch metadata from a commit's git trailers
+
+        Args:
+            commit: Commit object to read patch metadata from.
+
+        Returns:
+            Patch metadata read.
+        """
+        with tempfile.NamedTemporaryFile(mode="w+t") as fp:
+            fp.write(commit.message)
+            fp.flush()
+            return PatchMetadata.from_patch(fp.name)
+
+    @staticmethod
     def from_patch(patch: str) -> "PatchMetadata":
         """Read patch metadata by parsing Git trailers from a patch file.
 
