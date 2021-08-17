@@ -48,7 +48,7 @@ from requre.modules_decorate_all_methods import (
 )
 @apply_decorator_to_all_methods(
     replace_module_match(
-        what="packit.rpkg.PkgTool.clone",
+        what="packit.pkgtool.PkgTool.clone",
         decorate=StoreFiles.where_arg_references(
             key_position_params_dict={"target_path": 2}
         ),
