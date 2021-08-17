@@ -7,10 +7,10 @@ requests.sessions:
     GET:
       https://example.org/:
       - metadata:
-          latency: 0.5906727313995361
+          latency: 0.5332863330841064
           module_call_list:
           - unittest.case
-          - requre.online_replacing
+          - requre.record_and_replace
           - tests_recording.test_base_git
           - packit.base_git
           - rebasehelper.helpers.download_helper
@@ -23,19 +23,20 @@ requests.sessions:
           __store_indicator: 0
           _content: false
           _next: null
-          elapsed: 0.590607
+          elapsed: 0.533236
           encoding: UTF-8
           headers:
-            Age: '389567'
+            Accept-Ranges: bytes
+            Age: '486236'
             Cache-Control: max-age=604800
             Content-Encoding: gzip
             Content-Length: '648'
             Content-Type: text/html; charset=UTF-8
-            Date: Thu, 13 May 2021 12:40:00 GMT
+            Date: Fri, 13 Aug 2021 07:54:16 GMT
             Etag: '"3147526947+gzip"'
-            Expires: Thu, 20 May 2021 12:40:00 GMT
+            Expires: Fri, 20 Aug 2021 07:54:16 GMT
             Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
-            Server: ECS (dcb/7F81)
+            Server: ECS (dcb/7F5E)
             Vary: Accept-Encoding
             X-Cache: HIT
           raw: !!binary |
@@ -55,10 +56,10 @@ requests.sessions:
           status_code: 200
       https://httpbin.org/anything/rsync-3.1.3.tar.gz:
       - metadata:
-          latency: 0.6076457500457764
+          latency: 0.47382593154907227
           module_call_list:
           - unittest.case
-          - requre.online_replacing
+          - requre.record_and_replace
           - tests_recording.test_base_git
           - packit.base_git
           - rebasehelper.specfile
@@ -72,7 +73,7 @@ requests.sessions:
           __store_indicator: 0
           _content: false
           _next: null
-          elapsed: 0.607517
+          elapsed: 0.473777
           encoding: null
           headers:
             Access-Control-Allow-Credentials: 'true'
@@ -80,14 +81,14 @@ requests.sessions:
             Connection: keep-alive
             Content-Length: '412'
             Content-Type: application/json
-            Date: Thu, 13 May 2021 12:40:01 GMT
+            Date: Fri, 13 Aug 2021 07:54:16 GMT
             Server: gunicorn/19.9.0
           raw: !!binary |
             ewogICJhcmdzIjoge30sIAogICJkYXRhIjogIiIsIAogICJmaWxlcyI6IHt9LCAKICAiZm9ybSI6
             IHt9LCAKICAiaGVhZGVycyI6IHsKICAgICJBY2NlcHQiOiAiKi8qIiwgCiAgICAiQWNjZXB0LUVu
             Y29kaW5nIjogImd6aXAsIGRlZmxhdGUiLCAKICAgICJIb3N0IjogImh0dHBiaW4ub3JnIiwgCiAg
             ICAiVXNlci1BZ2VudCI6ICJweXRob24tcmVxdWVzdHMvMi4yNC4wIiwgCiAgICAiWC1BbXpuLVRy
-            YWNlLUlkIjogIlJvb3Q9MS02MDlkMWUyMS01OGM1Zjc5YzdmYzRkNTVmMTYzY2U1OTkiCiAgfSwg
+            YWNlLUlkIjogIlJvb3Q9MS02MTE2MjUyOC0zZDE3OWZmYzcwZTM2MjAzMjE1YmVlMjkiCiAgfSwg
             CiAgImpzb24iOiBudWxsLCAKICAibWV0aG9kIjogIkdFVCIsIAogICJvcmlnaW4iOiAiODkuMjku
             MjYuNjYiLCAKICAidXJsIjogImh0dHBzOi8vaHR0cGJpbi5vcmcvYW55dGhpbmcvcnN5bmMtMy4x
             LjMudGFyLmd6Igp9Cg==

@@ -11,10 +11,10 @@ X:
               return_value:
                 _bare: false
                 _common_dir: null
-                _working_tree_dir: /tmp/tmp_ppblk7d/cache/python-requre
-                git_dir: /tmp/tmp_ppblk7d/cache/python-requre/.git
-                working_dir: /tmp/tmp_ppblk7d/cache/python-requre
-              target_path: /tmp/tmp_ppblk7d/cache/python-requre
+                _working_tree_dir: /tmp/tmp3ycby7i7/cache/python-requre
+                git_dir: /tmp/tmp3ycby7i7/cache/python-requre/.git
+                working_dir: /tmp/tmp3ycby7i7/cache/python-requre
+              target_path: /tmp/tmp3ycby7i7/cache/python-requre
           - metadata:
               latency: 0
             output:
@@ -22,10 +22,10 @@ X:
               return_value:
                 _bare: false
                 _common_dir: null
-                _working_tree_dir: /tmp/tmp_ppblk7d/clone1
-                git_dir: /tmp/tmp_ppblk7d/clone1/.git
-                working_dir: /tmp/tmp_ppblk7d/clone1
-              target_path: /tmp/tmp_ppblk7d/clone1
+                _working_tree_dir: /tmp/tmp3ycby7i7/clone1
+                git_dir: /tmp/tmp3ycby7i7/clone1/.git
+                working_dir: /tmp/tmp3ycby7i7/clone1
+              target_path: /tmp/tmp3ycby7i7/clone1
           - metadata:
               latency: 0
             output:
@@ -33,10 +33,10 @@ X:
               return_value:
                 _bare: false
                 _common_dir: null
-                _working_tree_dir: /tmp/tmp_ppblk7d/clone2
-                git_dir: /tmp/tmp_ppblk7d/clone2/.git
-                working_dir: /tmp/tmp_ppblk7d/clone2
-              target_path: /tmp/tmp_ppblk7d/clone2
+                _working_tree_dir: /tmp/tmp3ycby7i7/clone2
+                git_dir: /tmp/tmp3ycby7i7/clone2/.git
+                working_dir: /tmp/tmp3ycby7i7/clone2
+              target_path: /tmp/tmp3ycby7i7/clone2
 _requre:
   DataTypes: 1
   key_strategy: StorageKeysInspectSimple
@@ -44,13 +44,13 @@ _requre:
 tempfile:
   mkdtemp:
   - metadata:
-      latency: 4.8160552978515625e-05
+      latency: 5.8650970458984375e-05
       module_call_list:
       - unittest.case
-      - requre.online_replacing
+      - requre.record_and_replace
       - tests_recording.test_repository_cache
       - requre.objects
       - requre.cassette
       - tempfile
       - mkdtemp
-    output: /tmp/tmp_ppblk7d
+    output: /tmp/tmp3ycby7i7
