@@ -204,8 +204,8 @@ def configure_git():
 
 
 @pytest.fixture
-def specfile_maker() -> 'SpecFileMaker':
-    """Creates a class instance that lets you create a single specfile for a test. If the 
+def specfile_maker() -> "SpecFileMaker":
+    """Creates a class instance that lets you create a single specfile for a test. If the
     specfile gets created, it is deleted at the end of the test(after yield)
 
         Args:
@@ -217,7 +217,6 @@ def specfile_maker() -> 'SpecFileMaker':
     """
 
     class SpecFileMaker:
-
         def __init__(self):
             self.filepath = None
             self.dirpath = None
@@ -256,6 +255,3 @@ def specfile_maker() -> 'SpecFileMaker':
 
     # make sure testfile is deleted
     del specfile_maker
-
-
-

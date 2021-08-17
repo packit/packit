@@ -149,9 +149,11 @@ class PackageConfig(CommonPackageConfig):
                 raw_dict["specfile_path"] = spec_file_path
             else:
                 raise PackitConfigException("Spec file was not found!")
-       
+
         if not Path(raw_dict["specfile_path"]).is_file():
-            raise PackitConfigException(f"Spec file not found under {raw_dict['specfile_path']}")
+            raise PackitConfigException(
+                f"Spec file not found under {raw_dict['specfile_path']}"
+            )
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
@@ -160,7 +162,6 @@ class PackageConfig(CommonPackageConfig):
             raw_dict["downstream_package_name"] = repo_name
 
         return PackageConfigSchema().load(raw_dict)
-
 
     def get_copr_build_project_value(self) -> Optional[str]:
         """
@@ -216,7 +217,6 @@ class PackageConfig(CommonPackageConfig):
             == other.copy_upstream_release_description
             and self.sources == other.sources
         )
-
 
 
 def find_packit_yaml(

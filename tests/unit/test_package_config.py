@@ -939,7 +939,9 @@ def test_package_config_overrides_bad(raw, err_message, specfile_maker):
         )
     ],
 )
-def test_package_config_upstream_and_downstream_package_names(raw, expected, specfile_maker):
+def test_package_config_upstream_and_downstream_package_names(
+    raw, expected, specfile_maker
+):
     specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     package_config = PackageConfig.get_from_dict(raw_dict=raw, repo_name="package")
     assert package_config
