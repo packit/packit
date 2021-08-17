@@ -3,7 +3,7 @@
 
 import shutil
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 import subprocess
 import tempfile
 
@@ -201,3 +201,61 @@ def configure_git():
         return
     for item in CMDS:
         subprocess.call(item)
+
+
+@pytest.fixture
+def specfile_maker() -> 'SpecFileMaker':
+    """Creates a class instance that lets you create a single specfile for a test. If the 
+    specfile gets created, it is deleted at the end of the test(after yield)
+
+        Args:
+            None
+
+        Returns:
+            None
+
+    """
+
+    class SpecFileMaker:
+
+        def __init__(self):
+            self.filepath = None
+            self.dirpath = None
+
+        def create_testfile_if_needed(self, testfile_path: Optional[str]) -> None:
+
+            if not testfile_path:
+                return None
+
+            if Path(testfile_path).is_file():
+                return None
+
+            self.filepath = Path(testfile_path).resolve()
+
+            # create a directory for temp file if needed
+            # (the unit tests only seemed to have a single directory
+            # added before the dummy spec file, so this works for now)
+            parent_dir = self.filepath.parents[0]
+            if not parent_dir.is_dir():
+                parent_dir.mkdir(exist_ok=False)
+                self.dirpath = parent_dir
+
+            # create file
+            self.filepath.touch()
+
+        def __del__(self):
+            # delete file and directory if created after tests are done
+            if self.filepath:
+                self.filepath.unlink()
+
+            if self.dirpath:
+                self.dirpath.rmdir()
+
+    specfile_maker = SpecFileMaker()
+    yield specfile_maker
+
+    # make sure testfile is deleted
+    del specfile_maker
+
+
+

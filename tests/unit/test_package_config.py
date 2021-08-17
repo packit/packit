@@ -404,7 +404,8 @@ def test_package_config_not_equal(not_equal_package_config):
         ),
     ],
 )
-def test_package_config_validate(raw, is_valid):
+def test_package_config_validate(raw, is_valid, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     if not is_valid:
         with pytest.raises((ValidationError, ValueError)):
             PackageConfig.get_from_dict(raw)
@@ -443,7 +444,8 @@ def test_package_config_validate(raw, is_valid):
         ),
     ],
 )
-def test_package_config_validate_unknown_key(raw, is_valid):
+def test_package_config_validate_unknown_key(raw, is_valid, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     if not is_valid:
         with pytest.raises((ValidationError, ValueError)):
             PackageConfig.get_from_dict(raw)
@@ -461,7 +463,8 @@ def test_package_config_validate_unknown_key(raw, is_valid):
         }
     ],
 )
-def test_package_config_parse_error(raw):
+def test_package_config_parse_error(raw, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     with pytest.raises(Exception):
         PackageConfig.get_from_dict(raw_dict=raw)
 
@@ -807,7 +810,8 @@ def test_package_config_parse_error(raw):
         ),
     ],
 )
-def test_package_config_parse(raw, expected):
+def test_package_config_parse(raw, expected, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     package_config = PackageConfig.get_from_dict(raw_dict=raw)
     assert package_config
     # tests for https://github.com/packit/packit-service/pull/342
@@ -879,7 +883,8 @@ def test_package_config_parse(raw, expected):
         ),
     ],
 )
-def test_package_config_overrides(raw, expected):
+def test_package_config_overrides(raw, expected, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     package_config = PackageConfig.get_from_dict(raw_dict=raw)
     assert package_config == expected
 
@@ -905,7 +910,8 @@ def test_package_config_overrides(raw, expected):
         ),
     ],
 )
-def test_package_config_overrides_bad(raw, err_message):
+def test_package_config_overrides_bad(raw, err_message, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     with pytest.raises(ValidationError) as ex:
         PackageConfig.get_from_dict(raw_dict=raw)
     assert err_message in str(ex)
@@ -933,13 +939,14 @@ def test_package_config_overrides_bad(raw, err_message):
         )
     ],
 )
-def test_package_config_upstream_and_downstream_package_names(raw, expected):
+def test_package_config_upstream_and_downstream_package_names(raw, expected, specfile_maker):
+    specfile_maker.create_testfile_if_needed(raw["specfile_path"])
     package_config = PackageConfig.get_from_dict(raw_dict=raw, repo_name="package")
     assert package_config
     assert package_config == expected
 
 
-def test_dist_git_package_url():
+def test_dist_git_package_url(specfile_maker):
     di = {
         "dist_git_base_url": "https://packit.dev/",
         "downstream_package_name": "packit",
@@ -948,6 +955,7 @@ def test_dist_git_package_url():
         "specfile_path": "fedora/package.spec",
         "create_pr": False,
     }
+    specfile_maker.create_testfile_if_needed(di["specfile_path"])
     new_pc = PackageConfig.get_from_dict(di)
     pc = PackageConfig(
         dist_git_base_url="https://packit.dev/",
@@ -1109,7 +1117,8 @@ def test_get_all_files_to_sync(package_config, all_synced_files):
     assert package_config.get_all_files_to_sync() == all_synced_files
 
 
-def test_notifications_section():
+def test_notifications_section(specfile_maker):
+    specfile_maker.create_testfile_if_needed("package.spec")
     pc = PackageConfig.get_from_dict({"specfile_path": "package.spec"})
     assert not pc.notifications.pull_request.successful_build
 
