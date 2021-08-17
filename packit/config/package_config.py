@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import json
-import os
 import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Union, Set

@@ -157,5 +157,3 @@ def cronie(tmp_path: Path):
         add_initial_content=False,
     )
     return d
-
-
