@@ -151,9 +151,8 @@ class PackageConfig(CommonPackageConfig):
             else:
                 raise PackitConfigException("Spec file was not found!")
        
-        if not os.path.isfile(raw_dict["specfile_path"]):
-            raise PackitConfigException("Spec file not found under " +
-                    raw_dict["specfile_path"])
+        if not Path(raw_dict["specfile_path"]).is_file():
+            raise PackitConfigException(f"Spec file not found under {raw_dict['specfile_path']}")
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
