@@ -168,7 +168,7 @@ class PatchMetadata:
         squash_commits: bool = False,
         patch_id: Optional[int] = None,
         no_prefix: bool = False,
-        metadata_defined: bool = None,
+        metadata_defined: bool = False,
     ) -> None:
         self.name = name
         self.path = path
@@ -181,6 +181,20 @@ class PatchMetadata:
         self.no_prefix = no_prefix
         # this is set during PatchMetadata.from_commit()
         self.metadata_defined = metadata_defined
+
+    def __eq__(self, other) -> bool:
+        return (
+            self.name == other.name
+            and self.path == other.path
+            and self.description == other.description
+            and self.commit == other.commit
+            and self.present_in_specfile == other.present_in_specfile
+            and self.ignore == other.ignore
+            and self.squash_commits == other.squash_commits
+            and self.patch_id == other.patch_id
+            and self.no_prefix == other.no_prefix
+            and self.metadata_defined == other.metadata_defined
+        )
 
     @property
     def specfile_comment(self) -> str:
@@ -304,15 +318,28 @@ class PatchMetadata:
             name=metadata.get("Patch-name") or patch_path.name,
             path=patch_path,
             description=description.strip(),
-            present_in_specfile=metadata.get("Patch-present-in-specfile"),
-            ignore=metadata.get("Ignore-patch"),
+            present_in_specfile=metadata.get("Patch-present-in-specfile", False),
+            ignore=metadata.get("Ignore-patch", False),
             patch_id=metadata.get("Patch-id"),
-            no_prefix=metadata.get("No-prefix"),
+            no_prefix=metadata.get("No-prefix", False),
             metadata_defined=bool(metadata),
         )
 
     def __repr__(self):
-        return f"Patch(name={self.name}, commit={self.commit})"
+        return (
+            f"Patch("
+            f"name={self.name}, "
+            f"path={self.path}, "
+            f"description={self.description}, "
+            f"commit={self.commit}, "
+            f"present_in_specfile={self.present_in_specfile}, "
+            f"ignore={self.ignore}, "
+            f"squash_commits={self.squash_commits}, "
+            f"patch_id={self.patch_id}, "
+            f"no_prefix={self.no_prefix}, "
+            f"metadata_defined={self.metadata_defined}"
+            ")"
+        )
 
 
 class PatchGenerator:
