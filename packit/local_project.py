@@ -33,7 +33,13 @@ from ogr.abstract import GitProject, GitService
 from ogr.parsing import parse_git_repo
 
 from packit.exceptions import PackitException, PackitMergeException
-from packit.utils.repo import RepositoryCache, is_git_repo, get_repo, is_a_git_ref
+from packit.utils.repo import (
+    RepositoryCache,
+    is_git_repo,
+    get_repo,
+    is_a_git_ref,
+    shorten_commit_hash,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -171,9 +177,9 @@ class LocalProject:
         :return: first 8 characters of the current commit
         """
         if self.git_repo.head.is_detached:
-            return self.git_repo.head.commit.hexsha[:8]
+            return shorten_commit_hash(self.git_repo.head.commit.hexsha)
         else:
-            return self.git_repo.active_branch.commit.hexsha[:8]
+            return shorten_commit_hash(self.git_repo.active_branch.commit.hexsha)
 
     def clean(self):
         if self.working_dir_temporary:
@@ -475,10 +481,10 @@ class LocalProject:
 
         self._fetch_as_branch(remote_ref, local_ref, local_branch)
 
-        commit_sha = str(self.git_repo.head.commit)[:7]
+        head_commit = self.git_repo.branches[local_branch].commit
         logger.info(
             f"Checked out commit\n"
-            f"({commit_sha})\t{self.git_repo.head.commit.summary}"
+            f"({shorten_commit_hash(head_commit.hexsha)})\t{head_commit.summary}"
         )
 
     def merge_pr(self, pr_id: Union[str, int]) -> None:
@@ -505,7 +511,7 @@ class LocalProject:
         self.git_repo.branches[local_target_branch].checkout()
         target_branch = self.git_repo.branches[local_target_branch]
 
-        commit_sha = str(target_branch.commit)[:7]
+        commit_sha = shorten_commit_hash(target_branch.commit.hexsha)
         logger.info(
             f"Merging ({pr.target_branch}) with commit:\n"
             f"({commit_sha})\t{target_branch.commit.summary}"
