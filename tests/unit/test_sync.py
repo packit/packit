@@ -187,3 +187,15 @@ def test_command_globs(tmp_path):
         f"{tmp_path}/src/file2",
         f"{tmp_path}/dest",
     ] == command
+
+
+def test_sync_files_item_sorting():
+    order1 = [
+        SyncFilesItem(src=["packit.spec"], dest="packit.spec"),
+        SyncFilesItem(src=[".packit.yaml"], dest=".packit2.yaml"),
+    ]
+    order2 = [
+        SyncFilesItem(src=[".packit.yaml"], dest=".packit2.yaml"),
+        SyncFilesItem(src=["packit.spec"], dest="packit.spec"),
+    ]
+    assert sorted(order1) == sorted(order2)

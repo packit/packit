@@ -91,24 +91,24 @@ class SyncFilesItem:
         if not isinstance(other, SyncFilesItem):
             raise NotImplementedError()
 
-        return (
-            self.src < other.src
-            and self.dest < other.dest
-            and self.mkpath < other.mkpath
-            and self.delete < other.delete
-            and self.filters < other.filters
+        return (self.src, self.dest, self.mkpath, self.delete, self.filters) < (
+            other.src,
+            other.dest,
+            other.mkpath,
+            other.delete,
+            other.filters,
         )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SyncFilesItem):
             raise NotImplementedError()
 
-        return (
-            self.src == other.src
-            and self.dest == other.dest
-            and self.mkpath == other.mkpath
-            and self.delete == other.delete
-            and self.filters == other.filters
+        return (self.src, self.dest, self.mkpath, self.delete, self.filters) == (
+            other.src,
+            other.dest,
+            other.mkpath,
+            other.delete,
+            other.filters,
         )
 
     def command(self, fail_on_missing: bool = False) -> List[str]:
