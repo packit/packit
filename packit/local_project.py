@@ -27,11 +27,12 @@ from pathlib import Path
 from typing import Optional, Union, Iterable, Iterator
 
 import git
+from git.exc import GitCommandError
 from ogr import GitlabService
 from ogr.abstract import GitProject, GitService
 from ogr.parsing import parse_git_repo
 
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, PackitMergeException
 from packit.utils.repo import RepositoryCache, is_git_repo, get_repo, is_a_git_ref
 
 logger = logging.getLogger(__name__)
@@ -130,6 +131,7 @@ class LocalProject:
         # the PR itself, so if both are specified, PR ID > ref
         if pr_id:
             self.checkout_pr(pr_id)
+            self.merge_pr(pr_id)
         elif ref:
             self.checkout_ref(ref)
 
@@ -442,6 +444,22 @@ class LocalProject:
 
         return head
 
+    def _fetch_as_branch(
+        self, remote_ref: str, local_ref: str, local_branch: str
+    ) -> None:
+        """
+        Fetches reference from the remote as the specified local reference and
+        creates a branch for it.
+
+        Args:
+            remote_ref: Git reference to be fetched from remote.
+            local_ref: Git reference that refers to the remote reference.
+            local_branch: Branch that represents local reference.
+        """
+        remote = self.remote or "origin"
+        self.git_repo.remotes[remote].fetch(f"{remote_ref}:{local_ref}")
+        self.git_repo.create_head(local_branch, f"{remote}/{local_branch}")
+
     def checkout_pr(self, pr_id: Union[str, int]):
         """
         Fetch selected PR and check it out.
@@ -452,12 +470,53 @@ class LocalProject:
             "merge-requests" if is_gitlab else "pull", pr_id
         )
         remote_name = self.remote or "origin"
-        local_ref = f"refs/remotes/{remote_name}/pr/{pr_id}"
-        local_branch = f"pr/{pr_id}"
-        self.git_repo.remotes[remote_name].fetch(f"{remote_ref}:{local_ref}")
-        self.git_repo.create_head(local_branch, f"{remote_name}/{local_branch}")
-        self.git_repo.branches[local_branch].checkout()
-        logger.info(f"Checked out commit {self.git_repo.head.commit}")
+        local_ref = f"refs/remotes/{remote_name}/pr-changes/{pr_id}"
+        local_branch = f"pr-changes/{pr_id}"
+
+        self._fetch_as_branch(remote_ref, local_ref, local_branch)
+
+        commit_sha = str(self.git_repo.head.commit)[:7]
+        logger.info(
+            f"Checked out commit\n"
+            f"({commit_sha})\t{self.git_repo.head.commit.summary}"
+        )
+
+    def merge_pr(self, pr_id: Union[str, int]) -> None:
+        """
+        Merge given PR into target branch. Fetches and switches to base branch
+        (where changes from the PR are to be merged) and then merges branch with
+        changes from the PR.
+
+        Args:
+            pr_id: ID of the PR we are merging.
+
+        Raises:
+            PackitException: In case merge fails.
+        """
+        remote = self.remote or "origin"
+        pr = self.git_project.get_pr(int(pr_id))
+
+        local_target_branch = f"pr/{pr_id}"
+        self._fetch_as_branch(
+            f"+refs/heads/{pr.target_branch}",
+            f"refs/remotes/{remote}/pr/{pr_id}",
+            local_target_branch,
+        )
+        self.git_repo.branches[local_target_branch].checkout()
+        target_branch = self.git_repo.branches[local_target_branch]
+
+        commit_sha = str(target_branch.commit)[:7]
+        logger.info(
+            f"Merging ({pr.target_branch}) with commit:\n"
+            f"({commit_sha})\t{target_branch.commit.summary}"
+        )
+        try:
+            self.git_repo.git.merge(f"pr-changes/{pr_id}")
+        except GitCommandError as ex:
+            logger.error(f"Merge failed with: {ex}")
+            if "Merge conflict" in str(ex):
+                raise PackitMergeException(ex)
+            raise PackitException(ex)
 
     def checkout_release(self, tag: str) -> None:
         logger.info(f"Checking out upstream version {tag}.")
