@@ -90,6 +90,10 @@ class PackitSRPMException(PackitException):
     """Problem with the SRPM"""
 
 
+class PackitMergeException(PackitException):
+    """Failed to merge PR into base branch"""
+
+
 class PackitSRPMNotFoundException(PackitSRPMException):
     """SRPM created but not found"""
 

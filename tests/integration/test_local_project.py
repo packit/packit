@@ -7,6 +7,7 @@ from ogr import GithubService, GitlabService
 from packit.local_project import LocalProject
 from packit.utils.repo import create_new_repo
 
+from flexmock import flexmock
 from tests.spellbook import initiate_git_repo
 
 
@@ -33,12 +34,16 @@ def test_pr_id_and_ref(tmp_path: Path):
     )
     subprocess.check_call(["git", "branch", "-D", local_tmp_branch], cwd=upstream_git)
 
+    git_project = flexmock(repo="random_name", namespace="random_namespace")
+    git_project.should_receive("get_pr").and_return(flexmock(target_branch="main"))
+
     LocalProject(
         working_dir=upstream_git,
         offline=True,
         pr_id=pr_id,
         ref=ref,
         git_service=GithubService(),
+        git_project=git_project,
     )
 
     assert (
@@ -79,12 +84,16 @@ def test_pr_id_and_ref_gitlab(tmp_path: Path):
     )
     subprocess.check_call(["git", "branch", "-D", local_tmp_branch], cwd=upstream_git)
 
+    git_project = flexmock(repo="random_name", namespace="random_namespace")
+    git_project.should_receive("get_pr").and_return(flexmock(target_branch="main"))
+
     LocalProject(
         working_dir=upstream_git,
         offline=True,
         pr_id=pr_id,
         ref=ref,
         git_service=GitlabService(token="12345"),
+        git_project=git_project,
     )
 
     assert (
