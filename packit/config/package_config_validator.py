@@ -22,11 +22,14 @@
 
 from pathlib import Path
 from typing import Dict, Union, List, Any
+import logging
 
 from marshmallow import ValidationError
 
 from packit.config.package_config import PackageConfig, get_local_specfile_path
 from packit.exceptions import PackitConfigException
+
+logger = logging.getLogger(__name__)
 
 
 class PackageConfigValidator:
@@ -51,6 +54,18 @@ class PackageConfigValidator:
             schema_errors = e.messages
         except PackitConfigException as e:
             return str(e)
+
+        specfile_path = self.content.get("specfile_path", None)
+        if specfile_path and not Path(specfile_path).is_file():
+            logger.warning(
+                f"The spec file you defined ({specfile_path}) is not "
+                f"present in the repository. If it's being generated "
+                f"dynamically, you can verify the functionality by "
+                f"running `packit srpm` to create an SRPM "
+                f"from the current checkout. If it's not being generated, "
+                f"please make sure the path is correct and "
+                f"the file is present."
+            )
 
         if not schema_errors:
             return f"{self.config_file_path.name} is valid and ready to be used"
