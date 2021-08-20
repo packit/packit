@@ -35,7 +35,7 @@ def test_add_patch(specfile, patch_id_digits):
 
     Change the number of digits, too, to see that it's considered.
     """
-    if list(map(int, rpm.__version__.split("."))) < [4, 16] and patch_id_digits == 0:
+    if list(map(int, rpm.__version_info__[:2])) < [4, 16] and patch_id_digits == 0:
         pytest.xfail(
             "Versions before RPM 4.16 have incorrect patch indexing "
             "when an index is not explicitly defined. "
