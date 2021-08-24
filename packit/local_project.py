@@ -519,7 +519,7 @@ class LocalProject:
         try:
             self.git_repo.git.merge(f"pr-changes/{pr_id}")
         except GitCommandError as ex:
-            logger.error(f"Merge failed with: {ex}")
+            logger.warning(f"Merge failed with: {ex}")
             if "Merge conflict" in str(ex):
                 raise PackitMergeException(ex)
             raise PackitException(ex)
