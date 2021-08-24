@@ -314,3 +314,16 @@ def get_metadata_from_message(commit: git.Commit) -> Optional[dict]:
             return loaded_part
 
     return None
+
+
+def shorten_commit_hash(commit_hash: str) -> str:
+    """
+    Shortens commit hash to first 8 characters.
+
+    Args:
+        commit_hash: Commit hash to be shortened.
+
+    Returns:
+        First 8 characters of the commit hash.
+    """
+    return commit_hash[:8]
