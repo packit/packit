@@ -199,8 +199,8 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     )
 
     assert (
-        "patch_name: turn-into-fedora.patch"
+        "Patch-name: turn-into-fedora.patch"
         in hello_source_git_repo.head.commit.message
     )
-    assert "patch_id: 0" in hello_source_git_repo.head.commit.message
-    assert "description:" in hello_source_git_repo.head.commit.message
+    assert "Patch-id: 0" in hello_source_git_repo.head.commit.message
+    assert "Patch-status:" in hello_source_git_repo.head.commit.message

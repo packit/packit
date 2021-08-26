@@ -44,7 +44,7 @@ cat - | /usr/bin/patch ${patch_args}
 commit_message=$(cat << EOF
 Apply patch ${patch_name}
 
-patch_name: ${patch_name}
+Patch-name: ${patch_name}
 EOF
 )
 
@@ -53,7 +53,7 @@ EOF
 if echo ${@:3} | grep -E "[-]p0|[-]p 0"; then
   commit_message=$(cat << EOF
 $commit_message
-no_prefix: true
+No-prefix: true
 EOF
 )
 fi
