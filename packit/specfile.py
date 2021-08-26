@@ -207,7 +207,11 @@ class Specfile(SpecFile):
             # https://src.fedoraproject.org/rpms/python3.10/blob/ac9a5093cb9f534ef2f65cbd1f50684c88b91eec/f/python3.10.spec#_267
             patch_id = max(patch_number_offset + 1, 1)
 
-        new_content = "\n# " + "\n# ".join(patch_metadata.specfile_comment.split("\n"))
+        new_content = "\n"
+        new_content += "\n".join(
+            line if line.startswith("#") else f"# {line}".strip()
+            for line in patch_metadata.specfile_comment.splitlines()
+        )
         patch_id_str = f"{patch_id:0{patch_id_digits}d}" if patch_id_digits > 0 else ""
         new_content += f"\nPatch{patch_id_str}: {patch_metadata.name}"
 
@@ -232,7 +236,7 @@ class Specfile(SpecFile):
             where = len(self.spec_content.section("%package"))
 
         logger.debug(f"Adding patch {patch_metadata.name} to the spec file.")
-        self.spec_content.section("%package")[where:where] = new_content.split("\n")
+        self.spec_content.section("%package")[where:where] = new_content.splitlines()
         self.save()
 
     def get_source(self, source_name: str) -> Optional[Tag]:

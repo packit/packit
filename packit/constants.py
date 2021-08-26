@@ -82,6 +82,15 @@ SYNCING_NOTE = (
     "The file was generated using packit {packit_version}.\n"
 )
 
+PATCH_META_TRAILER_TOKENS = {
+    "Patch-name",
+    "Patch-id",
+    "Patch-status",
+    "Patch-present-in-specfile",
+    "Ignore-patch",
+    "No-prefix",
+}
+
 # shell code wrapped in lua as a python constant, what could go wrong?
 # for real now: this horror is being used when creating source-git repos from upstream
 # these macros override RPM default macros for setup and patching so that
@@ -116,8 +125,7 @@ RPM_MACROS_FOR_PREP = [
     "%{__git} am %{-q} %{-p:-p%{-p*}} && "
     "patch_name=`basename %{1}` && "
     "commit_msg=`%{__git} log --format=%B -n1` && "
-    r'metadata_commit_msg=`printf "patch_name: $patch_name\\n'
-    r'squash_commits: true"` && '
+    r'metadata_commit_msg=`printf "Patch-name: $patch_name"` && '
     '%{__git} commit --amend -m "$commit_msg" -m "$metadata_commit_msg"',
     # do the same of %autosetup -Sgit
     # that is, apply packit patch metadata to the patch commit
@@ -126,6 +134,6 @@ RPM_MACROS_FOR_PREP = [
     "__scm_apply_git(qp:m:) "
     "%{__git} apply --index %{-p:-p%{-p*}} - && "
     "patch_name=`basename %{1}` && "
-    r'metadata_commit_msg=`printf "patch_name: $patch_name\\n"` && '
+    r'metadata_commit_msg=`printf "Patch-name: $patch_name\\n"` && '
     '%{__git} commit %{-q} -m %{-m*} -m "${metadata_commit_msg}" --author "%{__scm_author}"',
 ]

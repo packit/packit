@@ -203,14 +203,14 @@ class SourceGitGenerator:
 
             # Annotate commits in the source-git repo with patch_id. This info is not provided
             # during the rpm patching process so we need to do it here.
-            metadata = PatchMetadata.from_commit(commit=commit)
+            metadata = PatchMetadata.from_git_trailers(commit)
             # commit.message already ends with \n
             message = commit.message
-            message += f"patch_id: {patch_ids[metadata.name]}\n"
+            message += f"Patch-id: {patch_ids[metadata.name]}\n"
             if patch_comments.get(metadata.name):
-                message += "description: |-\n"
+                message += "Patch-status: |\n"
             for line in patch_comments.get(metadata.name, []):
-                message += f"    {line}\n"
+                message += f"    # {line}\n"
             self.source_git.git.commit(message=message, amend=True)
 
         self.source_git.git.branch("-D", to_branch)
