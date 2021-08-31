@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import logging
+from os import getenv
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
@@ -135,6 +136,8 @@ class SandcastleCommandHandler(CommandHandler):
             pvc_volume_specs = [
                 VolumeSpec(**vol_spec_dict)
                 for vol_spec_dict in self.config.command_handler_pvc_volume_specs
+                if "pvc_from_env" not in vol_spec_dict
+                or getenv(vol_spec_dict.get("pvc_from_env"))
             ]
 
             self._sandcastle = Sandcastle(
