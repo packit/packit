@@ -80,12 +80,6 @@ class Specfile(SpecFile):
             if not changelog_entry:
                 return
 
-            if not self.spec_content.section("%changelog"):
-                logger.debug(
-                    "The specfile doesn't have any %changelog, will not set it."
-                )
-                return
-
             self.update_changelog_in_spec(changelog_entry)
 
         except RebaseHelperError as ex:
