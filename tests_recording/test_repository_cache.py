@@ -44,12 +44,21 @@ class RepositoryCacheTest(unittest.TestCase):
 
         repo_cache = RepositoryCache(cache_path=cache_path, add_new=True)
         assert repo_cache.cached_projects == []
+        assert repo_cache.projects_added == []
+        assert repo_cache.projects_cloned_using_cache == []
 
         assert repo_cache.get_repo(url=TEST_PROJECT_URL_TO_CLONE, directory=clone1_path)
         assert repo_cache.cached_projects == [TEST_PROJECT_NAME]
+        assert repo_cache.projects_added == [TEST_PROJECT_NAME]
+        assert repo_cache.projects_cloned_using_cache == [TEST_PROJECT_NAME]
 
         assert repo_cache.get_repo(url=TEST_PROJECT_URL_TO_CLONE, directory=clone2_path)
         assert repo_cache.cached_projects == [TEST_PROJECT_NAME]
+        assert repo_cache.projects_added == [TEST_PROJECT_NAME]
+        assert repo_cache.projects_cloned_using_cache == [
+            TEST_PROJECT_NAME,
+            TEST_PROJECT_NAME,
+        ]
 
     def test_repository_cache_do_not_add_new_if_not_enabled(self):
         tmp_path = Path(tempfile.mkdtemp())
@@ -61,9 +70,13 @@ class RepositoryCacheTest(unittest.TestCase):
 
         repo_cache = RepositoryCache(cache_path=cache_path, add_new=False)
         assert repo_cache.cached_projects == []
+        assert repo_cache.projects_added == []
+        assert repo_cache.projects_cloned_using_cache == []
 
         assert repo_cache.get_repo(url=TEST_PROJECT_URL_TO_CLONE, directory=clone_path)
         assert repo_cache.cached_projects == []
+        assert repo_cache.projects_added == []
+        assert repo_cache.projects_cloned_using_cache == []
 
     def test_repository_cache_accept_str(self):
         tmp_path = Path(tempfile.mkdtemp())
