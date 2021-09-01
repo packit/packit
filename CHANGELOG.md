@@ -1,3 +1,11 @@
+# 0.36.0
+
+- `status` command has been refactored and now provides much cleaner output. (#1329)
+- A log warning is raised if the specfile specified by the user in the config doesn't exist. (#1342)
+- Packit by default locally merges checked out pull requests into target branch. Logging for checking out pull requests was improved to contain hashes and summaries of last commit on both source and target branches. (#1344)
+- `source-git update-dist-git` now supports using Git trailers to define patch metadata, which will control how patches are generated and added to the spec-file. `source-git init` uses this format to capture patch metadata when setting up a source-git repo, instead of the YAML one. To maintain backwards compatibility, the YAML format is still parsed, but only if none of the patches defines metadata using Git trailers. (#1336)
+- Fixed a bug that caused purging or syncing upstream changelog (when not configured) from specfile when running `propose-downstream`. New behavior preserves downstream changelog and in case there are either no entries or no %changelog section present, it is created with a new entry. (#1349)
+
 # 0.35.0
 
 - Propose-downstream: log when a PR already exists downstream (#1322).
