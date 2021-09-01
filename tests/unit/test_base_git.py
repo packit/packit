@@ -448,3 +448,47 @@ def test_set_spec_content(tmp_path):
         == dist_git.specfile.spec_content.section("%changelog")
     )
     assert "1.1" == dist_git.specfile.get_version()
+
+
+@pytest.mark.parametrize("changelog_section", ["\n%changelog\n", ""])
+def test_set_spec_content_no_changelog(tmp_path, changelog_section):
+    distgit_spec_contents = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1.0\n"
+        "Release: 1\n"
+        "Source0: foo.bar\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n" + changelog_section
+    )
+    distgit_spec_path = tmp_path / "life.spec"
+    distgit_spec_path.write_text(distgit_spec_contents)
+
+    upstream_spec_contents = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1.0\n"
+        "Release: 1\n"
+        "Source0: foo.bor\n"
+        "License: MIT\n"
+        "Summary: evanescence, I was brought to life\n"
+        "%description\n-\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    upstream_spec_path = tmp_path / "e-life.spec"
+    upstream_spec_path.write_text(upstream_spec_contents)
+    upstream_specfile = Specfile(upstream_spec_path, sources_dir=tmp_path)
+
+    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git._specfile_path = distgit_spec_path
+
+    new_log = [
+        "* Wed Jun 02 2021 John Fou <john-fou@example.com> - 1.1-1",
+        "- 1.1 upstream release",
+    ]
+    flexmock(SpecFile).should_receive("get_new_log").with_args(
+        "1.1 upstream release"
+    ).and_return(new_log)
+    dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
+    assert dist_git.specfile.spec_content.section("%changelog") == new_log

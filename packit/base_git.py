@@ -361,7 +361,9 @@ class PackitRepositoryBase:
         """
         previous_changelog = self.specfile.spec_content.section("%changelog")
         self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
-        self.specfile.spec_content.replace_section("%changelog", previous_changelog)
+        self.specfile.spec_content.replace_section(
+            "%changelog", previous_changelog or []
+        )
         self.specfile.save()
         self.specfile.set_spec_version(version=version, changelog_entry=comment)
         self.specfile.save()
