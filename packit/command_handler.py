@@ -133,11 +133,21 @@ class SandcastleCommandHandler(CommandHandler):
                 path=self.config.command_handler_work_dir,
                 with_interim_pvc=True,
             )
+
             pvc_volume_specs = [
                 VolumeSpec(**vol_spec_dict)
                 for vol_spec_dict in self.config.command_handler_pvc_volume_specs
-                if "pvc_from_env" not in vol_spec_dict
-                or getenv(vol_spec_dict.get("pvc_from_env"))
+                if (
+                    # Do not mount when the env-var is not set
+                    "pvc_from_env" not in vol_spec_dict
+                    or getenv(vol_spec_dict.get("pvc_from_env"))
+                )
+                and not (
+                    # Do not mount repository cache when it's not used
+                    self.config.repository_cache
+                    and vol_spec_dict.get("path") == self.config.repository_cache
+                    and not self.local_project.cache.projects_cloned_using_cache
+                )
             ]
 
             self._sandcastle = Sandcastle(

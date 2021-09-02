@@ -35,6 +35,8 @@ class RepositoryCache:
             f"Instantiation of the repository cache at {self.cache_path}. "
             f"New projects will {'not ' if not self.add_new else ''}be added."
         )
+        self.projects_added: List[str] = []
+        self.projects_cloned_using_cache: List[str] = []
 
     @property
     def cached_projects(self) -> List[str]:
@@ -82,9 +84,11 @@ class RepositoryCache:
         if project_name not in cached_projects and self.add_new:
             logger.debug(f"Creating reference repo: {reference_repo}")
             self._clone(url=url, to_path=str(reference_repo), tags=True)
+            self.projects_added.append(project_name)
 
         if self.add_new or project_name in cached_projects:
             logger.debug(f"Using reference repo: {reference_repo}")
+            self.projects_cloned_using_cache.append(project_name)
             return self._clone(
                 url=url, to_path=directory, tags=True, reference=str(reference_repo)
             )
