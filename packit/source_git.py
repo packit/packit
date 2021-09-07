@@ -211,7 +211,7 @@ class SourceGitGenerator:
                 message += "Patch-status: |\n"
             for line in patch_comments.get(metadata.name, []):
                 message += f"    # {line}\n"
-            self.source_git.git.commit(message=message, amend=True)
+            self.source_git.git.commit(message=message, amend=True, allow_empty=True)
 
         self.source_git.git.branch("-D", to_branch)
 
