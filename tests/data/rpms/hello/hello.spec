@@ -8,7 +8,10 @@ URL: src/hello
 Source: hello-1.0.1.tar.gz
 
 # Say hello to Fedora
-Patch: turn-into-fedora.patch
+Patch0001: turn-into-fedora.patch
+
+# Patch from Git
+Patch0002: from-git.patch
 
 Provides: hello
 
