@@ -181,7 +181,7 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
         Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text()
     )
     check_source_git_config(source_git_config)
-    assert source_git_config["patch_generation_patch_id_digits"] == 0
+    assert source_git_config["patch_generation_patch_id_digits"] == 4
 
     assert (
         Path(hello_source_git_repo.working_dir, DISTRO_DIR, ".gitignore").read_text()
@@ -194,13 +194,16 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     assert not Path(hello_source_git_repo.working_dir, DISTRO_DIR, ".git").exists()
 
     assert (
-        "Hello Fedora"
+        "Hello Fedora Linux"
         in Path(hello_source_git_repo.working_dir, "hello.rs").read_text()
     )
 
-    assert (
-        "Patch-name: turn-into-fedora.patch"
-        in hello_source_git_repo.head.commit.message
-    )
-    assert "Patch-id: 0" in hello_source_git_repo.head.commit.message
-    assert "Patch-status:" in hello_source_git_repo.head.commit.message
+    commit_messsage_lines = hello_source_git_repo.commit("HEAD~1").message.splitlines()
+    assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
+    assert "Patch-id: 1" in commit_messsage_lines
+    assert "Patch-status: |" in commit_messsage_lines
+
+    commit_messsage_lines = hello_source_git_repo.commit("HEAD").message.splitlines()
+    assert "Patch-name: from-git.patch" in commit_messsage_lines
+    assert "Patch-id: 2" in commit_messsage_lines
+    assert "Patch-status: |" in commit_messsage_lines
