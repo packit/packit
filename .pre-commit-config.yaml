@@ -27,9 +27,9 @@ repos:
       - id: detect-private-key
         exclude: tests/integration/conftest.py
       - id: end-of-file-fixer
-        exclude: tests/data/patches
+        exclude: ^(tests/data/patches|tests/.+\.patch)
       - id: trailing-whitespace
-        exclude: tests/data/patches
+        exclude: ^(tests/data/patches|tests/.+\.patch)
   - repo: https://github.com/PyCQA/flake8
     rev: 3.9.2
     hooks:

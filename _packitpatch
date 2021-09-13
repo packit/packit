@@ -33,36 +33,57 @@ else
   patch_path=$1
 fi
 patch_name=$(basename $patch_path)
-patch_id=$2
 
 # we process first and second arg above, the rest is for patch
 # and we don't want backup files in our source-git repos
 patch_args=$(echo ${@:3} | sed -e 's/ -b//' -e 's/--backup//')
 
-cat - | /usr/bin/patch ${patch_args}
+base_commit=$(git rev-parse HEAD)
+temp_branch="apply-${patch_name}"
+git checkout -b ${temp_branch}
+# Try to apply the patch with 'git am'. This might produce multiple commits.
+# Might succeed OR fail, in which case use 'patch' to apply the patch.
+if ! cat "$patch_path" | git am; then
+    git am --abort
+    cat "$patch_path" | /usr/bin/patch ${patch_args}
+    git add -f .
+    # patches can be empty, rpmbuild is fine with it
+    git commit -m"Apply patch ${patch_name}" --allow-empty
+fi
 
-commit_message=$(cat << EOF
-Apply patch ${patch_name}
+# Let's go back to the ref we were before starting all this.
+git checkout -
 
-Patch-name: ${patch_name}
-EOF
-)
-
+trailers="Patch-name: ${patch_name}"
 # when patches are applied with -p0, we need to strip the prefix
 # in packit when creating the patch files
 if echo ${@:3} | grep -E "[-]p0|[-]p 0"; then
-  commit_message=$(cat << EOF
-$commit_message
+  trailers="$trailers
 No-prefix: true
-EOF
-)
+"
 fi
 
-if [ "$patch_id" != "%{2}" ]; then
-  # concat 2 strings and separate them with \n - a nightmare to do in bash
-  printf -v commit_message "${commit_message}"
-fi
+# Cherry-pick commits from the temp branch, one-by-one, and amend them
+# to include Git-trailers with patch-metadata.
+for commit in $(git rev-list ${base_commit}..${temp_branch} | tac); do
+    commit_message=$(git show -s --format=%B $commit)
+    has_trailers=$(echo "$commit_message" | git interpret-trailers --parse)
+    # Make sure there is an empty line to separate the trailer block
+    # from the commit message if the commit message has no trailers so far.
+    if [[ -z "$has_trailers" ]]; then
+        # Watch out for the correct indentation!
+        # This seems to be the easiest way to add a newline
+        # at the end of the message.
+        commit_message="$commit_message
+"
+    fi
+    # Watch out for the correct indentation!
+    commit_message="$commit_message
+$trailers
+"
+    git cherry-pick --allow-empty $commit
+    git commit --allow-empty --amend -m"$commit_message"
+done
 
-git add -f .
-# patches can be empty, rpmbuild is fine with it
-git commit -m "$commit_message" --allow-empty
+# Clean up the temporary branch.
+git branch -D ${temp_branch}
