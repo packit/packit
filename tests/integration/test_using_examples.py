@@ -48,7 +48,8 @@ from tests.spellbook import (
         (UP_EDD, "0.3", "https://github.com/psss/edd"),
         (UP_VSFTPD, "3.0.3", "https://github.com/olysonek/vsftpd"),
         (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
-    ]
+    ],
+    ids=["snapd", "osbuild", "edd", "vsftpd", "ogr"],
 )
 def example_repo(request, tmp_path):
     example_path, tag, remote = request.param

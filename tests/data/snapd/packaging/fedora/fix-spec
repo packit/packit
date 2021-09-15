@@ -4,6 +4,7 @@ set -ex
 test `printenv PACKIT_PROJECT_VERSION` = "2.41"
 # just make sure it is set
 printenv PACKIT_PROJECT_COMMIT
+printenv PACKIT_RPMSPEC_RELEASE
 test `printenv PACKIT_PROJECT_ARCHIVE` = "snapd-2.41.tar.gz"
 
 p="packaging/fedora"
