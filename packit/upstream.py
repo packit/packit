@@ -351,18 +351,19 @@ class Upstream(PackitRepositoryBase):
             )
             raise
 
-    def fix_spec(self, archive: str, version: str, commit: str):
-        """
-        In order to create a SRPM from current git checkout, we need to have the spec reference
-        the tarball and unpack it. This method updates the spec so it's possible.
+    def get_spec_release(self) -> str:
+        """Assemble pieces of the spec file %release field we intend to set
+        within the default fix-spec-file action
 
-        :param archive: relative path to the archive: used as Source0
-        :param version: version to set in the spec
-        :param commit: commit to set in the changelog
-        """
-        self._fix_spec_source(archive)
-        self._fix_spec_prep(archive)
+        The format is:
+            {original_release_number}.{current_time}.{sanitized_current_branch}{git_desc_suffix}
 
+        Example:
+            1.20210913173257793557.packit.experiment.24.g8b618e91
+
+        Returns:
+            string which is meant to be put into a spec file %release field by packit
+        """
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
         git_des_command = [
@@ -388,15 +389,27 @@ class Upstream(PackitRepositoryBase):
             # release components are meant to be separated by ".", not "-"
             git_desc_suffix = "." + ".".join(g_desc_raw)
             # the leading dot is put here b/c git_desc_suffix can be empty
-            # and we could have two subsequent dots - rpm errors in such a case
+            # and we could have two subsequent dots - rpm errors out in such a case
         current_branch = self.local_project.ref
         sanitized_current_branch = sanitize_branch_name_for_rpm(current_branch)
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-        release = (
+        return (
             f"{original_release_number}.{current_time}."
             f"{sanitized_current_branch}{git_desc_suffix}"
         )
+
+    def fix_spec(self, archive: str, version: str, commit: str):
+        """
+        In order to create a SRPM from current git checkout, we need to have the spec reference
+        the tarball and unpack it. This method updates the spec so it's possible.
+
+        :param archive: relative path to the archive: used as Source0
+        :param version: version to set in the spec
+        :param commit: commit to set in the changelog
+        """
+        self._fix_spec_source(archive)
+        self._fix_spec_prep(archive)
 
         last_tag = self.get_last_tag()
         msg = ""
@@ -406,6 +419,7 @@ class Upstream(PackitRepositoryBase):
             # no describe, no tag - just a boilerplate message w/ commit hash
             # or, there were no changes b/w HEAD and last_tag, which implies last_tag == HEAD
             msg = f"- Development snapshot ({commit})"
+        release = self.get_spec_release()
         logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
@@ -873,8 +887,15 @@ class SRPMBuilder:
             archive: Path to the archive.
         """
         current_commit = self.upstream.local_project.commit_hexsha
+        # the logic behind the naming:
+        # * PACKIT - our namespace
+        # * PACKIT_PROJECT - info about the project which we obtained
+        # * PACKIT_RPMSPEC - data for the project's specfile assembled by us
+        #                  - RPMSPEC is more descriptive than just SPEC
         env = {
             "PACKIT_PROJECT_VERSION": self.current_git_describe_version,
+            # Spec file %release field which packit sets by default
+            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
         }
