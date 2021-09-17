@@ -1,3 +1,8 @@
+# 0.37.0
+
+- `packit source-git` init was updated to try to apply patches with `git am` first, and use `patch` only when this fails, in order to keep the commit message of Git-formatted (mbox) patch files in the source-git history. (#1358)
+- Packit now provides `PACKIT_RPMSPEC_RELEASE` environment variable in actions. (#1363)
+
 # 0.36.0
 
 - `status` command has been refactored and now provides much cleaner output. (#1329)
