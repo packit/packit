@@ -31,6 +31,7 @@ from packit.local_project import LocalProject
 from packit.patches import PatchGenerator, PatchMetadata
 from packit.specfile import Specfile
 from packit.utils import commands, sanitize_branch_name_for_rpm
+from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.commands import run_command
 from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
 from packit.sync import iter_srcs
@@ -429,26 +430,7 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_source(archive)
         self._fix_spec_prep(archive)
 
-        last_tag = self.get_last_tag()
-        msg = ""
-        if last_tag and bump_version:
-            msg = self.get_commit_messages(after=last_tag)
-        if not msg and bump_version:
-            # no describe, no tag - just a boilerplate message w/ commit hash
-            # or, there were no changes b/w HEAD and last_tag, which implies last_tag == HEAD
-            msg = f"- Development snapshot ({commit})"
-        release = self.get_spec_release(
-            bump_version=bump_version,
-            local_version=local_version,
-        )
-        logger.debug(f"Setting Release in spec to {release!r}.")
-        # instead of changing version, we change Release field
-        # upstream projects should take care of versions
-        self.specfile.set_spec_version(
-            version=version,
-            release=release,
-            changelog_entry=msg,
-        )
+        ChangelogHelper(self).prepare_upstream_locally(version, commit, bump_version, local_version)
 
     def _fix_spec_prep(self, archive):
         prep = self.specfile.spec_content.section("%prep")
@@ -904,19 +886,8 @@ class SRPMBuilder:
         """
         self.upstream.fetch_upstream_archive()
         self.upstream.create_patches_and_update_specfile(self.upstream_ref)
-        old_release = self.upstream.specfile.get_release_number()
-        try:
-            old_release_int = int(old_release)
-            new_release = str(old_release_int + 1)
-        except ValueError:
-            new_release = str(old_release)
 
-        current_commit = self.upstream.local_project.commit_hexsha
-        release_to_update = f"{new_release}.g{current_commit}"
-        msg = f"Downstream changes ({current_commit})"
-        self.upstream.specfile.set_spec_version(
-            release=release_to_update, changelog_entry=f"- {msg}"
-        )
+        ChangelogHelper(self.upstream).prepare_upstream_using_source_git()
 
     def _fix_specfile_to_use_local_archive(
         self, archive: str, bump_version: bool, local_version: Optional[str]
