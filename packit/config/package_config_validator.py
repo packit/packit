@@ -28,6 +28,7 @@ from marshmallow import ValidationError
 
 from packit.config.package_config import PackageConfig, get_local_specfile_path
 from packit.exceptions import PackitConfigException
+from packit.sync import iter_srcs
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +43,9 @@ class PackageConfigValidator:
     def validate(self) -> str:
         """Create output for PackageConfig validation."""
         schema_errors: Union[List[Any], Dict[Any, Any]] = None
+        config = None
         try:
-            PackageConfig.get_from_dict(
+            config = PackageConfig.get_from_dict(
                 self.content,
                 config_file_path=str(self.config_file_path),
                 spec_file_path=str(
@@ -67,17 +69,38 @@ class PackageConfigValidator:
                 f"the file is present."
             )
 
-        if not schema_errors:
-            return f"{self.config_file_path.name} is valid and ready to be used"
+        synced_files_errors = []
+        if config:
+            synced_files_errors = [
+                f for f in iter_srcs(config.synced_files) if not Path(f).exists()
+            ]
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
-        if isinstance(schema_errors, list):
-            output += "\n".join(map(str, schema_errors))
-            return output
 
-        for field_name, errors in schema_errors.items():
-            output += self.validate_get_field_output(errors, field_name)
-        return output
+        if schema_errors:
+            if isinstance(schema_errors, list):
+                output += "\n".join(map(str, schema_errors))
+            else:
+                for field_name, errors in schema_errors.items():
+                    output += self.validate_get_field_output(errors, field_name)
+
+        if synced_files_errors:
+            output += "The following {} configured to be synced but {} not exist: {}\n".format(
+                *(
+                    (
+                        "paths are",
+                        "do",
+                    )
+                    if (len(synced_files_errors) > 1)
+                    else ("path is", "does")
+                ),
+                ", ".join(synced_files_errors),
+            )
+
+        if schema_errors or synced_files_errors:
+            return output
+        else:
+            return f"{self.config_file_path.name} is valid and ready to be used"
 
     def validate_get_field_output(
         self,
