@@ -114,7 +114,7 @@ def commit_message(
     Returns:
         The commit message: subject and body, separated by an empty line.
     """
-    message = email.message_from_string(patch.read_text())
+    message = email.message_from_bytes(patch.read_bytes())
     subject = message["Subject"]
     # The file only contains the commit message.
     if not subject:
