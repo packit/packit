@@ -229,6 +229,9 @@ def test_schema_validation(tmpdir, raw_package_config, expected_output):
     with cwd(tmpdir):
         Path("packit.json").write_text(raw_package_config)
         Path("packit.spec").write_text("hello")
+        Path("a.md").write_text("a")
+        Path("b.md").write_text("b")
+        Path("c.txt").write_text("c")
 
         output = PackitAPI.validate_package_config(Path("."))
         assert expected_output in output
