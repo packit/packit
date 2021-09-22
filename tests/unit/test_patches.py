@@ -48,6 +48,46 @@ index e69de29..e892e75 100644
 
 
 @pytest.fixture
+def patch_with_bytes(tmp_path):
+    patch_file = tmp_path / "with_bytes.patch"
+    patch_file.write_bytes(
+        b"""\
+From 477fb1b17ee5fa84913102e964239c0d28019b8a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Everyday=20Programmer?= <eprog@redhat.com>
+Date: Wed, 18 Aug 2021 10:06:09 +0200
+Subject: [PATCH 1/2] Add some content
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is an explanation why the content was added.
+
+Signed-off-by: Everyday Programmer <eprog@redhat.com>
+---
+ a.file | 1 +
+ b.file | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/a.file b/a.file
+index e69de29..8a1853f 100644
+--- a/a.file
++++ b/a.file
+@@ -0,0 +1 @@
++Some content \xc0 in file A.
+diff --git a/b.file b/b.file
+index e69de29..e892e75 100644
+--- a/b.file
++++ b/b.file
+@@ -0,0 +1 @@
++Some content in file B.
+--
+2.31.1
+"""
+    )
+    return patch_file
+
+
+@pytest.fixture
 def patch_with_meta(tmp_path):
     patch_file = tmp_path / "with_meta.patch"
     patch_file.write_text(
@@ -153,6 +193,12 @@ index e69de29..e892e75 100644
     [
         ("patch", None, "Signed-off-by: Everyday Programmer <eprog@redhat.com>"),
         ("patch", "PATCH", None),
+        (
+            "patch_with_bytes",
+            None,
+            "Signed-off-by: Everyday Programmer <eprog@redhat.com>",
+        ),
+        ("patch_with_bytes", "PATCH", None),
         (
             "commit_message_file",
             None,
