@@ -10,6 +10,7 @@ import click
 import git
 
 from packit.cli.types import GitRepoParameter
+from packit.cli.utils import cover_packit_exception
 from packit.api import PackitAPI
 from packit.config.config import pass_config
 from packit.config import get_context_settings
@@ -46,6 +47,7 @@ logger = logging.getLogger(__name__)
     Defaults to the directory name of DIST_GIT.""",
 )
 @pass_config
+@cover_packit_exception
 def source_git_init(
     config,
     dist_git: git.Repo,
@@ -58,6 +60,8 @@ def source_git_init(
 ):
     """Initialize SOURCE_GIT as a source-git repo by applying downstream
     patches from DIST_GIT as Git commits on top of UPSTREAM_REF.
+
+    SOURCE_GIT needs to be an existing clone of the upstream repository.
 
     UPSTREAM_REF is a tag, branch or commit from SOURCE_GIT.
 
