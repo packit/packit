@@ -52,7 +52,7 @@ class SourceGitGenerator:
             source-git history. This can be a branch, tag or commit sha. It is expected
             that the current HEAD and this ref point to the same commit.
         upstream_url: Git URL to be saved in the source-git configuration. If not specified,
-            the fetch URL of the 'origin' remote us used, unless 'upstream_remote' is set.
+            the fetch URL of the 'origin' remote is used, unless 'upstream_remote' is set.
         upstream_remote: Name of the remote from which the fetch URL is taken as the Git URL
             of the upstream project to be saved in the source-git configuration.
         pkg_tool: Packaging tool to be used to interact with the dist-git repo.
@@ -74,9 +74,18 @@ class SourceGitGenerator:
         self.source_git = source_git
         self.dist_git = dist_git
         self.upstream_ref = upstream_ref
-        self.upstream_url = upstream_url or next(
-            self.source_git.remote(upstream_remote or "origin").urls
-        )
+        try:
+            self.upstream_url = upstream_url or next(
+                self.source_git.remote(upstream_remote or "origin").urls
+            )
+        except ValueError as exc:
+            logger.debug(f"Failed when getting upstream URL: {exc}")
+            raise PackitException(
+                "Unable to tell the URL of the upstream repository because there is no remote "
+                f"called '{upstream_remote or 'origin'}' in {self.source_git.working_dir}. "
+                "Please specify the correct upstream remote using '--upstream-remote' or the "
+                "upstream URL, using '--upstream-url'."
+            )
         self.pkg_tool = pkg_tool
         self.pkg_name = pkg_name or Path(self.dist_git.working_dir).name
 
