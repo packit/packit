@@ -1,3 +1,11 @@
+# 0.38.0
+
+- `packit validate-config` was updated to check if files to be synced
+  downstream are present in the upstream repo and emit a warning in case they
+  are missing. (#1366)
+- Patch files are read as byte streams now, in order to support having
+  non-UTF-8 characters. (#1372)
+
 # 0.37.0
 
 - `packit source-git` init was updated to try to apply patches with `git am` first, and use `patch` only when this fails, in order to keep the commit message of Git-formatted (mbox) patch files in the source-git history. (#1358)
