@@ -53,7 +53,7 @@ jobs:
       targets:
         - fedora-all
         - epel-8
-      project: packit-master
+      project: packit-dev
       list_on_homepage: True
       preserve_project: True
   - job: copr_build
