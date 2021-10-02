@@ -617,20 +617,26 @@ class Upstream(PackitRepositoryBase):
                 f"The `rpmbuild` command failed:\n{ex}"
             ) from ex
 
-        rpms = self._get_rpms_from_rpmbuild_output(out)
+        rpms = Upstream._get_rpms_from_rpmbuild_output(out)
         return [Path(rpm) for rpm in rpms]
 
-    def _get_rpms_from_rpmbuild_output(self, output: str) -> List[str]:
+    @staticmethod
+    def _get_rpms_from_rpmbuild_output(output: str) -> List[str]:
         """
         Try to find the rpm files in the `rpmbuild -bb` command output.
 
-        :param output: output of the `rpmbuild -bb` command
-        :return: the names of the RPM files
+        Args:
+            output: Output of the `rpmbuild -bb` command.
+
+        Returns:
+            List of names of the RPM files.
         """
         logger.debug(f"The `rpmbuild` command output: {output}")
-        reg = r": (.+\.rpm)"
-        logger.debug(re.findall(reg, output))
+        reg = r": (\S+\.rpm)(\s|$)"
         rpms = re.findall(reg, output)
+
+        rpms = [rpm for rpm, _ in rpms]
+        logger.debug(rpms)
 
         if not rpms:
             raise PackitRPMNotFoundException(
@@ -770,7 +776,7 @@ class SRPMBuilder:
         """
         logger.debug(f"The `rpmbuild` command output: {output}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
-        reg = r": (.+\.src\.rpm)$"
+        reg = r": (\S+\.src\.rpm)$"
         try:
             the_srpm = re.findall(reg, output)[0]
         except IndexError:
