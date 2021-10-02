@@ -55,6 +55,7 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
+            ownername=owner,
         )
     )
 
@@ -101,6 +102,7 @@ def test_copr_build_existing_project_change_settings(
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
+            ownername=owner,
         )
     )
 
@@ -178,67 +180,12 @@ def test_copr_build_existing_project_munch_no_settings_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
+                "ownername": owner,
             }
         )
     )
 
     flexmock(ProjectProxy).should_receive("edit").and_return().times(0)
-
-    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
-    )
-
-    build = flexmock(
-        id="1",
-        ownername=owner,
-        projectname=project,
-    )
-    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
-    build_id, url = api.run_copr_build(
-        project=project,
-        chroots=chroots,
-        owner=owner,
-        description=None,
-        instructions=None,
-        list_on_homepage=False,
-        preserve_project=False,
-        additional_repos=None,
-    )
-
-    assert build_id == "1"
-    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
-
-
-def test_copr_build_existing_project_munch_chroot_change(
-    cwd_upstream_or_distgit, api_instance
-):
-    u, d, api = api_instance
-    owner = "the-owner"
-    project = "project-name"
-    chroots = ["fedora-rawhide-x86_64", "fedora-31-x86_64"]
-
-    flexmock(ProjectProxy).should_receive("get").and_return(
-        munchify(
-            {
-                "additional_repos": [],
-                "auto_prune": True,
-                "chroot_repos": {
-                    "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
-                    "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
-                },
-                "contact": "https://github.com/packit/packit/issues",
-                "description": "Continuous builds initiated by packit service.\n"
-                "For more info check out https://packit.dev/",
-                "devel_mode": False,
-                "enable_net": True,
-                "full_name": "packit/packit-hello-world-127-stg",
-                "homepage": "",
-                "id": 34245,
-            }
-        )
-    )
-
-    flexmock(ProjectProxy).should_receive("edit").and_return().once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
@@ -290,6 +237,7 @@ def test_copr_build_existing_project_munch_additional_repos_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
+                "ownername": owner,
             }
         )
     )
@@ -350,6 +298,7 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
+                "ownername": owner,
             }
         )
     )
@@ -408,6 +357,7 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
+                "ownername": owner,
             }
         )
     )
@@ -440,13 +390,32 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
     assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
 
 
-def test_copr_build_existing_project_munch_remove_present_chroots(
-    cwd_upstream_or_distgit, api_instance
+@pytest.mark.parametrize(
+    "owner, requested_chroots, expected_chroots_for_edit",
+    (
+        # For Copr projects that are not created by Packit we try to extend the
+        # chroots instead of replacing them.
+        (
+            "the-owner",
+            ["fedora-rawhide-x86_64", "fedora-35-x86_64"],
+            ["fedora-rawhide-x86_64", "fedora-35-x86_64", "epel-8-x86_64"],
+        ),
+        # For Copr projects that are created by Packit we replace the chroots.
+        ("packit", ["fedora-rawhide-x86_64"], ["fedora-rawhide-x86_64"]),
+        # For Copr projects that are not created by Packit we **do not** touch
+        # chroots as long as the requirements for Copr build are satisfied.
+        ("the-owner", ["fedora-rawhide-x86_64"], None),
+    ),
+)
+def test_copr_build_existing_project_munch_chroot_updates(
+    cwd_upstream_or_distgit,
+    api_instance,
+    owner,
+    requested_chroots,
+    expected_chroots_for_edit,
 ):
     u, d, api = api_instance
-    owner = "the-owner"
     project = "project-name"
-    chroots = ["fedora-rawhide-x86_64"]
 
     flexmock(ProjectProxy).should_receive("get").and_return(
         munchify(
@@ -456,8 +425,8 @@ def test_copr_build_existing_project_munch_remove_present_chroots(
                 "chroot_repos": {
                     "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
                     "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
-                    "fedora-32-x86_64": "https://download.copr.fedorainfracloud.org/"
-                    "results/packit/packit-hello-world-127-stg/fedora-32-x86_64/",
+                    "epel-8-x86_64": "https://download.copr.fedorainfracloud.org/"
+                    "results/packit/packit-hello-world-127-stg/epel-8-x86_64/",
                 },
                 "contact": "https://github.com/packit-service/packit/issues",
                 "description": "Continuous builds initiated by packit service.\n"
@@ -468,11 +437,18 @@ def test_copr_build_existing_project_munch_remove_present_chroots(
                 "full_name": "packit/packit-hello-world-127-stg",
                 "homepage": "",
                 "id": 34245,
+                "ownername": owner,
             }
         )
     )
 
-    flexmock(ProjectProxy).should_receive("edit").and_return()
+    if expected_chroots_for_edit:
+        expected_chroots_for_edit.sort()
+        flexmock(ProjectProxy).should_receive("edit").with_args(
+            ownername=owner, projectname=project, chroots=expected_chroots_for_edit
+        ).and_return().once()
+    else:
+        flexmock(ProjectProxy).should_receive("edit").never()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
@@ -486,66 +462,7 @@ def test_copr_build_existing_project_munch_remove_present_chroots(
     flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
     build_id, url = api.run_copr_build(
         project=project,
-        chroots=chroots,
-        owner=owner,
-        description=None,
-        instructions=None,
-        list_on_homepage=None,
-        preserve_project=False,
-        additional_repos=None,
-    )
-
-    assert build_id == "1"
-    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
-
-
-def test_copr_build_existing_project_munch_append_chroots(
-    cwd_upstream_or_distgit, api_instance
-):
-    u, d, api = api_instance
-    owner = "the-owner"
-    project = "project-name"
-    chroots = ["fedora-rawhide-x86_64", "fedora-31-x86_64"]
-
-    flexmock(ProjectProxy).should_receive("get").and_return(
-        munchify(
-            {
-                "additional_repos": [],
-                "auto_prune": True,
-                "chroot_repos": {
-                    "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
-                    "results/packit/packit-hello-world-127-stg/fedora-rawhide-x86_64/",
-                    "fedora-32-x86_64": "https://download.copr.fedorainfracloud.org/"
-                    "results/packit/packit-hello-world-127-stg/fedora-32-x86_64/",
-                },
-                "contact": "https://github.com/packit-service/packit/issues",
-                "description": "Continuous builds initiated by packit service.\n"
-                "For more info check out https://packit.dev/",
-                "unlisted_on_hp": True,  # Value not present currently.
-                "devel_mode": False,
-                "enable_net": True,
-                "full_name": "packit/packit-hello-world-127-stg",
-                "homepage": "",
-                "id": 34245,
-            }
-        )
-    )
-
-    flexmock(ProjectProxy).should_receive("edit").and_return().times(1)
-
-    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(config={"copr_url": "https://copr.fedorainfracloud.org"})
-    )
-
-    build = flexmock(
-        id="1",
-        ownername=owner,
-        projectname=project,
-    )
-    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
-    build_id, url = api.run_copr_build(
-        project=project,
-        chroots=chroots,
+        chroots=requested_chroots,
         owner=owner,
         description=None,
         instructions=None,
@@ -576,6 +493,7 @@ def test_copr_build_existing_project_error_on_change_settings(
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
+            ownername=owner,
         )
     )
 
