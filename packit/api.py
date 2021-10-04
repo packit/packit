@@ -974,7 +974,7 @@ class PackitAPI:
             or not self.config.keytab_path
             or not Path(self.config.keytab_path).is_file()
         ):
-            logger.warning("Won't be doing kinit, no credentials provided.")
+            logger.debug("Won't be doing kinit, no credentials provided.")
             return
 
         self._run_kinit()
