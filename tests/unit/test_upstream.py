@@ -339,3 +339,37 @@ def test_convert_version_to_tag(
     with expectation:
         upstream_mock.package_config.upstream_tag_template = tag_template
         assert upstream_mock.convert_version_to_tag(version) == expected_output
+
+
+@pytest.mark.parametrize(
+    "output, expected",
+    (
+        (
+            "Wrote: packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
+            [
+                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm"
+            ],
+        ),
+        (
+            "Processing files: python3-packit-0.37.1.dev14+g860168a.d20211004-1."
+            "20211004105435567001.rpm.regex.broken.14.g860168a.fc35.noarch\n"
+            "\nAnother false positive: random_rpm_named_with_space .rpm"
+            "Wrote: packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
+            [
+                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm"
+            ],
+        ),
+        (
+            "Wrote: packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm"
+            "\n\n\nWrote: packit-0.38.0.rpma.fc35.noarch.rpm\n"
+            "Wrote: packit-0.38.0.rpm_hmm.fc35.noarch.rpm\n",
+            [
+                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
+                "packit-0.38.0.rpma.fc35.noarch.rpm",
+                "packit-0.38.0.rpm_hmm.fc35.noarch.rpm",
+            ],
+        ),
+    ),
+)
+def test_get_rpms_from_rpmbuild_output(output, expected):
+    assert Upstream._get_rpms_from_rpmbuild_output(output) == expected
