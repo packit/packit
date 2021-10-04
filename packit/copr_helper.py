@@ -1,24 +1,6 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 import functools
 import logging
 import time
@@ -199,11 +181,21 @@ class CoprHelper:
     ) -> Dict[str, Tuple[Any, Any]]:
 
         fields_to_change: Dict[str, Tuple[Any, Any]] = {}
-        if chroots is not None and set(chroots) != set(copr_proj.chroot_repos.keys()):
-            fields_to_change["chroots"] = (
-                list(copr_proj.chroot_repos.keys()),
-                chroots,
-            )
+        if chroots is not None:
+            old_chroots = set(copr_proj.chroot_repos.keys())
+
+            new_chroots = None
+            if copr_proj.ownername == "packit" and set(chroots) != old_chroots:
+                new_chroots = chroots
+            elif not set(chroots).issubset(old_chroots):
+                new_chroots = list(set(chroots) | old_chroots)
+
+            if new_chroots:
+                new_chroots.sort()
+                fields_to_change["chroots"] = (
+                    list(old_chroots),
+                    new_chroots,
+                )
         if description and copr_proj.description != description:
             fields_to_change["description"] = (copr_proj.description, description)
 
