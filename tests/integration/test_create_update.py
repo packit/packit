@@ -254,6 +254,24 @@ def bodhi_response():
     )
 
 
+@pytest.fixture()
+def latest_builds_from_koji():
+    return {
+        "f29-override": "sen-0.6.0-3.fc29",
+        "f29-updates": "sen-0.6.0-3.fc29",
+        "f29-updates-candidate": "sen-0.6.0-3.fc29",
+        "f29-updates-pending": "sen-0.6.0-3.fc29",
+        "f29-updates-testing": "sen-0.6.0-3.fc29",
+        "f29-updates-testing-pending": "sen-0.6.0-3.fc29",
+        "f30-override": "sen-0.6.0-4.fc30",
+        "f30-updates": "sen-0.6.0-4.fc30",
+        "f30-updates-candidate": "sen-0.6.1-1.fc30",
+        "f30-updates-pending": "sen-0.6.0-4.fc30",
+        "f30-updates-testing": "sen-0.6.0-4.fc30",
+        "f30-updates-testing-pending": "sen-0.6.0-4.fc30",
+    }
+
+
 @pytest.mark.parametrize(
     "branch,update_type,update_notes,koji_builds",
     (
@@ -280,26 +298,14 @@ def test_basic_bodhi_update(
     update_notes,
     koji_builds,
     bodhi_response,
+    latest_builds_from_koji,
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(
         BodhiClient,
-        latest_builds=lambda package: {
-            "f29-override": "sen-0.6.0-3.fc29",
-            "f29-updates": "sen-0.6.0-3.fc29",
-            "f29-updates-candidate": "sen-0.6.0-3.fc29",
-            "f29-updates-pending": "sen-0.6.0-3.fc29",
-            "f29-updates-testing": "sen-0.6.0-3.fc29",
-            "f29-updates-testing-pending": "sen-0.6.0-3.fc29",
-            "f30-override": "sen-0.6.0-4.fc30",
-            "f30-updates": "sen-0.6.0-4.fc30",
-            "f30-updates-candidate": "sen-0.6.1-1.fc30",
-            "f30-updates-pending": "sen-0.6.0-4.fc30",
-            "f30-updates-testing": "sen-0.6.0-4.fc30",
-            "f30-updates-testing-pending": "sen-0.6.0-4.fc30",
-        },
+        latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
     )
 
@@ -308,4 +314,57 @@ def test_basic_bodhi_update(
         update_type=update_type,
         update_notes=update_notes,
         koji_builds=koji_builds,
+    )
+
+
+@pytest.mark.parametrize(
+    "update_notes,koji_builds",
+    (
+        (
+            "This is the best upstream release ever: {version}",
+            ("foo-1-1",),
+        ),
+        (
+            "This is the best upstream release ever: {version}",
+            None,
+        ),
+    ),
+)
+def test_bodhi_update_with_bugs(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+    update_notes,
+    koji_builds,
+    bodhi_response,
+    latest_builds_from_koji,
+):
+    def validate_save(kwargs, expected_kwargs):
+        assert kwargs == expected_kwargs
+        return bodhi_response
+
+    u, d, api = api_instance
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    flexmock(
+        BodhiClient,
+        latest_builds=lambda package: latest_builds_from_koji,
+        save=lambda **kwargs: validate_save(
+            kwargs,
+            {
+                "builds": koji_builds
+                or [latest_builds_from_koji["f30-updates-candidate"]],
+                "notes": update_notes.format(version="0.0.0"),
+                "type": "enhancement",
+                "bugs": ["1", "2", "3"],
+            },
+        ),
+    )
+
+    api.create_update(
+        dist_git_branch="f30",
+        update_type="enhancement",
+        update_notes=update_notes,
+        koji_builds=koji_builds,
+        bugzilla_ids=[1, 2, 3],
     )
