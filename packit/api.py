@@ -1005,6 +1005,8 @@ class PackitAPI:
             self.up.command_handler.clean()
         if self.dg.is_command_handler_set():
             self.dg.command_handler.clean()
+        if self._up:
+            self.up.local_project.free_resources()
 
     @staticmethod
     def validate_package_config(working_dir: Path) -> str:
