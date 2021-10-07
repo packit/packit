@@ -182,10 +182,20 @@ class LocalProject:
             return shorten_commit_hash(self.git_repo.active_branch.commit.hexsha)
 
     def clean(self):
+        """Remove the git tree when cloned into a temporary directory"""
         if self.working_dir_temporary:
             logger.debug(f"Cleaning: {self.working_dir}")
             shutil.rmtree(self.working_dir, ignore_errors=True)
             self.working_dir_temporary = False
+
+    def free_resources(self):
+        """Clean internal git cache which GitPython uses in the background, suggested solution:
+        https://github.com/gitpython-developers/GitPython/issues/546#issuecomment-256657166
+        the code of the function clearly manipulates the git-cat-file operations
+        which we are seeing hang (source: git.cmd.Git.clear_cache)
+        """
+        if self.git_repo:  # tests in p-s can have `self.git_repo = None`
+            self.git_repo.git.clear_cache()
 
     def refresh_the_arguments(self):
         change = True
