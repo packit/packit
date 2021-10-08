@@ -25,6 +25,7 @@ from typing import Union, List, Optional, Dict
 
 from flexmock import flexmock
 
+from packit.local_project import LocalProject
 from packit.utils import commands
 
 
@@ -66,6 +67,7 @@ def test_build_from_upstream(
         return "\n\nLink to koji build: https://koji...\n"
 
     flexmock(commands, run_command_remote=mocked_run_command)
+    flexmock(LocalProject).should_receive("free_resources")
     api.build(
         "master",
         scratch=True,
