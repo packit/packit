@@ -124,7 +124,10 @@ def check_source_git_config(source_git_config):
 
 
 @pytest.mark.skipif(
-    list(map(int, yaml.__version__.split("."))) < [5, 1],
+    # on rawhide the version can contain letters:
+    # >>> yaml.__version__
+    # '6.0b1'
+    list(map(int, yaml.__version__[:3].split("."))) < [5, 1],
     reason="Requires PyYAML 5.1 or higher.",
 )
 def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_repo):
