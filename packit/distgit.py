@@ -410,6 +410,7 @@ class DistGit(PackitRepositoryBase):
         update_type: str,
         update_notes: str,
         koji_builds: Sequence[str] = None,
+        bugzilla_ids: Optional[List[int]] = None,
     ):
         logger.debug(
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
@@ -447,7 +448,16 @@ class DistGit(PackitRepositoryBase):
         # but in the end it's likely a waste of resources since bodhi will tell us
         rendered_note = update_notes.format(version=self.specfile.get_version())
         try:
-            result = b.save(builds=koji_builds, notes=rendered_note, type=update_type)
+            save_kwargs = {
+                "builds": koji_builds,
+                "notes": rendered_note,
+                "type": update_type,
+            }
+
+            if bugzilla_ids:
+                save_kwargs["bugs"] = list(map(str, bugzilla_ids))
+
+            result = b.save(**save_kwargs)
             logger.debug(f"Bodhi response:\n{result}")
             logger.info(
                 f"Bodhi update {result['alias']}:\n"
