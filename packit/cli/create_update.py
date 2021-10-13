@@ -34,6 +34,25 @@ from packit.constants import DEFAULT_BODHI_NOTE
 logger = logging.getLogger(__name__)
 
 
+class BugzillaIDs(click.ParamType):
+    name = "bugzilla_ids"
+
+    def convert(self, value, param, ctx):
+        ids = []
+
+        str_ids = value.split(",")
+        for bugzilla_id in str_ids:
+            try:
+                ids.append(int(bugzilla_id))
+            except ValueError:
+                raise click.BadParameter(
+                    "cannot parse non-integer bugzilla ID. Please use following "
+                    "format: id[,id]"
+                )
+
+        return ids
+
+
 @click.command("create-update", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
@@ -61,11 +80,25 @@ logger = logging.getLogger(__name__)
     required=False,
     default="enhancement",
 )
+@click.option(
+    "-b",
+    "--resolve-bugzillas",
+    help="Bugzilla IDs that are resolved with the update",
+    required=False,
+    default=None,
+    type=BugzillaIDs(),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
 def create_update(
-    config, dist_git_branch, koji_build, update_notes, update_type, path_or_url
+    config,
+    dist_git_branch,
+    koji_build,
+    update_notes,
+    update_type,
+    resolve_bugzillas,
+    path_or_url,
 ):
     """
     Create a bodhi update for the selected upstream project
@@ -92,4 +125,5 @@ def create_update(
             dist_git_branch=branch,
             update_notes=update_notes,
             update_type=update_type,
+            bugzilla_ids=resolve_bugzillas,
         )

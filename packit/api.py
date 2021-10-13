@@ -598,14 +598,17 @@ class PackitAPI:
         update_type: str,
         update_notes: str,
         koji_builds: Sequence[str] = None,
+        bugzilla_ids: Optional[List[int]] = None,
     ):
         """
-        Create bodhi update
+        Create bodhi update.
 
-        :param dist_git_branch: git ref
-        :param update_type: type of the update, check CLI
-        :param update_notes: documentation about the update
-        :param koji_builds: list of koji builds or None (and pick latest)
+        Args:
+            dist_git_branch: Git reference.
+            update_type: Type of the update, check CLI.
+            update_notes: Notes about the update to be displayed in Bodhi.
+            koji_builds: List of Koji builds or `None` (picks latest).
+            bugzilla_ids: List of Bugzillas that are resolved with the update.
         """
         logger.debug(
             f"Create bodhi update, "
@@ -616,6 +619,7 @@ class PackitAPI:
             dist_git_branch=dist_git_branch,
             update_notes=update_notes,
             update_type=update_type,
+            bugzilla_ids=bugzilla_ids,
         )
 
     def create_srpm(
