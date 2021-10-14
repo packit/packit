@@ -1,3 +1,8 @@
+# 0.39.0
+
+- Bug in Packit causing issues with local build when the branch was named with prefix rpm has been fixed. (#1380)
+- We have added a new option to Packit CLI when creating Bodhi updates, you can use `-b` or `--resolve-bugzillas` and specify IDs (separated by comma, e.g. `-b 1` or `-b 1,2,3`) of bugzillas that are being closed by the update. (#1383)
+
 # 0.38.0
 
 - `packit validate-config` was updated to check if files to be synced
