@@ -162,7 +162,8 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
 
 
 @pytest.mark.skipif(
-    list(map(int, yaml.__version__.split("."))) < [5, 1],
+    # on rawhide the version can contain letters:
+    list(map(int, yaml.__version__[:3].split("."))) < [5, 1],
     reason="Requires PyYAML 5.1 or higher.",
 )
 def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_repo):
