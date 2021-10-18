@@ -57,7 +57,7 @@ def sanitize_branch_name_for_rpm(branch_name: str) -> str:
     rpm is picky about release: hates "/" - it's an error
     also prints a warning for "-"
     """
-    offenders = "!@#$%^&*()+={[}]|\\'\":;<,>/?~`"
+    offenders = "!@#$%^&*()={[}]|\\'\":;<,>/?~`"
     for o in offenders:
         branch_name = branch_name.replace(o, "")
     return branch_name.replace("-", ".")
