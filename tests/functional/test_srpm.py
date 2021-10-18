@@ -25,6 +25,7 @@ Functional tests for srpm command
 """
 import json
 from pathlib import Path
+import subprocess
 
 from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit
@@ -54,6 +55,19 @@ def test_srpm_command_for_path_with_multiple_sources(
 def test_srpm_command(cwd_upstream_or_distgit):
     call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
     srpm_path = list(cwd_upstream_or_distgit.glob("*.src.rpm"))[0]
+    assert srpm_path.exists()
+    build_srpm(srpm_path)
+
+
+def test_srpm_command_no_tags(upstream_and_remote):
+    upstream_cwd, _ = upstream_and_remote
+
+    # remove the tags
+    tags = subprocess.run(("git", "tag"), cwd=upstream_cwd, stdout=subprocess.PIPE)
+    subprocess.run(["xargs", "git", "tag", "-d"], cwd=upstream_cwd, input=tags.stdout)
+
+    call_real_packit(parameters=["--debug", "srpm"], cwd=upstream_cwd)
+    srpm_path = list(upstream_cwd.glob("*.src.rpm"))[0]
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
