@@ -156,7 +156,8 @@ class PackitAPI:
             version: Upstream version to update in Fedora.
             upstream_ref: For a source-git repo, use this ref as the latest upstream commit.
             add_new_sources: Download and upload source archives.
-            force_new_sources: Don't check the lookaside cache and perform new-sources.
+            force_new_sources: Download/upload the archive even if it's name
+                is already in the cache or in sources file.
             upstream_tag: Use the message of the commit referenced by this tag to update the
                 changelog in the spec-file, if requested.
             commit_title: Commit message title (aka subject-line) in dist-git.
@@ -214,6 +215,7 @@ class PackitAPI:
         version: Optional[str] = None,
         tag: Optional[str] = None,
         use_local_content=False,
+        add_new_sources=True,
         force_new_sources=False,
         upstream_ref: Optional[str] = None,
         create_pr: bool = True,
@@ -231,7 +233,9 @@ class PackitAPI:
         :param use_local_content: don't check out anything
         :param version: upstream version to update in dist-git
         :param tag: upstream git tag
-        :param force_new_sources: don't check the lookaside cache and perform new-sources
+        :param add_new_sources: download and upload source archives
+        :param force_new_sources: download/upload the archive even if it's name
+                                  is already in the cache or in sources file
         :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
         :param create_pr: create a pull request if set to True
         :param force: ignore changes in the git index
@@ -332,7 +336,7 @@ class PackitAPI:
             self.update_dist_git(
                 version,
                 upstream_ref,
-                add_new_sources=True,
+                add_new_sources=add_new_sources,
                 force_new_sources=force_new_sources,
                 upstream_tag=upstream_tag,
                 commit_title=title or f"[packit] {version} upstream release",
