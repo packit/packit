@@ -253,34 +253,45 @@ class Upstream(PackitRepositoryBase):
         """
         Get version of the project in current state. Tries following steps:
 
-        1. get output from actions
-        2. use configured `current_version_command (.packit.yaml)
-        3. extract version from `self.get_last_tag()` using `self.get_version_from_tag()`
+        1. Get output from actions
+        2. Use configured `current_version_command` (from `.packit.yaml`)
+        3. Extract version from `self.get_last_tag()` using `self.get_version_from_tag()`
+        4. Falls back to version in the specfile.
 
-        :return: version (e.g. 0.1.1)
+        Returns:
+            String containing version, e.g. `"0.1.1"`.
         """
+        version = None
 
+        # Step 1
         action_output = self.get_output_from_action(
             action=ActionName.get_current_version
         )
         if action_output:
-            return action_output[-1].strip()
+            version = action_output[-1].strip()
 
-        elif self.package_config.current_version_command:
-            ver = self.command_handler.run_command(
+        # Step 2
+        if version is None and self.package_config.current_version_command:
+            version = self.command_handler.run_command(
                 self.package_config.current_version_command,
                 return_output=True,
                 cwd=self.local_project.working_dir,
             ).strip()
-            logger.debug(f"Raw version: {ver}")
-        else:
-            ver = self.get_version_from_tag(self.get_last_tag())
-        logger.debug(f"Version: {ver}")
 
-        ver = sanitize_branch_name_for_rpm(ver)
-        logger.debug(f"Sanitized version: {ver}")
+        # Step 3
+        if version is None:
+            version = self.get_version_from_tag(self.get_last_tag())
 
-        return ver
+        # Step 4
+        if version is None:
+            logger.info("No git tags found, falling back to %version in the specfile.")
+            version = self.specfile.get_version()
+
+        logger.debug(f"Version: {version}")
+        version = sanitize_branch_name_for_rpm(version)
+        logger.debug(f"Sanitized version: {version}")
+
+        return version
 
     def create_archive(self, version: str = None) -> str:
         return Archive(self, version).create()
@@ -683,13 +694,18 @@ class Upstream(PackitRepositoryBase):
         p = re.compile(r"{(.*?)}")
         return p.sub(r"(?P<\g<1>>.*)", template)
 
-    def get_version_from_tag(self, tag: str) -> str:
+    def get_version_from_tag(self, tag: Optional[str]) -> Optional[str]:
         """
-        Extracts version from git tag using upstream_template_tag
+        Extracts version from git tag using `upstream_template_tag`.
 
-        :param tag: git tag containing version
-        :return: version string
+        Args:
+            tag: Git tag containing version.
+
+        Returns:
+            Version string or `None` if given empty string or `None`.
         """
+        if not tag:
+            return None
 
         field = "version"
         regex = self._template2regex(self.package_config.upstream_tag_template)
