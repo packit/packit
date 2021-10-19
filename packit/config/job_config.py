@@ -50,20 +50,23 @@ class JobMetadataConfig:
         fmf_url: str = None,
         fmf_ref: str = None,
         use_internal_tf: bool = False,
+        skip_build: bool = False,
     ):
         """
-        :param targets: copr_build job, mock chroots where to build
-        :param timeout: copr_build, give up watching a build after timeout, defaults to 7200s
-        :param owner: copr_build, a namespace in COPR where the build should happen
-        :param project: copr_build, a name of the copr project
-        :param dist_git_branches: propose_downstream, branches in dist-git where packit should work
-        :param branch: for `commit` trigger to specify the branch name
-        :param scratch: if we want to run scratch build in koji
-        :param list_on_homepage: if set, created copr project will be visible on copr's home-page
-        :param preserve_project: if set, project will not be created as temporary
-        :param list additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
-        :param list additional_repos: buildroot additional additional_repos
-        :param bool use_internal_tf: if we want to use internal instance for Testing Farm
+        Args:
+            targets: copr_build job, mock chroots where to build
+            timeout: copr_build, give up watching a build after timeout, defaults to 7200s
+            owner: copr_build, a namespace in COPR where the build should happen
+            project: copr_build, a name of the copr project
+            dist_git_branches: propose_downstream, branches in dist-git where packit should work
+            branch: for `commit` trigger to specify the branch name
+            scratch: if we want to run scratch build in koji
+            list_on_homepage: if set, created copr project will be visible on copr's home-page
+            preserve_project: if set, project will not be created as temporary
+            additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
+            additional_repos: buildroot additional additional_repos
+            use_internal_tf: if we want to use internal instance for Testing Farm
+            skip_build: if we want to skip build phase for Testing Farm job
         """
         self.targets: Set[str] = set(targets) if targets else set()
         self.timeout: int = timeout
@@ -81,6 +84,7 @@ class JobMetadataConfig:
         self.fmf_url = fmf_url
         self.fmf_ref = fmf_ref
         self.use_internal_tf = use_internal_tf
+        self.skip_build = skip_build
 
     def __repr__(self):
         return (
@@ -98,7 +102,8 @@ class JobMetadataConfig:
             f"additional_repos={self.additional_repos}, "
             f"fmf_url={self.fmf_url}, "
             f"fmf_ref={self.fmf_ref}, "
-            f"use_internal_tf={self.use_internal_tf})"
+            f"use_internal_tf={self.use_internal_tf}, "
+            f"skip_build={self.skip_build})"
         )
 
     def __eq__(self, other: object):
@@ -121,6 +126,7 @@ class JobMetadataConfig:
             and self.fmf_url == other.fmf_url
             and self.fmf_ref == other.fmf_ref
             and self.use_internal_tf == other.use_internal_tf
+            and self.skip_build == other.skip_build
         )
 
 
