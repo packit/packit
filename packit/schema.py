@@ -200,6 +200,7 @@ class JobMetadataSchema(Schema):
     additional_repos = fields.List(fields.String(), missing=None)
     fmf_url = fields.String(missing=None)
     fmf_ref = fields.String(missing=None)
+    skip_build = fields.Boolean()
 
     @pre_load
     def ordered_preprocess(self, data, **_):
