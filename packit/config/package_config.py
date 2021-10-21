@@ -147,8 +147,6 @@ class PackageConfig(CommonPackageConfig):
         if not raw_dict.get("specfile_path", None):
             if spec_file_path:
                 raw_dict["specfile_path"] = spec_file_path
-            else:
-                raise PackitConfigException("Spec file was not found!")
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
@@ -156,7 +154,17 @@ class PackageConfig(CommonPackageConfig):
         if not raw_dict.get("downstream_package_name", None) and repo_name:
             raw_dict["downstream_package_name"] = repo_name
 
-        return PackageConfigSchema().load(raw_dict)
+        package_config = PackageConfigSchema().load(raw_dict)
+
+        if not package_config.specfile_path and not all(
+            [
+                job.type == JobType.tests and job.metadata.skip_build
+                for job in package_config.jobs
+            ]
+        ):
+            raise PackitConfigException("Spec file was not found!")
+
+        return package_config
 
     def get_copr_build_project_value(self) -> Optional[str]:
         """
