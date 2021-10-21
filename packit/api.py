@@ -631,6 +631,8 @@ class PackitAPI:
         output_file: str = None,
         upstream_ref: str = None,
         srpm_dir: Union[Path, str] = None,
+        bump_version: bool = True,
+        release_suffix: Optional[str] = None,
     ) -> Path:
         """
         Create srpm from the upstream repo
@@ -644,7 +646,11 @@ class PackitAPI:
             self.up.run_action(actions=ActionName.post_upstream_clone)
 
             try:
-                self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
+                self.up.prepare_upstream_for_srpm_creation(
+                    upstream_ref=upstream_ref,
+                    bump_version=bump_version,
+                    local_version=release_suffix,
+                )
             except Exception as ex:
                 raise PackitSRPMException(
                     f"Preparation of the repository for creation of an SRPM failed: {ex}"
