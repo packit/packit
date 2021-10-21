@@ -55,7 +55,7 @@ class CommonPackageConfig:
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
-        merge_in_ci: bool = True,
+        merge_pr_in_ci: bool = True,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -90,7 +90,7 @@ class CommonPackageConfig:
         self.archive_root_dir_template = archive_root_dir_template
         self.copy_upstream_release_description = copy_upstream_release_description
         self.sources = sources or []
-        self.merge_in_ci = merge_in_ci
+        self.merge_pr_in_ci = merge_pr_in_ci
 
     def __repr__(self):
         return (
@@ -113,7 +113,8 @@ class CommonPackageConfig:
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"
             f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}',"
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
-            f"sources='{self.sources}')"
+            f"sources='{self.sources}', "
+            f"merge_pr_in_ci={self.merge_pr_in_ci})"
         )
 
     @property
