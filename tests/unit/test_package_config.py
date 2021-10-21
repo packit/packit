@@ -26,6 +26,7 @@ from packit.config.package_config import (
 import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.constants import CONFIG_FILE_NAMES
+from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -1233,3 +1234,72 @@ def test_get_specfile_sync_files_item():
     assert pc.get_specfile_sync_files_item(from_downstream=True) == SyncFilesItem(
         src=[downstream_specfile_path], dest=upstream_specfile_path
     )
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        {
+            "jobs": [
+                {
+                    "job": "copr_build",
+                    "trigger": "release",
+                    "metadata": {"targets": ["fedora-stable", "fedora-development"]},
+                }
+            ],
+        },
+        {
+            "jobs": [
+                {
+                    "job": "tests",
+                    "trigger": "release",
+                    "metadata": {"targets": ["fedora-stable", "fedora-development"]},
+                }
+            ],
+        },
+    ],
+)
+def test_package_config_specilfe_not_present_raise(raw):
+    with pytest.raises(PackitConfigException):
+        PackageConfig.get_from_dict(raw_dict=raw)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        {
+            "jobs": [
+                {
+                    "job": "tests",
+                    "trigger": "commit",
+                    "metadata": {
+                        "targets": ["fedora-stable", "fedora-development"],
+                        "skip_build": True,
+                    },
+                }
+            ],
+        },
+        {
+            "jobs": [
+                {
+                    "job": "tests",
+                    "trigger": "commit",
+                    "metadata": {
+                        "targets": ["fedora-stable", "fedora-development"],
+                        "skip_build": True,
+                    },
+                },
+                {
+                    "job": "tests",
+                    "trigger": "pull_request",
+                    "metadata": {
+                        "targets": ["fedora-stable", "fedora-development"],
+                        "skip_build": True,
+                    },
+                },
+            ],
+        },
+    ],
+)
+def test_package_config_specilfe_not_present_not_raise(raw):
+    assert PackageConfig.get_from_dict(raw_dict=raw)
