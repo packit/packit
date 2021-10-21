@@ -55,6 +55,7 @@ class CommonPackageConfig:
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
+        merge_in_ci: bool = True,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -89,6 +90,7 @@ class CommonPackageConfig:
         self.archive_root_dir_template = archive_root_dir_template
         self.copy_upstream_release_description = copy_upstream_release_description
         self.sources = sources or []
+        self.merge_in_ci = merge_in_ci
 
     def __repr__(self):
         return (
