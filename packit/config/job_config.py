@@ -152,8 +152,6 @@ class JobConfig(CommonPackageConfig):
         downstream_project_url: str = None,
         downstream_package_name: str = None,
         dist_git_base_url: str = None,
-        create_tarball_command: List[str] = None,
-        current_version_command: List[str] = None,
         actions: Dict[ActionName, Union[str, List[str]]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
@@ -178,8 +176,6 @@ class JobConfig(CommonPackageConfig):
             downstream_project_url=downstream_project_url,
             downstream_package_name=downstream_package_name,
             dist_git_base_url=dist_git_base_url,
-            create_tarball_command=create_tarball_command,
-            current_version_command=current_version_command,
             actions=actions,
             upstream_ref=upstream_ref,
             allowed_gpg_keys=allowed_gpg_keys,
@@ -210,8 +206,6 @@ class JobConfig(CommonPackageConfig):
             f"downstream_project_url='{self.downstream_project_url}', "
             f"downstream_package_name='{self.downstream_package_name}', "
             f"dist_git_base_url='{self.dist_git_base_url}', "
-            f"create_tarball_command='{self.create_tarball_command}', "
-            f"current_version_command='{self.current_version_command}', "
             f"actions='{self.actions}', "
             f"upstream_ref='{self.upstream_ref}', "
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
@@ -250,8 +244,6 @@ class JobConfig(CommonPackageConfig):
             and self.downstream_project_url == other.downstream_project_url
             and self.downstream_package_name == other.downstream_package_name
             and self.dist_git_base_url == other.dist_git_base_url
-            and self.current_version_command == other.current_version_command
-            and self.create_tarball_command == other.create_tarball_command
             and self.actions == other.actions
             and self.allowed_gpg_keys == other.allowed_gpg_keys
             and self.create_pr == other.create_pr
