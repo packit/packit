@@ -254,9 +254,8 @@ class Upstream(PackitRepositoryBase):
         Get version of the project in current state. Tries following steps:
 
         1. Get output from actions
-        2. Use configured `current_version_command` (from `.packit.yaml`)
-        3. Extract version from `self.get_last_tag()` using `self.get_version_from_tag()`
-        4. Falls back to version in the specfile.
+        2. Extract version from `self.get_last_tag()` using `self.get_version_from_tag()`
+        3. Falls back to version in the specfile.
 
         Returns:
             String containing version, e.g. `"0.1.1"`.
@@ -271,18 +270,10 @@ class Upstream(PackitRepositoryBase):
             version = action_output[-1].strip()
 
         # Step 2
-        if version is None and self.package_config.current_version_command:
-            version = self.command_handler.run_command(
-                self.package_config.current_version_command,
-                return_output=True,
-                cwd=self.local_project.working_dir,
-            ).strip()
-
-        # Step 3
         if version is None:
             version = self.get_version_from_tag(self.get_last_tag())
 
-        # Step 4
+        # Step 3
         if version is None:
             logger.info("No git tags found, falling back to %version in the specfile.")
             version = self.specfile.get_version()
@@ -1121,8 +1112,7 @@ class Archive:
         self, dir_name: str, env: Dict[str, str]
     ) -> str:
         """
-        Create an archive using `git archive`, unless `create_tarball_command` is
-        configured.
+        Create an archive using `git archive`.
         Archive will be placed in the `specfile_directory`.
 
         Args:
@@ -1136,18 +1126,15 @@ class Archive:
         relative_archive_path = (
             self.upstream.absolute_specfile_dir / archive_name
         ).relative_to(self.upstream.local_project.working_dir)
-        if self.upstream.package_config.create_tarball_command:
-            archive_cmd = self.upstream.package_config.create_tarball_command
-        else:
-            archive_cmd = [
-                "git",
-                "archive",
-                "--output",
-                str(relative_archive_path),
-                "--prefix",
-                f"{dir_name}/",
-                "HEAD",
-            ]
+        archive_cmd = [
+            "git",
+            "archive",
+            "--output",
+            str(relative_archive_path),
+            "--prefix",
+            f"{dir_name}/",
+            "HEAD",
+        ]
         self.upstream.command_handler.run_command(
             archive_cmd, return_output=True, env=env
         )
