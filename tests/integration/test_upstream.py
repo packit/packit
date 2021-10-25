@@ -57,42 +57,27 @@ def test_get_spec_version(upstream_instance):
 
 
 @pytest.mark.parametrize(
-    "tag, tag_template, current_version_command_out, expected_output",
+    "tag, tag_template, expected_output",
     [
         pytest.param(
             "1.0.0",
             "{version}",
-            None,
             "1.0.0",
             id="no_command-pure_version-valid_template",
         ),
         pytest.param(
             "test-1.0.0",
             "test-{version}",
-            None,
             "1.0.0",
             id="no_command-valid_tag-valid_template",
         ),
-        pytest.param(
-            "_",
-            "_",
-            "2.0",
-            "2.0",
-            id="with_command_output",
-        ),
     ],
 )
-def test_get_current_version(
-    tag, tag_template, current_version_command_out, expected_output, upstream_instance
-):
+def test_get_current_version(tag, tag_template, expected_output, upstream_instance):
     u, ups = upstream_instance
     flexmock(ups)
     ups.package_config.upstream_tag_template = tag_template
     # just to simulate current_vesrsion_command set/notset
-    ups.package_config.current_version_command = current_version_command_out
-    ups.should_receive("command_handler.run_command").and_return(
-        current_version_command_out
-    )
     ups.should_receive("get_last_tag").and_return(tag)
 
     assert ups.get_current_version() == expected_output

@@ -20,7 +20,6 @@ from packit.utils.commands import cwd
                 "downstream_package_name": "packit",
                 "upstream_ref": "last_commit",
                 "upstream_package_name": "packit_upstream",
-                "create_tarball_command": ["commands"],
                 "allowed_gpg_keys": ["gpg"],
                 "dist_git_namespace": "awesome",
                 "notifications": {
@@ -40,7 +39,6 @@ from packit.utils.commands import cwd
                 "downstream_package_name": "packit",
                 "upstream_ref": "last_commit",
                 "upstream_package_name": "packit_upstream",
-                "create_tarball_command": ["commands"],
                 "allowed_gpg_keys": ["gpg"],
                 "dist_git_namespace": "awesome",
                 "notifications": {
@@ -63,7 +61,6 @@ from packit.utils.commands import cwd
                 "downstream_package_name": "packit",
                 "upstream_ref": "last_commit",
                 "upstream_package_name": "packit_upstream",
-                "create_tarball_command": ["commands"],
                 "allowed_gpg_keys": ["gpg"],
                 "dist_git_namespace": "awesome",
                 "synced_files": ["a.md", "b.md", "c.txt"]
@@ -79,7 +76,6 @@ from packit.utils.commands import cwd
                     "downstream_package_name": "packit",
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": ["gpg"],
                     "dist_git_namespace": "awesome",
                     "synced_files": [{ "src": 55, "dest": "a.md" }, "b.md", "c.txt"]
@@ -95,7 +91,6 @@ from packit.utils.commands import cwd
                     "downstream_package_name": "packit",
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": ["gpg"],
                     "dist_git_namespace": "awesome",
                     "synced_files": ["a.md", "b.md", { "src": "c.txt", "dest": True }]
@@ -110,7 +105,6 @@ from packit.utils.commands import cwd
                     "downstream_package_name": "packit",
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": ["gpg"],
                     "dist_git_namespace": "awesome"
                 }
@@ -124,7 +118,6 @@ from packit.utils.commands import cwd
                     "downstream_package_name": 23,
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": ["gpg"],
                     "dist_git_namespace": "awesome"
                 }
@@ -138,7 +131,6 @@ from packit.utils.commands import cwd
                     "downstream_package_name": "packit",
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": ["gpg"],
                     "dist_git_namespace": "awesome",
                     create_pr: ""
@@ -154,7 +146,6 @@ from packit.utils.commands import cwd
                     "downstream_package_name": "packit",
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": ["gpg"],
                     "dist_git_namespace": "awesome"
                 }
@@ -169,44 +160,11 @@ from packit.utils.commands import cwd
                     "downstream_package_name": "packit",
                     "upstream_ref": "last_commit",
                     "upstream_package_name": "packit_upstream",
-                    "create_tarball_command": ["commands"],
                     "allowed_gpg_keys": "gpg",
                     "dist_git_namespace": "awesome"
                 }
                 """,
             "* field allowed_gpg_keys: Not a valid list.",
-        ),
-        (
-            """
-                {
-                    "config_file_path":"packit.json",
-                    "dist_git_base_url":"https://packit.dev/",
-                    "downstream_package_name":"packit",
-                    "upstream_ref":"last_commit",
-                    "upstream_package_name":"packit_upstream",
-                    "create_tarball_command":[25],
-                    "allowed_gpg_keys":["gpg"],
-                    "dist_git_namespace":"awesome"
-                }
-                """,
-            "* field create_tarball_command has an incorrect value:\n"
-            "** value at index 0: Not a valid string.",
-        ),
-        (
-            """
-                {
-                    "config_file_path":"packit.json",
-                    "dist_git_base_url":"https://packit.dev/",
-                    "downstream_package_name":"packit",
-                    "upstream_ref":"last_commit",
-                    "upstream_package_name":"packit_upstream",
-                    "create_tarball_command":["commands", True],
-                    "allowed_gpg_keys":["gpg"],
-                    "dist_git_namespace":"awesome"
-                }
-                """,
-            "* field create_tarball_command has an incorrect value:\n"
-            "** value at index 1: Not a valid string.",
         ),
     ],
     ids=[
@@ -221,8 +179,6 @@ from packit.utils.commands import cwd
         "create_pr",
         "valid_4",
         "allowed_gpg",
-        "create_tarball_1",
-        "create_tarball_2",
     ],
 )
 def test_schema_validation(tmpdir, raw_package_config, expected_output):
