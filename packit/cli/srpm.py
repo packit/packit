@@ -43,6 +43,18 @@ logger = logging.getLogger("packit")
     "from which packit should generate patches "
     "(this option implies the repository is source-git).",
 )
+@click.option(
+    "--bump/--no-bump",
+    default=True,
+    help="Specifies whether to bump version or not.",
+)
+@click.option(
+    "--release-suffix",
+    default=None,
+    type=click.STRING,
+    help="Specifies release suffix. Allows to override default generated:"
+    "{current_time}.{sanitized_current_branch}{git_desc_suffix}",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
@@ -55,6 +67,8 @@ def srpm(
     output,
     path_or_url,
     upstream_ref,
+    bump,
+    release_suffix,
 ):
     """
     Create new SRPM (.src.rpm file) using content of the upstream repository.
@@ -63,5 +77,10 @@ def srpm(
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    srpm_path = api.create_srpm(output_file=output, upstream_ref=upstream_ref)
+    srpm_path = api.create_srpm(
+        output_file=output,
+        upstream_ref=upstream_ref,
+        bump_version=bump,
+        release_suffix=release_suffix,
+    )
     logger.info(f"SRPM: {srpm_path}")
