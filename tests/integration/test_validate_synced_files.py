@@ -22,7 +22,6 @@ from packit.utils.commands import cwd
                 "downstream_package_name": "packit",
                 "upstream_ref": "last_commit",
                 "upstream_package_name": "packit_upstream",
-                "create_tarball_command": ["commands"],
                 "allowed_gpg_keys": ["gpg"],
                 "dist_git_namespace": "awesome",
                 "synced_files": [{ "src": "a.md", "dest": "aaa.md" }, "a_dir"]
@@ -40,7 +39,6 @@ from packit.utils.commands import cwd
                 "downstream_package_name": "packit",
                 "upstream_ref": "last_commit",
                 "upstream_package_name": "packit_upstream",
-                "create_tarball_command": ["commands"],
                 "allowed_gpg_keys": ["gpg"],
                 "dist_git_namespace": "awesome",
                 "synced_files": ["a.md", "b.md", "c.txt", "a_dir"]
@@ -58,7 +56,6 @@ from packit.utils.commands import cwd
                  "downstream_package_name": "packit",
                  "upstream_ref": "last_commit",
                  "upstream_package_name": "packit_upstream",
-                 "create_tarball_command": ["commands"],
                  "allowed_gpg_keys": ["gpg"],
                  "dist_git_namespace": "awesome",
                  "synced_files": ["a.md", "b.md", "c.txt"]

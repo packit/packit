@@ -41,8 +41,6 @@ class CommonPackageConfig:
         downstream_project_url: str = None,
         downstream_package_name: str = None,
         dist_git_base_url: str = None,
-        create_tarball_command: List[str] = None,
-        current_version_command: List[str] = None,
         actions: Dict[ActionName, Union[str, List[str]]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
@@ -85,11 +83,6 @@ class CommonPackageConfig:
             pull_request=PullRequestNotificationsConfig()
         )
 
-        # command to generate a tarball from the upstream repo
-        # uncommitted changes will not be present in the archive
-        self.create_tarball_command: List[str] = create_tarball_command
-        # command to get current version of the project
-        self.current_version_command: List[str] = current_version_command
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
         self.archive_root_dir_template = archive_root_dir_template
@@ -107,8 +100,6 @@ class CommonPackageConfig:
             f"downstream_project_url='{self.downstream_project_url}', "
             f"downstream_package_name='{self.downstream_package_name}', "
             f"dist_git_base_url='{self.dist_git_base_url}', "
-            f"create_tarball_command='{self.create_tarball_command}', "
-            f"current_version_command='{self.current_version_command}', "
             f"actions='{self.actions}', "
             f"upstream_ref='{self.upstream_ref}', "
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "

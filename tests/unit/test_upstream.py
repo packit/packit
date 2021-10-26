@@ -168,27 +168,18 @@ def test_fix_spec__setup_line(
 
 
 @pytest.mark.parametrize(
-    "action_output, current_version_command, version, expected_result",
+    "action_output, version, expected_result",
     [
         pytest.param(
-            ("some_action_output", "1.0.1"), None, "_", "1.0.1", id="with_action_output"
+            ("some_action_output", "1.0.1"), "_", "1.0.1", id="with_action_output"
         ),
-        pytest.param(None, "1.0.2", "_", "1.0.2", id="command_valid_version"),
-        pytest.param(None, "1.0-3", "_", "1.0.3", id="command_version_with_dash"),
-        pytest.param(None, None, "1.0.2", "1.0.2", id="tag_valid_version"),
-        pytest.param(None, None, "1.0-3", "1.0.3", id="tag_version_with_dash"),
+        pytest.param(None, "1.0.2", "1.0.2", id="tag_valid_version"),
+        pytest.param(None, "1.0-3", "1.0.3", id="tag_version_with_dash"),
     ],
 )
-def test_get_current_version(
-    action_output, current_version_command, version, expected_result, upstream_mock
-):
+def test_get_current_version(action_output, version, expected_result, upstream_mock):
     flexmock(packit.upstream.os).should_receive("listdir").and_return("mocked")
     upstream_mock.should_receive("get_output_from_action").and_return(action_output)
-    # just to simulate if is configured or not
-    upstream_mock.package_config.current_version_command = current_version_command
-    upstream_mock.should_receive("command_handler.run_command").and_return(
-        current_version_command
-    )
     upstream_mock.should_receive("get_last_tag").and_return("_mocked")
     upstream_mock.should_receive("get_version_from_tag").and_return(version)
     assert upstream_mock.get_current_version() == expected_result

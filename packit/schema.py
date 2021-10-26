@@ -242,8 +242,6 @@ class CommonConfigSchema(Schema):
     )
     dist_git_base_url = fields.String(mising=None)
     dist_git_namespace = fields.String(missing=None)
-    create_tarball_command = fields.List(fields.String(), missing=None)
-    current_version_command = fields.List(fields.String(), missing=None)
     allowed_gpg_keys = fields.List(fields.String(), missing=None)
     spec_source_id = fields.Method(
         deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"

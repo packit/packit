@@ -5,7 +5,5 @@ synced_files:
 upstream_package_name: snapd
 downstream_package_name: snapd
 upstream_project_url: "https://github.com/snapcore/snapd"
-create_tarball_command: ["packaging/fedora/pack-source", "-o", ".", "-g"]
-current_version_command: ["git", "describe"]
 actions:
   fix-spec-file: packaging/fedora/fix-spec

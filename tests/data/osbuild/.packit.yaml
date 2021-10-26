@@ -2,5 +2,4 @@ specfile_path: osbuild.spec
 upstream_package_name: osbuild
 downstream_package_name: osbuild
 upstream_project_url: "https://github.com/osbuild/osbuild"
-current_version_command: ["python3", "setup.py", "--version"]
 spec_source_id: "0"
