@@ -1,3 +1,5 @@
+# packit(1) completion                                      -*- shell-script -*-
+
 _packit_completion() {
     COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
                    COMP_CWORD=$COMP_CWORD \
