@@ -5,6 +5,7 @@
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
 from os import getenv
+from os.path import basename
 from typing import Dict, List, Optional, Union
 
 from packit.actions import ActionName
@@ -136,7 +137,7 @@ class CommonPackageConfig:
         downstream_specfile_path = (
             f"{self.downstream_package_name}.spec"
             if self.downstream_package_name
-            else self.specfile_path
+            else basename(upstream_specfile_path)
         )
         return SyncFilesItem(
             src=[

@@ -1236,6 +1236,19 @@ def test_get_specfile_sync_files_item():
     )
 
 
+def test_get_specfile_sync_files_nodownstreamname_item():
+    pc = PackageConfig(specfile_path="fedora/python-ogr.spec")
+    upstream_specfile_path = "fedora/python-ogr.spec"
+    downstream_specfile_path = "python-ogr.spec"
+
+    assert pc.get_specfile_sync_files_item() == SyncFilesItem(
+        src=[upstream_specfile_path], dest=downstream_specfile_path
+    )
+    assert pc.get_specfile_sync_files_item(from_downstream=True) == SyncFilesItem(
+        src=[downstream_specfile_path], dest=upstream_specfile_path
+    )
+
+
 @pytest.mark.parametrize(
     "raw",
     [
@@ -1259,7 +1272,7 @@ def test_get_specfile_sync_files_item():
         },
     ],
 )
-def test_package_config_specilfe_not_present_raise(raw):
+def test_package_config_specfile_not_present_raise(raw):
     with pytest.raises(PackitConfigException):
         PackageConfig.get_from_dict(raw_dict=raw)
 
