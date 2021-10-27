@@ -1259,7 +1259,7 @@ def test_get_specfile_sync_files_item():
         },
     ],
 )
-def test_package_config_specilfe_not_present_raise(raw):
+def test_package_config_specfile_not_present_raise(raw):
     with pytest.raises(PackitConfigException):
         PackageConfig.get_from_dict(raw_dict=raw)
 
