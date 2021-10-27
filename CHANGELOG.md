@@ -1,3 +1,10 @@
+# 0.40.0
+
+- Packit will deduce the version for SRPM from the spec file, if there are no git tags or action for acquiring current version defined. (#1388)
+- We have introduced new options for generating SRPM packages: (#1396)
+  - `--no-bump` that prevents changing of the release in the SRPM, which can be used for creating SRPMs on checked out tags/releases.
+  - `--release-suffix` that allows you to customize the suffix after the release number, e.g. reference bugzilla or specific branch of the build.
+
 # 0.39.0
 
 - Bug in Packit causing issues with local build when the branch was named with prefix rpm has been fixed. (#1380)
