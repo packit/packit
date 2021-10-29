@@ -165,6 +165,7 @@ class JobConfig(CommonPackageConfig):
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
+        merge_pr_in_ci: bool = True,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -189,6 +190,7 @@ class JobConfig(CommonPackageConfig):
             notifications=notifications,
             copy_upstream_release_description=copy_upstream_release_description,
             sources=sources,
+            merge_pr_in_ci=merge_pr_in_ci,
         )
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
@@ -216,7 +218,8 @@ class JobConfig(CommonPackageConfig):
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"
             f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}',"
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
-            f"sources='{self.sources}')"
+            f"sources='{self.sources}', "
+            f"merge_pr_in_ci={self.merge_pr_in_ci})"
         )
 
     @classmethod
@@ -253,6 +256,7 @@ class JobConfig(CommonPackageConfig):
             and self.copy_upstream_release_description
             == other.copy_upstream_release_description
             and self.sources == other.sources
+            and self.merge_pr_in_ci == other.merge_pr_in_ci
         )
 
 

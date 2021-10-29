@@ -80,6 +80,7 @@ class LocalProject:
         remote: str = "",
         pr_id: Optional[str] = None,
         cache: Optional[RepositoryCache] = None,
+        merge_pr: bool = True,
     ) -> None:
         """
 
@@ -137,7 +138,8 @@ class LocalProject:
         # the PR itself, so if both are specified, PR ID > ref
         if pr_id:
             self.checkout_pr(pr_id)
-            self.merge_pr(pr_id)
+            if merge_pr:
+                self.merge_pr(pr_id)
         elif ref:
             self.checkout_ref(ref)
 
@@ -490,6 +492,7 @@ class LocalProject:
         local_branch = f"pr-changes/{pr_id}"
 
         self._fetch_as_branch(remote_ref, local_ref, local_branch)
+        self.git_repo.branches[local_branch].checkout()
 
         head_commit = self.git_repo.branches[local_branch].commit
         logger.info(
