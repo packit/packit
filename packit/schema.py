@@ -257,6 +257,7 @@ class CommonConfigSchema(Schema):
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
     sources = fields.List(fields.Nested(SourceSchema), missing=None)
+    merge_pr_in_ci = fields.Bool(default=True)
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
