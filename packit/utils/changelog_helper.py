@@ -40,6 +40,14 @@ class ChangelogHelper:
         return "\n".join(map(lambda line: line.rstrip(), messages))
 
     def update_dist_git(self, full_version: str, upstream_tag: str) -> None:
+        """
+        Updates changelog when running `update-dist-git`.
+
+        Args:
+            full_version: Version to be set in the spec-file.
+            upstream_tag: The commit message of this commit is going to be used
+                to update the changelog in the spec-file.
+        """
         comment = self.entry_from_action or (
             self.up.local_project.git_project.get_release(name=full_version).body
             if self.package_config.copy_upstream_release_description
@@ -61,6 +69,9 @@ class ChangelogHelper:
             )
 
     def prepare_upstream_using_source_git(self) -> None:
+        """
+        Updates changelog when creating SRPM within source-git repository.
+        """
         old_release = self.up.specfile.get_release_number()
         try:
             old_release_int = int(old_release)
@@ -76,8 +87,21 @@ class ChangelogHelper:
         )
 
     def prepare_upstream_locally(
-        self, version: str, commit: str, bump_version: bool, local_version: Optional[str]
+        self,
+        version: str,
+        commit: str,
+        bump_version: bool,
+        local_version: Optional[str],
     ) -> None:
+        """
+        Updates changelog when creating SRPM within upstream repository.
+
+        Args:
+            version: Version to be set in the spec-file.
+            commit: Commit to be set in the changelog.
+            bump_version: Specifies whether version should be changed in the spec-file.
+            local_version: Specifies local release suffix. `None` represents default suffix.
+        """
         last_tag = self.up.get_last_tag()
         msg = self.entry_from_action
         if not msg and last_tag and bump_version:

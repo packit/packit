@@ -423,14 +423,23 @@ class Upstream(PackitRepositoryBase):
         In order to create a SRPM from current git checkout, we need to have the spec reference
         the tarball and unpack it. This method updates the spec so it's possible.
 
-        :param archive: relative path to the archive: used as Source0
-        :param version: version to set in the spec
-        :param commit: commit to set in the changelog
+        Args:
+            archive: Relative path to the archive, used as `Source0`.
+            version: Version to be set in the spec-file.
+            commit: Commit to be set in the changelog.
+            bump_version: Specifies whether version should be changed in the spec-file.
+
+                Defaults to `True`.
+            local_version: Specifies local release suffix.
+
+                Defaults to `None`, which means default generated suffix is used.
         """
         self._fix_spec_source(archive)
         self._fix_spec_prep(archive)
 
-        ChangelogHelper(self).prepare_upstream_locally(version, commit, bump_version, local_version)
+        ChangelogHelper(self).prepare_upstream_locally(
+            version, commit, bump_version, local_version
+        )
 
     def _fix_spec_prep(self, archive):
         prep = self.specfile.spec_content.section("%prep")
