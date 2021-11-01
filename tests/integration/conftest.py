@@ -13,7 +13,8 @@ import git
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
-from ogr.abstract import PullRequest, PRStatus
+from ogr.abstract import PRStatus
+from ogr.read_only import PullRequestReadOnly
 from ogr.services.github import GithubService, GithubProject
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
 
@@ -105,7 +106,7 @@ def mock_spec_download_remote_s(
 
 def mock_remote_functionality(distgit: Path, upstream: Path):
     def mocked_create_pr(*args, **kwargs):
-        return PullRequest(
+        return PullRequestReadOnly(
             title="",
             id=42,
             status=PRStatus.open,
