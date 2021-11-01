@@ -91,7 +91,7 @@ class ChangelogHelper:
         version: str,
         commit: str,
         bump_version: bool,
-        local_version: Optional[str],
+        release_suffix: Optional[str],
     ) -> None:
         """
         Updates changelog when creating SRPM within upstream repository.
@@ -100,7 +100,7 @@ class ChangelogHelper:
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
             bump_version: Specifies whether version should be changed in the spec-file.
-            local_version: Specifies local release suffix. `None` represents default suffix.
+            release_suffix: Specifies local release suffix. `None` represents default suffix.
         """
         last_tag = self.up.get_last_tag()
         msg = self.entry_from_action
@@ -112,7 +112,7 @@ class ChangelogHelper:
             msg = f"- Development snapshot ({commit})"
         release = self.up.get_spec_release(
             bump_version=bump_version,
-            local_version=local_version,
+            release_suffix=release_suffix,
         )
         logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field

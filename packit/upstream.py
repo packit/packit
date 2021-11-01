@@ -356,7 +356,7 @@ class Upstream(PackitRepositoryBase):
             raise
 
     def get_spec_release(
-        self, bump_version: bool = True, local_version: Optional[str] = None
+        self, bump_version: bool = True, release_suffix: Optional[str] = None
     ) -> str:
         """Assemble pieces of the spec file %release field we intend to set
         within the default fix-spec-file action
@@ -371,8 +371,8 @@ class Upstream(PackitRepositoryBase):
             string which is meant to be put into a spec file %release field by packit
         """
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
-        if local_version:
-            return f"{original_release_number}.{local_version}"
+        if release_suffix:
+            return f"{original_release_number}.{release_suffix}"
 
         if not bump_version:
             return original_release_number
@@ -417,7 +417,7 @@ class Upstream(PackitRepositoryBase):
         version: str,
         commit: str,
         bump_version: bool = True,
-        local_version: Optional[str] = None,
+        release_suffix: Optional[str] = None,
     ):
         """
         In order to create a SRPM from current git checkout, we need to have the spec reference
@@ -430,7 +430,7 @@ class Upstream(PackitRepositoryBase):
             bump_version: Specifies whether version should be changed in the spec-file.
 
                 Defaults to `True`.
-            local_version: Specifies local release suffix.
+            release_suffix: Specifies local release suffix.
 
                 Defaults to `None`, which means default generated suffix is used.
         """
@@ -438,7 +438,7 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_prep(archive)
 
         ChangelogHelper(self).prepare_upstream_locally(
-            version, commit, bump_version, local_version
+            version, commit, bump_version, release_suffix
         )
 
     def _fix_spec_prep(self, archive):
@@ -520,7 +520,7 @@ class Upstream(PackitRepositoryBase):
         self,
         upstream_ref: str = None,
         bump_version: bool = True,
-        local_version: Optional[str] = None,
+        release_suffix: Optional[str] = None,
     ):
         """
         1. determine version
@@ -531,7 +531,7 @@ class Upstream(PackitRepositoryBase):
         :param upstream_ref: str, needed for the sourcegit mode
         """
         SRPMBuilder(upstream=self, ref=upstream_ref).prepare(
-            bump_version=bump_version, local_version=local_version
+            bump_version=bump_version, release_suffix=release_suffix
         )
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
@@ -899,7 +899,7 @@ class SRPMBuilder:
         ChangelogHelper(self.upstream).prepare_upstream_using_source_git()
 
     def _fix_specfile_to_use_local_archive(
-        self, archive: str, bump_version: bool, local_version: Optional[str]
+        self, archive: str, bump_version: bool, release_suffix: Optional[str]
     ) -> None:
         """
         Update specfile to use the archive with the right version.
@@ -926,10 +926,10 @@ class SRPMBuilder:
                 version=self.current_git_describe_version,
                 commit=current_commit,
                 bump_version=bump_version,
-                local_version=local_version,
+                release_suffix=release_suffix,
             )
 
-    def prepare(self, bump_version: bool, local_version: Optional[str] = None):
+    def prepare(self, bump_version: bool, release_suffix: Optional[str] = None):
         if self.upstream_ref:
             self._prepare_upstream_using_source_git()
         else:
@@ -939,7 +939,7 @@ class SRPMBuilder:
             self._fix_specfile_to_use_local_archive(
                 archive=created_archive,
                 bump_version=bump_version,
-                local_version=local_version,
+                release_suffix=release_suffix,
             )
 
         # https://github.com/packit/packit-service/issues/314

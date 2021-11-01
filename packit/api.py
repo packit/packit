@@ -635,7 +635,7 @@ class PackitAPI:
                 self.up.prepare_upstream_for_srpm_creation(
                     upstream_ref=upstream_ref,
                     bump_version=bump_version,
-                    local_version=release_suffix,
+                    release_suffix=release_suffix,
                 )
             except Exception as ex:
                 raise PackitSRPMException(
