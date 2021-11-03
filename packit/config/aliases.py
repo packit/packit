@@ -1,24 +1,6 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 import functools
 import logging
 from collections import defaultdict
@@ -33,9 +15,9 @@ from packit.utils.decorators import fallback_return_value
 
 ALIASES: Dict[str, List[str]] = {
     "fedora-development": ["fedora-rawhide"],
-    "fedora-latest": ["fedora-34"],
-    "fedora-stable": ["fedora-33", "fedora-34"],
-    "fedora-all": ["fedora-33", "fedora-34", "fedora-rawhide"],
+    "fedora-latest": ["fedora-35"],
+    "fedora-stable": ["fedora-34", "fedora-35"],
+    "fedora-all": ["fedora-34", "fedora-35", "fedora-rawhide"],
     "epel-all": ["el-6", "epel-7", "epel-8"],
 }
 
@@ -235,8 +217,7 @@ def get_all_koji_targets() -> List[str]:
 def get_aliases() -> Dict[str, List[str]]:
     """
     Function to automatically determine fedora-all, fedora-stable, fedora-development,
-    fedora-latest and epel-all
-    aliases.
+    fedora-latest and epel-all aliases.
     Current data are fetched via bodhi client, with default base url
     `https://bodhi.fedoraproject.org/'.
 
