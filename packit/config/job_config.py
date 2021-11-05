@@ -7,6 +7,7 @@ from logging import getLogger
 from typing import List, Set, Dict, Optional, Union
 
 from packit.actions import ActionName
+from packit.config.aliases import DEFAULT_VERSION
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.notifications import NotificationsConfig
 from packit.config.sources import SourcesItem
@@ -271,12 +272,12 @@ def get_default_jobs() -> List[Dict]:
             {
                 "job": "copr_build",
                 "trigger": "pull_request",
-                "metadata": {"targets": "fedora-stable"},
+                "metadata": {"targets": DEFAULT_VERSION},
             },
             {
                 "job": "tests",
                 "trigger": "pull_request",
-                "metadata": {"targets": "fedora-stable"},
+                "metadata": {"targets": DEFAULT_VERSION},
             },
             {
                 "job": "propose_downstream",

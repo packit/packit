@@ -33,6 +33,7 @@ from packit.config import (
     JobType,
     JobConfigTriggerType,
 )
+from packit.config.aliases import DEFAULT_VERSION
 from packit.config.job_config import JobMetadataConfig
 from packit.schema import JobConfigSchema
 
@@ -100,13 +101,13 @@ def get_default_job_config(**kwargs):
         JobConfig(
             type=JobType.copr_build,
             trigger=JobConfigTriggerType.pull_request,
-            metadata=JobMetadataConfig(targets=["fedora-stable"]),
+            metadata=JobMetadataConfig(targets=[DEFAULT_VERSION]),
             **kwargs,
         ),
         JobConfig(
             type=JobType.tests,
             trigger=JobConfigTriggerType.pull_request,
-            metadata=JobMetadataConfig(targets=["fedora-stable"]),
+            metadata=JobMetadataConfig(targets=[DEFAULT_VERSION]),
             **kwargs,
         ),
         JobConfig(
