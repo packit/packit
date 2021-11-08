@@ -1,12 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import flexmock
 import pytest
 import textwrap
 import shutil
 import rpm
 
+from flexmock import flexmock
 from pathlib import Path
 
 from packit.specfile import Specfile
