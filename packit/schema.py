@@ -167,26 +167,59 @@ class NotificationsSchema(Schema):
         return NotificationsConfig(**data)
 
 
-class TargetField(fields.String):
-    def _deserialize(
-        self,
-        target,
-        *args,
-        **kwargs,
-    ):
-        if target in DEPRECATED_TARGET_MAP:
-            logger.warning(
-                f"Target '{target}' is deprecated. Please update your configuration "
-                f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead."
+class TargetsListOrDict(fields.Field):
+    """Field type expecting a List[str] or Dict[str, Dict[str, Any]]
+    Union is not supported by marshmallow so we have to validate manually :(
+    https://github.com/marshmallow-code/marshmallow/issues/1191
+    """
+
+    @staticmethod
+    def __is_targets_dict(value) -> bool:
+        if (
+            not isinstance(value, dict)
+            or not all(isinstance(k, str) for k in value.keys())
+            or not all(isinstance(v, dict) for v in value.values())
+        ):
+            return False
+        # check the 'attributes', e.g. {'distros': ['centos-7']}
+        for attr in value.values():
+            for key, value in attr.items():
+                if key != "distros":
+                    raise ValidationError(f"Unknown key {key!r} in {attr!r}")
+                if isinstance(value, list) and all(
+                    isinstance(distro, str) for distro in value
+                ):
+                    return True
+                else:
+                    raise ValidationError(
+                        f"Expected list[str], got {value!r} (type {type(value)!r})"
+                    )
+        return True
+
+    def _deserialize(self, value, attr, data, **kwargs) -> Dict[str, Dict[str, Any]]:
+        targets_dict: Dict[str, Dict[str, Any]]
+        if isinstance(value, list) and all(isinstance(v, str) for v in value):
+            targets_dict = {key: {} for key in value}
+        elif self.__is_targets_dict(value):
+            targets_dict = value
+        else:
+            raise ValidationError(
+                f"Expected 'list[str]' or 'dict[str,dict]', got {value!r} (type {type(value)!r})."
             )
 
-        return super()._deserialize(target, *args, **kwargs)
+        for target in targets_dict.keys():
+            if target in DEPRECATED_TARGET_MAP:
+                logger.warning(
+                    f"Target '{target}' is deprecated. Please update your configuration "
+                    f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead."
+                )
+        return targets_dict
 
 
 class JobMetadataSchema(Schema):
     """Jobs metadata."""
 
-    targets = fields.List(TargetField(), missing=None)
+    _targets = TargetsListOrDict(missing=None, data_key="targets")
     timeout = fields.Integer()
     owner = fields.String(missing=None)
     project = fields.String(missing=None)

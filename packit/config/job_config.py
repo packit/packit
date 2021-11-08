@@ -4,9 +4,10 @@
 from copy import deepcopy
 from enum import Enum
 from logging import getLogger
-from typing import List, Set, Dict, Optional, Union
+from typing import List, Set, Dict, Optional, Union, Any
 
 from packit.actions import ActionName
+from packit.config.aliases import DEFAULT_VERSION
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.notifications import NotificationsConfig
 from packit.config.sources import SourcesItem
@@ -36,7 +37,7 @@ class JobConfigTriggerType(Enum):
 class JobMetadataConfig:
     def __init__(
         self,
-        targets: List[str] = None,
+        _targets: Union[List[str], Dict[str, Dict[str, Any]]] = None,
         timeout: int = 7200,
         owner: str = None,
         project: str = None,
@@ -54,7 +55,10 @@ class JobMetadataConfig:
     ):
         """
         Args:
-            targets: copr_build job, mock chroots where to build
+            _targets: copr_build, mock chroots where to build
+                      tests, builds to test
+                      The _ prefix is used because 'targets' without it
+                      is now used for backward compatibility.
             timeout: copr_build, give up watching a build after timeout, defaults to 7200s
             owner: copr_build, a namespace in COPR where the build should happen
             project: copr_build, a name of the copr project
@@ -65,10 +69,16 @@ class JobMetadataConfig:
             preserve_project: if set, project will not be created as temporary
             additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
             additional_repos: buildroot additional additional_repos
-            use_internal_tf: if we want to use internal instance for Testing Farm
+            fmf_url: - git repository containing the metadata (FMF) tree
+            fmf_ref: - branch, tag or commit specifying the desired git revision
+            use_internal_tf: if we want to use internal instance of Testing Farm
             skip_build: if we want to skip build phase for Testing Farm job
         """
-        self.targets: Set[str] = set(targets) if targets else set()
+        self._targets: Dict[str, Dict[str, Any]]
+        if isinstance(_targets, list):
+            self._targets = {key: {} for key in _targets}
+        else:
+            self._targets = _targets or {}
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
@@ -81,15 +91,15 @@ class JobMetadataConfig:
         self.preserve_project: bool = preserve_project
         self.additional_packages: List[str] = additional_packages or []
         self.additional_repos: List[str] = additional_repos or []
-        self.fmf_url = fmf_url
-        self.fmf_ref = fmf_ref
-        self.use_internal_tf = use_internal_tf
-        self.skip_build = skip_build
+        self.fmf_url: str = fmf_url
+        self.fmf_ref: str = fmf_ref
+        self.use_internal_tf: bool = use_internal_tf
+        self.skip_build: bool = skip_build
 
     def __repr__(self):
         return (
             f"JobMetadataConfig("
-            f"targets={self.targets}, "
+            f"targets={self._targets}, "
             f"timeout={self.timeout}, "
             f"owner={self.owner}, "
             f"project={self.project}, "
@@ -112,7 +122,7 @@ class JobMetadataConfig:
                 "Provided object is not a JobMetadataConfig instance."
             )
         return (
-            self.targets == other.targets
+            self._targets == other._targets
             and self.timeout == other.timeout
             and self.owner == other.owner
             and self.project == other.project
@@ -128,6 +138,15 @@ class JobMetadataConfig:
             and self.use_internal_tf == other.use_internal_tf
             and self.skip_build == other.skip_build
         )
+
+    @property
+    def targets_dict(self):
+        return self._targets
+
+    @property
+    def targets(self):
+        """For backward compatibility."""
+        return set(self._targets.keys())
 
 
 class JobConfig(CommonPackageConfig):
@@ -271,12 +290,12 @@ def get_default_jobs() -> List[Dict]:
             {
                 "job": "copr_build",
                 "trigger": "pull_request",
-                "metadata": {"targets": "fedora-stable"},
+                "metadata": {"targets": [DEFAULT_VERSION]},
             },
             {
                 "job": "tests",
                 "trigger": "pull_request",
-                "metadata": {"targets": "fedora-stable"},
+                "metadata": {"targets": [DEFAULT_VERSION]},
             },
             {
                 "job": "propose_downstream",

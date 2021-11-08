@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 import os
 
@@ -33,8 +14,9 @@ from packit.config import (
     JobType,
     JobConfigTriggerType,
 )
+from packit.config.aliases import DEFAULT_VERSION
 from packit.config.job_config import JobMetadataConfig
-from packit.schema import JobConfigSchema
+from packit.schema import JobConfigSchema, JobMetadataSchema
 
 
 def get_job_config_dict_simple(**update):
@@ -100,13 +82,13 @@ def get_default_job_config(**kwargs):
         JobConfig(
             type=JobType.copr_build,
             trigger=JobConfigTriggerType.pull_request,
-            metadata=JobMetadataConfig(targets=["fedora-stable"]),
+            metadata=JobMetadataConfig(_targets=[DEFAULT_VERSION]),
             **kwargs,
         ),
         JobConfig(
             type=JobType.tests,
             trigger=JobConfigTriggerType.pull_request,
-            metadata=JobMetadataConfig(targets=["fedora-stable"]),
+            metadata=JobMetadataConfig(_targets=[DEFAULT_VERSION]),
             **kwargs,
         ),
         JobConfig(
@@ -254,3 +236,24 @@ def test_serialize_and_deserialize_job_config(config):
     serialized = schema.dump(config)
     new_config = schema.load(serialized)
     assert new_config == config
+
+
+@pytest.mark.parametrize(
+    "config,is_valid",
+    [
+        ({}, True),
+        ({"targets": []}, True),
+        ({"targets": {}}, True),
+        ({"targets": ["this", "is", "list"]}, True),
+        ({"targets": {"a": {}, "b": {"distros": ["rhel-7"]}}}, True),
+        ({"targets": {"a": {}, "b": {"unknown": ["rhel-7"]}}}, False),
+        ({"targets": {"a": {}, "b": {"distros": "not a list"}}}, False),
+        ({"targets": {"this", "is", "set"}}, False),
+    ],
+)
+def test_job_metadata_targets(config, is_valid):
+    if is_valid:
+        JobMetadataSchema().load(config)
+    else:
+        with pytest.raises(ValidationError):
+            JobMetadataSchema().load(config)
