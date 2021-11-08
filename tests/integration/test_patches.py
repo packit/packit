@@ -4,9 +4,9 @@
 import git
 import pytest
 import shutil
-import flexmock
 import textwrap
 
+from flexmock import flexmock
 from pathlib import Path
 from packit.patches import PatchGenerator, PatchMetadata
 from packit.exceptions import PackitException
