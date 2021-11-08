@@ -749,7 +749,9 @@ class PatchGenerator:
             # patch-id before the change
             prev_patch = repo.git.show(f"HEAD:{relative_patch_path}")
             prev_patch = git_patch_ish(prev_patch)
-            with tempfile.TemporaryFile(mode="w+") as fp:
+            # We can't know the encoding of the patch.
+            # https://docs.python.org/3/howto/unicode.html#files-in-an-unknown-encoding
+            with tempfile.TemporaryFile(mode="w+", errors="surrogateescape") as fp:
                 fp.write(prev_patch)
                 fp.seek(0)
                 prev_patch_id = repo.git.patch_id("--stable", istream=fp).split()[0]
