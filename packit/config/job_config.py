@@ -52,6 +52,7 @@ class JobMetadataConfig:
         fmf_ref: str = None,
         use_internal_tf: bool = False,
         skip_build: bool = False,
+        env: Dict[str, Any] = None,
     ):
         """
         Args:
@@ -73,6 +74,7 @@ class JobMetadataConfig:
             fmf_ref: - branch, tag or commit specifying the desired git revision
             use_internal_tf: if we want to use internal instance of Testing Farm
             skip_build: if we want to skip build phase for Testing Farm job
+            env: environment variables
         """
         self._targets: Dict[str, Dict[str, Any]]
         if isinstance(_targets, list):
@@ -95,6 +97,7 @@ class JobMetadataConfig:
         self.fmf_ref: str = fmf_ref
         self.use_internal_tf: bool = use_internal_tf
         self.skip_build: bool = skip_build
+        self.env: Dict[str, Any] = env or {}
 
     def __repr__(self):
         return (
@@ -113,7 +116,8 @@ class JobMetadataConfig:
             f"fmf_url={self.fmf_url}, "
             f"fmf_ref={self.fmf_ref}, "
             f"use_internal_tf={self.use_internal_tf}, "
-            f"skip_build={self.skip_build})"
+            f"skip_build={self.skip_build},"
+            f"env={self.env})"
         )
 
     def __eq__(self, other: object):
@@ -137,6 +141,7 @@ class JobMetadataConfig:
             and self.fmf_ref == other.fmf_ref
             and self.use_internal_tf == other.use_internal_tf
             and self.skip_build == other.skip_build
+            and self.env == other.env
         )
 
     @property
