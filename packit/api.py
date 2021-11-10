@@ -8,7 +8,6 @@ This is the official python interface for packit.
 import asyncio
 import click
 import logging
-import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -43,6 +42,7 @@ from packit.status import Status
 from packit.sync import sync_files, SyncFilesItem
 from packit.upstream import Upstream
 from packit.utils import commands
+from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
 
 logger = logging.getLogger(__name__)
@@ -386,25 +386,11 @@ class PackitAPI:
         """
         if self.package_config.sync_changelog:
             return synced_files
-        comment = (
-            self.up.local_project.git_project.get_release(name=full_version).body
-            if self.package_config.copy_upstream_release_description
-            else self.up.get_commit_messages(
-                after=self.up.get_last_tag(upstream_tag), before=upstream_tag
-            )
+
+        # add entry to changelog
+        ChangelogHelper(self.up, self.dg, self.package_config).update_dist_git(
+            full_version=full_version, upstream_tag=upstream_tag
         )
-        try:
-            self.dg.set_specfile_content(self.up.specfile, full_version, comment)
-        except FileNotFoundError as ex:
-            # no downstream spec file: this is either a mistake or
-            # there is no spec file in dist-git yet, hence warning
-            logger.warning(
-                f"Unable to find a spec file in downstream: {ex}, copying the one from upstream."
-            )
-            shutil.copy2(
-                self.up.absolute_specfile_path,
-                self.dg.get_absolute_specfile_path(),
-            )
 
         # exclude spec, we have special plans for it
         return list(
@@ -649,7 +635,7 @@ class PackitAPI:
                 self.up.prepare_upstream_for_srpm_creation(
                     upstream_ref=upstream_ref,
                     bump_version=bump_version,
-                    local_version=release_suffix,
+                    release_suffix=release_suffix,
                 )
             except Exception as ex:
                 raise PackitSRPMException(
