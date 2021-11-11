@@ -1,9 +1,26 @@
+# 0.41.0
+
+- Packit now supports `changelog-entry` action that is used when creating
+  SRPM. The action is supposed to generate whole changelog entry (including
+  the `-` at the start of the lines) and has a priority over any other way we
+  modify the changelog with. (#1367)
+- Fixed an issue, which raised an `UnicodeEncodingError`, when working with
+  dist-git patch files with an encoding other than UTF-8. (#1406)
+- Backup alias definitions now reflect the official release of Fedora Linux 35. (#1405)
+- We have introduced a new configuration option `merge_pr_in_ci` that allows
+  you to disable merging of PR into the base branch before creating SRPM in
+  service. (#1395)
+- Fixed an issue, where spec-files located in a sub-directory of upstream
+  projects, were not placed in the root of the dist-git repo when proposing
+  changes downstream. (#1402)
+
 # 0.40.0
 
 - Packit will deduce the version for SRPM from the spec file, if there are no git tags or action for acquiring current version defined. (#1388)
 - We have introduced new options for generating SRPM packages: (#1396)
   - `--no-bump` that prevents changing of the release in the SRPM, which can be used for creating SRPMs on checked out tags/releases.
   - `--release-suffix` that allows you to customize the suffix after the release number, e.g. reference bugzilla or specific branch of the build.
+- Deprecated configuration options `current_version_command` and `create_tarball_command` have been removed and are no longer supported. They are superseded by actions `get-current-version` and `create-archive`. (#1397)
 
 # 0.39.0
 
