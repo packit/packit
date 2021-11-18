@@ -334,6 +334,25 @@ def test_package_config_not_equal(not_equal_package_config):
         (
             {
                 "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "tests",
+                        "trigger": "pull_request",
+                        "metadata": {
+                            "targets": "fedora-all",
+                            "env": {
+                                "MYVAR1": 5,
+                                "MYVAR2": "foo",
+                            },
+                        },
+                    }
+                ],
+            },
+            True,
+        ),
+        (
+            {
+                "specfile_path": "fedora/package.spec",
                 "synced_files": ["fedora/foobar.spec"],
                 "actions": {
                     "pre-sync": "some/pre-sync/command --option",
