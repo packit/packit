@@ -1,12 +1,14 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 from flexmock import flexmock
 
+from packit.actions import ActionName
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
@@ -46,6 +48,35 @@ def test_basic_local_update(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.get_version() == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
+def test_local_update_generated_spec(
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
+):
+    """Check that specfile can be generated on clone."""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    # Simulate generation by moving the spec to a different location
+    current_spec_location = u / "beer.spec"
+    new_spec_location = u / "tmp.spec"
+    shutil.move(current_spec_location, new_spec_location)
+    api.up.package_config.actions = {
+        ActionName.post_upstream_clone: [
+            f"mv {new_spec_location} {current_spec_location}"
+        ]
+    }
+    api.sync_release(dist_git_branch="main")
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
