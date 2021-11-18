@@ -250,6 +250,7 @@ class PackitAPI:
 
         :return created PullRequest if create_pr is True, else None
         """
+        self.up.run_action(actions=ActionName.post_upstream_clone)
         dist_git_branch = (
             dist_git_branch or self.dg.local_project.git_project.default_branch
         )
@@ -287,7 +288,6 @@ class PackitAPI:
             upstream_ref or self.package_config.upstream_ref
         )
         create_pr = create_pr and self.package_config.create_pr
-        self.up.run_action(actions=ActionName.post_upstream_clone)
 
         current_up_branch = self.up.active_branch
         try:
