@@ -85,7 +85,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
 
             else:
                 err_msg = (
-                    "Cannot get build target from '{one_name}'"
+                    f"Cannot get build target from '{one_name}'"
                     f", packit understands values like these: '{list(get_aliases().keys())}'."
                 )
                 raise PackitException(err_msg.format(one_name=one_name))
