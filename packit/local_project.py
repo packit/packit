@@ -109,6 +109,7 @@ class LocalProject:
             f"remote: {remote}\n"
             f"pr_id: {pr_id}\n"
             f"cache: {cache}\n"
+            f"merge_pr: {merge_pr}\n"
         )
 
         if refresh:
