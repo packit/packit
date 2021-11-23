@@ -21,39 +21,63 @@ class LocalProjectParameter(click.ParamType):
 
     name = "path_or_url"
 
-    def __init__(self, branch_param_name: str = None) -> None:
-        """
-        :param branch_param_name: name of the cli function parameter (not the option name)
-        """
+    def __init__(
+        self,
+        ref_param_name: str = None,
+        pr_id_param_name: str = None,
+        merge_pr_param_name: str = None,
+    ) -> None:
         super().__init__()
-        self.branch_param_name = branch_param_name
+        self.ref_param_name = ref_param_name
+        self.pr_id_param_name = pr_id_param_name
+        self.merge_pr_param_name = merge_pr_param_name
+
+    @staticmethod
+    def get_param(param_name, ctx):
+        value = None
+        if param_name in ctx.params:
+            value = ctx.params[param_name]
+        else:  # use the default
+            for param in ctx.command.params:
+                if param.name == param_name:
+                    value = param.default
+        return value
 
     def convert(self, value, param, ctx):
         if isinstance(value, LocalProject):
             return value
 
         try:
-            branch_name = None
-            if self.branch_param_name:
-                if self.branch_param_name in ctx.params:
-                    branch_name = ctx.params[self.branch_param_name]
-                else:  # use the default
-                    for param in ctx.command.params:
-                        if param.name == self.branch_param_name:
-                            branch_name = param.default
+            ref = ""
+            pr_id = None
+            merge_pr = True
+
+            if self.ref_param_name:
+                ref = self.get_param(self.ref_param_name, ctx)
+
+            if self.pr_id_param_name:
+                pr_id = self.get_param(self.pr_id_param_name, ctx)
+
+            if self.merge_pr_param_name:
+                merge_pr = self.get_param(self.merge_pr_param_name, ctx)
 
             if os.path.isdir(value):
                 absolute_path = os.path.abspath(value)
                 logger.debug(f"Input is a directory: {absolute_path}")
                 local_project = LocalProject(
                     working_dir=absolute_path,
-                    ref=branch_name,
+                    ref=ref,
                     remote=ctx.obj.upstream_git_remote,
+                    merge_pr=merge_pr,
                 )
             elif git_remote_url_to_https_url(value):
                 logger.debug(f"Input is a URL to a git repo: {value}")
                 local_project = LocalProject(
-                    git_url=value, ref=branch_name, remote=ctx.obj.upstream_git_remote
+                    git_url=value,
+                    ref=ref,
+                    remote=ctx.obj.upstream_git_remote,
+                    pr_id=pr_id,
+                    merge_pr=merge_pr,
                 )
             else:
                 self.fail(

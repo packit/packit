@@ -11,6 +11,7 @@ import click
 from github import GithubException
 
 from ogr.parsing import parse_git_repo
+from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import PackageConfig
 
 from packit.api import PackitAPI
@@ -91,11 +92,14 @@ def get_packit_api(
     local_project: LocalProject,
     dist_git_path: str = None,
     load_packit_yaml: bool = True,
+    job_config: Optional[CommonPackageConfig] = None,
 ) -> PackitAPI:
     """
     Load the package config, set other options and return the PackitAPI
     """
-    if load_packit_yaml:
+    if job_config:
+        package_config = job_config
+    elif load_packit_yaml:
         package_config = get_local_package_config(
             local_project.working_dir,
             repo_name=local_project.repo_name,
