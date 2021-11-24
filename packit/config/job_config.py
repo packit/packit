@@ -24,7 +24,8 @@ class JobType(Enum):
     build = "build"
     sync_from_downstream = "sync_from_downstream"
     copr_build = "copr_build"
-    production_build = "production_build"  # koji build
+    production_build = "production_build"  # upstream koji build
+    koji_build = "koji_build"  # downstream koji build
     tests = "tests"
 
 
