@@ -1,3 +1,10 @@
+# 0.42.0
+
+- Running `post-upstream-clone` action in `propose-downstream` command was fixed.
+  This solves the issue for projects that generate the specfile during this action.
+- New config option `env` has been added for specifying environment variables
+  used for running tests in the Testing Farm.
+
 # 0.41.0
 
 - Packit now supports `changelog-entry` action that is used when creating
