@@ -36,6 +36,10 @@ class PackitConfigException(PackitException):
     pass
 
 
+class PackitMissingConfigException(PackitConfigException):
+    pass
+
+
 class PackitCoprException(PackitException):
     pass
 
