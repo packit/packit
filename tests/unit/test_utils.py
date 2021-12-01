@@ -10,7 +10,10 @@ from flexmock import flexmock
 from pkg_resources import DistributionNotFound, Distribution
 
 from packit.api import get_packit_version
+from packit.config import JobConfig, JobConfigTriggerType, JobType
+from packit.config.job_config import JobMetadataConfig
 from packit.exceptions import PackitException, ensure_str
+from packit.schema import JobConfigSchema
 from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
 from packit.utils.decorators import fallback_return_value
 from packit.utils.repo import (
@@ -21,6 +24,7 @@ from packit.utils.repo import (
     get_message_from_metadata,
 )
 from packit.utils.commands import run_command
+from packit.utils.source_script import create_source_script
 
 
 @pytest.mark.parametrize(
@@ -375,3 +379,74 @@ def test_get_metadata_from_message(source, result):
 )
 def test_get_message_from_metadata(metadata, header, result):
     assert get_message_from_metadata(metadata, header) == result
+
+
+@pytest.mark.parametrize(
+    "ref, pr_id, merge_pr, job_config, url, command",
+    [
+        (
+            None,
+            None,
+            True,
+            None,
+            "https://github.com/packit/ogr",
+            'packit -d prepare-sources --result-dir "$resultdir" https://github.com/packit/ogr',
+        ),
+        (
+            "123",
+            None,
+            True,
+            None,
+            "https://github.com/packit/ogr",
+            'packit -d prepare-sources --result-dir "$resultdir" --ref 123 '
+            "https://github.com/packit/ogr",
+        ),
+        (
+            None,
+            "1",
+            False,
+            None,
+            "https://github.com/packit/ogr",
+            'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
+            "--no-merge-pr https://github.com/packit/ogr",
+        ),
+    ],
+)
+def test_create_source_script(ref, pr_id, merge_pr, job_config, url, command):
+    assert (
+        create_source_script(
+            ref=ref, pr_id=pr_id, merge_pr=merge_pr, job_config=job_config, url=url
+        )
+        == f"""
+#!/bin/sh
+
+resultdir=$PWD
+{command}
+
+"""
+    )
+
+
+def test_create_source_script_with_job_config():
+    test_job_config = JobConfig(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.release,
+        metadata=JobMetadataConfig(project="example1"),
+    )
+    expected_command = (
+        'packit -d prepare-sources --result-dir "$resultdir" '
+        f"--job-config {JobConfigSchema().dumps(test_job_config)!r}"
+        f" https://github.com/packit/ogr"
+    )
+    assert (
+        create_source_script(
+            job_config=test_job_config, url="https://github.com/packit/ogr"
+        )
+        == f"""
+#!/bin/sh
+
+resultdir=$PWD
+{expected_command}
+
+"""
+    )
