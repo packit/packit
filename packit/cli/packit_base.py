@@ -15,6 +15,7 @@ from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
+from packit.cli.prepare_sources import prepare_sources
 from packit.cli.propose_downstream import propose_downstream
 from packit.cli.validate_config import validate_config
 from packit.cli.source_git import source_git
@@ -99,6 +100,7 @@ packit_base.add_command(init)
 packit_base.add_command(local_build)
 packit_base.add_command(validate_config)
 packit_base.add_command(source_git)
+packit_base.add_command(prepare_sources)
 
 if __name__ == "__main__":
     packit_base()

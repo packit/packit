@@ -6,6 +6,8 @@ This is the official python interface for packit.
 """
 
 import asyncio
+from distutils.dir_util import copy_tree
+
 import click
 import logging
 import sys
@@ -612,6 +614,52 @@ class PackitAPI:
             bugzilla_ids=bugzilla_ids,
         )
 
+    def prepare_sources(
+        self,
+        upstream_ref: str = None,
+        bump_version: bool = True,
+        release_suffix: Optional[str] = None,
+        result_dir: Union[Path, str] = None,
+    ) -> None:
+        """
+        Prepare sources for an SRPM build.
+
+        Args:
+            upstream_ref: git ref to upstream commit used in source-git
+            release_suffix: specifies local release suffix. `None` represents default suffix.
+            bump_version: specifies whether version should be changed in the spec-file.
+            result_dir: directory where the specfile directory content should be copied
+        """
+        self.up.run_action(actions=ActionName.post_upstream_clone)
+
+        try:
+            self.up.prepare_upstream_for_srpm_creation(
+                upstream_ref=upstream_ref,
+                bump_version=bump_version,
+                release_suffix=release_suffix,
+            )
+        except Exception as ex:
+            raise PackitSRPMException(
+                f"Preparation of the repository for creation of an SRPM failed: {ex}"
+            ) from ex
+
+        if result_dir:
+            self.copy_sources(result_dir)
+
+        logger.info(
+            f"Directory with sources: {result_dir or self.up.absolute_specfile_dir}"
+        )
+
+    def copy_sources(self, result_dir) -> None:
+        """
+        Copy content of the specfile directory to the `result_dir`.
+
+        Args:
+            result_dir: directory where the specfile directory content should be copied
+        """
+        logger.debug(f"Copying {self.up.absolute_specfile_dir} -> {result_dir}")
+        copy_tree(str(self.up.absolute_specfile_dir), str(result_dir))
+
     def create_srpm(
         self,
         output_file: str = None,
@@ -623,24 +671,18 @@ class PackitAPI:
         """
         Create srpm from the upstream repo
 
-        :param upstream_ref: git ref to upstream commit
-        :param output_file: path + filename where the srpm should be written, defaults to cwd
-        :param srpm_dir: path to the directory where the srpm is meant to be placed
-        :return: a path to the srpm
+        Args:
+            upstream_ref: git ref to upstream commit
+            output_file: path + filename where the srpm should be written, defaults to cwd
+            srpm_dir: path to the directory where the srpm is meant to be placed
+            release_suffix: specifies local release suffix. `None` represents default suffix.
+            bump_version: specifies whether version should be changed in the spec-file.
+
+        Returns:
+            a path to the srpm
         """
         try:
-            self.up.run_action(actions=ActionName.post_upstream_clone)
-
-            try:
-                self.up.prepare_upstream_for_srpm_creation(
-                    upstream_ref=upstream_ref,
-                    bump_version=bump_version,
-                    release_suffix=release_suffix,
-                )
-            except Exception as ex:
-                raise PackitSRPMException(
-                    f"Preparation of the repository for creation of an SRPM failed: {ex}"
-                ) from ex
+            self.prepare_sources(upstream_ref, bump_version, release_suffix)
             try:
                 srpm_path = self.up.create_srpm(
                     srpm_path=output_file, srpm_dir=srpm_dir
