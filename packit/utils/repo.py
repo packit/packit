@@ -114,7 +114,7 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
         logger.debug(f"Repo already exists in {directory}.")
         repo = git.repo.Repo(directory)
     else:
-        logger.debug(f"Cloning repo {url} -> {directory}")
+        logger.info(f"Cloning repo {url} -> {directory}")
         repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
     return repo
