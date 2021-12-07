@@ -137,3 +137,11 @@ RPM_MACROS_FOR_PREP = [
     r'metadata_commit_msg=`printf "Patch-name: $patch_name\\n"` && '
     '%{__git} commit %{-q} -m %{-m*} -m "${metadata_commit_msg}" --author "%{__scm_author}"',
 ]
+
+COPR_SOURCE_SCRIPT = """
+#!/bin/sh
+
+resultdir=$PWD
+packit -d prepare-sources --result-dir "$resultdir" {options}
+
+"""
