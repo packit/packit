@@ -257,6 +257,16 @@ class JobMetadataSchema(Schema):
         return JobMetadataConfig(**data)
 
 
+def validate_repo_name(value):
+    """
+    marshmallow validation for a repository name. Any
+    filename is acceptable: No slash, no zero char.
+    """
+    if not all(c not in "/\0" for c in value):
+        raise ValidationError("Repository name must be a valid filename.")
+    return True
+
+
 class CommonConfigSchema(Schema):
     """
     Common methods for JobConfigSchema and PackageConfigSchema
@@ -266,7 +276,7 @@ class CommonConfigSchema(Schema):
     specfile_path = fields.String(missing=None)
     downstream_package_name = fields.String(missing=None)
     upstream_project_url = fields.String(missing=None)
-    upstream_package_name = fields.String(missing=None)
+    upstream_package_name = fields.String(missing=None, validate=validate_repo_name)
     upstream_ref = fields.String(missing=None)
     upstream_tag_template = fields.String()
     archive_root_dir_template = fields.String()
