@@ -1,3 +1,15 @@
+# 0.43.0
+
+- A new `packit prepare-sources` command has been implemented for preparing
+  sources for an SRPM build using the content of an upstream repository.
+  ([packit#1424](https://github.com/packit/packit/pull/1424))
+- Packit now visibly informs about an ongoing cloning process to remove
+  potential confusion.
+  ([packit#1431](https://github.com/packit/packit/pull/1431))
+- The `upstream_package_name` config option is now checked for illegal
+  characters and an error is thrown if it contains them.
+  ([packit#1434](https://github.com/packit/packit/pull/1434))
+
 # 0.42.0
 
 - Running `post-upstream-clone` action in `propose-downstream` command was fixed.
