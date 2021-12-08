@@ -166,6 +166,20 @@ from packit.utils.commands import cwd
                 """,
             "* field allowed_gpg_keys: Not a valid list.",
         ),
+        (
+            """
+                {
+                    "config_file_path": "packit.json",
+                    "dist_git_base_url": "https: //packit.dev/",
+                    "downstream_package_name": "packit",
+                    "upstream_ref": "last_commit",
+                    "upstream_package_name": "packit/upstream",
+                    "allowed_gpg_keys": ["gpg"],
+                    "dist_git_namespace": "awesome"
+                }
+                """,
+            " Repository name must be a valid filename.",
+        ),
     ],
     ids=[
         "valid_1",
@@ -179,6 +193,7 @@ from packit.utils.commands import cwd
         "create_pr",
         "valid_4",
         "allowed_gpg",
+        "slash_in_package_name",
     ],
 )
 def test_schema_validation(tmpdir, raw_package_config, expected_output):
