@@ -65,3 +65,11 @@ jobs:
       project: packit-releases
       list_on_homepage: True
       preserve_project: True
+
+  # downstream Koji build
+  - job: koji_build
+    trigger: commit
+    metadata:
+      dist_git_branches:
+        - fedora-all
+        - epel-8
