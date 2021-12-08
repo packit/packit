@@ -45,11 +45,13 @@ class ChangelogHelper:
 
         Args:
             full_version: Version to be set in the spec-file.
-            upstream_tag: The commit message of this commit is going to be used
+            upstream_tag: The commit messages after last tag and before this tag are used
                 to update the changelog in the spec-file.
         """
         comment = self.entry_from_action or (
-            self.up.local_project.git_project.get_release(name=full_version).body
+            self.up.local_project.git_project.get_release(
+                tag_name=upstream_tag, name=full_version
+            ).body
             if self.package_config.copy_upstream_release_description
             else self.up.get_commit_messages(
                 after=self.up.get_last_tag(upstream_tag), before=upstream_tag
