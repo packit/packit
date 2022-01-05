@@ -519,6 +519,23 @@ class LocalProject:
                 raise PackitMergeException(ex)
             raise PackitException(ex)
 
+    def get_pr_source_branch_head_commit_sha(
+        self, pr_id: Optional[int]
+    ) -> Optional[str]:
+        if not pr_id:
+            return None
+
+        return self.git_project.get_pr(pr_id).head_commit
+
+    def get_pr_target_branch_head_commit_sha(
+        self, pr_id: Optional[int]
+    ) -> Optional[str]:
+        if not pr_id:
+            return None
+
+        pr = self.git_project.get_pr(pr_id)
+        return self.git_project.get_sha_from_branch(pr.target_branch)
+
     def checkout_release(self, tag: str) -> None:
         logger.info(f"Checking out upstream version {tag}.")
         try:
