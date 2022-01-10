@@ -17,6 +17,9 @@ CONFIG_FILE_NAMES = [
     "packit.json",
 ]
 
+# local branch name when checking out a PR before we merge it with the target branch
+LP_TEMP_PR_CHECKOUT_NAME = "pr-changes"
+
 DATETIME_FORMAT = "%Y%m%d%H%M%S%f"
 
 # we create .tar.gz archives

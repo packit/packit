@@ -19,6 +19,11 @@ class ProposeUpdate(PackitTest):
     def cassette_setup(self, cassette):
         cassette.data_miner.data_type = DataTypes.Dict
 
+    @staticmethod
+    def commit_title(lp: LocalProject):
+        commit_msg = lp.git_repo.head.commit.message
+        return commit_msg.split("\n", 1)[0]
+
     def test_checkout_pr(self):
         """Test PR checkout with and without merging"""
         project = LocalProject(
@@ -27,6 +32,11 @@ class ProposeUpdate(PackitTest):
             git_url=self._project_url,
         )
         assert project.ref == "pr/596"
+        assert (
+            self.commit_title(project)
+            == "test data for packit:tests_recording/test_local_project"
+        )
+        assert (project.working_dir / "JUNGLE").read_text() == "Julia\n"
 
     def test_checkout_pr_no_merge(self):
         """Test PR checkout with and without merging"""
@@ -37,3 +47,8 @@ class ProposeUpdate(PackitTest):
             merge_pr=False,
         )
         assert project.ref == "pr/596"
+        assert (
+            self.commit_title(project)
+            == "test data for packit:tests_recording/test_local_project"
+        )
+        assert (project.working_dir / "JUNGLE").read_text() == "Julia\n"
