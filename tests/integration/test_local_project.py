@@ -3,6 +3,7 @@
 import subprocess
 from pathlib import Path
 
+import pytest
 from ogr import GithubService, GitlabService
 from packit.local_project import LocalProject
 from packit.utils.repo import create_new_repo
@@ -11,7 +12,10 @@ from flexmock import flexmock
 from tests.spellbook import initiate_git_repo
 
 
-def test_pr_id_and_ref(tmp_path: Path):
+@pytest.mark.parametrize(
+    "merge, hops_file_content", ((True, "Cascade\n"), (False, None))
+)
+def test_pr_id_and_ref(tmp_path: Path, merge, hops_file_content):
     """p-s passes both ref and pr_id, we want to check out PR"""
     remote = tmp_path / "remote"
     remote.mkdir()
@@ -44,6 +48,7 @@ def test_pr_id_and_ref(tmp_path: Path):
         ref=ref,
         git_service=GithubService(),
         git_project=git_project,
+        merge_pr=merge,
     )
 
     assert (
@@ -54,6 +59,12 @@ def test_pr_id_and_ref(tmp_path: Path):
         .decode()
         == f"pr/{pr_id}"
     )
+    if hops_file_content:
+        # the changes are merged into main so the file should be there
+        assert (upstream_git / "hops").read_text() == hops_file_content
+    else:
+        # we haven't merged into main, so there should be no "hops" file
+        assert not (upstream_git / "hops").is_file()
 
 
 def test_pr_id_and_ref_gitlab(tmp_path: Path):
