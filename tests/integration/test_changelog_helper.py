@@ -104,3 +104,16 @@ def test_update_distgit_when_copy_upstream_release_description(
     assert "Some release 0.1.0" in downstream._specfile.spec_content.section(
         "%changelog"
     )
+
+
+def test_do_not_update_distgit_with_autochangelog(
+    upstream, distgit_instance_with_autochangelog
+):
+    _, downstream = distgit_instance_with_autochangelog
+    package_config = upstream.package_config
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0", full_version="0.1.0"
+    )
+
+    assert "%autochangelog" in downstream._specfile.spec_content.section("%changelog")

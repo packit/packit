@@ -77,6 +77,15 @@ def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
 
 
 @pytest.fixture()
+def mock_remote_functionality_downstream_autochangelog(
+    upstream_and_remote, distgit_with_autochangelog_and_remote
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_with_autochangelog_and_remote
+    return mock_remote_functionality(d, u)
+
+
+@pytest.fixture()
 def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote):
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -279,6 +288,22 @@ def distgit_instance(
 ):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
+    c = get_test_config()
+    pc = get_local_package_config(str(u))
+    pc.dist_git_clone_path = str(d)
+    pc.upstream_project_url = str(u)
+    dg = DistGit(c, pc)
+    return d, dg
+
+
+@pytest.fixture()
+def distgit_instance_with_autochangelog(
+    upstream_and_remote,
+    distgit_with_autochangelog_and_remote,
+    mock_remote_functionality_downstream_autochangelog,
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_with_autochangelog_and_remote
     c = get_test_config()
     pc = get_local_package_config(str(u))
     pc.dist_git_clone_path = str(d)
