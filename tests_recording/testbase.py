@@ -22,6 +22,7 @@ class PackitTest(unittest.TestCase):
         self._static_tmp = None
         self._config = None
         self._project = None
+        # if you can, use this project to perform testing
         self._project_url = "https://github.com/packit/requre"
         self._project_specfile_path = Path("fedora", "python-requre.spec")
         self._pc = None
@@ -32,12 +33,13 @@ class PackitTest(unittest.TestCase):
     def tearDown(self):
         if self._static_tmp and os.path.exists(self._static_tmp):
             shutil.rmtree(self.static_tmp, ignore_errors=True)
+            self._static_tmp = None
 
     @property
     def static_tmp(self):
         if not self._static_tmp:
             self._static_tmp = tempfile.mkdtemp()
-        os.makedirs(self._static_tmp, exist_ok=True)
+            os.makedirs(self._static_tmp, exist_ok=True)
         return self._static_tmp
 
     @property
