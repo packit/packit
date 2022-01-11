@@ -1,0 +1,620 @@
+_requre:
+  DataTypes: 3
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+requests.sessions:
+  send:
+    GET:
+      https://api.github.com:443/repos/packit/requre:
+        all:
+          metadata:
+            latency: 0.2402043342590332
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_local_project
+            - packit.local_project
+            - ogr.abstract
+            - ogr.utils
+            - ogr.abstract
+            - ogr.services.github.pull_request
+            - ogr.services.github.project
+            - github.MainClass
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              allow_auto_merge: false
+              allow_forking: true
+              allow_merge_commit: true
+              allow_rebase_merge: true
+              allow_squash_merge: true
+              allow_update_branch: false
+              archive_url: https://api.github.com/repos/packit/requre/{archive_format}{/ref}
+              archived: false
+              assignees_url: https://api.github.com/repos/packit/requre/assignees{/user}
+              blobs_url: https://api.github.com/repos/packit/requre/git/blobs{/sha}
+              branches_url: https://api.github.com/repos/packit/requre/branches{/branch}
+              clone_url: https://github.com/packit/requre.git
+              collaborators_url: https://api.github.com/repos/packit/requre/collaborators{/collaborator}
+              comments_url: https://api.github.com/repos/packit/requre/comments{/number}
+              commits_url: https://api.github.com/repos/packit/requre/commits{/sha}
+              compare_url: https://api.github.com/repos/packit/requre/compare/{base}...{head}
+              contents_url: https://api.github.com/repos/packit/requre/contents/{+path}
+              contributors_url: https://api.github.com/repos/packit/requre/contributors
+              created_at: '2019-09-11T09:49:47Z'
+              default_branch: main
+              delete_branch_on_merge: false
+              deployments_url: https://api.github.com/repos/packit/requre/deployments
+              description: Library for testing python code what allows store output
+                of various objects and use stored data for testing
+              disabled: false
+              downloads_url: https://api.github.com/repos/packit/requre/downloads
+              events_url: https://api.github.com/repos/packit/requre/events
+              fork: false
+              forks: 9
+              forks_count: 9
+              forks_url: https://api.github.com/repos/packit/requre/forks
+              full_name: packit/requre
+              git_commits_url: https://api.github.com/repos/packit/requre/git/commits{/sha}
+              git_refs_url: https://api.github.com/repos/packit/requre/git/refs{/sha}
+              git_tags_url: https://api.github.com/repos/packit/requre/git/tags{/sha}
+              git_url: git://github.com/packit/requre.git
+              has_downloads: true
+              has_issues: true
+              has_pages: false
+              has_projects: true
+              has_wiki: true
+              homepage: ''
+              hooks_url: https://api.github.com/repos/packit/requre/hooks
+              html_url: https://github.com/packit/requre
+              id: 207778319
+              is_template: false
+              issue_comment_url: https://api.github.com/repos/packit/requre/issues/comments{/number}
+              issue_events_url: https://api.github.com/repos/packit/requre/issues/events{/number}
+              issues_url: https://api.github.com/repos/packit/requre/issues{/number}
+              keys_url: https://api.github.com/repos/packit/requre/keys{/key_id}
+              labels_url: https://api.github.com/repos/packit/requre/labels{/name}
+              language: Python
+              languages_url: https://api.github.com/repos/packit/requre/languages
+              license:
+                key: mit
+                name: MIT License
+                node_id: MDc6TGljZW5zZTEz
+                spdx_id: MIT
+                url: https://api.github.com/licenses/mit
+              merges_url: https://api.github.com/repos/packit/requre/merges
+              milestones_url: https://api.github.com/repos/packit/requre/milestones{/number}
+              mirror_url: null
+              name: requre
+              network_count: 9
+              node_id: MDEwOlJlcG9zaXRvcnkyMDc3NzgzMTk=
+              notifications_url: https://api.github.com/repos/packit/requre/notifications{?since,all,participating}
+              open_issues: 5
+              open_issues_count: 5
+              organization:
+                avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
+                events_url: https://api.github.com/users/packit/events{/privacy}
+                followers_url: https://api.github.com/users/packit/followers
+                following_url: https://api.github.com/users/packit/following{/other_user}
+                gists_url: https://api.github.com/users/packit/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/packit
+                id: 46870917
+                login: packit
+                node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                organizations_url: https://api.github.com/users/packit/orgs
+                received_events_url: https://api.github.com/users/packit/received_events
+                repos_url: https://api.github.com/users/packit/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/packit/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/packit/subscriptions
+                type: Organization
+                url: https://api.github.com/users/packit
+              owner:
+                avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
+                events_url: https://api.github.com/users/packit/events{/privacy}
+                followers_url: https://api.github.com/users/packit/followers
+                following_url: https://api.github.com/users/packit/following{/other_user}
+                gists_url: https://api.github.com/users/packit/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/packit
+                id: 46870917
+                login: packit
+                node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                organizations_url: https://api.github.com/users/packit/orgs
+                received_events_url: https://api.github.com/users/packit/received_events
+                repos_url: https://api.github.com/users/packit/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/packit/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/packit/subscriptions
+                type: Organization
+                url: https://api.github.com/users/packit
+              permissions:
+                admin: true
+                maintain: true
+                pull: true
+                push: true
+                triage: true
+              private: false
+              pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
+              pushed_at: '2022-01-10T21:32:00Z'
+              releases_url: https://api.github.com/repos/packit/requre/releases{/id}
+              size: 1180
+              ssh_url: git@github.com:packit/requre.git
+              stargazers_count: 7
+              stargazers_url: https://api.github.com/repos/packit/requre/stargazers
+              statuses_url: https://api.github.com/repos/packit/requre/statuses/{sha}
+              subscribers_count: 10
+              subscribers_url: https://api.github.com/repos/packit/requre/subscribers
+              subscription_url: https://api.github.com/repos/packit/requre/subscription
+              svn_url: https://github.com/packit/requre
+              tags_url: https://api.github.com/repos/packit/requre/tags
+              teams_url: https://api.github.com/repos/packit/requre/teams
+              temp_clone_token: ''
+              topics:
+              - hacktoberfest
+              trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
+              updated_at: '2022-01-04T08:57:12Z'
+              url: https://api.github.com/repos/packit/requre
+              visibility: public
+              watchers: 7
+              watchers_count: 7
+            _next: null
+            elapsed: 0.239643
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation,
+                Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Wed, 12 Jan 2022 13:10:58 GMT
+              ETag: W/"b155213d63b008f2cc9e6ee1f96662efe6caefa0ad6c609a86b45113a6b85d09"
+              Last-Modified: Tue, 04 Jan 2022 08:57:12 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: repo
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: 2321:13CBD:16D8565:17A2BF9:61DED362
+              X-OAuth-Scopes: repo, user, workflow
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4999'
+              X-RateLimit-Reset: '1641996658'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '1'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://api.github.com:443/repos/packit/requre/pulls/227:
+        all:
+          metadata:
+            latency: 0.4029397964477539
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_local_project
+            - packit.local_project
+            - ogr.abstract
+            - ogr.utils
+            - ogr.abstract
+            - ogr.services.github.pull_request
+            - github.Repository
+            - github.Requester
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              _links:
+                comments:
+                  href: https://api.github.com/repos/packit/requre/issues/227/comments
+                commits:
+                  href: https://api.github.com/repos/packit/requre/pulls/227/commits
+                html:
+                  href: https://github.com/packit/requre/pull/227
+                issue:
+                  href: https://api.github.com/repos/packit/requre/issues/227
+                review_comment:
+                  href: https://api.github.com/repos/packit/requre/pulls/comments{/number}
+                review_comments:
+                  href: https://api.github.com/repos/packit/requre/pulls/227/comments
+                self:
+                  href: https://api.github.com/repos/packit/requre/pulls/227
+                statuses:
+                  href: https://api.github.com/repos/packit/requre/statuses/20293541c66ecc283c7e569c01ea5a4e4fc4afd2
+              active_lock_reason: null
+              additions: 8
+              assignee: null
+              assignees: []
+              author_association: MEMBER
+              auto_merge: null
+              base:
+                label: packit:main
+                ref: main
+                repo:
+                  allow_forking: true
+                  archive_url: https://api.github.com/repos/packit/requre/{archive_format}{/ref}
+                  archived: false
+                  assignees_url: https://api.github.com/repos/packit/requre/assignees{/user}
+                  blobs_url: https://api.github.com/repos/packit/requre/git/blobs{/sha}
+                  branches_url: https://api.github.com/repos/packit/requre/branches{/branch}
+                  clone_url: https://github.com/packit/requre.git
+                  collaborators_url: https://api.github.com/repos/packit/requre/collaborators{/collaborator}
+                  comments_url: https://api.github.com/repos/packit/requre/comments{/number}
+                  commits_url: https://api.github.com/repos/packit/requre/commits{/sha}
+                  compare_url: https://api.github.com/repos/packit/requre/compare/{base}...{head}
+                  contents_url: https://api.github.com/repos/packit/requre/contents/{+path}
+                  contributors_url: https://api.github.com/repos/packit/requre/contributors
+                  created_at: '2019-09-11T09:49:47Z'
+                  default_branch: main
+                  deployments_url: https://api.github.com/repos/packit/requre/deployments
+                  description: Library for testing python code what allows store output
+                    of various objects and use stored data for testing
+                  disabled: false
+                  downloads_url: https://api.github.com/repos/packit/requre/downloads
+                  events_url: https://api.github.com/repos/packit/requre/events
+                  fork: false
+                  forks: 9
+                  forks_count: 9
+                  forks_url: https://api.github.com/repos/packit/requre/forks
+                  full_name: packit/requre
+                  git_commits_url: https://api.github.com/repos/packit/requre/git/commits{/sha}
+                  git_refs_url: https://api.github.com/repos/packit/requre/git/refs{/sha}
+                  git_tags_url: https://api.github.com/repos/packit/requre/git/tags{/sha}
+                  git_url: git://github.com/packit/requre.git
+                  has_downloads: true
+                  has_issues: true
+                  has_pages: false
+                  has_projects: true
+                  has_wiki: true
+                  homepage: ''
+                  hooks_url: https://api.github.com/repos/packit/requre/hooks
+                  html_url: https://github.com/packit/requre
+                  id: 207778319
+                  is_template: false
+                  issue_comment_url: https://api.github.com/repos/packit/requre/issues/comments{/number}
+                  issue_events_url: https://api.github.com/repos/packit/requre/issues/events{/number}
+                  issues_url: https://api.github.com/repos/packit/requre/issues{/number}
+                  keys_url: https://api.github.com/repos/packit/requre/keys{/key_id}
+                  labels_url: https://api.github.com/repos/packit/requre/labels{/name}
+                  language: Python
+                  languages_url: https://api.github.com/repos/packit/requre/languages
+                  license:
+                    key: mit
+                    name: MIT License
+                    node_id: MDc6TGljZW5zZTEz
+                    spdx_id: MIT
+                    url: https://api.github.com/licenses/mit
+                  merges_url: https://api.github.com/repos/packit/requre/merges
+                  milestones_url: https://api.github.com/repos/packit/requre/milestones{/number}
+                  mirror_url: null
+                  name: requre
+                  node_id: MDEwOlJlcG9zaXRvcnkyMDc3NzgzMTk=
+                  notifications_url: https://api.github.com/repos/packit/requre/notifications{?since,all,participating}
+                  open_issues: 5
+                  open_issues_count: 5
+                  owner:
+                    avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
+                    events_url: https://api.github.com/users/packit/events{/privacy}
+                    followers_url: https://api.github.com/users/packit/followers
+                    following_url: https://api.github.com/users/packit/following{/other_user}
+                    gists_url: https://api.github.com/users/packit/gists{/gist_id}
+                    gravatar_id: ''
+                    html_url: https://github.com/packit
+                    id: 46870917
+                    login: packit
+                    node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                    organizations_url: https://api.github.com/users/packit/orgs
+                    received_events_url: https://api.github.com/users/packit/received_events
+                    repos_url: https://api.github.com/users/packit/repos
+                    site_admin: false
+                    starred_url: https://api.github.com/users/packit/starred{/owner}{/repo}
+                    subscriptions_url: https://api.github.com/users/packit/subscriptions
+                    type: Organization
+                    url: https://api.github.com/users/packit
+                  private: false
+                  pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
+                  pushed_at: '2022-01-10T21:32:00Z'
+                  releases_url: https://api.github.com/repos/packit/requre/releases{/id}
+                  size: 1180
+                  ssh_url: git@github.com:packit/requre.git
+                  stargazers_count: 7
+                  stargazers_url: https://api.github.com/repos/packit/requre/stargazers
+                  statuses_url: https://api.github.com/repos/packit/requre/statuses/{sha}
+                  subscribers_url: https://api.github.com/repos/packit/requre/subscribers
+                  subscription_url: https://api.github.com/repos/packit/requre/subscription
+                  svn_url: https://github.com/packit/requre
+                  tags_url: https://api.github.com/repos/packit/requre/tags
+                  teams_url: https://api.github.com/repos/packit/requre/teams
+                  topics:
+                  - hacktoberfest
+                  trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
+                  updated_at: '2022-01-04T08:57:12Z'
+                  url: https://api.github.com/repos/packit/requre
+                  visibility: public
+                  watchers: 7
+                  watchers_count: 7
+                sha: 256fe9c430482d03b936715cab72b6732146cc05
+                user:
+                  avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
+                  events_url: https://api.github.com/users/packit/events{/privacy}
+                  followers_url: https://api.github.com/users/packit/followers
+                  following_url: https://api.github.com/users/packit/following{/other_user}
+                  gists_url: https://api.github.com/users/packit/gists{/gist_id}
+                  gravatar_id: ''
+                  html_url: https://github.com/packit
+                  id: 46870917
+                  login: packit
+                  node_id: MDEyOk9yZ2FuaXphdGlvbjQ2ODcwOTE3
+                  organizations_url: https://api.github.com/users/packit/orgs
+                  received_events_url: https://api.github.com/users/packit/received_events
+                  repos_url: https://api.github.com/users/packit/repos
+                  site_admin: false
+                  starred_url: https://api.github.com/users/packit/starred{/owner}{/repo}
+                  subscriptions_url: https://api.github.com/users/packit/subscriptions
+                  type: Organization
+                  url: https://api.github.com/users/packit
+              body: "Signed-off-by: Frantisek Lachman <flachman@redhat.com>\r\n\r\n\
+                ---\r\nN/A"
+              changed_files: 1
+              closed_at: null
+              comments: 7
+              comments_url: https://api.github.com/repos/packit/requre/issues/227/comments
+              commits: 1
+              commits_url: https://api.github.com/repos/packit/requre/pulls/227/commits
+              created_at: '2021-11-26T10:55:48Z'
+              deletions: 0
+              diff_url: https://github.com/packit/requre/pull/227.diff
+              draft: false
+              head:
+                label: lachmanfrantisek:koji-builds
+                ref: koji-builds
+                repo:
+                  allow_forking: true
+                  archive_url: https://api.github.com/repos/lachmanfrantisek/requre/{archive_format}{/ref}
+                  archived: false
+                  assignees_url: https://api.github.com/repos/lachmanfrantisek/requre/assignees{/user}
+                  blobs_url: https://api.github.com/repos/lachmanfrantisek/requre/git/blobs{/sha}
+                  branches_url: https://api.github.com/repos/lachmanfrantisek/requre/branches{/branch}
+                  clone_url: https://github.com/lachmanfrantisek/requre.git
+                  collaborators_url: https://api.github.com/repos/lachmanfrantisek/requre/collaborators{/collaborator}
+                  comments_url: https://api.github.com/repos/lachmanfrantisek/requre/comments{/number}
+                  commits_url: https://api.github.com/repos/lachmanfrantisek/requre/commits{/sha}
+                  compare_url: https://api.github.com/repos/lachmanfrantisek/requre/compare/{base}...{head}
+                  contents_url: https://api.github.com/repos/lachmanfrantisek/requre/contents/{+path}
+                  contributors_url: https://api.github.com/repos/lachmanfrantisek/requre/contributors
+                  created_at: '2019-10-04T11:37:21Z'
+                  default_branch: master
+                  deployments_url: https://api.github.com/repos/lachmanfrantisek/requre/deployments
+                  description: Library for testing python code what allows store output
+                    of various objects and use stored data for testing
+                  disabled: false
+                  downloads_url: https://api.github.com/repos/lachmanfrantisek/requre/downloads
+                  events_url: https://api.github.com/repos/lachmanfrantisek/requre/events
+                  fork: true
+                  forks: 0
+                  forks_count: 0
+                  forks_url: https://api.github.com/repos/lachmanfrantisek/requre/forks
+                  full_name: lachmanfrantisek/requre
+                  git_commits_url: https://api.github.com/repos/lachmanfrantisek/requre/git/commits{/sha}
+                  git_refs_url: https://api.github.com/repos/lachmanfrantisek/requre/git/refs{/sha}
+                  git_tags_url: https://api.github.com/repos/lachmanfrantisek/requre/git/tags{/sha}
+                  git_url: git://github.com/lachmanfrantisek/requre.git
+                  has_downloads: true
+                  has_issues: false
+                  has_pages: false
+                  has_projects: true
+                  has_wiki: true
+                  homepage: null
+                  hooks_url: https://api.github.com/repos/lachmanfrantisek/requre/hooks
+                  html_url: https://github.com/lachmanfrantisek/requre
+                  id: 212800938
+                  is_template: false
+                  issue_comment_url: https://api.github.com/repos/lachmanfrantisek/requre/issues/comments{/number}
+                  issue_events_url: https://api.github.com/repos/lachmanfrantisek/requre/issues/events{/number}
+                  issues_url: https://api.github.com/repos/lachmanfrantisek/requre/issues{/number}
+                  keys_url: https://api.github.com/repos/lachmanfrantisek/requre/keys{/key_id}
+                  labels_url: https://api.github.com/repos/lachmanfrantisek/requre/labels{/name}
+                  language: null
+                  languages_url: https://api.github.com/repos/lachmanfrantisek/requre/languages
+                  license:
+                    key: mit
+                    name: MIT License
+                    node_id: MDc6TGljZW5zZTEz
+                    spdx_id: MIT
+                    url: https://api.github.com/licenses/mit
+                  merges_url: https://api.github.com/repos/lachmanfrantisek/requre/merges
+                  milestones_url: https://api.github.com/repos/lachmanfrantisek/requre/milestones{/number}
+                  mirror_url: null
+                  name: requre
+                  node_id: MDEwOlJlcG9zaXRvcnkyMTI4MDA5Mzg=
+                  notifications_url: https://api.github.com/repos/lachmanfrantisek/requre/notifications{?since,all,participating}
+                  open_issues: 0
+                  open_issues_count: 0
+                  owner:
+                    avatar_url: https://avatars.githubusercontent.com/u/20214043?v=4
+                    events_url: https://api.github.com/users/lachmanfrantisek/events{/privacy}
+                    followers_url: https://api.github.com/users/lachmanfrantisek/followers
+                    following_url: https://api.github.com/users/lachmanfrantisek/following{/other_user}
+                    gists_url: https://api.github.com/users/lachmanfrantisek/gists{/gist_id}
+                    gravatar_id: ''
+                    html_url: https://github.com/lachmanfrantisek
+                    id: 20214043
+                    login: lachmanfrantisek
+                    node_id: MDQ6VXNlcjIwMjE0MDQz
+                    organizations_url: https://api.github.com/users/lachmanfrantisek/orgs
+                    received_events_url: https://api.github.com/users/lachmanfrantisek/received_events
+                    repos_url: https://api.github.com/users/lachmanfrantisek/repos
+                    site_admin: false
+                    starred_url: https://api.github.com/users/lachmanfrantisek/starred{/owner}{/repo}
+                    subscriptions_url: https://api.github.com/users/lachmanfrantisek/subscriptions
+                    type: User
+                    url: https://api.github.com/users/lachmanfrantisek
+                  private: false
+                  pulls_url: https://api.github.com/repos/lachmanfrantisek/requre/pulls{/number}
+                  pushed_at: '2021-12-08T09:12:35Z'
+                  releases_url: https://api.github.com/repos/lachmanfrantisek/requre/releases{/id}
+                  size: 1170
+                  ssh_url: git@github.com:lachmanfrantisek/requre.git
+                  stargazers_count: 0
+                  stargazers_url: https://api.github.com/repos/lachmanfrantisek/requre/stargazers
+                  statuses_url: https://api.github.com/repos/lachmanfrantisek/requre/statuses/{sha}
+                  subscribers_url: https://api.github.com/repos/lachmanfrantisek/requre/subscribers
+                  subscription_url: https://api.github.com/repos/lachmanfrantisek/requre/subscription
+                  svn_url: https://github.com/lachmanfrantisek/requre
+                  tags_url: https://api.github.com/repos/lachmanfrantisek/requre/tags
+                  teams_url: https://api.github.com/repos/lachmanfrantisek/requre/teams
+                  topics: []
+                  trees_url: https://api.github.com/repos/lachmanfrantisek/requre/git/trees{/sha}
+                  updated_at: '2019-10-04T11:37:22Z'
+                  url: https://api.github.com/repos/lachmanfrantisek/requre
+                  visibility: public
+                  watchers: 0
+                  watchers_count: 0
+                sha: 20293541c66ecc283c7e569c01ea5a4e4fc4afd2
+                user:
+                  avatar_url: https://avatars.githubusercontent.com/u/20214043?v=4
+                  events_url: https://api.github.com/users/lachmanfrantisek/events{/privacy}
+                  followers_url: https://api.github.com/users/lachmanfrantisek/followers
+                  following_url: https://api.github.com/users/lachmanfrantisek/following{/other_user}
+                  gists_url: https://api.github.com/users/lachmanfrantisek/gists{/gist_id}
+                  gravatar_id: ''
+                  html_url: https://github.com/lachmanfrantisek
+                  id: 20214043
+                  login: lachmanfrantisek
+                  node_id: MDQ6VXNlcjIwMjE0MDQz
+                  organizations_url: https://api.github.com/users/lachmanfrantisek/orgs
+                  received_events_url: https://api.github.com/users/lachmanfrantisek/received_events
+                  repos_url: https://api.github.com/users/lachmanfrantisek/repos
+                  site_admin: false
+                  starred_url: https://api.github.com/users/lachmanfrantisek/starred{/owner}{/repo}
+                  subscriptions_url: https://api.github.com/users/lachmanfrantisek/subscriptions
+                  type: User
+                  url: https://api.github.com/users/lachmanfrantisek
+              html_url: https://github.com/packit/requre/pull/227
+              id: 789464212
+              issue_url: https://api.github.com/repos/packit/requre/issues/227
+              labels:
+              - color: 0e8a16
+                default: false
+                description: When set, zuul wil gate and merge the PR.
+                id: 1602404089
+                name: mergeit
+                node_id: MDU6TGFiZWwxNjAyNDA0MDg5
+                url: https://api.github.com/repos/packit/requre/labels/mergeit
+              locked: false
+              maintainer_can_modify: true
+              merge_commit_sha: da0f4c0ee6b27e9c455ff638347ec31dce0fff2d
+              mergeable: true
+              mergeable_state: unstable
+              merged: false
+              merged_at: null
+              merged_by: null
+              milestone: null
+              node_id: PR_kwDODGJyD84vDkSU
+              number: 227
+              patch_url: https://github.com/packit/requre/pull/227.patch
+              rebaseable: true
+              requested_reviewers: []
+              requested_teams: []
+              review_comment_url: https://api.github.com/repos/packit/requre/pulls/comments{/number}
+              review_comments: 0
+              review_comments_url: https://api.github.com/repos/packit/requre/pulls/227/comments
+              state: open
+              statuses_url: https://api.github.com/repos/packit/requre/statuses/20293541c66ecc283c7e569c01ea5a4e4fc4afd2
+              title: Run Koji builds automatically for new dist-git commits
+              updated_at: '2021-12-08T09:26:38Z'
+              url: https://api.github.com/repos/packit/requre/pulls/227
+              user:
+                avatar_url: https://avatars.githubusercontent.com/u/20214043?v=4
+                events_url: https://api.github.com/users/lachmanfrantisek/events{/privacy}
+                followers_url: https://api.github.com/users/lachmanfrantisek/followers
+                following_url: https://api.github.com/users/lachmanfrantisek/following{/other_user}
+                gists_url: https://api.github.com/users/lachmanfrantisek/gists{/gist_id}
+                gravatar_id: ''
+                html_url: https://github.com/lachmanfrantisek
+                id: 20214043
+                login: lachmanfrantisek
+                node_id: MDQ6VXNlcjIwMjE0MDQz
+                organizations_url: https://api.github.com/users/lachmanfrantisek/orgs
+                received_events_url: https://api.github.com/users/lachmanfrantisek/received_events
+                repos_url: https://api.github.com/users/lachmanfrantisek/repos
+                site_admin: false
+                starred_url: https://api.github.com/users/lachmanfrantisek/starred{/owner}{/repo}
+                subscriptions_url: https://api.github.com/users/lachmanfrantisek/subscriptions
+                type: User
+                url: https://api.github.com/users/lachmanfrantisek
+            _next: null
+            elapsed: 0.402656
+            encoding: utf-8
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-GitHub-OTP,
+                X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource,
+                X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval,
+                X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation,
+                Sunset
+              Cache-Control: private, max-age=60, s-maxage=60
+              Content-Encoding: gzip
+              Content-Security-Policy: default-src 'none'
+              Content-Type: application/json; charset=utf-8
+              Date: Wed, 12 Jan 2022 13:10:58 GMT
+              ETag: W/"4ed51eec4c28393f673ed808cf5b01448084e830775f94ad4335077fbad5b7e7"
+              Last-Modified: Wed, 12 Jan 2022 11:25:42 GMT
+              Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+              Server: GitHub.com
+              Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+              Transfer-Encoding: chunked
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
+                Accept, X-Requested-With
+              X-Accepted-OAuth-Scopes: ''
+              X-Content-Type-Options: nosniff
+              X-Frame-Options: deny
+              X-GitHub-Media-Type: github.v3; format=json
+              X-GitHub-Request-Id: 2321:13CBD:16D8588:17A2C1C:61DED362
+              X-OAuth-Scopes: repo, user, workflow
+              X-RateLimit-Limit: '5000'
+              X-RateLimit-Remaining: '4998'
+              X-RateLimit-Reset: '1641996658'
+              X-RateLimit-Resource: core
+              X-RateLimit-Used: '2'
+              X-XSS-Protection: '0'
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+tempfile:
+  mkdtemp:
+    all:
+      metadata:
+        latency: 0.000110626220703125
+        module_call_list:
+        - unittest.case
+        - requre.record_and_replace
+        - tests_recording.test_local_project
+        - tests_recording.testbase
+        - requre.objects
+        - requre.cassette
+        - tempfile
+        - mkdtemp
+      output: /tmp/tmpwi7roo2l
