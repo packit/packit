@@ -351,13 +351,19 @@ class PackitRepositoryBase:
         with cwd(self.absolute_specfile_dir):
             self.download_remote_sources()
 
-    def set_specfile_content(self, specfile: Specfile, version: str, comment: str):
+    def set_specfile_content(
+        self,
+        specfile: Specfile,
+        version: str,
+        comment: str,
+    ):
         """
-        update this specfile using provided specfile
+        Update this specfile using provided specfile
 
-        :param specfile: specfile to get changes from (we update self.specfile)
-        :param version: version to set in self.specfile
-        :param comment: new comment for the version in %changelog
+        Args:
+            specfile: specfile to get changes from (we update self.specfile)
+            version: version to set in self.specfile
+            comment: new comment for the version in %changelog
         """
         previous_changelog = self.specfile.spec_content.section("%changelog")
         self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]

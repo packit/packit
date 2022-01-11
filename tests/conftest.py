@@ -17,6 +17,7 @@ from tests.spellbook import (
     UPSTREAM,
     prepare_dist_git_repo,
     DISTGIT,
+    DISTGIT_WITH_AUTOCHANGELOG,
     DG_OGR,
     UPSTREAM_SPEC_NOT_IN_ROOT,
     UPSTREAM_WITH_MUTLIPLE_SOURCES,
@@ -84,6 +85,27 @@ def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
 
     d = tmp_path / "dist_git"
     shutil.copytree(DISTGIT, d)
+    initiate_git_repo(
+        d,
+        push=True,
+        remotes=[
+            ("origin", str(d_remote_path)),
+            ("i_am_distgit", "https://src.fedoraproject.org/rpms/python-ogr"),
+        ],
+    )
+    prepare_dist_git_repo(d)
+
+    return d, d_remote_path
+
+
+@pytest.fixture()
+def distgit_with_autochangelog_and_remote(tmp_path) -> Tuple[Path, Path]:
+    d_remote_path = tmp_path / "autochangelog_dist_git_remote"
+    d_remote_path.mkdir(parents=True, exist_ok=True)
+    create_new_repo(d_remote_path, ["--bare"])
+
+    d = tmp_path / "autochangelog_dist_git"
+    shutil.copytree(DISTGIT_WITH_AUTOCHANGELOG, d)
     initiate_git_repo(
         d,
         push=True,
