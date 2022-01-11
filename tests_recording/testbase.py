@@ -31,7 +31,7 @@ class PackitTest(unittest.TestCase):
 
     def tearDown(self):
         if self._static_tmp and os.path.exists(self._static_tmp):
-            shutil.rmtree(os.path.dirname(self.static_tmp), ignore_errors=True)
+            shutil.rmtree(self.static_tmp, ignore_errors=True)
 
     @property
     def static_tmp(self):
