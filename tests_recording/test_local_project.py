@@ -1,6 +1,8 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import distro
+import pytest
 from requre.cassette import DataTypes
 from requre.modules_decorate_all_methods import (
     record_tempfile_module,
@@ -29,6 +31,10 @@ class TestLocalProject(PackitTest):
         commit_msg = lp.git_repo.head.commit.message
         return commit_msg.split("\n", 1)[0]
 
+    @pytest.mark.skipif(
+        distro.name() == "CentOS Stream" and distro.version() == "8",
+        reason="This test is know to fail on el8: https://github.com/packit/requre/issues/233",
+    )
     def test_checkout_pr(self):
         """Test PR checkout with and without merging"""
         project = LocalProject(
@@ -44,6 +50,10 @@ class TestLocalProject(PackitTest):
         )
         assert "koji_build" in (project.working_dir / ".packit.yaml").read_text()
 
+    @pytest.mark.skipif(
+        distro.name() == "CentOS Stream" and distro.version() == "8",
+        reason="This test is know to fail on el8: https://github.com/packit/requre/issues/233",
+    )
     def test_checkout_pr_no_merge(self):
         """Test PR checkout with and without merging"""
         project = LocalProject(
