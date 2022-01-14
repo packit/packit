@@ -357,7 +357,7 @@ class Upstream(PackitRepositoryBase):
 
     def get_spec_release(
         self, bump_version: bool = True, release_suffix: Optional[str] = None
-    ) -> str:
+    ) -> Optional[str]:
         """Assemble pieces of the spec file %release field we intend to set
         within the default fix-spec-file action
 
@@ -375,7 +375,7 @@ class Upstream(PackitRepositoryBase):
             return f"{original_release_number}.{release_suffix}"
 
         if not bump_version:
-            return original_release_number
+            return None
 
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
@@ -889,14 +889,18 @@ class SRPMBuilder:
 
         return self.get_path(out)
 
-    def _prepare_upstream_using_source_git(self) -> None:
+    def _prepare_upstream_using_source_git(
+        self, bump_version: bool, release_suffix: Optional[str]
+    ) -> None:
         """
         Fetch the tarball and don't check out the upstream ref.
         """
         self.upstream.fetch_upstream_archive()
         self.upstream.create_patches_and_update_specfile(self.upstream_ref)
 
-        ChangelogHelper(self.upstream).prepare_upstream_using_source_git()
+        ChangelogHelper(self.upstream).prepare_upstream_using_source_git(
+            bump_version, release_suffix
+        )
 
     def _fix_specfile_to_use_local_archive(
         self, archive: str, bump_version: bool, release_suffix: Optional[str]
@@ -931,7 +935,7 @@ class SRPMBuilder:
 
     def prepare(self, bump_version: bool, release_suffix: Optional[str] = None):
         if self.upstream_ref:
-            self._prepare_upstream_using_source_git()
+            self._prepare_upstream_using_source_git(bump_version, release_suffix)
         else:
             created_archive = self.upstream.create_archive(
                 version=self.current_git_describe_version
