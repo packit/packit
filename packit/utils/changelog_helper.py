@@ -70,20 +70,38 @@ class ChangelogHelper:
                 self.dg.get_absolute_specfile_path(),
             )
 
-    def prepare_upstream_using_source_git(self) -> None:
-        """
-        Updates changelog when creating SRPM within source-git repository.
-        """
+    def _get_release_for_source_git(
+        self, current_commit: str, bump_version: bool, release_suffix: Optional[str]
+    ) -> Optional[str]:
         old_release = self.up.specfile.get_release_number()
+        if release_suffix:
+            return f"{old_release}.{release_suffix}"
+
+        if not bump_version:
+            return None
+
         try:
             old_release_int = int(old_release)
             new_release = str(old_release_int + 1)
         except ValueError:
             new_release = str(old_release)
 
+        return f"{new_release}.g{current_commit}"
+
+    def prepare_upstream_using_source_git(
+        self, bump_version: bool, release_suffix: Optional[str]
+    ) -> None:
+        """
+        Updates changelog when creating SRPM within source-git repository.
+        """
         current_commit = self.up.local_project.commit_hexsha
-        release_to_update = f"{new_release}.g{current_commit}"
-        msg = self.entry_from_action or f"- Downstream changes ({current_commit})"
+        release_to_update = self._get_release_for_source_git(
+            current_commit, bump_version, release_suffix
+        )
+
+        msg = self.entry_from_action
+        if not msg and bump_version:
+            msg = f"- Downstream changes ({current_commit})"
         self.up.specfile.set_spec_version(
             release=release_to_update, changelog_entry=msg
         )
