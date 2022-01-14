@@ -72,13 +72,13 @@ class ChangelogHelper:
 
     def _get_release_for_source_git(
         self, current_commit: str, bump_version: bool, release_suffix: Optional[str]
-    ) -> str:
+    ) -> Optional[str]:
         old_release = self.up.specfile.get_release_number()
         if release_suffix:
             return f"{old_release}.{release_suffix}"
 
         if not bump_version:
-            return old_release
+            return None
 
         try:
             old_release_int = int(old_release)

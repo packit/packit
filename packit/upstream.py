@@ -357,7 +357,7 @@ class Upstream(PackitRepositoryBase):
 
     def get_spec_release(
         self, bump_version: bool = True, release_suffix: Optional[str] = None
-    ) -> str:
+    ) -> Optional[str]:
         """Assemble pieces of the spec file %release field we intend to set
         within the default fix-spec-file action
 
@@ -375,7 +375,7 @@ class Upstream(PackitRepositoryBase):
             return f"{original_release_number}.{release_suffix}"
 
         if not bump_version:
-            return original_release_number
+            return None
 
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
