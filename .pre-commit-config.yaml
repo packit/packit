@@ -44,7 +44,7 @@ repos:
           - --max-line-length=100
           - --per-file-ignores=files/packit.wsgi:F401,E402
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.930
+    rev: v0.931
     hooks:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
@@ -58,7 +58,7 @@ repos:
             types-PyYAML,
           ]
   - repo: https://github.com/packit/pre-commit-hooks
-    rev: b05e5e2196b725c98529c5c3861658ebcbf18783
+    rev: 1da916777f5cc26ecf221b15e58ca51891d26d94
     hooks:
       - id: check-rebase
         args:
