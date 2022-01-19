@@ -6,6 +6,7 @@ This is the official python interface for packit.
 """
 
 import asyncio
+import tempfile
 from distutils.dir_util import copy_tree
 
 import click
@@ -16,6 +17,7 @@ from pathlib import Path
 from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional, Union
 
 import git
+from git.exc import GitCommandError
 
 from ogr.abstract import PullRequest
 from pkg_resources import get_distribution, DistributionNotFound
@@ -26,7 +28,7 @@ from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
-from packit.constants import SYNCING_NOTE
+from packit.constants import SYNCING_NOTE, DISTRO_DIR
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import (
@@ -210,6 +212,113 @@ class PackitAPI:
 
         if commit_title:
             self.dg.commit(title=commit_title, msg=commit_msg, prefix="")
+
+    @staticmethod
+    def _transform_patch_to_source_git(patch: str, diffs: List[git.Diff]) -> str:
+        """Transforms a dist-git patch to source-git.
+
+        It's necessary to insert .distro directory to paths in the patch.
+        """
+        for diff in diffs:
+            if diff.a_path:
+                patch = patch.replace(
+                    f"a/{diff.a_path}", f"a/{DISTRO_DIR}/{diff.a_path}"
+                )
+            if diff.b_path:
+                patch = patch.replace(
+                    f"b/{diff.b_path}", f"b/{DISTRO_DIR}/{diff.b_path}"
+                )
+        return patch
+
+    def update_source_git(self, revision_range: str):
+        """Update a source-git repo from a dist-git repo.
+
+        Synchronizes the spec file and commits in the given revision range.
+        The sources and patches in dist-git must not have been touched.
+
+        Args:
+            revision_range: Range of commits from dist-git to convert to
+                source-git. Specified in git-log-like format.
+
+        Raises:
+            PackitException: If the given update cannot be performed, i.e.
+                sources or patches were touched.
+        """
+        dg_release = self.dg.specfile.get_release()
+        up_release = self.up.specfile.get_release()
+        if dg_release != up_release:
+            logger.info(
+                f"Release differs between dist-git and source-git ("
+                f"{dg_release} in dist-git and {up_release} in source-git). "
+                f"Trying to continue with the update."
+            )
+
+        # Do the checks beforehand but store commits and diffs to avoid recomputing.
+        # Getting patch of a git commit is costly as per GitPython docs.
+        commits: List[git.Commit] = []
+        diffs: List[List[git.Diff]] = []
+        patch_suffix = ".patch"
+        distro_path = self.up.local_project.working_dir / DISTRO_DIR
+        for commit in self.dg.local_project.get_commits(revision_range, reverse=True):
+            commits.append(commit)
+            diffs.append(self.dg.local_project.get_commit_diff(commit))
+            for diff in diffs[-1]:
+                if diff.a_path == "sources" or diff.b_path == "sources":
+                    raise PackitException(
+                        f"The sources file was modified in commit "
+                        f"{commit.hexsha} which is part of the provided range. "
+                        f"Such operation is not supported."
+                    )
+                a_path = diff.a_path or ""
+                b_path = diff.b_path or ""
+                # FIXME: this check is not great, but if we want to be more precise, we would
+                #   have to parse the spec in each checkout of dist-git
+                if a_path.endswith(patch_suffix) or b_path.endswith(patch_suffix):
+                    raise PackitException(
+                        f"A patch was modified in commit {commit.hexsha} "
+                        f"which is not supported by this command."
+                    )
+
+        logger.info(f"Synchronizing {len(commits)} commits.")
+        for i, commit in enumerate(commits):
+            logger.info(f"Applying commit {commit}.")
+            # GitPython does not store the raw diff of the patch in its representation.
+            # We can delete and rename based on the information from GitPython but additions
+            # and modifications require git-apply on a patch. We need to manually parse
+            # the corresponding patch hunk.
+            hunks = self.dg.local_project.get_commit_hunks(commit)
+            for j, diff in enumerate(diffs[i]):
+                if diff.deleted_file:
+                    path = distro_path / diff.a_path
+                    try:
+                        path.unlink()
+                    except FileNotFoundError:
+                        pass  # missing_ok argument to unlink was added in 3.8 which is not in EPEL
+                elif diff.renamed_file:
+                    path = distro_path / diff.a_path
+                    try:
+                        path.rename(distro_path / Path(diff.b_path).name)
+                    except FileNotFoundError as e:
+                        raise PackitException(
+                            f"File {diff.a_path} to be renamed does not exist in source-git."
+                        ) from e
+                else:
+                    # The order of `hunks` should match the order of `diffs`, they are using the
+                    # same git commands.
+                    with tempfile.TemporaryDirectory() as tmp:
+                        patch = self._transform_patch_to_source_git(hunks[j], diffs[i])
+                        changes_path = Path(tmp) / "changes.patch"
+                        changes_path.write_text(f"{patch}\n")
+                        try:
+                            self.up.local_project.git_repo.git.apply(changes_path)
+                        except GitCommandError as e:
+                            raise PackitException(
+                                f"Commit {commit} could not be applied to source-git."
+                            ) from e
+
+            title, _, message = commit.message.partition("\n")
+            message = message.strip()
+            self.up.commit(title=title, msg=message, prefix="")
 
     def sync_release(
         self,
