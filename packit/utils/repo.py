@@ -99,9 +99,9 @@ class RepositoryCache:
 def is_git_repo(directory: Union[Path, str]) -> bool:
     """
     Test, if the directory is a git repo.
-    (Has .git subdirectory?)
+    (Has .git subdirectory or 'gitdir' file?)
     """
-    return Path(directory, ".git").is_dir()
+    return Path(directory, ".git").exists()
 
 
 def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
