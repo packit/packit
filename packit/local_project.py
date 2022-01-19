@@ -578,8 +578,8 @@ class LocalProject:
             allow_empty=allow_empty, m=message, amend=amend, **other_message_kwargs
         )
 
-    def get_commits(self, ref: str = "HEAD") -> Iterator[git.Commit]:
-        return self.git_repo.iter_commits(ref)
+    def get_commits(self, ref: str = "HEAD", **kwargs) -> Iterator[git.Commit]:
+        return self.git_repo.iter_commits(ref, **kwargs)
 
     def fetch(self, remote: str, refspec: Optional[str] = None):
         """
