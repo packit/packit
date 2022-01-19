@@ -44,10 +44,10 @@ class TestLocalProject(PackitTest):
             working_dir=self.static_tmp,
         )
         assert project.ref == f"pr/{PR_ID}"
-        assert (
-            self.commit_title(project)
-            == "Merge pull request #227 from lachmanfrantisek/koji-builds"
-        )
+        # check that HEAD of the merge matches HEAD of main
+        main = project.git_repo.heads["main"]
+        # 'Merge pull request #231 from packit/pre-commit-ci-update-config
+        assert self.commit_title(project) == main.commit.message.split("\n", 1)[0]
         assert "koji_build" in (project.working_dir / ".packit.yaml").read_text()
 
     @pytest.mark.skipif(
