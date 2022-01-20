@@ -1,3 +1,21 @@
+# 0.44.0
+
+- Packit now correctly finds the release, even if you don't use the version as
+  the title of the release on GitHub.
+  ([packit#1437](https://github.com/packit/packit/pull/1437))
+- Local branches are now named as `pr/{pr_id}` when checking out a PR, even
+  when it's not being merged with the target branch. This results in the NVR
+  of the build containing `pr{pr_id}` instead of `pr.changes{pr_id}`.
+  ([packit#1445](https://github.com/packit/packit/pull/1445))
+- A bug which caused ignoring the `--no-bump` and `--release-suffix` options
+  when creating an SRPMs from source-git repositories has been fixed. Packit
+  also doesn't touch the `Release` field in the specfile unless it needs to be
+  changed (the macros are not expanded that way when not necessary).
+  ([packit#1452](https://github.com/packit/packit/pull/1452))
+- When checking if directories hold a Git-tree, Packit now also allows `.git`
+  to be a file with a `gitdir` reference, not only a directory.
+  ([packit#1458](https://github.com/packit/packit/pull/1458))
+
 # 0.43.0
 
 - A new `packit prepare-sources` command has been implemented for preparing
