@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 import pytest
+import rpm
 
 from packit.specfile import Specfile
 
@@ -43,6 +44,9 @@ Summary: evanescence
             False,
         ),
     ],
+)
+@pytest.mark.skipif(
+    rpm.__version__ < "4.16", reason="%autochangelog requires rpm 4.16 or higher"
 )
 def test_set_spec_has_autochangelog(spec_content, has_autochangelog, tmp_path):
     spec_path = tmp_path / "life.spec"

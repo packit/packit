@@ -4,6 +4,7 @@
 from logging import getLogger
 
 import pytest
+import rpm
 from flexmock import flexmock
 
 from packit.actions import ActionName
@@ -106,6 +107,9 @@ def test_update_distgit_when_copy_upstream_release_description(
     )
 
 
+@pytest.mark.skipif(
+    rpm.__version__ < "4.16", reason="%autochangelog requires rpm 4.16 or higher"
+)
 def test_do_not_update_distgit_with_autochangelog(
     upstream, distgit_instance_with_autochangelog
 ):
