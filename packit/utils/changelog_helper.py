@@ -41,7 +41,10 @@ class ChangelogHelper:
 
     def update_dist_git(self, full_version: str, upstream_tag: str) -> None:
         """
-        Updates changelog when running `update-dist-git`.
+        Update the spec-file in dist-git by setting the 'Version' tag and
+        adding a new entry in the %changelog section.
+        If downstream spec file has the %autochangelog macro then
+        preserve it and do not write a comment to the %changelog section.
 
         Args:
             full_version: Version to be set in the spec-file.
@@ -58,7 +61,11 @@ class ChangelogHelper:
             )
         )
         try:
-            self.dg.set_specfile_content(self.up.specfile, full_version, comment)
+            self.dg.set_specfile_content(
+                self.up.specfile,
+                full_version,
+                comment=None if self.dg.specfile.has_autochangelog() else comment,
+            )
         except FileNotFoundError as ex:
             # no downstream spec file: this is either a mistake or
             # there is no spec file in dist-git yet, hence warning
