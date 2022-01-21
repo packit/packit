@@ -36,9 +36,7 @@ class ActionName(Enum):
 
     @classmethod
     def get_action_from_name(cls, action: str) -> Optional["ActionName"]:
-        if not cls.is_valid_action(action):
-            return None
-        return ActionName(action)
+        return None if not cls.is_valid_action(action) else ActionName(action)
 
     @classmethod
     def get_possible_values(cls):

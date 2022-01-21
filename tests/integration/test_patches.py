@@ -21,12 +21,10 @@ def check_copytree_dirs_exists_support():
     Old version of shutil.copytree does not support
     dirs_exist_ok parameter.
     """
-    if (
+    return bool(
         hasattr(shutil.copytree, "__defaults__")
         and len(shutil.copytree.__defaults__) >= 5
-    ):
-        return True
-    return False
+    )
 
 
 @pytest.fixture
