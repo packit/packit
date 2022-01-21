@@ -322,11 +322,9 @@ class Specfile(SpecFile):
         if self._uses_autosetup is not None:
             return self._uses_autosetup
 
-        self._uses_autosetup = False
-        for line in self.spec_content.section("%prep"):
-            if line.startswith("%autosetup"):
-                self._uses_autosetup = True
-                break
+        self._uses_autosetup = any(
+            line.startswith("%autosetup") for line in self.spec_content.section("%prep")
+        )
 
         return self._uses_autosetup
 

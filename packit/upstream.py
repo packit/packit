@@ -262,16 +262,13 @@ class Upstream(PackitRepositoryBase):
         Returns:
             String containing version, e.g. `"0.1.1"`.
         """
-        version = None
-
         # Step 1
         action_output = self.get_output_from_action(
             action=ActionName.get_current_version
         )
-        if action_output:
-            version = action_output[-1].strip()
 
         # Step 2
+        version = action_output[-1].strip() if action_output else None
         if version is None:
             version = self.get_version_from_tag(self.get_last_tag())
 
@@ -719,15 +716,16 @@ class Upstream(PackitRepositoryBase):
         regex = self._template2regex(self.package_config.upstream_tag_template)
         p = re.compile(regex)
         match = p.match(tag)
+
         if match and field in match.groupdict():
             return match.group(field)
-        else:
-            msg = (
-                f'Unable to extract "{field}" from {tag} using '
-                f"{self.package_config.upstream_tag_template}"
-            )
-            logger.error(msg)
-            raise PackitException(msg)
+
+        msg = (
+            f'Unable to extract "{field}" from {tag} using '
+            f"{self.package_config.upstream_tag_template}"
+        )
+        logger.error(msg)
+        raise PackitException(msg)
 
     def convert_version_to_tag(self, version_: str) -> str:
         """

@@ -48,13 +48,12 @@ class LocalProjectParameter(click.ParamType):
             return value
 
         try:
-            ref = ""
             pr_id = None
             merge_pr = True
 
-            if self.ref_param_name:
-                ref = self.get_param(self.ref_param_name, ctx)
-
+            ref = (
+                self.get_param(self.ref_param_name, ctx) if self.ref_param_name else ""
+            )
             if self.pr_id_param_name:
                 pr_id = self.get_param(self.pr_id_param_name, ctx)
 

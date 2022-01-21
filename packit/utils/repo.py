@@ -112,12 +112,10 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
 
     if is_git_repo(directory=directory):
         logger.debug(f"Repo already exists in {directory}.")
-        repo = git.repo.Repo(directory)
+        return git.repo.Repo(directory)
     else:
         logger.info(f"Cloning repo {url} -> {directory}")
-        repo = git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
-
-    return repo
+        return git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
 
 def get_namespace_and_repo_name(url: str) -> Tuple[Optional[str], str]:

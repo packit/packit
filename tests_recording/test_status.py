@@ -78,11 +78,10 @@ class TestStatus(PackitTest):
         assert len(table) >= 3
 
         # Check if get_updates doesn't return more than one stable update per branch
-        stable_branches = []
-        for [update, _, status] in table:
-            branch = update[-4:]
-            if status == "stable":
-                stable_branches.append(branch)
+        stable_branches = [
+            update[-4:] for [update, _, status] in table if status == "stable"
+        ]
+
         assert len(set(stable_branches)) == len(stable_branches)
 
     def test_up_releases(self):
