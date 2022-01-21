@@ -184,6 +184,29 @@ def test_basic_local_update_direct_push(
     assert (remote_dir_clone / "README.packit").is_file()
 
 
+def test_update_downstream_changelog_even_if_has_autochangelog(
+    cwd_upstream,
+    api_instance,
+    distgit_with_autochangelog_and_remote,
+    mock_remote_functionality_downstream_autochangelog,
+):
+    """Check that a new entry is added to the %changelog section of the the spec-file in dist-git,
+    when sync_changelog is set, even if the spec-file in dist-git uses %autochangelog"""
+    u, d, api = api_instance
+    _, distgit_remote = distgit_with_autochangelog_and_remote
+
+    api.package_config.sync_changelog = True
+    api.sync_release(
+        dist_git_branch="main", version="0.1.0", create_pr=False, add_new_sources=False
+    )
+
+    assert api.dg.specfile.get_version() == "0.1.0"
+    assert (
+        "* Mon Feb 25 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.1.0-1"
+        in api.dg.specfile.spec_content.section("%changelog")
+    )
+
+
 def test_basic_local_update_direct_push_no_dg_spec(
     cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
 ):

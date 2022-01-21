@@ -34,6 +34,18 @@ class Specfile(SpecFile):
         self._patch_id_digits: Optional[int] = None
         self._uses_autosetup: Optional[bool] = None
 
+    def has_autochangelog(self) -> bool:
+        """
+        Tell whether the %autochangelog macro is to be found in the %changelog section.
+
+        Returns:
+            True if %autochangelog was found in the %changelog section.
+        """
+        return any(
+            value.strip() == "%autochangelog"
+            for value in self.spec_content.section("%changelog")
+        )
+
     def update_spec(self):
         if hasattr(self, "update"):
             # new rebase-helper
@@ -77,10 +89,8 @@ class Specfile(SpecFile):
                     "Release", "{}%{{?dist}}".format(release), preserve_macros=False
                 )
 
-            if not changelog_entry:
-                return
-
-            self.update_changelog_in_spec(changelog_entry)
+            if changelog_entry:
+                self.update_changelog_in_spec(changelog_entry)
 
         except RebaseHelperError as ex:
             logger.error(f"Rebase-helper failed to change the spec file: {ex}")
