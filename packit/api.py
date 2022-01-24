@@ -312,13 +312,28 @@ class PackitAPI:
                         try:
                             self.up.local_project.git_repo.git.apply(changes_path)
                         except GitCommandError as e:
+                            # Gitignore is reset when creating source-git, git-apply may fail
+                            if diff.b_path == ".gitignore":
+                                logger.info(
+                                    f"Commit {commit} contains an inapplicable .gitignore "
+                                    f"change, skipping this part of the commit."
+                                )
+                                continue
                             raise PackitException(
                                 f"Commit {commit} could not be applied to source-git."
                             ) from e
 
             title, _, message = commit.message.partition("\n")
             message = message.strip()
-            self.up.commit(title=title, msg=message, prefix="")
+            if (
+                self.up.local_project.git_repo.is_dirty()
+                or self.up.local_project.git_repo.untracked_files
+            ):
+                self.up.commit(title=title, msg=message, prefix="")
+            else:
+                logger.info(
+                    f"Commit {commit} had no changes to be applied, skipping it."
+                )
 
     def sync_release(
         self,

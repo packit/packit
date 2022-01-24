@@ -40,6 +40,9 @@ def update_source_git(
     exits with return code 2. Such changes are not supported by this
     command, code changes should happen in the source-git repo.
 
+    Inapplicable changes to the .gitignore file are ignored since the
+    file may not be synchronized between dist-git and source-git.
+
     This command, by default, performs only local operations and uses the
     content of the source-git and dist-git repositories as it is, no checkout
     or fetch is performed.
