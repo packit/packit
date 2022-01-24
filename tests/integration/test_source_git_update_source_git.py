@@ -51,6 +51,46 @@ def test_update_source_git_patch_changed(
         update_api.update_source_git("HEAD~1..")
 
 
+def test_update_source_git_gitignore_empty_commit(
+    sourcegit_and_remote,
+    distgit_and_remote,
+    update_api,
+):
+    """Checks that inapplicable gitignore changes do not cause an error
+    when a commit contains only the gitignore change."""
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+    (sourcegit / DISTRO_DIR / ".gitignore").write_text("# Reset gitignore\n!*\n")
+    (distgit / ".gitignore").write_text("# Former gitignore\na\nb\n")
+    update_api.dg.commit("Setup gitignore", "")
+    update_api.up.commit("Reset gitignore", "")
+    # Should not raise on gitignore changes
+    update_api.update_source_git("HEAD~1..")
+    # There is nothing to commit in the gitignore patch, head should stay the same
+    assert "Reset" in update_api.up.local_project.git_repo.head.commit.message
+
+
+def test_update_source_git_gitignore(
+    sourcegit_and_remote,
+    distgit_and_remote,
+    update_api,
+):
+    """Checks that inapplicable gitignore changes do not cause an error but
+    the rest of the commit is applied."""
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+    (sourcegit / DISTRO_DIR / ".gitignore").write_text("# Reset gitignore\n!*\n")
+    (distgit / ".gitignore").write_text("# Former gitignore\na\nb\n")
+    content = "abcd"
+    (distgit / "c").write_text(content)
+    update_api.dg.commit("Setup gitignore", "")
+    update_api.up.commit("Reset gitignore", "")
+    # Should not raise on gitignore changes
+    update_api.update_source_git("HEAD~1..")
+    assert content == (sourcegit / DISTRO_DIR / "c").read_text()
+    assert "Setup" in update_api.up.local_project.git_repo.head.commit.message
+
+
 def test_update_source_git(
     sourcegit_and_remote,
     distgit_and_remote,
