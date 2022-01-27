@@ -108,20 +108,19 @@ class PackitAPI:
     def dg(self):
         if self._dg is None:
             self.init_kerberos_ticket()
-            if not self.package_config.downstream_package_name:
-                if (
-                    self.downstream_local_project
-                    and self.downstream_local_project.working_dir
-                ):
-                    # the path to dist-git was passed but downstream_package_name is not set
-                    # we know that package names are equal to repo names
-                    self.package_config.downstream_package_name = (
-                        self.downstream_local_project.working_dir.name
-                    )
-                    logger.info(
-                        "Package name was not set, we've got it from dist-git's "
-                        f"directory name: {self.package_config.downstream_package_name}"
-                    )
+            if not self.package_config.downstream_package_name and (
+                self.downstream_local_project
+                and self.downstream_local_project.working_dir
+            ):
+                # the path to dist-git was passed but downstream_package_name is not set
+                # we know that package names are equal to repo names
+                self.package_config.downstream_package_name = (
+                    self.downstream_local_project.working_dir.name
+                )
+                logger.info(
+                    "Package name was not set, we've got it from dist-git's "
+                    f"directory name: {self.package_config.downstream_package_name}"
+                )
             self._dg = DistGit(
                 config=self.config,
                 package_config=self.package_config,

@@ -75,25 +75,23 @@ def config_mock():
 
 @pytest.fixture
 def git_project_mock():
-    mock = flexmock(upstream_project_url="dummy_url")
-    return mock
+    return flexmock(upstream_project_url="dummy_url")
 
 
 @pytest.fixture
 def git_repo_mock():
-    git_repo = flexmock(
+    return flexmock(
         git=flexmock(checkout=lambda *_: None, reset=lambda *_: None),
         remote=lambda *_: flexmock(refs={"_": "_"}),
         branches=[],
         create_head=lambda *_, **__: None,
     )
-    return git_repo
 
 
 @pytest.fixture
 def local_project_mock(git_project_mock, git_repo_mock):
     flexmock(Path).should_receive("write_text")
-    mock = flexmock(
+    return flexmock(
         git_project=git_project_mock,
         working_dir=Path("/mock_dir"),
         ref="mock_ref",
@@ -101,7 +99,6 @@ def local_project_mock(git_project_mock, git_repo_mock):
         checkout_release=lambda *_: None,
         commit_hexsha="_",
     )
-    return mock
 
 
 @pytest.fixture
