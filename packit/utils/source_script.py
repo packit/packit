@@ -10,6 +10,7 @@ def create_source_script(
     ref: Optional[str] = None,
     pr_id: Optional[str] = None,
     merge_pr: Optional[bool] = True,
+    target_branch: Optional[str] = None,
     job_config: Optional[JobConfig] = None,
 ):
     options = []
@@ -17,6 +18,8 @@ def create_source_script(
         options += ["--ref", ref]
     if pr_id:
         options += ["--pr-id", pr_id, f"--{'no-' if not merge_pr else ''}merge-pr"]
+        if merge_pr and target_branch:
+            options += ["--target-branch", target_branch]
     if job_config:
         job_config = JobConfigSchema().dumps(job_config)
         options += ["--job-config", f"{job_config!r}"]

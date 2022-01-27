@@ -26,11 +26,13 @@ class LocalProjectParameter(click.ParamType):
         ref_param_name: str = None,
         pr_id_param_name: str = None,
         merge_pr_param_name: str = None,
+        target_branch_param_name: str = None,
     ) -> None:
         super().__init__()
         self.ref_param_name = ref_param_name
         self.pr_id_param_name = pr_id_param_name
         self.merge_pr_param_name = merge_pr_param_name
+        self.target_branch_param_name = target_branch_param_name
 
     @staticmethod
     def get_param(param_name, ctx):
@@ -50,6 +52,7 @@ class LocalProjectParameter(click.ParamType):
         try:
             pr_id = None
             merge_pr = True
+            target_branch = None
 
             ref = (
                 self.get_param(self.ref_param_name, ctx) if self.ref_param_name else ""
@@ -60,6 +63,9 @@ class LocalProjectParameter(click.ParamType):
             if self.merge_pr_param_name:
                 merge_pr = self.get_param(self.merge_pr_param_name, ctx)
 
+            if self.target_branch_param_name:
+                target_branch = self.get_param(self.target_branch_param_name, ctx)
+
             if os.path.isdir(value):
                 absolute_path = os.path.abspath(value)
                 logger.debug(f"Input is a directory: {absolute_path}")
@@ -68,6 +74,7 @@ class LocalProjectParameter(click.ParamType):
                     ref=ref,
                     remote=ctx.obj.upstream_git_remote,
                     merge_pr=merge_pr,
+                    target_branch=target_branch,
                 )
             elif git_remote_url_to_https_url(value):
                 logger.debug(f"Input is a URL to a git repo: {value}")
@@ -77,6 +84,7 @@ class LocalProjectParameter(click.ParamType):
                     remote=ctx.obj.upstream_git_remote,
                     pr_id=pr_id,
                     merge_pr=merge_pr,
+                    target_branch=target_branch,
                 )
             else:
                 self.fail(
