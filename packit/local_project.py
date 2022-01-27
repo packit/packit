@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+import re
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Union, Iterable, Iterator
+from typing import Optional, Union, Iterable, Iterator, List
 
 import git
 from git.exc import GitCommandError
@@ -578,8 +579,39 @@ class LocalProject:
             allow_empty=allow_empty, m=message, amend=amend, **other_message_kwargs
         )
 
-    def get_commits(self, ref: str = "HEAD") -> Iterator[git.Commit]:
-        return self.git_repo.iter_commits(ref)
+    def get_commits(self, ref: str = "HEAD", **kwargs) -> Iterator[git.Commit]:
+        return self.git_repo.iter_commits(ref, **kwargs)
+
+    @staticmethod
+    def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
+        """Get modified files of the given commit."""
+        if len(commit.parents) == 1:
+            return commit.parents[0].diff(commit, create_patch=True)
+        elif len(commit.parents) == 0:
+            # First commit in the repo
+            return commit.diff(git.NULL_TREE, create_patch=True)
+        else:
+            # Probably a merge commit, we can't do much about it
+            return []
+
+    def get_commit_hunks(self, commit: git.Commit) -> List[str]:
+        """Get a list of hunks of the given commit."""
+        patch = self.git_repo.git.show(commit, format="", color="never")
+        hunk_start_re = re.compile(r"diff --git a/.+ b/.+")
+        section_start = 0
+        result = []
+        patch_lines = patch.splitlines()
+        for i, line in enumerate(patch_lines):
+            if hunk_start_re.match(line):
+                section = patch_lines[section_start:i]
+                if section:
+                    result.append("\n".join(section))
+                section_start = i
+        # The last section
+        section = patch_lines[section_start:]
+        if section:
+            result.append("\n".join(section))
+        return result
 
     def fetch(self, remote: str, refspec: Optional[str] = None):
         """

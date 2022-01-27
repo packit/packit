@@ -564,3 +564,60 @@ def test_clone_and_add_to_cache():
     assert project.git_project
     assert project.git_repo
     assert project.ref == "branch"
+
+
+def test_get_commit_hunks_single_change():
+    commit = "abcdefgh"
+    git_api = flexmock()
+    git_api.should_receive("show").with_args(
+        commit, format="", color="never"
+    ).and_return(
+        """\
+diff --git a/test2 b/test2
+deleted file mode 100644
+index 1c7858b..0000000
+--- a/test2
++++ /dev/null
+@@ -1 +0,0 @@
+-deleted
+        """
+    )
+    repository = flexmock(git=git_api)
+    project = LocalProject(git_repo=repository, refresh=False)
+    hunks = project.get_commit_hunks(commit)
+    assert len(hunks) == 1
+    assert "diff --git a/test2 b/test2" in hunks[0]
+    assert "-deleted" in hunks[0]
+
+
+def test_get_commit_hunks_multiple_changes():
+    commit = "abcdefgh"
+    git_api = flexmock()
+    git_api.should_receive("show").with_args(
+        commit, format="", color="never"
+    ).and_return(
+        """\
+diff --git a/a b/a
+new file mode 100644
+index 0000000..7898192
+--- /dev/null
++++ b/a
+@@ -0,0 +1 @@
++a
+diff --git a/b.txt b/b.txt
+new file mode 100644
+index 0000000..6178079
+--- /dev/null
++++ b/b.txt
+@@ -0,0 +1 @@
++b
+        """
+    )
+    repository = flexmock(git=git_api)
+    project = LocalProject(git_repo=repository, refresh=False)
+    hunks = project.get_commit_hunks(commit)
+    assert len(hunks) == 2
+    assert "diff --git a/a b/a" in hunks[0]
+    assert "+a" in hunks[0]
+    assert "diff --git a/b.txt b/b.txt" in hunks[1]
+    assert "+b" in hunks[1]
