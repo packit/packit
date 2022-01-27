@@ -70,10 +70,6 @@ def test_basic_local_update_empty_patch(
     spec = Specfile(distgit / "beer.spec")
     assert spec.get_version() == "0.1.0"
 
-    spec_package_section = ""
-    for section in spec.spec_content.sections:
-        if "%package" in section[0]:
-            spec_package_section += "\n".join(section[1])
     assert not spec.patches["applied"]
     assert not spec.patches["not_applied"]
 

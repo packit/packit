@@ -262,7 +262,7 @@ def validate_repo_name(value):
     marshmallow validation for a repository name. Any
     filename is acceptable: No slash, no zero char.
     """
-    if not all(c not in "/\0" for c in value):
+    if any(c in "/\0" for c in value):
         raise ValidationError("Repository name must be a valid filename.")
     return True
 

@@ -152,9 +152,7 @@ class LocalProject:
         Name of the HEAD if the HEAD is not detached,
         else commit hash.
         """
-        if self.git_repo:
-            return self._get_ref_from_git_repo()
-        return None
+        return self._get_ref_from_git_repo() if self.git_repo else None
 
     @property
     def commit_hexsha(self) -> str:

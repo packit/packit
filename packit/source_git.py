@@ -124,10 +124,11 @@ class SourceGitGenerator:
             f"_topdir {str(self.dist_git.working_dir)}",
             "-bp",
             "--define",
-            f"_specdir {str(self.dist_git.working_dir)}",
+            f"_specdir {self.dist_git.working_dir}",
             "--define",
-            f"_sourcedir {str(self.dist_git.working_dir)}",
+            f"_sourcedir {self.dist_git.working_dir}",
         ]
+
         rpmbuild_args += RPM_MACROS_FOR_PREP
         if logger.level <= logging.DEBUG:  # -vv can be super-duper verbose
             rpmbuild_args.append("-v")
@@ -174,7 +175,7 @@ class SourceGitGenerator:
         build_dirs = [d for d in (path / "BUILD").iterdir() if d.is_dir()]
         if len(build_dirs) > 1:
             raise RuntimeError(f"More than one directory found in {path / 'BUILD'}")
-        if len(build_dirs) < 1:
+        if not build_dirs:
             raise RuntimeError(f"No subdirectory found in {path / 'BUILD'}")
         return build_dirs[0]
 

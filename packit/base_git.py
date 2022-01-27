@@ -193,9 +193,8 @@ class PackitRepositoryBase:
         """
         if not method:
             logger.debug(f"Running {actions} hook.")
-        if self.with_action(action=actions):
-            if method:
-                method(*args, **kwargs)
+        if self.with_action(action=actions) and method:
+            method(*args, **kwargs)
 
     def has_action(self, action: ActionName) -> bool:
         """
@@ -291,15 +290,13 @@ class PackitRepositoryBase:
 
         commands_to_run = self.get_commands_for_actions(action)
 
-        outputs = []
         logger.info(f"Using user-defined script for {action}: {commands_to_run}")
-        for cmd in commands_to_run:
-            outputs.append(
-                self.command_handler.run_command(
-                    cmd, return_output=True, env=env, print_live=True
-                )
+        return [
+            self.command_handler.run_command(
+                cmd, return_output=True, env=env, print_live=True
             )
-        return outputs
+            for cmd in commands_to_run
+        ]
 
     def specfile_add_patches(
         self, patch_list: List[PatchMetadata], patch_id_digits: int = 4

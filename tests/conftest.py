@@ -146,13 +146,11 @@ def upstream_or_distgit_path(
     """
     Parametrize the test to upstream, downstream [currently skipped] and ogr distgit
     """
-    cwd_path = {
+    return {
         "upstream": upstream_and_remote[0],
         "distgit": distgit_and_remote[0],
         "ogr-distgit": ogr_distgit_and_remote[0],
     }[request.param]
-
-    return cwd_path
 
 
 @pytest.fixture(
@@ -204,8 +202,7 @@ def copr_client_mock(get_list_return=None):
         "fedora-rawhide-x86_64": "",
     }
 
-    copr_mock = flexmock(mock_chroot_proxy=flexmock(get_list=lambda: get_list_return))
-    return copr_mock
+    return flexmock(mock_chroot_proxy=flexmock(get_list=lambda: get_list_return))
 
 
 @pytest.fixture(autouse=True, scope="function")
