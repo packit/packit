@@ -64,6 +64,7 @@ class LocalProject:
         pr_id: Optional[str] = None,
         cache: Optional[RepositoryCache] = None,
         merge_pr: bool = True,
+        target_branch: str = "",
     ) -> None:
         """
 
@@ -112,6 +113,7 @@ class LocalProject:
             f"pr_id: {pr_id}\n"
             f"cache: {cache}\n"
             f"merge_pr: {merge_pr}\n"
+            f"target_branch: {target_branch}\n"
         )
 
         if refresh:
@@ -123,7 +125,7 @@ class LocalProject:
         if pr_id:
             self.checkout_pr(pr_id)
             if merge_pr:
-                self.merge_pr(pr_id)
+                self.merge_pr(pr_id, target_branch)
             self.checkout_as_pr_branch(pr_id)
         elif ref:
             self.checkout_ref(ref)
@@ -497,7 +499,9 @@ class LocalProject:
             f"({shorten_commit_hash(head_commit.hexsha)})\t{head_commit.summary}"
         )
 
-    def merge_pr(self, pr_id: Union[str, int]) -> None:
+    def merge_pr(
+        self, pr_id: Union[str, int], target_branch_name: Optional[str] = None
+    ) -> None:
         """
         Merge given PR into target branch. Fetches and switches to base branch
         (where changes from the PR are to be merged) and then merges branch with
@@ -505,25 +509,36 @@ class LocalProject:
 
         Args:
             pr_id: ID of the PR we are merging.
+            target_branch_name: name of the branch the PR should be merged into if
+            git_project is None
 
         Raises:
             PackitException: In case merge fails.
         """
         remote = self.remote or "origin"
-        pr = self.git_project.get_pr(int(pr_id))
-
-        local_target_branch = pr.target_branch
-        self._fetch_as_branch(
-            f"+refs/heads/{pr.target_branch}",
-            f"refs/remotes/{remote}/pr/{pr_id}",
-            local_target_branch,
+        target_branch_name = (
+            self.git_project.get_pr(int(pr_id)).target_branch
+            if self.git_project
+            else target_branch_name
         )
-        self.git_repo.branches[local_target_branch].checkout()
-        target_branch = self.git_repo.branches[local_target_branch]
+        if not target_branch_name:
+            raise PackitException(
+                f"Cannot get the target branch for merging PR {pr_id}."
+            )
+
+        logger.debug(f"Target branch: {target_branch_name}")
+
+        self._fetch_as_branch(
+            f"+refs/heads/{target_branch_name}",
+            f"refs/remotes/{remote}/pr/{pr_id}",
+            target_branch_name,
+        )
+        self.git_repo.branches[target_branch_name].checkout()
+        target_branch = self.git_repo.branches[target_branch_name]
 
         commit_sha = shorten_commit_hash(target_branch.commit.hexsha)
         logger.info(
-            f"Merging ({pr.target_branch}) with commit:\n"
+            f"Merging ({target_branch}) with commit:\n"
             f"({commit_sha})\t{target_branch.commit.summary}"
         )
         try:
