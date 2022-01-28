@@ -382,12 +382,13 @@ def test_get_message_from_metadata(metadata, header, result):
 
 
 @pytest.mark.parametrize(
-    "ref, pr_id, merge_pr, job_config, url, command",
+    "ref, pr_id, merge_pr, target_branch, job_config, url, command",
     [
         (
             None,
             None,
             True,
+            None,
             None,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" https://github.com/packit/ogr',
@@ -396,6 +397,7 @@ def test_get_message_from_metadata(metadata, header, result):
             "123",
             None,
             True,
+            None,
             None,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" --ref 123 '
@@ -406,16 +408,34 @@ def test_get_message_from_metadata(metadata, header, result):
             "1",
             False,
             None,
+            None,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
             "--no-merge-pr https://github.com/packit/ogr",
         ),
+        (
+            None,
+            "1",
+            True,
+            "main",
+            None,
+            "https://github.com/packit/ogr",
+            'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
+            "--merge-pr --target-branch main https://github.com/packit/ogr",
+        ),
     ],
 )
-def test_create_source_script(ref, pr_id, merge_pr, job_config, url, command):
+def test_create_source_script(
+    ref, pr_id, merge_pr, target_branch, job_config, url, command
+):
     assert (
         create_source_script(
-            ref=ref, pr_id=pr_id, merge_pr=merge_pr, job_config=job_config, url=url
+            ref=ref,
+            pr_id=pr_id,
+            merge_pr=merge_pr,
+            target_branch=target_branch,
+            job_config=job_config,
+            url=url,
         )
         == f"""
 #!/bin/sh

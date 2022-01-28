@@ -74,12 +74,19 @@ def load_job_config(job_config):
     default=True,
     help="Specifies whether to merge PR into the base branch in case pr-id is specified.",
 )
+@click.option(
+    "--target-branch",
+    default=None,
+    type=click.STRING,
+    help="Specifies target branch which PR should be merged into.",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(
         ref_param_name="ref",
         pr_id_param_name="pr_id",
         merge_pr_param_name="merge_pr",
+        target_branch_param_name="target_branch",
     ),
     default=os.path.curdir,
 )
@@ -96,6 +103,7 @@ def prepare_sources(
     ref,
     pr_id,
     merge_pr,
+    target_branch,
 ):
     """
     Prepare sources for a new SRPM build using content of the upstream repository.
