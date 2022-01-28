@@ -88,17 +88,15 @@ def update_dist_git(
     to the lookaside cache and creating a commit with the updates, run:
 
     \b
-        $ packit -c src/curl/.distro/source-git.yaml update-dist-git \\
-                src/curl rpms/curl
+        $ packit source-git update-dist-git src/curl rpms/curl
 
 
     To also commit the changes and upload the source-archive to the lookaside-cache
     specify -m and --pkg-tool:
 
     \b
-        $ packit -c src/curl/.distro/source-git.yaml update-dist-git \\
-                -m'Update from source-git' --pkg-tool fedpkg \\
-                src/curl rpms/curl
+        $ packit source-git update-dist-git -m'Update from source-git' \\
+                --pkg-tool fedpkg src/curl rpms/curl
     """
     if message and file:
         raise click.BadOptionUsage("-m", "Option -m cannot be combined with -F.")
