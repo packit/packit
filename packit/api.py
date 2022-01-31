@@ -447,7 +447,7 @@ class PackitAPI:
                 self.dg.create_branch(local_pr_branch)
                 self.dg.checkout_branch(local_pr_branch)
 
-            if create_sync_note:
+            if create_sync_note and self.package_config.create_sync_note:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
                 logger.debug(f"README: {readme_path}")
                 readme_path.write_text(

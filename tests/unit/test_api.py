@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from contextlib import suppress as does_not_raise
+import pathlib
 
 from munch import Munch
 import pytest
@@ -124,6 +125,19 @@ def test_sync_release_version_tag_processing(
         api_mock.sync_release(
             version=version or get_version_return, tag=tag, dist_git_branch="_"
         )
+
+
+def test_sync_release_do_not_create_sync_note(api_mock):
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    flexmock(pathlib.Path).should_receive("write_text").never()
+    api_mock.up.package_config.create_sync_note = False
+    api_mock.sync_release(version="1.1", dist_git_branch="_")
+
+
+def test_sync_release_create_sync_note(api_mock):
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    flexmock(pathlib.Path).should_receive("write_text").once()
+    api_mock.sync_release(version="1.1", dist_git_branch="_")
 
 
 @pytest.mark.parametrize(
