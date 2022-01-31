@@ -440,6 +440,8 @@ def test_create_source_script(
         == f"""
 #!/bin/sh
 
+git config --global user.email "user-cont-team@redhat.com"
+git config --global user.name "Packit"
 resultdir=$PWD
 {command}
 
@@ -465,6 +467,8 @@ def test_create_source_script_with_job_config():
         == f"""
 #!/bin/sh
 
+git config --global user.email "user-cont-team@redhat.com"
+git config --global user.name "Packit"
 resultdir=$PWD
 {expected_command}
 
