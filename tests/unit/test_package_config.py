@@ -775,6 +775,39 @@ def test_package_config_parse_error(raw):
         pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
+                "create_sync_note": False,
+                "jobs": [get_job_config_dict_simple()],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                create_sync_note=False,
+                jobs=[
+                    get_job_config_simple(
+                        specfile_path="fedora/package.spec", create_sync_note=False
+                    )
+                ],
+            ),
+            id="create_sync_note_false",
+        ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [get_job_config_dict_simple()],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                create_sync_note=True,
+                jobs=[
+                    get_job_config_simple(
+                        specfile_path="fedora/package.spec", create_sync_note=True
+                    )
+                ],
+            ),
+            id="create_sync_note_true_by_default",
+        ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
                 "sources": [
                     {
                         "path": "rsync-3.1.3.tar.gz",

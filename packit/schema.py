@@ -294,6 +294,7 @@ class CommonConfigSchema(Schema):
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     sync_changelog = fields.Bool(default=False)
+    create_sync_note = fields.Bool(default=True)
     patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
     patch_generation_patch_id_digits = fields.Integer(
         missing=4, default=4, validate=lambda x: x >= 0

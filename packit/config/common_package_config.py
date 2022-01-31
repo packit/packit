@@ -47,6 +47,7 @@ class CommonPackageConfig:
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = True,
         sync_changelog: bool = False,
+        create_sync_note: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
@@ -80,6 +81,7 @@ class CommonPackageConfig:
         self.allowed_gpg_keys = allowed_gpg_keys
         self.create_pr: bool = create_pr
         self.sync_changelog: bool = sync_changelog
+        self.create_sync_note: bool = create_sync_note
         self.spec_source_id: str = spec_source_id
         self.notifications = notifications or NotificationsConfig(
             pull_request=PullRequestNotificationsConfig()
@@ -108,6 +110,7 @@ class CommonPackageConfig:
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
             f"create_pr='{self.create_pr}', "
             f"synced_files='{self.synced_files}', "
+            f"create_sync_note='{self.create_sync_note}', "
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"

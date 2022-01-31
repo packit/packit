@@ -56,6 +56,7 @@ def package_config_mock():
         upstream_project_url="_",
         allowed_gpg_keys="_",
         upstream_ref="_",
+        create_sync_note=True,
         create_pr=False,
         actions=[],
         patch_generation_ignore_paths=[],
