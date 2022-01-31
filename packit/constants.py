@@ -144,6 +144,8 @@ RPM_MACROS_FOR_PREP = [
 COPR_SOURCE_SCRIPT = """
 #!/bin/sh
 
+git config --global user.email "user-cont-team@redhat.com"
+git config --global user.name "Packit"
 resultdir=$PWD
 packit -d prepare-sources --result-dir "$resultdir" {options}
 
