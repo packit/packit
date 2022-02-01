@@ -211,3 +211,68 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     assert "Patch-name: from-git.patch" in commit_messsage_lines
     assert "Patch-id: 2" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
+
+
+@pytest.mark.skipif(
+    # on rawhide the version can contain letters:
+    # >>> yaml.__version__
+    # '6.0b1'
+    list(map(int, yaml.__version__[:3].split("."))) < [5, 1],
+    reason="Requires PyYAML 5.1 or higher.",
+)
+def test_create_from_upstream_not_require_autosetup(
+    hello_source_git_repo, hello_dist_git_repo
+):
+    """A source-git repo is properly initialized from a dist-git repo.
+    - No downstream patches.
+    """
+    spec = Path(hello_dist_git_repo.working_dir, "hello.spec")
+    content = spec.read_text().replace(
+        "%autosetup", "%setup -q -n hello-%{version}\n%autopatch -p1"
+    )
+    spec.write_text(content)
+    hello_dist_git_repo.git.add("hello.spec")
+    hello_dist_git_repo.git.commit(message="Use %setup")
+
+    flexmock(
+        PkgTool, sources=download_sources(hello_source_git_repo, hello_dist_git_repo)
+    )
+    sgg = SourceGitGenerator(
+        config=flexmock(fas_user=None, pkg_tool="fedpkg"),
+        source_git=hello_source_git_repo,
+        dist_git=hello_dist_git_repo,
+        upstream_ref=HELLO_RELEASE,
+        pkg_name="hello",
+        ignore_missing_autosetup=True,
+    )
+    sgg.create_from_upstream()
+    source_git_config = yaml.safe_load(
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text()
+    )
+    check_source_git_config(source_git_config)
+    assert source_git_config["patch_generation_patch_id_digits"] == 4
+
+    assert (
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, ".gitignore").read_text()
+        == """\
+# Reset gitignore rules
+!*
+"""
+    )
+    assert not Path(hello_source_git_repo.working_dir, DISTRO_DIR, "sources").exists()
+    assert not Path(hello_source_git_repo.working_dir, DISTRO_DIR, ".git").exists()
+
+    assert (
+        "Hello Fedora Linux"
+        in Path(hello_source_git_repo.working_dir, "hello.rs").read_text()
+    )
+
+    commit_messsage_lines = hello_source_git_repo.commit("HEAD~1").message.splitlines()
+    assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
+    assert "Patch-id: 1" in commit_messsage_lines
+    assert "Patch-status: |" in commit_messsage_lines
+
+    commit_messsage_lines = hello_source_git_repo.commit("HEAD").message.splitlines()
+    assert "Patch-name: from-git.patch" in commit_messsage_lines
+    assert "Patch-id: 2" in commit_messsage_lines
+    assert "Patch-status: |" in commit_messsage_lines
