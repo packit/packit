@@ -420,14 +420,10 @@ def test_set_spec_content(tmp_path):
         "1.1 upstream release"
     ).and_return(new_log)
     dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
-    assert (
-        new_log
-        + [
-            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
-            "- Initial package.",
-        ]
-        == dist_git.specfile.spec_content.section("%changelog")
-    )
+    assert new_log + [
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+        "- Initial package.",
+    ] == dist_git.specfile.spec_content.section("%changelog")
     assert "1.1" == dist_git.specfile.get_version()
 
 
