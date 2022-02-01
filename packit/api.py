@@ -1193,6 +1193,7 @@ class PackitAPI:
         upstream_remote: Optional[str] = None,
         pkg_tool: Optional[str] = None,
         pkg_name: Optional[str] = None,
+        ignore_missing_autosetup: bool = False,
     ):
         """
         Initialize a source-git repo from dist-git, that is: add configuration, packaging files
@@ -1209,6 +1210,8 @@ class PackitAPI:
                 of the upstream project to be saved in the source-git configuration.
             pkg_tool: Packaging tool to be used to interact with the dist-git repo.
             pkg_name: Name of the package in dist-git.
+            ignore_missing_autosetup: Do not require %autosetup to be used in the %prep
+                section of specfile.
         """
         sgg = SourceGitGenerator(
             config=self.config,
@@ -1219,5 +1222,6 @@ class PackitAPI:
             upstream_remote=upstream_remote,
             pkg_tool=pkg_tool,
             pkg_name=pkg_name,
+            ignore_missing_autosetup=ignore_missing_autosetup,
         )
         sgg.create_from_upstream()
