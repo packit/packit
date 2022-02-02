@@ -46,6 +46,13 @@ logger = logging.getLogger(__name__)
     help="""The name of the package in the distro.
     Defaults to the directory name of DIST_GIT.""",
 )
+@click.option(
+    "--ignore-missing-autosetup",
+    is_flag=True,
+    default=False,
+    help="Do not require %autosetup macro to be used in %prep section of specfile. "
+    "By default, %autosetup is required.",
+)
 @pass_config
 @cover_packit_exception
 def source_git_init(
@@ -57,6 +64,7 @@ def source_git_init(
     upstream_remote,
     pkg_tool: Optional[str],
     pkg_name: Optional[str],
+    ignore_missing_autosetup: bool,
 ):
     """Initialize SOURCE_GIT as a source-git repo by applying downstream
     patches from DIST_GIT as Git commits on top of UPSTREAM_REF.
@@ -98,4 +106,5 @@ def source_git_init(
         upstream_remote=upstream_remote,
         pkg_tool=pkg_tool or config.pkg_tool,
         pkg_name=pkg_name,
+        ignore_missing_autosetup=ignore_missing_autosetup,
     )
