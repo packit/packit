@@ -78,10 +78,16 @@ jobs:
       list_on_homepage: True
       preserve_project: True
 
-  # downstream Koji build
+  # downstream automation:
   - job: koji_build
     trigger: commit
     metadata:
       dist_git_branches:
         - fedora-all
+        - epel-8
+  - job: bodhi_update
+    trigger: commit
+    metadata:
+      dist_git_branches:
+        - fedora-stable # rawhide updates are created automatically
         - epel-8
