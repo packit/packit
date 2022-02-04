@@ -1,3 +1,15 @@
+# 0.45.0
+
+- A new `packit source-git update-source-git` command has been introduced for
+  taking new changes from dist-git (specified by a revision range) to source-git.
+  These may include any changes except source code, patches and `Version` tag
+  changes in the spec file. ([packit#1456](https://github.com/packit/packit/pull/1456))
+- There's a new configuration option `create_sync_note` that allows you to
+  disable creating of README by packit in downstream. ([packit#1465](https://github.com/packit/packit/pull/1465))
+- A new option `--no-require-autosetup` for `source-git init` command has been
+  introduced. Please note that source-git repositories not using `%autosetup` may
+  not be properly initialized. ([packit#1470](https://github.com/packit/packit/pull/1470))
+
 # 0.44.0
 
 - Packit now correctly finds the release, even if you don't use the version as
