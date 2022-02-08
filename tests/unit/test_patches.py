@@ -103,10 +103,12 @@ Content-Transfer-Encoding: 8bit
 
 This is an explanation why the content was added.
 
-Patch-name: clever.patch
+Patch-name: clev:er.patch
 Patch-id: 200
 Patch-status: |
-    # This needs to be here
+    # The: empty line
+    #
+    # needs to be here
 Patch-present-in-specfile: true
 Ignore-patch: true
 No-prefix: true
@@ -239,8 +241,8 @@ def test_commit_message(patch_file, strip_subject_prefix, strip_trailers, reques
         (
             "patch_with_meta",
             {
-                "name": "clever.patch",
-                "description": "# This needs to be here",
+                "name": "clev:er.patch",
+                "description": "# The: empty line\n#\n# needs to be here",
                 "present_in_specfile": True,
                 "ignore": True,
                 "patch_id": 200,

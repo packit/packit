@@ -67,6 +67,9 @@ def git_format_patch(
 def git_interpret_trailers(patch: str) -> str:
     """Run 'git interpret-trailers' on 'patch' and return the output.
 
+    We don't use --parse/--unfold to unfold multiline values per RFC822
+    because we use YAML block scalars for multiline trailer values.
+
     Args:
         patch: Path of the patch.
 
@@ -302,11 +305,15 @@ class PatchMetadata:
         trailer = ""
         metadata = {}
         for line in trailers.splitlines():
-            token = line.rpartition(": ")[0]
-            if token and trailer:
+            token = line.partition(": ")[0]
+            if token and not token.startswith(" ") and trailer:
+                # found ANOTHER trailer, store the previous one
                 metadata.update(yaml.safe_load(trailer))
                 trailer = ""
-            if token in PATCH_META_TRAILER_TOKENS or (not token and trailer):
+            if token in PATCH_META_TRAILER_TOKENS or (
+                token.startswith(" ") and trailer
+            ):
+                # it's OUR token or we're already processing OUR trailer
                 trailer += line + "\n"
         metadata.update(yaml.safe_load(trailer) or {})
 
