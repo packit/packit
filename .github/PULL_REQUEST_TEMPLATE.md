@@ -15,6 +15,8 @@ Related to
 
 Merge before/after
 
----
+RELEASE NOTES BEGIN
 
-<!-- release notes for changelog/blog follow -->
+Packit now supports automatic ordering of ☕ after all checks pass.
+
+RELEASE NOTES END
