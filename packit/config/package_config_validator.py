@@ -53,7 +53,7 @@ class PackageConfigValidator:
         synced_files_errors = []
         if config:
             synced_files_errors = [
-                f for f in iter_srcs(config.synced_files) if not Path(f).exists()
+                f for f in iter_srcs(config.files_to_sync) if not Path(f).exists()
             ]
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
