@@ -14,10 +14,10 @@ from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
 
 ALIASES: Dict[str, List[str]] = {
-    "fedora-development": ["fedora-rawhide"],
+    "fedora-development": ["fedora-rawhide", "fedora-36"],
     "fedora-latest": ["fedora-35"],
     "fedora-stable": ["fedora-34", "fedora-35"],
-    "fedora-all": ["fedora-34", "fedora-35", "fedora-rawhide"],
+    "fedora-all": ["fedora-34", "fedora-35", "fedora-36", "fedora-rawhide"],
     "epel-all": ["el-6", "epel-7", "epel-8"],
 }
 
