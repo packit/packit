@@ -1072,7 +1072,7 @@ def test_get_package_config_from_repo(
     )
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == spec_path
-    assert config.synced_files == [
+    assert config.files_to_sync == [
         SyncFilesItem(src=["packit.spec"], dest="packit.spec"),
         SyncFilesItem(src=[".packit.yaml"], dest=".packit2.yaml"),
     ]
@@ -1156,6 +1156,17 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
                 SyncFilesItem(src=["packit.yaml"], dest="packit.yaml"),
             ],
         ),
+        (
+            PackageConfig(
+                config_file_path="packit.yaml",
+                specfile_path="file.spec",
+                synced_files=[SyncFilesItem(src=["file.txt"], dest="file.txt")],
+                files_to_sync=[SyncFilesItem(src=["file.spec"], dest="file.spec")],
+            ),
+            [
+                SyncFilesItem(src=["file.spec"], dest="file.spec"),
+            ],
+        ),
     ],
 )
 def test_get_all_files_to_sync(package_config, all_synced_files):
@@ -1211,6 +1222,34 @@ def test_get_local_package_config_path(
             downstream_package_name="package",
             upstream_package_name="package",
             synced_files=[
+                SyncFilesItem(src=["fedora/package.spec"], dest="fedora/package.spec")
+            ],
+        ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            downstream_package_name="package",
+            upstream_package_name="package",
+            synced_files=[
+                SyncFilesItem(src=["fedora/package.spec"], dest="fedora/package.spec")
+            ],
+            files_to_sync=[
+                SyncFilesItem(src=["fedora/package.spec"], dest="fedora/package.spec")
+            ],
+        ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            downstream_package_name="package",
+            upstream_package_name="package",
+            synced_files=[SyncFilesItem(src=["fedora/p.spec"], dest="fedora/p.spec")],
+            files_to_sync=[
+                SyncFilesItem(src=["fedora/package.spec"], dest="fedora/package.spec")
+            ],
+        ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            downstream_package_name="package",
+            upstream_package_name="package",
+            files_to_sync=[
                 SyncFilesItem(src=["fedora/package.spec"], dest="fedora/package.spec")
             ],
         ),

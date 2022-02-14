@@ -172,6 +172,7 @@ class JobConfig(CommonPackageConfig):
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
         synced_files: Optional[List[SyncFilesItem]] = None,
+        files_to_sync: Optional[List[SyncFilesItem]] = None,
         dist_git_namespace: str = None,
         upstream_project_url: str = None,  # can be URL or path
         upstream_package_name: str = None,
@@ -198,6 +199,7 @@ class JobConfig(CommonPackageConfig):
             config_file_path=config_file_path,
             specfile_path=specfile_path,
             synced_files=synced_files,
+            files_to_sync=files_to_sync,
             dist_git_namespace=dist_git_namespace,
             upstream_project_url=upstream_project_url,
             upstream_package_name=upstream_package_name,
@@ -229,7 +231,7 @@ class JobConfig(CommonPackageConfig):
             f"JobConfig(job={self.type}, trigger={self.trigger}, meta={self.metadata}, "
             f"config_file_path='{self.config_file_path}', "
             f"specfile_path='{self.specfile_path}', "
-            f"synced_files='{self.synced_files}', "
+            f"files_to_sync='{self.files_to_sync}', "
             f"dist_git_namespace='{self.dist_git_namespace}', "
             f"upstream_project_url='{self.upstream_project_url}', "
             f"upstream_package_name='{self.upstream_package_name}', "
@@ -269,7 +271,7 @@ class JobConfig(CommonPackageConfig):
             and self.trigger == other.trigger
             and self.metadata == other.metadata
             and self.specfile_path == other.specfile_path
-            and self.synced_files == other.synced_files
+            and self.files_to_sync == other.files_to_sync
             and self.dist_git_namespace == other.dist_git_namespace
             and self.upstream_project_url == other.upstream_project_url
             and self.upstream_package_name == other.upstream_package_name

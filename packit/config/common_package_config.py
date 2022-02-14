@@ -4,6 +4,9 @@
 """
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
+import warnings
+import logging
+
 from os import getenv
 from os.path import basename
 from typing import Dict, List, Optional, Union
@@ -36,6 +39,7 @@ class CommonPackageConfig:
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
         synced_files: Optional[List[SyncFilesItem]] = None,
+        files_to_sync: Optional[List[SyncFilesItem]] = None,
         dist_git_namespace: str = None,
         upstream_project_url: str = None,  # can be URL or path
         upstream_package_name: str = None,
@@ -60,7 +64,15 @@ class CommonPackageConfig:
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
-        self.synced_files: List[SyncFilesItem] = synced_files or []
+
+        self._files_to_sync: List[SyncFilesItem] = files_to_sync or []  # new option
+        self._files_to_sync_used: bool = False if files_to_sync is None else True
+        self._synced_files: List[SyncFilesItem] = (
+            synced_files or []
+        )  # old deprecated option
+        if synced_files is not None:
+            self._warn_user()
+
         self.patch_generation_ignore_paths = patch_generation_ignore_paths or []
         self.patch_generation_patch_id_digits = patch_generation_patch_id_digits
         self.upstream_project_url: Optional[str] = upstream_project_url
@@ -94,11 +106,46 @@ class CommonPackageConfig:
         self.sources = sources or []
         self.merge_pr_in_ci = merge_pr_in_ci
 
+    def _warn_user(self):
+        logger = logging.getLogger(__name__)
+        msg = "synced_files option is deprecated. Use files_to_sync option instead."
+        logger.warning(msg)
+        warnings.warn(msg, DeprecationWarning)
+        if self._files_to_sync_used:
+            logger.warning(
+                "You are setting both files_to_sync and synced_file."
+                " Packit will use files_to_sync. You should remove "
+                "synced_files since it is deprecated."
+            )
+
+    @property
+    def files_to_sync(self) -> List[SyncFilesItem]:
+        """
+        synced_files is the old option we want to deprecate.
+        Spec file and configuration file can be automatically added to
+        the list of synced_files (see get_all_files_to_sync method)
+
+        files_to_sync is the new option. Files to be synced are just those listed here.
+        Spec file and configuration file will not be automatically added
+        to the list of files_to_sync (see get_all_files_to_sync method).
+
+        files_to_sync has precedence over synced_files.
+
+        Once the old option will be removed this method can be removed as well.
+        """
+
+        if self._files_to_sync_used:
+            return self._files_to_sync
+        elif self._synced_files:
+            return self._synced_files
+        else:
+            return []
+
     def __repr__(self):
         return (
             "CommonPackageConfig("
             f"specfile_path='{self.specfile_path}', "
-            f"synced_files='{self.synced_files}', "
+            f"files_to_sync='{self.files_to_sync}', "
             f"dist_git_namespace='{self.dist_git_namespace}', "
             f"upstream_project_url='{self.upstream_project_url}', "
             f"upstream_package_name='{self.upstream_package_name}', "
@@ -109,7 +156,6 @@ class CommonPackageConfig:
             f"upstream_ref='{self.upstream_ref}', "
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
             f"create_pr='{self.create_pr}', "
-            f"synced_files='{self.synced_files}', "
             f"create_sync_note='{self.create_sync_note}', "
             f"spec_source_id='{self.spec_source_id}', "
             f"upstream_tag_template='{self.upstream_tag_template}', "
@@ -157,18 +203,25 @@ class CommonPackageConfig:
     def get_all_files_to_sync(self):
         """
         Adds the default files (config file, spec file) to synced files
-        when doing propose-downstream.
+        if the new files_to_sync option is not yet used otherwise
+        do not performer any addition to the list of files to be synced.
+
+        When the old option will be removed this method could be removed as well.
+
         :return: Files to be synced
         """
-        files = self.synced_files
+        files = self.files_to_sync
 
-        if self.specfile_path not in iter_srcs(files):
-            files.append(self.get_specfile_sync_files_item())
+        if not self._files_to_sync_used:
+            if self.specfile_path not in iter_srcs(files):
+                files.append(self.get_specfile_sync_files_item())
 
-        if self.config_file_path and self.config_file_path not in iter_srcs(files):
-            # this relative because of glob: "Non-relative patterns are unsupported"
-            files.append(
-                SyncFilesItem(src=[self.config_file_path], dest=self.config_file_path)
-            )
+            if self.config_file_path and self.config_file_path not in iter_srcs(files):
+                # this relative because of glob: "Non-relative patterns are unsupported"
+                files.append(
+                    SyncFilesItem(
+                        src=[self.config_file_path], dest=self.config_file_path
+                    )
+                )
 
         return files

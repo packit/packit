@@ -32,6 +32,7 @@ class PackageConfig(CommonPackageConfig):
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
         synced_files: Optional[List[SyncFilesItem]] = None,
+        files_to_sync: Optional[List[SyncFilesItem]] = None,
         jobs: Optional[List[JobConfig]] = None,
         dist_git_namespace: str = None,
         upstream_project_url: str = None,  # can be URL or path
@@ -59,6 +60,7 @@ class PackageConfig(CommonPackageConfig):
             config_file_path=config_file_path,
             specfile_path=specfile_path,
             synced_files=synced_files,
+            files_to_sync=files_to_sync,
             dist_git_namespace=dist_git_namespace,
             upstream_project_url=upstream_project_url,
             upstream_package_name=upstream_package_name,
@@ -88,7 +90,7 @@ class PackageConfig(CommonPackageConfig):
             "PackageConfig("
             f"config_file_path='{self.config_file_path}', "
             f"specfile_path='{self.specfile_path}', "
-            f"synced_files='{self.synced_files}', "
+            f"files_to_sync='{self.files_to_sync}', "
             f"jobs='{self.jobs}', "
             f"dist_git_namespace='{self.dist_git_namespace}', "
             f"upstream_project_url='{self.upstream_project_url}', "
@@ -185,7 +187,7 @@ class PackageConfig(CommonPackageConfig):
         logger.debug(f"the other configuration:\n{other.__dict__}")
         return (
             self.specfile_path == other.specfile_path
-            and self.synced_files == other.synced_files
+            and self.files_to_sync == other.files_to_sync
             and self.jobs == other.jobs
             and self.dist_git_namespace == other.dist_git_namespace
             and self.upstream_project_url == other.upstream_project_url
