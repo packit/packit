@@ -65,7 +65,7 @@ PACKIT_CONFIG_TEMPLATE = """# See the documentation for more information:
 specfile_path: {specfile_path}
 
 # add or remove files that should be synced
-synced_files:
+files_to_sync:
     - {specfile_path}
     - .packit.yaml
 

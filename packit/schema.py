@@ -291,6 +291,7 @@ class CommonConfigSchema(Schema):
         deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
     )
     synced_files = fields.List(FilesToSyncField())
+    files_to_sync = fields.List(FilesToSyncField())
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
     sync_changelog = fields.Bool(default=False)
