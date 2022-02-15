@@ -173,7 +173,7 @@ class PackitAPI:
         if sync_default_files:
             synced_files = self.package_config.get_all_files_to_sync()
         else:
-            synced_files = self.package_config.synced_files
+            synced_files = self.package_config.files_to_sync
         # Make all paths absolute and check that they are within
         # the working directories of the repositories.
         for item in synced_files:
@@ -575,7 +575,7 @@ class PackitAPI:
         files = (
             [self.package_config.get_specfile_sync_files_item(from_downstream=True)]
             if sync_only_specfile
-            else self.package_config.synced_files
+            else self.package_config.files_to_sync
         )
 
         # Drop files to be excluded from the sync.
