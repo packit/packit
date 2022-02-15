@@ -113,7 +113,7 @@ class CommonPackageConfig:
         warnings.warn(msg, DeprecationWarning)
         if self._files_to_sync_used:
             logger.warning(
-                "You are setting both files_to_sync and synced_file."
+                "You are setting both files_to_sync and synced_files."
                 " Packit will use files_to_sync. You should remove "
                 "synced_files since it is deprecated."
             )
