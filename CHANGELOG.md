@@ -1,3 +1,10 @@
+# 0.46.0
+
+- Synchronization of default files can now be disabled using a new config
+  `files_to_sync`. Key `sync_files` is now deprecated. (#1483)
+- Packit now correctly handles colons in git trailer values in source-git commits. (#1478)
+- Fedora 36 was added to the static list of `fedora-` aliases. (#1480)
+
 # 0.45.0
 
 - A new `packit source-git update-source-git` command has been introduced for
