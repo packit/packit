@@ -281,7 +281,7 @@ class SourceGitGenerator:
                 "patch_generation_ignore_paths": [DISTRO_DIR],
                 "patch_generation_patch_id_digits": self.dist_git_specfile.patch_id_digits,
                 "sync_changelog": True,
-                "synced_files": [
+                "files_to_sync": [
                     {
                         # The trailing-slash is important, as we want to
                         # sync the content of the directory, not the directory
