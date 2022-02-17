@@ -107,7 +107,7 @@ def check_source_git_config(source_git_config):
     assert source_git_config["specfile_path"] == ".distro/hello.spec"
     assert source_git_config["patch_generation_ignore_paths"] == [DISTRO_DIR]
     assert source_git_config["sync_changelog"] is True
-    assert source_git_config["synced_files"] == [
+    assert source_git_config["files_to_sync"] == [
         {
             "src": ".distro/",
             "dest": ".",
