@@ -83,6 +83,9 @@ def source_git_init(
     out before setting up the source-git repo. This branch is expected
     to exist.
 
+    Each Git commit created in SOURCE_GIT will have a 'From-dist-git-commit'
+    trailer to mark the hash of the dist-git commit from which it is created.
+
     To learn more about source-git, please check
 
         https://packit.dev/docs/source-git/

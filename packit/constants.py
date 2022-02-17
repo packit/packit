@@ -150,3 +150,6 @@ resultdir=$PWD
 packit -d prepare-sources --result-dir "$resultdir" {options}
 
 """
+
+# Git-trailer tokens to mark the commit origin
+FROM_DIST_GIT_TOKEN = "From-dist-git-commit"

@@ -159,6 +159,10 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
     )
     check_source_git_config(source_git_config)
     assert source_git_config["patch_generation_patch_id_digits"] == 1
+    assert (
+        f"\nFrom-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}\n"
+        in hello_source_git_repo.head.commit.message
+    )
 
 
 @pytest.mark.skipif(
@@ -206,11 +210,19 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
     assert "Patch-id: 1" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
+    assert (
+        f"From-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}"
+        in commit_messsage_lines
+    )
 
     commit_messsage_lines = hello_source_git_repo.commit("HEAD").message.splitlines()
     assert "Patch-name: from-git.patch" in commit_messsage_lines
     assert "Patch-id: 2" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
+    assert (
+        f"From-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}"
+        in commit_messsage_lines
+    )
 
 
 @pytest.mark.skipif(
@@ -271,8 +283,16 @@ def test_create_from_upstream_not_require_autosetup(
     assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
     assert "Patch-id: 1" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
+    assert (
+        f"From-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}"
+        in commit_messsage_lines
+    )
 
     commit_messsage_lines = hello_source_git_repo.commit("HEAD").message.splitlines()
     assert "Patch-name: from-git.patch" in commit_messsage_lines
     assert "Patch-id: 2" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
+    assert (
+        f"From-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}"
+        in commit_messsage_lines
+    )
