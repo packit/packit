@@ -55,6 +55,7 @@ class PackageConfig(CommonPackageConfig):
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
         merge_pr_in_ci: bool = True,
+        srpm_build_deps: Optional[List[str]] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -82,6 +83,7 @@ class PackageConfig(CommonPackageConfig):
             copy_upstream_release_description=copy_upstream_release_description,
             sources=sources,
             merge_pr_in_ci=merge_pr_in_ci,
+            srpm_build_deps=srpm_build_deps,
         )
         self.jobs: List[JobConfig] = jobs or []
 
@@ -111,7 +113,8 @@ class PackageConfig(CommonPackageConfig):
             f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}', "
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
             f"sources='{self.sources}', "
-            f"merge_pr_in_ci={self.merge_pr_in_ci})"
+            f"merge_pr_in_ci={self.merge_pr_in_ci}, "
+            f"srpm_build_deps={self.srpm_build_deps})"
         )
 
     @classmethod
@@ -206,6 +209,7 @@ class PackageConfig(CommonPackageConfig):
             == other.copy_upstream_release_description
             and self.sources == other.sources
             and self.merge_pr_in_ci == other.merge_pr_in_ci
+            and self.srpm_build_deps == other.srpm_build_deps
         )
 
 

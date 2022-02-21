@@ -304,6 +304,7 @@ class CommonConfigSchema(Schema):
     copy_upstream_release_description = fields.Bool(default=False)
     sources = fields.List(fields.Nested(SourceSchema), missing=None)
     merge_pr_in_ci = fields.Bool(default=True)
+    srpm_build_deps = fields.List(fields.String(), missing=None)
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
