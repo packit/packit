@@ -115,6 +115,10 @@ def test_update_source_git(
     update_api.update_source_git("HEAD~1..")
     assert (sourcegit / DISTRO_DIR / new_file).read_text() == content
     assert "Add" in update_api.up.local_project.git_repo.head.commit.message
+    assert (
+        f"From-dist-git-commit: {update_api.dg.local_project.git_repo.head.commit.hexsha}"
+        in update_api.up.local_project.git_repo.head.commit.message
+    )
 
     # Modify the existing file
     extra_content = "\ndefgh"
@@ -124,6 +128,10 @@ def test_update_source_git(
     update_api.update_source_git("HEAD~1..")
     assert (sourcegit / DISTRO_DIR / new_file).read_text() == content + extra_content
     assert "Modify" in update_api.up.local_project.git_repo.head.commit.message
+    assert (
+        f"From-dist-git-commit: {update_api.dg.local_project.git_repo.head.commit.hexsha}"
+        in update_api.up.local_project.git_repo.head.commit.message
+    )
 
     # Rename a file
     new_name = "test.txt"
@@ -134,6 +142,10 @@ def test_update_source_git(
     with open(sourcegit / DISTRO_DIR / new_name, "r") as file:
         assert file.read() == content + extra_content
     assert "Rename" in update_api.up.local_project.git_repo.head.commit.message
+    assert (
+        f"From-dist-git-commit: {update_api.dg.local_project.git_repo.head.commit.hexsha}"
+        in update_api.up.local_project.git_repo.head.commit.message
+    )
 
     # Delete a file
     (distgit / new_name).unlink()
@@ -141,3 +153,7 @@ def test_update_source_git(
     update_api.update_source_git("HEAD~1..")
     assert not (sourcegit / DISTRO_DIR / new_name).exists()
     assert "Delete" in update_api.up.local_project.git_repo.head.commit.message
+    assert (
+        f"From-dist-git-commit: {update_api.dg.local_project.git_repo.head.commit.hexsha}"
+        in update_api.up.local_project.git_repo.head.commit.message
+    )

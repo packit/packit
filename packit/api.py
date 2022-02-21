@@ -28,7 +28,7 @@ from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
-from packit.constants import SYNCING_NOTE, DISTRO_DIR
+from packit.constants import SYNCING_NOTE, DISTRO_DIR, FROM_DIST_GIT_TOKEN
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import (
@@ -328,7 +328,12 @@ class PackitAPI:
                 self.up.local_project.git_repo.is_dirty()
                 or self.up.local_project.git_repo.untracked_files
             ):
-                self.up.commit(title=title, msg=message, prefix="")
+                self.up.commit(
+                    title=title,
+                    msg=message,
+                    prefix="",
+                    trailers=[(FROM_DIST_GIT_TOKEN, commit.hexsha)],
+                )
             else:
                 logger.info(
                     f"Commit {commit} had no changes to be applied, skipping it."
