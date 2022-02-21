@@ -5,6 +5,7 @@ import os
 import subprocess
 from pathlib import Path
 
+import git
 import pytest
 
 from packit.constants import DISTRO_DIR
@@ -32,7 +33,9 @@ def test_basic_local_update_without_patching(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git
+    Check that the upstream commit hash is saved when 'mock_commit_origin' is set.
+    """
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -42,11 +45,16 @@ def test_basic_local_update_without_patching(
         dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
+        mark_commit_origin=True,
     )
 
     assert (distgit / TARBALL_NAME).is_file()
     spec = Specfile(distgit / "beer.spec")
     assert spec.get_version() == "0.1.0"
+    assert (
+        f"From-source-git-commit: {git.Repo(sourcegit).head.commit.hexsha}"
+        in git.Repo(distgit).head.commit.message
+    )
 
 
 @pytest.mark.parametrize("ref", [None, "0.1.0", "0.1*", "0.*"])
@@ -56,7 +64,9 @@ def test_basic_local_update_empty_patch(
     api_instance_source_git,
     ref,
 ):
-    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git
+    Check that by default commit origin is not marked in dist-git.
+    """
 
     distgit, _ = distgit_and_remote
     mock_spec_download_remote_s(distgit)
@@ -72,6 +82,7 @@ def test_basic_local_update_empty_patch(
 
     assert not spec.patches["applied"]
     assert not spec.patches["not_applied"]
+    assert "From-source-git-commit" not in git.Repo(distgit).head.commit.message
 
 
 def test_basic_local_update_patch_content(
@@ -80,7 +91,9 @@ def test_basic_local_update_patch_content(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
 ):
-    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
+    """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git
+    Check that commit origin is not marked when 'mark_commit_origin' is set to False.
+    """
 
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
@@ -100,12 +113,14 @@ def test_basic_local_update_patch_content(
         dist_git_branch="main",
         version="0.1.0",
         upstream_ref="0.1.0",
+        mark_commit_origin=False,
     )
 
     git_diff = subprocess.check_output(
         ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
     ).decode()
 
+    assert "From-source-git-commit" not in git.Repo(distgit).head.commit.message
     assert (
         """
 -Version:        0.0.0
