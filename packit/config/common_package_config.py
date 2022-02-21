@@ -61,6 +61,7 @@ class CommonPackageConfig:
         copy_upstream_release_description: bool = False,
         sources: Optional[List[SourcesItem]] = None,
         merge_pr_in_ci: bool = True,
+        srpm_build_deps: Optional[List[str]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -105,6 +106,7 @@ class CommonPackageConfig:
         self.copy_upstream_release_description = copy_upstream_release_description
         self.sources = sources or []
         self.merge_pr_in_ci = merge_pr_in_ci
+        self.srpm_build_deps = srpm_build_deps
 
     def _warn_user(self):
         logger = logging.getLogger(__name__)
@@ -163,7 +165,8 @@ class CommonPackageConfig:
             f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}',"
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
             f"sources='{self.sources}', "
-            f"merge_pr_in_ci={self.merge_pr_in_ci})"
+            f"merge_pr_in_ci={self.merge_pr_in_ci}, "
+            f"srpm_build_deps={self.srpm_build_deps})"
         )
 
     @property

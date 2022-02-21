@@ -1303,6 +1303,17 @@ def test_get_local_package_config_path(
                 ),
             ],
         ),
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            actions={
+                ActionName.pre_sync: "some/pre-sync/command --option",
+                ActionName.get_current_version: "get-me-version",
+            },
+            jobs=[],
+            upstream_project_url="https://github.com/asd/qwe",
+            upstream_package_name="qwe",
+            srpm_build_deps=["make", "tar", "findutils"],
+        ),
     ],
 )
 def test_serialize_and_deserialize(package_config):
