@@ -52,7 +52,10 @@ def update_source_git(
     prior to the synchronization process.
 
     Dist-git commit messages are preserved and used when creating new
-    source-git commits.
+    source-git commits, but a 'From-dist-git-commit' trailer is appended
+    to them to mark the hash of the dist-git commit from which they
+    are created.
+
 
     Examples
 
