@@ -28,7 +28,12 @@ from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
-from packit.constants import SYNCING_NOTE, DISTRO_DIR, FROM_DIST_GIT_TOKEN
+from packit.constants import (
+    SYNCING_NOTE,
+    DISTRO_DIR,
+    FROM_DIST_GIT_TOKEN,
+    FROM_SOURCE_GIT_TOKEN,
+)
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import (
@@ -147,6 +152,7 @@ class PackitAPI:
         commit_msg: str,
         sync_default_files: bool = True,
         pkg_tool: str = "",
+        mark_commit_origin: bool = False,
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
@@ -168,7 +174,9 @@ class PackitAPI:
             commit_msg: Use this commit message in dist-git.
             sync_default_files: Whether to sync the default files, that is: packit.yaml and
                 the spec-file.
-            pkg_tool: what tool (fedpkg/centpkg) to use upload to lookaside cache
+            pkg_tool: What tool (fedpkg/centpkg) to use upload to lookaside cache.
+            mark_commit_origin: Whether to include a Git-trailer in the dist-git
+                commit message to mark the hash of the upstream (source-git) commit.
         """
         if sync_default_files:
             synced_files = self.package_config.get_all_files_to_sync()
@@ -210,7 +218,22 @@ class PackitAPI:
             )
 
         if commit_title:
-            self.dg.commit(title=commit_title, msg=commit_msg, prefix="")
+            trailers = (
+                [
+                    (
+                        FROM_SOURCE_GIT_TOKEN,
+                        self.up.local_project.git_repo.head.commit.hexsha,
+                    )
+                ]
+                if mark_commit_origin
+                else None
+            )
+            self.dg.commit(
+                title=commit_title,
+                msg=commit_msg,
+                prefix="",
+                trailers=trailers,
+            )
 
     @staticmethod
     def _transform_patch_to_source_git(patch: str, diffs: List[git.Diff]) -> str:
@@ -353,32 +376,43 @@ class PackitAPI:
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: Optional[bool] = True,
-        local_pr_branch_suffix: Optional[str] = "update",
+        sync_default_files: bool = True,
+        local_pr_branch_suffix: str = "update",
+        mark_commit_origin: bool = False,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
 
-        :param dist_git_branch: branch in dist-git, defaults to repo's default branch
-        :param use_local_content: don't check out anything
-        :param version: upstream version to update in dist-git
-        :param tag: upstream git tag
-        :param add_new_sources: download and upload source archives
-        :param force_new_sources: download/upload the archive even if it's name
-                                  is already in the cache or in sources file
-        :param upstream_ref: for a source-git repo, use this ref as the latest upstream commit
-        :param create_pr: create a pull request if set to True
-        :param force: ignore changes in the git index
-        :param create_sync_note: whether to create a note about the sync in the dist-git repo
-        :param title: title (first line) of the commit & PR
-        :param description: description of the commit & PR
-        :param sync_default_files: Whether to sync the default files,
-                                   that is: packit.yaml and the spec-file.
-        :param local_pr_branch_suffix: When create_pr is True, we push into a newly created
-               branch and create a PR from it. This param specifies a suffix attached to the
-               created branch name, so that we can have more PRs for the same dg branch at one time.
+        Args:
+            dist_git_branch: Branch in dist-git, defaults to repo's default branch.
+            use_local_content: Don't check out anything.
+            version: Upstream version to update in dist-git.
+            tag: Upstream git tag.
+            add_new_sources: Download and upload source archives.
+            force_new_sources: Download/upload the archive even if it's
+                name is already in the cache or in sources file.
+            upstream_ref: For a source-git repo, use this ref as the latest upstream commit.
+            create_pr: Create a pull request if set to True.
+            force: Ignore changes in the git index.
+            create_sync_note: Whether to create a note about the sync in the dist-git repo.
+            title: Title (first line) of the commit & PR.
+            description: Description of the commit & PR.
+            sync_default_files: Whether to sync the default files, that is:
+                packit.yaml and the spec-file.
+            local_pr_branch_suffix: When create_pr is True, we push into a newly created
+                branch and create a PR from it. This param specifies a suffix attached
+                to the created branch name, so that we can have more PRs for the same
+                dg branch at one time.
+            mark_commit_origin: Whether to include a Git-trailer in the dist-git
+                commit message to mark the hash of the upstream (source-git) commit.
 
-        :return created PullRequest if create_pr is True, else None
+        Returns:
+            The created PullRequest if create_pr is True, else None.
+
+        Raises:
+            PackitException, if both 'version' and 'tag' are provided.
+            PackitException, if the version of the latest upstream release cannot be told.
+            PackitException, if the upstream repo or dist-git is dirty.
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
         dist_git_branch = (
@@ -472,6 +506,7 @@ class PackitAPI:
                 commit_title=title or f"[packit] {version} upstream release",
                 commit_msg=description,
                 sync_default_files=sync_default_files,
+                mark_commit_origin=mark_commit_origin,
             )
 
             new_pr = None

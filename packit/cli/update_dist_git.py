@@ -76,7 +76,9 @@ def update_dist_git(
     does not checkout branches or fetches remotes.
 
     A commit in dist-git is created only if a commit message is provided with
-    --message or --file.
+    --message or --file. This commit will have a 'From-source-git-commit'
+    Git-trailer appended to it, to mark the hash of the source-git commit
+    from which it is created.
 
     The source archives are retrieved from the upstream URLs specified in
     the spec-file and uploaded to the lookaside cache in dist-git only if
@@ -131,4 +133,5 @@ def update_dist_git(
         commit_msg=message,
         sync_default_files=False,
         pkg_tool=pkg_tool,
+        mark_commit_origin=True,
     )
