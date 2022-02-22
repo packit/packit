@@ -15,5 +15,3 @@ RUN pip3 install ./ \
     && git rev-parse HEAD >/.packit.git.commit.hash \
     && git show --quiet --format=%B HEAD >/.packit.git.commit.message \
     && rm -rf ~/.cache/*
-
-RUN cd / && rm -rf /src && mkdir /src
