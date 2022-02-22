@@ -1,5 +1,5 @@
 ---
-synced_files:
+files_to_sync:
   - src: plans/
     dest: plans/
   - src: .fmf/
