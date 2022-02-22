@@ -9,10 +9,10 @@ CONTAINER_TEST_COMMAND=bash -c "pip3 install .; make check"
 
 # In case you don't want to use pre-built image
 image:
-	$(CONTAINER_ENGINE) build --rm --tag $(IMAGE) .
+	$(CONTAINER_ENGINE) build --rm --tag $(IMAGE) -f Containerfile .
 
 build-test-image:
-	$(CONTAINER_ENGINE) build --rm --tag $(TEST_IMAGE) -f Dockerfile.tests .
+	$(CONTAINER_ENGINE) build --rm --tag $(TEST_IMAGE) -f Containerfile.tests .
 
 remove-test-image:
 	$(CONTAINER_ENGINE) rmi $(TEST_IMAGE)
