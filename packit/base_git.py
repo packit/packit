@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import shlex
+import tempfile
 from logging import getLogger
 from pathlib import Path
-from typing import Optional, Callable, List, Iterable, Dict
+from typing import Optional, Callable, List, Iterable, Dict, Tuple
 
 import git
 from git import PushInfo
@@ -142,7 +143,13 @@ class PackitRepositoryBase:
             raise PackitException(f"Branch {git_ref} does not exist")
         head.checkout()
 
-    def commit(self, title: str, msg: str, prefix: str = "[packit] ") -> None:
+    def commit(
+        self,
+        title: str,
+        msg: str,
+        prefix: str = "[packit] ",
+        trailers: Optional[List[Tuple[str, str]]] = None,
+    ) -> None:
         """
         Perform `git add -A` and `git commit`
         """
@@ -156,17 +163,21 @@ class PackitRepositoryBase:
                 "No changes are present in the dist-git repo: nothing to commit."
             )
         self.local_project.git_repo.index.write()
-        commit_args = ["-s", "-m", main_msg]
-        if msg:
-            commit_args += ["-m", msg]
-        # TODO: attach git note to every commit created
-        # TODO: implement cleaning policy: once the PR is closed (merged/refused), remove the branch
-        #       make this configurable so that people know this would happen, don't clean by default
-        #       we should likely clean only merged PRs by default
-        # TODO: implement signing properly: we need to create a cert for the bot,
-        #       distribute it to the container, prepare git config and then we can start signing
-        # TODO: make -s configurable
-        self.local_project.git_repo.git.commit(*commit_args)
+
+        with tempfile.NamedTemporaryFile(mode="w+t") as fp:
+            fp.writelines([main_msg, "\n"])
+            if msg:
+                fp.writelines(["\n", msg, "\n"])
+            fp.seek(0)
+            if trailers:
+                args = ["--in-place"]
+                for token, value in trailers:
+                    args += ["--trailer", f"{token}={value}"]
+                self.local_project.git_repo.git.interpret_trailers(*args, fp.name)
+
+            # TODO: make -s configurable
+            commit_args = ["-s", "-F", fp.name]
+            self.local_project.git_repo.git.commit(*commit_args)
 
     def run_action(self, actions: ActionName, method: Callable = None, *args, **kwargs):
         """

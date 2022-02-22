@@ -18,7 +18,12 @@ from rebasehelper.exceptions import LookasideCacheError
 from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
 
 from packit.config import Config
-from packit.constants import RPM_MACROS_FOR_PREP, DISTRO_DIR, SRC_GIT_CONFIG
+from packit.constants import (
+    RPM_MACROS_FOR_PREP,
+    DISTRO_DIR,
+    SRC_GIT_CONFIG,
+    FROM_DIST_GIT_TOKEN,
+)
 from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
 from packit.pkgtool import PkgTool
@@ -225,6 +230,7 @@ class SourceGitGenerator:
                 message += "Patch-status: |\n"
             for line in patch_comments.get(metadata.name, []):
                 message += f"    # {line}\n"
+            message += f"{FROM_DIST_GIT_TOKEN}: {self.dist_git.head.commit.hexsha}"
             self.source_git.git.commit(message=message, amend=True, allow_empty=True)
 
         self.source_git.git.branch("-D", to_branch)
@@ -347,7 +353,11 @@ class SourceGitGenerator:
         spec.remove_patches()
 
         self.source_git.git.stage(DISTRO_DIR, force=True)
-        self.source_git.git.commit(message="Initialize as a source-git repository")
+        message = f"""Initialize as a source-git repository
+
+{FROM_DIST_GIT_TOKEN}: {self.dist_git.head.commit.hexsha}
+"""
+        self.source_git.git.commit(message=message)
 
         pkg_tool = PkgTool(
             fas_username=self.config.fas_user,
