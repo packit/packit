@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - dockerfile: Dockerfile
+          - dockerfile: Containerfile
             image: packit
 
     steps:
