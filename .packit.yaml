@@ -16,11 +16,15 @@ actions:
   get-current-version:
     - "python3 setup.py --version"
   pre-sync:
-    # FMF  has to be installed on system where you are calling this tool.
+    # FMF has to be installed on system where you are calling this tool.
     - python3 plans/git_reference.py
 
 allowed_gpg_keys:
   - 5DE3E0509C47EA3CF04A42D34AEE18F83AFDEB23
+
+srpm_build_deps:
+  - python3-pip # "python3 setup.py --version" needs it
+  - python3-setuptools_scm
 
 jobs:
   - job: propose_downstream
