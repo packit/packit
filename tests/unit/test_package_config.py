@@ -1418,3 +1418,17 @@ def test_package_config_specfile_not_present_raise(raw):
 )
 def test_package_config_specilfe_not_present_not_raise(raw):
     assert PackageConfig.get_from_dict(raw_dict=raw)
+
+
+@pytest.mark.parametrize(
+    "package_name,result", ((None, None), ("baz", "http://foo/bar/baz.git"))
+)
+def test_pc_dist_git_package_url_has_no_None(package_name, result):
+    assert (
+        PackageConfig(
+            downstream_package_name=package_name,
+            dist_git_base_url="http://foo/",
+            dist_git_namespace="bar",
+        ).dist_git_package_url
+        == result
+    )
