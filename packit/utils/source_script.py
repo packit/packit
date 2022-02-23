@@ -1,8 +1,6 @@
 from typing import Optional
 
-from packit.config import JobConfig
 from packit.constants import COPR_SOURCE_SCRIPT
-from packit.schema import JobConfigSchema
 
 
 def create_source_script(
@@ -11,7 +9,7 @@ def create_source_script(
     pr_id: Optional[str] = None,
     merge_pr: Optional[bool] = True,
     target_branch: Optional[str] = None,
-    job_config: Optional[JobConfig] = None,
+    job_config_index: Optional[int] = None,
 ):
     options = []
     if ref:
@@ -20,9 +18,8 @@ def create_source_script(
         options += ["--pr-id", pr_id, f"--{'no-' if not merge_pr else ''}merge-pr"]
         if merge_pr and target_branch:
             options += ["--target-branch", target_branch]
-    if job_config:
-        job_config = JobConfigSchema().dumps(job_config)
-        options += ["--job-config", f"{job_config!r}"]
+    if job_config_index:
+        options += ["--job-config-index", str(job_config_index)]
 
     options += [url]
     return COPR_SOURCE_SCRIPT.format(options=" ".join(options))

@@ -10,10 +10,7 @@ from flexmock import flexmock
 from pkg_resources import DistributionNotFound, Distribution
 
 from packit.api import get_packit_version
-from packit.config import JobConfig, JobConfigTriggerType, JobType
-from packit.config.job_config import JobMetadataConfig
 from packit.exceptions import PackitException, ensure_str
-from packit.schema import JobConfigSchema
 from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
 from packit.utils.decorators import fallback_return_value
 from packit.utils.repo import (
@@ -382,7 +379,7 @@ def test_get_message_from_metadata(metadata, header, result):
 
 
 @pytest.mark.parametrize(
-    "ref, pr_id, merge_pr, target_branch, job_config, url, command",
+    "ref, pr_id, merge_pr, target_branch, job_config_index, url, command",
     [
         (
             None,
@@ -423,10 +420,20 @@ def test_get_message_from_metadata(metadata, header, result):
             'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
             "--merge-pr --target-branch main https://github.com/packit/ogr",
         ),
+        (
+            None,
+            "1",
+            True,
+            "main",
+            1,
+            "https://github.com/packit/ogr",
+            'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
+            "--merge-pr --target-branch main --job-config-index 1 https://github.com/packit/ogr",
+        ),
     ],
 )
 def test_create_source_script(
-    ref, pr_id, merge_pr, target_branch, job_config, url, command
+    ref, pr_id, merge_pr, target_branch, job_config_index, url, command
 ):
     assert (
         create_source_script(
@@ -434,7 +441,7 @@ def test_create_source_script(
             pr_id=pr_id,
             merge_pr=merge_pr,
             target_branch=target_branch,
-            job_config=job_config,
+            job_config_index=job_config_index,
             url=url,
         )
         == f"""
@@ -444,33 +451,6 @@ git config --global user.email "user-cont-team@redhat.com"
 git config --global user.name "Packit"
 resultdir=$PWD
 {command}
-
-"""
-    )
-
-
-def test_create_source_script_with_job_config():
-    test_job_config = JobConfig(
-        type=JobType.copr_build,
-        trigger=JobConfigTriggerType.release,
-        metadata=JobMetadataConfig(project="example1"),
-    )
-    expected_command = (
-        'packit -d prepare-sources --result-dir "$resultdir" '
-        f"--job-config {JobConfigSchema().dumps(test_job_config)!r}"
-        f" https://github.com/packit/ogr"
-    )
-    assert (
-        create_source_script(
-            job_config=test_job_config, url="https://github.com/packit/ogr"
-        )
-        == f"""
-#!/bin/sh
-
-git config --global user.email "user-cont-team@redhat.com"
-git config --global user.name "Packit"
-resultdir=$PWD
-{expected_command}
 
 """
     )
