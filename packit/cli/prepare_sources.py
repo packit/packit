@@ -50,11 +50,11 @@ def load_job_config(job_config):
     "{current_time}.{sanitized_current_branch}{git_desc_suffix}",
 )
 @click.option(
-    "--job-config",
+    "--job-config-index",
     default=None,
-    type=click.STRING,
+    type=click.INT,
     help="Internal option to override package config found in the repository "
-    "(needed for packit service).",
+    "with job config with given index (needed for packit service).",
 )
 @click.option(
     "--ref",
@@ -95,7 +95,7 @@ def load_job_config(job_config):
 def prepare_sources(
     config,
     path_or_url,
-    job_config,
+    job_config_index,
     upstream_ref,
     bump,
     release_suffix,
@@ -115,14 +115,12 @@ def prepare_sources(
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    job_config = load_job_config(job_config)
 
     if not result_dir:
         result_dir = Path.cwd().joinpath("prepare_sources_result")
         logger.debug(f"Setting result_dir to the default one: {result_dir}")
-
     api = get_packit_api(
-        config=config, local_project=path_or_url, job_config=job_config
+        config=config, local_project=path_or_url, job_config_index=job_config_index
     )
 
     api.prepare_sources(
