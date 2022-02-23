@@ -13,6 +13,7 @@ from packit.config import (
     JobConfig,
     JobType,
     JobConfigTriggerType,
+    PackageConfig,
 )
 from packit.config.aliases import DEFAULT_VERSION
 from packit.config.job_config import JobMetadataConfig
@@ -257,3 +258,26 @@ def test_job_metadata_targets(config, is_valid):
     else:
         with pytest.raises(ValidationError):
             JobMetadataSchema().load(config)
+
+
+def test_repr_simple_packageconfig(job_config_simple):
+    assert str(PackageConfig()) == (
+        "PackageConfig(specfile_path='None', jobs='[]', actions='{}', "
+        "dist_git_namespace='rpms', dist_git_base_url='https://src.fedoraproject.org/', "
+        "create_sync_note='True', spec_source_id='Source0', "
+        "upstream_tag_template='{version}', archive_root_dir_template="
+        "{upstream_pkg_name}-{version}', patch_generation_patch_id_digits='4')"
+    )
+
+
+def test_repr_simple_jobconfig(job_config_simple):
+    assert (
+        str(job_config_simple.metadata) == "JobMetadataConfig(targets={}, timeout=7200)"
+    )
+    assert str(job_config_simple) == (
+        "JobConfig(job=JobType.build, trigger=JobConfigTriggerType.release, "
+        "meta=JobMetadataConfig(targets={}, timeout=7200), dist_git_namespace='rpms', "
+        "dist_git_base_url='https://src.fedoraproject.org/', create_sync_note='True', "
+        "spec_source_id='Source0', upstream_tag_template='{version}', "
+        "patch_generation_patch_id_digits='4')"
+    )

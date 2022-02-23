@@ -88,33 +88,63 @@ class PackageConfig(CommonPackageConfig):
         self.jobs: List[JobConfig] = jobs or []
 
     def __repr__(self):
-        return (
-            "PackageConfig("
+        content = (
             f"config_file_path='{self.config_file_path}', "
-            f"specfile_path='{self.specfile_path}', "
-            f"files_to_sync='{self.files_to_sync}', "
-            f"jobs='{self.jobs}', "
+            if self.config_file_path
+            else "",
+            f"files_to_sync='{self.files_to_sync}', " if self.files_to_sync else "",
             f"dist_git_namespace='{self.dist_git_namespace}', "
+            if self.dist_git_namespace
+            else "",
             f"upstream_project_url='{self.upstream_project_url}', "
+            if self.upstream_project_url
+            else "",
             f"upstream_package_name='{self.upstream_package_name}', "
+            if self.upstream_package_name
+            else "",
             f"downstream_project_url='{self.downstream_project_url}', "
+            if self.downstream_project_url
+            else "",
             f"downstream_package_name='{self.downstream_package_name}', "
+            if self.downstream_package_name
+            else "",
             f"dist_git_base_url='{self.dist_git_base_url}', "
-            f"actions='{self.actions}', "
-            f"upstream_ref='{self.upstream_ref}', "
+            if self.dist_git_base_url
+            else "",
+            f"upstream_ref='{self.upstream_ref}', " if self.upstream_ref else "",
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
-            f"create_pr='{self.create_pr}', "
-            f"sync_changelog='{self.sync_changelog}', "
+            if self.allowed_gpg_keys
+            else "",
+            f"create_pr='{self.create_pr}', " if not self.create_pr else "",
+            f"sync_changelog='{self.sync_changelog}', " if self.sync_changelog else "",
             f"create_sync_note='{self.create_sync_note}', "
-            f"spec_source_id='{self.spec_source_id}', "
+            if self.create_sync_note
+            else "",
+            f"spec_source_id='{self.spec_source_id}', " if self.spec_source_id else "",
             f"upstream_tag_template='{self.upstream_tag_template}', "
+            if self.upstream_tag_template
+            else "",
             f"archive_root_dir_template={self.archive_root_dir_template}', "
+            if self.archive_root_dir_template
+            else "",
             f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}', "
+            if self.patch_generation_ignore_paths
+            else "",
             f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}', "
+            if self.patch_generation_patch_id_digits
+            else "",
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
-            f"sources='{self.sources}', "
+            if self.copy_upstream_release_description
+            else "",
+            f"sources='{self.sources}', " if self.sources else "",
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
-            f"srpm_build_deps={self.srpm_build_deps})"
+            if not self.merge_pr_in_ci
+            else "",
+            f"srpm_build_deps={self.srpm_build_deps}, " if self.srpm_build_deps else "",
+        )
+        return (
+            f"PackageConfig(specfile_path='{self.specfile_path}', jobs='{self.jobs}', "
+            f"actions='{self.actions}', {''.join(content)[:-2]})"
         )
 
     @classmethod

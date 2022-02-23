@@ -101,26 +101,37 @@ class JobMetadataConfig:
         self.skip_build: bool = skip_build
         self.env: Dict[str, Any] = env or {}
 
-    def __repr__(self):
-        return (
-            f"JobMetadataConfig("
-            f"targets={self._targets}, "
-            f"timeout={self.timeout}, "
-            f"owner={self.owner}, "
-            f"project={self.project}, "
+    def __repr__(self) -> str:
+        """Show values that were set in this job metadata config"""
+        content = (
+            f"timeout={self.timeout}, " if self.timeout else "",
+            f"owner={self.owner}, " if self.owner else "",
+            f"project={self.project}, " if self.project else "",
             f"dist_git_branches={self.dist_git_branches}, "
-            f"branch={self.branch}, "
-            f"scratch={self.scratch}, "
+            if self.dist_git_branches
+            else "",
+            f"branch={self.branch}, " if self.branch else "",
+            f"scratch={self.scratch}, " if self.scratch else "",
             f"list_on_homepage={self.list_on_homepage}, "
+            if self.list_on_homepage
+            else "",
             f"preserve_project={self.preserve_project}, "
+            if self.preserve_project
+            else "",
             f"additional_packages={self.additional_packages}, "
+            if self.additional_packages
+            else "",
             f"additional_repos={self.additional_repos}, "
-            f"fmf_url={self.fmf_url}, "
-            f"fmf_ref={self.fmf_ref}, "
-            f"use_internal_tf={self.use_internal_tf}, "
-            f"skip_build={self.skip_build},"
-            f"env={self.env})"
+            if self.additional_repos
+            else "",
+            f"fmf_url={self.fmf_url}, " if self.fmf_url else "",
+            f"fmf_ref={self.fmf_ref}, " if self.fmf_ref else "",
+            f"use_internal_tf={self.use_internal_tf}, " if self.use_internal_tf else "",
+            f"skip_build={self.skip_build}," if self.skip_build else "",
+            f"env={self.env}, " if self.env else "",
         )
+        # -2 = drop trailing ", "
+        return f"JobMetadataConfig(targets={self._targets}, {''.join(content)[:-2]})"
 
     def __eq__(self, other: object):
         if not isinstance(other, JobMetadataConfig):
@@ -228,32 +239,65 @@ class JobConfig(CommonPackageConfig):
         self.trigger: JobConfigTriggerType = trigger
         self.metadata: JobMetadataConfig = metadata or JobMetadataConfig()
 
-    def __repr__(self):
-        return (
-            f"JobConfig(job={self.type}, trigger={self.trigger}, meta={self.metadata}, "
+    def __repr__(self) -> str:
+        """Show values that were set in this job config"""
+        content = (
             f"config_file_path='{self.config_file_path}', "
-            f"specfile_path='{self.specfile_path}', "
-            f"files_to_sync='{self.files_to_sync}', "
+            if self.config_file_path
+            else "",
+            f"specfile_path='{self.specfile_path}', " if self.specfile_path else "",
+            f"files_to_sync='{self.files_to_sync}', " if self.files_to_sync else "",
             f"dist_git_namespace='{self.dist_git_namespace}', "
+            if self.dist_git_namespace
+            else "",
             f"upstream_project_url='{self.upstream_project_url}', "
+            if self.upstream_project_url
+            else "",
             f"upstream_package_name='{self.upstream_package_name}', "
+            if self.upstream_package_name
+            else "",
             f"downstream_project_url='{self.downstream_project_url}', "
+            if self.downstream_project_url
+            else "",
             f"downstream_package_name='{self.downstream_package_name}', "
+            if self.downstream_package_name
+            else "",
             f"dist_git_base_url='{self.dist_git_base_url}', "
-            f"actions='{self.actions}', "
-            f"upstream_ref='{self.upstream_ref}', "
+            if self.dist_git_base_url
+            else "",
+            f"actions='{self.actions}', " if self.actions else "",
+            f"upstream_ref='{self.upstream_ref}', " if self.upstream_ref else "",
             f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
-            f"create_pr='{self.create_pr}', "
-            f"sync_changelog='{self.sync_changelog}', "
+            if self.allowed_gpg_keys
+            else "",
+            f"create_pr='{self.create_pr}', " if not self.create_pr else "",
+            f"sync_changelog='{self.sync_changelog}', " if self.sync_changelog else "",
             f"create_sync_note='{self.create_sync_note}', "
-            f"spec_source_id='{self.spec_source_id}', "
+            if self.create_sync_note
+            else "",
+            f"spec_source_id='{self.spec_source_id}', " if self.spec_source_id else "",
             f"upstream_tag_template='{self.upstream_tag_template}', "
-            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}',"
-            f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}',"
-            f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
-            f"sources='{self.sources}', "
+            if self.upstream_tag_template
+            else "",
+            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}', "
+            if self.patch_generation_ignore_paths
+            else "",
+            f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}', "
+            if self.patch_generation_patch_id_digits
+            else "",
+            f"copy_upstream_release_description='{self.copy_upstream_release_description}', "
+            if self.copy_upstream_release_description
+            else "",
+            f"sources='{self.sources}', " if self.sources else "",
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
-            f"srpm_build_deps={self.srpm_build_deps})"
+            if not self.merge_pr_in_ci
+            else "",
+            f"srpm_build_deps={self.srpm_build_deps}, " if self.srpm_build_deps else "",
+        )
+        # -2 = drop trailing ", "
+        return (
+            f"JobConfig(job={self.type}, trigger={self.trigger}, "
+            f"meta={self.metadata}, {''.join(content)[:-2]})"
         )
 
     @classmethod
