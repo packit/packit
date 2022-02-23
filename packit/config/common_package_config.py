@@ -177,10 +177,11 @@ class CommonPackageConfig:
 
     @property
     def dist_git_package_url(self):
-        return (
-            f"{self.dist_git_base_url}{self.dist_git_namespace}/"
-            f"{self.downstream_package_name}.git"
-        )
+        if self.downstream_package_name:
+            return (
+                f"{self.dist_git_base_url}{self.dist_git_namespace}/"
+                f"{self.downstream_package_name}.git"
+            )
 
     def get_specfile_sync_files_item(self, from_downstream: bool = False):
         """
