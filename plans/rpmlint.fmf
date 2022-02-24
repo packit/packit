@@ -1,0 +1,12 @@
+summary:
+  Execute rpmlint on the spec file
+discover:
+  how: shell
+  tests:
+  - name: rpmlint
+    test: rpmlint packit.spec
+prepare:
+  - name: packages
+    how: install
+    package:
+    - rpmlint
