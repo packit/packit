@@ -295,11 +295,12 @@ def get_local_package_config(
         )
 
     loaded_config = load_packit_yaml(config_file_name)
+    local_specfile_path = get_local_specfile_path(config_file_name.parent)
     return parse_loaded_config(
         loaded_config=loaded_config,
         config_file_path=config_file_name.name,
         repo_name=repo_name,
-        spec_file_path=str(get_local_specfile_path(config_file_name.parent)),
+        spec_file_path=str(local_specfile_path) if local_specfile_path else None,
     )
 
 
@@ -380,11 +381,11 @@ def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Pa
         path.relative_to(dir) for path in dir.rglob("*.spec")
     ]
 
-    if len(files) > 0:
-        # Don't take files found in exclude
-        sexclude = set(exclude) if exclude else {"tests"}
-        files = [f for f in files if f.parts[0] not in sexclude]
+    # Don't take files found in exclude
+    sexclude = set(exclude) if exclude else {"tests"}
+    files = [f for f in files if f.parts[0] not in sexclude]
 
+    if len(files) > 0:
         logger.debug(f"Local spec files found: {files}. Taking: {files[0]}")
         return files[0]
 
