@@ -338,6 +338,16 @@ def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
 
 
 @pytest.fixture()
+def api_instance_update_source_git(api_instance_source_git):
+    # The version in dg is different from up, sync it
+    version = api_instance_source_git.up.specfile.get_version()
+    api_instance_source_git.dg.specfile.set_version(version)
+    api_instance_source_git.dg.specfile.save()
+    api_instance_source_git.dg.commit("Update spec", "")
+    return api_instance_source_git
+
+
+@pytest.fixture()
 def gnupg_instance() -> GPG:
     return GPG()
 
