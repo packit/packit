@@ -1214,6 +1214,29 @@ def test_get_local_package_config_path(
     )
 
 
+def test_get_local_package_config_no_spec():
+    """make sure specfile_path gets the proper default when not set"""
+    flexmock(PosixPath).should_receive("is_file").and_return(True)
+
+    (
+        flexmock(packit.config.package_config)
+        .should_receive("load_packit_yaml")
+        .and_return({})
+    )
+    (
+        flexmock(packit.config.package_config)
+        .should_receive("get_local_specfile_path")
+        .and_return(None)
+    )
+
+    assert (
+        get_local_package_config(
+            package_config_path=".packit.yaml", repo_name="cockpit"
+        ).specfile_path
+        == PackageConfig(specfile_path="cockpit.spec").specfile_path
+    )
+
+
 @pytest.mark.parametrize(
     "package_config",
     [
