@@ -425,10 +425,10 @@ def test_get_message_from_metadata(metadata, header, result):
             "1",
             True,
             "main",
-            1,
+            0,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
-            "--merge-pr --target-branch main --job-config-index 1 https://github.com/packit/ogr",
+            "--merge-pr --target-branch main --job-config-index 0 https://github.com/packit/ogr",
         ),
     ],
 )
