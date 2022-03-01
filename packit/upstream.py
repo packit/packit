@@ -525,7 +525,10 @@ class Upstream(PackitRepositoryBase):
         3. fix/update the specfile to use the right archive
         4. download the remote sources
 
-        :param upstream_ref: str, needed for the sourcegit mode
+        Args:
+            upstream_ref: the base git ref for the source git
+            bump_version: increase version in spec file
+            release_suffix: suffix %release part of NVR with this
         """
         SRPMBuilder(upstream=self, ref=upstream_ref).prepare(
             bump_version=bump_version, release_suffix=release_suffix
