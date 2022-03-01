@@ -137,14 +137,23 @@ class PackageConfig(CommonPackageConfig):
             # we want default jobs to go through the proper parsing process
             raw_dict["jobs"] = get_default_jobs()
 
-        if not raw_dict.get("specfile_path", None) and spec_file_path:
-            raw_dict["specfile_path"] = spec_file_path
-
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
 
         if not raw_dict.get("downstream_package_name", None) and repo_name:
             raw_dict["downstream_package_name"] = repo_name
+
+        if not raw_dict.get("specfile_path", None):
+            if spec_file_path:
+                raw_dict["specfile_path"] = spec_file_path
+            else:
+                # we default to downstream_package_name
+                # https://packit.dev/docs/configuration/#specfile_path
+                downstream_package_name = raw_dict.get("downstream_package_name", None)
+                if downstream_package_name:
+                    raw_dict["specfile_path"] = f"{downstream_package_name}.spec"
+                # else: we could try upstream_package_name but this seems
+                # like an extreme corner case
 
         package_config = PackageConfigSchema().load(raw_dict)
 
@@ -296,6 +305,7 @@ def get_local_package_config(
 
     loaded_config = load_packit_yaml(config_file_name)
     local_specfile_path = get_local_specfile_path(config_file_name.parent)
+
     return parse_loaded_config(
         loaded_config=loaded_config,
         config_file_path=config_file_name.name,
