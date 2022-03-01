@@ -18,7 +18,7 @@ def create_source_script(
         options += ["--pr-id", pr_id, f"--{'no-' if not merge_pr else ''}merge-pr"]
         if merge_pr and target_branch:
             options += ["--target-branch", target_branch]
-    if job_config_index:
+    if job_config_index is not None:
         options += ["--job-config-index", str(job_config_index)]
 
     options += [url]
