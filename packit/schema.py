@@ -360,7 +360,6 @@ class PackageConfigSchema(CommonConfigSchema):
     @pre_load
     def ordered_preprocess(self, data, **kwargs):
         data = self.rename_deprecated_keys(data, **kwargs)
-        data = self.specfile_path_pre(data, **kwargs)
         data = self.add_defaults_for_jobs(data, **kwargs)
         return data
 
@@ -401,32 +400,6 @@ class PackageConfigSchema(CommonConfigSchema):
                     # prio: new > old
                     data[new_key_name] = old_key_value
                 del data[old_key_name]
-        return data
-
-    def specfile_path_pre(self, data: Dict, **kwargs):
-        """
-        Method for pre-processing specfile_path value.
-        Set it to downstream_package_name if specified, else leave unset.
-
-        :param data: conf dictionary to process
-        :return: processed dictionary
-        """
-        if not data:  # data is None when .packit.yaml is empty
-            return data
-
-        specfile_path = data.get("specfile_path", None)
-        if not specfile_path:
-            downstream_package_name = data.get("downstream_package_name", None)
-            if downstream_package_name:
-                data["specfile_path"] = f"{downstream_package_name}.spec"
-                logger.debug(
-                    f'Setting `specfile_path` to "./{downstream_package_name}.spec".'
-                )
-            else:
-                # guess it?
-                logger.debug(
-                    "Neither `specfile_path` nor `downstream_package_name` set."
-                )
         return data
 
     @post_load
