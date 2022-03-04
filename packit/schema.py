@@ -235,6 +235,7 @@ class JobMetadataSchema(Schema):
     fmf_ref = fields.String(missing=None)
     skip_build = fields.Boolean()
     env = fields.Dict(keys=fields.String(), missing=None)
+    enable_net = fields.Boolean(missing=True)
 
     @pre_load
     def ordered_preprocess(self, data, **_):

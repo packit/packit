@@ -75,6 +75,12 @@ logger = logging.getLogger(__name__)
     default=False,
     is_flag=True,
 )
+@click.option(
+    "--enable-net/--disable-net",
+    help="Copr build is built with explicitly enabled network access or disabled",
+    default=True,
+    is_flag=True,
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
@@ -91,6 +97,7 @@ def copr_build(
     upstream_ref,
     additional_repos,
     request_admin_if_needed,
+    enable_net,
     path_or_url,
 ):
     """
@@ -146,6 +153,7 @@ def copr_build(
         preserve_project=preserve_project,
         additional_repos=additional_repos_list,
         request_admin_if_needed=request_admin_if_needed,
+        enable_net=enable_net,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if not nowait:
