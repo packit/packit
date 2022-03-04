@@ -1249,24 +1249,33 @@ class PackitAPI:
         additional_packages: List[str] = None,
         additional_repos: List[str] = None,
         request_admin_if_needed: bool = False,
+        enable_net: bool = True,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
 
-        :param project: name of the copr project to build
-                        inside (defaults to something long and ugly)
-        :param chroots: a list of COPR chroots (targets) e.g. fedora-rawhide-x86_64
-        :param owner: defaults to username from copr config file
-        :param description: description of the project
-        :param instructions: installation instructions for the project
-        :param upstream_ref: git ref to upstream commit
-        :param list_on_homepage: if set, created copr project will be visible on copr's home-page
-        :param preserve_project: if set, project will not be created as temporary
-        :param list additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
-        :param list additional_repos: buildroot additional additional_repos
-        :param bool request_admin_if_needed: if we can't change the settings
-                                             and are not allowed to do so
-        :return: id of the created build and url to the build web page
+        Args:
+            project: Name of the copr project to build inside
+
+                Defaults to something long and ugly.
+            chroots: List of Copr chroots (targets), e.g. `fedora-rawhide-x86_64`.
+            owner: Defaults to username from copr config file.
+            description: Description of the Copr project.
+            instructions: Installation instructions for the Copr project.
+            upstream_ref: Git ref to upstream commit.
+            list_on_homepage: Specifies whether created Copr project will be
+                visible on Copr's homepage.
+            preserve_project: Specifies whether created Copr project should be
+                automatically deleted after specific period.
+            additional_packages: Buildroot packages for the chroot [DOES NOT WORK YET].
+            additional_repos: Buildroot additional additional_repos.
+            request_admin_if_needed: Specifies whether to ask for admin privileges,
+                if changes to configuration of Copr project are required.
+            enable_net: Specifies whether created Copr build should have access
+                to network during its build.
+
+        Returns:
+            ID of the created build and URL to the build web page.
         """
         srpm_path = self.create_srpm(
             upstream_ref=upstream_ref, srpm_dir=self.up.local_project.working_dir
@@ -1297,7 +1306,10 @@ class PackitAPI:
         )
 
         build = self.copr_helper.copr_client.build_proxy.create_from_file(
-            ownername=owner, projectname=project, path=srpm_path
+            ownername=owner,
+            projectname=project,
+            path=srpm_path,
+            buildopts={"enable_net": enable_net},
         )
         return build.id, self.copr_helper.copr_web_build_url(build)
 
