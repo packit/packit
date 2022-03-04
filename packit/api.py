@@ -11,6 +11,7 @@ from distutils.dir_util import copy_tree
 
 import click
 import logging
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -53,6 +54,7 @@ from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
+from packit.utils.repo import shorten_commit_hash, get_next_commit, commit_exists
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +64,33 @@ def get_packit_version() -> str:
         return get_distribution("packitos").version
     except DistributionNotFound:
         return "NOT_INSTALLED"
+
+
+class SynchronizationStatus:
+    """Represents the synchronization status of source-git and dist-git
+
+    Attributes:
+        source_git_range_start: Start of commit range that is extra in
+            source-git (must be synced to dist-git). None if dist-git
+            is up to date.
+        dist_git_range_start: Start of commit range that is extra in
+            dist-git (must be synced to source-git). None if source-git
+            is up to date.
+    """
+
+    def __init__(
+        self, source_git_range_start: Optional[str], dist_git_range_start: Optional[str]
+    ):
+        self.source_git_range_start = source_git_range_start
+        self.dist_git_range_start = dist_git_range_start
+
+    def __eq__(self, other: object):
+        if not isinstance(other, SynchronizationStatus):
+            raise NotImplementedError
+        return (
+            self.source_git_range_start == other.source_git_range_start
+            and self.dist_git_range_start == other.dist_git_range_start
+        )
 
 
 class PackitAPI:
@@ -361,6 +390,175 @@ class PackitAPI:
                 logger.info(
                     f"Commit {commit} had no changes to be applied, skipping it."
                 )
+
+    def show_sync_status(
+        self, status: SynchronizationStatus, source_git: str, dist_git: str
+    ) -> None:
+        """Outputs the synchronization status of source-git and dist-git.
+
+        Args:
+            status: Synchronization status of source-git and dist-git.
+            source_git: Path to source-git as specified by the user.
+            dist_git: Path to dist-git as specified by the user.
+        """
+        if status.source_git_range_start and status.dist_git_range_start:
+            click.echo(f"'{source_git}' and '{dist_git}' have diverged.")
+            click.echo("Sync status needs to be reestablished manually.")
+            click.echo(
+                f"The first source-git commit to be synced is "
+                f"'{shorten_commit_hash(status.source_git_range_start)}'."
+            )
+            click.echo(
+                f"The first dist-git commit to be synced is "
+                f"'{shorten_commit_hash(status.dist_git_range_start)}'."
+            )
+        elif status.source_git_range_start:
+            number_of_commits = len(
+                list(
+                    self.up.local_project.git_repo.iter_commits(
+                        f"{status.source_git_range_start}~..", ancestry_path=True
+                    )
+                )
+            )
+            click.echo(
+                f"'{source_git}' is ahead of '{dist_git}' by {number_of_commits} commits."
+            )
+            click.echo(
+                f'Use "packit-dev source-git update-dist-git {source_git} {dist_git}" '
+                f"to transform changes from '{source_git}' to '{dist_git}'."
+            )
+            click.echo(
+                f"The first source-git commit to be synced is "
+                f"'{shorten_commit_hash(status.source_git_range_start)}'."
+            )
+        elif status.dist_git_range_start:
+            number_of_commits = len(
+                list(
+                    self.dg.local_project.git_repo.iter_commits(
+                        f"{status.dist_git_range_start}~..", ancestry_path=True
+                    )
+                )
+            )
+            short_hash = shorten_commit_hash(status.dist_git_range_start)
+            click.echo(
+                f"'{source_git}' is behind of '{dist_git}' by {number_of_commits} commits."
+            )
+            click.echo(
+                f'Use "packit-dev source-git update-source-git {dist_git} {source_git} '
+                f"{short_hash}~..\" to transform changes from '{dist_git}' to '{source_git}'."
+            )
+            click.echo(f"The first dist-git commit to be synced is '{short_hash}'.")
+        else:
+            click.echo(f"'{source_git}' is up to date with '{dist_git}'.")
+
+    def _get_latest_commit_update_pair(self) -> Tuple[str, str]:
+        """Finds the latest pair of commits which was created by updating
+        source-git from dist-git (or vice versa) denoted by git trailers.
+
+        Determining the latest pair by commit time is not sufficient since
+        the datetime may be the same in all commits. We need to check for
+        actual parent-child relationships to determine the ordering.
+
+        Returns:
+            A tuple containing hash of the source-git commit and hash of the
+                corresponding dist-git commit. This represents the latest
+                update pair in both source-git and dist-git.
+
+        Raises:
+            PackitException, if no commits with git trailers that are used
+                for checking the sync could be found in either of the
+                repositories.
+        """
+        # Use source-git commit first in both tuples for consistency
+        sg_update_commits = [
+            (
+                c.hexsha,
+                re.search(
+                    rf"^{re.escape(FROM_DIST_GIT_TOKEN)}: (.+)$",
+                    c.message,
+                    re.MULTILINE,
+                ).group(1),
+            )
+            for c in self.up.local_project.get_commits(
+                max_count=1, grep=rf"^{re.escape(FROM_DIST_GIT_TOKEN)}: .\+$"
+            )
+        ]
+        dg_update_commits = [
+            (
+                re.search(
+                    rf"^{re.escape(FROM_SOURCE_GIT_TOKEN)}: (.+)$",
+                    c.message,
+                    re.MULTILINE,
+                ).group(1),
+                c.hexsha,
+            )
+            for c in self.dg.local_project.get_commits(
+                max_count=1, grep=rf"^{re.escape(FROM_SOURCE_GIT_TOKEN)}: .\+$"
+            )
+        ]
+        if sg_update_commits and not commit_exists(
+            self.dg.local_project.git_repo, sg_update_commits[0][1]
+        ):
+            raise PackitException(
+                f"Commit '{sg_update_commits[0][1]}' referenced in {FROM_DIST_GIT_TOKEN} "
+                f"git trailer does not exist in dist-git."
+            )
+        if dg_update_commits and not commit_exists(
+            self.up.local_project.git_repo, dg_update_commits[0][0]
+        ):
+            raise PackitException(
+                f"Commit '{dg_update_commits[0][0]}' referenced in {FROM_SOURCE_GIT_TOKEN} "
+                f"git trailer does not exist in source-git."
+            )
+        if sg_update_commits and dg_update_commits:
+            # Check ancestor relationships, the situation is as follows:
+            #     source-git HEAD          dist-git HEAD
+            #           |                       |
+            # sg_update_commits[0][0] <- sg_update_commits[0][1]
+            #           |                       |
+            # dg_update_commits[0][0] -> dg_update_commits[0][1]
+
+            # sg_update_commits and dg_update_commits could be swapped,
+            # we need to determine the correct order using
+            #   git merge-base --is-ancestor
+            # Ancestor is the older commit, we want to return the newer
+            if self.up.local_project.git_repo.is_ancestor(
+                sg_update_commits[0][0], dg_update_commits[0][0]
+            ):
+                return dg_update_commits[0]
+            else:
+                return sg_update_commits[0]
+        elif sg_update_commits:
+            return sg_update_commits[0]
+        elif dg_update_commits:
+            return dg_update_commits[0]
+        else:
+            raise PackitException(
+                "No git commits with trailers to mark synchronization points were found."
+            )
+
+    def sync_status(self) -> SynchronizationStatus:
+        """Checks the sync status of source-git and dist-git.
+
+        Returns:
+            A dataclass representing the synchronization status of
+            source-git and dist-git containing the range of commits
+            that need to be synchronized.
+
+        Raises:
+            PackitException, if no commits with git trailers that are used
+                for checking the sync could be found in either of the
+                repositories.
+        """
+        sg_sync_point, dg_sync_point = self._get_latest_commit_update_pair()
+        return SynchronizationStatus(
+            source_git_range_start=get_next_commit(
+                self.up.local_project.git_repo, sg_sync_point
+            ),
+            dist_git_range_start=get_next_commit(
+                self.dg.local_project.git_repo, dg_sync_point
+            ),
+        )
 
     def sync_release(
         self,

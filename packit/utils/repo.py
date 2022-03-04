@@ -10,6 +10,7 @@ from typing import Tuple, Optional, Union, List
 
 import git
 import yaml
+from git.exc import GitCommandError
 
 from ogr.parsing import RepoUrl, parse_git_repo
 from packit.exceptions import PackitException
@@ -329,3 +330,36 @@ def shorten_commit_hash(commit_hash: str) -> str:
         First 8 characters of the commit hash.
     """
     return commit_hash[:8]
+
+
+def get_next_commit(repo: git.Repo, commit: str) -> Optional[str]:
+    """Returns the commit following the specified commit.
+
+    Args:
+        repo: Git repo to search the commit in.
+        commit: Hash of the commit to get the next commit of.
+
+    Returns:
+        The hash of the commit following the given commit or None if no
+        such commit exists, i.e. the given commit is the HEAD.
+    """
+    commits = list(repo.iter_commits(f"{commit}..", ancestry_path=True))
+    return commits[-1].hexsha if commits else None
+
+
+def commit_exists(repo: git.Repo, commit: str) -> bool:
+    """Checks whether a commit with the given hash exists.
+
+    Args:
+        repo: Git repo to check if the commit exists in.
+        commit: Hash of the commit to check.
+
+    Returns:
+        Whether a commit with such hash exists
+    """
+    try:
+        list(repo.iter_commits(f"{commit}..{commit}"))
+    except GitCommandError:
+        return False
+    else:
+        return True
