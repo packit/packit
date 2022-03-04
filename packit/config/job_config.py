@@ -55,6 +55,7 @@ class JobMetadataConfig:
         use_internal_tf: bool = False,
         skip_build: bool = False,
         env: Dict[str, Any] = None,
+        enable_net: bool = True,
     ):
         """
         Args:
@@ -77,6 +78,7 @@ class JobMetadataConfig:
             use_internal_tf: if we want to use internal instance of Testing Farm
             skip_build: if we want to skip build phase for Testing Farm job
             env: environment variables
+            enable_net: if set to False, Copr builds have network disabled
         """
         self._targets: Dict[str, Dict[str, Any]]
         if isinstance(_targets, list):
@@ -100,6 +102,7 @@ class JobMetadataConfig:
         self.use_internal_tf: bool = use_internal_tf
         self.skip_build: bool = skip_build
         self.env: Dict[str, Any] = env or {}
+        self.enable_net = enable_net
 
     def __repr__(self):
         return (
@@ -119,7 +122,8 @@ class JobMetadataConfig:
             f"fmf_ref={self.fmf_ref}, "
             f"use_internal_tf={self.use_internal_tf}, "
             f"skip_build={self.skip_build},"
-            f"env={self.env})"
+            f"env={self.env},"
+            f"enable_net={self.enable_net})"
         )
 
     def __eq__(self, other: object):
@@ -144,6 +148,7 @@ class JobMetadataConfig:
             and self.use_internal_tf == other.use_internal_tf
             and self.skip_build == other.skip_build
             and self.env == other.env
+            and self.enable_net == other.enable_net
         )
 
     @property
