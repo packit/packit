@@ -62,6 +62,7 @@ class CommonPackageConfig:
         sources: Optional[List[SourcesItem]] = None,
         merge_pr_in_ci: bool = True,
         srpm_build_deps: Optional[List[str]] = None,
+        identifier: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -99,6 +100,7 @@ class CommonPackageConfig:
         self.notifications = notifications or NotificationsConfig(
             pull_request=PullRequestNotificationsConfig()
         )
+        self.identifier = identifier
 
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
