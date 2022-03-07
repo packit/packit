@@ -261,7 +261,7 @@ class JobConfig(CommonPackageConfig):
             f"sources='{self.sources}', "
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
             f"srpm_build_deps={self.srpm_build_deps}, "
-            f"identifier={self.identifier})"
+            f"identifier='{self.identifier}')"
         )
 
     @classmethod

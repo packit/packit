@@ -56,6 +56,7 @@ class PackageConfig(CommonPackageConfig):
         sources: Optional[List[SourcesItem]] = None,
         merge_pr_in_ci: bool = True,
         srpm_build_deps: Optional[List[str]] = None,
+        identifier: Optional[str] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -84,6 +85,7 @@ class PackageConfig(CommonPackageConfig):
             sources=sources,
             merge_pr_in_ci=merge_pr_in_ci,
             srpm_build_deps=srpm_build_deps,
+            identifier=identifier,
         )
         self.jobs: List[JobConfig] = jobs or []
 
@@ -114,7 +116,8 @@ class PackageConfig(CommonPackageConfig):
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
             f"sources='{self.sources}', "
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
-            f"srpm_build_deps={self.srpm_build_deps})"
+            f"srpm_build_deps={self.srpm_build_deps}, "
+            f"identifier='{self.identifier}')"
         )
 
     @classmethod
@@ -219,6 +222,7 @@ class PackageConfig(CommonPackageConfig):
             and self.sources == other.sources
             and self.merge_pr_in_ci == other.merge_pr_in_ci
             and self.srpm_build_deps == other.srpm_build_deps
+            and self.identifier == other.identifier
         )
 
 
