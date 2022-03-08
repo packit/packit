@@ -1,3 +1,23 @@
+# 0.47.0
+
+- When specfile is being generated, and both `specfile_path` and
+  `downstream_package_name` are not set, Packit now correctly resolves this
+  situation and sets `specfile_path` to the name of the upstream repo suffixed
+  with ".spec". (#1499)
+- We are now building SRPMs for Packit's own PRs in Copr. For more info see #1490 and
+  https://packit.dev/docs/configuration/#srpm_build_deps (#1490)
+- All source-git-commands were updated to append a `From-source-git-commit` or `From-dist-git-commit`
+  Git-trailer to the commit messages they create in dist-git or source-git, in order to
+  save the hash of the commits from which these commits were created. This information
+  is going to be used to tell whether a source-git repository is in sync with the
+  corresponding dist-git repository. (#1488)
+- Spec file and configuration file are no more automatically added to the list of files
+  to sync when the `new files_to_sync` option is used. The old `synced_files` option is
+  deprecated. (#1483)
+- We have added a new configuration option for Copr builds `enable_net` that allows you to
+  disable network access during Copr builds. It is also complemented by
+  `--enable-net/--disable-net` CLI options if you use Packit locally. (#1504)
+
 # 0.46.0
 
 - Synchronization of default files can now be disabled using a new config
