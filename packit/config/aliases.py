@@ -139,16 +139,27 @@ def get_valid_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set:
 
 
 def get_branches(
-    *name: str, default=DEFAULT_VERSION, default_dg_branch="main"
+    *name: str,
+    default: str = DEFAULT_VERSION,
+    default_dg_branch: str = "main",
+    with_aliases: bool = False,
 ) -> Set[str]:
     """
     Expand the aliases to the name(s) and transfer to the dist-git branch name.
 
-    :param name: name(s) of the system and version (e.g. "fedora-stable" or "fedora-30")
-            or branch name (e.g. "f30" or "epel8")
-    :param default: used if no positional argument was given
-    :param default_dg_branch: repo's default branch
-    :return: set of dist-git branch names
+    Args:
+        name: Name(s) of the system and version (e.g. "fedora-stable"
+            or "fedora-30") or branch name (e.g. "f30" or "epel8").
+        default: Used if no positional argument was given.
+        default_dg_branch: Default branch of dist-git repository.
+        with_aliases: If set to `True`, returns branches including aliases.
+            Can be used for reacting to webhooks where push can be done against
+            either the branch itself or its alias.
+
+            Defaults to `False`.
+
+    Returns:
+        Set of dist-git branch names.
     """
     if not (default or name):
         return set()
@@ -159,6 +170,8 @@ def get_branches(
     for sys_and_version in get_versions(*names):
         if "rawhide" in sys_and_version:
             branches.add(default_dg_branch)
+            if with_aliases:
+                branches.add("rawhide")
         elif sys_and_version.startswith("fedora"):
             sys, version = sys_and_version.rsplit("-", maxsplit=1)
             branches.add(f"f{version}")
