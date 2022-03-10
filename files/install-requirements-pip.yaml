@@ -12,5 +12,6 @@
         - rebasehelper
         - sandcastle
         - requre
+        - cachetools
       become: true
     - include_tasks: tasks/requre.yaml
