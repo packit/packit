@@ -29,6 +29,7 @@ BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
 BuildRequires:  python3-bodhi-client
+BuildRequires:  python3-cachetools
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %description
