@@ -59,6 +59,7 @@ from packit.utils.repo import (
     get_next_commit,
     commit_exists,
     get_commit_diff,
+    get_commit_hunks,
 )
 
 logger = logging.getLogger(__name__)
@@ -342,7 +343,7 @@ class PackitAPI:
             # We can delete and rename based on the information from GitPython but additions
             # and modifications require git-apply on a patch. We need to manually parse
             # the corresponding patch hunk.
-            hunks = self.dg.local_project.get_commit_hunks(commit)
+            hunks = get_commit_hunks(self.dg.local_project.git_repo, commit)
             for j, diff in enumerate(diffs[i]):
                 if diff.deleted_file:
                     path = distro_path / diff.a_path
