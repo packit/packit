@@ -54,7 +54,13 @@ from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
-from packit.utils.repo import shorten_commit_hash, get_next_commit, commit_exists
+from packit.utils.repo import (
+    shorten_commit_hash,
+    get_next_commit,
+    commit_exists,
+    get_commit_diff,
+    get_commit_hunks,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -312,7 +318,7 @@ class PackitAPI:
         distro_path = self.up.local_project.working_dir / DISTRO_DIR
         for commit in self.dg.local_project.get_commits(revision_range, reverse=True):
             commits.append(commit)
-            diffs.append(self.dg.local_project.get_commit_diff(commit))
+            diffs.append(get_commit_diff(commit))
             for diff in diffs[-1]:
                 if diff.a_path == "sources" or diff.b_path == "sources":
                     raise PackitException(
@@ -337,7 +343,7 @@ class PackitAPI:
             # We can delete and rename based on the information from GitPython but additions
             # and modifications require git-apply on a patch. We need to manually parse
             # the corresponding patch hunk.
-            hunks = self.dg.local_project.get_commit_hunks(commit)
+            hunks = get_commit_hunks(self.dg.local_project.git_repo, commit)
             for j, diff in enumerate(diffs[i]):
                 if diff.deleted_file:
                     path = distro_path / diff.a_path
