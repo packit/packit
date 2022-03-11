@@ -1,12 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import functools
 import logging
 import time
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional, Dict, Tuple, Any
 
+from cachetools.func import ttl_cache
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import (
     CoprNoResultException,
@@ -351,12 +351,13 @@ class CoprHelper:
         ]
 
     @staticmethod
-    @functools.lru_cache(maxsize=1)
+    @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
     def get_available_chroots() -> list:
         """
         Gets available copr chroots. Uses cache to avoid repetitive url fetching.
 
-        :return: list of valid chroots
+        Returns:
+            List of valid chroots.
         """
 
         client = CoprClient.create_from_config_file()

@@ -1,12 +1,13 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import functools
 import logging
 from collections import defaultdict
+from datetime import timedelta
 from typing import Dict, List, Set
 
 from bodhi.client.bindings import BodhiClient
+from cachetools.func import ttl_cache
 
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
@@ -212,7 +213,7 @@ def get_all_koji_targets() -> List[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).split()
 
 
-@functools.lru_cache(maxsize=1)
+@ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
 @fallback_return_value(ALIASES)
 def get_aliases() -> Dict[str, List[str]]:
     """
@@ -221,7 +222,8 @@ def get_aliases() -> Dict[str, List[str]]:
     Current data are fetched via bodhi client, with default base url
     `https://bodhi.fedoraproject.org/'.
 
-    :return: dictionary containing aliases
+    Returns:
+        Dictionary containing aliases.
     """
 
     bodhi_client = BodhiClient()
