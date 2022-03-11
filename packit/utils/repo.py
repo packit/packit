@@ -363,3 +363,23 @@ def commit_exists(repo: git.Repo, commit: str) -> bool:
         return False
     else:
         return True
+
+
+def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
+    """Get modified files of the given commit.
+
+    Args:
+        commit: Commit to get the diff of.
+
+    Returns:
+        List of git.Diff containing information about the modified files
+        in the given commit.
+    """
+    if len(commit.parents) == 1:
+        return commit.parents[0].diff(commit, create_patch=True)
+    elif len(commit.parents) == 0:
+        # First commit in the repo
+        return commit.diff(git.NULL_TREE, create_patch=True)
+    else:
+        # Probably a merge commit, we can't do much about it
+        return []
