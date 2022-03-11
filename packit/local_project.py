@@ -4,7 +4,6 @@
 import logging
 import re
 import shutil
-from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional, Union, Iterable, Iterator, List
 
@@ -20,7 +19,6 @@ from packit.utils.repo import (
     RepositoryCache,
     is_git_repo,
     get_repo,
-    is_a_git_ref,
     shorten_commit_hash,
 )
 
@@ -204,28 +202,6 @@ class LocalProject:
                 or self._parse_git_url_from_git_repo()
                 or self._parse_namespace_from_git_url()
             )
-
-    @contextmanager
-    def git_checkout_block(self, ref: str = None):
-        """Allows temporarily checkout another git-ref."""
-        current_head = self._get_ref_from_git_repo()
-        if ref:
-            logger.debug(
-                f"Leaving old ref {current_head!r} and checkout new ref {ref!r}"
-            )
-            if ref not in self.git_repo.refs:
-                if not is_a_git_ref(self.git_repo, ref):
-                    raise PackitException(
-                        f"Git ref {ref!r} not found, cannot checkout."
-                    )
-                ref = self.git_repo.commit(ref).hexsha
-            self.git_repo.git.checkout(ref)
-        yield
-        if ref:
-            logger.debug(
-                f"Leaving new ref {ref!r} and checkout old ref {current_head!r}"
-            )
-            self.git_repo.git.checkout(current_head)
 
     def _parse_repo_name_full_name_and_namespace(self):
         change = False
