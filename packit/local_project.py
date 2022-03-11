@@ -571,18 +571,6 @@ class LocalProject:
     def get_commits(self, ref: str = "HEAD", **kwargs) -> Iterator[git.Commit]:
         return self.git_repo.iter_commits(ref, **kwargs)
 
-    @staticmethod
-    def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
-        """Get modified files of the given commit."""
-        if len(commit.parents) == 1:
-            return commit.parents[0].diff(commit, create_patch=True)
-        elif len(commit.parents) == 0:
-            # First commit in the repo
-            return commit.diff(git.NULL_TREE, create_patch=True)
-        else:
-            # Probably a merge commit, we can't do much about it
-            return []
-
     def get_commit_hunks(self, commit: git.Commit) -> List[str]:
         """Get a list of hunks of the given commit."""
         patch = self.git_repo.git.show(commit, format="", color="never")
