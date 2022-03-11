@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 import logging
-import re
 import shutil
-from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Union, Iterable, Iterator, List
+from typing import Optional, Union, Iterable, Iterator
 
 import git
 from git.exc import GitCommandError
@@ -20,7 +18,6 @@ from packit.utils.repo import (
     RepositoryCache,
     is_git_repo,
     get_repo,
-    is_a_git_ref,
     shorten_commit_hash,
 )
 
@@ -204,28 +201,6 @@ class LocalProject:
                 or self._parse_git_url_from_git_repo()
                 or self._parse_namespace_from_git_url()
             )
-
-    @contextmanager
-    def git_checkout_block(self, ref: str = None):
-        """Allows temporarily checkout another git-ref."""
-        current_head = self._get_ref_from_git_repo()
-        if ref:
-            logger.debug(
-                f"Leaving old ref {current_head!r} and checkout new ref {ref!r}"
-            )
-            if ref not in self.git_repo.refs:
-                if not is_a_git_ref(self.git_repo, ref):
-                    raise PackitException(
-                        f"Git ref {ref!r} not found, cannot checkout."
-                    )
-                ref = self.git_repo.commit(ref).hexsha
-            self.git_repo.git.checkout(ref)
-        yield
-        if ref:
-            logger.debug(
-                f"Leaving new ref {ref!r} and checkout old ref {current_head!r}"
-            )
-            self.git_repo.git.checkout(current_head)
 
     def _parse_repo_name_full_name_and_namespace(self):
         change = False
@@ -594,37 +569,6 @@ class LocalProject:
 
     def get_commits(self, ref: str = "HEAD", **kwargs) -> Iterator[git.Commit]:
         return self.git_repo.iter_commits(ref, **kwargs)
-
-    @staticmethod
-    def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
-        """Get modified files of the given commit."""
-        if len(commit.parents) == 1:
-            return commit.parents[0].diff(commit, create_patch=True)
-        elif len(commit.parents) == 0:
-            # First commit in the repo
-            return commit.diff(git.NULL_TREE, create_patch=True)
-        else:
-            # Probably a merge commit, we can't do much about it
-            return []
-
-    def get_commit_hunks(self, commit: git.Commit) -> List[str]:
-        """Get a list of hunks of the given commit."""
-        patch = self.git_repo.git.show(commit, format="", color="never")
-        hunk_start_re = re.compile(r"diff --git a/.+ b/.+")
-        section_start = 0
-        result = []
-        patch_lines = patch.splitlines()
-        for i, line in enumerate(patch_lines):
-            if hunk_start_re.match(line):
-                section = patch_lines[section_start:i]
-                if section:
-                    result.append("\n".join(section))
-                section_start = i
-        # The last section
-        section = patch_lines[section_start:]
-        if section:
-            result.append("\n".join(section))
-        return result
 
     def fetch(self, remote: str, refspec: Optional[str] = None):
         """
