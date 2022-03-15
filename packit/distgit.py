@@ -10,7 +10,7 @@ from typing import Optional, Sequence, List, Union
 import cccolutils
 import git
 import requests
-from bodhi.client.bindings import BodhiClient, BodhiClientException
+from bodhi.client.bindings import BodhiClientException
 
 from ogr.abstract import PullRequest
 
@@ -24,6 +24,7 @@ from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
 from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
+from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import cwd
 
 logger = logging.getLogger(__name__)
@@ -416,18 +417,15 @@ class DistGit(PackitRepositoryBase):
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
 
-        if self.config.fas_user and self.config.fas_password:
-            b = BodhiClient(
-                username=self.config.fas_user, password=self.config.fas_password
-            )
-        else:
-            # Bodhi will prompt for username and password if the session is not cached.
-            # (It is stored as `~/.fedora/openidbaseclient-sessions.cache`.)
-            b = BodhiClient()
+        bodhi_client = get_bodhi_client(
+            fas_username=self.config.fas_user, fas_password=self.config.fas_password
+        )
 
         if not koji_builds:
             # alternatively we can call something like `koji latest-build rawhide sen`
-            builds_d = b.latest_builds(self.package_config.downstream_package_name)
+            builds_d = bodhi_client.latest_builds(
+                self.package_config.downstream_package_name
+            )
 
             builds_str = "\n".join(f" - {b}" for b in builds_d)
             logger.debug(
@@ -464,7 +462,7 @@ class DistGit(PackitRepositoryBase):
             if bugzilla_ids:
                 save_kwargs["bugs"] = list(map(str, bugzilla_ids))
 
-            result = b.save(**save_kwargs)
+            result = bodhi_client.save(**save_kwargs)
             logger.debug(f"Bodhi response:\n{result}")
             logger.info(
                 f"Bodhi update {result['alias']}:\n"

@@ -3,10 +3,9 @@
 
 import logging
 from datetime import datetime, timedelta
-from typing import List, Tuple, Dict, Set
+from typing import Dict, List, Set, Tuple
 
-from bodhi.client.bindings import BodhiClient
-from koji import ClientSession, BUILD_STATES
+from koji import BUILD_STATES, ClientSession
 
 from ogr.abstract import Release
 from packit.config import Config
@@ -15,6 +14,7 @@ from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
+from packit.utils.bodhi import get_bodhi_client
 
 logger = logging.getLogger(__name__)
 
@@ -130,10 +130,10 @@ class Status:
         :param number_of_updates: int
         :return: None
         """
-        b = BodhiClient()
-        results = b.query(packages=self.dg.package_config.downstream_package_name)[
-            "updates"
-        ]
+        bodhi_client = get_bodhi_client()
+        results = bodhi_client.query(
+            packages=self.dg.package_config.downstream_package_name
+        )["updates"]
         logger.debug("Bodhi updates fetched.")
 
         stable_branches: Set[str] = set()
