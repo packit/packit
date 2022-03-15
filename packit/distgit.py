@@ -416,8 +416,15 @@ class DistGit(PackitRepositoryBase):
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
 
-        # bodhi will likely prompt for username and password if kerb ticket is not up
-        b = BodhiClient()
+        if self.config.fas_user and self.config.fas_password:
+            b = BodhiClient(
+                username=self.config.fas_user, password=self.config.fas_password
+            )
+        else:
+            # Bodhi will prompt for username and password if the session is not cached.
+            # (It is stored as `~/.fedora/openidbaseclient-sessions.cache`.)
+            b = BodhiClient()
+
         if not koji_builds:
             # alternatively we can call something like `koji latest-build rawhide sen`
             builds_d = b.latest_builds(self.package_config.downstream_package_name)
