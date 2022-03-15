@@ -6,11 +6,11 @@ from collections import defaultdict
 from datetime import timedelta
 from typing import Dict, List, Set
 
-from bodhi.client.bindings import BodhiClient
 from cachetools.func import ttl_cache
 
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
+from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
 
@@ -239,7 +239,7 @@ def get_aliases() -> Dict[str, List[str]]:
         Dictionary containing aliases.
     """
 
-    bodhi_client = BodhiClient()
+    bodhi_client = get_bodhi_client()
     releases = bodhi_client.get_releases(exclude_archived=True)
     aliases = defaultdict(list)
     for release in releases.releases:
