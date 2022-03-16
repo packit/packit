@@ -1,3 +1,8 @@
+# 0.47.1
+
+- When using Packit CLI for creating Bodhi updates, you can now set fas_username and fas_password
+  in your Packit user config to not be asked about that when the command is executed. (#1517)
+
 # 0.47.0
 
 - When specfile is being generated, and both `specfile_path` and
