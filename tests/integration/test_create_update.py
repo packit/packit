@@ -6,6 +6,8 @@ from bodhi.client.bindings import BodhiClient
 from flexmock import flexmock
 from munch import Munch
 
+from packit import distgit
+
 
 @pytest.fixture()
 def bodhi_response():
@@ -348,4 +350,33 @@ def test_bodhi_update_with_bugs(
         update_notes=update_notes,
         koji_builds=koji_builds,
         bugzilla_ids=[1, 2, 3],
+    )
+
+
+def test_bodhi_update_auth_with_fas(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+    bodhi_response,
+    latest_builds_from_koji,
+):
+    u, d, api = api_instance
+    api.config.fas_user = "the_fas_username"
+    api.config.fas_password = "the_fas_password"
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    flexmock(distgit).should_call("get_bodhi_client").with_args(
+        fas_username="the_fas_username", fas_password="the_fas_password"
+    )
+    flexmock(
+        BodhiClient,
+        latest_builds=lambda package: latest_builds_from_koji,
+        save=lambda **kwargs: bodhi_response,
+    )
+
+    api.create_update(
+        dist_git_branch="f30",
+        update_type="enhancement",
+        update_notes="This is the best upstream release ever: {version}",
+        koji_builds=("foo-1-1",),
     )

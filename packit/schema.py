@@ -416,6 +416,7 @@ class UserConfigSchema(Schema):
 
     debug = fields.Bool()
     fas_user = fields.String()
+    fas_password = fields.String()
     keytab_path = fields.String()
     upstream_git_remote = fields.String()
     github_token = fields.String()

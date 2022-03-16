@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MIT
 from collections import Counter
 
-import bodhi
 import pytest
 from flexmock import flexmock
 
 import packit
+from packit.config import aliases
 from packit.config.aliases import (
     get_versions,
     get_build_targets,
@@ -284,22 +284,28 @@ class TestGetAliases:
         bodhi_instance_mock.should_receive("get_releases").and_return(
             bodhi_client_response(releases_list)
         )
-        flexmock(bodhi.client.bindings.BodhiClient).new_instances(bodhi_instance_mock)
+        flexmock(aliases).should_receive("get_bodhi_client").and_return(
+            bodhi_instance_mock
+        ).once()
 
         get_aliases.cache_clear()
-        aliases = get_aliases()
+        aliases_result = get_aliases()
 
-        assert Counter(aliases["fedora-stable"]) == Counter(
+        assert Counter(aliases_result["fedora-stable"]) == Counter(
             expected_return["fedora-stable"]
         )
-        assert Counter(aliases["fedora-development"]) == Counter(
+        assert Counter(aliases_result["fedora-development"]) == Counter(
             expected_return["fedora-development"]
         )
-        assert Counter(aliases["fedora-all"]) == Counter(expected_return["fedora-all"])
-        assert Counter(aliases["fedora-latest"]) == Counter(
+        assert Counter(aliases_result["fedora-all"]) == Counter(
+            expected_return["fedora-all"]
+        )
+        assert Counter(aliases_result["fedora-latest"]) == Counter(
             expected_return["fedora-latest"]
         )
-        assert Counter(aliases["epel-all"]) == Counter(expected_return["epel-all"])
+        assert Counter(aliases_result["epel-all"]) == Counter(
+            expected_return["epel-all"]
+        )
 
 
 @pytest.mark.parametrize(
