@@ -95,7 +95,7 @@ cp files/bash-completion/packit %{buildroot}%{_datadir}/bash-completion/completi
 
 %changelog
 * Wed Mar 16 2022 Frantisek Lachman <flachman@redhat.com> - 0.47.1-1
-- New upstream release 0.47.1
+- new upstream release 0.47.1
 
 * Tue Mar 8 2022 Jiří Kyjovský <jkyjovsk@redhat.com> - 0.47.0-1
 - new upstream release 0.47.0
