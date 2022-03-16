@@ -52,6 +52,7 @@ from packit.status import Status
 from packit.sync import sync_files, SyncFilesItem
 from packit.upstream import Upstream
 from packit.utils import commands
+from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
 from packit.utils.repo import (
@@ -1329,11 +1330,11 @@ class PackitAPI:
 
     @staticmethod
     def push_bodhi_update(update_alias: str):
-        from bodhi.client.bindings import BodhiClient, UpdateNotFound
+        from bodhi.client.bindings import UpdateNotFound
 
-        b = BodhiClient()
+        bodhi_client = get_bodhi_client()
         try:
-            response = b.request(update=update_alias, request="stable")
+            response = bodhi_client.request(update=update_alias, request="stable")
             logger.debug(f"Bodhi response:\n{response}")
             response = response["update"]
             logger.info(
@@ -1346,10 +1347,8 @@ class PackitAPI:
             logger.error("Update was not found.")
 
     def get_testing_updates(self, update_alias: Optional[str]) -> List:
-        from bodhi.client.bindings import BodhiClient
-
-        b = BodhiClient()
-        results = b.query(
+        bodhi_client = get_bodhi_client()
+        results = bodhi_client.query(
             alias=update_alias,
             packages=self.dg.package_config.downstream_package_name,
             status="testing",
