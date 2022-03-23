@@ -1,5 +1,7 @@
 ---
 files_to_sync:
+  - packit.spec
+  - .packit.yaml
   - src: plans/
     dest: plans/
   - src: .fmf/
