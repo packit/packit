@@ -282,6 +282,13 @@ class CoprHelper:
             )
             # TODO: additional_packages
         except CoprException as ex:
+            # TODO: Remove once Copr doesn't throw for existing projects or new
+            # API endpoint is established.
+            if "You already have a project named" in ex.result.error:
+                # race condition between workers
+                logger.debug(f"Copr project ({owner}/{project}) is already present.")
+                return
+
             error = (
                 f"Cannot create a new Copr project "
                 f"(owner={owner} project={project} chroots={chroots}): {ex}"
