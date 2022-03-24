@@ -16,6 +16,9 @@ def get_bodhi_client(fas_username: str = None, fas_password: str = None) -> Bodh
     if the values are not set and the session is not cached.
     (The session is stored as `~/.fedora/openidbaseclient-sessions.cache`.)
 
+    When username and password is configured, we are not caching the session
+    to avoid any caching issues (mainly for the service).
+
     Note for tests:
     * Don't mock the Bodhi instantiation via
       `flexmock(bodhi.client.bindings.BodhiClient).new_instances(bodhi_instance_mock)`
@@ -27,4 +30,9 @@ def get_bodhi_client(fas_username: str = None, fas_password: str = None) -> Bodh
         f'Initialisation of the Bodhi client: FAS user {fas_username or "not configured"}; '
         f'password {"provided" if fas_password else "not configured"}'
     )
-    return BodhiClient(username=fas_username, password=fas_password)
+    return BodhiClient(
+        username=fas_username,
+        password=fas_password,
+        cache_session=not bool(fas_username and fas_password),
+        retries=3,
+    )
