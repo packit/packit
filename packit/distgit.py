@@ -11,7 +11,7 @@ import cccolutils
 import git
 import requests
 from bodhi.client.bindings import BodhiClientException
-from fedora.client import LoginRequiredError
+from fedora.client import AuthError, LoginRequiredError
 
 from ogr.abstract import PullRequest
 
@@ -485,6 +485,11 @@ class DistGit(PackitRepositoryBase):
                 for cav in result["caveats"]:
                     logger.info(f"- {cav['name']}: {cav['description']}\n")
 
+        except AuthError as ex:
+            logger.error(ex)
+            raise PackitException(
+                f"There is an authentication problem with Bodhi:\n{ex}"
+            ) from ex
         except BodhiClientException as ex:
             logger.error(ex)
             raise PackitException(
