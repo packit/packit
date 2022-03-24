@@ -11,6 +11,7 @@ import cccolutils
 import git
 import requests
 from bodhi.client.bindings import BodhiClientException
+from fedora.client import LoginRequiredError
 
 from ogr.abstract import PullRequest
 
@@ -461,8 +462,17 @@ class DistGit(PackitRepositoryBase):
 
             if bugzilla_ids:
                 save_kwargs["bugs"] = list(map(str, bugzilla_ids))
+            try:
+                result = bodhi_client.save(**save_kwargs)
+            except LoginRequiredError as ex:
+                logger.debug(
+                    f"Bodhi client raised a login error: {ex}. "
+                    f"Let's clear the session, csrf token and retry."
+                )
+                bodhi_client._session.cookies.clear()
+                bodhi_client.csrf_token = None
+                result = bodhi_client.save(**save_kwargs)
 
-            result = bodhi_client.save(**save_kwargs)
             logger.debug(f"Bodhi response:\n{result}")
             logger.info(
                 f"Bodhi update {result['alias']}:\n"
@@ -479,7 +489,7 @@ class DistGit(PackitRepositoryBase):
             logger.error(ex)
             raise PackitException(
                 f"There is a problem with creating the bodhi update:\n{ex}"
-            )
+            ) from ex
         return result["alias"]
 
     def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[List[str]]:
