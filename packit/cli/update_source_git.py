@@ -18,13 +18,25 @@ from packit.cli.utils import cover_packit_exception
 
 
 @click.command("update-source-git")
+@click.option(
+    "-f",
+    "--force",
+    default=False,
+    is_flag=True,
+    help="Don't check the synchronization status of the source-git"
+    " and dist-git repos prior to performing the update.",
+)
 @click.argument("dist-git", type=click.Path(exists=True, file_okay=False))
 @click.argument("source-git", type=click.Path(exists=True, file_okay=False))
 @click.argument("revision-range")
 @pass_config
-@cover_packit_exception()
+@cover_packit_exception
 def update_source_git(
-    config: Config, source_git: str, dist_git: str, revision_range: str
+    config: Config,
+    source_git: str,
+    dist_git: str,
+    revision_range: str,
+    force: bool,
 ):
     """Update a source-git repository based on a dist-git repository.
 
@@ -81,4 +93,8 @@ def update_source_git(
         upstream_local_project=LocalProject(working_dir=source_git_path, offline=True),
         downstream_local_project=LocalProject(working_dir=dist_git_path, offline=True),
     )
-    api.update_source_git(revision_range=revision_range)
+
+    api.update_source_git(
+        revision_range=revision_range,
+        check_sync_status=not force,
+    )
