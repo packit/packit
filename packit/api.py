@@ -302,7 +302,7 @@ class PackitAPI:
                 )
         return patch
 
-(??)    def update_source_git(self, revision_range: str, check_sync_status: bool = True):
+    def update_source_git(self, revision_range: str, check_sync_status: bool = True):
         """Update a source-git repo from a dist-git repo.
 
         Synchronizes the spec file and commits in the given revision range.

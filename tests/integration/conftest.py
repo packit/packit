@@ -22,6 +22,7 @@ from packit.api import PackitAPI
 from packit.base_git import PackitRepositoryBase
 from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
+from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
 from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
@@ -343,7 +344,16 @@ def api_instance_update_source_git(api_instance_source_git):
     version = api_instance_source_git.up.specfile.get_version()
     api_instance_source_git.dg.specfile.set_version(version)
     api_instance_source_git.dg.specfile.save()
-    api_instance_source_git.dg.commit("Update spec", "")
+    api_instance_source_git.dg.commit(
+        "Update spec",
+        "",
+        trailers=[
+            (
+                FROM_SOURCE_GIT_TOKEN,
+                api_instance_source_git.up.local_project.git_repo.head.commit.hexsha,
+            )
+        ],
+    )
     return api_instance_source_git
 
 
