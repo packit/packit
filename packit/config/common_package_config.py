@@ -70,6 +70,7 @@ class CommonPackageConfig:
         merge_pr_in_ci: bool = True,
         srpm_build_deps: Optional[List[str]] = None,
         identifier: Optional[str] = None,
+        packit_instances: Optional[List[Deployment]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -108,6 +109,13 @@ class CommonPackageConfig:
             pull_request=PullRequestNotificationsConfig()
         )
         self.identifier = identifier
+
+        # The default is set also on schema level,
+        # but for sake of code-generated configs,
+        # we want to react on prod events only by default.
+        self.packit_instances = (
+            packit_instances if packit_instances is not None else [Deployment.prod]
+        )
 
         # template to create an upstream tag name (upstream may use different tagging scheme)
         self.upstream_tag_template = upstream_tag_template
@@ -175,7 +183,9 @@ class CommonPackageConfig:
             f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
             f"sources='{self.sources}', "
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
-            f"srpm_build_deps={self.srpm_build_deps})"
+            f"srpm_build_deps={self.srpm_build_deps}, "
+            f"identifier={self.identifier}, "
+            f"packit_instances={self.packit_instances})"
         )
 
     @property
