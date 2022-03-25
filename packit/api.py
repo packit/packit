@@ -398,66 +398,6 @@ class PackitAPI:
                     f"Commit {commit} had no changes to be applied, skipping it."
                 )
 
-    def show_sync_status(
-        self, status: SynchronizationStatus, source_git: str, dist_git: str
-    ) -> None:
-        """Outputs the synchronization status of source-git and dist-git.
-
-        Args:
-            status: Synchronization status of source-git and dist-git.
-            source_git: Path to source-git as specified by the user.
-            dist_git: Path to dist-git as specified by the user.
-        """
-        if status.source_git_range_start and status.dist_git_range_start:
-            click.echo(f"'{source_git}' and '{dist_git}' have diverged.")
-            click.echo("Sync status needs to be reestablished manually.")
-            click.echo(
-                f"The first source-git commit to be synced is "
-                f"'{shorten_commit_hash(status.source_git_range_start)}'."
-            )
-            click.echo(
-                f"The first dist-git commit to be synced is "
-                f"'{shorten_commit_hash(status.dist_git_range_start)}'."
-            )
-        elif status.source_git_range_start:
-            number_of_commits = len(
-                list(
-                    self.up.local_project.git_repo.iter_commits(
-                        f"{status.source_git_range_start}~..", ancestry_path=True
-                    )
-                )
-            )
-            click.echo(
-                f"'{source_git}' is ahead of '{dist_git}' by {number_of_commits} commits."
-            )
-            click.echo(
-                f'Use "packit-dev source-git update-dist-git {source_git} {dist_git}" '
-                f"to transform changes from '{source_git}' to '{dist_git}'."
-            )
-            click.echo(
-                f"The first source-git commit to be synced is "
-                f"'{shorten_commit_hash(status.source_git_range_start)}'."
-            )
-        elif status.dist_git_range_start:
-            number_of_commits = len(
-                list(
-                    self.dg.local_project.git_repo.iter_commits(
-                        f"{status.dist_git_range_start}~..", ancestry_path=True
-                    )
-                )
-            )
-            short_hash = shorten_commit_hash(status.dist_git_range_start)
-            click.echo(
-                f"'{source_git}' is behind of '{dist_git}' by {number_of_commits} commits."
-            )
-            click.echo(
-                f'Use "packit-dev source-git update-source-git {dist_git} {source_git} '
-                f"{short_hash}~..\" to transform changes from '{dist_git}' to '{source_git}'."
-            )
-            click.echo(f"The first dist-git commit to be synced is '{short_hash}'.")
-        else:
-            click.echo(f"'{source_git}' is up to date with '{dist_git}'.")
-
     def _get_latest_commit_update_pair(self) -> Tuple[str, str]:
         """Finds the latest pair of commits which was created by updating
         source-git from dist-git (or vice versa) denoted by git trailers.
@@ -566,6 +506,59 @@ class PackitAPI:
                 self.dg.local_project.git_repo, dg_sync_point
             ),
         )
+
+    def sync_status_string(
+        self,
+        status: SynchronizationStatus = None,
+        source_git: Union[Path, str] = None,
+        dist_git: Union[Path, str] = None,
+    ) -> str:
+        """Returns the synchronization status of source-git and dist-git as a string.
+
+        Args:
+            status: Synchronization status of source-git and dist-git.
+            source_git: Path to source-git as specified by the user.
+            dist_git: Path to dist-git as specified by the user.
+        """
+        status = status or self.sync_status()
+        source_git = source_git or self.up.local_project.working_dir
+        dist_git = dist_git or self.dg.local_project.working_dir
+
+        if status.source_git_range_start and status.dist_git_range_start:
+            return f"""'{source_git}' and '{dist_git}' have diverged.
+Sync status needs to be reestablished manually.
+The first source-git commit to be synced is '{shorten_commit_hash(status.source_git_range_start)}'.
+The first dist-git commit to be synced is '{shorten_commit_hash(status.dist_git_range_start)}'.
+"""
+        elif status.source_git_range_start:
+            number_of_commits = len(
+                list(
+                    self.up.local_project.git_repo.iter_commits(
+                        f"{status.source_git_range_start}~..", ancestry_path=True
+                    )
+                )
+            )
+            return f"""'{source_git}' is ahead of '{dist_git}' by {number_of_commits} commits.
+Use "packit source-git update-dist-git {source_git} {dist_git}"
+to transform changes from '{source_git}' to '{dist_git}'.
+The first source-git commit to be synced is '{shorten_commit_hash(status.source_git_range_start)}'.
+"""
+        elif status.dist_git_range_start:
+            number_of_commits = len(
+                list(
+                    self.dg.local_project.git_repo.iter_commits(
+                        f"{status.dist_git_range_start}~..", ancestry_path=True
+                    )
+                )
+            )
+            short_hash = shorten_commit_hash(status.dist_git_range_start)
+            return f"""'{source_git}' is behind of '{dist_git}' by {number_of_commits} commits.
+Use "packit source-git update-source-git {dist_git} {source_git}
+{short_hash}~..\" to transform changes from '{dist_git}' to '{source_git}'.
+The first dist-git commit to be synced is '{short_hash}'.
+"""
+        else:
+            return f"'{source_git}' is up to date with '{dist_git}'."
 
     def sync_release(
         self,
