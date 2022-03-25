@@ -189,6 +189,7 @@ class PackitAPI:
         sync_default_files: bool = True,
         pkg_tool: str = "",
         mark_commit_origin: bool = False,
+        check_sync_status: bool = False,
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
@@ -213,7 +214,20 @@ class PackitAPI:
             pkg_tool: What tool (fedpkg/centpkg) to use upload to lookaside cache.
             mark_commit_origin: Whether to include a Git-trailer in the dist-git
                 commit message to mark the hash of the upstream (source-git) commit.
+            check_sync_status: Check the synchronization status of the source-git
+                and dist-git repos prior to performing the update.
         """
+        if check_sync_status:
+            status = self.sync_status()
+            # There are dist-git changes that need to be synced back to source-git first
+            # before accepting content to be transformed from source-git to dist-git.
+            if status.dist_git_range_start:
+                raise PackitException(self.sync_status_string(status))
+            # Both repos are already in sync.
+            if not status.source_git_range_start:
+                logger.info(self.sync_status_string(status))
+                return
+
         if sync_default_files:
             synced_files = self.package_config.get_all_files_to_sync()
         else:
@@ -288,7 +302,7 @@ class PackitAPI:
                 )
         return patch
 
-    def update_source_git(self, revision_range: str):
+(??)    def update_source_git(self, revision_range: str, check_sync_status: bool = True):
         """Update a source-git repo from a dist-git repo.
 
         Synchronizes the spec file and commits in the given revision range.
@@ -297,11 +311,23 @@ class PackitAPI:
         Args:
             revision_range: Range of commits from dist-git to convert to
                 source-git. Specified in git-log-like format.
+            check_sync_status: Check the synchronization status of the
+                source-git and dist-git repos prior to performing the update.
 
         Raises:
             PackitException: If the given update cannot be performed, i.e.
                 sources or patches were touched.
         """
+        if check_sync_status:
+            status = self.sync_status()
+            # There are extra source-git commits
+            if status.source_git_range_start:
+                raise PackitException(self.sync_status_string(status))
+            # There's nothing to sync
+            if not status.dist_git_range_start:
+                logger.info(self.sync_status_string(status))
+                return
+
         dg_release = self.dg.specfile.get_release()
         up_release = self.up.specfile.get_release()
         if dg_release != up_release:
