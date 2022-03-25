@@ -4,12 +4,11 @@
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union, List
 
-from marshmallow import Schema, fields, post_load, pre_load, ValidationError
+from marshmallow import Schema, fields, post_load, pre_load, post_dump, ValidationError
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
-from packit.config import PackageConfig, Config
-from packit.config.common_package_config import Deployment
+from packit.config import PackageConfig, Config, CommonPackageConfig, Deployment
 from packit.config.job_config import (
     JobType,
     JobConfig,
@@ -335,6 +334,29 @@ class CommonConfigSchema(Schema):
                 # is a number!
                 value = f"Source{value}"
         return value
+
+    @post_dump(pass_original=True)
+    def adjust_files_to_sync(
+        self, data: dict, original: CommonPackageConfig, **kwargs
+    ) -> dict:
+        """Fix the files_to_sync field in the serialized object
+
+        B/c CommonPackageConfig.files_to_sync is a derived value, the meaning of the
+        original configuration can be re-established only by checking the
+        '_files_to_sync_used' attribute, and removing the 'files_to_sync' field from
+        the serialized data if it's False.
+
+        Args:
+            data: Already serialized data.
+            original: Original object being serialized.
+
+        Returns:
+            Modified serialized data with the 'files_to_sync' key removed if it was
+            not used in the original object.
+        """
+        if not original._files_to_sync_used:
+            data.pop("files_to_sync", None)
+        return data
 
 
 class JobConfigSchema(CommonConfigSchema):
