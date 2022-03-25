@@ -77,7 +77,7 @@ class CommonPackageConfig:
 
         self._files_to_sync: List[SyncFilesItem] = files_to_sync or []  # new option
         self._files_to_sync_used: bool = False if files_to_sync is None else True
-        self._synced_files: List[SyncFilesItem] = (
+        self.synced_files: List[SyncFilesItem] = (
             synced_files or []
         )  # old deprecated option
         if synced_files is not None:
@@ -155,8 +155,8 @@ class CommonPackageConfig:
 
         if self._files_to_sync_used:
             return self._files_to_sync
-        elif self._synced_files:
-            return self._synced_files
+        elif self.synced_files:
+            return self.synced_files
         else:
             return []
 
