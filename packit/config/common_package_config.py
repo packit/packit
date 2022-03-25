@@ -6,6 +6,7 @@ Common package config attributes so they can be imported both in PackageConfig a
 """
 import warnings
 import logging
+from enum import Enum
 
 from os import getenv
 from os.path import basename
@@ -19,6 +20,12 @@ from packit.config.notifications import (
 from packit.config.sources import SourcesItem
 from packit.constants import PROD_DISTGIT_URL, DISTGIT_NAMESPACE
 from packit.sync import SyncFilesItem, iter_srcs
+
+
+class Deployment(Enum):
+    dev = "dev"
+    stg = "stg"
+    prod = "prod"
 
 
 class CommonPackageConfig:
