@@ -19,9 +19,15 @@ from packit.config.package_config import (
     get_local_package_config,
     parse_loaded_config,
 )
+from packit.config.common_package_config import (
+    CommonPackageConfig,
+    Deployment,
+)
 
 __all__ = [
+    CommonPackageConfig.__name__,
     Config.__name__,
+    Deployment.__name__,
     JobConfig.__name__,
     JobConfigTriggerType.__name__,
     JobType.__name__,

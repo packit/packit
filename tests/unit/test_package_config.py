@@ -1346,6 +1346,25 @@ def test_serialize_and_deserialize(package_config):
     assert package_config == new_package_config
 
 
+@pytest.mark.parametrize(
+    "package_config",
+    [
+        PackageConfig(
+            specfile_path="fedora/package.spec",
+            config_file_path=".packit.yaml",
+            downstream_package_name="package",
+            upstream_package_name="package",
+        ),
+    ],
+)
+def test_files_to_sync_after_dump(package_config):
+    schema = PackageConfigSchema()
+    assert len(package_config.get_all_files_to_sync()) == 2
+    serialized = schema.dump(package_config)
+    new_package_config = schema.load(serialized)
+    assert len(new_package_config.get_all_files_to_sync()) == 2
+
+
 def test_get_specfile_sync_files_item():
     pc = PackageConfig(
         specfile_path="fedora/python-ogr.spec", downstream_package_name="python-ogr"
