@@ -228,7 +228,7 @@ class PackageConfig(CommonPackageConfig):
             and self.sources == other.sources
             and self.merge_pr_in_ci == other.merge_pr_in_ci
             and self.srpm_build_deps == other.srpm_build_deps
-            and self.identifier == self.identifier
+            and self.identifier == other.identifier
             and self.issue_repository == other.issue_repository
         )
 
