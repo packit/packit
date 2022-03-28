@@ -8,7 +8,7 @@ from typing import List, Set, Dict, Optional, Union, Any
 
 from packit.actions import ActionName
 from packit.config.aliases import DEFAULT_VERSION
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import CommonPackageConfig, Deployment
 from packit.config.notifications import NotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.sync import SyncFilesItem
@@ -201,6 +201,7 @@ class JobConfig(CommonPackageConfig):
         merge_pr_in_ci: bool = True,
         srpm_build_deps: Optional[List[str]] = None,
         identifier: Optional[str] = None,
+        packit_instances: Optional[List[Deployment]] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -230,6 +231,7 @@ class JobConfig(CommonPackageConfig):
             merge_pr_in_ci=merge_pr_in_ci,
             srpm_build_deps=srpm_build_deps,
             identifier=identifier,
+            packit_instances=packit_instances,
         )
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
@@ -261,7 +263,8 @@ class JobConfig(CommonPackageConfig):
             f"sources='{self.sources}', "
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
             f"srpm_build_deps={self.srpm_build_deps}, "
-            f"identifier='{self.identifier}')"
+            f"identifier='{self.identifier}', "
+            f"packit_instances={self.packit_instances})"
         )
 
     @classmethod
@@ -302,6 +305,7 @@ class JobConfig(CommonPackageConfig):
             and self.merge_pr_in_ci == other.merge_pr_in_ci
             and self.srpm_build_deps == other.srpm_build_deps
             and self.identifier == other.identifier
+            and self.packit_instances == self.packit_instances
         )
 
 
