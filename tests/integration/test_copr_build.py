@@ -633,3 +633,23 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
     ).and_return(("id", "url")).once()
 
     run_packit(["copr-build", "--nowait"], working_dir=upstream)
+
+
+def test_create_copr_project(copr_client_mock):
+    copr_helper = CoprHelper(flexmock(git_url="https://gitlab.com/"))
+    flexmock(packit.copr_helper.CoprClient).should_receive(
+        "create_from_config_file"
+    ).and_return(copr_client_mock)
+
+    copr_client_mock.project_proxy = flexmock()
+    flexmock(copr_client_mock.project_proxy).should_receive("add").and_raise(
+        CoprRequestException, "You already have a project named 'already-present'."
+    )
+
+    copr_helper.create_copr_project(
+        chroots=["centos-stream-8-x86_64"],
+        description="my fabulous test",
+        instructions=None,
+        owner="me",
+        project="already-present",
+    )
