@@ -308,6 +308,7 @@ class CommonConfigSchema(Schema):
     srpm_build_deps = fields.List(fields.String(), missing=None)
     identifier = fields.String(missing=None)
     packit_instances = fields.List(EnumField(Deployment), missing=[Deployment.prod])
+    issue_repository = fields.String(missing=None)
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
