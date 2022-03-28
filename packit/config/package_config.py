@@ -10,7 +10,7 @@ from ogr.abstract import GitProject
 from yaml import safe_load
 
 from packit.actions import ActionName
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import CommonPackageConfig, Deployment
 from packit.config.job_config import JobConfig, get_default_jobs, JobType
 from packit.config.notifications import NotificationsConfig
 from packit.config.sources import SourcesItem
@@ -57,6 +57,7 @@ class PackageConfig(CommonPackageConfig):
         merge_pr_in_ci: bool = True,
         srpm_build_deps: Optional[List[str]] = None,
         identifier: Optional[str] = None,
+        packit_instances: Optional[List[Deployment]] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -86,6 +87,7 @@ class PackageConfig(CommonPackageConfig):
             merge_pr_in_ci=merge_pr_in_ci,
             srpm_build_deps=srpm_build_deps,
             identifier=identifier,
+            packit_instances=packit_instances,
         )
         self.jobs: List[JobConfig] = jobs or []
 
@@ -117,7 +119,8 @@ class PackageConfig(CommonPackageConfig):
             f"sources='{self.sources}', "
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
             f"srpm_build_deps={self.srpm_build_deps}, "
-            f"identifier='{self.identifier}')"
+            f"identifier='{self.identifier}', "
+            f"packit_instances={self.packit_instances})"
         )
 
     @classmethod

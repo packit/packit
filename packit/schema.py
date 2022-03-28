@@ -9,6 +9,7 @@ from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
 from packit.config import PackageConfig, Config
+from packit.config.common_package_config import Deployment
 from packit.config.job_config import (
     JobType,
     JobConfig,
@@ -307,6 +308,7 @@ class CommonConfigSchema(Schema):
     merge_pr_in_ci = fields.Bool(default=True)
     srpm_build_deps = fields.List(fields.String(), missing=None)
     identifier = fields.String(missing=None)
+    packit_instances = fields.List(EnumField(Deployment), missing=[Deployment.prod])
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):
