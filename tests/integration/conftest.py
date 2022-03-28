@@ -332,10 +332,8 @@ def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
         pc.dist_git_clone_path = str(distgit)
-        pc.upstream_ref = SOURCE_GIT_RELEASE_TAG
         up_lp = LocalProject(working_dir=sourcegit)
-        api = PackitAPI(c, pc, up_lp)
-        return api
+        return PackitAPI(c, pc, up_lp)
 
 
 @pytest.fixture()
