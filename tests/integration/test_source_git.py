@@ -197,28 +197,6 @@ Source0:        %{upstream_name}-%{version}.tar.gz
         in git_diff
     )
 
-    # direct diff in the synced file
-    assert (
-        """diff --git a/.packit.yaml b/.packit.yaml
-new file mode 100644"""
-        in git_diff
-    )
-
-    assert (
-        """
---- /dev/null
-+++ b/.packit.yaml"""
-        in git_diff
-    )
-
-    # diff of the synced file should not be in the patch
-    assert (
-        """
-+diff --git a/.packit.yaml b/.packit.yaml
-+new file mode 100644"""
-        not in git_diff
-    )
-
     patch_1_3 = """
 +Subject: [PATCH 1/3] switching to amarillo hops
 +
