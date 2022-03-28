@@ -202,6 +202,7 @@ class JobConfig(CommonPackageConfig):
         srpm_build_deps: Optional[List[str]] = None,
         identifier: Optional[str] = None,
         packit_instances: Optional[List[Deployment]] = None,
+        issue_repository: Optional[str] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -232,6 +233,7 @@ class JobConfig(CommonPackageConfig):
             srpm_build_deps=srpm_build_deps,
             identifier=identifier,
             packit_instances=packit_instances,
+            issue_repository=issue_repository,
         )
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
@@ -264,7 +266,8 @@ class JobConfig(CommonPackageConfig):
             f"merge_pr_in_ci={self.merge_pr_in_ci}, "
             f"srpm_build_deps={self.srpm_build_deps}, "
             f"identifier='{self.identifier}', "
-            f"packit_instances={self.packit_instances})"
+            f"packit_instances={self.packit_instances}, "
+            f"issue_repository='{self.issue_repository}')"
         )
 
     @classmethod
@@ -305,7 +308,8 @@ class JobConfig(CommonPackageConfig):
             and self.merge_pr_in_ci == other.merge_pr_in_ci
             and self.srpm_build_deps == other.srpm_build_deps
             and self.identifier == other.identifier
-            and self.packit_instances == self.packit_instances
+            and self.packit_instances == other.packit_instances
+            and self.issue_repository == other.issue_repository
         )
 
 
