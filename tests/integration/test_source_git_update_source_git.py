@@ -5,7 +5,7 @@ import pytest
 
 from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
-from packit.constants import DISTRO_DIR
+from packit.constants import DISTRO_DIR, FROM_DIST_GIT_TOKEN
 
 
 def test_update_source_git_sources_changed(
@@ -49,11 +49,22 @@ def test_update_source_git_gitignore_empty_commit(
     """Checks that inapplicable gitignore changes do not cause an error
     when a commit contains only the gitignore change."""
     sourcegit, _ = sourcegit_and_remote
-    distgit, _ = distgit_and_remote
     (sourcegit / DISTRO_DIR / ".gitignore").write_text("# Reset gitignore\n!*\n")
+    api_instance_update_source_git.up.commit(
+        "Reset gitignore",
+        "",
+        trailers=[
+            (
+                FROM_DIST_GIT_TOKEN,
+                api_instance_update_source_git.dg.local_project.git_repo.head.commit.hexsha,
+            )
+        ],
+    )
+
+    distgit, _ = distgit_and_remote
     (distgit / ".gitignore").write_text("# Former gitignore\na\nb\n")
     api_instance_update_source_git.dg.commit("Setup gitignore", "")
-    api_instance_update_source_git.up.commit("Reset gitignore", "")
+
     # Should not raise on gitignore changes
     api_instance_update_source_git.update_source_git("HEAD~1..")
     # There is nothing to commit in the gitignore patch, head should stay the same
@@ -71,13 +82,24 @@ def test_update_source_git_gitignore(
     """Checks that inapplicable gitignore changes do not cause an error but
     the rest of the commit is applied."""
     sourcegit, _ = sourcegit_and_remote
-    distgit, _ = distgit_and_remote
     (sourcegit / DISTRO_DIR / ".gitignore").write_text("# Reset gitignore\n!*\n")
+    api_instance_update_source_git.up.commit(
+        "Reset gitignore",
+        "",
+        trailers=[
+            (
+                FROM_DIST_GIT_TOKEN,
+                api_instance_update_source_git.dg.local_project.git_repo.head.commit.hexsha,
+            )
+        ],
+    )
+
+    distgit, _ = distgit_and_remote
     (distgit / ".gitignore").write_text("# Former gitignore\na\nb\n")
     content = "abcd"
     (distgit / "c").write_text(content)
     api_instance_update_source_git.dg.commit("Setup gitignore", "")
-    api_instance_update_source_git.up.commit("Reset gitignore", "")
+
     # Should not raise on gitignore changes
     api_instance_update_source_git.update_source_git("HEAD~1..")
     assert content == (sourcegit / DISTRO_DIR / "c").read_text()
@@ -169,3 +191,24 @@ def test_update_source_git(
         f"{api_instance_update_source_git.dg.local_project.git_repo.head.commit.hexsha}"
         in api_instance_update_source_git.up.local_project.git_repo.head.commit.message
     )
+
+
+def test_update_source_git_diverged(
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api_instance_update_source_git,
+):
+    """Check that exception is raised when there's
+    a commit in source-git which has no origin in dist-git.
+    """
+    sourcegit, _ = sourcegit_and_remote
+    (sourcegit / DISTRO_DIR / "test").write_text("foo")
+    api_instance_update_source_git.up.commit("test foor", "")
+
+    distgit, _ = distgit_and_remote
+    (distgit / "bar").write_text("bar")
+    api_instance_update_source_git.dg.commit("test bar", "")
+
+    with pytest.raises(PackitException) as exc:
+        api_instance_update_source_git.update_source_git("HEAD~1..")
+    assert " have diverged." in str(exc.value)

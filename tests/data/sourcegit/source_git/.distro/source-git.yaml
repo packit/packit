@@ -1,0 +1,18 @@
+---
+upstream_ref: 0.1.0
+upstream_package_name: beerware
+downstream_package_name: beer
+specfile_path: .distro/beer.spec
+patch_generation_ignore_paths:
+  - ignored_file.txt
+  - .distro
+sync_changelog: true
+files_to_sync:
+  - src: .distro/
+    dest: .
+    filters:
+      - protect .git*
+      - protect sources
+      - exclude source-git.yaml
+      - exclude .gitignore
+create_pr: false
