@@ -1,4 +1,5 @@
 ---
+packit_instances: ["prod", "stg"]
 files_to_sync:
   - packit.spec
   - .packit.yaml
@@ -31,6 +32,8 @@ srpm_build_deps:
 jobs:
   - job: propose_downstream
     trigger: release
+    # Use the stage instance once it works in downstream.
+    packit_instances: ["prod"]
     metadata:
       dist_git_branches:
         - fedora-all
@@ -87,12 +90,16 @@ jobs:
   # downstream automation:
   - job: koji_build
     trigger: commit
+    # Use the stage instance once it works in downstream.
+    packit_instances: ["prod"]
     metadata:
       dist_git_branches:
         - fedora-all
         - epel-8
   - job: bodhi_update
     trigger: commit
+    # Use the stage instance once it works in downstream.
+    packit_instances: ["prod"]
     metadata:
       dist_git_branches:
         - fedora-stable # rawhide updates are created automatically
