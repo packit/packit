@@ -41,4 +41,4 @@ def source_git_status(config: Config, source_git: str, dist_git: str):
         upstream_local_project=LocalProject(working_dir=source_git_path, offline=True),
         downstream_local_project=LocalProject(working_dir=dist_git_path, offline=True),
     )
-    api.show_sync_status(api.sync_status(), source_git, dist_git)
+    click.echo(api.sync_status_string(source_git=source_git, dist_git=dist_git))

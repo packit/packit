@@ -12,6 +12,7 @@ import click
 
 from typing import Optional
 
+from packit.cli.utils import cover_packit_exception
 from packit.config import pass_config
 from packit.config import Config, get_local_package_config
 from packit.api import PackitAPI
@@ -54,9 +55,18 @@ from packit.local_project import LocalProject
     help="""Commit the changes in the dist-git repository and take the commit message
     from <file>. Use - to read from the standard input.""",
 )
+@click.option(
+    "-f",
+    "--force",
+    default=False,
+    is_flag=True,
+    help="Don't check the synchronization status of the source-git"
+    " and dist-git repos prior to performing the update.",
+)
 @click.argument("source-git", type=click.Path(exists=True, file_okay=False))
 @click.argument("dist-git", type=click.Path(exists=True, file_okay=False))
 @pass_config
+@cover_packit_exception
 def update_dist_git(
     config: Config,
     source_git: str,
@@ -65,6 +75,7 @@ def update_dist_git(
     pkg_tool: Optional[str],
     message: Optional[str],
     file: Optional[str],
+    force: Optional[bool],
 ):
     """Update a dist-git repository using content from a source-git repository
 
@@ -121,6 +132,7 @@ def update_dist_git(
         upstream_local_project=LocalProject(working_dir=source_git_path, offline=True),
         downstream_local_project=LocalProject(working_dir=dist_git_path, offline=True),
     )
+
     title, _, message = message.partition("\n\n") if message else (None, None, None)
     api.update_dist_git(
         version=None,
@@ -134,4 +146,5 @@ def update_dist_git(
         sync_default_files=False,
         pkg_tool=pkg_tool,
         mark_commit_origin=True,
+        check_sync_status=not force,
     )
