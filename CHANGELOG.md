@@ -1,3 +1,10 @@
+# 0.48.0
+
+- `packit source-git update-dist-git` and `packit source-git update-source-git` now check the synchronization of source-git and dist-git repositories prior to doing the update. If the update can't be done, for example, because the histories have diverged, the command provides instructions on how to synchronize the repositories. A `--force` option is available to try to update the destination repository anyway.
+- Downstream synchronization of the Packit configuration file (aka `packit.yaml`) should be fixed. (#1532)
+- Packit will no longer error out when trying to create a new Copr repository when it is already present (caused by a race condition). (#1527)
+- Interactions with Bodhi should be now more reliable when creating Bodhi updates. (#1528)
+
 # 0.47.1
 
 - When using Packit CLI for creating Bodhi updates, you can now set `fas_username` and `fas_password`
