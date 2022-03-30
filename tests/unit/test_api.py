@@ -93,43 +93,77 @@ class TestPackitAPI:
 
 
 @pytest.mark.parametrize(
-    "version, tag, get_version_return, expectation",
+    "version, tag, get_latest_released_return, get_specfile_version_return, expectation",
     [
-        pytest.param("1.1.1", None, None, does_not_raise(), id="version_set"),
-        pytest.param(None, "v1.1.1", None, does_not_raise(), id="tag_set"),
         pytest.param(
-            "1.1", "v1.1.1", None, pytest.raises(PackitException), id="both_set"
+            "1.1.1",
+            None,
+            None,
+            "some.version",
+            does_not_raise(),
+            id="version_set(CLI_explicit)",
         ),
         pytest.param(
-            None, None, "1.1", does_not_raise(), id="none_set-get_version_exists"
+            None,
+            "v1.1.1",
+            None,
+            "some.version",
+            does_not_raise(),
+            id="tag_set(service_mode)",
         ),
         pytest.param(
+            "1.1",
+            "v1.1.1",
+            None,
+            None,
+            pytest.raises(PackitException),
+            id="both_set(CLI_wrong_usage)",
+        ),
+        pytest.param(
+            None,
+            None,
+            "1.1",
+            "some.version",
+            does_not_raise(),
+            id="none_set(CLI_version_from_upstream_release_monitoring)",
+        ),
+        pytest.param(
+            None,
             None,
             None,
             None,
             pytest.raises(PackitException),
-            id="none_set-get_version_None",
+            id="none_set(CLI_version_not_in_upstream_release_monitoring)",
         ),
     ],
 )
 def test_sync_release_version_tag_processing(
-    version, tag, get_version_return, expectation, api_mock
+    version,
+    tag,
+    get_latest_released_return,
+    get_specfile_version_return,
+    expectation,
+    api_mock,
 ):
     api_mock.up.package_config.upstream_tag_template = "v{version}"
-    api_mock.up.should_receive("get_version").and_return(get_version_return)
+    api_mock.up.should_receive("get_latest_released_version").and_return(
+        get_latest_released_return
+    )
+    api_mock.up.should_receive("get_specfile_version").and_return(
+        get_specfile_version_return
+    )
     api_mock.should_receive("_prepare_files_to_sync").with_args(
         synced_files=[], full_version=version, upstream_tag=tag
     )
     flexmock(PatchGenerator).should_receive("undo_identical")
     with expectation:
-        api_mock.sync_release(
-            version=version or get_version_return, tag=tag, dist_git_branch="_"
-        )
+        api_mock.sync_release(version=version, tag=tag, dist_git_branch="_")
 
 
 def test_sync_release_do_not_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").never()
+    api_mock.up.should_receive("get_specfile_version").and_return("some.version")
     api_mock.up.package_config.create_sync_note = False
     api_mock.sync_release(version="1.1", dist_git_branch="_")
 
@@ -137,6 +171,7 @@ def test_sync_release_do_not_create_sync_note(api_mock):
 def test_sync_release_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").once()
+    api_mock.up.should_receive("get_specfile_version").and_return("some.version")
     api_mock.sync_release(version="1.1", dist_git_branch="_")
 
 

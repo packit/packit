@@ -13,6 +13,7 @@ from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
 from packit.specfile import Specfile
+from packit.upstream import Upstream
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
 
@@ -66,16 +67,23 @@ def test_local_update_generated_spec(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(Upstream).should_receive("get_latest_released_version").and_return("0.1.0")
 
     # Simulate generation by moving the spec to a different location
+    # We are checking two things:
+    # * spec-file is not used before the post-upstream-clone
+    # * the version is get from the release state
     current_spec_location = u / "beer.spec"
-    new_spec_location = u / "tmp.spec"
+    new_spec_location = u / ".." / "tmp.spec"
     shutil.move(current_spec_location, new_spec_location)
+    subprocess.check_call(["git", "add", "beer.spec"], cwd=u)
+    subprocess.check_call(["git", "commit", "-m", "Spec removed from upstream"], cwd=u)
     api.up.package_config.actions = {
         ActionName.post_upstream_clone: [
             f"mv {new_spec_location} {current_spec_location}"
         ]
     }
+
     api.sync_release(dist_git_branch="main")
 
     assert (d / TARBALL_NAME).is_file()
