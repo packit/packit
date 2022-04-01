@@ -8,6 +8,7 @@ This is the official python interface for packit.
 import asyncio
 import tempfile
 from distutils.dir_util import copy_tree
+from packaging import version as version_imported
 
 import click
 import logging
@@ -638,7 +639,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             PackitException, if the version of the latest upstream release cannot be told.
             PackitException, if the upstream repo or dist-git is dirty.
         """
-        self.up.run_action(actions=ActionName.post_upstream_clone)
         dist_git_branch = (
             dist_git_branch or self.dg.local_project.git_project.default_branch
         )
@@ -648,10 +648,11 @@ The first dist-git commit to be synced is '{short_hash}'.
                 "Function parameters version and tag are mutually exclusive."
             )
         elif not tag:
-            version = version or self.up.get_version()
+            version = version or self.up.get_latest_released_version()
             if not version:
                 raise PackitException(
-                    "Could not figure out version of latest upstream release."
+                    "Could not figure out version of latest upstream release. "
+                    "You can specify it as an argument."
                 )
             upstream_tag = self.up.convert_version_to_tag(version)
         else:
@@ -688,6 +689,11 @@ The first dist-git commit to be synced is '{short_hash}'.
                 )
             elif not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
+            self.up.run_action(actions=ActionName.post_upstream_clone)
+
+            spec_ver = self.up.get_specfile_version()
+            if version_imported.parse(version) > version_imported.parse(spec_ver):
+                logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
 
             self.dg.check_last_commit()
 
