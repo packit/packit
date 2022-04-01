@@ -9,7 +9,6 @@ from requre.online_replacing import (
 )
 from requre.helpers.simple_object import Simple
 from requre.helpers.files import StoreFiles
-from ogr.exceptions import GithubAPIException
 from packit.api import PackitAPI
 from tests_recording.testbase import PackitTest
 from requre.modules_decorate_all_methods import (
@@ -83,7 +82,7 @@ class ProposeUpdate(PackitTest):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release(force=True)
+        self.api.sync_release(version="0.8.1", force=True)
 
     def test_comment_in_spec(self):
         """
@@ -98,7 +97,7 @@ class ProposeUpdate(PackitTest):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release()
+        self.api.sync_release(version="0.8.1")
 
     def test_changelog_sync(self):
         """
@@ -116,13 +115,6 @@ class ProposeUpdate(PackitTest):
         changed_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()
         assert original_upstream_spec_content != changed_upstream_spec_content
         self.api.package_config.sync_changelog = True
-        self.api.sync_release(use_local_content=True)
+        self.api.sync_release(version="some.version", use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
-
-    def test_version_change_exception(self):
-        """
-        check if it raises exception, because sources are not uploaded in distgit
-        Downgrade rebasehelper to version < 0.24.0
-        """
-        self.assertRaises(GithubAPIException, self.check_version_increase)
