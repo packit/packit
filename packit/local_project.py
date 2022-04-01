@@ -80,7 +80,7 @@ class LocalProject:
         :param pr_id: ID of the pull request to fetch and check out
         """
         self.working_dir_temporary = False
-        self.git_repo: git.Repo = git_repo
+        self._git_repo: git.Repo = git_repo
         self.working_dir: Path = Path(working_dir) if working_dir else None
         self._ref = ref
         self.git_project = git_project
@@ -144,6 +144,17 @@ class LocalProject:
             f"remote='{self.remote}', "
             f"commit_hexsha='{self.commit_hexsha}')"
         )
+
+    @property
+    def git_repo(self) -> Optional[git.Repo]:
+        """The git.Repo tied to this LocalProject.
+
+        This is useful for creating class-level mocks with flexmock rather
+        than having to worry about instantiation of the LocalProject class.
+        The property can be mocked so that it returns a mock repo with the
+        required capabilities.
+        """
+        return self._git_repo
 
     @property
     def ref(self) -> Optional[str]:
@@ -228,11 +239,11 @@ class LocalProject:
             )
             if is_git_repo(directory=self.working_dir):
                 logger.debug("It's a git repo!")
-                self.git_repo = git.Repo(path=self.working_dir)
+                self._git_repo = git.Repo(path=self.working_dir)
                 return True
 
             elif self.git_url and not self.offline:
-                self.git_repo = self._get_repo(
+                self._git_repo = self._get_repo(
                     url=self.git_url, directory=self.working_dir
                 )
                 logger.debug(
@@ -292,7 +303,7 @@ class LocalProject:
             and not self.git_repo
             and not self.offline
         ):
-            self.git_repo = self._get_repo(url=self.git_url)
+            self._git_repo = self._get_repo(url=self.git_url)
             self.working_dir_temporary = True
             logger.debug(f"Parsed repo {self.git_repo} from url {self.git_url!r}.")
             return True
