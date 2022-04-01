@@ -303,15 +303,18 @@ class PackitAPI:
                 )
         return patch
 
-    def update_source_git(self, revision_range: str, check_sync_status: bool = True):
+    def update_source_git(
+        self, revision_range: str = None, check_sync_status: bool = True
+    ):
         """Update a source-git repo from a dist-git repo.
 
         Synchronizes the spec file and commits in the given revision range.
         The sources and patches in dist-git must not have been touched.
 
         Args:
-            revision_range: Range of commits from dist-git to convert to
-                source-git. Specified in git-log-like format.
+            revision_range: Range (in git-log-like format) of commits from
+                dist-git to convert to source-git. If not specified, dist-git
+                commits with no counterpart in source-git will be synchronized.
             check_sync_status: Check the synchronization status of the
                 source-git and dist-git repos prior to performing the update.
 
@@ -319,6 +322,11 @@ class PackitAPI:
             PackitException: If the given update cannot be performed, i.e.
                 sources or patches were touched.
         """
+        if not revision_range and not check_sync_status:
+            raise PackitException(
+                "revision_range has to be specified if check_sync_status is False"
+            )
+
         if check_sync_status:
             status = self.sync_status()
             # There are extra source-git commits
@@ -328,6 +336,11 @@ class PackitAPI:
             if not status.dist_git_range_start:
                 logger.info(self.sync_status_string(status))
                 return
+            if not revision_range:
+                revision_range = f"{status.dist_git_range_start}~.."
+                logger.debug(
+                    f"revision_range not specified, setting to {revision_range}"
+                )
 
         dg_release = self.dg.specfile.get_release()
         up_release = self.up.specfile.get_release()

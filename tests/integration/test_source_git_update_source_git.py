@@ -109,10 +109,18 @@ def test_update_source_git_gitignore(
     )
 
 
+@pytest.mark.parametrize(
+    "revision_range",
+    [
+        pytest.param("HEAD~1..", id="revision_range_set"),
+        pytest.param(None, id="revision_range_not_set"),
+    ],
+)
 def test_update_source_git(
     sourcegit_and_remote,
     distgit_and_remote,
     api_instance_update_source_git,
+    revision_range,
 ):
     """Updates source-git based on multiple 'extra' commits in the dist-git,
     tests the various possible types of changes of the commit:
@@ -130,7 +138,7 @@ def test_update_source_git(
     content = "abcd"
     (distgit / new_file).write_text(content)
     api_instance_update_source_git.dg.commit("Add", "")
-    api_instance_update_source_git.update_source_git("HEAD~1..")
+    api_instance_update_source_git.update_source_git(revision_range)
     assert (sourcegit / DISTRO_DIR / new_file).read_text() == content
     assert (
         "Add"
@@ -147,7 +155,7 @@ def test_update_source_git(
     with open(distgit / new_file, "a") as file:
         file.write(extra_content)
     api_instance_update_source_git.dg.commit("Modify", "")
-    api_instance_update_source_git.update_source_git("HEAD~1..")
+    api_instance_update_source_git.update_source_git(revision_range)
     assert (sourcegit / DISTRO_DIR / new_file).read_text() == content + extra_content
     assert (
         "Modify"
@@ -163,7 +171,7 @@ def test_update_source_git(
     new_name = "test.txt"
     (distgit / new_file).rename(distgit / new_name)
     api_instance_update_source_git.dg.commit("Rename", "")
-    api_instance_update_source_git.update_source_git("HEAD~1..")
+    api_instance_update_source_git.update_source_git(revision_range)
     assert not (sourcegit / DISTRO_DIR / new_file).exists()
     with open(sourcegit / DISTRO_DIR / new_name, "r") as file:
         assert file.read() == content + extra_content
@@ -180,7 +188,7 @@ def test_update_source_git(
     # Delete a file
     (distgit / new_name).unlink()
     api_instance_update_source_git.dg.commit("Delete", "")
-    api_instance_update_source_git.update_source_git("HEAD~1..")
+    api_instance_update_source_git.update_source_git(revision_range)
     assert not (sourcegit / DISTRO_DIR / new_name).exists()
     assert (
         "Delete"
