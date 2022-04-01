@@ -28,7 +28,7 @@ from packit.cli.utils import cover_packit_exception
 )
 @click.argument("dist-git", type=click.Path(exists=True, file_okay=False))
 @click.argument("source-git", type=click.Path(exists=True, file_okay=False))
-@click.argument("revision-range")
+@click.argument("revision-range", required=False)
 @pass_config
 @cover_packit_exception
 def update_source_git(
@@ -46,7 +46,8 @@ def update_source_git(
     Revision range represents part of dist-git history which is supposed
     to be synchronized. Use `HEAD~..` if you want to synchronize the last
     commit from dist-git. For more information on possible revision range
-    formats, see gitrevisions(7).
+    formats, see gitrevisions(7). If the revision range is not specified,
+    dist-git commits with no counterpart in source-git will be synchronized.
 
     If patches or the sources file in the spec file changed, the command
     exits with return code 2. Such changes are not supported by this
@@ -71,17 +72,22 @@ def update_source_git(
 
     Examples
 
-    Take the last commit (HEAD) of systemd dist-git repo and copy the
-    spec file and other packaging files into the source-git repo:
+    Take the extra (not synchronized) commit(s) of systemd dist-git repo and
+    copy the spec file and other packaging files into the source-git repo:
 
     \b
-        $ packit source-git update-source-git rpms/systemd src/systemd HEAD~..
+        $ packit source-git update-source-git rpms/systemd src/systemd
 
     Synchronize changes from the last three dist-git commits:
 
     \b
         $ packit source-git update-source-git rpms/systemd src/systemd HEAD~3..
     """
+    if force and not revision_range:
+        raise click.BadOptionUsage(
+            "-f", "revision-range has to be specified when -f/--force is used"
+        )
+
     source_git_path = pathlib.Path(source_git).resolve()
     dist_git_path = pathlib.Path(dist_git).resolve()
     package_config = get_local_package_config(
