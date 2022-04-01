@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import logging
-from collections import defaultdict
 from datetime import timedelta
 from typing import Dict, List, Set
 
@@ -15,11 +14,13 @@ from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
 
 ALIASES: Dict[str, List[str]] = {
-    "fedora-development": ["fedora-rawhide", "fedora-36"],
-    "fedora-latest": ["fedora-35"],
-    "fedora-stable": ["fedora-34", "fedora-35"],
     "fedora-all": ["fedora-34", "fedora-35", "fedora-36", "fedora-rawhide"],
-    "epel-all": ["el-6", "epel-7", "epel-8"],
+    "fedora-stable": ["fedora-34", "fedora-35"],
+    "fedora-development": ["fedora-36", "fedora-rawhide"],
+    "fedora-latest": ["fedora-36"],
+    "fedora-latest-stable": ["fedora-35"],
+    "fedora-branched": ["fedora-34", "fedora-35", "fedora-36"],
+    "epel-all": ["epel-7", "epel-8", "epel-9"],
 }
 
 ARCHITECTURE_LIST: List[str] = [
@@ -230,45 +231,51 @@ def get_all_koji_targets() -> List[str]:
 @fallback_return_value(ALIASES)
 def get_aliases() -> Dict[str, List[str]]:
     """
-    Function to automatically determine fedora-all, fedora-stable, fedora-development,
-    fedora-latest and epel-all aliases.
+    Function to automatically determine fedora-* and epel-* aliases.
     Current data are fetched via bodhi client, with default base url
     `https://bodhi.fedoraproject.org/'.
 
     Returns:
         Dictionary containing aliases.
     """
-
     bodhi_client = get_bodhi_client()
     releases = bodhi_client.get_releases(exclude_archived=True)
-    aliases = defaultdict(list)
-    for release in releases.releases:
+    current_fedora_releases, pending_fedora_releases, epel_releases = [], [], []
 
+    for release in filter(
+        lambda r: r.state in ["current", "pending"], releases.releases
+    ):
         if release.id_prefix == "FEDORA" and release.name != "ELN":
             name = release.long_name.lower().replace(" ", "-")
             if release.state == "current":
-                aliases["fedora-stable"].append(name)
-            elif release.state == "pending":
-                aliases["fedora-development"].append(name)
-
+                current_fedora_releases.append(name)
+            else:
+                pending_fedora_releases.append(name)
         elif release.id_prefix == "FEDORA-EPEL":
             name = release.name.lower()
-            aliases["epel-all"].append(name)
+            epel_releases.append(name)
 
-    if "fedora-development" in aliases:
-        aliases["fedora-development"].sort(key=lambda x: int(x.rsplit("-")[-1]))
-        # The Fedora with the highest version is "rawhide", but
-        # Bodhi always uses release names, and has no concept of "rawhide".
-        aliases["fedora-development"][-1] = "fedora-rawhide"
+    current_fedora_releases.sort(key=lambda x: int(x.rsplit("-")[-1]))
+    pending_fedora_releases.sort(key=lambda x: int(x.rsplit("-")[-1]))
+    # The Fedora with the highest version is "rawhide", but
+    # Bodhi always uses release names, and has no concept of "rawhide".
+    pending_fedora_releases[-1] = "fedora-rawhide"
 
-    if "fedora-stable" in aliases:
-        aliases["fedora-stable"].sort(key=lambda x: int(x.rsplit("-")[-1]))
-
-    aliases["fedora-all"] = aliases["fedora-stable"] + aliases["fedora-development"]
-
-    # fedora-rawhide is the last release, we want the second latest (the latest
-    # non rawhide release)
-    if len(aliases["fedora-all"]) >= 2:
-        aliases["fedora-latest"] = [aliases["fedora-all"][-2]]
-
-    return aliases
+    #  fedora-34   fedora-35   [ fedora-36 ]   fedora-rawhide
+    #  current     current  [ current/pending ]  pending
+    #
+    # all: everything
+    # stable: everything marked as "current"
+    # development: everything marked as "pending"
+    # latest: the latest with a version number
+    # latest-stable: the last "current"
+    # branched: all with a version number
+    return {
+        "fedora-all": current_fedora_releases + pending_fedora_releases,
+        "fedora-stable": current_fedora_releases,
+        "fedora-development": pending_fedora_releases,
+        "fedora-latest": pending_fedora_releases[-2:-1] or current_fedora_releases[-1:],
+        "fedora-latest-stable": current_fedora_releases[-1:],
+        "fedora-branched": current_fedora_releases + pending_fedora_releases[:-1],
+        "epel-all": epel_releases,
+    }
