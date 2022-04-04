@@ -34,13 +34,13 @@ class PackageConfig(CommonPackageConfig):
         synced_files: Optional[List[SyncFilesItem]] = None,
         files_to_sync: Optional[List[SyncFilesItem]] = None,
         jobs: Optional[List[JobConfig]] = None,
-        dist_git_namespace: str = None,
-        upstream_project_url: str = None,  # can be URL or path
-        upstream_package_name: str = None,
-        downstream_project_url: str = None,
-        downstream_package_name: str = None,
-        dist_git_base_url: str = None,
-        actions: Dict[ActionName, Union[str, List[str]]] = None,
+        dist_git_namespace: Optional[str] = None,
+        upstream_project_url: Optional[str] = None,  # can be URL or path
+        upstream_package_name: Optional[str] = None,
+        downstream_project_url: Optional[str] = None,
+        downstream_package_name: Optional[str] = None,
+        dist_git_base_url: Optional[str] = None,
+        actions: Optional[Dict[ActionName, Union[str, List[str]]]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[List[str]] = None,
         create_pr: bool = True,
@@ -49,7 +49,7 @@ class PackageConfig(CommonPackageConfig):
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
-        patch_generation_ignore_paths: List[str] = None,
+        patch_generation_ignore_paths: Optional[List[str]] = None,
         patch_generation_patch_id_digits: int = 4,
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
@@ -130,9 +130,9 @@ class PackageConfig(CommonPackageConfig):
     def get_from_dict(
         cls,
         raw_dict: dict,
-        config_file_path: str = None,
-        repo_name: str = None,
-        spec_file_path: str = None,
+        config_file_path: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        spec_file_path: Optional[str] = None,
     ) -> "PackageConfig":
         # required to avoid cyclical imports
         from packit.schema import PackageConfigSchema
@@ -326,7 +326,7 @@ def get_local_package_config(
 
 
 def get_package_config_from_repo(
-    project: GitProject, ref: str = None, spec_file_path: Optional[str] = None
+    project: GitProject, ref: Optional[str] = None, spec_file_path: Optional[str] = None
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:

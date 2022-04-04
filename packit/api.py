@@ -304,7 +304,7 @@ class PackitAPI:
         return patch
 
     def update_source_git(
-        self, revision_range: str = None, check_sync_status: bool = True
+        self, revision_range: Optional[str] = None, check_sync_status: bool = True
     ):
         """Update a source-git repo from a dist-git repo.
 
@@ -550,8 +550,8 @@ class PackitAPI:
     def sync_status_string(
         self,
         status: SynchronizationStatus = None,
-        source_git: Union[Path, str] = None,
-        dist_git: Union[Path, str] = None,
+        source_git: Union[Path, str, None] = None,
+        dist_git: Union[Path, str, None] = None,
     ) -> str:
         """Returns the synchronization status of source-git and dist-git as a string.
 
@@ -809,11 +809,11 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def sync_from_downstream(
         self,
-        dist_git_branch: str = None,
-        upstream_branch: str = None,
+        dist_git_branch: Optional[str] = None,
+        upstream_branch: Optional[str] = None,
         no_pr: bool = False,
         fork: bool = True,
-        remote_name: str = None,
+        remote_name: Optional[str] = None,
         exclude_files: Iterable[str] = None,
         force: bool = False,
         sync_only_specfile: bool = False,
@@ -1022,7 +1022,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def prepare_sources(
         self,
-        upstream_ref: str = None,
+        upstream_ref: Optional[str] = None,
         bump_version: bool = True,
         release_suffix: Optional[str] = None,
         result_dir: Union[Path, str] = None,
@@ -1068,8 +1068,8 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def create_srpm(
         self,
-        output_file: str = None,
-        upstream_ref: str = None,
+        output_file: Optional[str] = None,
+        upstream_ref: Optional[str] = None,
         srpm_dir: Union[Path, str] = None,
         bump_version: bool = True,
         release_suffix: Optional[str] = None,
@@ -1108,7 +1108,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         finally:
             self.clean()
 
-    def create_rpms(self, upstream_ref: str = None, rpm_dir: str = None) -> List[Path]:
+    def create_rpms(
+        self, upstream_ref: Optional[str] = None, rpm_dir: str = None
+    ) -> List[Path]:
         """
         Create rpms from the upstream repo
 
@@ -1285,14 +1287,14 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         project: str,
         chroots: List[str],
-        owner: str = None,
-        description: str = None,
-        instructions: str = None,
-        upstream_ref: str = None,
+        owner: Optional[str] = None,
+        description: Optional[str] = None,
+        instructions: Optional[str] = None,
+        upstream_ref: Optional[str] = None,
         list_on_homepage: bool = False,
         preserve_project: bool = False,
-        additional_packages: List[str] = None,
-        additional_repos: List[str] = None,
+        additional_packages: Optional[List[str]] = None,
+        additional_repos: Optional[List[str]] = None,
         request_admin_if_needed: bool = False,
         enable_net: bool = True,
     ) -> Tuple[int, str]:

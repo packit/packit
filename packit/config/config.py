@@ -41,7 +41,7 @@ class Config:
         kerberos_realm: Optional[str] = "FEDORAPROJECT.ORG",
         koji_build_command: Optional[str] = "koji build",
         pkg_tool: str = "fedpkg",
-        command_handler: str = None,
+        command_handler: Optional[str] = None,
         command_handler_work_dir: str = SANDCASTLE_WORK_DIR,
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
         command_handler_image_reference: str = SANDCASTLE_IMAGE,

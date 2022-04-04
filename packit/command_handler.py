@@ -39,7 +39,7 @@ class CommandHandler:
         command: List[str],
         return_output: bool = True,
         env: Optional[Dict] = None,
-        cwd: Union[str, Path] = None,
+        cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ):
         """
@@ -67,7 +67,7 @@ class LocalCommandHandler(CommandHandler):
         command: List[str],
         return_output: bool = True,
         env: Optional[Dict] = None,
-        cwd: Union[str, Path] = None,
+        cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ):
         """
@@ -146,7 +146,7 @@ class SandcastleCommandHandler(CommandHandler):
         command: List[str],
         return_output: bool = True,
         env: Optional[Dict] = None,
-        cwd: Union[str, Path] = None,
+        cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ):
         """
