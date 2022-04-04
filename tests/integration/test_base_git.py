@@ -78,11 +78,17 @@ def test_base_push_bad(distgit_and_remote):
     b.local_project = LocalProject(
         working_dir=distgit, git_url="https://github.com/packit/lol"
     )
-    flexmock(
-        LocalProject,
-        push=lambda *args, **kwargs: [
-            PushInfo(PushInfo.REMOTE_REJECTED, None, None, None, None)
-        ],
+    flexmock(LocalProject).should_receive("git_repo").and_return(
+        flexmock()
+        .should_receive("remote")
+        .and_return(
+            flexmock(
+                push=lambda *args, **kwargs: [
+                    PushInfo(PushInfo.REMOTE_REJECTED, None, None, None, None)
+                ]
+            )
+        )
+        .mock()
     )
     with pytest.raises(PackitException) as e:
         b.push("master")
@@ -96,10 +102,16 @@ def test_base_push_good(distgit_and_remote):
     b.local_project = LocalProject(
         working_dir=distgit, git_url="https://github.com/packit/lol"
     )
-    flexmock(
-        LocalProject,
-        push=lambda *args, **kwargs: [
-            PushInfo(PushInfo.FAST_FORWARD, None, None, None, None)
-        ],
+    flexmock(LocalProject).should_receive("git_repo").and_return(
+        flexmock()
+        .should_receive("remote")
+        .and_return(
+            flexmock(
+                push=lambda *args, **kwargs: [
+                    PushInfo(PushInfo.FAST_FORWARD, None, None, None, None)
+                ]
+            )
+        )
+        .mock()
     )
     b.push("master")

@@ -357,7 +357,9 @@ class PackitAPI:
         diffs: List[List[git.Diff]] = []
         patch_suffix = ".patch"
         distro_path = self.up.local_project.working_dir / DISTRO_DIR
-        for commit in self.dg.local_project.get_commits(revision_range, reverse=True):
+        for commit in self.dg.local_project.git_repo.iter_commits(
+            revision_range, reverse=True
+        ):
             commits.append(commit)
             diffs.append(get_commit_diff(commit))
             for diff in diffs[-1]:
@@ -466,7 +468,7 @@ class PackitAPI:
                     re.MULTILINE,
                 ).group(1),
             )
-            for c in self.up.local_project.get_commits(
+            for c in self.up.local_project.git_repo.iter_commits(
                 max_count=1, grep=rf"^{re.escape(FROM_DIST_GIT_TOKEN)}: .\+$"
             )
         ]
@@ -479,7 +481,7 @@ class PackitAPI:
                 ).group(1),
                 c.hexsha,
             )
-            for c in self.dg.local_project.get_commits(
+            for c in self.dg.local_project.git_repo.iter_commits(
                 max_count=1, grep=rf"^{re.escape(FROM_SOURCE_GIT_TOKEN)}: .\+$"
             )
         ]

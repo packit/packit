@@ -4,7 +4,7 @@
 import logging
 import shutil
 from pathlib import Path
-from typing import Optional, Union, Iterable, Iterator
+from typing import Optional, Union
 
 import git
 from git.exc import GitCommandError
@@ -542,45 +542,6 @@ class LocalProject:
         except Exception as ex:
             raise PackitException(f"Cannot checkout release tag: {ex!r}.")
 
-    def push(
-        self, refspec: str, remote_name: str = "origin", force: bool = False
-    ) -> Iterable[git.PushInfo]:
-        """
-        push changes to a remote using provided refspec
-
-        :param refspec: e.g. "main", "HEAD:f30"
-        :param remote_name: name of the remote where we push
-        :param force: force push: yes or no?
-        :return: a list of git.remote.PushInfo objects - have fun
-        """
-        return self.git_repo.remote(name=remote_name).push(refspec=refspec, force=force)
-
-    def stage(self, path: str = ".", force: bool = True):
-        """
-        stage provided path from working tree to index
-
-        force: bypass gitignore
-        """
-        self.git_repo.git.add(path, force=force)
-
-    def commit(
-        self,
-        message: str,
-        body: Optional[str] = None,
-        allow_empty: bool = True,
-        amend: bool = False,
-    ):
-        """Commit staged changes"""
-        other_message_kwargs = {"message": body} if body else {}
-        # some of the commits may be empty and it's not an error,
-        # e.g. extra source files
-        self.git_repo.git.commit(
-            allow_empty=allow_empty, m=message, amend=amend, **other_message_kwargs
-        )
-
-    def get_commits(self, ref: str = "HEAD", **kwargs) -> Iterator[git.Commit]:
-        return self.git_repo.iter_commits(ref, **kwargs)
-
     def fetch(self, remote: str, refspec: Optional[str] = None):
         """
         fetch refs from a remote to this repo
@@ -592,13 +553,6 @@ class LocalProject:
             self.git_repo.git.fetch(remote, refspec)
         else:
             self.git_repo.git.fetch(remote, "--tags")
-
-    def rebase(self, ref: str):
-        self.git_repo.git.rebase(ref)
-
-    def reset(self, ref: str):
-        """git reset --hard $ref"""
-        self.git_repo.head.reset(ref, index=True, working_tree=True)
 
     def __del__(self):
         self.clean()
