@@ -17,8 +17,8 @@ class PkgTool:
 
     def __init__(
         self,
-        fas_username: str = None,
-        directory: Union[Path, str] = None,
+        fas_username: Optional[str] = None,
+        directory: Union[Path, str, None] = None,
         tool: str = "fedpkg",
     ):
         self.fas_username = fas_username
@@ -115,7 +115,7 @@ class PkgTool:
         self,
         package_name: str,
         target_path: Union[Path, str],
-        branch: str = None,
+        branch: Optional[str] = None,
         anonymous: bool = False,
     ):
         """

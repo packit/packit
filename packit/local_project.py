@@ -47,7 +47,7 @@ class LocalProject:
     def __init__(
         self,
         git_repo: git.Repo = None,
-        working_dir: Union[Path, str] = None,
+        working_dir: Union[Path, str, None] = None,
         ref: str = "",
         git_project: GitProject = None,
         git_service: GitService = None,
@@ -81,7 +81,7 @@ class LocalProject:
         """
         self.working_dir_temporary = False
         self._git_repo: git.Repo = git_repo
-        self.working_dir: Path = Path(working_dir) if working_dir else None
+        self.working_dir: Optional[Path] = Path(working_dir) if working_dir else None
         self._ref = ref
         self.git_project = git_project
         self.git_service = git_service

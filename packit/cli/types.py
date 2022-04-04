@@ -23,10 +23,10 @@ class LocalProjectParameter(click.ParamType):
 
     def __init__(
         self,
-        ref_param_name: str = None,
-        pr_id_param_name: str = None,
-        merge_pr_param_name: str = None,
-        target_branch_param_name: str = None,
+        ref_param_name: Optional[str] = None,
+        pr_id_param_name: Optional[str] = None,
+        merge_pr_param_name: Optional[str] = None,
+        target_branch_param_name: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.ref_param_name = ref_param_name

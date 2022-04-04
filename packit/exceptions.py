@@ -24,8 +24,8 @@ class PackitCommandFailedError(PackitException):
     def __init__(
         self,
         *args,
-        stdout_output: Union[str, bytes] = None,
-        stderr_output: Union[str, bytes] = None,
+        stdout_output: Union[str, bytes],
+        stderr_output: Union[str, bytes],
     ):
         super().__init__(*args)
         self.stdout_output = ensure_str(stdout_output)

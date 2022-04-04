@@ -2,13 +2,16 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+from typing import Optional
 
 from bodhi.client.bindings import BodhiClient
 
 logger = logging.getLogger(__name__)
 
 
-def get_bodhi_client(fas_username: str = None, fas_password: str = None) -> BodhiClient:
+def get_bodhi_client(
+    fas_username: Optional[str] = None, fas_password: str = None
+) -> BodhiClient:
     """
     Initialise the Bodhi client.
 

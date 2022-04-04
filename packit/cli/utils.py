@@ -91,7 +91,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
 def get_packit_api(
     config: Config,
     local_project: LocalProject,
-    dist_git_path: str = None,
+    dist_git_path: Optional[str] = None,
     load_packit_yaml: bool = True,
     job_config_index: Optional[int] = None,
 ) -> PackitAPI:

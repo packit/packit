@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 def run_command(
     cmd: Union[List[str], str],
-    error_message: str = None,
-    cwd: Union[str, Path] = None,
+    error_message: Optional[str] = None,
+    cwd: Union[str, Path, None] = None,
     fail: bool = True,
     output: bool = False,
     env: Optional[Dict] = None,
