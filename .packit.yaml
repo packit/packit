@@ -11,6 +11,7 @@ files_to_sync:
 upstream_package_name: packitos
 upstream_project_url: https://github.com/packit/packit
 copy_upstream_release_description: true
+issue_repository: https://github.com/packit/packit
 
 actions:
   create-archive:
