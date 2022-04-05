@@ -249,9 +249,38 @@ class TestGetAliases:
                     "fedora-stable": ["fedora-32", "fedora-33"],
                     "fedora-development": ["fedora-34", "fedora-rawhide"],
                     "fedora-latest": ["fedora-34"],
+                    "fedora-latest-stable": ["fedora-33"],
+                    "fedora-branched": ["fedora-32", "fedora-33", "fedora-34"],
                     "epel-all": ["epel-8"],
                 },
-                id="valid_bodhi_response",
+                id="after_branching",
+            ),
+            pytest.param(
+                [
+                    ("F30", "Fedora 30", "FEDORA", "archived"),
+                    ("F31", "Fedora 31", "FEDORA", "archived"),
+                    ("F32", "Fedora 32", "FEDORA", "current"),
+                    ("F33", "Fedora 33", "FEDORA", "current"),
+                    ("F34", "Fedora 34", "FEDORA", "current"),
+                    ("F35", "Fedora 35", "FEDORA", "pending"),
+                    ("F31F", "Fedora 31 Flatpaks", "FEDORA-FLATPAK", "current"),
+                    ("EPEL-8", "Fedora EPEL 8", "FEDORA-EPEL", "current"),
+                ],
+                {
+                    "fedora-all": [
+                        "fedora-32",
+                        "fedora-33",
+                        "fedora-34",
+                        "fedora-rawhide",
+                    ],
+                    "fedora-stable": ["fedora-32", "fedora-33", "fedora-34"],
+                    "fedora-development": ["fedora-rawhide"],
+                    "fedora-latest": ["fedora-34"],
+                    "fedora-latest-stable": ["fedora-34"],
+                    "fedora-branched": ["fedora-32", "fedora-33", "fedora-34"],
+                    "epel-all": ["epel-8"],
+                },
+                id="after_release",
             ),
             pytest.param(
                 [
@@ -273,9 +302,11 @@ class TestGetAliases:
                     "fedora-stable": ["fedora-33", "fedora-34"],
                     "fedora-development": ["fedora-rawhide"],
                     "fedora-latest": ["fedora-34"],
+                    "fedora-latest-stable": ["fedora-34"],
+                    "fedora-branched": ["fedora-33", "fedora-34"],
                     "epel-all": ["epel-8"],
                 },
-                id="valid_bodhi_response",
+                id="after_eol",
             ),
         ],
     )
@@ -302,6 +333,12 @@ class TestGetAliases:
         )
         assert Counter(aliases_result["fedora-latest"]) == Counter(
             expected_return["fedora-latest"]
+        )
+        assert Counter(aliases_result["fedora-latest-stable"]) == Counter(
+            expected_return["fedora-latest-stable"]
+        )
+        assert Counter(aliases_result["fedora-branched"]) == Counter(
+            expected_return["fedora-branched"]
         )
         assert Counter(aliases_result["epel-all"]) == Counter(
             expected_return["epel-all"]
