@@ -467,7 +467,7 @@ class PatchGenerator:
         patches: Dict[str, bytes],
         commits: List[git.Commit],
         destination: str,
-        files_to_ignore: List[str] = None,
+        files_to_ignore: Optional[List[str]] = None,
     ) -> List[PatchMetadata]:
         """
         Pair commits (in a source-git repo) with a list patches generated with git-format-patch.

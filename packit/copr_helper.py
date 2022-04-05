@@ -69,13 +69,13 @@ class CoprHelper:
         self,
         project: str,
         chroots: List[str],
-        owner: str = None,
-        description: str = None,
-        instructions: str = None,
+        owner: Optional[str] = None,
+        description: Optional[str] = None,
+        instructions: Optional[str] = None,
         list_on_homepage: Optional[bool] = False,
         preserve_project: Optional[bool] = False,
-        additional_packages: List[str] = None,
-        additional_repos: List[str] = None,
+        additional_packages: Optional[List[str]] = None,
+        additional_repos: Optional[List[str]] = None,
         request_admin_if_needed: bool = False,
     ) -> None:
         """
@@ -254,8 +254,8 @@ class CoprHelper:
         project: str,
         list_on_homepage: bool = False,
         preserve_project: bool = False,
-        additional_packages: List[str] = None,
-        additional_repos: List[str] = None,
+        additional_packages: Optional[List[str]] = None,
+        additional_repos: Optional[List[str]] = None,
     ) -> None:
 
         try:

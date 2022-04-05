@@ -53,7 +53,7 @@ class RepositoryCache:
     def get_repo(
         self,
         url: str,
-        directory: Union[Path, str] = None,
+        directory: Union[Path, str, None] = None,
     ) -> git.Repo:
         """
         Clone the repository.

@@ -67,7 +67,10 @@ class Specfile(SpecFile):
             self.save()
 
     def set_spec_version(
-        self, version: str = None, release: str = None, changelog_entry: str = None
+        self,
+        version: Optional[str] = None,
+        release: Optional[str] = None,
+        changelog_entry: str = None,
     ):
         """
         Set version in spec, release and add a changelog_entry (if they are presented).
