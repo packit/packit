@@ -97,7 +97,7 @@ class Upstream(PackitRepositoryBase):
         branch_name: str,
         force: bool = False,
         fork: bool = True,
-        remote_name: str = None,
+        remote_name: Optional[str] = None,
     ) -> Tuple[str, Optional[str]]:
         """
         push current branch to fork if fork=True, else to origin
@@ -160,7 +160,7 @@ class Upstream(PackitRepositoryBase):
         pr_description: str,
         source_branch: str,
         target_branch: str,
-        fork_username: str = None,
+        fork_username: Optional[str] = None,
     ) -> None:
         """
         Create upstream pull request using the requested branches
@@ -182,7 +182,7 @@ class Upstream(PackitRepositoryBase):
             logger.info(f"PR created: {upstream_pr.url}")
 
     def create_patches(
-        self, upstream: str = None, destination: Union[str, Path] = None
+        self, upstream: Optional[str] = None, destination: Union[str, Path] = None
     ) -> List[PatchMetadata]:
         """
         Create patches from downstream commits.
@@ -313,7 +313,9 @@ class Upstream(PackitRepositoryBase):
             return None
         return last_tag
 
-    def get_commit_messages(self, after: str = None, before: str = "HEAD") -> str:
+    def get_commit_messages(
+        self, after: Optional[str] = None, before: str = "HEAD"
+    ) -> str:
         """
         :param after: get commit messages after this revision,
         if None, all commit messages before 'before' will be returned
@@ -492,7 +494,9 @@ class Upstream(PackitRepositoryBase):
             )
 
     def create_srpm(
-        self, srpm_path: Union[Path, str] = None, srpm_dir: Union[Path, str] = None
+        self,
+        srpm_path: Union[Path, str, None] = None,
+        srpm_dir: Union[Path, str, None] = None,
     ) -> Path:
         """
         Create SRPM from the actual content of the repo.
@@ -515,7 +519,7 @@ class Upstream(PackitRepositoryBase):
 
     def prepare_upstream_for_srpm_creation(
         self,
-        upstream_ref: str = None,
+        upstream_ref: Optional[str] = None,
         bump_version: bool = True,
         release_suffix: Optional[str] = None,
     ):
@@ -755,8 +759,8 @@ class SRPMBuilder:
     def __init__(
         self,
         upstream: Upstream,
-        srpm_path: Union[Path, str] = None,
-        srpm_dir: Union[Path, str] = None,
+        srpm_path: Union[Path, str, None] = None,
+        srpm_dir: Union[Path, str, None] = None,
         ref: Optional[str] = None,
     ) -> None:
         self.upstream = upstream

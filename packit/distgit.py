@@ -89,7 +89,7 @@ class DistGit(PackitRepositoryBase):
         config: Config,
         package_config: CommonPackageConfig,
         path: Path,
-        branch: str = None,
+        branch: Optional[str] = None,
     ) -> "DistGit":
         """
         Clone dist-git repo for selected package and return this class
@@ -153,7 +153,7 @@ class DistGit(PackitRepositoryBase):
     def clone_package(
         self,
         target_path: Union[Path, str],
-        branch: str = None,
+        branch: Optional[str] = None,
     ) -> None:
         """
         Clone package from dist-git, i.e. from:
@@ -411,7 +411,7 @@ class DistGit(PackitRepositoryBase):
         dist_git_branch: str,
         update_type: str,
         update_notes: str,
-        koji_builds: Sequence[str] = None,
+        koji_builds: Optional[Sequence[str]] = None,
         bugzilla_ids: Optional[List[int]] = None,
     ):
         logger.debug(
