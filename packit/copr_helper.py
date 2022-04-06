@@ -331,14 +331,16 @@ class CoprHelper:
 
     def get_copr_builds(self, number_of_builds: int = 5) -> List:
         """
-        Get the copr builds of this project done by packit.
+        Get the copr builds of this project done by the user from the Copr config file.
         :return: list of builds
         """
         client = CoprClient.create_from_config_file()
 
         projects = [
             project.name
-            for project in reversed(client.project_proxy.get_list(ownername="packit"))
+            for project in reversed(
+                client.project_proxy.get_list(ownername=self.configured_owner)
+            )
             if project.name.startswith(
                 f"{self.upstream_local_project.namespace}-{self.upstream_local_project.repo_name}-"
             )
@@ -347,7 +349,7 @@ class CoprHelper:
         builds: List = []
         for project in projects:
             builds += client.build_proxy.get_list(
-                ownername="packit", projectname=project
+                ownername=self.configured_owner, projectname=project
             )
 
         logger.debug("Copr builds fetched.")
