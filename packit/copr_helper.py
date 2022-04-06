@@ -185,9 +185,7 @@ class CoprHelper:
             old_chroots = set(copr_proj.chroot_repos.keys())
 
             new_chroots = None
-            if copr_proj.ownername == "packit" and set(chroots) != old_chroots:
-                new_chroots = chroots
-            elif not set(chroots).issubset(old_chroots):
+            if not set(chroots).issubset(old_chroots):
                 new_chroots = list(set(chroots) | old_chroots)
 
             if new_chroots:
