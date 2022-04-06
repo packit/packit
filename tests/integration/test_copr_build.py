@@ -381,8 +381,6 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
             ["fedora-rawhide-x86_64", "fedora-35-x86_64"],
             ["fedora-rawhide-x86_64", "fedora-35-x86_64", "epel-8-x86_64"],
         ),
-        # For Copr projects that are created by Packit we replace the chroots.
-        ("packit", ["fedora-rawhide-x86_64"], ["fedora-rawhide-x86_64"]),
         # For Copr projects that are not created by Packit we **do not** touch
         # chroots as long as the requirements for Copr build are satisfied.
         ("the-owner", ["fedora-rawhide-x86_64"], None),
