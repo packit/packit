@@ -394,9 +394,9 @@ class PackitRepositoryBase:
         logger.info(
             f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}."
         )
-        push_infos_list: Iterable[PushInfo] = self.local_project.push(
-            refspec, remote_name=remote_name, force=force
-        )
+        push_infos_list: Iterable[PushInfo] = self.local_project.git_repo.remote(
+            name=remote_name
+        ).push(refspec=refspec, force=force)
         for pi in push_infos_list:
             logger.info(f"Push summary: {pi.summary}")
             push_failed = [
