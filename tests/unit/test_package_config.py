@@ -18,7 +18,6 @@ from packit.config import (
 )
 from packit.config.job_config import JobMetadataConfig
 from packit.config.package_config import (
-    get_specfile_path_from_repo,
     PackageConfig,
     get_local_specfile_path,
     get_local_package_config,
@@ -26,7 +25,6 @@ from packit.config.package_config import (
 import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.constants import CONFIG_FILE_NAMES
-from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -44,18 +42,6 @@ from tests.unit.test_config import (
 @pytest.fixture()
 def job_config_simple():
     return get_job_config_simple()
-
-
-@pytest.mark.parametrize(
-    "files,expected",
-    [(["foo.spec"], "foo.spec"), ([], None)],
-)
-def test_get_specfile_path_from_repo(files, expected):
-    gp = flexmock(GitProject)
-    gp.should_receive("full_repo_name").and_return("a/b")
-    gp.should_receive("get_files").and_return(files)
-    git_project = GitProject(repo="", service=GitService(), namespace="")
-    assert get_specfile_path_from_repo(project=git_project) == expected
 
 
 @pytest.mark.parametrize(
@@ -1031,17 +1017,35 @@ def test_dist_git_package_url():
 
 
 @pytest.mark.parametrize(
-    "content,project,mock_spec_search,spec_path_option,spec_path",
+    "content,project,spec_path",
     [
         (
+            "specfile_path: packit.spec\n"
             "synced_files:\n"
             "  - packit.spec\n"
             "  - src: .packit.yaml\n"
             "    dest: .packit2.yaml",
             GitProject(repo="", service=GitService(), namespace=""),
-            True,
-            None,
             "packit.spec",
+        ),
+        (
+            "downstream_package_name: packit\n"
+            "synced_files:\n"
+            "  - packit.spec\n"
+            "  - src: .packit.yaml\n"
+            "    dest: .packit2.yaml",
+            GitProject(repo="", service=GitService(), namespace=""),
+            "packit.spec",
+        ),
+        (
+            "specfile_path: blue.spec\n"
+            "downstream_package_name: packit\n"
+            "files_to_sync:\n"
+            "  - packit.spec\n"
+            "  - src: .packit.yaml\n"
+            "    dest: .packit2.yaml",
+            GitProject(repo="", service=GitService(), namespace=""),
+            "blue.spec",
         ),
         (
             "synced_files:\n"
@@ -1049,27 +1053,19 @@ def test_dist_git_package_url():
             "  - src: .packit.yaml\n"
             "    dest: .packit2.yaml",
             GitProject(repo="", service=GitService(), namespace=""),
-            False,
-            "packit.spec",
-            "packit.spec",
+            None,
         ),
     ],
 )
 def test_get_package_config_from_repo(
     content,
     project: GitProject,
-    mock_spec_search: bool,
     spec_path: Optional[str],
-    spec_path_option: Optional[str],
 ):
     gp = flexmock(GitProject)
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
-    if mock_spec_search:
-        gp.should_receive("get_files").and_return(["packit.spec"]).once()
-    config = get_package_config_from_repo(
-        project=project, spec_file_path=spec_path_option
-    )
+    config = get_package_config_from_repo(project=project)
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == spec_path
     assert config.files_to_sync == [
@@ -1077,32 +1073,6 @@ def test_get_package_config_from_repo(
         SyncFilesItem(src=[".packit.yaml"], dest=".packit2.yaml"),
     ]
     assert config.create_pr
-
-
-@pytest.mark.parametrize(
-    "content",
-    [
-        "{}",
-        "{jobs: [{job: build, trigger: commit}]}",
-        "{downstream_package_name: horkyze, jobs: [{job: build, trigger: commit}]}",
-        "{upstream_package_name: slize, jobs: [{job: build, trigger: commit}]}",
-    ],
-)
-def test_get_package_config_from_repo_spec_file_not_defined(content):
-    specfile_path = "packit.spec"
-    gp = flexmock(GitProject)
-    gp.should_receive("full_repo_name").and_return("a/b")
-    gp.should_receive("get_file_content").and_return(content)
-    gp.should_receive("get_files").and_return([specfile_path])
-    git_project = GitProject(repo="", service=GitService(), namespace="")
-    config = get_package_config_from_repo(project=git_project)
-    assert isinstance(config, PackageConfig)
-    assert Path(config.specfile_path).name == specfile_path
-    assert config.create_pr
-    for j in config.jobs:
-        assert j.specfile_path == specfile_path
-        assert j.downstream_package_name == config.downstream_package_name
-        assert j.upstream_package_name == config.upstream_package_name
 
 
 @pytest.mark.parametrize(
@@ -1206,7 +1176,7 @@ def test_get_local_package_config_path(
     (
         flexmock(packit.config.package_config)
         .should_receive("parse_loaded_config")
-        .and_return(None)
+        .and_return(flexmock(specfile_path=None))
     )
 
     get_local_package_config(
@@ -1391,34 +1361,6 @@ def test_get_specfile_sync_files_nodownstreamname_item():
     assert pc.get_specfile_sync_files_item(from_downstream=True) == SyncFilesItem(
         src=[downstream_specfile_path], dest=upstream_specfile_path
     )
-
-
-@pytest.mark.parametrize(
-    "raw",
-    [
-        {
-            "jobs": [
-                {
-                    "job": "copr_build",
-                    "trigger": "release",
-                    "metadata": {"targets": ["fedora-stable", "fedora-development"]},
-                }
-            ],
-        },
-        {
-            "jobs": [
-                {
-                    "job": "tests",
-                    "trigger": "release",
-                    "metadata": {"targets": ["fedora-stable", "fedora-development"]},
-                }
-            ],
-        },
-    ],
-)
-def test_package_config_specfile_not_present_raise(raw):
-    with pytest.raises(PackitConfigException):
-        PackageConfig.get_from_dict(raw_dict=raw)
 
 
 @pytest.mark.parametrize(

@@ -132,7 +132,6 @@ class PackageConfig(CommonPackageConfig):
         raw_dict: dict,
         config_file_path: Optional[str] = None,
         repo_name: Optional[str] = None,
-        spec_file_path: Optional[str] = None,
     ) -> "PackageConfig":
         # required to avoid cyclical imports
         from packit.schema import PackageConfigSchema
@@ -153,26 +152,15 @@ class PackageConfig(CommonPackageConfig):
             raw_dict["downstream_package_name"] = repo_name
 
         if not raw_dict.get("specfile_path", None):
-            if spec_file_path:
-                raw_dict["specfile_path"] = spec_file_path
-            else:
-                # we default to downstream_package_name
-                # https://packit.dev/docs/configuration/#specfile_path
-                downstream_package_name = raw_dict.get("downstream_package_name", None)
-                if downstream_package_name:
-                    raw_dict["specfile_path"] = f"{downstream_package_name}.spec"
-                # else: we could try upstream_package_name but this seems
-                # like an extreme corner case
+            # we default to downstream_package_name
+            # https://packit.dev/docs/configuration/#specfile_path
+            downstream_package_name = raw_dict.get("downstream_package_name", None)
+            if downstream_package_name:
+                raw_dict["specfile_path"] = f"{downstream_package_name}.spec"
+            # else: we could try upstream_package_name but this seems
+            # like an extreme corner case
 
-        package_config = PackageConfigSchema().load(raw_dict)
-
-        if not package_config.specfile_path and not all(
-            job.type == JobType.tests and job.metadata.skip_build
-            for job in package_config.jobs
-        ):
-            raise PackitConfigException("Spec file was not found!")
-
-        return package_config
+        return PackageConfigSchema().load(raw_dict)
 
     def get_copr_build_project_value(self) -> Optional[str]:
         """
@@ -295,7 +283,10 @@ def get_local_package_config(
     package_config_path: Optional[str] = None,
 ) -> PackageConfig:
     """
-    find packit.yaml in provided dirs, load it and return PackageConfig
+    Find packit.yaml in provided dirs, load it and return PackageConfig.
+
+    If 'specfile_path' is not specified in the package configuration,
+    search for the tree and set the first spec file found.
 
     :param directory: a list of dirs where we should find
     :param repo_name: name of the git repository (default for project name)
@@ -314,19 +305,21 @@ def get_local_package_config(
             try_local_dir_last=try_local_dir_last,
         )
 
-    loaded_config = load_packit_yaml(config_file_name)
-    local_specfile_path = get_local_specfile_path(config_file_name.parent)
-
-    return parse_loaded_config(
-        loaded_config=loaded_config,
+    parsed_config = parse_loaded_config(
+        loaded_config=load_packit_yaml(config_file_name),
         config_file_path=config_file_name.name,
         repo_name=repo_name,
-        spec_file_path=str(local_specfile_path) if local_specfile_path else None,
     )
+    if not parsed_config.specfile_path:
+        parsed_config.specfile_path = str(
+            get_local_specfile_path(config_file_name.parent)
+        )
+
+    return parsed_config
 
 
 def get_package_config_from_repo(
-    project: GitProject, ref: Optional[str] = None, spec_file_path: Optional[str] = None
+    project: GitProject, ref: Optional[str] = None
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
@@ -357,15 +350,11 @@ def get_package_config_from_repo(
         raise PackitConfigException(
             f"Cannot load package config {config_file_name!r}. {ex}"
         )
-    if not spec_file_path:
-        logger.warning(f"Spec file path is not specified in {config_file_name}.")
-        spec_file_path = get_specfile_path_from_repo(project=project, ref=ref)
 
     return parse_loaded_config(
         loaded_config=loaded_config,
         config_file_path=config_file_name,
         repo_name=project.repo,
-        spec_file_path=spec_file_path,
     )
 
 
@@ -373,7 +362,6 @@ def parse_loaded_config(
     loaded_config: dict,
     config_file_path: Optional[str] = None,
     repo_name: Optional[str] = None,
-    spec_file_path: Optional[str] = None,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
@@ -383,7 +371,6 @@ def parse_loaded_config(
             raw_dict=loaded_config,
             config_file_path=config_file_path,
             repo_name=repo_name,
-            spec_file_path=spec_file_path,
         )
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
@@ -411,18 +398,3 @@ def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Pa
         return files[0]
 
     return None
-
-
-def get_specfile_path_from_repo(project: GitProject, ref: str = None) -> Optional[str]:
-    """
-    Get the path of the spec file in the given repo if present.
-    :param project: GitProject
-    :param ref: git ref (defaults to repo's default branch)
-    :return: str path of the spec file or None
-    """
-    spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
-
-    if not spec_files:
-        logger.debug(f"No spec file found in {project.full_repo_name!r}")
-        return None
-    return spec_files[0]

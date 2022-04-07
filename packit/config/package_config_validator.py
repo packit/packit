@@ -7,7 +7,7 @@ import logging
 
 from marshmallow import ValidationError
 
-from packit.config.package_config import PackageConfig, get_local_specfile_path
+from packit.config.package_config import PackageConfig
 from packit.exceptions import PackitConfigException
 from packit.sync import iter_srcs
 
@@ -29,9 +29,6 @@ class PackageConfigValidator:
             config = PackageConfig.get_from_dict(
                 self.content,
                 config_file_path=str(self.config_file_path),
-                spec_file_path=str(
-                    get_local_specfile_path(self.config_file_path.parent)
-                ),
             )
         except ValidationError as e:
             schema_errors = e.messages
