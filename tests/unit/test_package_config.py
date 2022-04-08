@@ -858,6 +858,24 @@ def test_package_config_parse_error(raw):
             ),
             id="sync_changelog_false_by_default",
         ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [get_job_config_dict_simple()],
+                "downstream_branch_name": "another-branch",
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                downstream_branch_name="another-branch",
+                jobs=[
+                    get_job_config_simple(
+                        downstream_branch_name="another-branch",
+                        specfile_path="fedora/package.spec",
+                    )
+                ],
+            ),
+            id="downstream_branch_name",
+        ),
     ],
 )
 def test_package_config_parse(raw, expected):
