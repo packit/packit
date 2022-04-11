@@ -39,6 +39,7 @@ class PackageConfig(CommonPackageConfig):
         upstream_package_name: Optional[str] = None,
         downstream_project_url: Optional[str] = None,
         downstream_package_name: Optional[str] = None,
+        downstream_branch_name: Optional[str] = None,
         dist_git_base_url: Optional[str] = None,
         actions: Optional[Dict[ActionName, Union[str, List[str]]]] = None,
         upstream_ref: Optional[str] = None,
@@ -70,6 +71,7 @@ class PackageConfig(CommonPackageConfig):
             upstream_package_name=upstream_package_name,
             downstream_project_url=downstream_project_url,
             downstream_package_name=downstream_package_name,
+            downstream_branch_name=downstream_branch_name,
             dist_git_base_url=dist_git_base_url,
             actions=actions,
             upstream_ref=upstream_ref,
@@ -105,6 +107,7 @@ class PackageConfig(CommonPackageConfig):
             f"upstream_package_name='{self.upstream_package_name}', "
             f"downstream_project_url='{self.downstream_project_url}', "
             f"downstream_package_name='{self.downstream_package_name}', "
+            f"downstream_branch_name='{self.downstream_branch_name}', "
             f"dist_git_base_url='{self.dist_git_base_url}', "
             f"actions='{self.actions}', "
             f"upstream_ref='{self.upstream_ref}', "
@@ -215,6 +218,7 @@ class PackageConfig(CommonPackageConfig):
             and self.upstream_package_name == other.upstream_package_name
             and self.downstream_project_url == other.downstream_project_url
             and self.downstream_package_name == other.downstream_package_name
+            and self.downstream_branch_name == other.downstream_branch_name
             and self.dist_git_base_url == other.dist_git_base_url
             and self.actions == other.actions
             and self.allowed_gpg_keys == other.allowed_gpg_keys
