@@ -276,6 +276,7 @@ class CommonConfigSchema(Schema):
     config_file_path = fields.String(missing=None)
     specfile_path = fields.String(missing=None)
     downstream_package_name = fields.String(missing=None)
+    downstream_branch_name = fields.String(missing=None)
     upstream_project_url = fields.String(missing=None)
     upstream_package_name = fields.String(missing=None, validate=validate_repo_name)
     upstream_ref = fields.String(missing=None)
