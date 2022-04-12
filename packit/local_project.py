@@ -1,10 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import dataclasses
 import logging
 import shutil
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Iterable, Any, Set, TypeVar
+from functools import partial
 
 import git
 from git.exc import GitCommandError
@@ -12,6 +14,7 @@ from ogr import GitlabService
 from ogr.abstract import GitProject, GitService
 from ogr.factory import get_service_class
 from ogr.parsing import parse_git_repo
+from ogr.factory import get_project
 
 from packit.constants import LP_TEMP_PR_CHECKOUT_NAME
 from packit.exceptions import PackitException, PackitMergeException
@@ -47,11 +50,11 @@ class LocalProject:
     # setting defaults to str because `None == ""` results into TypeError is not true-true
     def __init__(
         self,
-        git_repo: git.Repo = None,
+        git_repo: Optional[git.Repo] = None,
         working_dir: Union[Path, str, None] = None,
         ref: str = "",
-        git_project: GitProject = None,
-        git_service: GitService = None,
+        git_project: Optional[GitProject] = None,
+        git_service: Optional[GitService] = None,
         git_url: str = "",
         full_name: str = "",
         namespace: str = "",
@@ -63,6 +66,7 @@ class LocalProject:
         cache: Optional[RepositoryCache] = None,
         merge_pr: bool = True,
         target_branch: str = "",
+        working_dir_temporary: bool = False,
     ) -> None:
         """
 
@@ -80,7 +84,7 @@ class LocalProject:
         :param remote: name of the git remote to use
         :param pr_id: ID of the pull request to fetch and check out
         """
-        self.working_dir_temporary = False
+        self.working_dir_temporary = working_dir_temporary
         self._git_repo: git.Repo = git_repo
         self.working_dir: Optional[Path] = Path(working_dir) if working_dir else None
         self._ref = ref
@@ -194,6 +198,7 @@ class LocalProject:
             self.git_repo.git.clear_cache()
 
     def refresh_the_arguments(self):
+        # TODO: remove this whole logic once everything uses LocalProjectBuilder
         change = True
         while change:
             # we are trying to get new information while it is possible
@@ -561,3 +566,476 @@ class LocalProject:
 
     def __del__(self):
         self.clean()
+
+
+@dataclasses.dataclass
+class LocalProjectCalculationState:
+    """Class representing the current state of construction of LocalProject.
+
+    Encloses all the arguments that will then be passed to LocalProject's
+    constructor.
+    """
+
+    remote: str = ""
+    git_repo: Optional[git.Repo] = None
+    working_dir: Union[Path, str, None] = None
+    ref: str = ""
+    git_project: Optional[GitProject] = None
+    git_service: Optional[GitService] = None
+    git_url: str = ""
+    full_name: str = ""
+    namespace: str = ""
+    repo_name: str = ""
+    working_dir_temporary: bool = False
+
+    @classmethod
+    def from_local_project(cls, lp: LocalProject) -> "LocalProjectCalculationState":
+        """Constructs the calculation state from an existing LocalProject."""
+        return cls(
+            lp.remote,
+            lp.git_repo,
+            lp.working_dir,
+            lp.ref,
+            lp.git_project,
+            lp.git_service,
+            lp.git_url,
+            lp.full_name,
+            lp.namespace,
+            lp.repo_name,
+        )
+
+
+# Use an explicit sentinel class to have stricter type-checking than just object()
+class _CalculateType:
+    pass
+
+
+CALCULATE = _CalculateType()
+
+
+T = TypeVar("T")
+CanCalculate = Union[T, _CalculateType]
+
+
+class LocalProjectBuilder:
+    """Class for building instances of LocalProject dynamically."""
+
+    PREREQUISITES = {
+        "git_repo": ["working_dir", "git_url"],
+        "git_project": ["git_url", "repo_name", "namespace", "git_service"],
+        "git_service": ["git_project"],
+        "ref": ["git_repo"],
+        "working_dir": ["git_repo"],
+        "git_url": ["git_project", "git_repo"],
+        "repo_name": ["git_project", "full_name"],
+        "namespace": ["git_project", "git_url", "full_name"],
+        "full_name": ["namespace", "repo_name"],
+    }
+
+    def __init__(
+        self,
+        cache: Optional[RepositoryCache] = None,
+        instances: Iterable[GitService] = None,
+        offline: bool = False,
+    ):
+        """Creates a builder instance.
+
+        Args:
+            cache: Repository cache that may be used for getting repos.
+            instances: List of GitService instances to utilise while building.
+            offline: Whether only offline operations should be performed in this builder.
+        """
+        self._instances = instances or []
+        self._cache = cache
+        self.offline = offline
+
+    def _add_prerequisites_to_calculations(self, to_calculate: Set[str]) -> None:
+        """Adds calculation prerequisites into to_calculate set.
+
+        If a caller of this class requests git_repo to be calculated, they should not
+        have to care about the prerequisites to git_repo, hence we add those to the
+        calculation set as well.
+        """
+        logger.debug(f"Attributes requested: {', '.join(to_calculate)}")
+        dependencies = {}
+        change = True
+        while change:
+            len_before = len(to_calculate)
+            for calc in to_calculate.copy():
+                required = set(self.PREREQUISITES.get(calc, []))
+                new_dependencies = required - to_calculate
+                to_calculate.update(new_dependencies)
+                dependencies.update({calc: dep for dep in new_dependencies})
+            change = len(to_calculate) > len_before
+
+        dep_list = [f"{k} => {v}" for k, v in dependencies.items()]
+        logger.debug(f"Transitive dependencies: {', '.join(dep_list)}")
+
+    def _refresh_the_state(
+        self, state: LocalProjectCalculationState, to_calculate: Set[str]
+    ) -> None:
+        """Calculates the requested attributes while also considering transitive relations.
+
+        Args:
+            state: The initial state which will be updated with new calculated data.
+            to_calculate: Set of attributes that need to be calculated.
+        """
+        self._add_prerequisites_to_calculations(to_calculate)
+        # Remove the already set pieces
+        to_calculate = set(filter(lambda a: not getattr(state, a, None), to_calculate))
+        logger.debug(f"To-calculate set: {to_calculate}")
+        name_partial = partial(self._parse_repo_name_full_name_and_namespace)
+        all_partials = {
+            "git_repo": [
+                partial(self._parse_git_repo_from_git_url),
+                partial(self._parse_git_repo_from_working_dir),
+            ],
+            "git_project": [
+                partial(self._parse_git_project_from_url),
+                partial(self._parse_git_project_from_repo_namespace_and_git_service),
+            ],
+            "git_service": [partial(self._parse_git_service_from_git_project)],
+            "ref": [partial(self._parse_ref_from_git_repo)],
+            "working_dir": [partial(self._parse_working_dir_from_git_repo)],
+            "git_url": [
+                partial(self._parse_git_url_from_git_project),
+                partial(self._parse_git_url_from_git_repo),
+            ],
+            "repo_name": [
+                name_partial,
+                partial(self._parse_repo_name_from_git_project),
+            ],
+            "namespace": [
+                name_partial,
+                partial(self._parse_namespace_from_git_project),
+                partial(self._parse_namespace_from_git_url),
+            ],
+            "full_name": [name_partial],
+        }
+
+        partials = [
+            part for calc in to_calculate for part in all_partials.get(calc, [])
+        ]
+        change = True
+        while change:
+            change = False
+            for part in partials:
+                change = change or part(state)
+
+    def _parse_repo_name_full_name_and_namespace(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Calculates repo name, namespace or full name if they are missing
+        based on the other attributes."""
+        change = False
+        if state.repo_name and state.namespace and not state.full_name:
+            state.full_name = f"{state.namespace}/{state.repo_name}"
+            change = True
+        if state.full_name and not state.namespace:
+            state.namespace = state.full_name.split("/")[0]
+            change = True
+        if state.full_name and not state.repo_name:
+            state.repo_name = state.full_name.split("/")[1]
+            change = True
+
+        if change:
+            logger.debug(
+                f"Parsed full repo name '{state.namespace}/{state.repo_name}'."
+            )
+        return change
+
+    def _parse_git_repo_from_working_dir(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Prepares git.Repo instance based on working_dir.
+
+        Clones git_url if working_dir is not a repo.
+        """
+        if state.working_dir and not state.git_repo:
+            logger.debug(
+                "`working_dir` is set and `git_repo` is not: let's discover..."
+            )
+            if is_git_repo(directory=state.working_dir):
+                logger.debug("It's a git repo!")
+                state.git_repo = git.Repo(path=state.working_dir)
+                return True
+
+            elif state.git_url and not self.offline:
+                state.git_repo = self._get_repo(
+                    url=state.git_url, directory=state.working_dir
+                )
+                logger.debug(
+                    f"We just cloned git repo {state.git_url} to {state.working_dir}."
+                )
+                return True
+
+        return False
+
+    def _parse_git_project_from_url(self, state: LocalProjectCalculationState) -> bool:
+        """Creates GitProject based on git_url and provided GitService instances."""
+        if state.git_url and self._instances:
+            state.git_project = get_project(
+                state.git_url, custom_instances=self._instances
+            )
+            return True
+        return False
+
+    def _parse_git_project_from_repo_namespace_and_git_service(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Creates GitProject based on namespace, repo name and GitService."""
+
+        if (
+            state.repo_name
+            and state.namespace
+            and state.git_service
+            and not state.git_project
+            and not self.offline
+        ):
+            state.git_project = state.git_service.get_project(
+                repo=state.repo_name, namespace=state.namespace
+            )
+            logger.debug(f"Parsed project '{state.namespace}/{state.repo_name}'.")
+            return True
+        return False
+
+    def _parse_git_service_from_git_project(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Creates GitService based on GitProject."""
+        if not (state.git_project is None or state.git_service or self.offline):
+            state.git_service = state.git_project.service
+            logger.debug(
+                f"Parsed service {state.git_service} from the project {state.git_project}."
+            )
+            return True
+        return False
+
+    def _parse_ref_from_git_repo(self, state: LocalProjectCalculationState) -> bool:
+        """Obtains the current git ref from git.Repo."""
+        if state.git_repo and not state.ref:
+            state.ref = self._get_ref_from_git_repo(state.git_repo)
+            logger.debug(f"Parsed ref {state.ref!r} from the repo {state.git_repo}.")
+            return bool(state.ref)
+        return False
+
+    def _parse_working_dir_from_git_repo(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Obtains the working_dir from git.Repo instance."""
+        if state.git_repo and not state.working_dir:
+            state.working_dir = Path(state.git_repo.working_dir)
+            logger.debug(
+                f"Parsed working directory {state.working_dir} from the repo {state.git_repo}."
+            )
+            return True
+        return False
+
+    def _parse_git_repo_from_git_url(self, state: LocalProjectCalculationState) -> bool:
+        """Prepares git.Repo instance based on a git URL."""
+        if (
+            state.git_url
+            and not state.working_dir
+            and not state.git_repo
+            and not self.offline
+        ):
+            state.git_repo = self._get_repo(url=state.git_url)
+            state.working_dir_temporary = True
+            logger.debug(f"Parsed repo {state.git_repo} from url {state.git_url!r}.")
+            return True
+        return False
+
+    def _parse_git_url_from_git_project(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Obtains git URL from a GitProject."""
+        if state.git_project and not state.git_url and not self.offline:
+            state.git_url = state.git_project.get_git_urls()["git"]
+            logger.debug(
+                f"Parsed remote url {state.git_url!r} from the project {state.git_project}."
+            )
+            return True
+        return False
+
+    def _parse_repo_name_from_git_project(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Obtains git repo name from a GitProject."""
+        if state.git_project and not state.repo_name:
+            state.repo_name = state.git_project.repo
+            if not state.repo_name:
+                raise PackitException(
+                    "Repo name should have been set but isn't, this is bug!"
+                )
+            logger.debug(
+                f"Parsed repo name {state.repo_name!r} from the git project {state.git_project}."
+            )
+            return True
+        return False
+
+    def _parse_namespace_from_git_project(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Obtains git repo namespace from a GitProject."""
+        if state.git_project and not state.namespace:
+            state.namespace = state.git_project.namespace
+            logger.debug(
+                f"Parsed namespace {state.namespace!r} from the project {state.git_project}."
+            )
+            return True
+        return False
+
+    def _parse_git_url_from_git_repo(self, state: LocalProjectCalculationState) -> bool:
+        """Obtains git URL from git.Repo based on the set remote."""
+        if not state.git_repo or state.git_url:
+            return False
+
+        if state.remote:
+            state.git_url = next(state.git_repo.remote(state.remote).urls)
+        elif state.git_repo.remotes:
+            for remote in state.git_repo.remotes:
+                if remote.name == "origin":
+                    # origin as a default
+                    state.git_url = remote.url
+                    break
+            else:
+                # or use first one
+                state.git_url = next(state.git_repo.remotes[0].urls)
+        else:
+            # Repo has no remotes
+            return False
+        logger.debug(
+            f"Parsed remote url {state.git_url!r} from the repo {state.git_repo}."
+        )
+        return True
+
+    def _parse_namespace_from_git_url(
+        self, state: LocalProjectCalculationState
+    ) -> bool:
+        """Obtains git repo namespace from a git URL."""
+        if state.git_url and not (state.namespace and state.repo_name):
+            parsed_repo_url = parse_git_repo(potential_url=state.git_url)
+            if (
+                parsed_repo_url.namespace == state.namespace
+                and parsed_repo_url.repo == state.repo_name
+            ):
+                return False
+            state.namespace, state.repo_name = (
+                parsed_repo_url.namespace,
+                parsed_repo_url.repo,
+            )
+            logger.debug(
+                f"Parsed namespace and repo name ({state.namespace}, {state.repo_name}) "
+                f"from url {state.git_url!r}."
+            )
+            return True
+        return False
+
+    @staticmethod
+    def _get_ref_from_git_repo(git_repo: git.Repo) -> str:
+        if git_repo.head.is_detached:
+            return git_repo.head.commit.hexsha
+        else:
+            return git_repo.active_branch.name
+
+    def _get_repo(self, url, directory=None):
+        if self._cache:
+            return self._cache.get_repo(url, directory=directory)
+        return get_repo(url=url, directory=directory)
+
+    def build(
+        self,
+        # Non-building stuff
+        remote: str = "",
+        pr_id: Optional[str] = None,
+        merge_pr: bool = True,
+        target_branch: str = "",
+        # Building data/instructions
+        git_repo: CanCalculate[Union[git.Repo, None]] = None,
+        working_dir: CanCalculate[Union[Path, str, None]] = None,
+        ref: CanCalculate[str] = "",
+        git_project: CanCalculate[Union[GitProject, None]] = None,
+        git_service: CanCalculate[Union[GitService, None]] = None,
+        git_url: CanCalculate[str] = "",
+        full_name: CanCalculate[str] = "",
+        namespace: CanCalculate[str] = "",
+        repo_name: CanCalculate[str] = "",
+        # LocalProject "template"
+        local_project: Optional[LocalProject] = None,
+    ) -> LocalProject:
+        """Builds the LocalProject instance from the provided attributes.
+
+        Most arguments can either take an explicit value, None (or empty string) or
+        they can be passed the sentinel value CALCULATE to signal that this attribute
+        must be present in the final LocalProject object and therefore be computed
+        dynamically based on the rest of the information.
+
+        Args:
+            remote: Name of the git remote to use.
+            pr_id: ID of the pull request to fetch and check out.
+            merge_pr: Whether the fetched pull request should be merged.
+            target_branch: Name of the branch the PR should be merged into.
+            git_repo: Instance of git.Repo.
+            working_dir: Path to the working directory of the project.
+            ref: Git ref, if set, it will be checked out.
+            git_project: ogr.GitProject (remote API)
+            git_service: ogr.Gitservice (tokens for remote API)
+            git_url: URL of the git project (used for cloning)
+            full_name: Full name of the remote git project (including namespace).
+            repo_name: Name of the remote git project.
+            namespace: Namespace of the remote git project.
+            local_project: LocalProject to use as the initial calculation state,
+                the other arguments will override information present in this LocalProject.
+
+        Returns:
+            The constructed LocalProject instance.
+
+        Examples:
+            Clone the given URL and checkout the develop branch.
+
+                builder.build(
+                    git_url="https://github.com/packit/hello-world",
+                    git_repo="CALCULATE",
+                    ref="develop",
+                )
+        """
+        to_calculate: Set[str] = set()
+
+        def check_and_set(
+            calc_state: LocalProjectCalculationState, attr: str, value: Any
+        ):
+            if value is CALCULATE:
+                to_calculate.add(attr)
+            elif value is not None and value != "":
+                setattr(calc_state, attr, value)
+
+        if local_project:
+            state = LocalProjectCalculationState.from_local_project(local_project)
+        else:
+            state = LocalProjectCalculationState()
+        check_and_set(state, "remote", remote)
+        check_and_set(state, "git_repo", git_repo)
+        check_and_set(state, "working_dir", working_dir)
+        check_and_set(state, "ref", ref)
+        check_and_set(state, "git_project", git_project)
+        check_and_set(state, "git_service", git_service)
+        check_and_set(state, "git_url", git_url)
+        check_and_set(state, "full_name", full_name)
+        check_and_set(state, "namespace", namespace)
+        check_and_set(state, "repo_name", repo_name)
+        self._refresh_the_state(state, to_calculate)
+        # dataclasses.asdict cannot be used because some parts of the calculation state
+        # are not deep-copyable (git.Repo and possibly ogr objects). A shallow copy suffices.
+        state_dict = {
+            field.name: getattr(state, field.name)
+            for field in dataclasses.fields(state)
+        }
+        # Do not refresh the built local project (the logic will go away)
+        return LocalProject(
+            offline=self.offline,
+            pr_id=pr_id,
+            merge_pr=merge_pr,
+            target_branch=target_branch,
+            refresh=False,
+            **state_dict,
+        )
