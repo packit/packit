@@ -1,3 +1,15 @@
+# 0.49.0
+
+- A new configuration option `downstream_branch_name` has been added,
+  which is meant to be used in source-git projects and allow users
+  to customize the name of the branch in dist-git which corresponds
+  to the current source-git branch. (#1555)
+- Introduced two new build and test target aliases: `fedora-latest-stable`
+  resolves to the latest stable Fedora Linux release, while `fedora-branched`
+  resolves to all branched releases (all Fedora Linux release, except `rawhide`). (#1546)
+- When using `post_upstream_clone` to generate your spec-file,
+  Packit now correctly checkouts the release before the action is run. (#1542)
+
 # 0.48.0
 
 - `packit source-git update-dist-git` and `packit source-git update-source-git` now check the synchronization of source-git and dist-git repositories prior to doing the update. If the update can't be done, for example, because the histories have diverged, the command provides instructions on how to synchronize the repositories. A `--force` option is available to try to update the destination repository anyway.
