@@ -8,7 +8,7 @@ from typing import Optional
 import click
 import git
 
-from packit.local_project import LocalProject
+from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
 from packit.utils.repo import git_remote_url_to_https_url
 
 logger = logging.getLogger(__name__)
@@ -66,25 +66,41 @@ class LocalProjectParameter(click.ParamType):
             if self.target_branch_param_name:
                 target_branch = self.get_param(self.target_branch_param_name, ctx)
 
+            # General use-case, create fully featured project
+            builder = LocalProjectBuilder()
             if os.path.isdir(value):
                 absolute_path = os.path.abspath(value)
                 logger.debug(f"Input is a directory: {absolute_path}")
-                local_project = LocalProject(
+                local_project = builder.build(
                     working_dir=absolute_path,
                     ref=ref,
                     remote=ctx.obj.upstream_git_remote,
                     merge_pr=merge_pr,
                     target_branch=target_branch,
+                    git_repo=CALCULATE,
+                    git_project=CALCULATE,
+                    git_service=CALCULATE,
+                    full_name=CALCULATE,
+                    namespace=CALCULATE,
+                    repo_name=CALCULATE,
+                    git_url=CALCULATE,
                 )
             elif git_remote_url_to_https_url(value):
                 logger.debug(f"Input is a URL to a git repo: {value}")
-                local_project = LocalProject(
+                local_project = builder.build(
                     git_url=value,
                     ref=ref,
                     remote=ctx.obj.upstream_git_remote,
                     pr_id=pr_id,
                     merge_pr=merge_pr,
                     target_branch=target_branch,
+                    git_repo=CALCULATE,
+                    working_dir=CALCULATE,
+                    git_project=CALCULATE,
+                    git_service=CALCULATE,
+                    full_name=CALCULATE,
+                    namespace=CALCULATE,
+                    repo_name=CALCULATE,
                 )
             else:
                 self.fail(
