@@ -14,7 +14,7 @@ from packit.config import pass_config
 from packit.config import Config, get_local_package_config
 from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
 from packit.api import PackitAPI
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder, CALCULATE
 from packit.cli.utils import cover_packit_exception
 
 
@@ -94,11 +94,16 @@ def update_source_git(
     package_config = get_local_package_config(
         package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
     )
+    builder = LocalProjectBuilder(offline=True)
     api = PackitAPI(
         config=config,
         package_config=package_config,
-        upstream_local_project=LocalProject(working_dir=source_git_path, offline=True),
-        downstream_local_project=LocalProject(working_dir=dist_git_path, offline=True),
+        upstream_local_project=builder.build(
+            working_dir=source_git_path, git_repo=CALCULATE
+        ),
+        downstream_local_project=builder.build(
+            working_dir=dist_git_path, git_repo=CALCULATE
+        ),
     )
 
     api.update_source_git(

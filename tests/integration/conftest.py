@@ -26,7 +26,7 @@ from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
 from packit.upstream import Upstream
 from packit.pkgtool import PkgTool
-from packit.local_project import LocalProject
+from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 
@@ -321,7 +321,8 @@ def mock_api_for_source_git(
 def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
-    up_lp = LocalProject(working_dir=sourcegit)
+    builder = LocalProjectBuilder()
+    up_lp = builder.build(working_dir=sourcegit, git_repo=CALCULATE)
     return mock_api_for_source_git(sourcegit, distgit, up_lp)
 
 
