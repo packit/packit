@@ -35,6 +35,7 @@ from packit.constants import (
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
+    REPO_NOT_PRISTINE_HINT,
 )
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
@@ -62,6 +63,7 @@ from packit.utils.repo import (
     commit_exists,
     get_commit_diff,
     get_commit_hunks,
+    is_the_repo_pristine,
 )
 
 logger = logging.getLogger(__name__)
@@ -191,6 +193,7 @@ class PackitAPI:
         pkg_tool: str = "",
         mark_commit_origin: bool = False,
         check_sync_status: bool = False,
+        check_dist_git_pristine: bool = True,
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
@@ -217,6 +220,7 @@ class PackitAPI:
                 commit message to mark the hash of the upstream (source-git) commit.
             check_sync_status: Check the synchronization status of the source-git
                 and dist-git repos prior to performing the update.
+            check_dist_git_pristine: Check whether the dist-git is pristine.
         """
         if check_sync_status:
             status = self.sync_status()
@@ -228,6 +232,15 @@ class PackitAPI:
             if not status.source_git_range_start:
                 logger.info(self.sync_status_string(status))
                 return
+
+        if check_dist_git_pristine and not is_the_repo_pristine(
+            self.dg.local_project.git_repo
+        ):
+            raise PackitException(
+                "Cannot update the dist-git repo "
+                f"{self.dg.local_project.git_repo.working_dir!r}, since it is not pristine."
+                f"{REPO_NOT_PRISTINE_HINT}"
+            )
 
         if sync_default_files:
             synced_files = self.package_config.get_all_files_to_sync()
@@ -341,6 +354,13 @@ class PackitAPI:
                 logger.debug(
                     f"revision_range not specified, setting to {revision_range}"
                 )
+
+        if not is_the_repo_pristine(self.up.local_project.git_repo):
+            raise PackitException(
+                "Cannot update the source-git repo "
+                f"{self.up.local_project.git_repo.working_dir!r}, since it is not pristine."
+                f"{REPO_NOT_PRISTINE_HINT}"
+            )
 
         dg_release = self.dg.specfile.get_release()
         up_release = self.up.specfile.get_release()
@@ -752,6 +772,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 commit_msg=description,
                 sync_default_files=sync_default_files,
                 mark_commit_origin=mark_commit_origin,
+                check_dist_git_pristine=False,
             )
 
             new_pr = None

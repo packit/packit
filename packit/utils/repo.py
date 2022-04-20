@@ -412,3 +412,15 @@ def get_commit_hunks(repo: git.Repo, commit: git.Commit) -> List[str]:
     if section:
         result.append("\n".join(section))
     return result
+
+
+def is_the_repo_pristine(repo: git.Repo) -> bool:
+    """Checks whether the repository is pristine.
+
+    Args:
+        repo: Git repo to check.
+
+    Returns:
+        Whether the repo is pristine.
+    """
+    return not repo.git.diff() and not repo.git.clean("-xdn")
