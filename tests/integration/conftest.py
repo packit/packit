@@ -162,6 +162,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         is_archive_in_lookaside_cache=lambda archive_path: False,
         local_project=dglp,
     )
+    flexmock(DistGit).should_receive("existing_pr").and_return(None)
 
     def mocked_new_sources(sources=None):
         if not Path(sources).is_file():
