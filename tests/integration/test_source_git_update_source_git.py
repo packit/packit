@@ -220,3 +220,23 @@ def test_update_source_git_diverged(
     with pytest.raises(PackitException) as exc:
         api_instance_update_source_git.update_source_git("HEAD~1..")
     assert " have diverged." in str(exc.value)
+
+
+def test_update_source_git_source_git_not_pristine(
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api_instance_update_source_git,
+):
+    """Check that exception is raised when the
+    source-git repo is not pristine.
+    """
+    sourcegit, _ = sourcegit_and_remote
+    (sourcegit / "new_file").write_text("abcd")
+
+    distgit, _ = distgit_and_remote
+    (distgit / "bar").write_text("bar")
+    api_instance_update_source_git.dg.commit("test bar", "")
+
+    with pytest.raises(PackitException) as exc:
+        api_instance_update_source_git.update_source_git("HEAD~..")
+    assert "is not pristine" in str(exc.value)

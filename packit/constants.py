@@ -154,3 +154,8 @@ packit -d prepare-sources --result-dir "$resultdir" {options}
 # Git-trailer tokens to mark the commit origin
 FROM_DIST_GIT_TOKEN = "From-dist-git-commit"
 FROM_SOURCE_GIT_TOKEN = "From-source-git-commit"
+
+REPO_NOT_PRISTINE_HINT = (
+    "Use 'git reset --hard HEAD' to reset changed files and "
+    "'git clean -xdff' to delete untracked files and directories."
+)

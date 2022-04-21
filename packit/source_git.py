@@ -23,6 +23,7 @@ from packit.constants import (
     DISTRO_DIR,
     SRC_GIT_CONFIG,
     FROM_DIST_GIT_TOKEN,
+    REPO_NOT_PRISTINE_HINT,
 )
 from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
@@ -32,6 +33,7 @@ from packit.utils import (
     get_default_branch,
 )
 from packit.specfile import Specfile
+from packit.utils.repo import is_the_repo_pristine
 
 logger = logging.getLogger(__name__)
 
@@ -242,16 +244,12 @@ class SourceGitGenerator:
             PackitException, if the dist-git repository is not pristine, that is,
             there are changed or untracked files in it.
         """
-        dist_git_is_pristine = (
-            not self.dist_git.git.diff() and not self.dist_git.git.clean("-xdn")
-        )
-        if not dist_git_is_pristine:
+        if not is_the_repo_pristine(self.dist_git):
             raise PackitException(
                 "Cannot initialize a source-git repo. "
                 "The corresponding dist-git repository at "
                 f"{self.dist_git.working_dir!r} is not pristine."
-                "Use 'git reset --hard HEAD' to reset changed files and "
-                "'git clean -xdff' to delete untracked files and directories."
+                f"{REPO_NOT_PRISTINE_HINT}"
             )
 
         command = ["rsync", "--archive", "--delete"]

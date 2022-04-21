@@ -62,6 +62,39 @@ def test_update_dist_git_with_sync_status_check(
     assert " have diverged." in str(exc.value)
 
 
+def test_update_dist_git_dist_git_not_pristine(
+    sourcegit_and_remote,
+    distgit_and_remote,
+    mock_remote_functionality_sourcegit,
+    api_instance_update_source_git,
+):
+    """Check that exception is raised when the
+    dist-git repo is not pristine.
+    """
+
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+
+    (distgit / "new_file").write_text("abcd")
+
+    api_instance_update_source_git.up.specfile.set_version("0.3.0")
+    api_instance_update_source_git.up.specfile.save()
+    api_instance_update_source_git.up.commit("Source-git commit to be synced", "")
+
+    with pytest.raises(PackitException) as exc:
+        api_instance_update_source_git.update_dist_git(
+            version=None,
+            upstream_ref=None,
+            add_new_sources=False,
+            force_new_sources=False,
+            upstream_tag=None,
+            commit_title="",
+            commit_msg="",
+            check_sync_status=True,
+        )
+    assert "is not pristine" in str(exc.value)
+
+
 def test_basic_local_update_without_patching(
     sourcegit_and_remote,
     distgit_and_remote,
