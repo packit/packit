@@ -60,10 +60,12 @@ def get_dg_branches(api, dist_git_branch):
     help="Upload the new sources also when the archive is already in the lookaside cache.",
 )
 @click.option(
-    "--no-pr",
-    is_flag=True,
-    default=False,
-    help="Do not create a pull request to downstream repository.",
+    "--pr/--no-pr",
+    default=None,
+    help=(
+        "Create a pull request to downstream repository or push directly. "
+        "If not set, defaults to value set in configuration."
+    ),
 )
 @click.option(
     "--upstream-ref",
@@ -92,7 +94,7 @@ def propose_downstream(
     dist_git_path,
     dist_git_branch,
     force_new_sources,
-    no_pr,
+    pr,
     local_content,
     path_or_url,
     upstream_ref,
@@ -112,6 +114,8 @@ def propose_downstream(
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
     )
+    if pr is None:
+        pr = api.package_config.create_pr
 
     branches_to_update = get_dg_branches(api, dist_git_branch)
 
@@ -126,6 +130,6 @@ def propose_downstream(
             version=version,
             force_new_sources=force_new_sources,
             upstream_ref=upstream_ref,
-            create_pr=not no_pr,
+            create_pr=pr,
             force=force,
         )
