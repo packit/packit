@@ -1,5 +1,8 @@
 TODO:
 
+- [ ] Write new tests or update the old ones to cover new functionality.
+- [ ] Update doc-strings where appropriate.
+- [ ] Update or write new documentation in `packit/packit.dev`.
 - [ ] ‹fill in›
 
 <!-- notes for reviewers -->
