@@ -107,7 +107,7 @@ def get_packit_api(
             package_config_path=config.package_config_path,
         )
         logger.debug(f"job_config_index: {job_config_index}")
-        if job_config_index and isinstance(package_config, PackageConfig):
+        if job_config_index is not None and isinstance(package_config, PackageConfig):
             if job_config_index >= len(package_config.jobs):
                 raise PackitException(
                     "job_config_index is bigger than number of jobs in package config!"
