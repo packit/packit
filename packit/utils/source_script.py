@@ -10,6 +10,7 @@ def create_source_script(
     merge_pr: Optional[bool] = True,
     target_branch: Optional[str] = None,
     job_config_index: Optional[int] = None,
+    bump_version: bool = True,
 ):
     options = []
     if ref:
@@ -20,6 +21,8 @@ def create_source_script(
             options += ["--target-branch", target_branch]
     if job_config_index is not None:
         options += ["--job-config-index", str(job_config_index)]
+    if not bump_version:
+        options += ["--no-bump"]
 
     options += [url]
     return COPR_SOURCE_SCRIPT.format(options=" ".join(options))
