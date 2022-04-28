@@ -309,6 +309,7 @@ class CommonConfigSchema(Schema):
     identifier = fields.String(missing=None)
     packit_instances = fields.List(EnumField(Deployment), missing=[Deployment.prod])
     issue_repository = fields.String(missing=None)
+    release_suffix = fields.String(missing=None)
 
     @staticmethod
     def spec_source_id_serialize(value: PackageConfig):

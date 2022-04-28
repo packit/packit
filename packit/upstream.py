@@ -928,7 +928,15 @@ class SRPMBuilder:
             "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
+            "PACKIT_PROJECT_BRANCH": sanitize_branch_name_for_rpm(
+                self.upstream.local_project.ref
+            ),
         }
+
+        # in case we are given template as a release suffix
+        if release_suffix:
+            release_suffix = release_suffix.format(**env)
+
         if self.upstream.with_action(action=ActionName.fix_spec, env=env):
             self.upstream.fix_spec(
                 archive=archive,

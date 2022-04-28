@@ -59,6 +59,7 @@ class PackageConfig(CommonPackageConfig):
         identifier: Optional[str] = None,
         packit_instances: Optional[List[Deployment]] = None,
         issue_repository: Optional[str] = None,
+        release_suffix: Optional[str] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -90,6 +91,7 @@ class PackageConfig(CommonPackageConfig):
             identifier=identifier,
             packit_instances=packit_instances,
             issue_repository=issue_repository,
+            release_suffix=release_suffix,
         )
         self.jobs: List[JobConfig] = jobs or []
 
@@ -123,7 +125,8 @@ class PackageConfig(CommonPackageConfig):
             f"srpm_build_deps={self.srpm_build_deps}, "
             f"identifier='{self.identifier}', "
             f"packit_instances={self.packit_instances}, "
-            f"issue_repository='{self.issue_repository}')"
+            f"issue_repository='{self.issue_repository}', "
+            f"release_suffix='{self.release_suffix}')"
         )
 
     @classmethod

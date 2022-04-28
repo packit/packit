@@ -11,6 +11,7 @@ def create_source_script(
     target_branch: Optional[str] = None,
     job_config_index: Optional[int] = None,
     bump_version: bool = True,
+    release_suffix: Optional[str] = None,
 ):
     options = []
     if ref:
@@ -23,6 +24,8 @@ def create_source_script(
         options += ["--job-config-index", str(job_config_index)]
     if not bump_version:
         options += ["--no-bump"]
+    if release_suffix:
+        options += ["--release-suffix", f"'{release_suffix}'"]
 
     options += [url]
     return COPR_SOURCE_SCRIPT.format(options=" ".join(options))
