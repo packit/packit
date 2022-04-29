@@ -120,8 +120,8 @@ class PackitAPI:
         self.downstream_local_project = downstream_local_project
         self.stage = stage
 
-        self._up = None
-        self._dg = None
+        self._up: Optional[Upstream] = None
+        self._dg: Optional[DistGit] = None
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
 
@@ -139,7 +139,7 @@ class PackitAPI:
         )
 
     @property
-    def up(self):
+    def up(self) -> Upstream:
         if self._up is None:
             self._up = Upstream(
                 config=self.config,
@@ -149,7 +149,7 @@ class PackitAPI:
         return self._up
 
     @property
-    def dg(self):
+    def dg(self) -> DistGit:
         if self._dg is None:
             self.init_kerberos_ticket()
             if not self.package_config.downstream_package_name and (
