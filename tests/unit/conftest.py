@@ -135,6 +135,7 @@ def distgit_mock(local_project_mock, config_mock, package_config_mock):
     distgit.should_receive("commit")
     distgit.should_receive("push")
     distgit.should_receive("absolute_specfile_dir").and_return(Path("/mock_path"))
+    distgit.should_receive("existing_pr").and_return(None)
     return distgit
 
 
