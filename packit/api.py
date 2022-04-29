@@ -711,7 +711,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_ref = self.up._expand_git_ref(
             upstream_ref or self.package_config.upstream_ref
         )
-        create_pr = create_pr and self.package_config.create_pr
 
         current_up_branch = self.up.active_branch
         try:
