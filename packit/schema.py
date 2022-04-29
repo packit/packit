@@ -13,7 +13,6 @@ from packit.config.job_config import (
     JobType,
     JobConfig,
     JobConfigTriggerType,
-    JobMetadataConfig,
 )
 from packit.config.package_config import NotificationsConfig
 from packit.config.notifications import PullRequestNotificationsConfig
@@ -217,7 +216,12 @@ class TargetsListOrDict(fields.Field):
 
 
 class JobMetadataSchema(Schema):
-    """Jobs metadata."""
+    """Jobs metadata.
+
+    TODO: to be removed after deprecation period.
+          Will end also dist-git-branch and
+          dist_git_branch deprecation period.
+    """
 
     _targets = TargetsListOrDict(missing=None, data_key="targets")
     timeout = fields.Integer()
@@ -252,10 +256,6 @@ class JobMetadataSchema(Schema):
                 data[key] = [data.pop(key)]
 
         return data
-
-    @post_load
-    def make_instance(self, data, **_):
-        return JobMetadataConfig(**data)
 
 
 def validate_repo_name(value):
@@ -368,10 +368,47 @@ class JobConfigSchema(CommonConfigSchema):
 
     job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
+    # old metadata dictionary keys
+    _targets = TargetsListOrDict(missing=None, data_key="targets")
+    timeout = fields.Integer()
+    owner = fields.String(missing=None)
+    project = fields.String(missing=None)
+    dist_git_branches = fields.List(fields.String(), missing=None)
+    branch = fields.String(missing=None)
+    scratch = fields.Boolean()
+    list_on_homepage = fields.Boolean()
+    preserve_project = fields.Boolean()
+    use_internal_tf = fields.Boolean()
+    additional_packages = fields.List(fields.String(), missing=None)
+    additional_repos = fields.List(fields.String(), missing=None)
+    fmf_url = fields.String(missing=None)
+    fmf_ref = fields.String(missing=None)
+    skip_build = fields.Boolean()
+    env = fields.Dict(keys=fields.String(), missing=None)
+    enable_net = fields.Boolean(missing=True)
+
     metadata = fields.Nested(JobMetadataSchema)
+
+    @pre_load
+    def ordered_preprocess(self, data, **_):
+        if "metadata" in data:
+            logger.warning(
+                "The 'metadata' key in jobs is deprecated and can be removed."
+                "Nest config options from 'metadata' directly under the job object."
+            )
+        for key in ("targets", "dist_git_branches"):
+            if data is dict:
+                if isinstance(data.get(key), str):
+                    # allow key value being specified as string, convert to list
+                    data[key] = [data.pop(key)]
+
+        return data
 
     @post_load
     def make_instance(self, data, **_):
+        if "metadata" in data:
+            metadata = data.pop("metadata")
+            data.update(metadata)
         return JobConfig(**data)
 
 
