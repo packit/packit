@@ -16,7 +16,6 @@ from packit.config import (
     JobConfig,
     get_package_config_from_repo,
 )
-from packit.config.job_config import JobMetadataConfig
 from packit.config.package_config import (
     get_specfile_path_from_repo,
     PackageConfig,
@@ -80,7 +79,7 @@ def test_get_specfile_path_from_repo(files, expected):
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(project="example"),
+                        project="example",
                     )
                 ],
             ),
@@ -93,12 +92,12 @@ def test_get_specfile_path_from_repo(files, expected):
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.release,
-                        metadata=JobMetadataConfig(project="example1"),
+                        project="example1",
                     ),
                     JobConfig(
                         type=JobType.copr_build,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(project="example2"),
+                        project="example2",
                     ),
                 ],
             ),
@@ -121,11 +120,9 @@ def test_project_from_copr_build_job(package_config, project):
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(
-                            dist_git_branches=[
-                                "example",
-                            ]
-                        ),
+                        dist_git_branches=[
+                            "example",
+                        ],
                     )
                 ],
             ),
@@ -140,13 +137,11 @@ def test_project_from_copr_build_job(package_config, project):
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(
-                            dist_git_branches=[
-                                "example1",
-                                "example2",
-                            ]
-                        ),
-                    )
+                        dist_git_branches=[
+                            "example1",
+                            "example2",
+                        ],
+                    ),
                 ],
             ),
             {"example1", "example2"},
@@ -266,7 +261,9 @@ def test_package_config_not_equal(not_equal_package_config):
                     {
                         "job": "propose_downstream",
                         "trigger": "release",
-                        "metadata": {"dist-git-branch": "fedora-all"},
+                        "dist_git_branches": [
+                            "fedora-all",
+                        ],
                     }
                 ],
             },
@@ -279,7 +276,7 @@ def test_package_config_not_equal(not_equal_package_config):
                     {
                         "job": "propose_downstream",
                         "trigger": "release",
-                        "metadata": {"dist_git_branches": ["fedora-all", "epel-8"]},
+                        "dist_git_branches": ["fedora-all", "epel-8"],
                     }
                 ],
             },
@@ -292,7 +289,9 @@ def test_package_config_not_equal(not_equal_package_config):
                     {
                         "job": "copr_build",
                         "trigger": "release",
-                        "metadata": {"targets": "fedora-stable"},
+                        "targets": [
+                            "fedora-stable",
+                        ],
                     }
                 ],
             },
@@ -305,9 +304,7 @@ def test_package_config_not_equal(not_equal_package_config):
                     {
                         "job": "copr_build",
                         "trigger": "release",
-                        "metadata": {
-                            "targets": ["fedora-stable", "fedora-development"]
-                        },
+                        "targets": ["fedora-stable", "fedora-development"],
                     }
                 ],
             },
@@ -320,12 +317,10 @@ def test_package_config_not_equal(not_equal_package_config):
                     {
                         "job": "propose_downstream",
                         "trigger": "release",
-                        "metadata": {
-                            "targets": ["f31", "f32"],
-                            "timeout": 123,
-                            "owner": "santa",
-                            "project": "gifts",
-                        },
+                        "targets": ["f31", "f32"],
+                        "timeout": 123,
+                        "owner": "santa",
+                        "project": "gifts",
                     }
                 ],
             },
@@ -338,12 +333,12 @@ def test_package_config_not_equal(not_equal_package_config):
                     {
                         "job": "tests",
                         "trigger": "pull_request",
-                        "metadata": {
-                            "targets": "fedora-all",
-                            "env": {
-                                "MYVAR1": 5,
-                                "MYVAR2": "foo",
-                            },
+                        "targets": [
+                            "fedora-all",
+                        ],
+                        "env": {
+                            "MYVAR1": 5,
+                            "MYVAR2": "foo",
                         },
                     }
                 ],
@@ -455,7 +450,7 @@ def test_package_config_validate(raw, is_valid):
                     {
                         "job": "propose_downstream",
                         "trigger": "release",
-                        "metadata": {"unknown": "key"},
+                        "unknown": "key",
                     }
                 ],
             },
@@ -835,10 +830,8 @@ def test_package_config_parse_error(raw):
                     {
                         "job": "copr_build",
                         "trigger": "release",
-                        "metadata": {
-                            "fmf_url": "https://example.com",
-                            "fmf_ref": "test_ref",
-                        },
+                        "fmf_url": "https://example.com",
+                        "fmf_ref": "test_ref",
                     },
                 ],
             },
@@ -850,9 +843,8 @@ def test_package_config_parse_error(raw):
                         type=JobType.copr_build,
                         specfile_path="fedora/package.spec",
                         trigger=JobConfigTriggerType.release,
-                        metadata=JobMetadataConfig(
-                            fmf_url="https://example.com", fmf_ref="test_ref"
-                        ),
+                        fmf_url="https://example.com",
+                        fmf_ref="test_ref",
                     ),
                 ],
             ),
@@ -1401,7 +1393,7 @@ def test_get_specfile_sync_files_nodownstreamname_item():
                 {
                     "job": "copr_build",
                     "trigger": "release",
-                    "metadata": {"targets": ["fedora-stable", "fedora-development"]},
+                    "targets": ["fedora-stable", "fedora-development"],
                 }
             ],
         },
@@ -1410,7 +1402,7 @@ def test_get_specfile_sync_files_nodownstreamname_item():
                 {
                     "job": "tests",
                     "trigger": "release",
-                    "metadata": {"targets": ["fedora-stable", "fedora-development"]},
+                    "targets": ["fedora-stable", "fedora-development"],
                 }
             ],
         },
@@ -1429,10 +1421,8 @@ def test_package_config_specfile_not_present_raise(raw):
                 {
                     "job": "tests",
                     "trigger": "commit",
-                    "metadata": {
-                        "targets": ["fedora-stable", "fedora-development"],
-                        "skip_build": True,
-                    },
+                    "targets": ["fedora-stable", "fedora-development"],
+                    "skip_build": True,
                 }
             ],
         },
@@ -1441,18 +1431,14 @@ def test_package_config_specfile_not_present_raise(raw):
                 {
                     "job": "tests",
                     "trigger": "commit",
-                    "metadata": {
-                        "targets": ["fedora-stable", "fedora-development"],
-                        "skip_build": True,
-                    },
+                    "targets": ["fedora-stable", "fedora-development"],
+                    "skip_build": True,
                 },
                 {
                     "job": "tests",
                     "trigger": "pull_request",
-                    "metadata": {
-                        "targets": ["fedora-stable", "fedora-development"],
-                        "skip_build": True,
-                    },
+                    "targets": ["fedora-stable", "fedora-development"],
+                    "skip_build": True,
                 },
             ],
         },

@@ -13,7 +13,6 @@ from packit.config import (
     JobConfigTriggerType,
     JobConfig,
 )
-from packit.config.job_config import JobMetadataConfig
 
 
 @pytest.mark.parametrize(
@@ -41,7 +40,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(dist_git_branches=["file"]),
+                        dist_git_branches=["file"],
                     )
                 ],
             ),
@@ -72,7 +71,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(dist_git_branches=["file"]),
+                        dist_git_branches=["file"],
                     )
                 ],
             ),
@@ -88,9 +87,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(
-                            dist_git_branches=["file1", "file2"]
-                        ),
+                        dist_git_branches=["file1", "file2"],
                     )
                 ],
             ),
@@ -138,7 +135,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(dist_git_branches=["rawhide"]),
+                        dist_git_branches=["rawhide"],
                     )
                 ],
             ),
@@ -154,9 +151,7 @@ from packit.config.job_config import JobMetadataConfig
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        metadata=JobMetadataConfig(
-                            dist_git_branches=["file1", "rawhide"]
-                        ),
+                        dist_git_branches=["file1", "rawhide"],
                     )
                 ],
             ),

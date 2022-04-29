@@ -10,7 +10,7 @@ from enum import Enum
 
 from os import getenv
 from os.path import basename
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any, Set
 
 from packit.actions import ActionName
 from packit.config.notifications import (
@@ -39,6 +39,28 @@ class CommonPackageConfig:
                    PackageConfig   JobConfig
                           //
               contains [JobConfig]
+
+    Args:
+        _targets: copr_build, mock chroots where to build
+                    tests, builds to test
+                    The _ prefix is used because 'targets' without it
+                    is now used for backward compatibility.
+        timeout: copr_build, give up watching a build after timeout, defaults to 7200s
+        owner: copr_build, a namespace in COPR where the build should happen
+        project: copr_build, a name of the copr project
+        dist_git_branches: propose_downstream, branches in dist-git where packit should work
+        branch: for `commit` trigger to specify the branch name
+        scratch: if we want to run scratch build in koji
+        list_on_homepage: if set, created copr project will be visible on copr's home-page
+        preserve_project: if set, project will not be created as temporary
+        additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
+        additional_repos: buildroot additional additional_repos
+        fmf_url: - git repository containing the metadata (FMF) tree
+        fmf_ref: - branch, tag or commit specifying the desired git revision
+        use_internal_tf: if we want to use internal instance of Testing Farm
+        skip_build: if we want to skip build phase for Testing Farm job
+        env: environment variables
+        enable_net: if set to False, Copr builds have network disabled
     """
 
     def __init__(
@@ -73,6 +95,24 @@ class CommonPackageConfig:
         packit_instances: Optional[List[Deployment]] = None,
         issue_repository: Optional[str] = None,
         release_suffix: Optional[str] = None,
+        # from deprecated JobMetadataConfig
+        _targets: Union[List[str], Dict[str, Dict[str, Any]], None] = None,
+        timeout: int = 7200,
+        owner: Optional[str] = None,
+        project: Optional[str] = None,
+        dist_git_branches: Optional[List[str]] = None,
+        branch: Optional[str] = None,
+        scratch: bool = False,
+        list_on_homepage: bool = False,
+        preserve_project: bool = False,
+        additional_packages: Optional[List[str]] = None,
+        additional_repos: Optional[List[str]] = None,
+        fmf_url: Optional[str] = None,
+        fmf_ref: Optional[str] = None,
+        use_internal_tf: bool = False,
+        skip_build: bool = False,
+        env: Optional[Dict[str, Any]] = None,
+        enable_net: bool = True,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -128,6 +168,40 @@ class CommonPackageConfig:
         self.srpm_build_deps = srpm_build_deps
         self.issue_repository = issue_repository
         self.release_suffix = release_suffix
+
+        # from deprecated JobMetadataConfig
+        self._targets: Dict[str, Dict[str, Any]]
+        if isinstance(_targets, list):
+            self._targets = {key: {} for key in _targets}
+        else:
+            self._targets = _targets or {}
+        self.timeout: int = timeout
+        self.owner: str = owner
+        self.project: str = project
+        self.dist_git_branches: Set[str] = (
+            set(dist_git_branches) if dist_git_branches else set()
+        )
+        self.branch: str = branch
+        self.scratch: bool = scratch
+        self.list_on_homepage: bool = list_on_homepage
+        self.preserve_project: bool = preserve_project
+        self.additional_packages: List[str] = additional_packages or []
+        self.additional_repos: List[str] = additional_repos or []
+        self.fmf_url: str = fmf_url
+        self.fmf_ref: str = fmf_ref
+        self.use_internal_tf: bool = use_internal_tf
+        self.skip_build: bool = skip_build
+        self.env: Dict[str, Any] = env or {}
+        self.enable_net = enable_net
+
+    @property
+    def targets_dict(self):
+        return self._targets
+
+    @property
+    def targets(self):
+        """For backward compatibility."""
+        return set(self._targets.keys())
 
     def _warn_user(self):
         logger = logging.getLogger(__name__)
@@ -191,7 +265,25 @@ class CommonPackageConfig:
             f"identifier={self.identifier}, "
             f"packit_instances={self.packit_instances}, "
             f"issue_repository='{self.issue_repository}', "
-            f"release_suffix='{self.release_suffix}')"
+            f"release_suffix='{self.release_suffix}', "
+            # from deprecated JobMetadataConfig
+            f"targets={self._targets}, "
+            f"timeout={self.timeout}, "
+            f"owner={self.owner}, "
+            f"project={self.project}, "
+            f"dist_git_branches={self.dist_git_branches}, "
+            f"branch={self.branch}, "
+            f"scratch={self.scratch}, "
+            f"list_on_homepage={self.list_on_homepage}, "
+            f"preserve_project={self.preserve_project}, "
+            f"additional_packages={self.additional_packages}, "
+            f"additional_repos={self.additional_repos}, "
+            f"fmf_url={self.fmf_url}, "
+            f"fmf_ref={self.fmf_ref}, "
+            f"use_internal_tf={self.use_internal_tf}, "
+            f"skip_build={self.skip_build},"
+            f"env={self.env},"
+            f"enable_net={self.enable_net})"
         )
 
     @property
