@@ -313,6 +313,7 @@ class JobConfig(CommonPackageConfig):
             and self.identifier == other.identifier
             and self.packit_instances == other.packit_instances
             and self.issue_repository == other.issue_repository
+            and self.release_suffix == other.release_suffix
         )
 
 
