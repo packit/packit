@@ -72,6 +72,7 @@ class CommonPackageConfig:
         identifier: Optional[str] = None,
         packit_instances: Optional[List[Deployment]] = None,
         issue_repository: Optional[str] = None,
+        release_suffix: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -126,6 +127,7 @@ class CommonPackageConfig:
         self.merge_pr_in_ci = merge_pr_in_ci
         self.srpm_build_deps = srpm_build_deps
         self.issue_repository = issue_repository
+        self.release_suffix = release_suffix
 
     def _warn_user(self):
         logger = logging.getLogger(__name__)
@@ -188,7 +190,8 @@ class CommonPackageConfig:
             f"srpm_build_deps={self.srpm_build_deps}, "
             f"identifier={self.identifier}, "
             f"packit_instances={self.packit_instances}, "
-            f"issue_repository='{self.issue_repository}')"
+            f"issue_repository='{self.issue_repository}', "
+            f"release_suffix='{self.release_suffix}')"
         )
 
     @property
