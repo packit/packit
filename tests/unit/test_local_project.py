@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 import git
+import pytest
 from flexmock import flexmock
 
 from packit import local_project
@@ -1018,3 +1019,51 @@ def test_builder_clone_and_add_to_cache():
     assert project.git_project
     assert project.git_repo
     assert project.ref == "branch"
+
+
+def mock_no_parsing(builder: LocalProjectBuilder):
+    flexmock(builder).should_receive("_parse_git_repo_from_working_dir").never()
+    flexmock(builder).should_receive("_parse_repo_name_full_name_and_namespace").never()
+    flexmock(builder).should_receive("_parse_git_repo_from_git_url").never()
+    flexmock(builder).should_receive("_parse_git_project_from_url").never()
+    flexmock(builder).should_receive(
+        "_parse_git_project_from_repo_namespace_and_git_service"
+    ).never()
+    flexmock(builder).should_receive("_parse_git_service_from_git_project").never()
+    flexmock(builder).should_receive("_parse_ref_from_git_repo").never()
+    flexmock(builder).should_receive("_parse_git_url_from_git_project").never()
+    flexmock(builder).should_receive("_parse_git_url_from_git_repo").never()
+    flexmock(builder).should_receive("_parse_repo_name_from_git_project").never()
+    flexmock(builder).should_receive("_parse_namespace_from_git_project").never()
+    flexmock(builder).should_receive("_parse_namespace_from_git_url").never()
+
+
+def test_builder_calculate_nothing():
+    builder = LocalProjectBuilder()
+    mock_no_parsing(builder)
+    builder.build(working_dir="foo")
+
+
+@pytest.fixture
+def valid_repo():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        result = git.Repo.init(tmpdir)
+        yield result, tmpdir
+
+
+def test_builder_direct_dependency(valid_repo):
+    repo, path = valid_repo
+    builder = LocalProjectBuilder()
+    project = builder.build(git_repo=repo, working_dir=CALCULATE)
+    assert str(project.working_dir) == path
+    assert project.git_repo
+
+
+def test_builder_transitive_prerequisite(valid_repo):
+    repo, path = valid_repo
+    repo.create_remote("origin", "https://github.com/packit/packit.git")
+    builder = LocalProjectBuilder()
+    project = builder.build(working_dir=path, git_url=CALCULATE)
+    assert str(project.working_dir) == path
+    assert project.git_repo
+    assert project.git_url == "https://github.com/packit/packit.git"
