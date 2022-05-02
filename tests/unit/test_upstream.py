@@ -9,7 +9,7 @@ from flexmock import flexmock
 import packit
 from packit.actions import ActionName
 from packit.exceptions import PackitException
-from packit.upstream import Archive, Upstream
+from packit.upstream import Archive, SRPMBuilder, Upstream
 
 
 @pytest.fixture
@@ -345,3 +345,37 @@ def test_convert_version_to_tag(
 )
 def test_get_rpms_from_rpmbuild_output(output, expected):
     assert Upstream._get_rpms_from_rpmbuild_output(output) == expected
+
+
+@pytest.mark.parametrize(
+    ("archive", "version", "release_suffix", "expanded_release_suffix"),
+    [
+        ("archive.tar.gz", "1.0.0", "123", "123"),
+        # not allowed outside of tests, but the SHA is hardcoded for local project
+        ("ravl.tar.bz2", "1.2.3", "{PACKIT_PROJECT_COMMIT}", "_"),
+        ("one_piece.tar.gz", "1.0.2", "{PACKIT_PROJECT_BRANCH}", "mock_ref"),
+        (
+            "something.zip",
+            "1.0.2",
+            "{PACKIT_PROJECT_BRANCH}.{PACKIT_PROJECT_VERSION}",
+            "mock_ref.1.0.2",
+        ),
+    ],
+)
+def test_release_suffix(
+    upstream_mock, archive, version, release_suffix, expanded_release_suffix
+):
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(version)
+    flexmock(upstream_mock).should_receive("get_spec_release").and_return("1")
+
+    flexmock(upstream_mock).should_receive("fix_spec").with_args(
+        archive=archive,
+        version=version,
+        commit="_",
+        bump_version=False,
+        release_suffix=expanded_release_suffix,
+    )
+
+    SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+        archive=archive, bump_version=False, release_suffix=release_suffix
+    )
