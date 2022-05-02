@@ -370,8 +370,12 @@ class Upstream(PackitRepositoryBase):
             string which is meant to be put into a spec file %release field by packit
         """
         original_release_number = self.specfile.get_release_number().split(".", 1)[0]
-        if release_suffix:
-            return f"{original_release_number}.{release_suffix}"
+        if release_suffix is not None:
+            return (
+                f"{original_release_number}.{release_suffix}"
+                if release_suffix
+                else None
+            )
 
         if not bump_version:
             return None
@@ -925,7 +929,9 @@ class SRPMBuilder:
         env = {
             "PACKIT_PROJECT_VERSION": self.current_git_describe_version,
             # Spec file %release field which packit sets by default
-            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(),
+            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(
+                bump_version, release_suffix
+            ),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
             "PACKIT_PROJECT_BRANCH": sanitize_branch_name_for_rpm(
