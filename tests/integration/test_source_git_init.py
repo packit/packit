@@ -279,7 +279,8 @@ def test_create_from_upstream_not_require_autosetup(
         in Path(hello_source_git_repo.working_dir, "hello.rs").read_text()
     )
 
-    commit_messsage_lines = hello_source_git_repo.commit("HEAD~1").message.splitlines()
+    commit = hello_source_git_repo.commit("HEAD~1")
+    commit_messsage_lines = commit.message.splitlines()
     assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
     assert "Patch-id: 1" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
@@ -287,8 +288,13 @@ def test_create_from_upstream_not_require_autosetup(
         f"From-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}"
         in commit_messsage_lines
     )
+    # Author of a non-git-am patch is the one who was the original author
+    # of the patch-file in dist-git.
+    assert commit.author.name == "Engin Eer"
+    assert commit.author.email == "eer@redhat.com"
 
-    commit_messsage_lines = hello_source_git_repo.commit("HEAD").message.splitlines()
+    commit = hello_source_git_repo.commit("HEAD")
+    commit_messsage_lines = commit.message.splitlines()
     assert "Patch-name: from-git.patch" in commit_messsage_lines
     assert "Patch-id: 2" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
@@ -296,3 +302,5 @@ def test_create_from_upstream_not_require_autosetup(
         f"From-dist-git-commit: {hello_dist_git_repo.head.commit.hexsha}"
         in commit_messsage_lines
     )
+    assert commit.author.name == "A U Thor"
+    assert commit.author.email == "thor@redhat.com"

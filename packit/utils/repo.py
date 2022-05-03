@@ -424,3 +424,27 @@ def is_the_repo_pristine(repo: git.Repo) -> bool:
         Whether the repo is pristine.
     """
     return not repo.git.diff() and not repo.git.clean("-xdn")
+
+
+def get_file_author(repo: git.Repo, filename: str) -> str:
+    """Get the original author of 'filename' in 'repo'
+
+    Args:
+        repo: Git-repo where the file is commited.
+        filename: Name of the file.
+
+    Returns:
+        The original (first) author of the file in the
+        "A U Thor <author@example.com>" format.
+    """
+    author, author_mail = "", ""
+    for line in repo.git.blame(filename, line_porcelain=True).splitlines():
+        token, _, value = line.partition(" ")
+        if token == "author":
+            author = value
+        elif token == "author-mail":
+            author_mail = value
+        elif token == "filename":
+            # End of the first blame-block
+            break
+    return f"{author} {author_mail}"
