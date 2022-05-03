@@ -248,7 +248,7 @@ class SourceGitGenerator:
             raise PackitException(
                 "Cannot initialize a source-git repo. "
                 "The corresponding dist-git repository at "
-                f"{self.dist_git.working_dir!r} is not pristine."
+                f"{self.dist_git.working_dir!r} is not pristine. "
                 f"{REPO_NOT_PRISTINE_HINT}"
             )
 
