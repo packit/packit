@@ -31,6 +31,7 @@ from packit.pkgtool import PkgTool
 from packit.utils import (
     run_command,
     get_default_branch,
+    get_file_author,
 )
 from packit.specfile import Specfile
 from packit.utils.repo import is_the_repo_pristine
@@ -233,7 +234,16 @@ class SourceGitGenerator:
             for line in patch_comments.get(metadata.name, []):
                 message += f"    # {line}\n"
             message += f"{FROM_DIST_GIT_TOKEN}: {self.dist_git.head.commit.hexsha}"
-            self.source_git.git.commit(message=message, amend=True, allow_empty=True)
+            author = None
+            # If the commit subject matches the one used in _packitpatch
+            # when applying patches with 'patch', get the original (first)
+            # author of the patch file in dist-git.
+            if message.startswith(f"Apply patch {metadata.name}"):
+                author = get_file_author(self.dist_git, metadata.name)
+            logger.debug(f"author={author}")
+            self.source_git.git.commit(
+                message=message, author=author, amend=True, allow_empty=True
+            )
 
         self.source_git.git.branch("-D", to_branch)
 
