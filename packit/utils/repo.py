@@ -5,8 +5,9 @@ import logging
 import re
 import subprocess
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Tuple, Optional, Union, List
+from typing import Generator, List, Optional, Tuple, Union
 
 import git
 import yaml
@@ -448,3 +449,39 @@ def get_file_author(repo: git.Repo, filename: str) -> str:
             # End of the first blame-block
             break
     return f"{author} {author_mail}"
+
+
+@contextmanager
+def commit_message_file(
+    subject: str, message: str = None, trailers: Optional[List[Tuple[str, str]]] = None
+) -> Generator[str, None, None]:
+    """Context manager to yield a commit message file
+
+    Which then can be used by a commit operation.
+
+    This handles a few things:
+    - It concatenates a commit message subject line and a message.
+      Though: if 'subject' is the complete commit message that'll also work.
+    - Adds the Git-trailers specified by 'trailers'.
+
+    Args:
+        subject: Subject line of the commit message.
+        message: Message following the subject line.
+        trailers: List Git-trailers to be added to the commit message.
+
+    Yields:
+        Name of the temporary file with the prepared commit message.
+    """
+    with tempfile.NamedTemporaryFile(mode="w+t") as fp:
+        fp.writelines([subject, "\n"])
+        if message:
+            fp.writelines(["\n", message, "\n"])
+        fp.seek(0)
+        if trailers:
+            args = ["--in-place", "--if-exists", "replace"]
+            for token, value in trailers:
+                args += ["--trailer", f"{token}={value}"]
+            # 'interpret-trailers' doesn't require a working directory,
+            # so a plain Git command can be used here.
+            git.cmd.Git().interpret_trailers(*args, fp.name)
+        yield fp.name

@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import shlex
-import tempfile
 from logging import getLogger
 from pathlib import Path
 from typing import Optional, Callable, List, Iterable, Dict, Tuple
@@ -21,7 +20,7 @@ from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
 from packit.specfile import Specfile
 from packit.utils.commands import cwd
-from packit.utils.repo import RepositoryCache
+from packit.utils.repo import RepositoryCache, commit_message_file
 
 logger = getLogger(__name__)
 
@@ -164,19 +163,9 @@ class PackitRepositoryBase:
             )
         self.local_project.git_repo.index.write()
 
-        with tempfile.NamedTemporaryFile(mode="w+t") as fp:
-            fp.writelines([main_msg, "\n"])
-            if msg:
-                fp.writelines(["\n", msg, "\n"])
-            fp.seek(0)
-            if trailers:
-                args = ["--in-place"]
-                for token, value in trailers:
-                    args += ["--trailer", f"{token}={value}"]
-                self.local_project.git_repo.git.interpret_trailers(*args, fp.name)
-
+        with commit_message_file(main_msg, msg, trailers) as commit_message:
             # TODO: make -s configurable
-            commit_args = ["-s", "-F", fp.name]
+            commit_args = ["-s", "-F", commit_message]
             self.local_project.git_repo.git.commit(*commit_args)
 
     def run_action(self, actions: ActionName, method: Callable = None, *args, **kwargs):
