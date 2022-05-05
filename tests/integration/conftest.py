@@ -238,7 +238,7 @@ def hello_dist_git_repo(tmp_path):
     shutil.copytree(DATA_DIR / "rpms" / "hello", repo_dir)
     repo = git.Repo.init(repo_dir)
     repo.git.add(".")
-    repo.git.commit(message="Initial commit")
+    repo.git.commit(message="Initial commit", author="Engin Eer <eer@redhat.com>")
     return repo
 
 

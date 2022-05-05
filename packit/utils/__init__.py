@@ -11,6 +11,7 @@ from packit.utils.logging import (
 )
 from packit.utils.repo import (
     get_default_branch,
+    get_file_author,
     get_namespace_and_repo_name,
     get_repo,
     git_remote_url_to_https_url,
@@ -20,21 +21,22 @@ from packit.utils.repo import (
 
 
 __all__ = [
+    assert_existence.__name__,
+    commits_to_nice_str.__name__,
+    cwd.__name__,
+    get_default_branch.__name__,
+    get_file_author.__name__,
+    get_namespace_and_repo_name.__name__,
+    get_repo.__name__,
+    git_remote_url_to_https_url.__name__,
+    is_a_git_ref.__name__,
+    is_git_repo.__name__,
+    nested_get.__name__,
+    PackitFormatter.__name__,
     run_command.__name__,
     run_command_remote.__name__,
-    cwd.__name__,
-    assert_existence.__name__,
-    nested_get.__name__,
-    StreamLogger.__name__,
-    PackitFormatter.__name__,
     set_logging.__name__,
-    commits_to_nice_str.__name__,
-    is_git_repo.__name__,
-    get_repo.__name__,
-    get_namespace_and_repo_name.__name__,
-    is_a_git_ref.__name__,
-    git_remote_url_to_https_url.__name__,
-    get_default_branch.__name__,
+    StreamLogger.__name__,
 ]
 
 

@@ -47,7 +47,9 @@ if ! cat "$patch_path" | git am; then
     git am --abort
     cat "$patch_path" | /usr/bin/patch ${patch_args}
     git add -f .
-    # patches can be empty, rpmbuild is fine with it
+    # Patches can be empty, rpmbuild is fine with it.
+    # The subject line is relied on when guessing the author
+    # of this patch!
     git commit -m"Apply patch ${patch_name}" --allow-empty
 fi
 
