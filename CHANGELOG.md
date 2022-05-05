@@ -1,3 +1,11 @@
+# 0.50.0
+
+- When initializing source-git repos, the author of downstream commits created from patch files which are not in a git-am format is set to the original author of the patch-file in dist-git, instead of using the locally configured Git author. (#1575)
+- Packit now supports `release_suffix` configuration option that allows you to override the long release string provided by Packit that is used to ensure correct ordering and uniqueness of RPMs built in Copr. (#1568)
+- From the security perspective, we have to decided to disable the `create_pr` option for our service, from now on Packit will unconditionally create PRs when running `propose-downstream`.
+  We have also updated the `propose-downstream` CLI such that it is possible to use `create_pr` from configuration or override it via `--pr`/`--no-pr` options. (#1563)
+- The `source-git update-*` commands now check whether the target repository is pristine and in case not raise an error. (#1562)
+
 # 0.49.0
 
 - A new configuration option `downstream_branch_name` has been added,
