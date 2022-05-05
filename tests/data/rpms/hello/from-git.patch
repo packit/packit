@@ -1,12 +1,12 @@
 From 5691f2b93484dd9cebae5a9ca61e9de44e814d15 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Hunor=20Csomort=C3=A1ni?= <csomh@redhat.com>
+From: =?UTF-8?q?A=20U=20Thor?= <thor@redhat.com>
 Date: Wed, 8 Sep 2021 09:45:13 +0200
 Subject: [PATCH] Linux
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Hunor Csomortáni <csomh@redhat.com>
+Signed-off-by: A U Thor <thor@redhat.com>
 ---
  hello.rs | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
