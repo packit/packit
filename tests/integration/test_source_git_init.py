@@ -296,6 +296,7 @@ def test_create_from_upstream_not_require_autosetup(
     commit = hello_source_git_repo.commit("HEAD")
     commit_messsage_lines = commit.message.splitlines()
     assert "Patch-name: from-git.patch" in commit_messsage_lines
+    assert "Patch-name: from-another-git.patch" not in commit_messsage_lines
     assert "Patch-id: 2" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
     assert (

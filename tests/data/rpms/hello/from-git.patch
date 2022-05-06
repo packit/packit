@@ -6,6 +6,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+Patch-name: from-another-git.patch
 Signed-off-by: A U Thor <thor@redhat.com>
 ---
  hello.rs | 2 +-
