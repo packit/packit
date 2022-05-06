@@ -396,6 +396,37 @@ class JobConfigSchema(CommonConfigSchema):
                 "The 'metadata' key in jobs is deprecated and can be removed."
                 "Nest config options from 'metadata' directly under the job object."
             )
+
+            not_nested_metadata_keys = [
+                k
+                for k in (
+                    "_targets",
+                    "timeout",
+                    "owner",
+                    "project",
+                    "dist_git_branches",
+                    "branch",
+                    "scratch",
+                    "list_on_homepage",
+                    "preserve_project",
+                    "use_internal_tf",
+                    "additional_packages",
+                    "additional_repos",
+                    "fmf_url",
+                    "fmf_ref",
+                    "skip_build",
+                    "env",
+                    "enable_net",
+                )
+                if k in data
+            ]
+            if not_nested_metadata_keys:
+                raise ValidationError(
+                    f"Keys: {not_nested_metadata_keys} are defined outside job metadata dictionary."
+                    "Mixing obsolete metadata dictionary and new job keys is not possible."
+                    "Remove obsolete nested job metadata dictionary."
+                )
+
         for key in ("targets", "dist_git_branches"):
             if data is dict:
                 if isinstance(data.get(key), str):

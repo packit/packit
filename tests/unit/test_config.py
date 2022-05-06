@@ -240,6 +240,66 @@ def test_serialize_and_deserialize_job_config(config):
 
 
 @pytest.mark.parametrize(
+    "config_in,config_out,validation_error",
+    [
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "metadata": {"branch": "main"},
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            True,
+        ),
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "metadata": {"enable_net": False, "branch": "main"},
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            False,
+        ),
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            False,
+        ),
+    ],
+)
+def test_deserialize_and_serialize_job_config(config_in, config_out, validation_error):
+    schema = JobConfigSchema()
+    if validation_error:
+        with pytest.raises(ValidationError):
+            schema.dump(schema.load(config_in))
+    else:
+        serialized_from_in = schema.dump(schema.load(config_in))
+        serialized_from_out = schema.dump(schema.load(config_out))
+        assert serialized_from_in == serialized_from_out
+
+
+@pytest.mark.parametrize(
     "config,is_valid",
     [
         ({}, True),
