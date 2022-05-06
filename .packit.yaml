@@ -103,6 +103,5 @@ jobs:
     packit_instances: ["stg"]
     metadata:
       dist_git_branches:
-        - fedora-latest # branched version, rawhide updates are created automatically
-        - fedora-stable
+        - fedora-branched
         - epel-8
