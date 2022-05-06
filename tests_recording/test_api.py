@@ -45,7 +45,7 @@ class ProposeUpdate(PackitTest):
 
     def setUp(self):
         super().setUp()
-        self.set_git_user()
+        self.configure_git()
         self._api = None
 
     @property
