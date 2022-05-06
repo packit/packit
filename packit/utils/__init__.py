@@ -10,6 +10,7 @@ from packit.utils.logging import (
     commits_to_nice_str,
 )
 from packit.utils.repo import (
+    commit_message_file,
     get_default_branch,
     get_file_author,
     get_namespace_and_repo_name,
@@ -22,6 +23,7 @@ from packit.utils.repo import (
 
 __all__ = [
     assert_existence.__name__,
+    commit_message_file.__name__,
     commits_to_nice_str.__name__,
     cwd.__name__,
     get_default_branch.__name__,

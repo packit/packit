@@ -29,6 +29,7 @@ from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
 from packit.pkgtool import PkgTool
 from packit.utils import (
+    commit_message_file,
     run_command,
     get_default_branch,
     get_file_author,
@@ -226,24 +227,28 @@ class SourceGitGenerator:
             # Annotate commits in the source-git repo with patch_id. This info is not provided
             # during the rpm patching process so we need to do it here.
             metadata = PatchMetadata.from_git_trailers(commit)
-            # commit.message already ends with \n
-            message = commit.message
-            message += f"Patch-id: {patch_ids[metadata.name]}\n"
-            if patch_comments.get(metadata.name):
-                message += "Patch-status: |\n"
+            trailers = [("Patch-id", patch_ids[metadata.name])]
+            patch_status = ""
             for line in patch_comments.get(metadata.name, []):
-                message += f"    # {line}\n"
-            message += f"{FROM_DIST_GIT_TOKEN}: {self.dist_git.head.commit.hexsha}"
+                patch_status += f"    # {line}\n"
+            if patch_status:
+                trailers.append(("Patch-status", f"|\n{patch_status}"))
+            trailers.append((FROM_DIST_GIT_TOKEN, self.dist_git.head.commit.hexsha))
+
             author = None
             # If the commit subject matches the one used in _packitpatch
             # when applying patches with 'patch', get the original (first)
             # author of the patch file in dist-git.
-            if message.startswith(f"Apply patch {metadata.name}"):
+            if commit.message.startswith(f"Apply patch {metadata.name}"):
                 author = get_file_author(self.dist_git, metadata.name)
             logger.debug(f"author={author}")
-            self.source_git.git.commit(
-                message=message, author=author, amend=True, allow_empty=True
-            )
+
+            with commit_message_file(
+                commit.message, trailers=trailers
+            ) as commit_message:
+                self.source_git.git.commit(
+                    file=commit_message, author=author, amend=True, allow_empty=True
+                )
 
         self.source_git.git.branch("-D", to_branch)
 

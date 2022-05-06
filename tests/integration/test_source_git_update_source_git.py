@@ -187,11 +187,13 @@ def test_update_source_git(
 
     # Delete a file
     (distgit / new_name).unlink()
-    api_instance_update_source_git.dg.commit("Delete", "")
+    api_instance_update_source_git.dg.commit("Delete", "Some file")
     api_instance_update_source_git.update_source_git(revision_range)
     assert not (sourcegit / DISTRO_DIR / new_name).exists()
     assert (
-        "Delete"
+        """Delete
+
+Some file"""
         in api_instance_update_source_git.up.local_project.git_repo.head.commit.message
     )
     assert (
