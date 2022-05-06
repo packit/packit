@@ -1,4 +1,7 @@
 ---
+# We want to use both instances for all upstream jobs including the `propose-downstream` one.
+# For downstream, we need to pick just one instance (`stg` in our case)
+# and redefine it for the `koji_build` and `bodhi_update` jobs.
 packit_instances: ["prod", "stg"]
 files_to_sync:
   - packit.spec
@@ -34,7 +37,6 @@ jobs:
   - job: propose_downstream
     trigger: release
     # Use the stage instance once it works in downstream.
-    packit_instances: ["prod"]
     metadata:
       dist_git_branches:
         - fedora-all
@@ -91,18 +93,15 @@ jobs:
   # downstream automation:
   - job: koji_build
     trigger: commit
-    # Use the stage instance once it works in downstream.
-    packit_instances: ["prod"]
+    packit_instances: ["stg"]
     metadata:
       dist_git_branches:
         - fedora-all
         - epel-8
   - job: bodhi_update
     trigger: commit
-    # Use the stage instance once it works in downstream.
-    packit_instances: ["prod"]
+    packit_instances: ["stg"]
     metadata:
       dist_git_branches:
-        - fedora-latest # branched version, rawhide updates are created automatically
-        - fedora-stable
+        - fedora-branched
         - epel-8
