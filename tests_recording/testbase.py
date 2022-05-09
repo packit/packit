@@ -90,7 +90,7 @@ class PackitTest(unittest.TestCase):
         return self.lp.working_dir / self._project_specfile_path
 
     @staticmethod
-    def set_git_user():
+    def configure_git():
         try:
             check_output(["git", "config", "--global", "-l"])
         except CalledProcessError:
@@ -98,3 +98,4 @@ class PackitTest(unittest.TestCase):
                 ["git", "config", "--global", "user.email", "test@example.com"]
             )
             check_output(["git", "config", "--global", "user.name", "Tester"])
+            check_output(["git", "config", "--global", "safe.directory", "*"])

@@ -264,7 +264,8 @@ def test_create_srpm(upstream_instance, tmp_path):
 
     with pytest.raises(PackitSRPMException) as exc:
         ups.create_srpm()
-    assert "Bad source" in str(exc.value)
+    # Creating an SRPM failes b/c the source archive is not present.
+    assert "tar.gz: No such file or directory" in str(exc.value)
 
     ups.create_archive()
     srpm = ups.create_srpm()
