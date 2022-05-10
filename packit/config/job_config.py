@@ -4,7 +4,7 @@
 from copy import deepcopy
 from enum import Enum
 from logging import getLogger
-from typing import List, Set, Dict, Optional, Union, Any
+from typing import List, Dict, Optional, Union, Any
 
 from packit.actions import ActionName
 from packit.config.aliases import DEFAULT_VERSION
@@ -36,131 +36,6 @@ class JobConfigTriggerType(Enum):
     commit = "commit"
 
 
-class JobMetadataConfig:
-    def __init__(
-        self,
-        _targets: Union[List[str], Dict[str, Dict[str, Any]], None] = None,
-        timeout: int = 7200,
-        owner: Optional[str] = None,
-        project: Optional[str] = None,
-        dist_git_branches: Optional[List[str]] = None,
-        branch: Optional[str] = None,
-        scratch: bool = False,
-        list_on_homepage: bool = False,
-        preserve_project: bool = False,
-        additional_packages: Optional[List[str]] = None,
-        additional_repos: Optional[List[str]] = None,
-        fmf_url: Optional[str] = None,
-        fmf_ref: Optional[str] = None,
-        use_internal_tf: bool = False,
-        skip_build: bool = False,
-        env: Optional[Dict[str, Any]] = None,
-        enable_net: bool = True,
-    ):
-        """
-        Args:
-            _targets: copr_build, mock chroots where to build
-                      tests, builds to test
-                      The _ prefix is used because 'targets' without it
-                      is now used for backward compatibility.
-            timeout: copr_build, give up watching a build after timeout, defaults to 7200s
-            owner: copr_build, a namespace in COPR where the build should happen
-            project: copr_build, a name of the copr project
-            dist_git_branches: propose_downstream, branches in dist-git where packit should work
-            branch: for `commit` trigger to specify the branch name
-            scratch: if we want to run scratch build in koji
-            list_on_homepage: if set, created copr project will be visible on copr's home-page
-            preserve_project: if set, project will not be created as temporary
-            additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
-            additional_repos: buildroot additional additional_repos
-            fmf_url: - git repository containing the metadata (FMF) tree
-            fmf_ref: - branch, tag or commit specifying the desired git revision
-            use_internal_tf: if we want to use internal instance of Testing Farm
-            skip_build: if we want to skip build phase for Testing Farm job
-            env: environment variables
-            enable_net: if set to False, Copr builds have network disabled
-        """
-        self._targets: Dict[str, Dict[str, Any]]
-        if isinstance(_targets, list):
-            self._targets = {key: {} for key in _targets}
-        else:
-            self._targets = _targets or {}
-        self.timeout: int = timeout
-        self.owner: str = owner
-        self.project: str = project
-        self.dist_git_branches: Set[str] = (
-            set(dist_git_branches) if dist_git_branches else set()
-        )
-        self.branch: str = branch
-        self.scratch: bool = scratch
-        self.list_on_homepage: bool = list_on_homepage
-        self.preserve_project: bool = preserve_project
-        self.additional_packages: List[str] = additional_packages or []
-        self.additional_repos: List[str] = additional_repos or []
-        self.fmf_url: str = fmf_url
-        self.fmf_ref: str = fmf_ref
-        self.use_internal_tf: bool = use_internal_tf
-        self.skip_build: bool = skip_build
-        self.env: Dict[str, Any] = env or {}
-        self.enable_net = enable_net
-
-    def __repr__(self):
-        return (
-            f"JobMetadataConfig("
-            f"targets={self._targets}, "
-            f"timeout={self.timeout}, "
-            f"owner={self.owner}, "
-            f"project={self.project}, "
-            f"dist_git_branches={self.dist_git_branches}, "
-            f"branch={self.branch}, "
-            f"scratch={self.scratch}, "
-            f"list_on_homepage={self.list_on_homepage}, "
-            f"preserve_project={self.preserve_project}, "
-            f"additional_packages={self.additional_packages}, "
-            f"additional_repos={self.additional_repos}, "
-            f"fmf_url={self.fmf_url}, "
-            f"fmf_ref={self.fmf_ref}, "
-            f"use_internal_tf={self.use_internal_tf}, "
-            f"skip_build={self.skip_build},"
-            f"env={self.env},"
-            f"enable_net={self.enable_net})"
-        )
-
-    def __eq__(self, other: object):
-        if not isinstance(other, JobMetadataConfig):
-            raise PackitConfigException(
-                "Provided object is not a JobMetadataConfig instance."
-            )
-        return (
-            self._targets == other._targets
-            and self.timeout == other.timeout
-            and self.owner == other.owner
-            and self.project == other.project
-            and self.dist_git_branches == other.dist_git_branches
-            and self.branch == other.branch
-            and self.scratch == other.scratch
-            and self.list_on_homepage == other.list_on_homepage
-            and self.preserve_project == other.preserve_project
-            and self.additional_packages == other.additional_packages
-            and self.additional_repos == other.additional_repos
-            and self.fmf_url == other.fmf_url
-            and self.fmf_ref == other.fmf_ref
-            and self.use_internal_tf == other.use_internal_tf
-            and self.skip_build == other.skip_build
-            and self.env == other.env
-            and self.enable_net == other.enable_net
-        )
-
-    @property
-    def targets_dict(self):
-        return self._targets
-
-    @property
-    def targets(self):
-        """For backward compatibility."""
-        return set(self._targets.keys())
-
-
 class JobConfig(CommonPackageConfig):
     """
     Definition of a job.
@@ -173,7 +48,6 @@ class JobConfig(CommonPackageConfig):
         self,
         type: JobType,
         trigger: JobConfigTriggerType,
-        metadata: Optional[JobMetadataConfig] = None,
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
         synced_files: Optional[List[SyncFilesItem]] = None,
@@ -204,6 +78,24 @@ class JobConfig(CommonPackageConfig):
         packit_instances: Optional[List[Deployment]] = None,
         issue_repository: Optional[str] = None,
         release_suffix: Optional[str] = None,
+        # from deprecated JobMetadataConfig
+        _targets: Union[List[str], Dict[str, Dict[str, Any]], None] = None,
+        timeout: int = 7200,
+        owner: Optional[str] = None,
+        project: Optional[str] = None,
+        dist_git_branches: Optional[List[str]] = None,
+        branch: Optional[str] = None,
+        scratch: bool = False,
+        list_on_homepage: bool = False,
+        preserve_project: bool = False,
+        additional_packages: Optional[List[str]] = None,
+        additional_repos: Optional[List[str]] = None,
+        fmf_url: Optional[str] = None,
+        fmf_ref: Optional[str] = None,
+        use_internal_tf: bool = False,
+        skip_build: bool = False,
+        env: Optional[Dict[str, Any]] = None,
+        enable_net: bool = True,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -236,14 +128,31 @@ class JobConfig(CommonPackageConfig):
             packit_instances=packit_instances,
             issue_repository=issue_repository,
             release_suffix=release_suffix,
+            # from deprecated JobMetadataConfig
+            _targets=_targets,
+            timeout=timeout,
+            owner=owner,
+            project=project,
+            dist_git_branches=dist_git_branches,
+            branch=branch,
+            scratch=scratch,
+            list_on_homepage=list_on_homepage,
+            preserve_project=preserve_project,
+            additional_packages=additional_packages,
+            additional_repos=additional_repos,
+            fmf_url=fmf_url,
+            fmf_ref=fmf_ref,
+            use_internal_tf=use_internal_tf,
+            skip_build=skip_build,
+            env=env,
+            enable_net=enable_net,
         )
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
-        self.metadata: JobMetadataConfig = metadata or JobMetadataConfig()
 
     def __repr__(self):
         return (
-            f"JobConfig(job={self.type}, trigger={self.trigger}, meta={self.metadata}, "
+            f"JobConfig(job={self.type}, trigger={self.trigger}, "
             f"config_file_path='{self.config_file_path}', "
             f"specfile_path='{self.specfile_path}', "
             f"files_to_sync='{self.files_to_sync}', "
@@ -270,7 +179,25 @@ class JobConfig(CommonPackageConfig):
             f"identifier='{self.identifier}', "
             f"packit_instances={self.packit_instances}, "
             f"issue_repository='{self.issue_repository}', "
-            f"release_suffix='{self.release_suffix}')"
+            f"release_suffix='{self.release_suffix}', "
+            # from deprecated JobMetadataConfig
+            f"targets={self._targets}, "
+            f"timeout={self.timeout}, "
+            f"owner={self.owner}, "
+            f"project={self.project}, "
+            f"dist_git_branches={self.dist_git_branches}, "
+            f"branch={self.branch}, "
+            f"scratch={self.scratch}, "
+            f"list_on_homepage={self.list_on_homepage}, "
+            f"preserve_project={self.preserve_project}, "
+            f"additional_packages={self.additional_packages}, "
+            f"additional_repos={self.additional_repos}, "
+            f"fmf_url={self.fmf_url}, "
+            f"fmf_ref={self.fmf_ref}, "
+            f"use_internal_tf={self.use_internal_tf}, "
+            f"skip_build={self.skip_build},"
+            f"env={self.env},"
+            f"enable_net={self.enable_net})"
         )
 
     @classmethod
@@ -289,7 +216,6 @@ class JobConfig(CommonPackageConfig):
         return (
             self.type == other.type
             and self.trigger == other.trigger
-            and self.metadata == other.metadata
             and self.specfile_path == other.specfile_path
             and self.files_to_sync == other.files_to_sync
             and self.dist_git_namespace == other.dist_git_namespace
@@ -314,6 +240,23 @@ class JobConfig(CommonPackageConfig):
             and self.packit_instances == other.packit_instances
             and self.issue_repository == other.issue_repository
             and self.release_suffix == other.release_suffix
+            and self._targets == other._targets
+            and self.timeout == other.timeout
+            and self.owner == other.owner
+            and self.project == other.project
+            and self.dist_git_branches == other.dist_git_branches
+            and self.branch == other.branch
+            and self.scratch == other.scratch
+            and self.list_on_homepage == other.list_on_homepage
+            and self.preserve_project == other.preserve_project
+            and self.additional_packages == other.additional_packages
+            and self.additional_repos == other.additional_repos
+            and self.fmf_url == other.fmf_url
+            and self.fmf_ref == other.fmf_ref
+            and self.use_internal_tf == other.use_internal_tf
+            and self.skip_build == other.skip_build
+            and self.env == other.env
+            and self.enable_net == other.enable_net
         )
 
 

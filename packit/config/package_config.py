@@ -170,8 +170,7 @@ class PackageConfig(CommonPackageConfig):
         package_config = PackageConfigSchema().load(raw_dict)
 
         if not package_config.specfile_path and not all(
-            job.type == JobType.tests and job.metadata.skip_build
-            for job in package_config.jobs
+            job.type == JobType.tests and job.skip_build for job in package_config.jobs
         ):
             raise PackitConfigException("Spec file was not found!")
 
@@ -183,9 +182,9 @@ class PackageConfig(CommonPackageConfig):
         this is only used when invoking copr builds from CLI
         """
         projects_list = [
-            job.metadata.project
+            job.project
             for job in self.jobs
-            if job.type == JobType.copr_build and job.metadata.project
+            if job.type == JobType.copr_build and job.project
         ]
         if not projects_list:
             return None
@@ -201,7 +200,7 @@ class PackageConfig(CommonPackageConfig):
     def get_propose_downstream_dg_branches_value(self) -> Optional[Set]:
         for job in self.jobs:
             if job.type == JobType.propose_downstream:
-                return job.metadata.dist_git_branches
+                return job.dist_git_branches
         return set()
 
     def __eq__(self, other: object):
