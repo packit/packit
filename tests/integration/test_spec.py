@@ -194,3 +194,23 @@ Patch : dark.patch
     spec = Specfile(specfile, sources_dir=specfile.parent)
     spec.remove_patches()
     assert specfile.read_text() == no_patches
+
+
+def test_remove_patches_no_blanklines(specfile):
+    no_blanks = specfile.read_text().replace("\n\n", "\n")
+    no_patches = no_blanks.replace("\n### patches ###\n", "\n")
+    patches = no_blanks.replace(
+        "### patches ###\n",
+        """\
+# Some comment line to be removed
+Patch1: yellow.patch
+Patch2: blue.patch
+# One
+# Or more lines
+Patch : dark.patch
+""",
+    )
+    specfile.write_text(patches)
+    spec = Specfile(specfile, sources_dir=specfile.parent)
+    spec.remove_patches()
+    assert specfile.read_text() == no_patches

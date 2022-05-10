@@ -334,15 +334,19 @@ class Specfile(SpecFile):
     def remove_patches(self):
         """Remove all patch-lines from the spec file"""
         content = []
+        # The stretch gathers patch + the associated comments
         stretch = []
         for line in self.spec_content.section("%package"):
             stretch.append(line)
-            # Empty lines save the current stretch into content.
-            if not line.strip():
+            # Non-patch lines without comment save the current stretch
+            stripped = line.strip()
+            if not stripped.startswith("#") and not stripped.lower().startswith(
+                "patch"
+            ):
                 content += stretch
                 stretch = []
             # Patch-lines throw away the current stretch.
-            if line.lower().startswith("patch"):
+            if stripped.lower().startswith("patch"):
                 stretch = []
                 # If there is an empty line at the end of content
                 # throw it away, to avoid duplicate lines.
