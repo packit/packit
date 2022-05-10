@@ -15,7 +15,6 @@ from packit.config import (
     JobConfigTriggerType,
 )
 from packit.config.aliases import DEFAULT_VERSION
-from packit.config.job_config import JobMetadataConfig
 from packit.schema import JobConfigSchema, JobMetadataSchema
 
 
@@ -39,7 +38,7 @@ def get_job_config_dict_full():
     return {
         "job": "propose_downstream",
         "trigger": "pull_request",
-        "metadata": {"dist-git-branch": "master"},
+        "dist_git_branches": ["master"],
     }
 
 
@@ -48,7 +47,7 @@ def get_job_config_full(**kwargs):
     return JobConfig(
         type=JobType.propose_downstream,
         trigger=JobConfigTriggerType.pull_request,
-        metadata=JobMetadataConfig(dist_git_branches=["master"]),
+        dist_git_branches=["master"],
         **kwargs,
     )
 
@@ -62,7 +61,8 @@ def get_job_config_dict_build_for_branch():
     return {
         "job": "copr_build",
         "trigger": "commit",
-        "metadata": {"branch": "build-branch", "scratch": True},
+        "branch": "build-branch",
+        "scratch": True,
     }
 
 
@@ -71,7 +71,8 @@ def get_job_config_build_for_branch(**kwargs):
     return JobConfig(
         type=JobType.copr_build,
         trigger=JobConfigTriggerType.commit,
-        metadata=JobMetadataConfig(branch="build-branch", scratch=True),
+        branch="build-branch",
+        scratch=True,
         **kwargs,
     )
 
@@ -82,19 +83,19 @@ def get_default_job_config(**kwargs):
         JobConfig(
             type=JobType.copr_build,
             trigger=JobConfigTriggerType.pull_request,
-            metadata=JobMetadataConfig(_targets=[DEFAULT_VERSION]),
+            _targets=[DEFAULT_VERSION],
             **kwargs,
         ),
         JobConfig(
             type=JobType.tests,
             trigger=JobConfigTriggerType.pull_request,
-            metadata=JobMetadataConfig(_targets=[DEFAULT_VERSION]),
+            _targets=[DEFAULT_VERSION],
             **kwargs,
         ),
         JobConfig(
             type=JobType.propose_downstream,
             trigger=JobConfigTriggerType.release,
-            metadata=JobMetadataConfig(dist_git_branches=["fedora-all"]),
+            dist_git_branches=["fedora-all"],
             **kwargs,
         ),
     ]
@@ -142,15 +143,15 @@ def test_job_config_validate(raw, is_valid):
         (get_job_config_dict_full(), get_job_config_full()),
         (
             get_job_config_dict_simple(),
-            get_job_config_simple(metadata=JobMetadataConfig(preserve_project=False)),
+            get_job_config_simple(preserve_project=False),
         ),
         (
-            get_job_config_dict_simple(metadata={"preserve_project": False}),
-            get_job_config_simple(metadata=JobMetadataConfig(preserve_project=False)),
+            get_job_config_dict_simple(preserve_project=False),
+            get_job_config_simple(preserve_project=False),
         ),
         (
-            get_job_config_dict_simple(metadata={"preserve_project": True}),
-            get_job_config_simple(metadata=JobMetadataConfig(preserve_project=True)),
+            get_job_config_dict_simple(preserve_project=True),
+            get_job_config_simple(preserve_project=True),
         ),
     ],
 )
@@ -236,6 +237,66 @@ def test_serialize_and_deserialize_job_config(config):
     serialized = schema.dump(config)
     new_config = schema.load(serialized)
     assert new_config == config
+
+
+@pytest.mark.parametrize(
+    "config_in,config_out,validation_error",
+    [
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "metadata": {"branch": "main"},
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            True,
+        ),
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "metadata": {"enable_net": False, "branch": "main"},
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            False,
+        ),
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "enable_net": False,
+                "branch": "main",
+            },
+            False,
+        ),
+    ],
+)
+def test_deserialize_and_serialize_job_config(config_in, config_out, validation_error):
+    schema = JobConfigSchema()
+    if validation_error:
+        with pytest.raises(ValidationError):
+            schema.dump(schema.load(config_in))
+    else:
+        serialized_from_in = schema.dump(schema.load(config_in))
+        serialized_from_out = schema.dump(schema.load(config_out))
+        assert serialized_from_in == serialized_from_out
 
 
 @pytest.mark.parametrize(
