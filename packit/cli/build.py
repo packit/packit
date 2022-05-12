@@ -12,6 +12,7 @@ from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches, get_koji_targets
 from packit.exceptions import PackitCommandFailedError, ensure_str
 from packit.exceptions import PackitConfigException
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,22 @@ logger = logging.getLogger(__name__)
     "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
 )
 @click.option("--nowait", is_flag=True, default=False, help="Don't wait on build")
+@click.option(
+    "--release-suffix",
+    default=None,
+    type=click.STRING,
+    help="Specifies release suffix. Allows to override default generated:"
+    "{current_time}.{sanitized_current_branch}{git_desc_suffix}",
+)
+@click.option(
+    "--default-release-suffix",
+    default=False,
+    is_flag=True,
+    help=(
+        "Allows to use default, packit-generated, release suffix when some "
+        "release_suffix is specified in the configuration."
+    ),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
@@ -48,10 +65,12 @@ def build(
     dist_git_path,
     dist_git_branch,
     from_upstream,
+    koji_target,
     scratch,
     nowait,
+    release_suffix,
+    default_release_suffix,
     path_or_url,
-    koji_target,
 ):
     """
     Build selected upstream project in Fedora.
@@ -65,6 +84,9 @@ def build(
     """
     api = get_packit_api(
         config=config, dist_git_path=dist_git_path, local_project=path_or_url
+    )
+    release_suffix = ChangelogHelper.resolve_release_suffix(
+        api.package_config, release_suffix, default_release_suffix
     )
 
     default_dg_branch = api.dg.local_project.git_project.default_branch
@@ -94,6 +116,7 @@ def build(
                     nowait=nowait,
                     koji_target=target,
                     from_upstream=from_upstream,
+                    release_suffix=release_suffix,
                 )
             except PackitCommandFailedError as ex:
                 logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))

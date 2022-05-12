@@ -569,6 +569,7 @@ def test_copr_build_cli_no_project_configured(upstream_and_remote, copr_client_m
         additional_repos=None,
         request_admin_if_needed=False,
         enable_net=True,
+        release_suffix=None,
     ).and_return(("id", "url")).once()
 
     flexmock(packit.copr_helper.CoprClient).should_receive(
@@ -593,6 +594,7 @@ def test_copr_build_cli_project_set_via_cli(upstream_and_remote, copr_client_moc
         additional_repos=None,
         request_admin_if_needed=False,
         enable_net=True,
+        release_suffix=None,
     ).and_return(("id", "url")).once()
 
     flexmock(packit.copr_helper.CoprClient).should_receive(
@@ -628,6 +630,7 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
         additional_repos=None,
         request_admin_if_needed=False,
         enable_net=True,
+        release_suffix=None,
     ).and_return(("id", "url")).once()
 
     run_packit(["copr-build", "--nowait"], working_dir=upstream)
