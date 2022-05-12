@@ -10,6 +10,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.schema import JobConfigSchema
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger("packit")
 
@@ -48,6 +49,15 @@ def load_job_config(job_config):
     type=click.STRING,
     help="Specifies release suffix. Allows to override default generated:"
     "{current_time}.{sanitized_current_branch}{git_desc_suffix}",
+)
+@click.option(
+    "--default-release-suffix",
+    default=False,
+    is_flag=True,
+    help=(
+        "Allows to use default, packit-generated, release suffix when some "
+        "release_suffix is specified in the configuration."
+    ),
 )
 @click.option(
     "--job-config-index",
@@ -99,6 +109,7 @@ def prepare_sources(
     upstream_ref,
     bump,
     release_suffix,
+    default_release_suffix,
     result_dir,
     ref,
     pr_id,
@@ -121,6 +132,9 @@ def prepare_sources(
         logger.debug(f"Setting result_dir to the default one: {result_dir}")
     api = get_packit_api(
         config=config, local_project=path_or_url, job_config_index=job_config_index
+    )
+    release_suffix = ChangelogHelper.resolve_release_suffix(
+        api.package_config, release_suffix, default_release_suffix
     )
 
     api.prepare_sources(

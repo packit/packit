@@ -11,6 +11,7 @@ from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings, PackageConfig
 from packit.config.aliases import get_valid_build_targets, DEPRECATED_TARGET_MAP
 from packit.utils import sanitize_branch_name
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +82,22 @@ logger = logging.getLogger(__name__)
     default=True,
     is_flag=True,
 )
+@click.option(
+    "--release-suffix",
+    default=None,
+    type=click.STRING,
+    help="Specifies release suffix. Allows to override default generated:"
+    "{current_time}.{sanitized_current_branch}{git_desc_suffix}",
+)
+@click.option(
+    "--default-release-suffix",
+    default=False,
+    is_flag=True,
+    help=(
+        "Allows to use default, packit-generated, release suffix when some "
+        "release_suffix is specified in the configuration."
+    ),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
@@ -98,6 +115,8 @@ def copr_build(
     additional_repos,
     request_admin_if_needed,
     enable_net,
+    release_suffix,
+    default_release_suffix,
     path_or_url,
 ):
     """
@@ -107,6 +126,10 @@ def copr_build(
     it defaults to the current working directory.
     """
     api = get_packit_api(config=config, local_project=path_or_url)
+    release_suffix = ChangelogHelper.resolve_release_suffix(
+        api.package_config, release_suffix, default_release_suffix
+    )
+
     if not project:
         logger.debug("COPR project name was not passed via CLI.")
 
@@ -154,6 +177,7 @@ def copr_build(
         additional_repos=additional_repos_list,
         request_admin_if_needed=request_admin_if_needed,
         enable_net=enable_net,
+        release_suffix=release_suffix,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if not nowait:
