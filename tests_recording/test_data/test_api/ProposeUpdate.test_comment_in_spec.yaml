@@ -3703,6 +3703,58 @@ requests.sessions:
             raw: !!binary ""
             reason: OK
             status_code: 200
+    POST:
+      https://src.fedoraproject.org/api/0/-/whoami:
+        all:
+          metadata:
+            latency: 0.6465277671813965
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_api
+            - packit.api
+            - packit.distgit
+            - ogr.services.pagure.project
+            - ogr.services.pagure.pull_request
+            - ogr.services.pagure.project
+            - ogr.services.pagure.service
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              username: jscotka
+            _next: null
+            elapsed: 0.428414
+            encoding: null
+            headers:
+              Connection: Keep-Alive
+              Date: Fri, 13 Aug 2021 07:54:00 GMT
+              Keep-Alive: timeout=15, max=499
+              Referrer-Policy: same-origin
+              Server: Apache
+              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+              X-Content-Type-Options: nosniff
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: YRYlGGfCu6x3Q7yjr9_-iQAAAlg
+              X-Frame-Options: SAMEORIGIN
+              X-Xss-Protection: 1; mode=block
+              apptime: D=316030
+              content-length: '48460'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-KhLduggGruxT6cyR6tsb1T5da'
+                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
+                'self' 'nonce-KhLduggGruxT6cyR6tsb1T5da'; object-src 'none'; base-uri
+                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
+                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
+              content-type: application/json
+              set-cookie: a 'b';
+              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
 tempfile:
   mkdtemp:
     all:

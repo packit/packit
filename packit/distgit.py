@@ -506,11 +506,14 @@ class DistGit(PackitRepositoryBase):
         self, title: str, description: str, branch: str
     ) -> Optional[PullRequest]:
         distgit_prs = self.local_project.git_project.get_pr_list()
+        current_user = self.local_project.git_service.user.get_username()
+
         for pr in distgit_prs:
             if (
                 pr.title == title
                 and pr.description == description
                 and pr.target_branch == branch
+                and pr.author == current_user
             ):
                 return pr
         return None
