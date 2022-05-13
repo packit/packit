@@ -1,3 +1,20 @@
+# 0.51.0
+
+- We have decided to deprecate `metadata` section for job configurations. All
+  metadata-specific configuration values can be placed on the same level as the job
+  definition. For now we are in a backward-compatible period, please move your settings
+  from the `metadata` section. (#1569)
+- Packit now correctly removes patches during `packit source-git init` when the
+  preamble does not contain blank lines. (#1582)
+- `packit source-git` commands learnt to replace Git-trailers in commit
+  messages if they already exist. (#1577)
+- Packit now supports `--release-suffix` parameter in all of the related CLI
+  commands. Also we have added a support for the `release_suffix` option from
+  configuration to the CLI. With regards to that we have introduced a new CLI
+  switch `--default-release-suffix` that allows you to override the configuration
+  option to Packit-generated default option that ensures correct NVR ordering
+  of the RPMs. (#1586)
+
 # 0.50.0
 
 - When initializing source-git repos, the author of downstream commits created from patch files which are not in a git-am format is set to the original author of the patch-file in dist-git, instead of using the locally configured Git author. (#1575)
