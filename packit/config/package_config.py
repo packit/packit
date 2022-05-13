@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Union, Set
 
 from ogr.abstract import GitProject
+from ogr.exceptions import GithubAppNotInstalledError
 from yaml import safe_load
 
 from packit.actions import ActionName
@@ -335,7 +336,7 @@ def get_package_config_from_repo(
             config_file_content = project.get_file_content(
                 path=config_file_name, ref=ref
             )
-        except FileNotFoundError:
+        except (FileNotFoundError, GithubAppNotInstalledError):
             # do nothing
             pass
         else:
