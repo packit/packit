@@ -21,6 +21,7 @@ from packit.local_project import LocalProject
                     title="Update",
                     target_branch="f31",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
+                    author="packit",
                 )
             ],
             True,
@@ -34,6 +35,7 @@ from packit.local_project import LocalProject
                     title="Update",
                     target_branch="f31",
                     description="Upstream tag: 0.4.0\nUpstream commit: 8957453b",
+                    author="packit",
                 )
             ],
             False,
@@ -47,6 +49,21 @@ from packit.local_project import LocalProject
                     title="Update",
                     target_branch="f31",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
+                    author="packit",
+                )
+            ],
+            False,
+        ),
+        (
+            "Update",
+            "Upstream tag: 0.4.0\nUpstream commit: 6957453b",
+            "f31",
+            [
+                flexmock(
+                    title="Update",
+                    target_branch="f31",
+                    description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
+                    author="packit-stg",
                 )
             ],
             False,
@@ -54,9 +71,11 @@ from packit.local_project import LocalProject
     ],
 )
 def test_existing_pr(title, description, branch, prs, exists):
+    user_mock = flexmock().should_receive("get_username").and_return("packit").mock()
     local_project = LocalProject(
         git_project=flexmock(service="something", get_pr_list=lambda: prs),
         refresh=False,
+        git_service=flexmock(user=user_mock),
     )
     distgit = DistGit(
         config=flexmock(Config()),
