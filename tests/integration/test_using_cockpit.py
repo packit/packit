@@ -54,6 +54,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         upload_to_lookaside_cache=lambda archive, pkg_tool: None,
         download_upstream_archive=lambda: "the-archive",
     )
+    flexmock(DistGit).should_receive("existing_pr").and_return(None)
     flexmock(
         PackitAPI,
         push_and_create_pr=lambda pr_title, pr_description, dist_git_branch: None,
