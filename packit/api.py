@@ -979,21 +979,29 @@ The first dist-git commit to be synced is '{short_hash}'.
         nowait: bool = False,
         koji_target: Optional[str] = None,
         from_upstream: bool = False,
+        release_suffix: Optional[str] = None,
     ):
         """
-        Build component in Fedora infra (defaults to koji)
+        Build component in Fedora infra (defaults to koji).
 
-        :param dist_git_branch: ref in dist-git
-        :param scratch: should the build be a scratch build?
-        :param nowait: don't wait on build?
-        :param koji_target: koji target to pick (see `koji list-targets`)
-        :param from_upstream: build directly from the upstream checkout?
+        Args:
+            dist_git_branch: Branch in dist-git.
+            scratch: Defines whether the build should be scratch build.
+            nowait: Defines whether packit should wait for the build to finish
+                or not.
+            koji_target: Koji target to build for, see `koji list-targets`.
+            from_upstream: Specifies whether the build should be done directly
+                from the upstream checkout.
+            release_suffix: Specifies release suffix to be used for SRPM build.
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
         self.init_kerberos_ticket()
 
         if from_upstream:
-            srpm_path = self.create_srpm(srpm_dir=self.up.local_project.working_dir)
+            srpm_path = self.create_srpm(
+                srpm_dir=self.up.local_project.working_dir,
+                release_suffix=release_suffix,
+            )
             return self.up.koji_build(
                 scratch=scratch,
                 nowait=nowait,
@@ -1131,19 +1139,28 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.clean()
 
     def create_rpms(
-        self, upstream_ref: Optional[str] = None, rpm_dir: str = None
+        self,
+        upstream_ref: Optional[str] = None,
+        rpm_dir: str = None,
+        release_suffix: Optional[str] = None,
     ) -> List[Path]:
         """
-        Create rpms from the upstream repo
+        Create RPMs from the upstream repository.
 
-        :param upstream_ref: git ref to upstream commit
-        :param rpm_dir: path to the directory where the rpm is meant to be placed
-        :return: a path to the rpm
+        Args:
+            upstream_ref: Git reference to the upstream commit.
+            rpm_dir: Path to the directory where the RPMs are meant to be placed.
+            release_suffix: Release suffix that is used during modification of specfile.
+
+        Returns:
+            List of paths to the built RPMs.
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
         try:
-            self.up.prepare_upstream_for_srpm_creation(upstream_ref=upstream_ref)
+            self.up.prepare_upstream_for_srpm_creation(
+                upstream_ref=upstream_ref, release_suffix=release_suffix
+            )
         except Exception as ex:
             raise PackitRPMException(
                 f"Preparing of the upstream to the RPM build failed: {ex}"
@@ -1319,6 +1336,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         additional_repos: Optional[List[str]] = None,
         request_admin_if_needed: bool = False,
         enable_net: bool = True,
+        release_suffix: Optional[str] = None,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -1342,12 +1360,15 @@ The first dist-git commit to be synced is '{short_hash}'.
                 if changes to configuration of Copr project are required.
             enable_net: Specifies whether created Copr build should have access
                 to network during its build.
+            release_suffix: Release suffix that is used during generation of SRPM.
 
         Returns:
             ID of the created build and URL to the build web page.
         """
         srpm_path = self.create_srpm(
-            upstream_ref=upstream_ref, srpm_dir=self.up.local_project.working_dir
+            upstream_ref=upstream_ref,
+            srpm_dir=self.up.local_project.working_dir,
+            release_suffix=release_suffix,
         )
 
         owner = owner or self.copr_helper.configured_owner

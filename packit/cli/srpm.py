@@ -9,6 +9,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger("packit")
 
@@ -36,6 +37,15 @@ logger = logging.getLogger("packit")
     help="Specifies release suffix. Allows to override default generated:"
     "{current_time}.{sanitized_current_branch}{git_desc_suffix}",
 )
+@click.option(
+    "--default-release-suffix",
+    default=False,
+    is_flag=True,
+    help=(
+        "Allows to use default, packit-generated, release suffix when some "
+        "release_suffix is specified in the configuration."
+    ),
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
@@ -50,6 +60,7 @@ def srpm(
     upstream_ref,
     bump,
     release_suffix,
+    default_release_suffix,
 ):
     """
     Create new SRPM (.src.rpm file) using content of the upstream repository.
@@ -58,6 +69,12 @@ def srpm(
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
+    release_suffix = ChangelogHelper.resolve_release_suffix(
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
+    )
+
     srpm_path = api.create_srpm(
         output_file=output,
         upstream_ref=upstream_ref,
