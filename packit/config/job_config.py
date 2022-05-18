@@ -96,6 +96,8 @@ class JobConfig(CommonPackageConfig):
         skip_build: bool = False,
         env: Optional[Dict[str, Any]] = None,
         enable_net: bool = True,
+        allowed_pr_authors: Optional[List[str]] = None,
+        allowed_committers: Optional[List[str]] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -146,6 +148,8 @@ class JobConfig(CommonPackageConfig):
             skip_build=skip_build,
             env=env,
             enable_net=enable_net,
+            allowed_pr_authors=allowed_pr_authors,
+            allowed_committers=allowed_committers,
         )
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
@@ -197,7 +201,9 @@ class JobConfig(CommonPackageConfig):
             f"use_internal_tf={self.use_internal_tf}, "
             f"skip_build={self.skip_build},"
             f"env={self.env},"
-            f"enable_net={self.enable_net})"
+            f"enable_net={self.enable_net},"
+            f"allowed_pr_authors={self.allowed_pr_authors},"
+            f"allowed_commiters={self.allowed_committers})"
         )
 
     @classmethod

@@ -160,6 +160,60 @@ def test_job_config_parse(raw, expected_config):
     assert job_config == expected_config
 
 
+@pytest.mark.parametrize(
+    "raw,expected,allowed_pr_authors,allowed_committers",
+    [
+        pytest.param(
+            {
+                "job": "koji_build",
+                "trigger": "commit",
+            },
+            JobConfig(
+                type=JobType.koji_build,
+                trigger=JobConfigTriggerType.commit,
+            ),
+            ["packit"],
+            [],
+        ),
+        pytest.param(
+            {
+                "job": "koji_build",
+                "trigger": "commit",
+                "allowed_committers": ["me"],
+            },
+            JobConfig(
+                type=JobType.koji_build,
+                trigger=JobConfigTriggerType.commit,
+                allowed_committers=["me"],
+            ),
+            ["packit"],
+            ["me"],
+        ),
+        pytest.param(
+            {
+                "job": "koji_build",
+                "trigger": "commit",
+                "allowed_committers": ["me"],
+                "allowed_pr_authors": [],
+            },
+            JobConfig(
+                type=JobType.koji_build,
+                trigger=JobConfigTriggerType.commit,
+                allowed_committers=["me"],
+                allowed_pr_authors=[],
+            ),
+            [],
+            ["me"],
+        ),
+    ],
+)
+def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committers):
+    job_config = JobConfig.get_from_dict(raw_dict=raw)
+    assert job_config == expected
+    assert job_config.allowed_pr_authors == allowed_pr_authors
+    assert job_config.allowed_committers == allowed_committers
+
+
 def test_get_user_config(tmp_path):
     user_config_file_path = tmp_path / ".packit.yaml"
     user_config_file_path.write_text(

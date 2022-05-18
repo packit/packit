@@ -386,6 +386,8 @@ class JobConfigSchema(CommonConfigSchema):
     skip_build = fields.Boolean()
     env = fields.Dict(keys=fields.String(), missing=None)
     enable_net = fields.Boolean(missing=True)
+    allowed_pr_authors = fields.List(fields.String(), missing=None)
+    allowed_committers = fields.List(fields.String(), missing=None)
 
     metadata = fields.Nested(JobMetadataSchema)
 

@@ -61,6 +61,10 @@ class CommonPackageConfig:
         skip_build: if we want to skip build phase for Testing Farm job
         env: environment variables
         enable_net: if set to False, Copr builds have network disabled
+        allowed_pr_authors: list of Fedora accounts for which distgit PRs we
+                        will run koji builds
+        allowed_committers: list of Fedora accounts for which distgit pushes we
+                        will run koji builds
     """
 
     def __init__(
@@ -113,6 +117,8 @@ class CommonPackageConfig:
         skip_build: bool = False,
         env: Optional[Dict[str, Any]] = None,
         enable_net: bool = True,
+        allowed_pr_authors: Optional[List[str]] = None,
+        allowed_committers: Optional[List[str]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -193,6 +199,10 @@ class CommonPackageConfig:
         self.skip_build: bool = skip_build
         self.env: Dict[str, Any] = env or {}
         self.enable_net = enable_net
+        self.allowed_pr_authors = (
+            allowed_pr_authors if allowed_pr_authors is not None else ["packit"]
+        )
+        self.allowed_committers = allowed_committers or []
 
     @property
     def targets_dict(self):
@@ -283,7 +293,9 @@ class CommonPackageConfig:
             f"use_internal_tf={self.use_internal_tf}, "
             f"skip_build={self.skip_build},"
             f"env={self.env},"
-            f"enable_net={self.enable_net})"
+            f"enable_net={self.enable_net},"
+            f"allowed_pr_authors={self.allowed_pr_authors},"
+            f"allowed_committers={self.allowed_committers})"
         )
 
     @property
