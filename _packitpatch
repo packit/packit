@@ -39,7 +39,11 @@ patch_name=$(basename $patch_path)
 patch_args=$(echo ${@:3} | sed -e 's/ -b//' -e 's/--backup//')
 
 base_commit=$(git rev-parse HEAD)
-temp_branch="apply-${patch_name}"
+# Normalize patch-file name:
+# - replace non-alphanumeric characters with '-'
+# - replace consecutive '-' with a single '-'
+# - remove leading and trailing '-'
+temp_branch="apply-$(echo ${patch_name} | sed -e 's/[^0-9a-z]/-/ig' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')"
 git checkout -b ${temp_branch}
 # Try to apply the patch with 'git am'. This might produce multiple commits.
 # Might succeed OR fail, in which case use 'patch' to apply the patch.
