@@ -1094,7 +1094,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             result_dir: directory where the specfile directory content should be copied
         """
         logger.debug(f"Copying {self.up.absolute_specfile_dir} -> {result_dir}")
-        copy_tree(str(self.up.absolute_specfile_dir), str(result_dir))
+        copy_tree(
+            str(self.up.absolute_specfile_dir), str(result_dir), preserve_symlinks=True
+        )
 
     def create_srpm(
         self,
