@@ -206,7 +206,7 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
         in Path(hello_source_git_repo.working_dir, "hello.rs").read_text()
     )
 
-    commit_messsage_lines = hello_source_git_repo.commit("HEAD~1").message.splitlines()
+    commit_messsage_lines = hello_source_git_repo.commit("HEAD~2").message.splitlines()
     assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
     assert "Patch-id: 1" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
@@ -215,7 +215,7 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
         in commit_messsage_lines
     )
 
-    commit_messsage_lines = hello_source_git_repo.commit("HEAD").message.splitlines()
+    commit_messsage_lines = hello_source_git_repo.commit("HEAD~1").message.splitlines()
     assert "Patch-name: from-git.patch" in commit_messsage_lines
     assert "Patch-id: 2" in commit_messsage_lines
     assert "Patch-status: |" in commit_messsage_lines
@@ -279,7 +279,7 @@ def test_create_from_upstream_not_require_autosetup(
         in Path(hello_source_git_repo.working_dir, "hello.rs").read_text()
     )
 
-    commit = hello_source_git_repo.commit("HEAD~1")
+    commit = hello_source_git_repo.commit("HEAD~2")
     commit_messsage_lines = commit.message.splitlines()
     assert "Patch-name: turn-into-fedora.patch" in commit_messsage_lines
     assert "Patch-id: 1" in commit_messsage_lines
@@ -293,7 +293,7 @@ def test_create_from_upstream_not_require_autosetup(
     assert commit.author.name == "Engin Eer"
     assert commit.author.email == "eer@redhat.com"
 
-    commit = hello_source_git_repo.commit("HEAD")
+    commit = hello_source_git_repo.commit("HEAD~1")
     commit_messsage_lines = commit.message.splitlines()
     assert "Patch-name: from-git.patch" in commit_messsage_lines
     assert "Patch-name: from-another-git.patch" not in commit_messsage_lines
