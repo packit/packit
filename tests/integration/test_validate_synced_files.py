@@ -44,7 +44,8 @@ from packit.utils.commands import cwd
                 "synced_files": ["a.md", "b.md", "c.txt", "a_dir"]
             }
             """,
-            "The following path is configured to be synced but does not exist: c.txt",
+            "The following path is configured to be synced but is not present "
+            "in the repository: c.txt",
         ),
         (
             ["a.md"],
@@ -61,7 +62,8 @@ from packit.utils.commands import cwd
                  "synced_files": ["a.md", "b.md", "c.txt"]
              }
              """,
-            "The following paths are configured to be synced but do not exist: b.md, c.txt",
+            "The following paths are configured to be synced but are not present "
+            "in the repository: b.md, c.txt",
         ),
     ],
     ids=[

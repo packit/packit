@@ -15,11 +15,20 @@ logger = logging.getLogger(__name__)
 
 
 class PackageConfigValidator:
-    """validate content of .packit.yaml"""
+    """Validate the content of package configuration file (for example .packit.yaml)
 
-    def __init__(self, config_file_path: Path, config_content: Dict):
+    Attributes:
+        config_file_path: Path of the configuration file to be validated.
+        content: The content of the configuration file.
+        project_path: Path of the project to which the configuration file belongs.
+    """
+
+    def __init__(
+        self, config_file_path: Path, config_content: Dict, project_path: Path
+    ):
         self.config_file_path = config_file_path
         self.content = config_content
+        self.project_path = project_path
 
     def validate(self) -> str:
         """Create output for PackageConfig validation."""
@@ -39,7 +48,7 @@ class PackageConfigValidator:
             return str(e)
 
         specfile_path = self.content.get("specfile_path", None)
-        if specfile_path and not Path(specfile_path).is_file():
+        if specfile_path and not (self.project_path / specfile_path).is_file():
             logger.warning(
                 f"The spec file you defined ({specfile_path}) is not "
                 f"present in the repository. If it's being generated "
@@ -53,7 +62,9 @@ class PackageConfigValidator:
         synced_files_errors = []
         if config:
             synced_files_errors = [
-                f for f in iter_srcs(config.files_to_sync) if not Path(f).exists()
+                f
+                for f in iter_srcs(config.files_to_sync)
+                if not (self.project_path / f).exists()
             ]
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
@@ -66,14 +77,17 @@ class PackageConfigValidator:
                     output += self.validate_get_field_output(errors, field_name)
 
         if synced_files_errors:
-            output += "The following {} configured to be synced but {} not exist: {}\n".format(
+            output += (
+                "The following {} configured to be synced but "
+                "{} not present in the repository: {}\n"
+            ).format(
                 *(
                     (
                         "paths are",
-                        "do",
+                        "are",
                     )
                     if (len(synced_files_errors) > 1)
-                    else ("path is", "does")
+                    else ("path is", "is")
                 ),
                 ", ".join(synced_files_errors),
             )
