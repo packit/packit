@@ -198,11 +198,12 @@ from packit.utils.commands import cwd
 )
 def test_schema_validation(tmpdir, raw_package_config, expected_output):
     with cwd(tmpdir):
-        Path("packit.json").write_text(raw_package_config)
-        Path("packit.spec").write_text("hello")
-        Path("a.md").write_text("a")
-        Path("b.md").write_text("b")
-        Path("c.txt").write_text("c")
+        Path("test_dir").mkdir()
+        Path("test_dir/packit.json").write_text(raw_package_config)
+        Path("test_dir/packit.spec").write_text("hello")
+        Path("test_dir/a.md").write_text("a")
+        Path("test_dir/b.md").write_text("b")
+        Path("test_dir/c.txt").write_text("c")
 
-        output = PackitAPI.validate_package_config(Path("."))
+        output = PackitAPI.validate_package_config(Path("test_dir"))
         assert expected_output in output
