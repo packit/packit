@@ -542,17 +542,20 @@ class LocalProject:
         except Exception as ex:
             raise PackitException(f"Cannot checkout release tag: {ex!r}.")
 
-    def fetch(self, remote: str, refspec: Optional[str] = None):
+    def fetch(self, remote: str, refspec: Optional[str] = None, force: bool = False):
         """
-        fetch refs from a remote to this repo
+        Fetch refs and/or tags from a remote to this repo.
 
-        @param remote: str or path of the repo we fetch from
-        @param refspec: see man git-fetch
+        Args:
+            remote: Str or path of the repo we fetch from.
+            refspec: See man git-fetch.
+            force: See --force in man git-fetch.
         """
-        if refspec:
-            self.git_repo.git.fetch(remote, refspec)
-        else:
-            self.git_repo.git.fetch(remote, "--tags")
+        args = [remote]
+        args += [refspec] if refspec else ["--tags"]
+        if force:
+            args += ["--force"]
+        self.git_repo.git.fetch(*args)
 
     def __del__(self):
         self.clean()
