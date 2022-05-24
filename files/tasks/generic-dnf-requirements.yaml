@@ -1,6 +1,6 @@
 ---
 - name: Install generic RPM packages
-  dnf:
+  ansible.builtin.dnf:
     name:
       - make
       - git
