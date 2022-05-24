@@ -1,5 +1,5 @@
 ---
 - name: Pip install sandcastle, our sandboxing tech (needed when running as a service)
-  pip:
+  ansible.builtin.pip:
     name: git+https://github.com/packit/sandcastle
   become: true
