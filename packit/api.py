@@ -1521,7 +1521,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             try_local_dir_last=True,
         )
         config_content = load_packit_yaml(config_path)
-        v = PackageConfigValidator(config_path, config_content)
+        v = PackageConfigValidator(config_path, config_content, working_dir)
         return v.validate()
 
     def init_source_git(
