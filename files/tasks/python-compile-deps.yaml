@@ -1,6 +1,6 @@
 ---
 - name: Install specific RPMs to be able to use PIP installation
-  dnf:
+  ansible.builtin.dnf:
     name:
       - krb5-devel
       - gcc

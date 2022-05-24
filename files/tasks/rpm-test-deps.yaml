@@ -1,6 +1,6 @@
 ---
 - name: Install test rpm dependencies
-  dnf:
+  ansible.builtin.dnf:
     name:
       - python3-flexmock
       - python3-setuptools_scm_git_archive
@@ -10,7 +10,7 @@
   become: true
 
 - name: Install pytest & rpmautospec-rpm-macros
-  dnf:
+  ansible.builtin.dnf:
     name:
       - python3-pytest-cov
       - rpmautospec-rpm-macros
@@ -21,7 +21,7 @@
 
 # We need >=3.9 for tmp_path fixture, there's 3.4 in epel
 - name: Install pytest from PyPI
-  pip:
+  ansible.builtin.pip:
     name: pytest-cov
   when: ansible_distribution != 'Fedora'
   become: true

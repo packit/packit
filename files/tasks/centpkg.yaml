@@ -1,6 +1,6 @@
 ---
 - name: Install centpkg
-  dnf:
+  ansible.builtin.dnf:
     name:
       - centpkg
   become: true

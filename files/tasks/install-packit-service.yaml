@@ -1,5 +1,5 @@
 ---
 - name: Install packit-service
-  pip:
+  ansible.builtin.pip:
     name: "{{ reverse_dir }}"
   become: true
