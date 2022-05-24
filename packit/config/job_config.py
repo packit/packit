@@ -277,17 +277,17 @@ def get_default_jobs() -> List[Dict]:
             {
                 "job": "copr_build",
                 "trigger": "pull_request",
-                "metadata": {"targets": [DEFAULT_VERSION]},
+                "targets": [DEFAULT_VERSION],
             },
             {
                 "job": "tests",
                 "trigger": "pull_request",
-                "metadata": {"targets": [DEFAULT_VERSION]},
+                "targets": [DEFAULT_VERSION],
             },
             {
                 "job": "propose_downstream",
                 "trigger": "release",
-                "metadata": {"dist_git_branches": "fedora-all"},
+                "dist_git_branches": ["fedora-all"],
             },
         ]
     )
