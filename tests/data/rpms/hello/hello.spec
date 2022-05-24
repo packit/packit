@@ -13,6 +13,9 @@ Patch0001: turn-into-fedora.patch
 # Patch from Git
 Patch0002: from-git.patch
 
+# Funky patch
+Patch0003: 0017-Patch-This..patch
+
 Provides: hello
 
 BuildRequires: make
