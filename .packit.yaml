@@ -94,10 +94,12 @@ jobs:
   - job: koji_build
     trigger: commit
     packit_instances: ["stg"]
+    allowed_pr_authors: ["packit-stg"]
     metadata:
       dist_git_branches:
         - fedora-all
         - epel-8
+
   - job: bodhi_update
     trigger: commit
     packit_instances: ["stg"]
