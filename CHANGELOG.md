@@ -1,3 +1,10 @@
+# 0.52.0
+
+- Packit will not raise exceptions anymore when creating an SRPM with dangling symlinks. (#1592)
+- `packit validate-config` now checks the paths in the package config (path of the specfile,
+  paths of the files to be synced) relative to the project path (#1596)
+- The name of the temporary branch in `_packitpatch` was normalized which fixed applying the patches during `packit source-git init` (#1593)
+
 # 0.51.0
 
 - We have decided to deprecate `metadata` section for job configurations. All
