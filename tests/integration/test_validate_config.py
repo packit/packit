@@ -25,6 +25,10 @@ from packit.utils.commands import cwd
                 notifications:
                     pull_request:
                         successful_build: true
+                jobs:
+                - job: copr_build
+                  trigger: pull_request
+                  targets: fedora-stable
             """
             ),
             "packit.yaml is valid and ready to be used",
@@ -61,6 +65,10 @@ from packit.utils.commands import cwd
                 - a.md
                 - b.md
                 - c.txt
+                jobs:
+                - job: propose_downstream
+                  trigger: release
+                  dist_git_branches: fedora-latest
             """
             ),
             "packit.yaml is valid and ready to be used",
@@ -110,6 +118,12 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
+                jobs:
+                - job: tests
+                  trigger: pull_request
+                  targets:
+                  - fedora-stable
+                  - centos-stream-9
             """
             ),
             "packit.yaml is valid and ready to be used",
@@ -150,6 +164,12 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
+                jobs:
+                - job: bodhi_update
+                  trigger: commit
+                  dist_git_branches:
+                  - f35
+                  - f36
             """
             ),
             "packit.yaml is valid and ready to be used",
