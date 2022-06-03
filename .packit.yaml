@@ -37,73 +37,65 @@ jobs:
   - job: propose_downstream
     trigger: release
     # Use the stage instance once it works in downstream.
-    metadata:
-      dist_git_branches:
-        - fedora-all
-        - epel-8
+    dist_git_branches:
+      - fedora-all
+      - epel-8
 
   - job: sync_from_downstream
     trigger: commit
 
   - job: copr_build
     trigger: pull_request
-    metadata:
-      targets:
-        - fedora-all
-        - epel-8
+    targets:
+      - fedora-all
+      - epel-8
   - job: tests
     trigger: pull_request
-    metadata:
-      targets:
-        - fedora-all
-        - epel-8
+    targets:
+      - fedora-all
+      - epel-8
 
   - job: copr_build
     trigger: commit
-    metadata:
-      branch: main
-      targets:
-        - fedora-all
-        - epel-8
-      project: packit-dev
-      list_on_homepage: True
-      preserve_project: True
+    branch: main
+    targets:
+      - fedora-all
+      - epel-8
+    project: packit-dev
+    list_on_homepage: True
+    preserve_project: True
 
   - job: copr_build
     trigger: commit
-    metadata:
-      branch: stable
-      targets:
-        - fedora-all
-        - epel-8
-      project: packit-stable
-      list_on_homepage: True
-      preserve_project: True
+    branch: stable
+    targets:
+      - fedora-all
+      - epel-8
+    project: packit-stable
+    list_on_homepage: True
+    preserve_project: True
 
   - job: copr_build
     trigger: release
-    metadata:
-      targets:
-        - fedora-all
-        - epel-8
-      project: packit-releases
-      list_on_homepage: True
-      preserve_project: True
+    targets:
+      - fedora-all
+      - epel-8
+    project: packit-releases
+    list_on_homepage: True
+    preserve_project: True
 
   # downstream automation:
   - job: koji_build
     trigger: commit
     packit_instances: ["stg"]
     allowed_pr_authors: ["packit-stg"]
-    metadata:
-      dist_git_branches:
-        - fedora-all
-        - epel-8
+    dist_git_branches:
+      - fedora-all
+      - epel-8
 
   - job: bodhi_update
     trigger: commit
     packit_instances: ["stg"]
-    metadata:
-      dist_git_branches:
-        - fedora-branched
-        - epel-8
+    dist_git_branches:
+      - fedora-branched
+      - epel-8
