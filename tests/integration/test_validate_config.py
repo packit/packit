@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
+from textwrap import dedent
 
 import pytest
 
@@ -13,171 +14,170 @@ from packit.utils.commands import cwd
     "raw_package_config,expected_output",
     [
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                notifications:
+                    pull_request:
+                        successful_build: true
             """
-            {
-                "config_file_path": "packit.json",
-                "dist_git_base_url": "https://packit.dev/",
-                "downstream_package_name": "packit",
-                "upstream_ref": "last_commit",
-                "upstream_package_name": "packit_upstream",
-                "allowed_gpg_keys": ["gpg"],
-                "dist_git_namespace": "awesome",
-                "notifications": {
-                    "pull_request": {
-                        "successful_build": True
-                    }
-                }
-            }
-            """,
-            "packit.json is valid and ready to be used",
+            ),
+            "packit.yaml is valid and ready to be used",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                notifications:
+                    pull_request:
+                        successful_build: 55
             """
-            {
-                "config_file_path": "packit.json",
-                "dist_git_base_url": "https://packit.dev/",
-                "downstream_package_name": "packit",
-                "upstream_ref": "last_commit",
-                "upstream_package_name": "packit_upstream",
-                "allowed_gpg_keys": ["gpg"],
-                "dist_git_namespace": "awesome",
-                "notifications": {
-                    "pull_request": {
-                        "successful_build": 55
-                    }
-                }
-            }
-            """,
+            ),
             "* field notifications has an incorrect value:\n"
             "** field pull_request has an incorrect value:\n"
             "*** value at index successful_build: Not a valid boolean.",
         ),
-        ("{}", "packit.json is valid and ready to be used"),
+        ("", "packit.yaml is valid and ready to be used"),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                synced_files:
+                - a.md
+                - b.md
+                - c.txt
             """
-            {
-                "config_file_path": "packit.json",
-                "dist_git_base_url": "https://packit.dev/",
-                "downstream_package_name": "packit",
-                "upstream_ref": "last_commit",
-                "upstream_package_name": "packit_upstream",
-                "allowed_gpg_keys": ["gpg"],
-                "dist_git_namespace": "awesome",
-                "synced_files": ["a.md", "b.md", "c.txt"]
-            }
-            """,
-            "packit.json is valid and ready to be used",
+            ),
+            "packit.yaml is valid and ready to be used",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                synced_files:
+                - src: 55
+                  dest: a.md
+                - b.md
+                - c.txt
             """
-                {
-                    "config_file_path": "packit.json",
-                    "dist_git_base_url": "https://packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome",
-                    "synced_files": [{ "src": 55, "dest": "a.md" }, "b.md", "c.txt"]
-                }
-                """,
+            ),
             "Expected 'list[str]' or 'str', got <class 'int'>.",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                synced_files:
+                - a.md
+                - b.md
+                - src: c.txt
+                  dest: True
             """
-                {
-                    "config_file_path": "packit.json",
-                    "dist_git_base_url": "https://packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome",
-                    "synced_files": ["a.md", "b.md", { "src": "c.txt", "dest": True }]
-                }
-                """,
+            ),
             "dest: Not a valid string.",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
             """
-                {
-                    "dist_git_base_url": "https://packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome"
-                }
-                """,
-            "packit.json is valid and ready to be used",
+            ),
+            "packit.yaml is valid and ready to be used",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: 23
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
             """
-                {
-                    "dist_git_base_url": "https://packit.dev/",
-                    "downstream_package_name": 23,
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome"
-                }
-                """,
+            ),
             "* field downstream_package_name: Not a valid string.",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                create_pr: ""
             """
-                {
-                    "dist_git_base_url": "https://packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome",
-                    create_pr: ""
-                }
-                """,
+            ),
             "* field create_pr: Not a valid boolean.",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
             """
-                {
-                    "config_file_path": "packit.json",
-                    "dist_git_base_url": "https: //packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome"
-                }
-                """,
-            "packit.json is valid and ready to be used",
+            ),
+            "packit.yaml is valid and ready to be used",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: gpg
+                dist_git_namespace: awesome
             """
-                {
-                    "config_file_path": "packit.json",
-                    "dist_git_base_url": "https: //packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit_upstream",
-                    "allowed_gpg_keys": "gpg",
-                    "dist_git_namespace": "awesome"
-                }
-                """,
+            ),
             "* field allowed_gpg_keys: Not a valid list.",
         ),
         (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit/upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
             """
-                {
-                    "config_file_path": "packit.json",
-                    "dist_git_base_url": "https: //packit.dev/",
-                    "downstream_package_name": "packit",
-                    "upstream_ref": "last_commit",
-                    "upstream_package_name": "packit/upstream",
-                    "allowed_gpg_keys": ["gpg"],
-                    "dist_git_namespace": "awesome"
-                }
-                """,
+            ),
             " Repository name must be a valid filename.",
         ),
     ],
@@ -199,7 +199,7 @@ from packit.utils.commands import cwd
 def test_schema_validation(tmpdir, raw_package_config, expected_output):
     with cwd(tmpdir):
         Path("test_dir").mkdir()
-        Path("test_dir/packit.json").write_text(raw_package_config)
+        Path("test_dir/packit.yaml").write_text(raw_package_config)
         Path("test_dir/packit.spec").write_text("hello")
         Path("test_dir/a.md").write_text("a")
         Path("test_dir/b.md").write_text("b")
