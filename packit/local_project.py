@@ -10,6 +10,7 @@ import git
 from git.exc import GitCommandError
 from ogr import GitlabService
 from ogr.abstract import GitProject, GitService
+from ogr.factory import get_service_class
 from ogr.parsing import parse_git_repo
 
 from packit.constants import LP_TEMP_PR_CHECKOUT_NAME
@@ -468,7 +469,9 @@ class LocalProject:
             pr_id: ID of the PR we are merging.
         """
         logger.info(f"Checking out PR {pr_id}.")
-        is_gitlab = isinstance(self.git_service, GitlabService)
+        is_gitlab = isinstance(self.git_service, GitlabService) or (
+            not self.git_service and get_service_class(self.git_url) == GitlabService
+        )
         remote_ref = "+refs/{}/{}/head".format(
             "merge-requests" if is_gitlab else "pull", pr_id
         )
