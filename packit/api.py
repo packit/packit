@@ -1136,6 +1136,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         koji_target: Optional[str] = None,
         from_upstream: bool = False,
         release_suffix: Optional[str] = None,
+        srpm_path: Optional[Path] = None,
     ):
         """
         Build component in Fedora infra (defaults to koji).
@@ -1149,15 +1150,19 @@ The first dist-git commit to be synced is '{short_hash}'.
             from_upstream: Specifies whether the build should be done directly
                 from the upstream checkout.
             release_suffix: Specifies release suffix to be used for SRPM build.
+            srpm_path: Specifies the path to the SRPM. If given, it is used for
+                the Koji build instead of the dist-git sources or upstream (if
+                `from_upstream` is set).
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
         self.init_kerberos_ticket()
 
-        if from_upstream:
+        if from_upstream and not srpm_path:
             srpm_path = self.create_srpm(
                 srpm_dir=self.up.local_project.working_dir,
                 release_suffix=release_suffix,
             )
+        if srpm_path:
             return self.up.koji_build(
                 scratch=scratch,
                 nowait=nowait,
@@ -1495,6 +1500,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         request_admin_if_needed: bool = False,
         enable_net: bool = True,
         release_suffix: Optional[str] = None,
+        srpm_path: Optional[Path] = None,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -1519,15 +1525,18 @@ The first dist-git commit to be synced is '{short_hash}'.
             enable_net: Specifies whether created Copr build should have access
                 to network during its build.
             release_suffix: Release suffix that is used during generation of SRPM.
+            srpm_path: Specifies the path to the prebuilt SRPM. It is preferred
+                to the implicit creation of the SRPM.
 
         Returns:
             ID of the created build and URL to the build web page.
         """
-        srpm_path = self.create_srpm(
-            upstream_ref=upstream_ref,
-            srpm_dir=self.up.local_project.working_dir,
-            release_suffix=release_suffix,
-        )
+        if not srpm_path:
+            srpm_path = self.create_srpm(
+                upstream_ref=upstream_ref,
+                srpm_dir=self.up.local_project.working_dir,
+                release_suffix=release_suffix,
+            )
 
         owner = owner or self.copr_helper.configured_owner
         if not owner:
