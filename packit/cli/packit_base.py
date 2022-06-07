@@ -7,10 +7,8 @@ import click
 from pkg_resources import get_distribution
 
 from packit.cli.build import build
-from packit.cli.copr_build import copr_build
 from packit.cli.create_update import create_update
 from packit.cli.init import init
-from packit.cli.local_build import local_build
 from packit.cli.push_updates import push_updates
 from packit.cli.srpm import srpm
 from packit.cli.status import status
@@ -91,13 +89,11 @@ def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):
 packit_base.add_command(propose_downstream)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
-packit_base.add_command(copr_build)
 packit_base.add_command(create_update)
 packit_base.add_command(push_updates)
 packit_base.add_command(srpm)
 packit_base.add_command(status)
 packit_base.add_command(init)
-packit_base.add_command(local_build)
 packit_base.add_command(validate_config)
 packit_base.add_command(source_git)
 packit_base.add_command(prepare_sources)
