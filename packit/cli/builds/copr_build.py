@@ -1,5 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+
 import logging
 import os
 from typing import Optional, List
@@ -16,7 +17,7 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger(__name__)
 
 
-@click.command("copr-build", context_settings=get_context_settings())
+@click.command("copr", context_settings=get_context_settings())
 @click.option("--nowait", is_flag=True, default=False, help="Don't wait for build")
 @click.option(
     "--owner",
@@ -101,7 +102,7 @@ logger = logging.getLogger(__name__)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
-def copr_build(
+def copr(
     config,
     nowait,
     owner,
@@ -178,6 +179,7 @@ def copr_build(
         request_admin_if_needed=request_admin_if_needed,
         enable_net=enable_net,
         release_suffix=release_suffix,
+        srpm_path=config.srpm_path,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if not nowait:
