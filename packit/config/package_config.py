@@ -284,7 +284,9 @@ def load_packit_yaml(config_file_path: Path) -> Dict:
     :return: Dict with the file content
     """
     try:
-        return safe_load(config_file_path.read_text())
+        # safe_load() returns None when the file is empty, but this needs
+        # to return a dict.
+        return safe_load(config_file_path.read_text()) or {}
     except Exception as ex:
         logger.error(f"Cannot load package config {config_file_path}.")
         raise PackitConfigException(f"Cannot load package config: {ex!r}.")

@@ -430,10 +430,9 @@ class JobConfigSchema(CommonConfigSchema):
                 )
 
         for key in ("targets", "dist_git_branches"):
-            if data is dict:
-                if isinstance(data.get(key), str):
-                    # allow key value being specified as string, convert to list
-                    data[key] = [data.pop(key)]
+            if isinstance(data, dict) and isinstance(data.get(key), str):
+                # allow key value being specified as string, convert to list
+                data[key] = [data.pop(key)]
 
         return data
 
