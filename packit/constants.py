@@ -159,3 +159,5 @@ REPO_NOT_PRISTINE_HINT = (
     "Use 'git reset --hard HEAD' to reset changed files and "
     "'git clean -xdff' to delete untracked files and directories."
 )
+
+KOJI_BASEURL = "https://koji.fedoraproject.org/kojihub"

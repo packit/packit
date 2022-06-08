@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import pytest
+import koji
 from bodhi.client.bindings import BodhiClient
 from flexmock import flexmock
 from munch import Munch
@@ -239,20 +240,9 @@ def bodhi_response():
 
 @pytest.fixture()
 def latest_builds_from_koji():
-    return {
-        "f29-override": "sen-0.6.0-3.fc29",
-        "f29-updates": "sen-0.6.0-3.fc29",
-        "f29-updates-candidate": "sen-0.6.0-3.fc29",
-        "f29-updates-pending": "sen-0.6.0-3.fc29",
-        "f29-updates-testing": "sen-0.6.0-3.fc29",
-        "f29-updates-testing-pending": "sen-0.6.0-3.fc29",
-        "f30-override": "sen-0.6.0-4.fc30",
-        "f30-updates": "sen-0.6.0-4.fc30",
-        "f30-updates-candidate": "sen-0.6.1-1.fc30",
-        "f30-updates-pending": "sen-0.6.0-4.fc30",
-        "f30-updates-testing": "sen-0.6.0-4.fc30",
-        "f30-updates-testing-pending": "sen-0.6.0-4.fc30",
-    }
+    return [
+        {"nvr": "sen-0.6.1-1.fc30"},
+    ]
 
 
 @pytest.mark.parametrize(
@@ -286,9 +276,12 @@ def test_basic_bodhi_update(
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
+    flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
+        lambda tag, package, inherit, latest, strict: latest_builds_from_koji
+    )
+
     flexmock(
         BodhiClient,
-        latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
     )
 
@@ -329,14 +322,17 @@ def test_bodhi_update_with_bugs(
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
+    flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
+        lambda tag, package, inherit, latest, strict: latest_builds_from_koji
+    )
+
     flexmock(
         BodhiClient,
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: validate_save(
             kwargs,
             {
-                "builds": koji_builds
-                or [latest_builds_from_koji["f30-updates-candidate"]],
+                "builds": koji_builds or [latest_builds_from_koji[0]["nvr"]],
                 "notes": update_notes.format(version="0.0.0"),
                 "type": "enhancement",
                 "bugs": ["1", "2", "3"],
