@@ -1,3 +1,7 @@
+# 0.52.1
+
+- Fixed a regression where string values for the 'targets' and 'dist_git_branches' configuration keys were not accepted. (#1608)
+
 # 0.52.0
 
 - Packit will not raise exceptions anymore when creating an SRPM with dangling symlinks. (#1592)
