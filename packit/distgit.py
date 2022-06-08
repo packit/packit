@@ -12,6 +12,7 @@ import git
 import requests
 from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError, LoginRequiredError
+from koji import ClientSession
 
 from ogr.abstract import PullRequest
 
@@ -27,6 +28,7 @@ from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import cwd
+from packit.constants import KOJI_BASEURL
 
 logger = logging.getLogger(__name__)
 
@@ -406,6 +408,49 @@ class DistGit(PackitRepositoryBase):
         )
         pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
+    def get_latest_build_in_tag(self, downstream_package_name, dist_git_branch):
+        """Query Koji for the latest build of a package in a tag.
+
+        Args:
+            downstream_package_name (str): package name used for the Koji build
+            dist_git_branch (str): dist-git branch where to look for the build
+        Returns
+            The latest known build
+        """
+
+        logger.debug(
+            "Querying Koji for the latest build "
+            f"of package {downstream_package_name!r} "
+            f"in dist-git-branch {dist_git_branch!r}"
+        )
+
+        # EPEL uses "testing-candidate" instead of "updates-candidate"
+        prefix = "testing" if dist_git_branch.startswith("epel") else "updates"
+        koji_tag = f"{dist_git_branch}-{prefix}-candidate"
+        session = ClientSession(baseurl=KOJI_BASEURL)
+        koji_build = session.listTagged(
+            tag=koji_tag,
+            package=downstream_package_name,
+            inherit=True,
+            latest=True,
+            strict=False,
+        )
+
+        if not koji_build:
+            raise PackitException(
+                f"There is no build for {downstream_package_name!r} "
+                f"and koji tag {koji_tag}"
+            )
+        else:
+            koji_build_str = koji_build[0]["nvr"]
+            logger.info(
+                "Koji build for package "
+                f"{downstream_package_name!r} and koji tag {koji_tag}:"
+                f"\n{koji_build_str}"
+            )
+
+        return koji_build_str
+
     def create_bodhi_update(
         self,
         dist_git_branch: str,
@@ -423,33 +468,13 @@ class DistGit(PackitRepositoryBase):
         )
 
         if not koji_builds:
-            # alternatively we can call something like `koji latest-build rawhide sen`
-            builds_d = bodhi_client.latest_builds(
-                self.package_config.downstream_package_name
-            )
-
-            builds_str = "\n".join(f" - {b}" for b in builds_d)
-            logger.debug(
-                "Koji builds for package "
-                f"{self.package_config.downstream_package_name!r}: \n{builds_str}"
-            )
-
-            # EPEL uses "testing-candidate" instead of "updates-candidate"
-            prefix = "testing" if dist_git_branch.startswith("epel") else "updates"
-            koji_tag = f"{dist_git_branch}-{prefix}-candidate"
-            try:
-                koji_builds = [builds_d[koji_tag]]
-                koji_builds_str = "\n".join(f" - {b}" for b in koji_builds)
-                logger.info(
-                    "Koji builds for package "
-                    f"{self.package_config.downstream_package_name!r} and koji tag {koji_tag}:"
-                    f"\n{koji_builds_str}"
+            koji_builds = [
+                self.get_latest_build_in_tag(
+                    self.package_config.downstream_package_name,
+                    dist_git_branch=dist_git_branch,
                 )
-            except KeyError:
-                raise PackitException(
-                    f"There is no build for {self.package_config.downstream_package_name!r} "
-                    f"in koji tag {koji_tag}"
-                )
+            ]
+
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
         rendered_note = update_notes.format(version=self.specfile.get_version())
