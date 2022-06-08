@@ -15,6 +15,7 @@ from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
 from packit.utils.bodhi import get_bodhi_client
+from packit.constants import KOJI_BASEURL
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ class Status:
         """
         Get latest koji builds as a dict of branch: latest build in that branch.
         """
-        session = ClientSession(baseurl="https://koji.fedoraproject.org/kojihub")
+        session = ClientSession(baseurl=KOJI_BASEURL)
         package_id = session.getPackageID(
             self.dg.package_config.downstream_package_name
         )
