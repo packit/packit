@@ -17,7 +17,7 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger(__name__)
 
 
-@click.command("copr", context_settings=get_context_settings())
+@click.command("in-copr", context_settings=get_context_settings())
 @click.option("--nowait", is_flag=True, default=False, help="Don't wait for build")
 @click.option(
     "--owner",

@@ -578,7 +578,7 @@ def test_copr_build_cli_no_project_configured(upstream_and_remote, copr_client_m
     ).and_return(copr_client_mock)
     CoprHelper.get_available_chroots.cache_clear()
 
-    run_packit(["build", "copr", "--nowait"], working_dir=upstream)
+    run_packit(["build", "in-copr", "--nowait"], working_dir=upstream)
 
 
 def test_copr_build_cli_project_set_via_cli(upstream_and_remote, copr_client_mock):
@@ -605,7 +605,8 @@ def test_copr_build_cli_project_set_via_cli(upstream_and_remote, copr_client_moc
     CoprHelper.get_available_chroots.cache_clear()
 
     run_packit(
-        ["build", "copr", "--nowait", "--project", "the-project"], working_dir=upstream
+        ["build", "in-copr", "--nowait", "--project", "the-project"],
+        working_dir=upstream,
     )
 
 
@@ -636,7 +637,7 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
         srpm_path=None,
     ).and_return(("id", "url")).once()
 
-    run_packit(["build", "copr", "--nowait"], working_dir=upstream)
+    run_packit(["build", "in-copr", "--nowait"], working_dir=upstream)
 
 
 def test_create_copr_project(copr_client_mock):
