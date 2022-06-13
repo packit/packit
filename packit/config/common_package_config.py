@@ -65,6 +65,7 @@ class CommonPackageConfig:
                         will run koji builds
         allowed_committers: list of Fedora accounts for which distgit pushes we
                         will run koji builds
+        tf_post_install_script: post install script to run before the tf tests
     """
 
     def __init__(
@@ -119,6 +120,7 @@ class CommonPackageConfig:
         enable_net: bool = True,
         allowed_pr_authors: Optional[List[str]] = None,
         allowed_committers: Optional[List[str]] = None,
+        tf_post_install_script: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -203,6 +205,7 @@ class CommonPackageConfig:
             allowed_pr_authors if allowed_pr_authors is not None else ["packit"]
         )
         self.allowed_committers = allowed_committers or []
+        self.tf_post_install_script = tf_post_install_script
 
     @property
     def targets_dict(self):
@@ -295,7 +298,8 @@ class CommonPackageConfig:
             f"env={self.env},"
             f"enable_net={self.enable_net},"
             f"allowed_pr_authors={self.allowed_pr_authors},"
-            f"allowed_committers={self.allowed_committers})"
+            f"allowed_committers={self.allowed_commiters},"
+            f"tf_post_install_script='{self.tf_post_install_script}')"
         )
 
     @property
