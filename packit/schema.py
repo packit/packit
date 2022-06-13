@@ -388,7 +388,7 @@ class JobConfigSchema(CommonConfigSchema):
     enable_net = fields.Boolean(missing=True)
     allowed_pr_authors = fields.List(fields.String(), missing=None)
     allowed_committers = fields.List(fields.String(), missing=None)
-    tmt_plan_regex = fields.String(missing=None)
+    tmt_plan = fields.String(missing=None)
     tf_post_install_script = fields.String(missing=None)
 
     metadata = fields.Nested(JobMetadataSchema)

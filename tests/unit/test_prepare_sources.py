@@ -57,7 +57,7 @@ from packit.config import JobConfig, JobType, JobConfigTriggerType
                 "trigger": "release",
                 "spec_source_id": "Source0",
                 "allowed_gpg_keys": null,
-                "tmt_plan_regex": null,
+                "tmt_plan": null,
                 "tf_post_install_script": null
             }
             """,

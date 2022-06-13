@@ -299,7 +299,7 @@ class CommonPackageConfig:
             f"enable_net={self.enable_net},"
             f"allowed_pr_authors={self.allowed_pr_authors},"
             f"allowed_committers={self.allowed_commiters},"
-            f"tf_post_install_script='{self.tf_post_install_script}')"
+            f"tf_post_install_script='''{self.tf_post_install_script}''')"
         )
 
     @property

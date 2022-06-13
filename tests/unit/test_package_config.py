@@ -857,7 +857,7 @@ def test_package_config_parse_error(raw):
                     {
                         "job": "copr_build",
                         "trigger": "release",
-                        "tmt_plan_regex": "^packit!",
+                        "tmt_plan": "^packit!",
                         "tf_post_install_script": "echo 'hi packit!'",
                     },
                 ],
@@ -870,7 +870,7 @@ def test_package_config_parse_error(raw):
                         type=JobType.copr_build,
                         specfile_path="fedora/package.spec",
                         trigger=JobConfigTriggerType.release,
-                        tmt_plan_regex="^packit!",
+                        tmt_plan="^packit!",
                         tf_post_install_script="echo 'hi packit!'",
                     ),
                 ],
