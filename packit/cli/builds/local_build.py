@@ -14,7 +14,7 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger("packit")
 
 
-@click.command("local", context_settings=get_context_settings())
+@click.command("locally", context_settings=get_context_settings())
 @click.option(
     "--upstream-ref",
     default=None,

@@ -17,7 +17,7 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger(__name__)
 
 
-@click.command("koji", context_settings=get_context_settings())
+@click.command("in-koji", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
     help="Comma separated list of target branches in dist-git to release into. "
