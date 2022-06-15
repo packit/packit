@@ -1103,7 +1103,12 @@ class Archive:
 
         if archive_path.parent.absolute() != absolute_specfile_dir:
             archive_in_spec_dir = absolute_specfile_dir / archive_path.name
-            relative_archive_path = archive_path.relative_to(absolute_specfile_dir)
+
+            # [PurePath.relative_to()](https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.relative_to)
+            # requires self to be the subpath of the argument, but
+            # [os.path.relpath()](https://docs.python.org/3/library/os.path.html#os.path.relpath)
+            # does not.
+            relative_archive_path = os.path.relpath(archive_path, absolute_specfile_dir)
 
             logger.info(
                 "Linking to the specfile directory:"

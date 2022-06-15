@@ -15,6 +15,7 @@ from flexmock import flexmock
 from ogr import GithubService
 
 import packit
+from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
@@ -202,6 +203,42 @@ def test_create_archive(upstream_instance, extension):
 
     # we enforce .tar.gz now
     assert len(list(u.glob("*.tar.gz"))) == 1
+
+
+@pytest.mark.parametrize(
+    "with_create_archive_action",
+    (False, True),
+)
+def test_create_archive_spec_subdir(upstream_instance, with_create_archive_action):
+    """test archive creation when an archive is in root, but spec is in a subdir"""
+    u, ups = upstream_instance
+
+    if with_create_archive_action:
+        archive_path = u.joinpath("beer.tar.gz")
+        ups.package_config.actions[ActionName.create_archive] = [
+            [
+                "git",
+                "archive",
+                "--output",
+                str(archive_path),
+                "--prefix",
+                f"{u.name}/",
+                "HEAD",
+            ],
+            ["echo", str(archive_path)],
+        ]
+
+    packaging_dir = u / "packaging"
+    packaging_dir.mkdir()
+    spec_path = packaging_dir / "some.spec"
+    spec_path.write_text("asd")
+    ups._specfile_path = spec_path
+
+    ups.create_archive()
+
+    assert len(list(packaging_dir.glob("*.tar.gz"))) == 1
+    if with_create_archive_action:
+        assert len(list(ups.local_project.working_dir.glob("*.tar.gz"))) == 1
 
 
 def test_create_uncommon_archive(upstream_instance):
