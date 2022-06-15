@@ -98,6 +98,8 @@ class JobConfig(CommonPackageConfig):
         enable_net: bool = True,
         allowed_pr_authors: Optional[List[str]] = None,
         allowed_committers: Optional[List[str]] = None,
+        tmt_plan: Optional[str] = None,
+        tf_post_install_script: Optional[str] = None,
     ):
         super().__init__(
             config_file_path=config_file_path,
@@ -150,9 +152,11 @@ class JobConfig(CommonPackageConfig):
             enable_net=enable_net,
             allowed_pr_authors=allowed_pr_authors,
             allowed_committers=allowed_committers,
+            tf_post_install_script=tf_post_install_script,
         )
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
+        self.tmt_plan: str = tmt_plan
 
     def __repr__(self):
         return (
@@ -203,7 +207,9 @@ class JobConfig(CommonPackageConfig):
             f"env={self.env},"
             f"enable_net={self.enable_net},"
             f"allowed_pr_authors={self.allowed_pr_authors},"
-            f"allowed_commiters={self.allowed_committers})"
+            f"allowed_committers={self.allowed_committers},"
+            f"tmt_plan='{self.tmt_plan}',"
+            f"tf_post_install_script='''{self.tf_post_install_script}''')"
         )
 
     @classmethod
@@ -263,6 +269,8 @@ class JobConfig(CommonPackageConfig):
             and self.skip_build == other.skip_build
             and self.env == other.env
             and self.enable_net == other.enable_net
+            and self.tmt_plan == other.tmt_plan
+            and self.tf_post_install_script == other.tf_post_install_script
         )
 
 
