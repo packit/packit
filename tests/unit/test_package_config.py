@@ -850,6 +850,33 @@ def test_package_config_parse_error(raw):
             ),
             id="sync_changelog_false_by_default",
         ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "release",
+                        "tmt_plan": "^packit!",
+                        "tf_post_install_script": "echo 'hi packit!'",
+                    },
+                ],
+            },
+            PackageConfig(
+                specfile_path="fedora/package.spec",
+                sync_changelog=False,
+                jobs=[
+                    JobConfig(
+                        type=JobType.copr_build,
+                        specfile_path="fedora/package.spec",
+                        trigger=JobConfigTriggerType.release,
+                        tmt_plan="^packit!",
+                        tf_post_install_script="echo 'hi packit!'",
+                    ),
+                ],
+            ),
+            id="extra_tf_api_parameters",
+        ),
     ],
 )
 def test_package_config_parse(raw, expected):
