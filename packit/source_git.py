@@ -16,6 +16,7 @@ import git
 import yaml
 from rebasehelper.exceptions import LookasideCacheError
 from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
+from specfile import Specfile
 
 from packit.config import Config
 from packit.constants import (
@@ -34,7 +35,6 @@ from packit.utils import (
     get_default_branch,
     get_file_author,
 )
-from packit.specfile import Specfile
 from packit.utils.repo import is_the_repo_pristine
 
 logger = logging.getLogger(__name__)
@@ -112,7 +112,7 @@ class SourceGitGenerator:
         if not self._dist_git_specfile:
             path = str(Path(self.dist_git.working_dir, f"{self.pkg_name}.spec"))
             self._dist_git_specfile = Specfile(
-                path, sources_dir=self.dist_git.working_dir
+                path, sourcedir=self.dist_git.working_dir, autosave=True
             )
         return self._dist_git_specfile
 
@@ -145,7 +145,7 @@ class SourceGitGenerator:
         rpmbuild_args += RPM_MACROS_FOR_PREP
         if logger.level <= logging.DEBUG:  # -vv can be super-duper verbose
             rpmbuild_args.append("-v")
-        rpmbuild_args.append(self.dist_git_specfile.path)
+        rpmbuild_args.append(str(self.dist_git_specfile.path))
 
         run_command(
             rpmbuild_args,
@@ -192,13 +192,8 @@ class SourceGitGenerator:
             raise RuntimeError(f"No subdirectory found in {path / 'BUILD'}")
         return build_dirs[0]
 
-    def _rebase_patches(self, patch_comments: Dict[str, List[str]]):
-        """Rebase current branch against the from_branch
-
-        Args:
-            patch_comments: dict to map patch names to comment lines serving
-                as a description of those patches.
-        """
+    def _rebase_patches(self):
+        """Rebase current branch against the from_branch."""
         to_branch = "dist-git-commits"  # temporary branch to store the dist-git history
         BUILD_dir = self.get_BUILD_dir()
         prep_repo = git.Repo(BUILD_dir)
@@ -207,10 +202,9 @@ class SourceGitGenerator:
         self.source_git.git.fetch(BUILD_dir, f"+{from_branch}:{to_branch}")
 
         # transform into {patch_name: patch_id}
-        patch_ids = {
-            p.get_patch_name(): p.index
-            for p in self.dist_git_specfile.patches.get("applied", [])
-        }
+        with self.dist_git_specfile.patches() as patches:
+            patch_ids = {p.filename: p.number for p in patches}
+            patch_comments = {p.filename: p.comments.raw for p in patches}
 
         # -2 - drop first commit which represents tarball unpacking
         # -1 - reverse order, HEAD is last in the sequence
@@ -290,6 +284,11 @@ class SourceGitGenerator:
 
     def _configure_syncing(self):
         """Populate source-git.yaml"""
+        with self.dist_git_specfile.patches() as patches:
+            try:
+                patch_id_digits = patches[0].number_digits
+            except (IndexError, AttributeError):
+                patch_id_digits = 1
         package_config = {}
         package_config.update(
             {
@@ -298,7 +297,7 @@ class SourceGitGenerator:
                 "downstream_package_name": self.pkg_name,
                 "specfile_path": f"{DISTRO_DIR}/{self.pkg_name}.spec",
                 "patch_generation_ignore_paths": [DISTRO_DIR],
-                "patch_generation_patch_id_digits": self.dist_git_specfile.patch_id_digits,
+                "patch_generation_patch_id_digits": patch_id_digits,
                 "sync_changelog": True,
                 "files_to_sync": [
                     {
@@ -341,18 +340,19 @@ class SourceGitGenerator:
                 f"{self.upstream_ref!r} is not pointing to the current HEAD "
                 f"in {self.source_git.working_dir!r}."
             )
-        if not self.dist_git_specfile.uses_autosetup:
-            if not self.ignore_missing_autosetup:
-                raise PackitException(
-                    "Initializing source-git repos for packages "
-                    "not using %autosetup is not allowed by default. "
-                    "You can use --ignore-missing-autosetup option to enforce "
-                    "running the command without %autosetup."
+        with self.dist_git_specfile.prep() as prep:
+            if "%autosetup" not in prep:
+                if not self.ignore_missing_autosetup:
+                    raise PackitException(
+                        "Initializing source-git repos for packages "
+                        "not using %autosetup is not allowed by default. "
+                        "You can use --ignore-missing-autosetup option to enforce "
+                        "running the command without %autosetup."
+                    )
+                logger.warning(
+                    "Source-git repos for packages not using %autosetup may be not initialized"
+                    "properly or may not work with other packit commands."
                 )
-            logger.warning(
-                "Source-git repos for packages not using %autosetup may be not initialized"
-                "properly or may not work with other packit commands."
-            )
 
         self._populate_distro_dir()
         self._reset_gitignore()
@@ -360,10 +360,11 @@ class SourceGitGenerator:
 
         spec = Specfile(
             f"{self.distro_dir}/{self.pkg_name}.spec",
-            sources_dir=self.dist_git.working_dir,
+            sourcedir=self.dist_git.working_dir,
+            autosave=True,
         )
-        patch_comments = spec.read_patch_comments()
-        spec.remove_patches()
+        with spec.patches() as patches:
+            patches.clear()
 
         self.source_git.git.stage(DISTRO_DIR, force=True)
         message = f"""Initialize as a source-git repository
@@ -379,4 +380,4 @@ class SourceGitGenerator:
         )
         pkg_tool.sources()
         self._run_prep()
-        self._rebase_patches(patch_comments)
+        self._rebase_patches()

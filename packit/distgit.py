@@ -300,7 +300,9 @@ class DistGit(PackitRepositoryBase):
         """
         :return: name of the archive, e.g. sen-0.6.1.tar.gz
         """
-        archive_name = self.specfile.get_archive()
+        with self.specfile.sources() as sources:
+            source = next(s for s in sources if s.number == 0)
+            archive_name = source.expanded_filename
         logger.debug(f"Upstream archive name: {archive_name}")
         return archive_name
 
@@ -479,7 +481,7 @@ class DistGit(PackitRepositoryBase):
 
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
-        rendered_note = update_notes.format(version=self.specfile.get_version())
+        rendered_note = update_notes.format(version=self.specfile.expanded_version)
         try:
             save_kwargs = {
                 "builds": koji_builds,
