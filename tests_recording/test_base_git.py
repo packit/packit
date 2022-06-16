@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from flexmock import flexmock
+from specfile import Specfile
 from requre.cassette import DataTypes
 from requre.online_replacing import (
     record_requests_for_all_methods,
@@ -11,7 +12,6 @@ from requre.online_replacing import (
 from packit.base_git import PackitRepositoryBase
 from packit.config import PackageConfig
 from packit.config.sources import SourcesItem
-from packit.specfile import Specfile
 from tests_recording.testbase import PackitTest
 
 
@@ -58,10 +58,18 @@ class ProposeUpdate(PackitTest):
         tmp = Path(self.static_tmp)
         spec_path = tmp / "rsync.spec"
         spec_path.write_text(specfile_content)
-        specfile = Specfile(spec_path, sources_dir=tmp)
+        specfile = Specfile(spec_path, sourcedir=tmp, autosave=True)
         flexmock(base_git).should_receive("specfile").and_return(specfile)
 
-        flexmock(Path).should_receive("is_file").and_return(False)
+        def mocked_is_file():
+            import inspect
+
+            # return False only if Path.is_file() is called directly from within
+            # the download_remote_sources() method
+            # this is necessary because specfile relies on Path.is_file() as well
+            return inspect.stack()[3].function != "download_remote_sources"
+
+        flexmock(Path).should_receive("is_file").replace_with(mocked_is_file)
 
         base_git.download_remote_sources()
 

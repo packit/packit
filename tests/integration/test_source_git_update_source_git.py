@@ -4,7 +4,6 @@
 import pytest
 
 from packit.exceptions import PackitException
-from packit.patches import PatchMetadata
 from packit.constants import DISTRO_DIR, FROM_DIST_GIT_TOKEN
 
 
@@ -34,8 +33,7 @@ def test_update_source_git_patch_changed(
 
     patch = "something.patch"
     (distgit / patch).write_text("abcd")
-    api_instance_update_source_git.dg.specfile.add_patch(PatchMetadata(name=patch))
-    api_instance_update_source_git.dg.specfile.save()
+    api_instance_update_source_git.dg.specfile.add_patch(patch)
     api_instance_update_source_git.dg.commit("Add a patch", "")
     with pytest.raises(PackitException):
         api_instance_update_source_git.update_source_git("HEAD~1..")

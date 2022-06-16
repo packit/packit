@@ -42,9 +42,8 @@ def test_srpm_action(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", True, None
     )
-    assert "- hello from test_srpm_action" in upstream._specfile.spec_content.section(
-        "%changelog"
-    )
+    with upstream._specfile.sections() as sections:
+        assert "- hello from test_srpm_action" in sections.changelog
 
 
 def test_srpm_commits(upstream, downstream):
@@ -52,10 +51,8 @@ def test_srpm_commits(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", True, None
     )
-    assert (
-        "- Development snapshot (abc123a)"
-        in upstream._specfile.spec_content.section("%changelog")
-    )
+    with upstream._specfile.sections() as sections:
+        assert "- Development snapshot (abc123a)" in sections.changelog
 
 
 def test_srpm_no_tags(upstream, downstream):
@@ -65,10 +62,8 @@ def test_srpm_no_tags(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", True, None
     )
-    assert (
-        "- Development snapshot (abc123a)"
-        in upstream._specfile.spec_content.section("%changelog")
-    )
+    with upstream._specfile.sections() as sections:
+        assert "- Development snapshot (abc123a)" in sections.changelog
 
 
 def test_srpm_no_bump(upstream, downstream):
@@ -78,10 +73,8 @@ def test_srpm_no_bump(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", False, None
     )
-    assert (
-        "- Development snapshot (abc123a)"
-        not in upstream._specfile.spec_content.section("%changelog")
-    )
+    with upstream._specfile.sections() as sections:
+        assert "- Development snapshot (abc123a)" not in sections.changelog
 
 
 def test_update_distgit_when_copy_upstream_release_description(
@@ -102,9 +95,8 @@ def test_update_distgit_when_copy_upstream_release_description(
         upstream_tag="0.1.0", full_version="0.1.0"
     )
 
-    assert "Some release 0.1.0" in downstream._specfile.spec_content.section(
-        "%changelog"
-    )
+    with downstream._specfile.sections() as sections:
+        assert "Some release 0.1.0" in sections.changelog
 
 
 @pytest.mark.skipif(
@@ -120,4 +112,5 @@ def test_do_not_update_distgit_with_autochangelog(
         upstream_tag="0.1.0", full_version="0.1.0"
     )
 
-    assert "%autochangelog" in downstream._specfile.spec_content.section("%changelog")
+    with downstream._specfile.sections() as sections:
+        assert "%autochangelog" in sections.changelog
