@@ -77,6 +77,43 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         )
 
 
+def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
+    upstream_path, dist_git_path = cockpit_ostree
+
+    def mocked_new_sources(sources=None):
+        if not Path(sources).is_file():
+            raise RuntimeError("archive does not exist")
+
+    flexmock(PkgTool, new_sources=mocked_new_sources)
+    flexmock(PackitAPI, init_kerberos_ticket=lambda: None)
+
+    flexmock(
+        DistGit,
+        push_to_fork=lambda *args, **kwargs: None,
+        is_archive_in_lookaside_cache=lambda archive_path: False,
+        upload_to_lookaside_cache=lambda archive, pkg_tool: None,
+        download_upstream_archive=lambda: "the-archive",
+    )
+    pr = flexmock(url="https://example.com/pull/1")
+    flexmock(DistGit).should_receive("existing_pr").and_return(pr)
+
+    pc = get_local_package_config(str(upstream_path))
+    up_lp = LocalProject(working_dir=upstream_path)
+    c = get_test_config()
+    api = PackitAPI(c, pc, up_lp)
+    api._dg = DistGit(c, pc)
+    api._dg._local_project = LocalProject(working_dir=dist_git_path)
+
+    with cwd(upstream_path):
+        assert pr == api.sync_release(
+            dist_git_branch="main",
+            use_local_content=False,
+            version="179",
+            force_new_sources=False,
+            create_pr=True,
+        )
+
+
 def test_srpm_on_cockpit_ostree(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
