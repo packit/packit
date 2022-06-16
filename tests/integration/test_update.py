@@ -7,12 +7,12 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from specfile import Specfile
 
 from packit.actions import ActionName
 from packit.api import PackitAPI, Config
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
-from packit.specfile import Specfile
 from packit.upstream import Upstream
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
@@ -52,10 +52,11 @@ def test_basic_local_update(
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
-    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
 
@@ -88,10 +89,11 @@ def test_local_update_generated_spec(
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
-    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
 
@@ -127,10 +129,11 @@ def test_basic_local_update_copy_upstream_release_description(
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
-    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
 
     assert (
         """- 0.1.0-1
@@ -154,9 +157,10 @@ def test_basic_local_update_using_distgit(
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
 
-    package_section = spec.spec_content.section("%package")
+    with spec.sections() as sections:
+        package_section = sections.package
 
     assert package_section[2] == "# some change"
     assert package_section[4] == "Name:           beer"
@@ -166,7 +170,8 @@ def test_basic_local_update_using_distgit(
 
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
-    changelog = "\n".join(spec.spec_content.section("%changelog"))
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
 
@@ -188,7 +193,7 @@ def test_basic_local_update_direct_push(
     )
 
     spec = Specfile(remote_dir_clone / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
     assert (remote_dir_clone / "README.packit").is_file()
 
 
@@ -208,11 +213,12 @@ def test_update_downstream_changelog_even_if_has_autochangelog(
         dist_git_branch="main", version="0.1.0", create_pr=False, add_new_sources=False
     )
 
-    assert api.dg.specfile.get_version() == "0.1.0"
-    assert (
-        "* Mon Feb 25 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.1.0-1"
-        in api.dg.specfile.spec_content.section("%changelog")
-    )
+    assert api.dg.specfile.version == "0.1.0"
+    with api.dg.specfile.sections() as sections:
+        assert (
+            "* Mon Feb 25 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.1.0-1"
+            in sections.changelog
+        )
 
 
 def test_basic_local_update_direct_push_no_dg_spec(
@@ -236,7 +242,7 @@ def test_basic_local_update_direct_push_no_dg_spec(
     )
 
     spec = Specfile(remote_dir_clone / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
     assert (remote_dir_clone / "README.packit").is_file()
 
 
@@ -251,7 +257,7 @@ def test_basic_local_update_from_downstream(
     new_upstream = api.up.local_project.working_dir
     assert (new_upstream / "beer.spec").is_file()
     spec = Specfile(new_upstream / "beer.spec")
-    assert spec.get_version() == "0.0.0"
+    assert spec.expanded_version == "0.0.0"
 
 
 def test_local_update_with_specified_tag_template():
