@@ -11,6 +11,7 @@ require:
   - rpm-build
   - rpmdevtools
   - python3-bodhi-client
+  - python3-specfile
   - fedpkg
   - git
   - make

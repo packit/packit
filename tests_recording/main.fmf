@@ -4,6 +4,7 @@ require:
   - python3-pytest
   - packit
   - python3-packit
+  - python3-specfile
 component:
   - packit
 tier: 2
