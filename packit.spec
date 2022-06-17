@@ -17,6 +17,7 @@ BuildRequires:  python3-gnupg
 BuildRequires:  python3-ogr
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pyyaml
+BuildRequires:  python3-specfile
 BuildRequires:  python3-tabulate
 BuildRequires:  python3-cccolutils
 BuildRequires:  python3-copr
