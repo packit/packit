@@ -16,7 +16,23 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Sequence, Callable, List, Tuple, Dict, Iterable, Optional, Union
+from typing import (
+    Sequence,
+    Callable,
+    List,
+    Tuple,
+    Dict,
+    Iterable,
+    Optional,
+    Union,
+    overload,
+)
+
+# Literal is available only since Python3.8, workaround for el8
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 import git
 from git.exc import GitCommandError
@@ -622,6 +638,48 @@ The first dist-git commit to be synced is '{short_hash}'.
         else:
             return f"'{source_git}' is up to date with '{dist_git}'."
 
+    @overload
+    def sync_release(
+        self,
+        dist_git_branch: Optional[str] = None,
+        version: Optional[str] = None,
+        tag: Optional[str] = None,
+        use_local_content=False,
+        add_new_sources=True,
+        force_new_sources=False,
+        upstream_ref: Optional[str] = None,
+        create_pr: Literal[True] = True,
+        force: bool = False,
+        create_sync_note: bool = True,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        sync_default_files: bool = True,
+        local_pr_branch_suffix: str = "update",
+        mark_commit_origin: bool = False,
+    ) -> PullRequest:
+        """Overload for type-checking; return PullRequest if create_pr=True."""
+
+    @overload
+    def sync_release(
+        self,
+        dist_git_branch: Optional[str] = None,
+        version: Optional[str] = None,
+        tag: Optional[str] = None,
+        use_local_content=False,
+        add_new_sources=True,
+        force_new_sources=False,
+        upstream_ref: Optional[str] = None,
+        create_pr: Literal[False] = False,
+        force: bool = False,
+        create_sync_note: bool = True,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        sync_default_files: bool = True,
+        local_pr_branch_suffix: str = "update",
+        mark_commit_origin: bool = False,
+    ) -> None:
+        """Overload for type-checking; return None if create_pr=False."""
+
     def sync_release(
         self,
         dist_git_branch: Optional[str] = None,
@@ -667,7 +725,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 commit message to mark the hash of the upstream (source-git) commit.
 
         Returns:
-            The created PullRequest if create_pr is True, else None.
+            The created (or existing if one already exists) PullRequest if
+            create_pr is True, else None.
 
         Raises:
             PackitException, if both 'version' and 'tag' are provided.
@@ -774,21 +833,19 @@ The first dist-git commit to be synced is '{short_hash}'.
                 check_dist_git_pristine=False,
             )
 
-            new_pr = None
+            pr = None
             if create_pr:
                 title = title or f"Update to upstream release {version}"
 
-                existing_pr = self.dg.existing_pr(
-                    title, description.rstrip(), dist_git_branch
-                )
-                if not existing_pr:
-                    new_pr = self.push_and_create_pr(
+                pr = self.dg.existing_pr(title, description.rstrip(), dist_git_branch)
+                if not pr:
+                    pr = self.push_and_create_pr(
                         pr_title=title,
                         pr_description=description,
                         dist_git_branch=dist_git_branch,
                     )
                 else:
-                    logger.debug(f"PR already exists: {existing_pr.url}")
+                    logger.debug(f"PR already exists: {pr.url}")
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
@@ -796,7 +853,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.local_project.git_repo.git.checkout(current_up_branch)
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
-        return new_pr
+        return pr
 
     def _prepare_files_to_sync(
         self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
