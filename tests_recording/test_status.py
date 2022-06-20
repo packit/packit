@@ -1,18 +1,16 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
-
-
 from requre.cassette import DataTypes
-from requre.online_replacing import (
-    apply_decorator_to_all_methods,
-    replace_module_match,
-)
-from requre.helpers.simple_object import Simple
 from requre.helpers.files import StoreFiles
+from requre.helpers.simple_object import Simple
 from requre.modules_decorate_all_methods import (
     record_tempfile_module,
     record_git_module,
     record_requests_module,
+)
+from requre.online_replacing import (
+    apply_decorator_to_all_methods,
+    replace_module_match,
 )
 
 from packit.status import Status
@@ -71,18 +69,6 @@ class TestStatus(PackitTest):
         table = self.status.get_copr_builds()
         assert table
         assert len(table) >= 2
-
-    def test_updates(self):
-        table = self.status.get_updates()
-        assert table
-        assert len(table) >= 3
-
-        # Check if get_updates doesn't return more than one stable update per branch
-        stable_branches = [
-            update[-4:] for [update, _, status] in table if status == "stable"
-        ]
-
-        assert len(set(stable_branches)) == len(stable_branches)
 
     def test_up_releases(self):
         table = self.status.get_up_releases()
