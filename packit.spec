@@ -28,7 +28,7 @@ BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
-BuildRequires:  python3-bodhi-client
+BuildRequires:  python3-bodhi-client < 6.0
 BuildRequires:  python3-cachetools
 %if 0%{?rhel}
 # epel-8 requires typing-extensions due to old python version
