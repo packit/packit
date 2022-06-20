@@ -26,8 +26,13 @@ from typing import (
     Optional,
     Union,
     overload,
-    Literal,
 )
+
+# Literal is available only since Python3.8, workaround for el8
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 import git
 from git.exc import GitCommandError

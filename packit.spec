@@ -30,6 +30,10 @@ BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
 BuildRequires:  python3-bodhi-client
 BuildRequires:  python3-cachetools
+%if 0%{?rhel}
+# epel-8 requires typing-extensions due to old python version
+BuildRequires:  python3-typing-extensions
+%endif
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %description
