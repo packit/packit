@@ -11,6 +11,7 @@ URL:            https://github.com/packit/packit
 Source0:        %pypi_source
 BuildArch:      noarch
 BuildRequires:  python3-devel
+BuildRequires:  python3-fedora
 BuildRequires:  python3-click-man
 BuildRequires:  python3-GitPython
 BuildRequires:  python3-gnupg
