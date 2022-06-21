@@ -69,7 +69,7 @@ jobs:
     trigger: commit
     branch: stable
     targets:
-      - fedora-all
+      - fedora-stable
       - epel-8
     project: packit-stable
     list_on_homepage: True
