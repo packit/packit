@@ -3,11 +3,11 @@
 
 import pytest
 import koji
-from bodhi.client.bindings import BodhiClient
 from flexmock import flexmock
 from munch import Munch
 
 from packit import distgit
+from packit.utils.bodhi import OurBodhiClient
 
 
 @pytest.fixture()
@@ -281,8 +281,9 @@ def test_basic_bodhi_update(
     )
 
     flexmock(
-        BodhiClient,
+        OurBodhiClient,
         save=lambda **kwargs: bodhi_response,
+        refresh_auth=lambda: None,  # this is where the browser/OIDC fun happens
     )
 
     api.create_update(
@@ -327,7 +328,7 @@ def test_bodhi_update_with_bugs(
     )
 
     flexmock(
-        BodhiClient,
+        OurBodhiClient,
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: validate_save(
             kwargs,
@@ -338,6 +339,7 @@ def test_bodhi_update_with_bugs(
                 "bugs": ["1", "2", "3"],
             },
         ),
+        refresh_auth=lambda: None,
     )
 
     api.create_update(
@@ -365,9 +367,10 @@ def test_bodhi_update_auth_with_fas(
         fas_username="the_fas_username", fas_password="the_fas_password"
     )
     flexmock(
-        BodhiClient,
+        OurBodhiClient,
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
+        refresh_auth=lambda: None,
     )
 
     api.create_update(
