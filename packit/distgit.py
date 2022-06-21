@@ -494,8 +494,7 @@ class DistGit(PackitRepositoryBase):
                     f"Bodhi client raised a login error: {ex}. "
                     f"Let's clear the session, csrf token and retry."
                 )
-                bodhi_client._session.cookies.clear()
-                bodhi_client.csrf_token = None
+                bodhi_client.refresh_auth()
                 result = bodhi_client.save(**save_kwargs)
 
             logger.debug(f"Bodhi response:\n{result}")
