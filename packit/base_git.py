@@ -91,7 +91,11 @@ class PackitRepositoryBase:
                 self.local_project.working_dir / self.package_config.specfile_path
             )
             if not self._specfile_path.exists():
-                raise FileNotFoundError(f"Specfile {self._specfile_path} not found.")
+                # since propose-downstream checks out a tag, we should inform user
+                # on which ref this has happened: https://github.com/packit/packit/issues/1625
+                raise FileNotFoundError(
+                    f"Specfile {self._specfile_path} not found on ref {self.local_project.ref}."
+                )
 
         return self._specfile_path
 
