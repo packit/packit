@@ -1,3 +1,10 @@
+# 0.53.0
+
+- Packit now works with Bodhi 5 and Bodhi 6 authentication mechanism. (#1629)
+- Git ref name that Packit works with during `propose-downstream` is now made more obvious in logs. (#1626)
+- Packit now correctly handles creation of custom archives in root while a specfile is in a subdirectory. (#1622)
+- Creation of a Bodhi update will not timeout anymore as Packit is now using a more efficient way of obtaining the latest build in a release. (#1612)
+
 # 0.52.1
 
 - Fixed a regression where string values for the 'targets' and 'dist_git_branches' configuration keys were not accepted. (#1608)
