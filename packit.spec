@@ -24,6 +24,8 @@ BuildRequires:  python3-koji
 BuildRequires:  python3-lazy-object-proxy
 BuildRequires:  python3-marshmallow
 BuildRequires:  python3-marshmallow-enum
+BuildRequires:  python3-requests
+BuildRequires:  python3-requests-kerberos
 BuildRequires:  rebase-helper
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
