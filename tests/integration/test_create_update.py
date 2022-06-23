@@ -364,7 +364,9 @@ def test_bodhi_update_auth_with_fas(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(distgit).should_call("get_bodhi_client").with_args(
-        fas_username="the_fas_username", fas_password="the_fas_password"
+        fas_username="the_fas_username",
+        fas_password="the_fas_password",
+        kerberos_realm="FEDORAPROJECT.ORG",
     )
     flexmock(
         OurBodhiClient,
