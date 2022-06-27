@@ -464,7 +464,9 @@ class DistGit(PackitRepositoryBase):
         )
 
         bodhi_client = get_bodhi_client(
-            fas_username=self.config.fas_user, fas_password=self.config.fas_password
+            fas_username=self.config.fas_user,
+            fas_password=self.config.fas_password,
+            kerberos_realm=self.config.kerberos_realm,
         )
 
         if not koji_builds:
