@@ -16,6 +16,7 @@ Bodhi 6 does not use username, password nor keytab.
 """
 import inspect
 import logging
+import os
 import re
 from typing import Optional
 
@@ -56,6 +57,13 @@ class OurBodhiClient(BodhiClient):
             # bodhi 6
             self.is_bodhi_6 = True
             super().__init__()
+            # in our openshift deployment, ~/.config is not writable, but $HOME is
+            # so let's put the token there
+            # TODO: make this properly configurable in bodhi
+            if not os.access(self.oidc.storage.path, os.W_OK):
+                self.oidc.storage.path = os.path.join(
+                    os.environ["HOME"], "bodhi-client.json"
+                )
         else:
             # bodhi 5
             logger.debug(
