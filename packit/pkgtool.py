@@ -21,6 +21,12 @@ class PkgTool:
         directory: Union[Path, str, None] = None,
         tool: str = "fedpkg",
     ):
+        """
+        Args:
+            fas_username: FAS username (used for cloning)
+            directory: operate in this dist-git repository
+            tool: pkgtool to use (fedpkg, centpkg)
+        """
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
         self.tool = tool
