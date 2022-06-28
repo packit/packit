@@ -5,6 +5,7 @@ require:
   - packit
   - python3-packit
   - python3-specfile
+  - python3-requests-kerberos
 component:
   - packit
 tier: 2
