@@ -10,12 +10,8 @@ from ogr.abstract import GitProject
 from ogr.exceptions import GithubAppNotInstalledError
 from yaml import safe_load
 
-from packit.actions import ActionName
-from packit.config.common_package_config import CommonPackageConfig, Deployment
+from packit.config.common_package_config import CommonPackageConfig
 from packit.config.job_config import JobConfig, get_default_jobs, JobType
-from packit.config.notifications import NotificationsConfig
-from packit.config.sources import SourcesItem
-from packit.sync import SyncFilesItem
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 
@@ -26,109 +22,27 @@ class PackageConfig(CommonPackageConfig):
     """
     Config class for upstream/downstream packages;
     this is the config people put in their repos
+
+    Attributes:
+        jobs: List of job configs.
     """
 
     def __init__(
         self,
-        config_file_path: Optional[str] = None,
-        specfile_path: Optional[str] = None,
-        synced_files: Optional[List[SyncFilesItem]] = None,
-        files_to_sync: Optional[List[SyncFilesItem]] = None,
         jobs: Optional[List[JobConfig]] = None,
-        dist_git_namespace: Optional[str] = None,
-        upstream_project_url: Optional[str] = None,  # can be URL or path
-        upstream_package_name: Optional[str] = None,
-        downstream_project_url: Optional[str] = None,
-        downstream_package_name: Optional[str] = None,
-        dist_git_base_url: Optional[str] = None,
-        actions: Optional[Dict[ActionName, Union[str, List[str]]]] = None,
-        upstream_ref: Optional[str] = None,
-        allowed_gpg_keys: Optional[List[str]] = None,
-        create_pr: bool = True,
-        sync_changelog: bool = False,
-        create_sync_note: bool = True,
-        spec_source_id: str = "Source0",
-        upstream_tag_template: str = "{version}",
-        archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
-        patch_generation_ignore_paths: Optional[List[str]] = None,
-        patch_generation_patch_id_digits: int = 4,
-        notifications: Optional[NotificationsConfig] = None,
-        copy_upstream_release_description: bool = False,
-        sources: Optional[List[SourcesItem]] = None,
-        merge_pr_in_ci: bool = True,
-        srpm_build_deps: Optional[List[str]] = None,
-        identifier: Optional[str] = None,
-        packit_instances: Optional[List[Deployment]] = None,
-        issue_repository: Optional[str] = None,
-        release_suffix: Optional[str] = None,
+        **kwargs,
     ):
-        super().__init__(
-            config_file_path=config_file_path,
-            specfile_path=specfile_path,
-            synced_files=synced_files,
-            files_to_sync=files_to_sync,
-            dist_git_namespace=dist_git_namespace,
-            upstream_project_url=upstream_project_url,
-            upstream_package_name=upstream_package_name,
-            downstream_project_url=downstream_project_url,
-            downstream_package_name=downstream_package_name,
-            dist_git_base_url=dist_git_base_url,
-            actions=actions,
-            upstream_ref=upstream_ref,
-            allowed_gpg_keys=allowed_gpg_keys,
-            create_pr=create_pr,
-            sync_changelog=sync_changelog,
-            create_sync_note=create_sync_note,
-            spec_source_id=spec_source_id,
-            upstream_tag_template=upstream_tag_template,
-            archive_root_dir_template=archive_root_dir_template,
-            patch_generation_ignore_paths=patch_generation_ignore_paths,
-            patch_generation_patch_id_digits=patch_generation_patch_id_digits,
-            notifications=notifications,
-            copy_upstream_release_description=copy_upstream_release_description,
-            sources=sources,
-            merge_pr_in_ci=merge_pr_in_ci,
-            srpm_build_deps=srpm_build_deps,
-            identifier=identifier,
-            packit_instances=packit_instances,
-            issue_repository=issue_repository,
-            release_suffix=release_suffix,
-        )
+        super().__init__(**kwargs)
         self.jobs: List[JobConfig] = jobs or []
 
     def __repr__(self):
-        return (
-            "PackageConfig("
-            f"config_file_path='{self.config_file_path}', "
-            f"specfile_path='{self.specfile_path}', "
-            f"files_to_sync='{self.files_to_sync}', "
-            f"jobs='{self.jobs}', "
-            f"dist_git_namespace='{self.dist_git_namespace}', "
-            f"upstream_project_url='{self.upstream_project_url}', "
-            f"upstream_package_name='{self.upstream_package_name}', "
-            f"downstream_project_url='{self.downstream_project_url}', "
-            f"downstream_package_name='{self.downstream_package_name}', "
-            f"dist_git_base_url='{self.dist_git_base_url}', "
-            f"actions='{self.actions}', "
-            f"upstream_ref='{self.upstream_ref}', "
-            f"allowed_gpg_keys='{self.allowed_gpg_keys}', "
-            f"create_pr='{self.create_pr}', "
-            f"sync_changelog='{self.sync_changelog}', "
-            f"create_sync_note='{self.create_sync_note}', "
-            f"spec_source_id='{self.spec_source_id}', "
-            f"upstream_tag_template='{self.upstream_tag_template}', "
-            f"archive_root_dir_template={self.archive_root_dir_template}', "
-            f"patch_generation_ignore_paths='{self.patch_generation_ignore_paths}', "
-            f"patch_generation_patch_id_digits='{self.patch_generation_patch_id_digits}', "
-            f"copy_upstream_release_description='{self.copy_upstream_release_description}',"
-            f"sources='{self.sources}', "
-            f"merge_pr_in_ci={self.merge_pr_in_ci}, "
-            f"srpm_build_deps={self.srpm_build_deps}, "
-            f"identifier='{self.identifier}', "
-            f"packit_instances={self.packit_instances}, "
-            f"issue_repository='{self.issue_repository}', "
-            f"release_suffix='{self.release_suffix}')"
-        )
+        # required to avoid cyclical imports
+        from packit.schema import PackageConfigSchema
+
+        s = PackageConfigSchema()
+        # For __repr__() return a JSON-encoded string, by using dumps().
+        # Mind the 's'!
+        return f"PackageConfig: {s.dumps(self)}"
 
     @classmethod
     def get_from_dict(
@@ -207,33 +121,16 @@ class PackageConfig(CommonPackageConfig):
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        logger.debug(f"our configuration:\n{self.__dict__}")
-        logger.debug(f"the other configuration:\n{other.__dict__}")
-        return (
-            self.specfile_path == other.specfile_path
-            and self.files_to_sync == other.files_to_sync
-            and self.jobs == other.jobs
-            and self.dist_git_namespace == other.dist_git_namespace
-            and self.upstream_project_url == other.upstream_project_url
-            and self.upstream_package_name == other.upstream_package_name
-            and self.downstream_project_url == other.downstream_project_url
-            and self.downstream_package_name == other.downstream_package_name
-            and self.dist_git_base_url == other.dist_git_base_url
-            and self.actions == other.actions
-            and self.allowed_gpg_keys == other.allowed_gpg_keys
-            and self.create_pr == other.create_pr
-            and self.sync_changelog == other.sync_changelog
-            and self.create_sync_note == other.create_sync_note
-            and self.spec_source_id == other.spec_source_id
-            and self.upstream_tag_template == other.upstream_tag_template
-            and self.copy_upstream_release_description
-            == other.copy_upstream_release_description
-            and self.sources == other.sources
-            and self.merge_pr_in_ci == other.merge_pr_in_ci
-            and self.srpm_build_deps == other.srpm_build_deps
-            and self.identifier == other.identifier
-            and self.issue_repository == other.issue_repository
-        )
+        # required to avoid cyclical imports
+        from packit.schema import PackageConfigSchema
+
+        s = PackageConfigSchema()
+        # Compare the serialized objects.
+        serialized_self = s.dump(self)
+        serialized_other = s.dump(other)
+        logger.debug(f"our configuration:\n{serialized_self}")
+        logger.debug(f"the other configuration:\n{serialized_other}")
+        return serialized_self == serialized_other
 
 
 def find_packit_yaml(
