@@ -1,3 +1,8 @@
+# 0.54.0
+
+- Packit Bash completion file is no longer needlessly executable. (#1634)
+- Transition to Bodhi's new authentication mechanism is now fully complete. (#1635)
+
 # 0.53.0
 
 - Packit now works with Bodhi 5 and Bodhi 6 authentication mechanism. (#1629)
