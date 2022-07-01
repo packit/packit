@@ -918,15 +918,16 @@ def test_package_config_parse(raw, expected):
         pytest.param(
             {
                 "specfile_path": "fedora/package.spec",
-                "synced_files": ["x", "y"],
+                "files_to_sync": ["x", "y"],
                 "actions": {"post-upstream-clone": "ls"},
                 "spec_source_id": "Source0",
+                "targets": ["fedora-36"],
                 "jobs": [
                     {
                         "job": "build",
                         "trigger": "release",
                         "specfile_path": "somewhere/package.spec",
-                        "synced_files": ["a", "b", "c"],
+                        "files_to_sync": ["a", "b", "c"],
                         "actions": {"create-archive": "ls"},
                         "spec_source_id": "Source1",
                     }
@@ -934,17 +935,19 @@ def test_package_config_parse(raw, expected):
             },
             PackageConfig(
                 specfile_path="fedora/package.spec",
-                synced_files=[SyncFilesItem([x], x) for x in ("x", "y")],
+                files_to_sync=[SyncFilesItem([x], x) for x in ("x", "y")],
                 actions={ActionName.post_upstream_clone: "ls"},
+                _targets=["fedora-36"],
                 jobs=[
                     JobConfig(
                         type=JobType.build,
                         trigger=JobConfigTriggerType.release,
                         specfile_path="somewhere/package.spec",
-                        synced_files=[SyncFilesItem([x], x) for x in ("a", "b", "c")],
+                        files_to_sync=[SyncFilesItem([x], x) for x in ("a", "b", "c")],
                         actions={ActionName.create_archive: "ls"},
+                        _targets=["fedora-36"],
                         spec_source_id="Source1",
-                    )
+                    ),
                 ],
             ),
             id="override-alot",

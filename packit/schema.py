@@ -14,7 +14,7 @@ from packit.config.job_config import (
     JobConfig,
     JobConfigTriggerType,
 )
-from packit.config.package_config import NotificationsConfig
+from packit.config.notifications import NotificationsConfig
 from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.sync import SyncFilesItem
@@ -311,8 +311,31 @@ class CommonConfigSchema(Schema):
     issue_repository = fields.String(missing=None)
     release_suffix = fields.String(missing=None)
 
+    # Former 'metadata' keys
+    _targets = TargetsListOrDict(missing=None, data_key="targets")
+    timeout = fields.Integer()
+    owner = fields.String(missing=None)
+    project = fields.String(missing=None)
+    dist_git_branches = fields.List(fields.String(), missing=None)
+    branch = fields.String(missing=None)
+    scratch = fields.Boolean()
+    list_on_homepage = fields.Boolean()
+    preserve_project = fields.Boolean()
+    use_internal_tf = fields.Boolean()
+    additional_packages = fields.List(fields.String(), missing=None)
+    additional_repos = fields.List(fields.String(), missing=None)
+    fmf_url = fields.String(missing=None)
+    fmf_ref = fields.String(missing=None)
+    skip_build = fields.Boolean()
+    env = fields.Dict(keys=fields.String(), missing=None)
+    enable_net = fields.Boolean(missing=True)
+    allowed_pr_authors = fields.List(fields.String(), missing=None)
+    allowed_committers = fields.List(fields.String(), missing=None)
+    tmt_plan = fields.String(missing=None)
+    tf_post_install_script = fields.String(missing=None)
+
     @staticmethod
-    def spec_source_id_serialize(value: PackageConfig):
+    def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id
 
     @staticmethod
@@ -368,29 +391,7 @@ class JobConfigSchema(CommonConfigSchema):
 
     job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
-    # old metadata dictionary keys
-    _targets = TargetsListOrDict(missing=None, data_key="targets")
-    timeout = fields.Integer()
-    owner = fields.String(missing=None)
-    project = fields.String(missing=None)
-    dist_git_branches = fields.List(fields.String(), missing=None)
-    branch = fields.String(missing=None)
-    scratch = fields.Boolean()
-    list_on_homepage = fields.Boolean()
-    preserve_project = fields.Boolean()
-    use_internal_tf = fields.Boolean()
-    additional_packages = fields.List(fields.String(), missing=None)
-    additional_repos = fields.List(fields.String(), missing=None)
-    fmf_url = fields.String(missing=None)
-    fmf_ref = fields.String(missing=None)
-    skip_build = fields.Boolean()
-    env = fields.Dict(keys=fields.String(), missing=None)
-    enable_net = fields.Boolean(missing=True)
-    allowed_pr_authors = fields.List(fields.String(), missing=None)
-    allowed_committers = fields.List(fields.String(), missing=None)
-    tmt_plan = fields.String(missing=None)
-    tf_post_install_script = fields.String(missing=None)
-
+    # 'metadata' is deprecated
     metadata = fields.Nested(JobMetadataSchema)
 
     @pre_load
