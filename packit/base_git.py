@@ -10,6 +10,8 @@ import git
 from git import PushInfo
 from rebasehelper.helpers.download_helper import DownloadHelper
 
+from ogr.abstract import PullRequest
+
 from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, RunCommandType
@@ -425,3 +427,30 @@ class PackitRepositoryBase:
                     str(source_path),
                 )
         self.specfile.download_remote_sources()
+
+    def existing_pr(
+        self, title: str, description: str, branch: str
+    ) -> Optional[PullRequest]:
+        """Look for an already created PR with the same:
+        title, description and branch name
+
+        Args:
+            title (str)
+            description (str)
+            branch (str)
+
+        Return:
+            PullRequest: if one is found otherwise None
+        """
+        prs = self.local_project.git_project.get_pr_list()
+        current_user = self.local_project.git_service.user.get_username()
+
+        for pr in prs:
+            if (
+                pr.title == title
+                and pr.description == description
+                and pr.target_branch == branch
+                and pr.author == current_user
+            ):
+                return pr
+        return None
