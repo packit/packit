@@ -283,7 +283,7 @@ def test_basic_bodhi_update(
     flexmock(
         OurBodhiClient,
         save=lambda **kwargs: bodhi_response,
-        refresh_auth=lambda: None,  # this is where the browser/OIDC fun happens
+        ensure_auth=lambda: None,  # this is where the browser/OIDC fun happens
     )
 
     api.create_update(
@@ -316,11 +316,15 @@ def test_bodhi_update_with_bugs(
     bodhi_response,
     latest_builds_from_koji,
 ):
+    """This test checks that bugzilla IDs can be passed and that bodhi
+    authentication works using kerberos."""
+
     def validate_save(kwargs, expected_kwargs):
         assert kwargs == expected_kwargs
         return bodhi_response
 
     u, d, api = api_instance
+    api.config.fas_user = "packit"
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
@@ -339,8 +343,8 @@ def test_bodhi_update_with_bugs(
                 "bugs": ["1", "2", "3"],
             },
         ),
-        refresh_auth=lambda: None,
     )
+    flexmock(OurBodhiClient).should_receive("login_with_kerberos").and_return(None)
 
     api.create_update(
         dist_git_branch="f30",
@@ -372,7 +376,7 @@ def test_bodhi_update_auth_with_fas(
         OurBodhiClient,
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
-        refresh_auth=lambda: None,
+        ensure_auth=lambda: None,
     )
 
     api.create_update(

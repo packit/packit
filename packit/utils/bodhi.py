@@ -77,7 +77,7 @@ class OurBodhiClient(BodhiClient):
                 retries=3,
             )
 
-    def refresh_auth(self):
+    def ensure_auth(self):
         """clear existing authentication data and obtain new"""
         if self.is_bodhi_6:
             self.clear_auth()
@@ -87,7 +87,7 @@ class OurBodhiClient(BodhiClient):
                 self.login_with_kerberos()
             else:
                 # terminal prompt
-                self.ensure_auth()
+                super().ensure_auth()
         else:
             self._session.cookies.clear()
             self.csrf_token = None
