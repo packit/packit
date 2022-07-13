@@ -24,9 +24,9 @@ from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
+from packit.upstream import Upstream
 from packit.pkgtool import PkgTool
 from packit.local_project import LocalProject
-from packit.upstream import Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 
@@ -324,36 +324,72 @@ def api_instance(upstream_and_remote, distgit_and_remote):
     return u, d, api
 
 
-@pytest.fixture()
-def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
-    sourcegit, _ = sourcegit_and_remote
-    distgit, _ = distgit_and_remote
+def mock_api_for_source_git(
+    sourcegit: Path, distgit: Path, up_local_project: LocalProject
+):
     with cwd(sourcegit):
         c = get_test_config()
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
         pc.dist_git_clone_path = str(distgit)
-        up_lp = LocalProject(working_dir=sourcegit)
-        return PackitAPI(c, pc, up_lp)
+        return PackitAPI(c, pc, up_local_project)
 
 
 @pytest.fixture()
-def api_instance_update_source_git(api_instance_source_git):
+def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+    up_lp = LocalProject(working_dir=sourcegit)
+    return mock_api_for_source_git(sourcegit, distgit, up_lp)
+
+
+def add_source_git_commit_trailer(api: PackitAPI):
     # The version in dg is different from up, sync it
-    version = api_instance_source_git.up.specfile.get_version()
-    api_instance_source_git.dg.specfile.set_version(version)
-    api_instance_source_git.dg.specfile.save()
-    api_instance_source_git.dg.commit(
+    version = api.up.specfile.get_version()
+    api.dg.specfile.set_version(version)
+    api.dg.specfile.save()
+    api.dg.commit(
         "Update spec",
         "",
         trailers=[
             (
                 FROM_SOURCE_GIT_TOKEN,
-                api_instance_source_git.up.local_project.git_repo.head.commit.hexsha,
+                api.up.local_project.git_repo.head.commit.hexsha,
             )
         ],
     )
+    return api
+
+
+@pytest.fixture()
+def api_instance_update_source_git(api_instance_source_git):
+    add_source_git_commit_trailer(api_instance_source_git)
     return api_instance_source_git
+
+
+@pytest.fixture()
+def api_instance_sync_push(sourcegit_and_remote, distgit_and_remote):
+    sourcegit, _ = sourcegit_and_remote
+    distgit, _ = distgit_and_remote
+
+    repo = flexmock(
+        default_branch="main", get_pulls=lambda state, sort, direction: [], fork="fork"
+    )
+    service = flexmock(user=flexmock(get_username=lambda: "packit"))
+    up_lp = LocalProject(
+        working_dir=sourcegit,
+        git_project=GithubProject(
+            repo="beer", service=service, namespace="packit.dev", github_repo=repo
+        ),
+    )
+    api = mock_api_for_source_git(sourcegit, distgit, up_lp)
+
+    add_source_git_commit_trailer(api)
+
+    api.dg.specfile.set_version("1.2.3")
+    api.dg.specfile.save()
+    api.dg.commit("dist-git commit to be sync back", "")
+    return api
 
 
 @pytest.fixture()
