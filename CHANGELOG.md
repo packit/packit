@@ -1,3 +1,7 @@
+# 0.55.0
+
+- Packit can now correctly create bodhi updates using the new Bodhi 6 client. (#1651)
+
 # 0.54.0
 
 - Packit Bash completion file is no longer needlessly executable. (#1634)
