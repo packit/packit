@@ -121,7 +121,7 @@ def copr(
     path_or_url,
 ):
     """
-    Build selected upstream project in COPR.
+    Build selected upstream project in Copr.
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory.
@@ -132,22 +132,22 @@ def copr(
     )
 
     if not project:
-        logger.debug("COPR project name was not passed via CLI.")
+        logger.debug("Copr project name was not passed via CLI.")
 
         if isinstance(api.package_config, PackageConfig):
             project = api.package_config.get_copr_build_project_value()
 
         if project:
-            logger.debug("Using a first COPR project found in the job configuration.")
+            logger.debug("Using a first Copr project found in the job configuration.")
         else:
             logger.debug(
-                "COPR project not found in the job configuration. "
+                "Copr project not found in the job configuration. "
                 "Using the default one."
             )
             sanitized_ref = sanitize_branch_name(path_or_url.ref)
             project = f"packit-cli-{path_or_url.repo_name}-{sanitized_ref}"
 
-    logger.info(f"Using COPR project name = {project}")
+    logger.info(f"Using Copr project name = {project}")
 
     targets_list = targets.split(",")
     for target in targets_list:
