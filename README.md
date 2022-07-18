@@ -1,12 +1,12 @@
-# Packit
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+  <img src="design/export/logo-no-borders.png" width="100" />
+  <h1 align="center">Packit</h1>
+</p>
 
 [![Build Status](https://zuul-ci.org/gated.svg)](https://softwarefactory-project.io/zuul/t/local/builds?project=packit-service/packit)
 [![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-
-![Packit](design/export/logo-no-borders.png)
-
----
 
 Packit is a CLI tool that helps developers auto-package upstream projects
 into Fedora operating system.
