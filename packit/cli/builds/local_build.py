@@ -14,7 +14,7 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger("packit")
 
 
-@click.command("local-build", context_settings=get_context_settings())
+@click.command("locally", context_settings=get_context_settings())
 @click.option(
     "--upstream-ref",
     default=None,
@@ -45,9 +45,7 @@ logger = logging.getLogger("packit")
 )
 @pass_config
 @cover_packit_exception
-def local_build(
-    config, upstream_ref, release_suffix, default_release_suffix, path_or_url
-):
+def local(config, upstream_ref, release_suffix, default_release_suffix, path_or_url):
     """
     Create RPMs using content of the upstream repository.
 
@@ -60,7 +58,9 @@ def local_build(
     )
 
     rpm_paths = api.create_rpms(
-        upstream_ref=upstream_ref, release_suffix=release_suffix
+        upstream_ref=upstream_ref,
+        release_suffix=release_suffix,
+        # srpm_path=config.srpm_path,
     )
     logger.info("RPMs:")
     for path in rpm_paths:
