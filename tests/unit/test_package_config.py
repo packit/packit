@@ -877,6 +877,39 @@ def test_package_config_parse_error(raw):
             ),
             id="extra_tf_api_parameters",
         ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "vm_image_build",
+                        "trigger": "pull_request",
+                        "packages_to_install": ["peddle", "board"],
+                        "image_distribution": "rhel-90",
+                        "image_type": "aws",
+                        "image_account_id": "yolo",
+                        "image_architecture": "x86_64",
+                    }
+                ],
+            },
+            PackageConfig(
+                # parsing makes it inherit: in here we need to be explicit
+                specfile_path="fedora/package.spec",
+                jobs=[
+                    JobConfig(
+                        specfile_path="fedora/package.spec",
+                        type=JobType.vm_image_build,
+                        trigger=JobConfigTriggerType.pull_request,
+                        packages_to_install=["peddle", "board"],
+                        image_distribution="rhel-90",
+                        image_type="aws",
+                        image_account_id="yolo",
+                        image_architecture="x86_64",
+                    ),
+                ],
+            ),
+            id="vm-image-build",
+        ),
     ],
 )
 def test_package_config_parse(raw, expected):
