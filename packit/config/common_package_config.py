@@ -172,6 +172,16 @@ class CommonPackageConfig:
         allowed_committers: Optional[List[str]] = None,
         tmt_plan: Optional[str] = None,
         tf_post_install_script: Optional[str] = None,
+        # # vm-image-build
+        # example: "rhel-86"
+        image_distribution: Optional[str] = None,
+        image_architecture: Optional[str] = None,
+        # example: "aws"
+        image_type: Optional[str] = None,
+        # example: "727920393541"
+        image_account_id: Optional[str] = None,
+        # example: ["foo", "bar-1.2.3"]
+        packages_to_install: Optional[List[str]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -258,6 +268,12 @@ class CommonPackageConfig:
         self.allowed_committers = allowed_committers or []
         self.tmt_plan = tmt_plan
         self.tf_post_install_script = tf_post_install_script
+
+        self.image_distribution = image_distribution
+        self.image_architecture = image_architecture
+        self.image_type = image_type
+        self.image_account_id = image_account_id
+        self.packages_to_install = packages_to_install
 
     @property
     def targets_dict(self):
