@@ -18,22 +18,35 @@ from packit.exceptions import PackitConfigException
 logger = logging.getLogger(__name__)
 
 
-class PackageConfig(CommonPackageConfig):
+class PackageConfig:
     """
     Config class for upstream/downstream packages;
     this is the config people put in their repos
 
     Attributes:
         jobs: List of job configs.
+        packages: Packages in this configuration.
     """
 
     def __init__(
         self,
+        packages: Optional[Dict[str, CommonPackageConfig]] = None,
         jobs: Optional[List[JobConfig]] = None,
         **kwargs,
     ):
-        super().__init__(**kwargs)
         self.jobs: List[JobConfig] = jobs or []
+        self.packages: Dict[str, CommonPackageConfig] = packages or {
+            # There is a single package, under the key 'None'
+            None: CommonPackageConfig(**kwargs)
+        }
+
+    def __getattr__(self, name):
+        if len(self.packages) == 1:
+            return getattr(self.packages[list(self.packages.keys())[0]], name)
+        else:
+            raise AttributeError(
+                f"Cannot get {name!r}, PackageConfig has {len(self.packages)} packages"
+            )
 
     def __repr__(self):
         # required to avoid cyclical imports

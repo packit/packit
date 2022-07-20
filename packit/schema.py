@@ -287,6 +287,7 @@ class CommonConfigSchema(Schema):
     config_file_path = fields.String(missing=None)
     specfile_path = fields.String(missing=None)
     downstream_package_name = fields.String(missing=None)
+    paths = fields.List(fields.String(), missing=None)
     upstream_project_url = fields.String(missing=None)
     upstream_package_name = fields.String(missing=None, validate=validate_repo_name)
     upstream_ref = fields.String(missing=None)
@@ -401,6 +402,10 @@ class CommonConfigSchema(Schema):
             data.pop("files_to_sync", None)
         return data
 
+    @post_load
+    def make_instance(self, data, **_):
+        return CommonPackageConfig(**data)
+
 
 class JobConfigSchema(CommonConfigSchema):
     """
@@ -482,6 +487,9 @@ class PackageConfigSchema(CommonConfigSchema):
     path, for example).
     """
 
+    packages = fields.Dict(
+        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+    )
     jobs = fields.Nested(JobConfigSchema, many=True)
 
     # list of deprecated keys and their replacement (new,old)
@@ -491,6 +499,8 @@ class PackageConfigSchema(CommonConfigSchema):
     def ordered_preprocess(self, data, **kwargs):
         data = self.rename_deprecated_keys(data, **kwargs)
         data.setdefault("jobs", get_default_jobs())
+        data = self.update_packages(data)
+        data = self.set_package_defaults(data)
         data = self.propagate_options_to_jobs(data, **kwargs)
         return data
 
@@ -519,6 +529,26 @@ class PackageConfigSchema(CommonConfigSchema):
         return data
 
     @staticmethod
+    def update_packages(data):
+        if not data or data.get("packages") is None:
+            return data
+        for package in data.get("packages", {}).values():
+            for k, v in data.items():
+                if k not in ("jobs", "packages"):
+                    package.setdefault(k, v)
+        return data
+
+    @staticmethod
+    def set_package_defaults(data):
+        for package, config in data.get("packages", {}).items():
+            config.setdefault("downstream_package_name", package)
+            config.setdefault(
+                "specfile_path", f"{config['downstream_package_name']}.spec"
+            )
+            config.setdefault("paths", [package])
+        return data
+
+    @staticmethod
     def propagate_options_to_jobs(data, **_):
         """
         add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
@@ -527,10 +557,9 @@ class PackageConfigSchema(CommonConfigSchema):
             return data
         for job in data.get("jobs", []):
             for k, v in data.items():
-                if k == "jobs":
-                    # overriding jobs doesn't make any sense
-                    continue
-                job.setdefault(k, v)
+                # overriding jobs and packages doesn't make any sense
+                if k not in ("jobs", "packages"):
+                    job.setdefault(k, v)
         return data
 
     @validates_schema
@@ -550,16 +579,32 @@ class PackageConfigSchema(CommonConfigSchema):
         """
         # This is somewhat weird: while 'data' is still a dict,
         # elements in 'jobs' was already loaded, so those are JobConfig objects.
-        if not data.get("specfile_path") and not all(
-            job.type == JobType.tests and job.skip_build for job in data.get("jobs", [])
+        if (
+            not data.get("packages")
+            and not data.get("specfile_path")
+            and not all(
+                job.type == JobType.tests and job.skip_build
+                for job in data.get("jobs", [])
+            )
         ):
             raise ValidationError(
                 "'specfile_path' is not specified or no specfile was found in the repo"
             )
 
+    @validates_schema
+    def at_least_one_package(self, data, **_):
+        if data.get("packages") is not None and not len(data["packages"]):
+            raise ValidationError("'packages' needs at least a package defined")
+
     @post_load
     def make_instance(self, data, **kwargs):
         return PackageConfig(**data)
+
+    @post_dump(pass_original=True)
+    def remove_empty_packages(self, data: dict, original: PackageConfig, **_) -> dict:
+        if None in original.packages:
+            data.pop("packages")
+        return data
 
 
 class UserConfigSchema(Schema):
