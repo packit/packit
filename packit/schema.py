@@ -333,6 +333,11 @@ class CommonConfigSchema(Schema):
     allowed_committers = fields.List(fields.String(), missing=None)
     tmt_plan = fields.String(missing=None)
     tf_post_install_script = fields.String(missing=None)
+    image_distribution = fields.String(missing=None)
+    image_architecture = fields.String(missing=None)
+    image_type = fields.String(missing=None)
+    image_account_id = fields.String(missing=None)
+    packages_to_install = fields.List(fields.String(), missing=None)
 
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
