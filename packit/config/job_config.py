@@ -24,6 +24,7 @@ class JobType(Enum):
     koji_build = "koji_build"  # downstream koji build
     tests = "tests"
     bodhi_update = "bodhi_update"
+    vm_image_build = "vm_image_build"
 
 
 class JobConfigTriggerType(Enum):

@@ -11,11 +11,9 @@ import cccolutils
 import git
 import requests
 from bodhi.client.bindings import BodhiClientException
-from fedora.client import AuthError, LoginRequiredError
+from fedora.client import AuthError
 from koji import ClientSession
-
 from ogr.abstract import PullRequest
-
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
@@ -23,12 +21,12 @@ from packit.config import (
     get_local_package_config,
 )
 from packit.config.common_package_config import CommonPackageConfig
+from packit.constants import KOJI_BASEURL
 from packit.exceptions import PackitException, PackitConfigException
 from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import cwd
-from packit.constants import KOJI_BASEURL
 
 logger = logging.getLogger(__name__)
 
@@ -493,7 +491,7 @@ class DistGit(PackitRepositoryBase):
                 save_kwargs["bugs"] = list(map(str, bugzilla_ids))
             try:
                 result = bodhi_client.save(**save_kwargs)
-            except LoginRequiredError as ex:
+            except BodhiClientException as ex:
                 logger.debug(
                     f"Bodhi client raised a login error: {ex}. "
                     f"Let's clear the session, csrf token and retry."
