@@ -1516,7 +1516,7 @@ def test_package_config_specfile_not_present_raise(raw):
         },
     ],
 )
-def test_package_config_specilfe_not_present_not_raise(raw):
+def test_package_config_specfile_not_present_not_raise(raw):
     assert PackageConfig.get_from_dict(raw_dict=raw)
 
 
@@ -1532,3 +1532,103 @@ def test_pc_dist_git_package_url_has_no_None(package_name, result):
         ).dist_git_package_url
         == result
     )
+
+
+@pytest.mark.parametrize(
+    "raw, specfile, dp_name, paths",
+    [
+        # specfile_path from downstream_package_name
+        # default for paths is './'
+        (
+            {"downstream_package_name": "test"},
+            "test.spec",
+            "test",
+            ["./"],
+        ),
+        # specfile_path from downstream_package_name; different value
+        (
+            {
+                "upstream_package_name": "test",
+                "downstream_package_name": "downstream-test",
+            },
+            "downstream-test.spec",
+            "downstream-test",
+            ["./"],
+        ),
+        # explicit specfile_path
+        # non-default paths
+        # downstream_package_name not defined
+        (
+            {"specfile_path": "explicit.spec", "paths": ["only", "some", "paths"]},
+            "explicit.spec",
+            None,
+            ["only", "some", "paths"],
+        ),
+    ],
+)
+def test_no_packages_key(raw, specfile, dp_name, paths):
+    """When no 'packages' key is in the configuration dict:
+
+    - there is only one package in config.packages
+    - called 'None'
+    - downstream_package_name and specfile_path if handled correctly
+    - paths is handled correctly
+    - top level configuration values match package object configuration
+      values
+    """
+    config = PackageConfig.get_from_dict(raw_dict=raw)
+    assert len(config.packages) == 1
+    for p, c in config.packages.items():
+        assert p is None
+        assert c.specfile_path == config.specfile_path == specfile
+        assert c.downstream_package_name == config.downstream_package_name == dp_name
+        assert c.paths == config.paths == paths
+        assert c.upstream_package_name == config.upstream_package_name
+
+
+def test_packages_key_empty():
+    """The packages key is used, but it's an empty dict"""
+    with pytest.raises(ValidationError, match="needs at least a package defined"):
+        PackageConfig.get_from_dict(raw_dict={"packages": {}})
+
+
+@pytest.mark.parametrize(
+    "raw, packages, specfiles, dp_names, paths",
+    [
+        (
+            {
+                "packages": {"test": {}},
+            },
+            ["test"],
+            ["test.spec"],
+            ["test"],
+            [["test"]],
+        ),
+        (
+            {
+                "packages": {"blue": {}, "green": {}},
+            },
+            ["blue", "green"],
+            ["blue.spec", "green.spec"],
+            ["blue", "green"],
+            [["blue"], ["green"]],
+        ),
+    ],
+)
+def test_packages_key_used(raw, packages, specfiles, dp_names, paths):
+    config = PackageConfig.get_from_dict(raw_dict=raw)
+    assert len(config.packages) == len(packages)
+    for i, (p, c) in enumerate(config.packages.items()):
+        assert p == packages[i]
+        assert c.specfile_path == specfiles[i]
+        assert c.downstream_package_name == dp_names[i]
+        assert c.paths == paths[i]
+        if len(raw["packages"]) == 1:
+            assert c.specfile_path == config.specfile_path
+            assert c.downstream_package_name == config.downstream_package_name
+            assert c.paths == config.paths
+        else:
+            with pytest.raises(
+                AttributeError, match=f"{len(raw['packages'])} packages"
+            ):
+                config.specfile_path
