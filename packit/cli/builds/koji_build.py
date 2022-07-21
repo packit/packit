@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
 )
-@click.option("--nowait", is_flag=True, default=False, help="Don't wait on build")
+@click.option("--wait/--no-wait", default=True, help="Wait for the build to finish")
 @click.option(
     "--release-suffix",
     default=None,
@@ -67,7 +67,7 @@ def koji(
     from_upstream,
     koji_target,
     scratch,
-    nowait,
+    wait,
     release_suffix,
     default_release_suffix,
     path_or_url,
@@ -113,7 +113,7 @@ def koji(
                 out = api.build(
                     dist_git_branch=branch,
                     scratch=scratch,
-                    nowait=nowait,
+                    nowait=not wait,
                     koji_target=target,
                     from_upstream=from_upstream,
                     release_suffix=release_suffix,

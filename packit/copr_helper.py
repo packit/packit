@@ -373,3 +373,26 @@ class CoprHelper:
                 client.mock_chroot_proxy.get_list().keys(),
             )
         )
+
+    def get_build(self, build_id: int) -> Dict:
+        """
+        Get build details from Copr.
+
+        Arguments:
+            build_id -- Copr build id.
+
+        :return: Dict
+        """
+        return self.copr_client.build_proxy.get(build_id)
+
+    def get_repo_download_url(self, owner: str, project: str, chroot: str) -> str:
+        """Provide a link to yum repo for the particular chroot"""
+        copr_proj = self.copr_client.project_proxy.get(
+            ownername=owner, projectname=project
+        )
+        try:
+            return copr_proj["chroot_repos"][chroot]
+        except KeyError:
+            raise PackitCoprProjectException(
+                f"There is no such target {chroot} in {owner}/{project}."
+            )

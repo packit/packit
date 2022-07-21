@@ -37,6 +37,7 @@ class Config:
         fas_user: Optional[str] = None,
         fas_password: Optional[str] = None,
         keytab_path: Optional[str] = None,
+        redhat_api_refresh_token: Optional[str] = None,
         upstream_git_remote: Optional[str] = None,
         kerberos_realm: Optional[str] = "FEDORAPROJECT.ORG",
         koji_build_command: Optional[str] = "koji build",
@@ -56,6 +57,7 @@ class Config:
         self.fas_user: Optional[str] = fas_user
         self.fas_password: Optional[str] = fas_password
         self.keytab_path: Optional[str] = keytab_path
+        self.redhat_api_refresh_token: Optional[str] = redhat_api_refresh_token
         self.kerberos_realm = kerberos_realm
         self.koji_build_command = koji_build_command
         if not which(pkg_tool):

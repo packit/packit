@@ -29,6 +29,8 @@ from typing import (
 )
 
 # Literal is available only since Python3.8, workaround for el8
+from packit.vm_image_build import ImageBuilder
+
 if sys.version_info >= (3, 8):
     from typing import Literal
 else:
@@ -1785,3 +1787,67 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         rpms = Upstream._get_rpms_from_mock_output(cmd_result.stderr)
         return [Path(rpm) for rpm in rpms]
+
+    def submit_vm_image_build(
+        self,
+        image_distribution: str,
+        image_name: str,
+        image_request: Dict,
+        image_customizations: Dict,
+        copr_namespace: str,
+        copr_project: str,
+        copr_chroot: str,
+    ) -> str:
+        """
+        Submit a VM image build to Image Builder.
+
+        Documentation:
+            https://console.redhat.com/docs/api/image-builder
+
+        Args:
+            image_distribution: Distribution of the image (example: rhel-90, rhel-86).
+            image_name: Name of the image.
+            image_request: Image request definition of an image build, see API reference above.
+            image_customizations: Image customizations definition of an image build,
+                see API reference above.
+            copr_namespace: Copr namespace from which to pick the RPMs from.
+            copr_project: Copr project from which to pick the RPMs from.
+            copr_chroot: Copr chroot to use for installation of packages.
+
+        Returns:
+            Image ID of the submitted image.
+        """
+        # build_id = self.copr_helper.get_build(build_id=copr_build_id)
+        repo_url = self.copr_helper.get_repo_download_url(
+            owner=copr_namespace,
+            project=copr_project,
+            chroot=copr_chroot,
+        )
+        ib = ImageBuilder(
+            refresh_token=self.config.redhat_api_refresh_token,
+        )
+        return ib.create_image(
+            image_distribution=image_distribution,
+            image_name=image_name,
+            image_request=image_request,
+            image_customizations=image_customizations,
+            repo_url=repo_url,
+        )
+
+    def get_vm_image_build_status(
+        self,
+        build_id: str,
+    ):
+        """
+        Get the status of a VM image build.
+
+        Args:
+            build_id: Build ID of the image.
+
+        Returns:
+            Status of the build (example: success, building, pending)
+        """
+        ib = ImageBuilder(
+            refresh_token=self.config.redhat_api_refresh_token,
+        )
+        return ib.get_image_status(build_id)
