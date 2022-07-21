@@ -366,16 +366,6 @@ class PackitRepositoryBase:
 
         self.local_project.git_repo.index.write()
 
-    def get_project_url_from_distgit_spec(self) -> Optional[str]:
-        """
-        Parse spec file and return value of URL
-        """
-        url = self.specfile.expanded_url
-        if not url:
-            return None
-        logger.debug(f"Upstream project URL: {url}")
-        return url
-
     def check_last_commit(self) -> None:
         if self.allowed_gpg_keys is None:
             logger.debug("Allowed GPG keys are not set, skipping the verification.")
