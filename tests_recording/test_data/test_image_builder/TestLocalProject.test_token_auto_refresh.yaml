@@ -1,0 +1,106 @@
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+requests.sessions:
+  send:
+    GET:
+      https://console.redhat.com/api/image-builder/v1/composes/e31d475a-1d32-4cac-844e-a6a613f80439:
+      - metadata:
+          latency: 0.5824246406555176
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_image_builder
+          - packit.vm_image_build
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            image_status:
+              status: success
+              upload_status:
+                options:
+                  url: https://image-builder-service-production.s3.amazonaws.com/composer-api-317e0fb8-b439-40f7-8487-cde551da7915-installer.iso?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=asd&X-Amz-Date=20220804T162550Z&X-Amz-Expires=604800&X-Amz-Security-Token=foo&X-Amz-SignedHeaders=host&X-Amz-Signature=qwe
+                status: success
+                type: aws.s3
+          _next: null
+          elapsed: 0.582197
+          encoding: UTF-8
+          headers:
+            Cache-Control: private
+            Connection: keep-alive
+            Content-Encoding: gzip
+            Content-Length: '1342'
+            Content-Type: application/json; charset=UTF-8
+            Date: Mon, 15 Aug 2022 11:09:45 GMT
+            Server: openresty
+            Set-Cookie: asd=qwe;
+              path=/; HttpOnly; Secure; SameSite=None
+            Strict-Transport-Security: max-age=31536000; includeSubDomains
+            Vary: Accept-Encoding
+            X-Frame-Options: SAMEORIGIN
+            x-content-type-options: nosniff
+            x-rh-edge-cache-status: Miss from child, Miss from parent
+            x-rh-edge-reference-id: 0.47611702.1660561785.824021b7
+            x-rh-edge-request-id: 824021b7
+            x-rh-insights-request-id: c6726edf351a49418b92da12cb6e44c7
+          raw: !!binary ""
+          reason: OK
+          status_code: 200
+    POST:
+      https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token:
+      - metadata:
+          latency: 0.3449738025665283
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_image_builder
+          - packit.vm_image_build
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            access_token: bar
+            expires_in: 900
+            not-before-policy: 0
+            refresh_expires_in: 0
+            refresh_token: foo
+            scope: offline_access
+            session_state: 7b968000-fd86-46aa-bc49-4c1526ec5717
+            token_type: Bearer
+          _next: null
+          elapsed: 0.344729
+          encoding: utf-8
+          headers:
+            Cache-Control: no-store
+            Connection: keep-alive
+            Content-Encoding: gzip
+            Content-Length: '1844'
+            Content-Type: application/json
+            Date: Mon, 15 Aug 2022 11:09:45 GMT
+            Keep-Alive: timeout=300
+            Pragma: no-cache
+            Set-Cookie: asd=qwe;
+              path=/; HttpOnly; Secure; SameSite=None
+            Vary: Accept-Encoding
+            referrer-policy: strict-origin
+            strict-transport-security: max-age=31536000; includeSubDomains
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-rh-edge-cache-status: Miss from child, Miss from parent
+            x-rh-edge-reference-id: 0.446ed417.1660561785.10392bfb
+            x-rh-edge-request-id: 10392bfb
+            x-site: prod-spoke-aws-us-east-1
+            x-xss-protection: 1; mode=block
+          raw: !!binary ""
+          reason: OK
+          status_code: 200

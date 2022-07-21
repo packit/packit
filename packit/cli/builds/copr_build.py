@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.command("in-copr", context_settings=get_context_settings())
-@click.option("--nowait", is_flag=True, default=False, help="Don't wait for build")
+@click.option("--wait/--no-wait", default=True, help="Wait for the build to finish")
 @click.option(
     "--owner",
     help="Copr user, owner of the project. (defaults to username from copr config)",
@@ -104,7 +104,7 @@ logger = logging.getLogger(__name__)
 @cover_packit_exception
 def copr(
     config,
-    nowait,
+    wait,
     owner,
     project,
     targets,
@@ -182,5 +182,5 @@ def copr(
         srpm_path=config.srpm_path,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
-    if not nowait:
+    if wait:
         api.watch_copr_build(build_id=build_id, timeout=60 * 60 * 2)
