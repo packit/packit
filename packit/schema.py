@@ -240,6 +240,8 @@ class JobMetadataSchema(Schema):
     skip_build = fields.Boolean()
     env = fields.Dict(keys=fields.String(), missing=None)
     enable_net = fields.Boolean(missing=True)
+    tmt_plan = fields.String(missing=None)
+    tf_post_install_script = fields.String(missing=None)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
