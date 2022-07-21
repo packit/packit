@@ -492,6 +492,12 @@ class DistGit(PackitRepositoryBase):
             try:
                 result = bodhi_client.save(**save_kwargs)
             except BodhiClientException as ex:
+                if "Unauthorized: new_update__POST failed permission check" in str(ex):
+                    raise PackitException(
+                        "You are using Bodhi 6 client. There is an issue with creating "
+                        "updates using this version: "
+                        "https://github.com/fedora-infra/bodhi/issues/4660"
+                    )
                 logger.debug(
                     f"Bodhi client raised a login error: {ex}. "
                     f"Let's clear the session, csrf token and retry."
