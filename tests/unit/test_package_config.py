@@ -1086,7 +1086,7 @@ def test_dist_git_package_url():
 
 
 @pytest.mark.parametrize(
-    "content,project,mock_spec_search,spec_path_option,spec_path",
+    "content,project,spec_path",
     [
         (
             "synced_files:\n"
@@ -1094,8 +1094,6 @@ def test_dist_git_package_url():
             "  - src: .packit.yaml\n"
             "    dest: .packit2.yaml",
             GitProject(repo="", service=GitService(), namespace=""),
-            True,
-            None,
             "packit.spec",
         ),
         (
@@ -1104,8 +1102,6 @@ def test_dist_git_package_url():
             "  - src: .packit.yaml\n"
             "    dest: .packit2.yaml",
             GitProject(repo="", service=GitService(), namespace=""),
-            False,
-            "packit.spec",
             "packit.spec",
         ),
     ],
@@ -1113,18 +1109,13 @@ def test_dist_git_package_url():
 def test_get_package_config_from_repo(
     content,
     project: GitProject,
-    mock_spec_search: bool,
     spec_path: Optional[str],
-    spec_path_option: Optional[str],
 ):
     gp = flexmock(GitProject)
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
-    if mock_spec_search:
-        gp.should_receive("get_files").and_return(["packit.spec"]).once()
-    config = get_package_config_from_repo(
-        project=project, spec_file_path=spec_path_option
-    )
+    gp.should_receive("get_files").and_return(["packit.spec"]).once()
+    config = get_package_config_from_repo(project=project)
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == spec_path
     assert config.files_to_sync == [
