@@ -130,7 +130,9 @@ def test_get_commands_for_actions(action_config, result):
 def test_fix_spec__setup_line(
     inner_archive_dir, orig_setup_line, new_setup_line, upstream_mock, spec_mock
 ):
-    flexmock(packit.upstream).should_receive("run_command").and_return("mocked")
+    flexmock(packit.upstream).should_receive("run_command").and_return(
+        flexmock(stdout="mocked")
+    )
 
     upstream_mock.should_receive("_fix_spec_source")
     upstream_mock.should_receive("get_version").and_return("")
