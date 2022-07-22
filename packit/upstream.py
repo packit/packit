@@ -760,6 +760,36 @@ class Upstream(PackitRepositoryBase):
 
         return tag
 
+    @staticmethod
+    def _get_rpms_from_mock_output(output: str) -> List[str]:
+        """
+        Try to find the rpm files in the `mock` command output.
+
+        Args:
+            output: Output of the `mock` command.
+
+        Returns:
+            List of names of the RPM files.
+        """
+        logger.debug(f"The `mock` command output: {output}")
+        reg = r"Results and/or logs in: (.*)(\s|$)"
+        paths = re.findall(reg, output)
+
+        rpms = list(
+            filter(
+                lambda rpm: rpm.endswith(".rpm") and not rpm.endswith(".src.rpm"),
+                os.listdir(paths[0][0]),
+            )
+        )
+        logger.debug(rpms)
+
+        if not rpms:
+            raise PackitRPMNotFoundException(
+                "RPMs cannot be found, something is wrong."
+            )
+
+        return rpms
+
 
 class SRPMBuilder:
     def __init__(
