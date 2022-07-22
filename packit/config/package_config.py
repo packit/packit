@@ -228,7 +228,8 @@ def get_local_package_config(
 
 
 def get_package_config_from_repo(
-    project: GitProject, ref: Optional[str] = None, spec_file_path: Optional[str] = None
+    project: GitProject,
+    ref: Optional[str] = None,
 ) -> Optional[PackageConfig]:
     for config_file_name in CONFIG_FILE_NAMES:
         try:
@@ -259,15 +260,12 @@ def get_package_config_from_repo(
         raise PackitConfigException(
             f"Cannot load package config {config_file_name!r}. {ex}"
         )
-    if not spec_file_path:
-        logger.warning(f"Spec file path is not specified in {config_file_name}.")
-        spec_file_path = get_specfile_path_from_repo(project=project, ref=ref)
 
     return parse_loaded_config(
         loaded_config=loaded_config,
         config_file_path=config_file_name,
         repo_name=project.repo,
-        spec_file_path=spec_file_path,
+        spec_file_path=get_specfile_path_from_repo(project=project, ref=ref),
     )
 
 
