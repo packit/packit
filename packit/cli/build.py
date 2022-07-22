@@ -10,6 +10,7 @@ import click
 from packit.cli.builds.copr_build import copr
 from packit.cli.builds.koji_build import koji
 from packit.cli.builds.local_build import local
+from packit.cli.builds.mock_build import mock
 
 logger = logging.getLogger(__name__)
 
@@ -30,3 +31,4 @@ def build(ctx, srpm):
 build.add_command(copr)
 build.add_command(koji)
 build.add_command(local)
+build.add_command(mock)

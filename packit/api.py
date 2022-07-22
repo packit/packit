@@ -56,7 +56,9 @@ from packit.constants import (
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import (
+    PackitCommandFailedError,
     PackitException,
+    PackitFailedToCreateRPMException,
     PackitSRPMException,
     PackitSRPMNotFoundException,
     PackitRPMException,
@@ -1730,3 +1732,48 @@ The first dist-git commit to be synced is '{short_hash}'.
             ignore_missing_autosetup=ignore_missing_autosetup,
         )
         sgg.create_from_upstream()
+
+    def run_mock_build(
+        self,
+        srpm_path: Path,
+        root: str = "default",
+    ) -> List[Path]:
+        """
+        Performs a mock build with given SRPM and root.
+
+        Args:
+            root: Name of the chroot or path to the mock config.
+
+                Defaults to `"default"` mock config which should be a Fedora
+                rawhide.
+            srpm_path: Path to the SRPM to be built.
+
+        Returns:
+            List of paths to the built RPMs.
+        """
+        cmd = ["mock", "--root", root, str(srpm_path)]
+        escaped_command = " ".join(cmd)
+        logger.debug(f"Mock build command: {escaped_command}")
+
+        try:
+            cmd_result = self.up.command_handler.run_command(cmd, return_output=True)
+        except PackitCommandFailedError as ex:
+            logger.error(f"The `mock` command failed: {ex!r}")
+            raise PackitFailedToCreateRPMException(
+                f"reason:\n"
+                f"{ex}\n"
+                f"command:\n"
+                f"{escaped_command}\n"
+                f"stdout:\n"
+                f"{ex.stdout_output}\n"
+                f"stderr:\n"
+                f"{ex.stderr_output}"
+            ) from ex
+        except PackitException as ex:
+            logger.error(f"The `mock` command failed: {ex!r}")
+            raise PackitFailedToCreateRPMException(
+                f"The `mock` command failed:\n{ex}"
+            ) from ex
+
+        rpms = Upstream._get_rpms_from_mock_output(cmd_result.stderr)
+        return [Path(rpm) for rpm in rpms]
