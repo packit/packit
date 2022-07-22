@@ -300,7 +300,7 @@ class PackitRepositoryBase:
         return [
             self.command_handler.run_command(
                 cmd, return_output=True, env=env, print_live=True
-            )
+            ).stdout
             for cmd in commands_to_run
         ]
 

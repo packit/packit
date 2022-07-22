@@ -20,7 +20,7 @@ def test_run_cmd_unicode(tmp_path):
     t = tmp_path / "the-cancer"
     t.write_bytes(cancer)
     command = ["cat", str(t)]
-    assert cancer == run_command(command, decode=False, output=True)
+    assert cancer == run_command(command, decode=False, output=True).stdout
 
     with pytest.raises(UnicodeDecodeError):
         run_command(command, decode=True, output=True)

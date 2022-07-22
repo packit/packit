@@ -305,7 +305,7 @@ class Upstream(PackitRepositoryBase):
                 cmd,
                 output=True,
                 cwd=self.local_project.working_dir,
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.debug(f"{ex!r}")
             logger.info("Can't describe this repository, are there any git tags?")
@@ -343,7 +343,7 @@ class Upstream(PackitRepositoryBase):
         try:
             return run_command(
                 cmd, output=True, cwd=self.local_project.working_dir
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"We couldn't get commit messages for %changelog\n{ex}")
             logger.info(f"Does the git ref {after} exist in the git repo?")
@@ -393,7 +393,7 @@ class Upstream(PackitRepositoryBase):
         try:
             git_des_out = run_command(
                 git_des_command, output=True, cwd=self.local_project.working_dir
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             # probably no tags in the git repo
             logger.info(f"Exception while describing the repository: {ex!r}")
@@ -591,7 +591,7 @@ class Upstream(PackitRepositoryBase):
             output=True,
             decode=True,
             print_live=True,
-        )
+        ).stdout
 
     def create_rpms(self, rpm_dir: Union[str, Path] = None) -> List[Path]:
         """
@@ -625,7 +625,9 @@ class Upstream(PackitRepositoryBase):
         escaped_command = " ".join(cmd)
         logger.debug(f"RPM build command: {escaped_command}")
         try:
-            out = self.command_handler.run_command(cmd, return_output=True).strip()
+            out = self.command_handler.run_command(
+                cmd, return_output=True
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
             raise PackitFailedToCreateRPMException(
@@ -693,7 +695,7 @@ class Upstream(PackitRepositoryBase):
             ),
             return_output=True,
             cwd=self.local_project.working_dir,
-        ).strip()
+        ).stdout.strip()
         logger.debug(f"Matching tag for {ref}: {tag}")
 
         return tag
@@ -881,7 +883,7 @@ class SRPMBuilder:
         try:
             out = self.upstream.command_handler.run_command(
                 cmd, return_output=True
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
             raise PackitFailedToCreateSRPMException(
