@@ -11,7 +11,7 @@ from ogr.exceptions import GithubAppNotInstalledError
 from yaml import safe_load
 
 from packit.config.common_package_config import CommonPackageConfig
-from packit.config.job_config import JobConfig, get_default_jobs, JobType
+from packit.config.job_config import JobConfig, JobType
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 
@@ -59,10 +59,6 @@ class PackageConfig(CommonPackageConfig):
             raw_dict.update(config_file_path=config_file_path)
 
         # we need to process defaults first so they get propagated to JobConfigs
-
-        if "jobs" not in raw_dict:
-            # we want default jobs to go through the proper parsing process
-            raw_dict["jobs"] = get_default_jobs()
 
         if not raw_dict.get("upstream_package_name", None) and repo_name:
             raw_dict["upstream_package_name"] = repo_name
