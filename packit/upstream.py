@@ -589,7 +589,6 @@ class Upstream(PackitRepositoryBase):
             cmd,
             cwd=self.local_project.working_dir,
             output=True,
-            decode=True,
             print_live=True,
         ).stdout
 

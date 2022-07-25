@@ -60,7 +60,6 @@ def git_format_patch(
         cmd=git_f_p_cmd,
         cwd=working_dir,
         output=True,
-        decode=True,
     ).stdout.strip()
 
 
@@ -77,7 +76,7 @@ def git_interpret_trailers(patch: str) -> str:
         The output of the command.
     """
     cmd = ["git", "interpret-trailers", "--only-input", "--only-trailers", patch]
-    return run_command(cmd=cmd, cwd=Path.cwd(), output=True, decode=True).stdout
+    return run_command(cmd=cmd, cwd=Path.cwd(), output=True).stdout
 
 
 def remove_prefixes(patch: Path):
