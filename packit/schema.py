@@ -4,7 +4,15 @@
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union, List
 
-from marshmallow import Schema, fields, post_load, pre_load, post_dump, ValidationError
+from marshmallow import (
+    Schema,
+    fields,
+    post_load,
+    pre_load,
+    post_dump,
+    validates_schema,
+    ValidationError,
+)
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
@@ -522,6 +530,30 @@ class PackageConfigSchema(CommonConfigSchema):
                     continue
                 job.setdefault(k, v)
         return data
+
+    @validates_schema
+    def specfile_path_defined(self, data, **_):
+        """Check that 'specfile_path' is specified when needed
+
+        The only time 'specfile_path' is not required, is when all jobs
+        are of 'test' type and all of them are configured to skip building
+        the package.
+
+        Args:
+            data: partially loaded configuration data.
+
+        Raises:
+            ValidationError, if 'specfile_path' is not specified when
+            it should be.
+        """
+        # This is somewhat weird: while 'data' is still a dict,
+        # elements in 'jobs' was already loaded, so those are JobConfig objects.
+        if not data.get("specfile_path") and not all(
+            job.type == JobType.tests and job.skip_build for job in data.get("jobs", [])
+        ):
+            raise ValidationError(
+                "'specfile_path' is not specified or no specfile was found in the repo"
+            )
 
     @post_load
     def make_instance(self, data, **kwargs):
