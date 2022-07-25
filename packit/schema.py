@@ -13,6 +13,7 @@ from packit.config.job_config import (
     JobType,
     JobConfig,
     JobConfigTriggerType,
+    get_default_jobs,
 )
 from packit.config.notifications import NotificationsConfig
 from packit.config.notifications import PullRequestNotificationsConfig
@@ -457,6 +458,18 @@ class JobConfigSchema(CommonConfigSchema):
 class PackageConfigSchema(CommonConfigSchema):
     """
     Schema for processing PackageConfig config data.
+
+    This class is intended to handle all the logic that is internal
+    to the configuration and it is possible to be done while loading
+    or dumping the configuration.
+
+    This includes, for example, setting default values which depend on
+    the value of other keys, or validating key values according to the
+    value of other keys.
+
+    It does not include setting the value of keys based on context
+    *external* to the config file (if there is a spec-file in the current
+    path, for example).
     """
 
     jobs = fields.Nested(JobConfigSchema, many=True)
@@ -467,27 +480,13 @@ class PackageConfigSchema(CommonConfigSchema):
     @pre_load
     def ordered_preprocess(self, data, **kwargs):
         data = self.rename_deprecated_keys(data, **kwargs)
-        data = self.add_defaults_for_jobs(data, **kwargs)
-        return data
-
-    @staticmethod
-    def add_defaults_for_jobs(data, **_):
-        """
-        add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
-        """
-        if not data:  # data is None when .packit.yaml is empty
-            return data
-        for job in data.get("jobs", []):
-            for k, v in data.items():
-                if k == "jobs":
-                    # overriding jobs doesn't make any sense
-                    continue
-                job.setdefault(k, v)
+        data.setdefault("jobs", get_default_jobs())
+        data = self.propagate_options_to_jobs(data, **kwargs)
         return data
 
     def rename_deprecated_keys(self, data, **kwargs):
         """
-        Based on duples stored in tuple cls.deprecated_keys, reassigns old keys values to new keys,
+        Based on tuples stored in tuple cls.deprecated_keys, reassigns old keys values to new keys,
         in case new key is None and logs warning
         :param data: conf dictionary to process
         :return: processed dictionary
@@ -507,6 +506,21 @@ class PackageConfigSchema(CommonConfigSchema):
                     # prio: new > old
                     data[new_key_name] = old_key_value
                 del data[old_key_name]
+        return data
+
+    @staticmethod
+    def propagate_options_to_jobs(data, **_):
+        """
+        add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
+        """
+        if not data:  # data is None when .packit.yaml is empty
+            return data
+        for job in data.get("jobs", []):
+            for k, v in data.items():
+                if k == "jobs":
+                    # overriding jobs doesn't make any sense
+                    continue
+                job.setdefault(k, v)
         return data
 
     @post_load
