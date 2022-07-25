@@ -80,11 +80,6 @@ class PackageConfig(CommonPackageConfig):
 
         package_config = PackageConfigSchema().load(raw_dict)
 
-        if not package_config.specfile_path and not all(
-            job.type == JobType.tests and job.skip_build for job in package_config.jobs
-        ):
-            raise PackitConfigException("Spec file was not found!")
-
         return package_config
 
     def get_copr_build_project_value(self) -> Optional[str]:

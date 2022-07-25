@@ -25,7 +25,6 @@ from packit.config.package_config import (
 import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.constants import CONFIG_FILE_NAMES
-from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -1463,7 +1462,7 @@ def test_get_specfile_sync_files_nodownstreamname_item():
     ],
 )
 def test_package_config_specfile_not_present_raise(raw):
-    with pytest.raises(PackitConfigException):
+    with pytest.raises(ValidationError):
         PackageConfig.get_from_dict(raw_dict=raw)
 
 
