@@ -8,7 +8,7 @@ import subprocess
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 from packit.exceptions import PackitCommandFailedError
 from packit.utils.logging import StreamLogger
@@ -25,16 +25,13 @@ class CommandResult:
         success: Boolean value holding a result of the command.
         stdout: Holds standard output of the command, in case it was requsted.
         stderr: Holds standard error output of the command, in case it was requsted.
-
-    Both `stdout` and `stderr` can be represented by bytes or string, depending
-    on the provided `decode` argument to the `run_command`.
     """
 
     def __init__(
         self,
         success: bool = False,
-        stdout: Union[str, bytes, None] = None,
-        stderr: Union[str, bytes, None] = None,
+        stdout: Optional[str] = None,
+        stderr: Optional[str] = None,
     ) -> None:
         self.success = success
         self.stdout = stdout
@@ -48,7 +45,6 @@ def run_command(
     fail: bool = True,
     output: bool = False,
     env: Optional[Dict] = None,
-    decode: bool = True,
     print_live: bool = False,
 ) -> CommandResult:
     """
@@ -72,20 +68,14 @@ def run_command(
         env: Environment variables to be set in the newly created subprocess.
 
             Defaults to none.
-        decode: Decode the output of the subprocess in the system's default
-            encoding.
-
-            Defaults to `True`.
         print_live: Print real-time output of the command as INFO.
 
             Defaults to `False`.
 
     Returns:
-        In case `output = False`, returns boolean that indicates success of the
-        command that was run.
-
-        Otherwise returns pair of `stdout` and `stderr` produced by the subprocess.
-        It can be pair of bytes or string, depending on the value of `decode` parameter.
+        Data structure holding a result of the run command. In case it was
+        requested to keep the output, they are provided as decoded strings in the
+        data structure.
     """
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
@@ -117,12 +107,12 @@ def run_command(
     stdout = StreamLogger(
         shell.stdout,
         log_level=logging.DEBUG if not print_live else logging.INFO,
-        decode=decode,
+        decode=True,
     )
     stderr = StreamLogger(
         shell.stderr,
         log_level=logging.DEBUG if not print_live else logging.INFO,
-        decode=decode,
+        decode=True,
     )
 
     stdout.start()
@@ -135,12 +125,8 @@ def run_command(
     if shell.returncode != 0:
         logger.error(f"{error_message}")
         if fail:
-            stderr_output = (
-                stderr.get_output().decode() if decode else stderr.get_output()
-            )
-            stdout_output = (
-                stdout.get_output().decode() if decode else stdout.get_output()
-            )
+            stderr_output = stderr.get_output().decode()
+            stdout_output = stdout.get_output().decode()
             if output:
                 logger.debug(f"Command stderr: {stderr_output}")
                 logger.debug(f"Command stdout: {stdout_output}")
@@ -154,13 +140,9 @@ def run_command(
     if not output:
         return CommandResult(success=success)
 
-    command_output: Union[Tuple[str, str], Tuple[bytes, bytes]] = map(
-        lambda out: out.get_output(), (stdout, stderr)
+    command_output = map(
+        lambda out: out.get_output().decode(sys.getdefaultencoding()), (stdout, stderr)
     )
-    if decode:
-        command_output = map(
-            lambda out: out.decode(sys.getdefaultencoding()), command_output
-        )
 
     out, err = command_output
     return CommandResult(success, out, err)
@@ -173,7 +155,6 @@ def run_command_remote(
     fail=True,
     output=False,
     env: Optional[Dict] = None,
-    decode=True,
     print_live: bool = False,
 ):
     """
@@ -186,7 +167,7 @@ def run_command_remote(
     call kinit to obtain a ticket.
     """
     return run_command(
-        cmd, error_message, cwd, fail, output, env, decode=decode, print_live=print_live
+        cmd, error_message, cwd, fail, output, env, print_live=print_live
     )
 
 
