@@ -1125,16 +1125,21 @@ def test_get_package_config_from_repo(
 
 
 @pytest.mark.parametrize(
-    "content",
+    "content, specfile_path",
     [
-        "{}",
-        "{jobs: [{job: build, trigger: commit}]}",
-        "{downstream_package_name: horkyze, jobs: [{job: build, trigger: commit}]}",
-        "{upstream_package_name: slize, jobs: [{job: build, trigger: commit}]}",
+        ("{}", "packit.spec"),
+        ("{jobs: [{job: build, trigger: commit}]}", "packit.spec"),
+        (
+            "{downstream_package_name: horkyze, jobs: [{job: build, trigger: commit}]}",
+            "horkyze.spec",
+        ),
+        (
+            "{upstream_package_name: slize, jobs: [{job: build, trigger: commit}]}",
+            "packit.spec",
+        ),
     ],
 )
-def test_get_package_config_from_repo_spec_file_not_defined(content):
-    specfile_path = "packit.spec"
+def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_path):
     gp = flexmock(GitProject)
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
@@ -1142,7 +1147,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content):
     git_project = GitProject(repo="", service=GitService(), namespace="")
     config = get_package_config_from_repo(project=git_project)
     assert isinstance(config, PackageConfig)
-    assert Path(config.specfile_path).name == specfile_path
+    assert config.specfile_path == specfile_path
     assert config.create_pr
     for j in config.jobs:
         assert j.specfile_path == specfile_path
