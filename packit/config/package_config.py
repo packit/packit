@@ -4,7 +4,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional, List, Dict, Union, Set
+from typing import Callable, Optional, List, Dict, Union, Set
 
 from ogr.abstract import GitProject
 from ogr.exceptions import GithubAppNotInstalledError
@@ -50,7 +50,8 @@ class PackageConfig(CommonPackageConfig):
         raw_dict: dict,
         config_file_path: Optional[str] = None,
         repo_name: Optional[str] = None,
-        spec_file_path: Optional[str] = None,
+        search_specfile: Optional[Callable[..., Optional[str]]] = None,
+        **specfile_search_args,
     ) -> "PackageConfig":
         # required to avoid cyclical imports
         from packit.schema import PackageConfigSchema
@@ -67,16 +68,13 @@ class PackageConfig(CommonPackageConfig):
             raw_dict["downstream_package_name"] = repo_name
 
         if not raw_dict.get("specfile_path", None):
-            if spec_file_path:
-                raw_dict["specfile_path"] = spec_file_path
-            else:
-                # we default to downstream_package_name
-                # https://packit.dev/docs/configuration/#specfile_path
-                downstream_package_name = raw_dict.get("downstream_package_name", None)
-                if downstream_package_name:
-                    raw_dict["specfile_path"] = f"{downstream_package_name}.spec"
-                # else: we could try upstream_package_name but this seems
-                # like an extreme corner case
+            # we default to <downstream_package_name>.spec
+            # https://packit.dev/docs/configuration/#specfile_path
+            downstream_package_name = raw_dict.get("downstream_package_name", None)
+            if downstream_package_name:
+                raw_dict["specfile_path"] = f"{downstream_package_name}.spec"
+            elif search_specfile:
+                raw_dict["specfile_path"] = search_specfile(**specfile_search_args)
 
         package_config = PackageConfigSchema().load(raw_dict)
 
@@ -208,13 +206,13 @@ def get_local_package_config(
         )
 
     loaded_config = load_packit_yaml(config_file_name)
-    local_specfile_path = get_local_specfile_path(config_file_name.parent)
 
     return parse_loaded_config(
         loaded_config=loaded_config,
         config_file_path=config_file_name.name,
         repo_name=repo_name,
-        spec_file_path=str(local_specfile_path) if local_specfile_path else None,
+        search_specfile=get_local_specfile_path,
+        dir=config_file_name.parent,
     )
 
 
@@ -256,7 +254,9 @@ def get_package_config_from_repo(
         loaded_config=loaded_config,
         config_file_path=config_file_name,
         repo_name=project.repo,
-        spec_file_path=get_specfile_path_from_repo(project=project, ref=ref),
+        search_specfile=get_specfile_path_from_repo,
+        project=project,
+        ref=ref,
     )
 
 
@@ -265,6 +265,8 @@ def parse_loaded_config(
     config_file_path: Optional[str] = None,
     repo_name: Optional[str] = None,
     spec_file_path: Optional[str] = None,
+    search_specfile: Optional[Callable[..., Optional[str]]] = None,
+    **specfile_search_args,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
@@ -274,14 +276,15 @@ def parse_loaded_config(
             raw_dict=loaded_config,
             config_file_path=config_file_path,
             repo_name=repo_name,
-            spec_file_path=spec_file_path,
+            search_specfile=search_specfile,
+            **specfile_search_args,
         )
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
         raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
 
 
-def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Path]:
+def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[str]:
     """
     Get the path (relative to dir) of the local spec file if present.
     If the spec is not found in dir directly, try to search it recursively (rglob)
@@ -299,7 +302,7 @@ def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[Pa
 
     if len(files) > 0:
         logger.debug(f"Local spec files found: {files}. Taking: {files[0]}")
-        return files[0]
+        return str(files[0])
 
     return None
 
