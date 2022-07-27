@@ -26,11 +26,6 @@ class CommandHandler:
     name: RunCommandType
 
     def __init__(self, local_project: LocalProject, config: Config):
-        """
-
-        :param local_project:
-        :param config:
-        """
         self.local_project = local_project
         self.config = config
 
@@ -41,25 +36,46 @@ class CommandHandler:
         env: Optional[Dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
-    ):
+    ) -> commands.CommandResult:
         """
-        exec a command
+        Run provided command in a new subprocess.
 
-        :param command: the command
-        :param return_output: return output from this method if True
-        :param env: dict with env vars to set for the command
-        :param cwd: working directory to run command in
-        :param print_live: print output from the command realtime to INFO log
+        Args:
+            command: Command to be run.
+            return_output: Return the output of the subprocess.
+
+                Defaults to `False`.
+            env: Environment variables to be set in the newly created subprocess.
+
+                Defaults to none.
+            cwd: Working directory of the new subprocess.
+
+                Defaults to current working directory of the process itself.
+            print_live: Print real-time output of the command as INFO.
+
+                Defaults to `False`.
+
+        Returns:
+            In case `output = False`, returns boolean that indicates success of
+            the command that was run.
+
+            Otherwise returns pair of `stdout` and `stderr` produced by the
+            subprocess. It can be pair of bytes or string, depending on the value
+            of `decode` parameter.
         """
         raise NotImplementedError("This should be implemented")
 
-    def clean(self):
+    def clean(self) -> None:
         """clean up the mess after we're done"""
         logger.info("Nothing to clean.")
 
 
 @add_run_command
 class LocalCommandHandler(CommandHandler):
+    """
+    Local command handler that runs commands locally without any sandboxing.
+    """
+
     name = RunCommandType.local
 
     def run_command(
@@ -69,16 +85,7 @@ class LocalCommandHandler(CommandHandler):
         env: Optional[Dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
-    ):
-        """
-        exec a command
-
-        :param command: the command
-        :param return_output: return output from this method if True
-        :param env: dict with env vars to set for the command
-        :param cwd: working directory to run command in
-        :param print_live: print output from the command realtime to INFO log
-        """
+    ) -> commands.CommandResult:
         return commands.run_command(
             cmd=command,
             cwd=cwd or self.local_project.working_dir,
@@ -90,6 +97,14 @@ class LocalCommandHandler(CommandHandler):
 
 @add_run_command
 class SandcastleCommandHandler(CommandHandler):
+    """
+    Sandcastle command handler that runs commands in a sandbox provided by
+    a Sandcastle.
+
+    Warning: `.success` on returned `CommandResult` is set to `False`, since
+    only logs are fetched from the Sandcastle pods.
+    """
+
     name = RunCommandType.sandcastle
 
     def __init__(self, local_project: LocalProject, config: Config):
@@ -148,16 +163,7 @@ class SandcastleCommandHandler(CommandHandler):
         env: Optional[Dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
-    ):
-        """
-        Executes command in a sandbox provided by sandcastle.
-
-        :param command: the command
-        :param return_output: return output from this method if True
-        :param env: dict with env vars to set for the command
-        :param cwd: working directory to run command in
-        :param print_live: not used here
-        """
+    ) -> commands.CommandResult:
         logger.info(f"Running command: {' '.join(command)}")
         out: str = self.sandcastle.exec(command=command, env=env, cwd=cwd)
 
@@ -167,11 +173,9 @@ class SandcastleCommandHandler(CommandHandler):
             if output_line:
                 logger.info(output_line)
 
-        if return_output:
-            return out
-        return None
+        return commands.CommandResult(stdout=out if return_output else None)
 
-    def clean(self):
+    def clean(self) -> None:
         if self._sandcastle:
             logger.info("Deleting sandcastle pod.")
             self._sandcastle.delete_pod()
@@ -179,5 +183,5 @@ class SandcastleCommandHandler(CommandHandler):
         else:
             logger.info("Sandcastle pod is not running, nothing to clean up")
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.clean()

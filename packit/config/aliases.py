@@ -224,7 +224,7 @@ def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
 
 
 def get_all_koji_targets() -> List[str]:
-    return run_command(["koji", "list-targets", "--quiet"], output=True).split()
+    return run_command(["koji", "list-targets", "--quiet"], output=True).stdout.split()
 
 
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)

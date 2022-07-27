@@ -50,7 +50,7 @@ class PkgTool:
             error_message="Adding new sources failed:",
             print_live=True,
             fail=fail,
-        )
+        ).success
 
     def sources(self, fail: bool = True) -> str:
         """Run the 'sources' command
@@ -59,6 +59,7 @@ class PkgTool:
             fail: Raise an exception if the command fails
 
         Returns:
+            XXX vvv I wonder how is this possible without `output=True` vvv XXX
             The 'stdout' of the sources command that is executed.
         """
         return commands.run_command_remote(
@@ -67,7 +68,7 @@ class PkgTool:
             error_message="Downloading source files from the lookaside cache failed:",
             print_live=True,
             fail=fail,
-        )
+        ).success
 
     def build(
         self,
