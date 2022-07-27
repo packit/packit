@@ -16,6 +16,28 @@ from packit.utils.logging import StreamLogger
 logger = logging.getLogger(__name__)
 
 
+# TODO: Switch to dataclass when possible
+class CommandResult:
+    """
+    Structure to represent a result of the command that was run.
+
+    Attributes:
+        success: Boolean value holding a result of the command.
+        stdout: Holds standard output of the command, in case it was requsted.
+        stderr: Holds standard error output of the command, in case it was requsted.
+    """
+
+    def __init__(
+        self,
+        success: bool = False,
+        stdout: Optional[str] = None,
+        stderr: Optional[str] = None,
+    ) -> None:
+        self.success = success
+        self.stdout = stdout
+        self.stderr = stderr
+
+
 def run_command(
     cmd: Union[List[str], str],
     error_message: Optional[str] = None,
@@ -23,20 +45,37 @@ def run_command(
     fail: bool = True,
     output: bool = False,
     env: Optional[Dict] = None,
-    decode: bool = True,
     print_live: bool = False,
-):
+) -> CommandResult:
     """
-    run provided command in a new subprocess
+    Run provided command in a new subprocess.
 
-    :param cmd: 'duh
-    :param error_message: if the command fails, output this error message
-    :param cwd: run the command in
-    :param fail: raise an exception when the command fails
-    :param output: if True, return command's stdout & stderr
-    :param env: set these env vars in the subprocess
-    :param decode: decode stdout from utf8 to string
-    :param print_live: print output from the command realtime to INFO log
+    Args:
+        cmd: Command to be run.
+        error_message: Error message to be included in the exception and logs in
+            case the command fails.
+
+            Defaults to generic message with the escaped command.
+        cwd: Working directory of the new subprocess.
+
+            Defaults to current working directory of the process itself.
+        fail: Raise an exception if the command fails.
+
+            Defaults to `True`.
+        output: Return the output of the subprocess.
+
+            Defaults to `False`.
+        env: Environment variables to be set in the newly created subprocess.
+
+            Defaults to none.
+        print_live: Print real-time output of the command as INFO.
+
+            Defaults to `False`.
+
+    Returns:
+        Data structure holding a result of the run command. In case it was
+        requested to keep the output, they are provided as decoded strings in the
+        data structure.
     """
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
@@ -68,12 +107,12 @@ def run_command(
     stdout = StreamLogger(
         shell.stdout,
         log_level=logging.DEBUG if not print_live else logging.INFO,
-        decode=decode,
+        decode=True,
     )
     stderr = StreamLogger(
         shell.stderr,
         log_level=logging.DEBUG if not print_live else logging.INFO,
-        decode=decode,
+        decode=True,
     )
 
     stdout.start()
@@ -82,15 +121,12 @@ def run_command(
     stdout.join()
     stderr.join()
 
+    success = True  # default is success
     if shell.returncode != 0:
         logger.error(f"{error_message}")
         if fail:
-            stderr_output = (
-                stderr.get_output().decode() if decode else stderr.get_output()
-            )
-            stdout_output = (
-                stdout.get_output().decode() if decode else stdout.get_output()
-            )
+            stderr_output = stderr.get_output().decode()
+            stdout_output = stdout.get_output().decode()
             if output:
                 logger.debug(f"Command stderr: {stderr_output}")
                 logger.debug(f"Command stdout: {stdout_output}")
@@ -100,14 +136,16 @@ def run_command(
                 stderr_output=stderr_output,
             )
         success = False
-    else:
-        success = True
 
     if not output:
-        return success
+        return CommandResult(success=success)
 
-    o = stdout.get_output()
-    return o.decode(sys.getdefaultencoding()) if decode else o
+    command_output = map(
+        lambda out: out.get_output().decode(sys.getdefaultencoding()), (stdout, stderr)
+    )
+
+    out, err = command_output
+    return CommandResult(success, out, err)
 
 
 def run_command_remote(
@@ -117,20 +155,19 @@ def run_command_remote(
     fail=True,
     output=False,
     env: Optional[Dict] = None,
-    decode=True,
     print_live: bool = False,
 ):
     """
-    wrapper for run_command method
+    Wrapper for the `run_command` method.
+
     Indicating that this command run some action without local effect,
     or the effect is not important.
 
-    eg.
-        submit something to some server, and check how server reply
-        call kinit of some ticket
+    For example submit something to some server, and check how server reply, e.g.
+    call kinit to obtain a ticket.
     """
     return run_command(
-        cmd, error_message, cwd, fail, output, env, decode=decode, print_live=print_live
+        cmd, error_message, cwd, fail, output, env, print_live=print_live
     )
 
 

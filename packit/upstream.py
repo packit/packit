@@ -305,7 +305,7 @@ class Upstream(PackitRepositoryBase):
                 cmd,
                 output=True,
                 cwd=self.local_project.working_dir,
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.debug(f"{ex!r}")
             logger.info("Can't describe this repository, are there any git tags?")
@@ -343,7 +343,7 @@ class Upstream(PackitRepositoryBase):
         try:
             return run_command(
                 cmd, output=True, cwd=self.local_project.working_dir
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"We couldn't get commit messages for %changelog\n{ex}")
             logger.info(f"Does the git ref {after} exist in the git repo?")
@@ -393,7 +393,7 @@ class Upstream(PackitRepositoryBase):
         try:
             git_des_out = run_command(
                 git_des_command, output=True, cwd=self.local_project.working_dir
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             # probably no tags in the git repo
             logger.info(f"Exception while describing the repository: {ex!r}")
@@ -589,9 +589,8 @@ class Upstream(PackitRepositoryBase):
             cmd,
             cwd=self.local_project.working_dir,
             output=True,
-            decode=True,
             print_live=True,
-        )
+        ).stdout
 
     def create_rpms(self, rpm_dir: Union[str, Path] = None) -> List[Path]:
         """
@@ -625,7 +624,9 @@ class Upstream(PackitRepositoryBase):
         escaped_command = " ".join(cmd)
         logger.debug(f"RPM build command: {escaped_command}")
         try:
-            out = self.command_handler.run_command(cmd, return_output=True).strip()
+            out = self.command_handler.run_command(
+                cmd, return_output=True
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
             raise PackitFailedToCreateRPMException(
@@ -693,7 +694,7 @@ class Upstream(PackitRepositoryBase):
             ),
             return_output=True,
             cwd=self.local_project.working_dir,
-        ).strip()
+        ).stdout.strip()
         logger.debug(f"Matching tag for {ref}: {tag}")
 
         return tag
@@ -757,6 +758,36 @@ class Upstream(PackitRepositoryBase):
             raise PackitException(msg)
 
         return tag
+
+    @staticmethod
+    def _get_rpms_from_mock_output(output: str) -> List[str]:
+        """
+        Try to find the rpm files in the `mock` command output.
+
+        Args:
+            output: Output of the `mock` command.
+
+        Returns:
+            List of names of the RPM files.
+        """
+        logger.debug(f"The `mock` command output: {output}")
+        reg = r"Results and/or logs in: (.*)(\s|$)"
+        paths = re.findall(reg, output)
+
+        rpms = list(
+            filter(
+                lambda rpm: rpm.endswith(".rpm") and not rpm.endswith(".src.rpm"),
+                os.listdir(paths[0][0]),
+            )
+        )
+        logger.debug(rpms)
+
+        if not rpms:
+            raise PackitRPMNotFoundException(
+                "RPMs cannot be found, something is wrong."
+            )
+
+        return rpms
 
 
 class SRPMBuilder:
@@ -881,7 +912,7 @@ class SRPMBuilder:
         try:
             out = self.upstream.command_handler.run_command(
                 cmd, return_output=True
-            ).strip()
+            ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
             raise PackitFailedToCreateSRPMException(

@@ -45,7 +45,9 @@ def test_build_from_upstream(
         assert Path(srpm_path).is_file()
         assert srpm_path.endswith(".src.rpm")
         assert cwd == api.up.local_project.working_dir
-        return "\n\nLink to koji build: https://koji...\n"
+        return flexmock(
+            success=True, stdout="\n\nLink to koji build: https://koji...\n"
+        )
 
     flexmock(commands, run_command_remote=mocked_run_command)
     flexmock(LocalProject).should_receive("free_resources")
