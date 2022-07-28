@@ -49,8 +49,7 @@ def test_synch_push_and_diverged_repos(
 ):
     """Check that exception is raised when upstream and dist-git repos have diverged"""
 
-    api_instance_sync_push.up.specfile.set_version("2.3.4")
-    api_instance_sync_push.up.specfile.save()
+    api_instance_sync_push.up.specfile.version = "2.3.4"
     api_instance_sync_push.up.commit("Source-git commit to be synced", "")
 
     with pytest.raises(PackitException) as exc:
@@ -92,8 +91,7 @@ def test_synch_push_two_commits(
     api_instance_sync_push,
 ):
     """Update upstream if dist-git has a new commit"""
-    api_instance_sync_push.dg.specfile.set_version("3.4.5")
-    api_instance_sync_push.dg.specfile.save()
+    api_instance_sync_push.dg.specfile.version = "3.4.5"
     api_instance_sync_push.dg.commit(
         "Another dist-git commit to be synced back\n\nWith a multiline\ndescription", ""
     )

@@ -3,7 +3,7 @@
 import pytest
 import rpm
 
-from packit.specfile import Specfile
+from specfile import Specfile
 
 spec = """
 Name: bring-me-to-the-life
@@ -51,6 +51,6 @@ Summary: evanescence
 def test_set_spec_has_autochangelog(spec_content, has_autochangelog, tmp_path):
     spec_path = tmp_path / "life.spec"
     spec_path.write_text(spec_content)
-    specfile = Specfile(spec_path, sources_dir=tmp_path)
+    specfile = Specfile(spec_path, sourcedir=tmp_path, autosave=True)
 
-    assert specfile.has_autochangelog() == has_autochangelog
+    assert specfile.has_autochangelog == has_autochangelog

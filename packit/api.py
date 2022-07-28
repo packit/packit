@@ -380,8 +380,8 @@ class PackitAPI:
                 f"{REPO_NOT_PRISTINE_HINT}"
             )
 
-        dg_release = self.dg.specfile.get_release()
-        up_release = self.up.specfile.get_release()
+        dg_release = self.dg.specfile.expanded_release
+        up_release = self.up.specfile.expanded_release
         if dg_release != up_release:
             logger.info(
                 f"Release differs between dist-git and source-git ("

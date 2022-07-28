@@ -19,7 +19,6 @@ from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
-from packit.specfile import Specfile
 from packit.upstream import Archive, Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
@@ -76,7 +75,7 @@ def test_get_current_version(tag, tag_template, expected_output, upstream_instan
 )
 def test_get_version(upstream_instance, m_v, exp):
     u, ups = upstream_instance
-    flexmock(Specfile, get_upstream_version=lambda **kw: m_v)
+    flexmock(packit.upstream, get_upstream_version=lambda _: m_v)
 
     assert ups.get_version() == exp
 
@@ -107,7 +106,8 @@ def test_set_spec_ver(upstream_instance):
     u, ups = upstream_instance
 
     new_ver = "1.2.3"
-    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.version = new_ver
+    ups.specfile.add_changelog_entry("- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert "- asdqwe" in u.joinpath("beer.spec").read_text()
@@ -134,16 +134,17 @@ def test_set_spec_macro_source(tmp_path):
 
     expected_sources = ups.specfile.sources
     new_ver = "1.2.3"
-    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.version = new_ver
+    ups.specfile.add_changelog_entry("- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert ups.specfile.sources == expected_sources
 
     expected_sources = ups.specfile.sources
     new_rel = "121"
-    ups.specfile.set_spec_version(release=new_rel)
+    ups.specfile.release = new_rel
 
-    assert ups.specfile.get_release() == new_rel
+    assert ups.specfile.release == new_rel
     assert ups.specfile.sources == expected_sources
 
 
@@ -167,21 +168,20 @@ def test_set_spec_ver_empty_changelog(tmp_path):
         ups = Upstream(c, pc, lp)
 
     new_ver = "1.2.3"
-    ups.specfile.set_spec_version(version=new_ver, changelog_entry="- asdqwe")
+    ups.specfile.version = new_ver
+    ups.specfile.add_changelog_entry("- asdqwe")
 
     assert ups.get_specfile_version() == new_ver
     assert "%changelog" not in u.joinpath("beer.spec").read_text()
 
 
 def change_source_ext(upstream, extension):
-    preamble = upstream.specfile.spec_content.section("%package")
-    for i, line in enumerate(preamble):
-        if line.startswith("Source"):
-            source = line.split()[1]
-            start = line.index(source)
-            source = source.rstrip("".join(Path(source).suffixes)) + extension
-            preamble[i] = line[:start] + source
-    upstream.specfile.save()
+    with upstream.specfile.sources() as sources:
+        for source in sources:
+            source.location = (
+                source.location.rstrip("".join(Path(source.location).suffixes))
+                + extension
+            )
 
 
 @pytest.mark.parametrize(
@@ -256,7 +256,7 @@ def test_fix_spec(upstream_instance):
     archive = ups.create_archive()
     ups.fix_spec(archive=archive, version="_1.2.3", commit="_abcdef123")
 
-    release = ups.specfile.get_release()
+    release = ups.specfile.expanded_release
     # 1.20200710085501945230.master.0.g133ff39
     assert re.match(r"\d\.\d{20}\.\w+\.\d+\.g\w{7}", release)
 
@@ -291,7 +291,6 @@ def test__fix_spec_source(upstream_instance, spec_source_id, expected_line):
 
     ups.package_config.spec_source_id = spec_source_id
     ups._fix_spec_source("fixed-source-archive.tar.gz")
-    ups.specfile.write_spec_content()
 
     assert re.search(expected_line, u.joinpath("beer.spec").read_text())
 
@@ -314,11 +313,12 @@ def test_create_srpm(upstream_instance, tmp_path):
     ups.prepare_upstream_for_srpm_creation()
     srpm = ups.create_srpm(srpm_path=srpm_path)
     r = re.compile(r"^- Development snapshot \(\w{8}\)$")
-    for line in ups.specfile.spec_content.section("%changelog"):
-        if r.match(line):
-            break
-    else:
-        assert False, "Didn't find the correct line in the spec file."
+    with ups.specfile.sections() as sections:
+        for line in sections.changelog:
+            if r.match(line):
+                break
+        else:
+            assert False, "Didn't find the correct line in the spec file."
     assert srpm.exists()
     build_srpm(srpm)
 
@@ -338,8 +338,8 @@ def test_create_srpm_git_desc_release(upstream_instance):
         r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.(fc\d{2}|el\d).src.rpm$", str(srpm)
     )
 
-    changelog = ups.specfile.spec_content.section("%changelog")
-    assert "- More awesome changes (Packit Test Suite)" in changelog
+    with ups.specfile.sections() as sections:
+        assert "- More awesome changes (Packit Test Suite)" in sections.changelog
 
 
 def test_github_app(upstream_instance, tmp_path):

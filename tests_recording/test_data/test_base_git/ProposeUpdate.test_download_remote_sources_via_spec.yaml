@@ -7,7 +7,7 @@ requests.sessions:
     GET:
       https://example.org/:
       - metadata:
-          latency: 0.5332863330841064
+          latency: 0.41275477409362793
           module_call_list:
           - unittest.case
           - requre.record_and_replace
@@ -23,20 +23,20 @@ requests.sessions:
           __store_indicator: 0
           _content: false
           _next: null
-          elapsed: 0.533236
+          elapsed: 0.412634
           encoding: UTF-8
           headers:
             Accept-Ranges: bytes
-            Age: '486236'
+            Age: '203101'
             Cache-Control: max-age=604800
             Content-Encoding: gzip
             Content-Length: '648'
             Content-Type: text/html; charset=UTF-8
-            Date: Fri, 13 Aug 2021 07:54:16 GMT
-            Etag: '"3147526947+gzip"'
-            Expires: Fri, 20 Aug 2021 07:54:16 GMT
+            Date: Tue, 28 Jun 2022 11:06:01 GMT
+            Etag: '"3147526947"'
+            Expires: Tue, 05 Jul 2022 11:06:01 GMT
             Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
-            Server: ECS (dcb/7F5E)
+            Server: ECS (nyb/1D08)
             Vary: Accept-Encoding
             X-Cache: HIT
           raw: !!binary |
@@ -56,13 +56,12 @@ requests.sessions:
           status_code: 200
       https://httpbin.org/anything/rsync-3.1.3.tar.gz:
       - metadata:
-          latency: 0.47382593154907227
+          latency: 0.5152020454406738
           module_call_list:
           - unittest.case
           - requre.record_and_replace
           - tests_recording.test_base_git
           - packit.base_git
-          - rebasehelper.specfile
           - rebasehelper.helpers.download_helper
           - requests.sessions
           - requre.objects
@@ -73,24 +72,24 @@ requests.sessions:
           __store_indicator: 0
           _content: false
           _next: null
-          elapsed: 0.473777
-          encoding: null
+          elapsed: 0.515073
+          encoding: utf-8
           headers:
             Access-Control-Allow-Credentials: 'true'
             Access-Control-Allow-Origin: '*'
             Connection: keep-alive
-            Content-Length: '412'
+            Content-Length: '417'
             Content-Type: application/json
-            Date: Fri, 13 Aug 2021 07:54:16 GMT
+            Date: Tue, 28 Jun 2022 11:06:01 GMT
             Server: gunicorn/19.9.0
           raw: !!binary |
             ewogICJhcmdzIjoge30sIAogICJkYXRhIjogIiIsIAogICJmaWxlcyI6IHt9LCAKICAiZm9ybSI6
             IHt9LCAKICAiaGVhZGVycyI6IHsKICAgICJBY2NlcHQiOiAiKi8qIiwgCiAgICAiQWNjZXB0LUVu
-            Y29kaW5nIjogImd6aXAsIGRlZmxhdGUiLCAKICAgICJIb3N0IjogImh0dHBiaW4ub3JnIiwgCiAg
-            ICAiVXNlci1BZ2VudCI6ICJweXRob24tcmVxdWVzdHMvMi4yNC4wIiwgCiAgICAiWC1BbXpuLVRy
-            YWNlLUlkIjogIlJvb3Q9MS02MTE2MjUyOC0zZDE3OWZmYzcwZTM2MjAzMjE1YmVlMjkiCiAgfSwg
-            CiAgImpzb24iOiBudWxsLCAKICAibWV0aG9kIjogIkdFVCIsIAogICJvcmlnaW4iOiAiODkuMjku
-            MjYuNjYiLCAKICAidXJsIjogImh0dHBzOi8vaHR0cGJpbi5vcmcvYW55dGhpbmcvcnN5bmMtMy4x
-            LjMudGFyLmd6Igp9Cg==
+            Y29kaW5nIjogImd6aXAsIGRlZmxhdGUsIGJyIiwgCiAgICAiSG9zdCI6ICJodHRwYmluLm9yZyIs
+            IAogICAgIlVzZXItQWdlbnQiOiAicHl0aG9uLXJlcXVlc3RzLzIuMjcuMSIsIAogICAgIlgtQW16
+            bi1UcmFjZS1JZCI6ICJSb290PTEtNjJiYWUwOTktNDBiOGZjNzU3NWQwZGZjNTJjNjc3ZjVlIgog
+            IH0sIAogICJqc29uIjogbnVsbCwgCiAgIm1ldGhvZCI6ICJHRVQiLCAKICAib3JpZ2luIjogIjc4
+            LjQ1LjEzMS43MSIsIAogICJ1cmwiOiAiaHR0cHM6Ly9odHRwYmluLm9yZy9hbnl0aGluZy9yc3lu
+            Yy0zLjEuMy50YXIuZ3oiCn0K
           reason: OK
           status_code: 200

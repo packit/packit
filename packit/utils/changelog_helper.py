@@ -92,7 +92,7 @@ class ChangelogHelper:
             self.dg.set_specfile_content(
                 self.up.specfile,
                 full_version,
-                comment=None if self.dg.specfile.has_autochangelog() else comment,
+                comment=None if self.dg.specfile.has_autochangelog else comment,
             )
         except FileNotFoundError as ex:
             # no downstream spec file: this is either a mistake or
@@ -108,7 +108,7 @@ class ChangelogHelper:
     def _get_release_for_source_git(
         self, current_commit: str, bump_version: bool, release_suffix: Optional[str]
     ) -> Optional[str]:
-        old_release = self.up.specfile.get_release_number()
+        old_release = self.up.specfile.expanded_release
         if release_suffix:
             return f"{old_release}.{release_suffix}"
 
@@ -137,9 +137,9 @@ class ChangelogHelper:
         msg = self.entry_from_action
         if not msg and bump_version:
             msg = f"- Downstream changes ({current_commit})"
-        self.up.specfile.set_spec_version(
-            release=release_to_update, changelog_entry=msg
-        )
+        self.up.specfile.release = release_to_update
+        if msg is not None:
+            self.up.specfile.add_changelog_entry(msg)
 
     def prepare_upstream_locally(
         self,
@@ -172,8 +172,6 @@ class ChangelogHelper:
         logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
-        self.up.specfile.set_spec_version(
-            version=version,
-            release=release,
-            changelog_entry=msg,
-        )
+        self.up.specfile.set_version_and_release(version, release)
+        if msg is not None:
+            self.up.specfile.add_changelog_entry(msg)

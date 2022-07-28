@@ -18,26 +18,6 @@ def upstream_pr_mock():
 
 
 @pytest.fixture
-def spec_mock():
-    def spec_mock_factory(setup_line=""):
-        spec_content_mock = flexmock()
-        spec_content_mock.should_receive("section").and_return(setup_line)
-        spec_content_mock.should_receive("replace_section").with_args(
-            "%prep", setup_line
-        ).and_return(flexmock())
-
-        spec_mock = flexmock(
-            spec_content=spec_content_mock,
-            get_release_number=lambda: "1234567",
-            set_spec_version=lambda **_: None,
-            write_spec_content=flexmock(),
-        )
-        return spec_mock
-
-    return spec_mock_factory
-
-
-@pytest.fixture
 def tar_mock():
     def tar_mock_factory(archive_items=[], is_tarfile=True):
         tarfile_mock = flexmock(packit.upstream.tarfile)
@@ -114,40 +94,6 @@ def test_get_commands_for_actions(action_config, result):
         local_project=flexmock(),
     )
     assert ups.get_commands_for_actions(action=ActionName.create_archive) == result
-
-
-@pytest.mark.parametrize(
-    "inner_archive_dir, orig_setup_line, new_setup_line",
-    [
-        pytest.param(
-            "test_pkg_name-0.42",
-            ["%setup -q -n %{srcname}-%{version}"],
-            ["%setup -q -n test_pkg_name-0.42"],
-            id="test1",
-        )
-    ],
-)
-def test_fix_spec__setup_line(
-    inner_archive_dir, orig_setup_line, new_setup_line, upstream_mock, spec_mock
-):
-    flexmock(packit.upstream).should_receive("run_command").and_return(
-        flexmock(stdout="mocked")
-    )
-
-    upstream_mock.should_receive("_fix_spec_source")
-    upstream_mock.should_receive("get_version").and_return("")
-    flexmock(Archive).should_receive("get_archive_root_dir").and_return(
-        inner_archive_dir
-    )
-    upstream_mock.should_receive("specfile").and_return(
-        spec_mock(setup_line=orig_setup_line)
-    )
-
-    upstream_mock.specfile.spec_content.should_receive("replace_section").with_args(
-        "%prep", new_setup_line
-    ).once().and_return(flexmock())
-
-    upstream_mock.fix_spec("_archive", "_version", "_commit1234")
 
 
 @pytest.mark.parametrize(
