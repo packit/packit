@@ -757,12 +757,11 @@ class Upstream(PackitRepositoryBase):
         reg = r"Results and/or logs in: (.*)(\s|$)"
         paths = re.findall(reg, output)
 
-        rpms = list(
-            filter(
-                lambda rpm: rpm.endswith(".rpm") and not rpm.endswith(".src.rpm"),
-                os.listdir(paths[0][0]),
-            )
-        )
+        rpms = [
+            rpm.path
+            for rpm in os.scandir(paths[0][0])
+            if rpm.name.endswith(".rpm") and not rpm.name.endswith(".src.rpm")
+        ]
         logger.debug(rpms)
 
         if not rpms:
