@@ -1,3 +1,10 @@
+# 0.56.0
+
+- Packit can now build RPMs in mock. For more information see https://packit.dev/docs/cli/build/mock (#1662)
+- Packit now provides a more helpful error message when it hits a known issue while creating a Bodhi update: fedora-infra/bodhi#4660 (#1660)
+- Packit now correctly supports `tmt_plan` and `tf_post_install_script` in the configuration. (#1659)
+- RPM build commands of Packit CLI have been merged into one build subcommand, for more information see the updated documentation at https://packit.dev/docs/cli/build/. We have also introduced a new `--srpm` option to the new build subcommand that can be used to trigger local, Copr or Koji build from an already built SRPM rather than the one implicitly created by Packit. (#1611)
+
 # 0.55.0
 
 - Packit can now correctly create bodhi updates using the new Bodhi 6 client. (#1651)
