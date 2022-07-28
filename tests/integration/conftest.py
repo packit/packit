@@ -345,9 +345,7 @@ def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
 
 def add_source_git_commit_trailer(api: PackitAPI):
     # The version in dg is different from up, sync it
-    version = api.up.specfile.get_version()
-    api.dg.specfile.set_version(version)
-    api.dg.specfile.save()
+    api.dg.specfile.version = api.up.specfile.expanded_version
     api.dg.commit(
         "Update spec",
         "",
@@ -386,8 +384,7 @@ def api_instance_sync_push(sourcegit_and_remote, distgit_and_remote):
 
     add_source_git_commit_trailer(api)
 
-    api.dg.specfile.set_version("1.2.3")
-    api.dg.specfile.save()
+    api.dg.specfile.version = "1.2.3"
     api.dg.commit("dist-git commit to be sync back", "")
     return api
 

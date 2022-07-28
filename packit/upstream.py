@@ -29,12 +29,13 @@ from packit.exceptions import (
 )
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator, PatchMetadata
-from packit.specfile import Specfile
 from packit.utils import commands, sanitize_branch_name_for_rpm
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.commands import run_command
 from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
+from packit.utils.upstream_version import get_upstream_version
 from packit.sync import iter_srcs
+
 
 logger = logging.getLogger(__name__)
 
@@ -221,17 +222,13 @@ class Upstream(PackitRepositoryBase):
         :return: the version string (e.g. "1.0.0")
         """
 
-        version = Specfile.get_upstream_version(
-            versioneer=None,
-            package_name=self.package_config.downstream_package_name,
-            category=None,
-        )
+        version = get_upstream_version(self.package_config.downstream_package_name)
         logger.info(f"Version in upstream registries is {version!r}.")
         return version
 
     def get_specfile_version(self) -> str:
         """provide version from specfile"""
-        version = self.specfile.get_version()
+        version = self.specfile.expanded_version
         logger.info(f"Version in spec file is {version!r}.")
         return version
 
@@ -275,7 +272,7 @@ class Upstream(PackitRepositoryBase):
         # Step 3
         if version is None:
             logger.info("No git tags found, falling back to %version in the specfile.")
-            version = self.specfile.get_version()
+            version = self.specfile.expanded_version
 
         logger.debug(f"Version: {version}")
         version = sanitize_branch_name_for_rpm(version)
@@ -369,7 +366,7 @@ class Upstream(PackitRepositoryBase):
         Returns:
             string which is meant to be put into a spec file %release field by packit
         """
-        original_release_number = self.specfile.get_release_number().split(".", 1)[0]
+        original_release_number = self.specfile.expanded_release.split(".", 1)[0]
         if release_suffix is not None:
             return (
                 f"{original_release_number}.{release_suffix}"
@@ -445,57 +442,43 @@ class Upstream(PackitRepositoryBase):
         )
 
     def _fix_spec_prep(self, archive):
-        prep = self.specfile.spec_content.section("%prep")
-        if not prep:
-            logger.warning("This package doesn't have a %prep section.")
-            return
+        with self.specfile.prep() as prep:
+            if not prep:
+                logger.warning("This package doesn't have a %prep section.")
+                return
 
-        # stolen from tito, thanks!
-        # https://github.com/dgoodwin/tito/blob/master/src/tito/common.py#L695
-        regex = re.compile(r"^(\s*%(?:auto)?setup)(.*?)$")
-        for idx, line in enumerate(prep):
-            m = regex.match(line)
-            if m:
-                break
-        else:
-            logger.warning(
-                "This package is not using %(auto)setup macro in prep. "
-                "Packit will not update the %prep section."
+            if "%setup" in prep:
+                macro = prep.setup
+            elif "%autosetup" in prep:
+                macro = prep.autosetup
+            else:
+                logger.warning(
+                    "This package is not using %(auto)setup macro in prep. "
+                    "Packit will not update the %prep section."
+                )
+                return
+
+            archive_root_dir = Archive(self, self.get_version()).get_archive_root_dir(
+                archive
             )
-            return
 
-        archive_root_dir = Archive(self, self.get_version()).get_archive_root_dir(
-            archive
-        )
-
-        new_setup_line = m[1]
-        # replace -n with our -n because it's better
-        args_match = re.search(r"(.*?)\s+-n\s+\S+(.*)", m[2])
-        if args_match:
-            new_setup_line += args_match.group(1)
-            new_setup_line += args_match.group(2)
-        else:
-            new_setup_line += m[2]
-        new_setup_line += f" -n {archive_root_dir}"
-        logger.debug(
-            f"New {'%autosetup' if 'autosetup' in new_setup_line else '%setup'}"
-            f" line:\n{new_setup_line}"
-        )
-        prep[idx] = new_setup_line
-        self.specfile.spec_content.replace_section("%prep", prep)
-        self.specfile.write_spec_content()
+            if "n" in macro.options:
+                # replace -n with our -n because it's better
+                macro.options.n = archive_root_dir
 
     def _fix_spec_source(self, archive):
-        response = self.specfile.get_source(self.package_config.spec_source_id)
-        if response:
-            self.specfile.set_raw_tag_value(
-                response.name, archive, section=response.section_index
-            )
-        else:
-            raise PackitException(
-                "The spec file doesn't have sources set "
-                f"via {self.package_config.spec_source_id} nor Source."
-            )
+        number = int(
+            next(iter(re.split(r"(\d+)", self.package_config.spec_source_id)[1:]), 0)
+        )
+        with self.specfile.sources() as sources:
+            source = next((s for s in sources if s.number == number), None)
+            if source:
+                source.location = archive
+            else:
+                raise PackitException(
+                    "The spec file doesn't have sources set "
+                    f"via {self.package_config.spec_source_id} nor Source."
+                )
 
     def create_srpm(
         self,

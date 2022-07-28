@@ -2,14 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 import pytest
-import textwrap
 import shutil
-import rpm
 
-from flexmock import flexmock
 from pathlib import Path
+from specfile import Specfile
 
-from packit.specfile import Specfile
 from tests.spellbook import SPECFILE
 
 
@@ -22,62 +19,11 @@ def specfile(tmp_path):
 
 def test_write_spec_content(specfile):
     data = "new line 1\n"
-    spec = Specfile(specfile)
-    spec.spec_content.replace_section("%description", [data])
-    spec.write_spec_content()
+    spec = Specfile(specfile, autosave=True)
+    with spec.sections() as sections:
+        sections.description = [data]
 
     assert "new line 1" in specfile.read_text()
-
-
-@pytest.mark.parametrize("patch_id_digits", [4, 1, 0])
-def test_add_patch(specfile, patch_id_digits):
-    """Check adding patch lines to the spec-file.
-
-    Change the number of digits, too, to see that it's considered.
-    """
-    if rpm.__version__ < "4.16" and patch_id_digits == 0:
-        pytest.xfail(
-            "Versions before RPM 4.16 have incorrect patch indexing "
-            "when an index is not explicitly defined. "
-            "'patch_id_digits: 0' is not supported with these versions."
-        )
-
-    assert "Patch" not in specfile.read_text()
-
-    spec = Specfile(specfile, sources_dir=specfile.parent)
-    patch_meta = flexmock(
-        name="0001-a-clever.patch",
-        specfile_comment="This needs to be added because of\nBug 111",
-        patch_id=None,
-    )
-    Path(specfile.parent, "0001-a-clever.patch").touch()
-    spec.add_patch(patch_meta, patch_id_digits=patch_id_digits)
-
-    patch_meta = flexmock(
-        name="0022-an-even-smarter.patch",
-        specfile_comment="This needs to be added because of\nBug 22",
-        patch_id=22,
-    )
-    Path(specfile.parent, "0022-an-even-smarter.patch").touch()
-    spec.add_patch(patch_meta, patch_id_digits=patch_id_digits)
-
-    patch_tags = (
-        [f"Patch{1:0{patch_id_digits}d}", f"Patch{22:0{patch_id_digits}d}"]
-        if patch_id_digits > 0
-        else ["Patch", "Patch"]
-    )
-    patch_lines = textwrap.dedent(
-        f"""\
-        # This needs to be added because of
-        # Bug 111
-        {patch_tags[0]}: 0001-a-clever.patch
-
-        # This needs to be added because of
-        # Bug 22
-        {patch_tags[1]}: 0022-an-even-smarter.patch
-        """
-    )
-    assert patch_lines in specfile.read_text()
 
 
 simple_patch = """\
@@ -151,9 +97,10 @@ def test_read_patch_comments(specfile, lines, files, expectation):
     specfile.write_text(content)
     for patch_file in files:
         Path(specfile.parent, patch_file).touch()
-    spec = Specfile(specfile, sources_dir=specfile.parent)
-    comments = spec.read_patch_comments()
-    assert comments == expectation
+    spec = Specfile(specfile, sourcedir=specfile.parent, autosave=True)
+    with spec.patches() as patches:
+        comments = {p.filename: [c.text for c in p.comments] for p in patches}
+        assert comments == expectation
 
 
 @pytest.mark.parametrize(
@@ -171,8 +118,9 @@ def test_patch_id_digits(specfile, lines, digits):
     content = specfile.read_text()
     content = content.replace("### patches ###\n", lines)
     specfile.write_text(content)
-    spec = Specfile(specfile, sources_dir=specfile.parent)
-    assert spec.patch_id_digits == digits
+    spec = Specfile(specfile, sourcedir=specfile.parent, autosave=True)
+    with spec.patches() as patches:
+        assert patches[0].number_digits == digits
 
 
 def test_remove_patches(specfile):
@@ -191,8 +139,9 @@ Patch : dark.patch
 """,
     )
     specfile.write_text(patches)
-    spec = Specfile(specfile, sources_dir=specfile.parent)
-    spec.remove_patches()
+    spec = Specfile(specfile, sourcedir=specfile.parent, autosave=True)
+    with spec.patches() as patches:
+        patches.clear()
     assert specfile.read_text() == no_patches
 
 
@@ -211,6 +160,7 @@ Patch : dark.patch
 """,
     )
     specfile.write_text(patches)
-    spec = Specfile(specfile, sources_dir=specfile.parent)
-    spec.remove_patches()
+    spec = Specfile(specfile, sourcedir=specfile.parent, autosave=True)
+    with spec.patches() as patches:
+        patches.clear()
     assert specfile.read_text() == no_patches

@@ -7,7 +7,8 @@ from typing import List, Optional, Dict, Union
 import pytest
 from flexmock import flexmock
 from rebasehelper.helpers.download_helper import DownloadHelper
-from rebasehelper.specfile import SpecFile
+from specfile import Specfile
+from specfile.changelog import ChangelogEntry
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
@@ -16,7 +17,6 @@ from packit.config import Config, RunCommandType, PackageConfig
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
-from packit.specfile import Specfile
 from packit.upstream import Upstream
 from packit.utils import commands
 from tests.spellbook import can_a_module_be_imported
@@ -339,7 +339,7 @@ def test_download_remote_sources(source, package_config, expected_url, tmp_path:
     )
     spec_path = tmp_path / "rsync.spec"
     spec_path.write_text(specfile_content)
-    specfile = Specfile(spec_path, sources_dir=tmp_path)
+    specfile = Specfile(spec_path, sourcedir=tmp_path, autosave=True)
     base_git = PackitRepositoryBase(config=flexmock(), package_config=package_config)
     flexmock(base_git).should_receive("specfile").and_return(specfile)
 
@@ -395,36 +395,35 @@ def test_set_spec_content(tmp_path):
     )
     upstream_spec_path = tmp_path / "e-life.spec"
     upstream_spec_path.write_text(upstream_spec_contents)
-    upstream_specfile = Specfile(upstream_spec_path, sources_dir=tmp_path)
+    upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
     dist_git._specfile_path = distgit_spec_path
 
     dist_git.set_specfile_content(upstream_specfile, None, None)
-    assert [
-        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
-        "- Initial package.",
-    ] == dist_git.specfile.spec_content.section("%changelog")
-    assert "1.0" == dist_git.specfile.get_version()
-    assert "License: MIT" in dist_git.specfile.spec_content.section("%package")
-    assert (
-        "Summary: evanescence, I was brought to life"
-        in dist_git.specfile.spec_content.section("%package")
-    )
+    with dist_git.specfile.sections() as sections:
+        assert [
+            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+            "- Initial package.",
+        ] == sections.changelog
+        assert "1.0" == dist_git.specfile.expanded_version
+        assert "License: MIT" in sections.package
+        assert "Summary: evanescence, I was brought to life" in sections.package
 
-    new_log = [
+    new_log = ChangelogEntry(
         "* Wed Jun 02 2021 John Fou <john-fou@example.com> - 1.1-1",
-        "- 1.1 upstream release",
-    ]
-    flexmock(SpecFile).should_receive("get_new_log").with_args(
-        "1.1 upstream release"
-    ).and_return(new_log)
+        ["- 1.1 upstream release"],
+    )
+    flexmock(ChangelogEntry).should_receive("assemble").and_return(new_log)
     dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
-    assert new_log + [
-        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
-        "- Initial package.",
-    ] == dist_git.specfile.spec_content.section("%changelog")
-    assert "1.1" == dist_git.specfile.get_version()
+    with dist_git.specfile.sections() as sections:
+        assert [
+            new_log.header,
+            new_log.content[0],
+            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+            "- Initial package.",
+        ] == sections.changelog
+    assert "1.1" == dist_git.specfile.expanded_version
 
 
 @pytest.mark.parametrize("changelog_section", ["\n%changelog\n", ""])
@@ -455,17 +454,16 @@ def test_set_spec_content_no_changelog(tmp_path, changelog_section):
     )
     upstream_spec_path = tmp_path / "e-life.spec"
     upstream_spec_path.write_text(upstream_spec_contents)
-    upstream_specfile = Specfile(upstream_spec_path, sources_dir=tmp_path)
+    upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
     dist_git._specfile_path = distgit_spec_path
 
-    new_log = [
+    new_log = ChangelogEntry(
         "* Wed Jun 02 2021 John Fou <john-fou@example.com> - 1.1-1",
-        "- 1.1 upstream release",
-    ]
-    flexmock(SpecFile).should_receive("get_new_log").with_args(
-        "1.1 upstream release"
-    ).and_return(new_log)
+        ["- 1.1 upstream release"],
+    )
+    flexmock(ChangelogEntry).should_receive("assemble").and_return(new_log)
     dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
-    assert dist_git.specfile.spec_content.section("%changelog") == new_log
+    with dist_git.specfile.sections() as sections:
+        assert sections.changelog == [new_log.header, new_log.content[0]]

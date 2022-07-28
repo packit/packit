@@ -9,6 +9,13 @@ from typing import Optional, Callable, List, Iterable, Dict, Tuple
 import git
 from git import PushInfo
 from rebasehelper.helpers.download_helper import DownloadHelper
+from rebasehelper.helpers.lookaside_cache_helper import (
+    LookasideCacheHelper,
+    LookasideCacheError,
+)
+from specfile import Specfile
+from specfile.exceptions import DuplicateSourceException, SourceNumberException
+from specfile.sections import Section
 
 from ogr.abstract import PullRequest
 
@@ -20,7 +27,6 @@ from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
-from packit.specfile import Specfile
 from packit.utils.commands import cwd
 from packit.utils.repo import RepositoryCache, commit_message_file
 
@@ -105,7 +111,9 @@ class PackitRepositoryBase:
     def specfile(self) -> Specfile:
         if self._specfile is None:
             self._specfile = Specfile(
-                self.absolute_specfile_path, self.absolute_source_dir
+                self.absolute_specfile_path,
+                sourcedir=self.absolute_source_dir,
+                autosave=True,
             )
         return self._specfile
 
@@ -317,23 +325,46 @@ class PackitRepositoryBase:
         if not patch_list:
             return
 
-        self.specfile.set_patches(patch_list, patch_id_digits)
+        if all(p.present_in_specfile for p in patch_list):
+            logger.debug(
+                "All patches are present in the spec file, nothing to do here 🚀"
+            )
+            return
+
+        # we could have generated patches before (via git-format-patch)
+        # so let's reload the spec
+        self.specfile.reload()
+
+        for patch_metadata in patch_list:
+            if patch_metadata.present_in_specfile:
+                logger.debug(
+                    f"Patch {patch_metadata.name} is already present in the spec file."
+                )
+                continue
+
+            try:
+                logger.debug(f"Adding patch {patch_metadata.name} to the spec file.")
+                self.specfile.add_patch(
+                    patch_metadata.name,
+                    patch_metadata.patch_id,
+                    patch_metadata.specfile_comment,
+                    initial_number=1,
+                    number_digits=patch_id_digits,
+                )
+            except DuplicateSourceException:
+                logger.debug(
+                    f"Patch {patch_metadata.name} is already defined in the spec file."
+                )
+            except SourceNumberException as e:
+                raise PackitException(
+                    f"The 'patch_id' requested ({patch_metadata.patch_id}) for patch "
+                    f"{patch_metadata.name} is less than or equal to the last used patch ID."
+                    "Re-ordering the patches using 'patch_id' is not allowed - "
+                    "if you want to change the order of those patches, "
+                    "please reorder the commits in your source-git repository."
+                ) from e
 
         self.local_project.git_repo.index.write()
-
-    def get_project_url_from_distgit_spec(self) -> Optional[str]:
-        """
-        Parse spec file and return value of URL
-        """
-        # consider using rebase-helper for this: SpecFile.download_remote_sources
-        sections = self.specfile.spec_content.sections
-        package_section: List[str] = sections.get("%package", [])
-        for s in package_section:
-            if s.startswith("URL:"):
-                url = s[4:].strip()
-                logger.debug(f"Upstream project URL: {url}")
-                return url
-        return None
 
     def check_last_commit(self) -> None:
         if self.allowed_gpg_keys is None:
@@ -357,8 +388,8 @@ class PackitRepositoryBase:
     def set_specfile_content(
         self,
         specfile: Specfile,
-        version: str,
-        comment: str,
+        version: Optional[str] = None,
+        comment: Optional[str] = None,
     ):
         """
         Update this specfile using provided specfile
@@ -368,14 +399,20 @@ class PackitRepositoryBase:
             version: version to set in self.specfile
             comment: new comment for the version in %changelog
         """
-        previous_changelog = self.specfile.spec_content.section("%changelog")
-        self.specfile.spec_content.sections[:] = specfile.spec_content.sections[:]
-        self.specfile.spec_content.replace_section(
-            "%changelog", previous_changelog or []
-        )
-        self.specfile.save()
-        self.specfile.set_spec_version(version=version, changelog_entry=comment)
-        self.specfile.save()
+        with self.specfile.sections() as sections, specfile.sections() as other_sections:
+            try:
+                previous_changelog = sections.changelog[:]
+            except AttributeError:
+                previous_changelog = []
+            sections[:] = other_sections[:]
+            try:
+                sections.changelog = previous_changelog
+            except AttributeError:
+                sections.append(Section("changelog", previous_changelog))
+        if version is not None:
+            self.specfile.version = version
+        if comment is not None:
+            self.specfile.add_changelog_entry(comment)
 
     def refresh_specfile(self):
         self._specfile = None
@@ -419,14 +456,36 @@ class PackitRepositoryBase:
         """
         # Fetch all sources defined in packit.yaml -> sources
         for source in self.package_config.sources:
-            source_path = Path(self.specfile.sources_location).joinpath(source.path)
+            source_path = self.specfile.sourcedir.joinpath(source.path)
             if not source_path.is_file():
                 logger.info(f"Downloading source {source.path!r}.")
                 DownloadHelper.download_file(
                     source.url,
                     str(source_path),
                 )
-        self.specfile.download_remote_sources()
+        # Try to download sources defined in "sources" file from Fedora lookaside cache
+        try:
+            LookasideCacheHelper.download(
+                "fedpkg",
+                self.specfile.path.parent,
+                self.specfile.expanded_name,
+                self.specfile.sourcedir,
+            )
+        except LookasideCacheError as e:
+            logger.debug(f"Downloading sources from lookaside cache failed: {e}.")
+        # Fetch all remote sources defined in the spec file
+        with self.specfile.sources() as sources, self.specfile.patches() as patches:
+            for source in sources + patches:
+                if source.remote:
+                    source_path = self.specfile.sourcedir.joinpath(
+                        source.expanded_filename
+                    )
+                    if not source_path.is_file():
+                        logger.info(f"Downloading source {source.filename!r}.")
+                        DownloadHelper.download_file(
+                            source.expanded_location,
+                            str(source_path),
+                        )
 
     def existing_pr(
         self, title: str, description: str, branch: str

@@ -138,7 +138,7 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
     content = [
         line for line in spec.read_text().splitlines() if not line.startswith("Patch")
     ]
-    spec.write_text("\n".join(content))
+    spec.write_text("\n".join(content) + "\n")
     Path(hello_dist_git_repo.working_dir, "turn-into-fedora.patch").unlink()
     hello_dist_git_repo.git.add(".")
     hello_dist_git_repo.git.commit(message="Remove the patch")

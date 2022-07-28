@@ -1,17 +1,17 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import os
 import subprocess
 from pathlib import Path
 
 import git
 import pytest
+from specfile import Specfile
+from specfile.exceptions import SourceNumberException
 
 from packit.constants import DISTRO_DIR
 from packit.exceptions import PackitException
-from packit.patches import PatchGenerator, PatchMetadata
-from packit.specfile import Specfile
+from packit.patches import PatchGenerator
 from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import (
@@ -40,12 +40,10 @@ def test_update_dist_git_with_sync_status_check(
     sourcegit, _ = sourcegit_and_remote
     distgit, _ = distgit_and_remote
 
-    api_instance_update_source_git.dg.specfile.set_version("0.2.0")
-    api_instance_update_source_git.dg.specfile.save()
+    api_instance_update_source_git.dg.specfile.version = "0.2.0"
     api_instance_update_source_git.dg.commit("Extra dist-git commit", "")
 
-    api_instance_update_source_git.up.specfile.set_version("0.3.0")
-    api_instance_update_source_git.up.specfile.save()
+    api_instance_update_source_git.up.specfile.version = "0.3.0"
     api_instance_update_source_git.up.commit("Source-git commit to be synced", "")
 
     with pytest.raises(PackitException) as exc:
@@ -77,8 +75,7 @@ def test_update_dist_git_dist_git_not_pristine(
 
     (distgit / "new_file").write_text("abcd")
 
-    api_instance_update_source_git.up.specfile.set_version("0.3.0")
-    api_instance_update_source_git.up.specfile.save()
+    api_instance_update_source_git.up.specfile.version = "0.3.0"
     api_instance_update_source_git.up.commit("Source-git commit to be synced", "")
 
     with pytest.raises(PackitException) as exc:
@@ -118,7 +115,7 @@ def test_basic_local_update_without_patching(
 
     assert (distgit / TARBALL_NAME).is_file()
     spec = Specfile(distgit / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
     assert (
         f"From-source-git-commit: {git.Repo(sourcegit).head.commit.hexsha}"
         in git.Repo(distgit).head.commit.message
@@ -146,10 +143,10 @@ def test_basic_local_update_empty_patch(
 
     assert (distgit / TARBALL_NAME).is_file()
     spec = Specfile(distgit / "beer.spec")
-    assert spec.get_version() == "0.1.0"
+    assert spec.expanded_version == "0.1.0"
 
-    assert not spec.patches["applied"]
-    assert not spec.patches["not_applied"]
+    with spec.patches() as patches:
+        assert not patches
     assert "From-source-git-commit" not in git.Repo(distgit).head.commit.message
 
 
@@ -196,27 +193,20 @@ def test_basic_local_update_patch_content(
         in git_diff
     )
     # Make sure the patches are placed after Source0, but outside %if %endif
-    patches = (
-        """\
+    patches = """\
 Source0:        %{upstream_name}-%{version}.tar.gz
  %endif
- BuildArch:      noarch
- """  # because linters would remove the trailing whitespace
-        + """
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
-+Patch0001: 0001-switching-to-amarillo-hops.patch
-+
++Patch0001:      0001-switching-to-amarillo-hops.patch
 +# actually, let's do citra
 +# Author: Packit Test Suite <test@example.com>
-+Patch0002: 0002-actually-let-s-do-citra.patch
-+
++Patch0002:      0002-actually-let-s-do-citra.patch
 +# source change
 +# Author: Packit Test Suite <test@example.com>
-+Patch0003: 0003-source-change.patch
-+
++Patch0003:      0003-source-change.patch
+ BuildArch:      noarch
 """
-    )
     assert patches in git_diff
 
     assert "Patch0004:" not in git_diff
@@ -342,15 +332,12 @@ def test_basic_local_update_patch_content_with_metadata(
     patches = """
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
-+Patch0001: 0001-switching-to-amarillo-hops.patch
-+
++Patch0001:      0001-switching-to-amarillo-hops.patch
 +# actually, let's do citra
 +# Author: Packit Test Suite <test@example.com>
-+Patch0002: 0002-actually-let-s-do-citra.patch
-+
++Patch0002:      0002-actually-let-s-do-citra.patch
 +# Few words for info.
-+Patch0003: testing.patch
-+
++Patch0003:      testing.patch
 """
     assert patches in git_diff
 
@@ -393,12 +380,10 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     patches = """
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
-+Patch0001: 0001-switching-to-amarillo-hops.patch
-+
++Patch0001:      0001-switching-to-amarillo-hops.patch
 +# actually, let's do citra
 +# Author: Packit Test Suite <test@example.com>
-+Patch0002: 0002-actually-let-s-do-citra.patch
-+
++Patch0002:      0002-actually-let-s-do-citra.patch
 """
     assert patches in git_diff
 
@@ -434,12 +419,10 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     patches = """
 +# switching to amarillo hops
 +# Author: Packit Test Suite <test@example.com>
-+Patch0001: 0001-switching-to-amarillo-hops.patch
-+
++Patch0001:      0001-switching-to-amarillo-hops.patch
 +# actually, let's do citra
 +# Author: Packit Test Suite <test@example.com>
-+Patch0002: 0002-actually-let-s-do-citra.patch
-+
++Patch0002:      0002-actually-let-s-do-citra.patch
 """
     assert patches in git_diff
 
@@ -542,14 +525,8 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
-    autosetup_line = api_instance_source_git.up.specfile.spec_content.section("%prep")[
-        0
-    ]
-    autosetup_line = autosetup_line.replace("-S patch", "-S git_am")
-    api_instance_source_git.up.specfile.spec_content.section("%prep")[
-        0
-    ] = autosetup_line
-    api_instance_source_git.up.specfile.save()
+    with api_instance_source_git.up.specfile.prep() as prep:
+        prep.autosetup.options.S = "git_am"
 
     create_git_am_style_history(sg_path)
 
@@ -578,18 +555,18 @@ def test_srpm_git_no_prefix_patches(
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
-    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
-        "Patch1: amarillo.patch",
-        "Patch2: citra.patch",
-        "Patch8: malt.patch",
-    )
-    api_instance_source_git.up.specfile.spec_content.section("%prep")[0:2] = [
-        "%setup -n %{upstream_name}-%{version}",
-        "%patch1 -p1",
-        "%patch2 -p0",
-        "%patch8 -p1",
-    ]
-    api_instance_source_git.up.specfile.save()
+    with api_instance_source_git.up.specfile.sections() as sections:
+        sections.package[10:10] = (
+            "Patch1: amarillo.patch",
+            "Patch2: citra.patch",
+            "Patch8: malt.patch",
+        )
+        sections.prep[0:2] = [
+            "%setup -n %{upstream_name}-%{version}",
+            "%patch1 -p1",
+            "%patch2 -p0",
+            "%patch8 -p1",
+        ]
 
     create_patch_mixed_history(sg_path)
 
@@ -614,13 +591,13 @@ def test_srpm_empty_patch(
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
-    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
-        "Patch1: amarillo.patch",
-        "Patch2: citra.patch",
-        "Patch5: saaz.patch",
-        "Patch8: malt.patch",
-    )
-    api_instance_source_git.up.specfile.save()
+    with api_instance_source_git.up.specfile.sections() as sections:
+        sections.package[10:10] = (
+            "Patch1: amarillo.patch",
+            "Patch2: citra.patch",
+            "Patch5: saaz.patch",
+            "Patch8: malt.patch",
+        )
 
     create_history_with_empty_commit(sg_path)
 
@@ -647,13 +624,13 @@ def test_srpm_patch_non_conseq_indices(
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
 
-    api_instance_source_git.up.specfile.spec_content.section("%package")[10:10] = (
-        "Patch0: amarillo.patch",
-        "Patch3: citra.patch",
-        "Patch4: saaz.patch",
-        "Patch5: malt.patch",
-    )
-    api_instance_source_git.up.specfile.save()
+    with api_instance_source_git.up.specfile.sections() as sections:
+        sections.package[10:10] = (
+            "Patch0: amarillo.patch",
+            "Patch3: citra.patch",
+            "Patch4: saaz.patch",
+            "Patch5: malt.patch",
+        )
 
     create_history_with_empty_commit(sg_path)
 
@@ -665,15 +642,10 @@ def test_srpm_patch_non_conseq_indices(
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
     # make sure the patch is inserted AFTER existing patches
-    patches = api_instance_source_git.up.specfile.tags.filter(name="Patch*", valid=None)
-    last_patch = list(patches)[-1]
-    assert last_patch.name == "Patch6"
-    assert (
-        os.path.basename(
-            api_instance_source_git.up.specfile.get_applied_patches()[-1].path
-        )
-        == "0004-Wei-bier-Summer-is-coming.patch"
-    )
+    with api_instance_source_git.up.specfile.patches() as patches:
+        last_patch = patches[-1]
+    assert last_patch.number == 6
+    assert last_patch.filename == "0004-Wei-bier-Summer-is-coming.patch"
 
     srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
     assert srpm_path.is_file()
@@ -700,27 +672,20 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
     # we need to create the patch file so that rebase-helper can find it and process it
     good_patch_path1 = spec_dir.joinpath(good_patch_name1)
     good_patch_path1.write_text("")
-    good_patch1 = PatchMetadata(
-        name=good_patch_name1,
-        path=good_patch_path1,
-        present_in_specfile=False,
-        patch_id=starting_patch_id,
-    )
-    spec.add_patch(good_patch1)
+    spec.add_patch(good_patch_name1, starting_patch_id)
 
-    assert spec.get_applied_patches()[0].index == starting_patch_id
+    with spec.patches() as patches:
+        assert patches[0].number == starting_patch_id
 
     # add another, this time without patch_id
     good_patch_name2 = "hello2.patch"
     good_patch_path2 = spec_dir.joinpath(good_patch_name2)
     good_patch_path2.write_text("")
-    good_patch2 = PatchMetadata(
-        name=good_patch_name2, path=good_patch_path2, present_in_specfile=False
-    )
-    spec.add_patch(good_patch2)
+    spec.add_patch(good_patch_name2)
 
     # check that index of the second patch is (starting + 1)
-    assert spec.get_applied_patches()[1].index == starting_patch_id + 1
+    with spec.patches() as patches:
+        assert patches[1].number == starting_patch_id + 1
 
     # and now another with an index lower or equal than the last one and check if
     # an exc is thrown b/c that's not supported
@@ -730,17 +695,8 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
         bad_patch_id = starting_patch_id + 1
     else:
         bad_patch_id = starting_patch_id - 1
-    bad_patch = PatchMetadata(
-        name=patch_name, present_in_specfile=False, patch_id=bad_patch_id
-    )
-    with pytest.raises(PackitException) as exc:
-        spec.add_patch(bad_patch)
-
-    assert (
-        f"The 'patch_id' requested ({bad_patch.patch_id}) for patch "
-        f"{bad_patch.name} is less"
-    ) in str(exc.value)
-    assert f"to the last used patch ID ({starting_patch_id + 1})" in str(exc.value)
+    with pytest.raises(SourceNumberException):
+        spec.add_patch(patch_name, bad_patch_id)
 
 
 def test_add_patch_first_id_1(api_instance_source_git):
@@ -753,14 +709,10 @@ def test_add_patch_first_id_1(api_instance_source_git):
     # we need to create the patch file so that rebase-helper can find it and process it
     good_patch_path1 = spec_dir.joinpath(good_patch_name1)
     good_patch_path1.write_text("")
-    good_patch1 = PatchMetadata(
-        name=good_patch_name1,
-        path=good_patch_path1,
-        present_in_specfile=False,
-    )
-    spec.add_patch(good_patch1)
+    spec.add_patch(good_patch_name1, initial_number=1)
 
-    assert spec.get_applied_patches()[0].index == 1
+    with spec.patches() as patches:
+        assert patches[0].number == 1
 
 
 def test_srpm_add_patch_with_ids(
@@ -784,10 +736,10 @@ def test_srpm_add_patch_with_ids(
         "citra.patch",
         "malt.patch",
     }
-    applied_patches = api_instance_source_git.up.specfile.get_applied_patches()
-    assert Path(applied_patches[0].path).name == "amarillo.patch"
-    assert applied_patches[0].index == 3
-    assert Path(applied_patches[1].path).name == "citra.patch"
-    assert applied_patches[1].index == 4
-    assert Path(applied_patches[2].path).name == "malt.patch"
-    assert applied_patches[2].index == 100
+    with api_instance_source_git.up.specfile.patches() as patches:
+        assert patches[0].filename == "amarillo.patch"
+        assert patches[0].number == 3
+        assert patches[1].filename == "citra.patch"
+        assert patches[1].number == 4
+        assert patches[2].filename == "malt.patch"
+        assert patches[2].number == 100
