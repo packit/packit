@@ -12,3 +12,7 @@
       command: make check
       args:
         chdir: "{{ reverse_dir }}"
+      # Set 'COLOR' to no in the packit-service/Makefile to disable
+      # colored output in Zuul, in order to improve log readability.
+      environment:
+        COLOR: "no"

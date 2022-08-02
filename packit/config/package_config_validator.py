@@ -38,9 +38,8 @@ class PackageConfigValidator:
             config = PackageConfig.get_from_dict(
                 self.content,
                 config_file_path=str(self.config_file_path),
-                spec_file_path=str(
-                    get_local_specfile_path(self.config_file_path.parent)
-                ),
+                search_specfile=get_local_specfile_path,
+                dir=self.config_file_path.parent,
             )
         except ValidationError as e:
             schema_errors = e.messages
