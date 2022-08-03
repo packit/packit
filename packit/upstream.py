@@ -215,7 +215,7 @@ class Upstream(PackitRepositoryBase):
             upstream, str(destination), files_to_ignore=files_to_ignore
         )
 
-    def get_latest_released_version(self) -> str:
+    def get_latest_released_version(self) -> Optional[str]:
         """
         Return version of the upstream project for the latest official release
 
