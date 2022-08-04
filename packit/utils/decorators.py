@@ -1,13 +1,14 @@
 import functools
 import logging
-from typing import Union, Tuple
+from typing import Union, Tuple, Type, Any, Callable
 
 logger = logging.getLogger(__name__)
 
 
 def fallback_return_value(
-    fallback_value, exceptions: Union[Exception, Tuple[Exception]] = Exception()
-):
+    fallback_value: Any,
+    exceptions: Union[Type[Exception], Tuple[Type[Exception]]] = Exception,
+) -> Any:
     """
     The function of this decorator is to return some fallback value in case an exception was raised
     during a function call.
@@ -18,9 +19,9 @@ def fallback_return_value(
             fallback_return_value if a specified exception was caught
     """
 
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def inner(*args, **kwargs):
+        def inner(*args: Any, **kwargs: Any) -> Any:
             try:
                 return func(*args, **kwargs)
             except exceptions as e:
