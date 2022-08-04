@@ -1,3 +1,7 @@
+# 0.57.0
+
+- BREAKING CHANGE: fixed an issue where the repo was searched for the specfile before checking if 'downstream_package_name' is set, and '<downstream_package_name>.spec' can be used as the 'specfile_path'. (#1663)
+
 # 0.56.0
 
 - Packit can now build RPMs in mock. For more information see https://packit.dev/docs/cli/build/mock (#1662)
