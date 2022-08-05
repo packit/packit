@@ -932,6 +932,8 @@ class SRPMBuilder:
 
         Args:
             archive: Path to the archive.
+            bump_version: Should version be increased?
+            release_suffix: Append this suffix to the %release.
         """
         current_commit = self.upstream.local_project.commit_hexsha
         # the logic behind the naming:
@@ -964,6 +966,7 @@ class SRPMBuilder:
                 bump_version=bump_version,
                 release_suffix=release_suffix,
             )
+        self.upstream.specfile.reload()  # the specfile could have been changed by the action
 
     def prepare(self, bump_version: bool, release_suffix: Optional[str] = None):
         if self.upstream_ref:
