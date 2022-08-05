@@ -323,6 +323,8 @@ def test_release_suffix(
         bump_version=False,
         release_suffix=expanded_release_suffix,
     )
+    upstream_mock._specfile = flexmock()
+    upstream_mock._specfile.should_receive("reload").once()
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
         archive=archive, bump_version=False, release_suffix=release_suffix
