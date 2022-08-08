@@ -19,7 +19,7 @@ from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProject
-from packit.upstream import Archive, Upstream
+from packit.upstream import Archive, Upstream, SRPMBuilder
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 
@@ -259,6 +259,19 @@ def test_fix_spec(upstream_instance):
     release = ups.specfile.expanded_release
     # 1.20200710085501945230.master.0.g133ff39
     assert re.match(r"\d\.\d{20}\.\w+\.\d+\.g\w{7}", release)
+
+
+def test_fix_spec_persists(upstream_instance):
+    """verify that changing specfile in fix_spec action persists"""
+    _, upstream = upstream_instance
+    upstream.package_config.actions = {
+        ActionName.fix_spec: "sed -i 's/^Version:.*$/Version: 1.0.0/' beer.spec"
+    }
+    SRPMBuilder(upstream)._fix_specfile_to_use_local_archive(
+        "archive.tar.gz", bump_version=False, release_suffix="1.%dist"
+    )
+
+    assert upstream.specfile.version == "1.0.0"
 
 
 @pytest.mark.parametrize(
