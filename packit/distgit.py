@@ -313,7 +313,7 @@ class DistGit(PackitRepositoryBase):
         :return: path to the archive
         """
         with cwd(self.local_project.working_dir):
-            self.download_remote_sources()
+            self.download_remote_sources(self.config.pkg_tool)
         archive = self.absolute_source_dir / self.upstream_archive_name
         if not archive.exists():
             raise PackitException(
