@@ -79,6 +79,14 @@ class PackitMergeException(PackitException):
     """Failed to merge PR into base branch"""
 
 
+class PackitDownloadFailedException(PackitException):
+    """Failed to download file"""
+
+
+class PackitLookasideCacheException(PackitException):
+    """Problem with lookaside cache"""
+
+
 class PackitSRPMNotFoundException(PackitSRPMException):
     """SRPM created but not found"""
 

@@ -7,12 +7,8 @@ from pathlib import Path
 from typing import Optional, Callable, List, Iterable, Dict, Tuple
 
 import git
+import requests
 from git import PushInfo
-from rebasehelper.helpers.download_helper import DownloadHelper
-from rebasehelper.helpers.lookaside_cache_helper import (
-    LookasideCacheHelper,
-    LookasideCacheError,
-)
 from specfile import Specfile
 from specfile.exceptions import DuplicateSourceException, SourceNumberException
 from specfile.sections import Section
@@ -23,11 +19,12 @@ from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, RunCommandType
 from packit.config.common_package_config import CommonPackageConfig
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, PackitDownloadFailedException
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
 from packit.utils.commands import cwd
+from packit.utils.lookaside import get_lookaside_sources
 from packit.utils.repo import RepositoryCache, commit_message_file
 
 logger = getLogger(__name__)
@@ -448,44 +445,66 @@ class PackitRepositoryBase:
                     f"We were unable to push to dist-git: {pi.summary}."
                 )
 
-    def download_remote_sources(self):
+    def download_remote_sources(self, pkg_tool: Optional[str] = None) -> None:
         """
         Download the sources from the URL in the configuration (if the path in
         the configuration match to the URL basename from SourceX) or from the one
         from SourceX in specfile.
+
+        Args:
+            pkg_tool: Packaging tool associated with a lookaside cache instance
+              to be used for downloading sources.
+
+        Raises:
+            PackitDownloadFailedException if download fails for any reason.
         """
+        sourcelist = []
         # Fetch all sources defined in packit.yaml -> sources
         for source in self.package_config.sources:
-            source_path = self.specfile.sourcedir.joinpath(source.path)
-            if not source_path.is_file():
-                logger.info(f"Downloading source {source.path!r}.")
-                DownloadHelper.download_file(
-                    source.url,
-                    str(source_path),
-                )
-        # Try to download sources defined in "sources" file from Fedora lookaside cache
-        try:
-            LookasideCacheHelper.download(
-                "fedpkg",
-                self.specfile.path.parent,
+            sourcelist.append((source.url, source.path, False))
+        if pkg_tool:
+            # Fetch sources defined in "sources" file from lookaside cache
+            lookaside_sources = get_lookaside_sources(
+                pkg_tool,
                 self.specfile.expanded_name,
-                self.specfile.sourcedir,
+                self.specfile.path.parent,
             )
-        except LookasideCacheError as e:
-            logger.debug(f"Downloading sources from lookaside cache failed: {e}.")
+            for lookaside_source in lookaside_sources:
+                sourcelist.append(
+                    (lookaside_source["url"], lookaside_source["path"], True)
+                )
         # Fetch all remote sources defined in the spec file
         with self.specfile.sources() as sources, self.specfile.patches() as patches:
-            for source in sources + patches:
-                if source.remote:
-                    source_path = self.specfile.sourcedir.joinpath(
-                        source.expanded_filename
-                    )
-                    if not source_path.is_file():
-                        logger.info(f"Downloading source {source.filename!r}.")
-                        DownloadHelper.download_file(
-                            source.expanded_location,
-                            str(source_path),
+            for spec_source in sources + patches:
+                if spec_source.remote:
+                    sourcelist.append(
+                        (
+                            spec_source.expanded_location,
+                            spec_source.expanded_filename,
+                            False,
                         )
+                    )
+        # Download all sources
+        for url, filename, optional in sourcelist:
+            source_path = self.specfile.sourcedir.joinpath(filename)
+            if source_path.is_file():
+                continue
+            try:
+                with requests.get(url, stream=True) as response:
+                    response.raise_for_status()
+                    with open(source_path, "wb") as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError,
+            ) as e:
+                msg = f"Failed to download source from {url}"
+                if optional:
+                    logger.warning(f"{msg}: {e!r}")
+                    continue
+                logger.error(f"{msg}: {e!r}")
+                raise PackitDownloadFailedException(f"{msg}:\n{e}") from e
 
     def existing_pr(
         self, title: str, description: str, branch: str

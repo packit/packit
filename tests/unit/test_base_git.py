@@ -6,12 +6,11 @@ from typing import List, Optional, Dict, Union
 
 import pytest
 from flexmock import flexmock
-from rebasehelper.helpers.download_helper import DownloadHelper
 from specfile import Specfile
 from specfile.changelog import ChangelogEntry
 
 from packit.actions import ActionName
-from packit.base_git import PackitRepositoryBase
+from packit.base_git import PackitRepositoryBase, requests
 from packit.command_handler import LocalCommandHandler
 from packit.config import Config, RunCommandType, PackageConfig
 from packit.config.sources import SourcesItem
@@ -345,17 +344,17 @@ def test_download_remote_sources(source, package_config, expected_url, tmp_path:
 
     expected_path = tmp_path / "rsync-3.1.3.tar.gz"
 
-    # sadly we can't mock os.path.is_file, b/c the function is defined in posixpath.py
-    # and flexmock is not able to mock that
-    def mocked_download_file(url, destination_path, blocksize=8192):
+    def mocked_get(url, **_):
         assert url == expected_url
-        Path(destination_path).write_text("1")
+        return flexmock(
+            raise_for_status=lambda: None, iter_content=lambda **_: iter([b"1"])
+        )
 
-    flexmock(DownloadHelper, download_file=mocked_download_file)
+    flexmock(requests).should_receive("get").replace_with(mocked_get)
 
     base_git.download_remote_sources()
 
-    flexmock(DownloadHelper).should_receive("download_file").and_raise(
+    flexmock(requests).should_receive("get").and_raise(
         Exception(
             "This should not be called second time since the source is present already."
         )
