@@ -1219,6 +1219,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         bump_version: bool = True,
         release_suffix: Optional[str] = None,
         result_dir: Union[Path, str] = None,
+        create_symlinks: Optional[bool] = True,
     ) -> None:
         """
         Prepare sources for an SRPM build.
@@ -1228,6 +1229,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             release_suffix: specifies local release suffix. `None` represents default suffix.
             bump_version: specifies whether version should be changed in the spec-file.
             result_dir: directory where the specfile directory content should be copied
+            create_symlinks: whether symlinks should be created instead of copying the files
+                (currently when the archive is created outside the specfile dir, or in the future
+                 if we will create symlinks in some other places)
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
@@ -1236,6 +1240,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 upstream_ref=upstream_ref,
                 bump_version=bump_version,
                 release_suffix=release_suffix,
+                create_symlinks=create_symlinks,
             )
         except Exception as ex:
             raise PackitSRPMException(
