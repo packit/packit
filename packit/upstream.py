@@ -280,8 +280,10 @@ class Upstream(PackitRepositoryBase):
 
         return version
 
-    def create_archive(self, version: str = None) -> str:
-        return Archive(self, version).create()
+    def create_archive(
+        self, version: str = None, create_symlink: Optional[bool] = True
+    ) -> str:
+        return Archive(self, version).create(create_symlink=create_symlink)
 
     def get_last_tag(self, before: str = None) -> Optional[str]:
         """
@@ -509,6 +511,7 @@ class Upstream(PackitRepositoryBase):
         upstream_ref: Optional[str] = None,
         bump_version: bool = True,
         release_suffix: Optional[str] = None,
+        create_symlinks: Optional[bool] = True,
     ):
         """
         1. determine version
@@ -520,9 +523,13 @@ class Upstream(PackitRepositoryBase):
             upstream_ref: the base git ref for the source git
             bump_version: increase version in spec file
             release_suffix: suffix %release part of NVR with this
+            create_symlinks: whether symlinks should be created instead of copying the files
+                (e.g. when the archive is created outside the specfile dir)
         """
         SRPMBuilder(upstream=self, ref=upstream_ref).prepare(
-            bump_version=bump_version, release_suffix=release_suffix
+            bump_version=bump_version,
+            release_suffix=release_suffix,
+            create_symlinks=create_symlinks,
         )
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
@@ -968,12 +975,18 @@ class SRPMBuilder:
             )
         self.upstream.specfile.reload()  # the specfile could have been changed by the action
 
-    def prepare(self, bump_version: bool, release_suffix: Optional[str] = None):
+    def prepare(
+        self,
+        bump_version: bool,
+        release_suffix: Optional[str] = None,
+        create_symlinks: Optional[bool] = True,
+    ):
         if self.upstream_ref:
             self._prepare_upstream_using_source_git(bump_version, release_suffix)
         else:
             created_archive = self.upstream.create_archive(
-                version=self.current_git_describe_version
+                version=self.current_git_describe_version,
+                create_symlink=create_symlinks,
             )
             self._fix_specfile_to_use_local_archive(
                 archive=created_archive,
@@ -1017,12 +1030,16 @@ class Archive:
             self._version = self.upstream.get_current_version()
         return self._version
 
-    def create(self) -> str:
+    def create(self, create_symlink: Optional[bool] = True) -> str:
         """
         Create archive from the content of the upstream repository, only committed
         changes are present in the archive.
 
         Uses `git archive` by default, unless `create_archive` action is defined.
+
+        Args:
+            create_symlink: whether symlink to archive should be created when the
+                created archive is outside the specfile dir or the archive should be copied
 
         Returns:
             Name of the archive.
@@ -1051,7 +1068,7 @@ class Archive:
                     "The create-archive action did not output a path to the generated archive. "
                     "Please make sure that you have valid path in the single line of the output."
                 )
-            self._add_link_to_archive_from_specdir_if_needed(archive_path)
+            self._handle_archive_outside_specdir_if_needed(archive_path, create_symlink)
             return archive_path.name
 
         return self._create_archive_using_default_way(dir_name, env)
@@ -1098,7 +1115,7 @@ class Archive:
             outputs: Outputs produced by creating the archive.
 
         Returns:
-            Path to the archive if found, `None` otherwise.
+            Absolute path to the archive if found, `None` otherwise.
         """
         for output in reversed(outputs):
             for line in reversed(output.splitlines()):
@@ -1107,31 +1124,44 @@ class Archive:
                     return archive_path
         return None
 
-    def _add_link_to_archive_from_specdir_if_needed(self, archive_path: Path) -> None:
+    def _handle_archive_outside_specdir_if_needed(
+        self, archive_path: Path, create_symlink: Optional[bool] = True
+    ) -> None:
         """
         Create a relative symlink to the archive from in the specfile directory
-        if necessary.
+        or copy the archive to the specfile directory if necessary.
 
         Args:
-            archive_path: Relative path to the archive from the specfile dir.
+            archive_path: Absolute path to the archive from the specfile dir.
+            create_symlink: Whether a symlink should be created.
         """
         absolute_specfile_dir = self.upstream.absolute_specfile_dir
 
         if archive_path.parent.absolute() != absolute_specfile_dir:
             archive_in_spec_dir = absolute_specfile_dir / archive_path.name
 
-            # [PurePath.relative_to()](https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.relative_to)
-            # requires self to be the subpath of the argument, but
-            # [os.path.relpath()](https://docs.python.org/3/library/os.path.html#os.path.relpath)
-            # does not.
-            relative_archive_path = os.path.relpath(archive_path, absolute_specfile_dir)
+            if create_symlink:
+                # [PurePath.relative_to()](https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.relative_to)
+                # requires self to be the subpath of the argument, but
+                # [os.path.relpath()](https://docs.python.org/3/library/os.path.html#os.path.relpath)
+                # does not.
+                relative_archive_path = os.path.relpath(
+                    archive_path, absolute_specfile_dir
+                )
 
-            logger.info(
-                "Linking to the specfile directory:"
-                f" {archive_in_spec_dir} -> {relative_archive_path}"
-                f" (given path to archive: {archive_path})"
-            )
-            archive_in_spec_dir.symlink_to(relative_archive_path)
+                logger.info(
+                    "Linking to the specfile directory:"
+                    f" {archive_in_spec_dir} -> {relative_archive_path}"
+                    f" (given path to archive: {archive_path})"
+                )
+                archive_in_spec_dir.symlink_to(relative_archive_path)
+
+            else:
+                logger.info(
+                    "Copying the archive to the specfile directory: "
+                    f"{archive_path} -> {archive_in_spec_dir}"
+                )
+                shutil.copy2(archive_path, archive_in_spec_dir)
 
     def _create_archive_using_default_way(
         self, dir_name: str, env: Dict[str, str]
