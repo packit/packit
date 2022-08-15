@@ -5,17 +5,14 @@
 packit started as source-git and we're making a source-git module after such a long time, weird
 """
 
-import configparser
 import logging
 import shutil
 import textwrap
 from pathlib import Path
-from typing import Optional, List, Dict
+from typing import Optional
 
 import git
 import yaml
-from rebasehelper.exceptions import LookasideCacheError
-from rebasehelper.helpers.lookaside_cache_helper import LookasideCacheHelper
 from specfile import Specfile
 
 from packit.config import Config
@@ -35,6 +32,7 @@ from packit.utils import (
     get_default_branch,
     get_file_author,
 )
+from packit.utils.lookaside import get_lookaside_sources
 from packit.utils.repo import is_the_repo_pristine
 
 logger = logging.getLogger(__name__)
@@ -152,36 +150,6 @@ class SourceGitGenerator:
             cwd=self.dist_git.working_dir,
             print_live=True,
         )
-
-    def _get_lookaside_sources(self) -> List[Dict[str, str]]:
-        """
-        Read "sources" file from the dist-git repo and return a list of dicts
-        with path and url to sources stored in the lookaside cache
-        """
-        pkg_tool = self.pkg_tool or self.config.pkg_tool
-        try:
-            config = LookasideCacheHelper._read_config(pkg_tool)
-            base_url = config["lookaside"]
-        except (configparser.Error, KeyError) as e:
-            raise LookasideCacheError("Failed to read rpkg configuration") from e
-
-        package = self.pkg_name
-        basepath = self.dist_git.working_dir
-
-        sources = []
-        for source in LookasideCacheHelper._read_sources(basepath):
-            url = "{0}/rpms/{1}/{2}/{3}/{4}/{2}".format(
-                base_url,
-                package,
-                source["filename"],
-                source["hashtype"],
-                source["hash"],
-            )
-
-            path = source["filename"]
-            sources.append({"path": path, "url": url})
-
-        return sources
 
     def get_BUILD_dir(self):
         path = Path(self.dist_git.working_dir)
@@ -317,7 +285,11 @@ class SourceGitGenerator:
                 ],
             }
         )
-        lookaside_sources = self._get_lookaside_sources()
+        lookaside_sources = get_lookaside_sources(
+            self.pkg_tool or self.config.pkg_tool,
+            self.pkg_name,
+            self.dist_git.working_dir,
+        )
         if lookaside_sources:
             package_config["sources"] = lookaside_sources
 
