@@ -540,24 +540,15 @@ def test_get_upstream_version(package, version):
             "mock": "3.1-1",
             "packitos": "0.56.0",
         }
-        if url.endswith("projects"):
-            project, version = next(
-                iter(
-                    (k, v)
-                    for k, v in projects.items()
-                    if k.startswith(params["pattern"])
-                ),
-                (None, None),
-            )
-            items = [{"name": project, "version": version}] if project else []
-            return flexmock(ok=True, json=lambda: {"projects": items})
+        if url.endswith("packages"):
+            project = packages.get(params["name"])
+            items = [{"project": project}] if project else []
+        elif url.endswith("projects"):
+            version = projects.get(params["name"])
+            items = [{"version": version}] if version else []
         else:
-            package_name = url.split("/")[-1]
-            project = packages.get(package_name)
-            version = projects.get(project)
-            if version:
-                return flexmock(ok=True, json=lambda: {"version": version})
-        return flexmock(ok=False)
+            return flexmock(ok=False)
+        return flexmock(ok=True, json=lambda: {"items": items})
 
     flexmock(requests).should_receive("get").replace_with(mocked_get)
 
