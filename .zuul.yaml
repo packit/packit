@@ -37,7 +37,7 @@
 
 - job:
     name: reverse-dep-packit-service-tests
-    parent: packit-tests-pip-deps
+    parent: packit-tests-rpm
     description: Run packit-service tests to check we don't break it
     required-projects:
       - github.com/packit/packit-service
@@ -57,7 +57,7 @@
 
 - job:
     name: reverse-dep-packit-service-tests
-    parent: packit-tests-pip-deps
+    parent: packit-tests-rpm
     description: Run packit-service tests to check we don't break it
     required-projects:
       - github.com/packit/packit-service
