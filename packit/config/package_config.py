@@ -35,7 +35,7 @@ class PackageConfig:
         **kwargs,
     ):
         self.jobs: List[JobConfig] = jobs or []
-        self.packages: Dict[str, CommonPackageConfig] = packages or {
+        self.packages: Dict[Optional[str], CommonPackageConfig] = packages or {
             # There is a single package, under the key 'None'
             None: CommonPackageConfig(**kwargs)
         }

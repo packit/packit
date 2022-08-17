@@ -203,7 +203,9 @@ def get_current_version_command(
 
 
 def create_new_repo(cwd: Path, switches: List[str]):
-    subprocess.check_call(["git", "init"] + switches + [str(cwd)])
+    subprocess.check_call(
+        ["git", "init", "--initial-branch", "main"] + switches + [str(cwd)]
+    )
     # TODO: Replace with -b / --initial-branch in `git init` when possible
     if "--bare" not in switches:
         subprocess.check_call(["git", "checkout", "-b", "main"], cwd=cwd)

@@ -7,7 +7,7 @@ import pathlib
 
 import click
 
-from packit.config import pass_config
+from packit.config import pass_config, get_single_package_config
 from packit.config import Config, get_local_package_config
 from packit.api import PackitAPI
 from packit.local_project import LocalProject
@@ -37,7 +37,7 @@ def source_git_status(config: Config, source_git: str, dist_git: str):
     )
     api = PackitAPI(
         config=config,
-        package_config=package_config,
+        package_config=get_single_package_config(package_config),
         upstream_local_project=LocalProject(working_dir=source_git_path, offline=True),
         downstream_local_project=LocalProject(working_dir=dist_git_path, offline=True),
     )

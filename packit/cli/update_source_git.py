@@ -10,8 +10,12 @@ import pathlib
 
 import click
 
-from packit.config import pass_config
-from packit.config import Config, get_local_package_config
+from packit.config import (
+    pass_config,
+    get_single_package_config,
+    Config,
+    get_local_package_config,
+)
 from packit.api import PackitAPI
 from packit.local_project import LocalProject
 from packit.cli.utils import cover_packit_exception
@@ -95,7 +99,7 @@ def update_source_git(
     )
     api = PackitAPI(
         config=config,
-        package_config=package_config,
+        package_config=get_single_package_config(package_config),
         upstream_local_project=LocalProject(working_dir=source_git_path, offline=True),
         downstream_local_project=LocalProject(working_dir=dist_git_path, offline=True),
     )

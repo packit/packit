@@ -1,6 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+from typing import Union
+from packit.exceptions import PackitException
+
 from packit.config.config import (
     Config,
     RunCommandType,
@@ -40,3 +43,12 @@ __all__ = [
     "get_package_config_from_repo",
     "pass_config",
 ]
+
+
+def get_single_package_config(
+    config: Union[PackageConfig, JobConfig]
+) -> CommonPackageConfig:
+    if len(config.packages) > 1:
+        raise PackitException("More than one package is configured")
+    package = list(config.packages.keys())[0]
+    return config.packages[package]

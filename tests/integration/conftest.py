@@ -21,7 +21,7 @@ from ogr.services.pagure import PagureProject, PagureService, PagureUser
 from packit.api import PackitAPI
 from packit.base_git import PackitRepositoryBase
 from packit.cli.utils import get_packit_api
-from packit.config import get_local_package_config
+from packit.config import get_local_package_config, get_single_package_config
 from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
 from packit.upstream import Upstream
@@ -303,8 +303,12 @@ def mock_api_for_source_git(
     with cwd(sourcegit):
         c = get_test_config()
         pc = get_local_package_config(str(sourcegit))
-        pc.upstream_project_url = str(sourcegit)
-        return PackitAPI(c, pc, up_local_project, dist_git_clone_path=str(distgit))
+        return PackitAPI(
+            c,
+            get_single_package_config(pc),
+            up_local_project,
+            dist_git_clone_path=str(distgit),
+        )
 
 
 @pytest.fixture()

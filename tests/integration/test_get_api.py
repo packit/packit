@@ -57,92 +57,134 @@ def test_url_is_upstream():
         (
             [],
             flexmock(
-                upstream_project_url=None, dist_git_base_url=None, synced_files=None
+                packages={
+                    None: flexmock(
+                        upstream_project_url=None,
+                        dist_git_base_url=None,
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),
         (
             [],
             flexmock(
-                upstream_project_url="some-url",
-                dist_git_base_url=None,
-                synced_files=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="some-url",
+                        dist_git_base_url=None,
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),
         (
             [("origin", "https://github.com/packit/ogr.git")],
             flexmock(
-                upstream_project_url="some-url",
-                dist_git_base_url=None,
-                synced_files=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="some-url",
+                        dist_git_base_url=None,
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),
         (
             [("origin", "https://github.com/packit/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url=None,
-                synced_files=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url=None,
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),
         (
             [("upstream", "https://github.com/packit/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url=None,
-                synced_files=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url=None,
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),
         (
             [("origin", "https://src.fedoraproject.org/rpms/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="https://src.fedoraproject.org",
-                synced_files=None,
-                downstream_package_name=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url="https://src.fedoraproject.org",
+                        synced_files=None,
+                        downstream_package_name=None,
+                    )
+                }
             ),
             False,
         ),
         (
             [("origin", "https://src.fedoraproject.org/rpms/python-ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="src.fedoraproject.org",
-                synced_files=None,
-                downstream_package_name=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url="src.fedoraproject.org",
+                        synced_files=None,
+                        downstream_package_name=None,
+                    )
+                }
             ),
             False,
         ),
         (
             [("origin", "https://src.fedoraproject.org/rpms/python-ogr.git")],
             flexmock(
-                upstream_project_url=None,
-                dist_git_base_url="https://src.fedoraproject.org",
-                synced_files=None,
-                downstream_package_name=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url=None,
+                        dist_git_base_url="https://src.fedoraproject.org",
+                        synced_files=None,
+                        downstream_package_name=None,
+                    )
+                }
             ),
             False,
         ),
         (
             [("origin", "https://src.fedoraproject.org/fork/user/rpms/python-ogr.git")],
             flexmock(
-                upstream_project_url=None,
-                dist_git_base_url="https://src.fedoraproject.org",
-                synced_files=None,
-                downstream_package_name=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url=None,
+                        dist_git_base_url="https://src.fedoraproject.org",
+                        synced_files=None,
+                        downstream_package_name=None,
+                    )
+                }
             ),
             False,
         ),
         (
             [("origin", "git@github.com:user/ogr.git")],
             flexmock(
-                upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="https://src.fedoraproject.org",
-                synced_files=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url="https://src.fedoraproject.org",
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),
@@ -152,9 +194,13 @@ def test_url_is_upstream():
                 ("origin", "git@github.com:user/ogr.git"),
             ],
             flexmock(
-                upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="https://src.fedoraproject.org",
-                synced_files=None,
+                packages={
+                    None: flexmock(
+                        upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url="https://src.fedoraproject.org",
+                        synced_files=None,
+                    )
+                }
             ),
             True,
         ),

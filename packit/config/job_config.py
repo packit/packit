@@ -4,7 +4,7 @@
 from copy import deepcopy
 from enum import Enum
 from logging import getLogger
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from packit.config.aliases import DEFAULT_VERSION
 from packit.config.common_package_config import CommonPackageConfig
@@ -33,7 +33,7 @@ class JobConfigTriggerType(Enum):
     commit = "commit"
 
 
-class JobConfig(CommonPackageConfig):
+class JobConfig:
     """
     Definition of a job.
 
@@ -49,11 +49,22 @@ class JobConfig(CommonPackageConfig):
         self,
         type: JobType,
         trigger: JobConfigTriggerType,
+        packages: Optional[Dict[str, CommonPackageConfig]] = None,
         **kwargs,
     ):
-        super().__init__(**kwargs)
         self.type: JobType = type
         self.trigger: JobConfigTriggerType = trigger
+        self.packages: Dict[Optional[str], CommonPackageConfig] = packages or {
+            None: CommonPackageConfig(**kwargs)
+        }
+
+    def __getattr__(self, name):
+        if len(self.packages) == 1:
+            return getattr(self.packages[list(self.packages.keys())[0]], name)
+        else:
+            raise AttributeError(
+                f"Cannot get {name!r}, JobConfi has {len(self.packages)} packages"
+            )
 
     def __repr__(self):
         # required to avoid cyclical imports

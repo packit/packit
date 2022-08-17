@@ -636,7 +636,7 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
         enable_net=True,
         release_suffix=None,
         srpm_path=None,
-    ).and_return(("id", "url")).once()
+    ).once()
 
     run_packit(["build", "in-copr", "--no-wait"], working_dir=upstream)
 

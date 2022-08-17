@@ -12,11 +12,14 @@ from github import GithubException
 
 from ogr.parsing import parse_git_repo
 
-from packit.config.common_package_config import CommonPackageConfig
-from packit.config.package_config import PackageConfig
-
 from packit.api import PackitAPI
-from packit.config import Config, get_local_package_config, JobType
+from packit.config import (
+    Config,
+    get_local_package_config,
+    get_single_package_config,
+    JobType,
+    PackageConfig,
+)
 from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
@@ -99,13 +102,14 @@ def get_packit_api(
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config: CommonPackageConfig
     if load_packit_yaml:
-        package_config = get_local_package_config(
-            local_project.working_dir,
-            repo_name=local_project.repo_name,
-            try_local_dir_last=True,
-            package_config_path=config.package_config_path,
+        package_config = get_single_package_config(
+            get_local_package_config(
+                local_project.working_dir,
+                repo_name=local_project.repo_name,
+                try_local_dir_last=True,
+                package_config_path=config.package_config_path,
+            )
         )
         logger.debug(f"job_config_index: {job_config_index}")
         if job_config_index is not None and isinstance(package_config, PackageConfig):
@@ -113,7 +117,9 @@ def get_packit_api(
                 raise PackitException(
                     "job_config_index is bigger than number of jobs in package config!"
                 )
-            package_config = package_config.jobs[job_config_index]
+            package_config = get_single_package_config(
+                package_config.jobs[job_config_index]
+            )
             logger.debug(f"Final package (job) config: {package_config}")
         elif job_type is not None:
             try:
@@ -126,7 +132,7 @@ def get_packit_api(
                 )
             logger.debug(f"Final package (job) config: {package_config}")
     else:
-        package_config = PackageConfig()
+        package_config = get_single_package_config(PackageConfig())
 
     if dist_git_path and Path(dist_git_path) == local_project.working_dir:
         return PackitAPI(
