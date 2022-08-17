@@ -117,15 +117,13 @@ def get_packit_api(
     else:
         package_config = PackageConfig()
 
-    if dist_git_path:
-        package_config.dist_git_clone_path = dist_git_path
-
     if dist_git_path and Path(dist_git_path) == local_project.working_dir:
         return PackitAPI(
             config=config,
             package_config=package_config,
             upstream_local_project=None,
             downstream_local_project=local_project,
+            dist_git_clone_path=dist_git_path,
         )
 
     if not local_project.git_repo:
@@ -173,6 +171,7 @@ def get_packit_api(
         package_config=package_config,
         upstream_local_project=lp_upstream,
         downstream_local_project=lp_downstream,
+        dist_git_clone_path=dist_git_path,
     )
 
 

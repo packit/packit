@@ -131,12 +131,14 @@ class PackitAPI:
         upstream_local_project: LocalProject = None,
         downstream_local_project: LocalProject = None,
         stage: bool = False,
+        dist_git_clone_path: Optional[str] = None,
     ) -> None:
         self.config = config
         self.package_config: CommonPackageConfig = package_config
         self.upstream_local_project = upstream_local_project
         self.downstream_local_project = downstream_local_project
         self.stage = stage
+        self._dist_git_clone_path: Optional[str] = dist_git_clone_path
 
         self._up: Optional[Upstream] = None
         self._dg: Optional[DistGit] = None
@@ -187,6 +189,7 @@ class PackitAPI:
                 config=self.config,
                 package_config=self.package_config,
                 local_project=self.downstream_local_project,
+                clone_path=self._dist_git_clone_path,
             )
         return self._dg
 

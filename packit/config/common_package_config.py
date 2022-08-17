@@ -63,7 +63,6 @@ class CommonPackageConfig:
             stored.
         dist_git_namespace: Namespace in dist-git where the downstream package
             is stored.
-        dist_git_clone_path:
         actions: Custom steps used during different operations.
         upstream_ref: The ref used for the last upstream release.
         allowed_gpg_keys: GPG-key fingerprints allowed to sign commits to be
@@ -207,8 +206,6 @@ class CommonPackageConfig:
         self.dist_git_namespace: str = dist_git_namespace or getenv(
             "DISTGIT_NAMESPACE", DISTGIT_NAMESPACE
         )
-        # path to a local git clone of the dist-git repo; None means to clone in a tmpdir
-        self.dist_git_clone_path: Optional[str] = None
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
         self.allowed_gpg_keys = allowed_gpg_keys
