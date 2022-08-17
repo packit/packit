@@ -3,6 +3,8 @@
   ansible.builtin.dnf:
     name:
       - ansible
+      # this should be removed after the "base" Zuul job is moved to F36
+      - ansible-collection-community-general
     state: present
   become: true
 
