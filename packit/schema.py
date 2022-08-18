@@ -344,11 +344,13 @@ class CommonConfigSchema(Schema):
     allowed_committers = fields.List(fields.String(), missing=None)
     tmt_plan = fields.String(missing=None)
     tf_post_install_script = fields.String(missing=None)
+
+    # Image Builder integration
     image_distribution = fields.String(missing=None)
-    image_architecture = fields.String(missing=None)
-    image_type = fields.String(missing=None)
-    image_account_id = fields.String(missing=None)
-    packages_to_install = fields.List(fields.String(), missing=None)
+    # these two are freeform so that users can immediately use IB's new features
+    image_request = fields.Dict(missing=None)
+    image_customizations = fields.Dict(missing=None)
+    copr_chroot = fields.String(missing=None)
 
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
@@ -569,6 +571,7 @@ class UserConfigSchema(Schema):
     fas_user = fields.String()
     fas_password = fields.String()
     keytab_path = fields.String()
+    redhat_api_refresh_token = fields.String()
     upstream_git_remote = fields.String()
     github_token = fields.String()
     pagure_user_token = fields.String()

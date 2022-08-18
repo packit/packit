@@ -883,11 +883,18 @@ def test_package_config_parse_error(raw):
                     {
                         "job": "vm_image_build",
                         "trigger": "pull_request",
-                        "packages_to_install": ["peddle", "board"],
                         "image_distribution": "rhel-90",
-                        "image_type": "aws",
-                        "image_account_id": "yolo",
-                        "image_architecture": "x86_64",
+                        "image_request": {
+                            "architecture": "x86_64",
+                            "image_type": "aws",
+                            "upload_request": {
+                                "options": {"share_with_accounts": ["123456789012"]},
+                                "type": "aws",
+                            },
+                        },
+                        "image_customizations": {
+                            "packages": ["peddle", "board"],
+                        },
                     }
                 ],
             },
@@ -899,11 +906,18 @@ def test_package_config_parse_error(raw):
                         specfile_path="fedora/package.spec",
                         type=JobType.vm_image_build,
                         trigger=JobConfigTriggerType.pull_request,
-                        packages_to_install=["peddle", "board"],
                         image_distribution="rhel-90",
-                        image_type="aws",
-                        image_account_id="yolo",
-                        image_architecture="x86_64",
+                        image_request={
+                            "architecture": "x86_64",
+                            "image_type": "aws",
+                            "upload_request": {
+                                "options": {"share_with_accounts": ["123456789012"]},
+                                "type": "aws",
+                            },
+                        },
+                        image_customizations={
+                            "packages": ["peddle", "board"],
+                        },
                     ),
                 ],
             ),
