@@ -669,7 +669,7 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
 
     # we want to add this patch to the spec
     good_patch_name1 = "hello.patch"
-    # we need to create the patch file so that rebase-helper can find it and process it
+    # we need to create the patch file so that specfile can find it and process it
     good_patch_path1 = spec_dir.joinpath(good_patch_name1)
     good_patch_path1.write_text("")
     spec.add_patch(good_patch_name1, starting_patch_id)
@@ -706,7 +706,7 @@ def test_add_patch_first_id_1(api_instance_source_git):
 
     # we want to add this patch to the spec
     good_patch_name1 = "hello.patch"
-    # we need to create the patch file so that rebase-helper can find it and process it
+    # we need to create the patch file so that specfile can find it and process it
     good_patch_path1 = spec_dir.joinpath(good_patch_name1)
     good_patch_path1.write_text("")
     spec.add_patch(good_patch_name1, initial_number=1)
