@@ -236,8 +236,11 @@ def test_create_archive_spec_subdir(upstream_instance, with_create_archive_actio
 
     ups.create_archive()
 
-    assert len(list(packaging_dir.glob("*.tar.gz"))) == 1
+    archives_in_packaging_dir = list(packaging_dir.glob("*.tar.gz"))
+    assert len(archives_in_packaging_dir) == 1
+
     if with_create_archive_action:
+        assert archives_in_packaging_dir[0].is_symlink()
         assert len(list(ups.local_project.working_dir.glob("*.tar.gz"))) == 1
 
 
@@ -404,3 +407,35 @@ def test_get_archive_root_dir(template, expected_output, upstream_instance):
     archive_root_dir = Archive(ups, ups.get_version()).get_archive_root_dir(archive)
 
     assert archive_root_dir == expected_output
+
+
+def test_create_archive_not_create_symlink(upstream_instance):
+    """test archive creation when an archive is in root, but spec is in a subdir
+    and create_symlink=False"""
+    u, ups = upstream_instance
+
+    archive_path = u.joinpath("beer.tar.gz")
+    ups.package_config.actions[ActionName.create_archive] = [
+        [
+            "git",
+            "archive",
+            "--output",
+            str(archive_path),
+            "--prefix",
+            f"{u.name}/",
+            "HEAD",
+        ],
+        ["echo", str(archive_path)],
+    ]
+
+    packaging_dir = u / "packaging"
+    packaging_dir.mkdir()
+    spec_path = packaging_dir / "some.spec"
+    spec_path.write_text("asd")
+    ups._specfile_path = spec_path
+
+    ups.create_archive(create_symlink=False)
+
+    archives = list(packaging_dir.glob("*.tar.gz"))
+    assert len(archives) == 1
+    assert not archives[0].is_symlink()
