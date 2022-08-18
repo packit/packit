@@ -16,7 +16,7 @@ from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import PackageConfig
 
 from packit.api import PackitAPI
-from packit.config import Config, get_local_package_config
+from packit.config import Config, get_local_package_config, JobType
 from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
@@ -94,6 +94,7 @@ def get_packit_api(
     dist_git_path: Optional[str] = None,
     load_packit_yaml: bool = True,
     job_config_index: Optional[int] = None,
+    job_type: Optional[JobType] = None,
 ) -> PackitAPI:
     """
     Load the package config, set other options and return the PackitAPI
@@ -113,6 +114,16 @@ def get_packit_api(
                     "job_config_index is bigger than number of jobs in package config!"
                 )
             package_config = package_config.jobs[job_config_index]
+            logger.debug(f"Final package (job) config: {package_config}")
+        elif job_type is not None:
+            try:
+                package_config = [
+                    job for job in package_config.jobs if job.type == job_type
+                ][0]
+            except IndexError:
+                raise PackitException(
+                    f"No job with type {job_type} found in package config."
+                )
             logger.debug(f"Final package (job) config: {package_config}")
     else:
         package_config = PackageConfig()

@@ -1,0 +1,108 @@
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+requests.sessions:
+  send:
+    POST:
+      https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token:
+      - metadata:
+          latency: 0.283463716506958
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_image_builder
+          - packit.vm_image_build
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            access_token: foo
+            expires_in: 900
+            not-before-policy: 0
+            refresh_expires_in: 0
+            refresh_token: bar
+            scope: offline_access
+            session_state: 7b968000-fd86-46aa-bc49-4c1526ec5717
+            token_type: Bearer
+          _next: null
+          elapsed: 0.283222
+          encoding: utf-8
+          headers:
+            Cache-Control: no-store
+            Connection: keep-alive
+            Content-Encoding: gzip
+            Content-Length: '1839'
+            Content-Type: application/json
+            Date: Mon, 15 Aug 2022 11:08:25 GMT
+            Keep-Alive: timeout=300
+            Pragma: no-cache
+            Set-Cookie: foo=baz;
+              path=/; HttpOnly; Secure; SameSite=None
+            Vary: Accept-Encoding
+            referrer-policy: strict-origin
+            strict-transport-security: max-age=31536000; includeSubDomains
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-rh-edge-cache-status: Miss from child, Miss from parent
+            x-rh-edge-reference-id: 0.446ed417.1660561705.10367b2a
+            x-rh-edge-request-id: 10367b2a
+            x-site: prod-spoke-aws-us-east-1
+            x-xss-protection: 1; mode=block
+          raw: !!binary ""
+          reason: OK
+          status_code: 200
+      - metadata:
+          latency: 0.2908346652984619
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_image_builder
+          - packit.vm_image_build
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            access_token: foo
+            expires_in: 900
+            not-before-policy: 0
+            refresh_expires_in: 0
+            refresh_token: bar
+            scope: offline_access
+            session_state: 7b968000-fd86-46aa-bc49-4c1526ec5717
+            token_type: Bearer
+          _next: null
+          elapsed: 0.29051
+          encoding: utf-8
+          headers:
+            Cache-Control: no-store
+            Connection: keep-alive
+            Content-Encoding: gzip
+            Content-Length: '1841'
+            Content-Type: application/json
+            Date: Mon, 15 Aug 2022 11:08:25 GMT
+            Keep-Alive: timeout=300
+            Pragma: no-cache
+            Set-Cookie: bar=baz;
+              path=/; HttpOnly; Secure; SameSite=None
+            Vary: Accept-Encoding
+            referrer-policy: strict-origin
+            strict-transport-security: max-age=31536000; includeSubDomains
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-rh-edge-cache-status: Miss from child, Miss from parent
+            x-rh-edge-reference-id: 0.446ed417.1660561705.10367db8
+            x-rh-edge-request-id: 10367db8
+            x-site: prod-spoke-aws-us-east-1
+            x-xss-protection: 1; mode=block
+          raw: !!binary ""
+          reason: OK
+          status_code: 200

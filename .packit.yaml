@@ -99,3 +99,14 @@ jobs:
     dist_git_branches:
       - fedora-branched
       - epel-8
+#  - job: vm_image_build
+#    trigger: pull_request
+#    packit_instances: ["stg"]
+#    image_distribution: rhel-8
+#    image_type: aws
+#    image_architecture: x86_64
+#    image_account_id: "727920394381"
+#    packages_to_install: [packit]
+#    owner: packit
+#    project: packit-dev
+#    targets: [epel-8]
