@@ -58,6 +58,7 @@ class DistGit(PackitRepositoryBase):
         config: Config,
         package_config: CommonPackageConfig,
         local_project: LocalProject = None,
+        clone_path: Optional[str] = None,
     ):
         """
         Args:
@@ -65,6 +66,7 @@ class DistGit(PackitRepositoryBase):
             package_config: Packit configuration of the package
                 related to this dist-git repo.
             local_project: LocalProject object.
+            clone_path: Path where the dist-git repository is cloned.
         """
         super().__init__(config=config, package_config=package_config)
 
@@ -72,6 +74,7 @@ class DistGit(PackitRepositoryBase):
 
         self.fas_user = self.config.fas_user
         self._downstream_config: Optional[PackageConfig] = None
+        self._clone_path: Optional[str] = clone_path
 
     def __repr__(self):
         return (
@@ -109,14 +112,12 @@ class DistGit(PackitRepositoryBase):
     def local_project(self):
         """return an instance of LocalProject"""
         if self._local_project is None:
-            if self.package_config.dist_git_clone_path:
-                working_dir = self.package_config.dist_git_clone_path
-                working_dir_is_temporary = False
+            if self._clone_path:
+                working_dir = self._clone_path
             else:
                 tmpdir = tempfile.mkdtemp(prefix="packit-dist-git")
                 self.clone_package(target_path=tmpdir)
                 working_dir = tmpdir
-                working_dir_is_temporary = True
 
             self._local_project = LocalProject(
                 working_dir=working_dir,
@@ -128,7 +129,7 @@ class DistGit(PackitRepositoryBase):
                 ),
                 cache=self.repository_cache,
             )
-            self._local_project.working_dir_temporary = working_dir_is_temporary
+            self._local_project.working_dir_temporary = not self._clone_path
             self._local_project.refresh_the_arguments()
         elif not self._local_project.git_project:
             self._local_project.git_project = self.config.get_project(
