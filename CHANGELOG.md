@@ -1,3 +1,9 @@
+# 0.58.0
+
+- Action `fix_spec_file` can change a spec file - Packit now preserves that change. (#1679)
+- Packit now uses (py)rpkg instead of rebasehelper to parse `sources` files in dist-git repos and to interact with lookaside cache. (#1680)
+- `prepare-sources` command now has a new `--no-create-symlinks` option (together with the opposite `--create-symlinks`), which enables copying the archive instead of symlinking. (#1682)
+
 # 0.57.0
 
 - BREAKING CHANGE: fixed an issue where the repo was searched for the specfile before checking if 'downstream_package_name' is set, and '<downstream_package_name>.spec' can be used as the 'specfile_path'. (#1663)
