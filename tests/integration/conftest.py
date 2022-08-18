@@ -51,26 +51,6 @@ HELLO_RELEASE = "1.0.1"
 
 
 @pytest.fixture()
-def mock_downstream_remote_functionality(downstream_n_distgit):
-    u, d = downstream_n_distgit
-
-    dglp = LocalProject(
-        working_dir=d,
-        git_url="https://packit.dev/rpms/beer",
-        git_service=PagureService(),
-    )
-
-    flexmock(DistGit, update_branch=lambda *args, **kwargs: "0.0.0", local_project=dglp)
-
-    mock_spec_download_remote_s(d)
-
-    pc = get_local_package_config(str(u))
-    pc.dist_git_clone_path = str(d)
-    pc.upstream_project_url = str(u)
-    return u, d
-
-
-@pytest.fixture()
 def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
@@ -170,9 +150,6 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
 
     flexmock(PkgTool, new_sources=mocked_new_sources)
     flexmock(PackitAPI, init_kerberos_ticket=lambda: None)
-    pc = get_local_package_config(str(upstream))
-    pc.dist_git_clone_path = str(distgit)
-    pc.upstream_project_url = str(upstream)
     return upstream, distgit
 
 
@@ -260,15 +237,13 @@ def downstream_n_distgit(tmp_path):
 
 
 @pytest.fixture()
-def upstream_instance(upstream_and_remote, distgit_and_remote, tmp_path):
+def upstream_instance(upstream_and_remote, tmp_path):
     with cwd(tmp_path):
         u, _ = upstream_and_remote
-        d, _ = distgit_and_remote
         c = get_test_config()
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        pc.dist_git_clone_path = str(d)
         lp = LocalProject(working_dir=u)
 
         ups = Upstream(c, pc, lp)
@@ -292,9 +267,8 @@ def distgit_instance(
     d, _ = distgit_and_remote
     c = get_test_config()
     pc = get_local_package_config(str(u))
-    pc.dist_git_clone_path = str(d)
     pc.upstream_project_url = str(u)
-    dg = DistGit(c, pc)
+    dg = DistGit(c, pc, clone_path=str(d))
     return d, dg
 
 
@@ -308,9 +282,8 @@ def distgit_instance_with_autochangelog(
     d, _ = distgit_with_autochangelog_and_remote
     c = get_test_config()
     pc = get_local_package_config(str(u))
-    pc.dist_git_clone_path = str(d)
     pc.upstream_project_url = str(u)
-    dg = DistGit(c, pc)
+    dg = DistGit(c, pc, clone_path=str(d))
     return d, dg
 
 
@@ -331,8 +304,7 @@ def mock_api_for_source_git(
         c = get_test_config()
         pc = get_local_package_config(str(sourcegit))
         pc.upstream_project_url = str(sourcegit)
-        pc.dist_git_clone_path = str(distgit)
-        return PackitAPI(c, pc, up_local_project)
+        return PackitAPI(c, pc, up_local_project, dist_git_clone_path=str(distgit))
 
 
 @pytest.fixture()
