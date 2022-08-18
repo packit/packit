@@ -1,6 +1,6 @@
 import requests
 
-from typing import Optional
+from typing import Dict, Optional
 
 
 def get_upstream_version(package_name: str) -> Optional[str]:
@@ -16,19 +16,23 @@ def get_upstream_version(package_name: str) -> Optional[str]:
     """
 
     def query(endpoint, **kwargs):
-        kwargs["items_per_page"] = 1
         response = requests.get(
-            f"https://release-monitoring.org/api/v2/{endpoint}", params=kwargs
+            f"https://release-monitoring.org/api/{endpoint}", params=kwargs
         )
         if not response.ok:
             return {}
-        items = response.json().get("items", [])
-        return next(iter(items), {})
+        return response.json()
 
     if not package_name:
         return None
-    result = query("packages", distribution="Fedora", name=package_name)
-    # if there is no Fedora mapping, try using package name as project name
-    project_name = result.get("project", package_name)
-    result = query("projects", name=project_name)
-    return result.get("version")
+    result = query(f"project/Fedora/{package_name}")
+    version = result.get("version")
+    if not version:
+        # if there is no Fedora mapping, try using package name as project name
+        result = query("projects", pattern=package_name)
+        projects = result.get("projects", [])
+        project: Dict = next(
+            iter(p for p in projects if p.get("name") == package_name), {}
+        )
+        version = project.get("version")
+    return version
