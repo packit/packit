@@ -9,7 +9,7 @@
         name: "{{ item }}"
       with_items:
         - ogr
-        - rebasehelper
+        - specfile
         - sandcastle
         - requre
         - cachetools
