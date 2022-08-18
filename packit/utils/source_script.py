@@ -27,5 +27,8 @@ def create_source_script(
     if release_suffix:
         options += ["--release-suffix", f"'{release_suffix}'"]
 
+    # do not create symlinks in Copr environment
+    options += ["--no-create-symlinks"]
+
     options += [url]
     return COPR_SOURCE_SCRIPT.format(options=" ".join(options))

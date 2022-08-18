@@ -391,7 +391,8 @@ def test_get_message_from_metadata(metadata, header, result):
             None,
             None,
             "https://github.com/packit/ogr",
-            'packit -d prepare-sources --result-dir "$resultdir" https://github.com/packit/ogr',
+            'packit -d prepare-sources --result-dir "$resultdir" --no-create-symlinks '
+            "https://github.com/packit/ogr",
         ),
         (
             "123",
@@ -400,7 +401,7 @@ def test_get_message_from_metadata(metadata, header, result):
             None,
             None,
             "https://github.com/packit/ogr",
-            'packit -d prepare-sources --result-dir "$resultdir" --ref 123 '
+            'packit -d prepare-sources --result-dir "$resultdir" --ref 123 --no-create-symlinks '
             "https://github.com/packit/ogr",
         ),
         (
@@ -411,7 +412,7 @@ def test_get_message_from_metadata(metadata, header, result):
             None,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
-            "--no-merge-pr https://github.com/packit/ogr",
+            "--no-merge-pr --no-create-symlinks https://github.com/packit/ogr",
         ),
         (
             None,
@@ -421,7 +422,7 @@ def test_get_message_from_metadata(metadata, header, result):
             None,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
-            "--merge-pr --target-branch main https://github.com/packit/ogr",
+            "--merge-pr --target-branch main --no-create-symlinks https://github.com/packit/ogr",
         ),
         (
             None,
@@ -431,7 +432,8 @@ def test_get_message_from_metadata(metadata, header, result):
             0,
             "https://github.com/packit/ogr",
             'packit -d prepare-sources --result-dir "$resultdir" --pr-id 1 '
-            "--merge-pr --target-branch main --job-config-index 0 https://github.com/packit/ogr",
+            "--merge-pr --target-branch main --job-config-index 0 "
+            "--no-create-symlinks https://github.com/packit/ogr",
         ),
     ],
 )

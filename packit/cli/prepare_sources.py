@@ -90,6 +90,13 @@ def load_job_config(job_config):
     type=click.STRING,
     help="Specifies target branch which PR should be merged into.",
 )
+@click.option(
+    "--create-symlinks/--no-create-symlinks",
+    is_flag=True,
+    default=True,
+    help="Specifies whether Packit should create symlinks or copy the "
+    "files (e.g. archive outside specfile dir).",
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(
@@ -115,6 +122,7 @@ def prepare_sources(
     pr_id,
     merge_pr,
     target_branch,
+    create_symlinks,
 ):
     """
     Prepare sources for a new SRPM build using content of the upstream repository.
@@ -142,4 +150,5 @@ def prepare_sources(
         bump_version=bump,
         release_suffix=release_suffix,
         result_dir=result_dir,
+        create_symlinks=create_symlinks,
     )
