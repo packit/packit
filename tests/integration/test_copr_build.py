@@ -8,6 +8,7 @@ from copr.v3 import (
     CoprNoResultException,
     CoprRequestException,
     ProjectProxy,
+    CoprAuthException,
 )
 from flexmock import flexmock
 from munch import munchify
@@ -481,7 +482,7 @@ def test_copr_build_existing_project_error_on_change_settings(
     ).and_return()
 
     flexmock(ProjectProxy).should_receive("edit").and_raise(
-        CoprRequestException, "Only owners and admins may update their projects."
+        CoprAuthException, "Only owners and admins may update their projects."
     ).once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
