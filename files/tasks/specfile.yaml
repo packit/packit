@@ -1,0 +1,5 @@
+---
+- name: Pip install specfile
+  ansible.builtin.pip:
+    name: git+https://github.com/packit/specfile
+  become: true
