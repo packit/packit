@@ -75,12 +75,8 @@ def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):
     if ctx.obj.debug:
         set_logging(level=logging.DEBUG)
         set_logging(logger_name="sandcastle", level=logging.DEBUG)
-        set_logging(logger_name="rebasehelper", level=logging.DEBUG)
     else:
         set_logging(level=logging.INFO)
-        # rebase-helper prints errors about missing patches which are not an error in our case
-        #   Patch glibc-fedora-nscd.patch does not exist
-        set_logging(logger_name="rebasehelper", level=logging.CRITICAL)
 
     packit_version = get_distribution("packitos").version
     logger.debug(f"Packit {packit_version} is being used.")
