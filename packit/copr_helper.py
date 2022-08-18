@@ -12,6 +12,7 @@ from copr.v3.exceptions import (
     CoprNoResultException,
     CoprException,
     CoprRequestException,
+    CoprAuthException,
 )
 from munch import Munch
 
@@ -144,7 +145,7 @@ class CoprHelper:
                 self.copr_client.project_proxy.edit(
                     ownername=owner, projectname=project, **kwargs
                 )
-            except CoprRequestException as ex:
+            except CoprAuthException as ex:
                 if "Only owners and admins may update their projects." in str(ex):
                     if request_admin_if_needed:
                         logger.info(
