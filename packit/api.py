@@ -858,7 +858,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         finally:
             if not use_local_content and not upstream_ref:
                 logger.info(f"Checking out the original branch {current_up_branch}.")
-                self.up.local_project.git_repo.git.checkout(current_up_branch)
+                self.up.local_project.git_repo.git.checkout(current_up_branch, "-f")
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
         return pr
