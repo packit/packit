@@ -183,7 +183,7 @@ class CoprHelper:
 
         fields_to_change: Dict[str, Tuple[Any, Any]] = {}
         if chroots is not None:
-            old_chroots = set(copr_proj.chroot_repos.keys())
+            old_chroots = self.get_chroots(copr_project=copr_proj)
 
             new_chroots = None
             if not set(chroots).issubset(old_chroots):
@@ -397,18 +397,27 @@ class CoprHelper:
                 f"There is no such target {chroot} in {owner}/{project}."
             )
 
-    def get_chroots(self, owner: str, project: str) -> Set[str]:
+    def get_chroots(
+        self,
+        owner: Optional[str] = None,
+        project: Optional[str] = None,
+        copr_project=None,
+    ) -> Set[str]:
         """
-        Get chroots set on a specific project.
+        Get chroots set on a specific project. Use either `owner`+`project` or
+        directly `copr_project`.
 
         Args:
             owner: Owner of the Copr project.
             project: Name of the Copr project.
+            copr_project: Already fetched Copr project via project proxy of a
+                Copr client.
 
         Returns:
             Set of all enabled chroots on the requested Copr project.
         """
-        copr_project = self.copr_client.project_proxy.get(
-            ownername=owner, projectname=project
-        )
+        if not copr_project:
+            copr_project = self.copr_client.project_proxy.get(
+                ownername=owner, projectname=project
+            )
         return set(copr_project.chroot_repos.keys())
