@@ -62,6 +62,10 @@ class PackitCoprSettingsException(PackitException):
         super().__init__(*args)
 
 
+class PackitCoprBuildTimeoutException(PackitException):
+    """Copr build has timed out"""
+
+
 class PackitInvalidConfigException(PackitConfigException):
     """provided configuration file is not valid"""
 
