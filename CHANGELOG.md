@@ -1,3 +1,9 @@
+# 0.59.0
+
+- Packit CLI can now submit VM images in Red Hat Image Builder.
+  All build-related commands have now consistent `--wait`/`--no-wait` options. (#1666)
+- No more annoying issues will be created after a successfull propose downstream. (#1693)
+
 # 0.58.0
 
 - Action `fix_spec_file` can change a spec file - Packit now preserves that change. (#1679)
