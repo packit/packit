@@ -313,14 +313,15 @@ class DistGit(PackitRepositoryBase):
 
         :return: path to the archive
         """
+        logger.info(f"Downloading archive: {self.upstream_archive_name}")
         with cwd(self.local_project.working_dir):
             self.download_remote_sources(self.config.pkg_tool)
         archive = self.absolute_source_dir / self.upstream_archive_name
         if not archive.exists():
             raise PackitException(
-                "Upstream archive was not downloaded, something is wrong."
+                "Upstream archive was not downloaded. Check that {} exists in dist-git.".format(
+                    self.upstream_archive_name)
             )
-        logger.info(f"Downloaded archive: {archive}")
         return archive
 
     def download_source_files(self, pkg_tool: str = ""):
