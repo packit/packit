@@ -320,7 +320,8 @@ class DistGit(PackitRepositoryBase):
         if not archive.exists():
             raise PackitException(
                 "Upstream archive was not downloaded. Check that {} exists in dist-git.".format(
-                    self.upstream_archive_name)
+                    self.upstream_archive_name
+                )
             )
         return archive
 
