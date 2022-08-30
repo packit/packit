@@ -396,3 +396,15 @@ class CoprHelper:
             raise PackitCoprProjectException(
                 f"There is no such target {chroot} in {owner}/{project}."
             )
+
+    def get_packit_forge_projects_allowed(self, owner: str, project: str) -> str:
+        """Get a str with a list of the allowed packit forge projects"""
+        copr_proj = self.copr_client.project_proxy.get(
+            ownername=owner, projectname=project
+        )
+        try:
+            return copr_proj["packit_forge_projects_allowed"]
+        except KeyError:
+            raise PackitCoprProjectException(
+                f"There is no such key 'packit_forge_projects_allowed' in {owner}/{project}."
+            )
