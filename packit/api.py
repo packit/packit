@@ -1610,14 +1610,21 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def get_testing_updates(self, update_alias: Optional[str]) -> List:
         bodhi_client = get_bodhi_client()
-        results = bodhi_client.query(
-            alias=update_alias,
-            packages=self.dg.package_config.downstream_package_name,
-            status="testing",
-        )["updates"]
+        updates = []
+        page = pages = 1
+        while page <= pages:
+            results = bodhi_client.query(
+                alias=update_alias,
+                packages=self.dg.package_config.downstream_package_name,
+                status="testing",
+                page=page,
+            )
+            updates.extend(results["updates"])
+            page += 1
+            pages = results["pages"]
         logger.debug("Bodhi updates with status 'testing' fetched.")
 
-        return results
+        return updates
 
     @staticmethod
     def days_in_testing(update) -> int:
