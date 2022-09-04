@@ -27,7 +27,7 @@ def bodhi_client_response():
             }
             for name, long_name, id_prefix, state in releases_list
         ]
-        response = {"releases": releases}
+        response = {"releases": releases, "page": 1, "pages": 1}
         return munchify(response)
 
     return response_factory
