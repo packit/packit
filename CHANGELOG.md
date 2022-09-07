@@ -1,3 +1,7 @@
+# 0.60.1
+
+- packit propose-downstream is now more informative when sources cannot be downloaded. (#1698)
+
 # 0.59.0
 
 - Packit CLI can now submit VM images in Red Hat Image Builder.
