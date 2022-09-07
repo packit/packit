@@ -31,5 +31,7 @@ jobs:
         with:
           labels: release
           token: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
+          commit-message: Release ${{ inputs.version }}
           title: Release ${{ inputs.version }}
+          body: Update the changelog and the specfile for release ${{ inputs.version }}.
           delete-branch: true
