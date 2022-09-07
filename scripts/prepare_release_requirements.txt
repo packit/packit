@@ -1,3 +1,0 @@
-specfile
-click
-GitPython
