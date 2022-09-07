@@ -21,7 +21,10 @@ def prepare_release(version: str, specfile_path: List[str]):
         with Specfile(path, autosave=True) as specfile:
             specfile.version = version
             specfile.release = "1"
-            specfile.add_changelog_entry(f"- New upstream release {version}")
+            specfile.add_changelog_entry(
+                f"- New upstream release {version}",
+                author="Packit Team <hello@packit.dev>",
+            )
 
 
 if __name__ == "__main__":
