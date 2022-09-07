@@ -1,0 +1,21 @@
+name: Create a GitHub release once a release PR is merged
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          VERSION=$(grep -oP '^# \K[0-9.]*' CHANGELOG.md | head -n 1)
+          OLD_VERSION=$(grep -oP '^# \K[0-9.]*' CHANGELOG.md | head -n 2 | tail -n 1)
+          awk "/# ${VERSION}/,/# ${OLD_VERSION}/" CHANGELOG.md | head -n -1
+          gh release create ${VERSION} --draft --title ${VERSION} -F CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
