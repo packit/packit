@@ -5,11 +5,10 @@ on:
     types: [opened]
 
 jobs:
-  automate-project-columns:
+  add-new-issue-to-the-kanban-board:
     runs-on: ubuntu-latest
     steps:
-      - uses: alex-page/github-project-automation-plus@v0.8.1
+      - uses: actions/add-to-project@v0.3.0
         with:
-          project: "PackitKanbanBoard"
-          column: new
-          repo-token: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
+          project-url: https://github.com/orgs/packit/projects/7
+          github-token: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
