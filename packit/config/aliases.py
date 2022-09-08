@@ -239,12 +239,16 @@ def get_aliases() -> Dict[str, List[str]]:
         Dictionary containing aliases.
     """
     bodhi_client = get_bodhi_client()
-    releases = bodhi_client.get_releases(exclude_archived=True)
+    releases = []
+    page = pages = 1
+    while page <= pages:
+        results = bodhi_client.get_releases(exclude_archived=True, page=page)
+        releases.extend(results.releases)
+        page += 1
+        pages = results.pages
     current_fedora_releases, pending_fedora_releases, epel_releases = [], [], []
 
-    for release in filter(
-        lambda r: r.state in ["current", "pending"], releases.releases
-    ):
+    for release in filter(lambda r: r.state in ["current", "pending"], releases):
         if release.id_prefix == "FEDORA" and release.name != "ELN":
             name = release.long_name.lower().replace(" ", "-")
             if release.state == "current":

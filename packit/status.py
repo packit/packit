@@ -132,20 +132,27 @@ class Status:
         :return: None
         """
         bodhi_client = get_bodhi_client()
-        results = bodhi_client.query(
-            packages=self.dg.package_config.downstream_package_name
-        )["updates"]
+        updates = []
+        page = pages = 1
+        while page <= pages:
+            results = bodhi_client.query(
+                packages=self.dg.package_config.downstream_package_name,
+                page=page,
+            )
+            updates.extend(results["updates"])
+            page += 1
+            pages = results["pages"]
         logger.debug("Bodhi updates fetched.")
 
         stable_branches: Set[str] = set()
         all_updates = [
             [
-                result["title"],
-                result["karma"],
-                result["status"],
-                result["release"]["branch"],
+                update["title"],
+                update["karma"],
+                update["status"],
+                update["release"]["branch"],
             ]
-            for result in results
+            for update in updates
         ]
         updates = []
         for [update, karma, status, branch] in all_updates:
