@@ -10,7 +10,7 @@ from packit.utils.bodhi import OurBodhiClient
 def test_status_updates(config_mock, package_config_mock, upstream_mock, distgit_mock):
     flexmock(
         OurBodhiClient,
-        query=lambda packages: {
+        query=lambda packages, page: {
             "updates": [
                 {
                     "title": "python-requre-0.8.1-2.fc33",
@@ -24,7 +24,9 @@ def test_status_updates(config_mock, package_config_mock, upstream_mock, distgit
                     "status": "stable",
                     "release": {"branch": "f34"},
                 },
-            ]
+            ],
+            "page": 1,
+            "pages": 1,
         },
     )
 

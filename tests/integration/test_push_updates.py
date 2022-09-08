@@ -193,7 +193,9 @@ def query_response():
                         "test_cases": [],
                     }
                 )
-            ]
+            ],
+            "page": 1,
+            "pages": 1,
         }
     )
 
