@@ -21,6 +21,8 @@ jobs:
         with:
           version: ${{ inputs.version }}
           specfiles: packit.spec
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
