@@ -656,6 +656,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         force_new_sources=False,
         upstream_ref: Optional[str] = None,
         create_pr: Literal[True] = True,
+        update_pr: bool = False,
         force: bool = False,
         create_sync_note: bool = True,
         title: Optional[str] = None,
@@ -677,6 +678,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         force_new_sources=False,
         upstream_ref: Optional[str] = None,
         create_pr: Literal[False] = False,
+        update_pr: bool = False,
         force: bool = False,
         create_sync_note: bool = True,
         title: Optional[str] = None,
@@ -697,6 +699,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         force_new_sources=False,
         upstream_ref: Optional[str] = None,
         create_pr: bool = True,
+        update_pr: bool = False,
         force: bool = False,
         create_sync_note: bool = True,
         title: Optional[str] = None,
@@ -841,7 +844,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
 
             pr = None
-            if create_pr:
+            if update_pr:
+                self.dg.push_to_fork(self.dg.local_project.ref, force=True)
+            elif create_pr:
                 title = title or f"Update to upstream release {version}"
 
                 pr = self.dg.existing_pr(title, description.rstrip(), dist_git_branch)
