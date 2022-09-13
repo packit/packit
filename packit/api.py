@@ -873,12 +873,10 @@ The first dist-git commit to be synced is '{short_hash}'.
             The description str will be all the other lines in the latest commit, if any.
         """
         message = self.dg.local_project.git_repo.head.commit.message
-        lines = [line for line in message.split("\n")]
-
+        lines = list(message.split("\n"))
         title = lines[0] or f"({self.dg.local_project.commit_hexsha})"
         description = "\n".join(lines[1:]).strip()
-
-        return (f"Update upstream to latest dist-git commit: {title}", description)
+        return f"Update upstream to latest dist-git commit: {title}", description
 
     def sync_push(
         self,
