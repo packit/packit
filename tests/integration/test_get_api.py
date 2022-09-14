@@ -164,7 +164,7 @@ def test_url_is_upstream():
                 ("origin", "git@github.com:user/ogr.git"),
             ],
             JobConfig(
-                type=JobType.build,
+                type=JobType.copr_build,
                 trigger=JobConfigTriggerType.pull_request,
                 upstream_project_url="https://github.com/packit/ogr",
             ),

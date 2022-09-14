@@ -943,7 +943,7 @@ def test_package_config_parse(raw, expected):
                 "specfile_path": "fedora/package.spec",
                 "jobs": [
                     {
-                        "job": "build",
+                        "job": "copr_build",
                         "trigger": "release",
                         "specfile_path": "somewhere/package.spec",
                     }
@@ -953,7 +953,7 @@ def test_package_config_parse(raw, expected):
                 specfile_path="fedora/package.spec",
                 jobs=[
                     JobConfig(
-                        type=JobType.build,
+                        type=JobType.copr_build,
                         trigger=JobConfigTriggerType.release,
                         specfile_path="somewhere/package.spec",
                     )
@@ -970,7 +970,7 @@ def test_package_config_parse(raw, expected):
                 "targets": ["fedora-36"],
                 "jobs": [
                     {
-                        "job": "build",
+                        "job": "copr_build",
                         "trigger": "release",
                         "specfile_path": "somewhere/package.spec",
                         "files_to_sync": ["a", "b", "c"],
@@ -986,7 +986,7 @@ def test_package_config_parse(raw, expected):
                 _targets=["fedora-36"],
                 jobs=[
                     JobConfig(
-                        type=JobType.build,
+                        type=JobType.copr_build,
                         trigger=JobConfigTriggerType.release,
                         specfile_path="somewhere/package.spec",
                         files_to_sync=[SyncFilesItem([x], x) for x in ("a", "b", "c")],
