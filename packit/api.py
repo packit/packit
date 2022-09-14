@@ -842,17 +842,12 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             pr = None
             if create_pr:
-                title = title or f"Update to upstream release {version}"
-
-                pr = self.dg.existing_pr(title, description.rstrip(), dist_git_branch)
-                if not pr:
-                    pr = self.push_and_create_pr(
-                        pr_title=title,
-                        pr_description=description,
-                        git_branch=dist_git_branch,
-                    )
-                else:
-                    logger.debug(f"PR already exists: {pr.url}")
+                pr = self.push_and_create_pr(
+                    pr_title=title or f"Update to upstream release {version}",
+                    pr_description=description,
+                    git_branch=dist_git_branch,
+                    repo=self.dg,
+                )
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
@@ -917,10 +912,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                 " will not discard the changes. Use --force to bypass."
             )
 
-        pr = None
         source_git_branch = (
             source_git_branch or self.up.local_project.git_project.default_branch
         )
+        pr = None
         try:
             self.up.checkout_branch(source_git_branch)
             self.update_source_git()
@@ -930,23 +925,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                 default_description,
             ) = self.get_pr_default_title_and_description()
             if create_pr:
-                title = title or default_title
-                description = description or default_description
-
-                pr = self.up.existing_pr(
-                    title,
-                    description.rstrip(),
-                    source_git_branch,
+                pr = self.push_and_create_pr(
+                    pr_title=title or default_title,
+                    pr_description=description or default_description,
+                    git_branch=source_git_branch,
+                    repo=self.up,
                 )
-                if not pr:
-                    pr = self.push_and_create_pr(
-                        repo=self.up,
-                        pr_title=title,
-                        pr_description=description,
-                        git_branch=source_git_branch,
-                    )
-                else:
-                    logger.debug(f"PR already exists: {pr.url}")
             else:
                 self.up.push(refspec=f"HEAD:{source_git_branch}")
         finally:
@@ -1083,17 +1067,21 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_title: str,
         pr_description: str,
         git_branch: str,
-        repo: Optional[Union[Upstream, DistGit]] = None,
+        repo: Union[Upstream, DistGit],
     ) -> PullRequest:
-        repo = repo or self.dg
-        # the branch may already be up, let's push forcefully
-        repo.push_to_fork(repo.local_project.ref, force=True)
-        return repo.create_pull(
-            pr_title,
-            pr_description,
-            source_branch=repo.local_project.ref,
-            target_branch=git_branch,
-        )
+        pr = repo.existing_pr(pr_title, pr_description.rstrip(), git_branch)
+        if pr is None:
+            # the branch may already be up, let's push forcefully
+            repo.push_to_fork(repo.local_project.ref, force=True)
+            pr = repo.create_pull(
+                pr_title,
+                pr_description,
+                source_branch=repo.local_project.ref,
+                target_branch=git_branch,
+            )
+        else:
+            logger.debug(f"PR already exists: {pr.url}")
+        return pr
 
     def _handle_sources(
         self,
