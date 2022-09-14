@@ -520,10 +520,10 @@ class PackitRepositoryBase:
         Return:
             PullRequest: if one is found otherwise None
         """
-        prs = self.local_project.git_project.get_pr_list()
+        pull_requests = self.local_project.git_project.get_pr_list()
         current_user = self.local_project.git_service.user.get_username()
 
-        for pr in prs:
+        for pr in pull_requests:
             if (
                 pr.title == title
                 and pr.description == description
