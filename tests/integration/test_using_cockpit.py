@@ -57,7 +57,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
     flexmock(DistGit).should_receive("existing_pr").and_return(None)
     flexmock(
         PackitAPI,
-        push_and_create_pr=lambda pr_title, pr_description, git_branch: None,
+        push_and_create_pr=lambda pr_title, pr_description, git_branch, repo: None,
     )
 
     pc = get_local_package_config(str(upstream_path))
