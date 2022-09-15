@@ -41,8 +41,7 @@ requests.sessions:
             Date: Mon, 15 Aug 2022 11:08:25 GMT
             Keep-Alive: timeout=300
             Pragma: no-cache
-            Set-Cookie: foo=baz;
-              path=/; HttpOnly; Secure; SameSite=None
+            Set-Cookie: foo=baz; path=/; HttpOnly; Secure; SameSite=None
             Vary: Accept-Encoding
             referrer-policy: strict-origin
             strict-transport-security: max-age=31536000; includeSubDomains
@@ -91,8 +90,7 @@ requests.sessions:
             Date: Mon, 15 Aug 2022 11:08:25 GMT
             Keep-Alive: timeout=300
             Pragma: no-cache
-            Set-Cookie: bar=baz;
-              path=/; HttpOnly; Secure; SameSite=None
+            Set-Cookie: bar=baz; path=/; HttpOnly; Secure; SameSite=None
             Vary: Accept-Encoding
             referrer-policy: strict-origin
             strict-transport-security: max-age=31536000; includeSubDomains
