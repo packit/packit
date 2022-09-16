@@ -19,14 +19,16 @@ from packit.schema import JobConfigSchema, JobMetadataSchema
 
 
 def get_job_config_dict_simple(**update):
-    result = {"job": "build", "trigger": "release"}
+    result = {"job": "copr_build", "trigger": "release"}
     result.update(update)
     return result
 
 
 def get_job_config_simple(**kwargs):
     """pass kwargs to JobConfig constructor"""
-    return JobConfig(type=JobType.build, trigger=JobConfigTriggerType.release, **kwargs)
+    return JobConfig(
+        type=JobType.copr_build, trigger=JobConfigTriggerType.release, **kwargs
+    )
 
 
 @pytest.fixture()
