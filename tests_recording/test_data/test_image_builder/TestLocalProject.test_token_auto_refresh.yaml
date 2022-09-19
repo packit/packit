@@ -39,8 +39,7 @@ requests.sessions:
             Content-Type: application/json; charset=UTF-8
             Date: Mon, 15 Aug 2022 11:09:45 GMT
             Server: openresty
-            Set-Cookie: asd=qwe;
-              path=/; HttpOnly; Secure; SameSite=None
+            Set-Cookie: asd=qwe; path=/; HttpOnly; Secure; SameSite=None
             Strict-Transport-Security: max-age=31536000; includeSubDomains
             Vary: Accept-Encoding
             X-Frame-Options: SAMEORIGIN
@@ -89,8 +88,7 @@ requests.sessions:
             Date: Mon, 15 Aug 2022 11:09:45 GMT
             Keep-Alive: timeout=300
             Pragma: no-cache
-            Set-Cookie: asd=qwe;
-              path=/; HttpOnly; Secure; SameSite=None
+            Set-Cookie: asd=qwe; path=/; HttpOnly; Secure; SameSite=None
             Vary: Accept-Encoding
             referrer-policy: strict-origin
             strict-transport-security: max-age=31536000; includeSubDomains
