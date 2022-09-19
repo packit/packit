@@ -45,7 +45,7 @@ pytest-3 -v tests_recording
   requre pre-commit hook for removing secrets, e.g. token and login for copr.
   Remove them manually or with:
   ```
-  requre-patch purge --replaces "copr.v3.helpers:login:str:somelogin" --replaces "copr.v3.helpers:token:str:sometoken" tests_recording/test_data/*/*yaml
+  requre-patch purge --replaces ":set-cookie:str:a 'b';" --replaces "copr.v3.helpers:login:str:somelogin" --replaces "copr.v3.helpers:token:str:sometoken" tests_recording/test_data/*/*yaml
   ```
 - Create symlinks for same test-files in `tests_data` that are saved with the response. Requre uses tar archives for saving file content and you can easily symlink them via requre tool:
   ```
