@@ -411,7 +411,8 @@ class DistGit(PackitRepositoryBase):
         )
         pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
-    def get_latest_build_in_tag(self, downstream_package_name, dist_git_branch):
+    @staticmethod
+    def get_latest_build_in_tag(downstream_package_name, dist_git_branch):
         """Query Koji for the latest build of a package in a tag.
 
         Args:
