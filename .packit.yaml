@@ -40,6 +40,7 @@ jobs:
     dist_git_branches:
       - fedora-all
       - epel-8
+      - epel-9
 
   - job: sync_from_downstream
     trigger: commit
@@ -49,11 +50,13 @@ jobs:
     targets:
       - fedora-stable
       - epel-8
+      - epel-9
   - job: tests
     trigger: pull_request
     targets:
       - fedora-stable
       - epel-8
+      - epel-9
 
   - job: copr_build
     trigger: commit
@@ -61,6 +64,7 @@ jobs:
     targets:
       - fedora-stable
       - epel-8
+      - epel-9
     project: packit-dev
     list_on_homepage: True
     preserve_project: True
@@ -71,6 +75,7 @@ jobs:
     targets:
       - fedora-stable
       - epel-8
+      - epel-9
     project: packit-stable
     list_on_homepage: True
     preserve_project: True
@@ -80,6 +85,7 @@ jobs:
     targets:
       - fedora-stable
       - epel-8
+      - epel-9
     project: packit-releases
     list_on_homepage: True
     preserve_project: True
@@ -92,6 +98,7 @@ jobs:
     dist_git_branches:
       - fedora-all
       - epel-8
+      - epel-9
 
   - job: bodhi_update
     trigger: commit
@@ -99,6 +106,7 @@ jobs:
     dist_git_branches:
       - fedora-branched
       - epel-8
+      - epel-9
 #  - job: vm_image_build
 #    trigger: pull_request
 #    packit_instances: ["stg"]
