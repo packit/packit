@@ -2,7 +2,6 @@
 - name: Install test rpm dependencies
   ansible.builtin.dnf:
     name:
-      - python3-flexmock
       - python3-setuptools_scm_git_archive
       - python3-setuptools_scm
       - python3-distro
@@ -24,4 +23,12 @@
   ansible.builtin.pip:
     name: pytest-cov
   when: ansible_distribution != 'Fedora'
+  become: true
+
+# flexmock is not in EPEL 9 (https://bugzilla.redhat.com/show_bug.cgi?id=2120251),
+# install it from PyPI
+- name: Install flexmock from PyPI
+  ansible.builtin.pip:
+    name: flexmock
+    state: latest
   become: true
