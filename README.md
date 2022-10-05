@@ -11,7 +11,7 @@
 Packit is a CLI tool that helps developers auto-package upstream projects
 into Fedora operating system.
 
-You can use packit to continously build your upstream project in Fedora.
+You can use packit to continuously build your upstream project in Fedora.
 
 With packit you can create SRPMs, open pull requests in dist-git, submit koji builds and even create bodhi updates, effectively replacing the whole Fedora packaging workflow.
 
@@ -23,7 +23,7 @@ See our [documentation](https://packit.dev/docs/guide/)
 
 ## To start developing Packit
 
-The [Contributing Guidelines](CONTRIBUTING.md) hosts all information you need to know to contribute to code and documentation, run tests and additionnal configuration.
+The [Contributing Guidelines](CONTRIBUTING.md) hosts all information you need to know to contribute to code and documentation, run tests and additional configuration.
 
 ## Workflows covered by packit
 
@@ -41,7 +41,7 @@ Packit is written in python 3 and is supported only on 3.6 and later.
 
 ## Installation
 
-For complete informations on how to start using packit, please [click here](https://packit.dev/docs/guide/#have-packit-tooling-installed-locally).
+For complete information on how to start using packit, please [click here](https://packit.dev/docs/guide/#have-packit-tooling-installed-locally).
 
 ## User configuration file
 
