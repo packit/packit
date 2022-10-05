@@ -294,7 +294,7 @@ class CoprHelper:
             )
             logger.error(error)
             logger.error(ex.result)
-            raise PackitCoprProjectException(error, ex)
+            raise PackitCoprProjectException(error) from ex
 
     def watch_copr_build(
         self, build_id: int, timeout: int, report_func: Callable = None
