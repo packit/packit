@@ -1,3 +1,7 @@
+# 0.60.0
+
+- Propose downstream job now pushes changes even when it's not creating a new pull request. This allows updating already existing pull requests. (#1725)
+
 # 0.59.1
 
 - 'packit propose-downstream' is now more informative when sources cannot be downloaded. (#1698)
