@@ -19,7 +19,7 @@ jobs:
         # https://pypa-build.readthedocs.io
         run: |
           python -m pip install build
-          python -m build --sdist --wheel
+          python -m build
 
       - name: Publish 📦 to PyPI
         # https://github.com/pypa/gh-action-pypi-publish
