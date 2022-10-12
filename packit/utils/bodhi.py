@@ -81,14 +81,8 @@ class OurBodhiClient(BodhiClient):
     def ensure_auth(self):
         """clear existing authentication data and obtain new"""
         if self.is_bodhi_6:
-            self.clear_auth()
-            logger.info("Bodhi OIDC authentication follows.")
-            if self.fas_username and self.kerberos_realm:
-                # using local TGT to authenticate with id.fp.o
-                self.login_with_kerberos()
-            else:
-                # terminal prompt
-                super().ensure_auth()
+            # DO NOT TRY to be smart here: let all the authentication up to bodhi
+            super().ensure_auth()
         else:
             self._session.cookies.clear()
             self.csrf_token = None
@@ -108,6 +102,7 @@ class OurBodhiClient(BodhiClient):
         Raises:
             PackitException if there is a problem during the auth process
         """
+        logger.info("Obtain OIDC authentication token via Kerberos.")
         authorization_endpoint = self.oidc.metadata["authorization_endpoint"]
         uri, state_ = self.oidc.client.create_authorization_url(authorization_endpoint)
         response = requests.get(
