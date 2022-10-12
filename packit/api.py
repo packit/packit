@@ -1572,11 +1572,18 @@ The first dist-git commit to be synced is '{short_hash}'.
             build_id=build_id, timeout=timeout, report_func=report_func
         )
 
-    @staticmethod
-    def push_bodhi_update(update_alias: str):
+    def push_bodhi_update(self, update_alias: str):
+        """Push selected bodhi update from testing to stable."""
         from bodhi.client.bindings import UpdateNotFound
 
-        bodhi_client = get_bodhi_client()
+        bodhi_client = get_bodhi_client(
+            fas_username=self.config.fas_user,
+            fas_password=self.config.fas_password,
+            kerberos_realm=self.config.kerberos_realm,
+        )
+        # make sure we have the credentials
+        bodhi_client.login_with_kerberos()
+        bodhi_client.ensure_auth()
         try:
             response = bodhi_client.request(update=update_alias, request="stable")
             logger.debug(f"Bodhi response:\n{response}")

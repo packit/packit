@@ -5,6 +5,8 @@ import pytest
 from flexmock import flexmock
 from munch import Munch
 
+from packit.utils.bodhi import OurBodhiClient
+
 
 @pytest.fixture()
 def query_response():
@@ -402,5 +404,11 @@ def test_push_updates(
     BodhiClient.should_receive("request").with_args(
         update="FEDORA-2019-89c99f680c", request="stable"
     ).and_return(request_response).once()
+
+    flexmock(
+        OurBodhiClient,
+        ensure_auth=lambda: None,  # this is where the browser/OIDC fun happens
+        login_with_kerberos=lambda: None,
+    )
 
     api.push_updates()
