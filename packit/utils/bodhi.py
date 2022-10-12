@@ -59,7 +59,8 @@ class OurBodhiClient(BodhiClient):
             super().__init__()
             # in our openshift deployment, ~/.config is not writable, but $HOME is
             # so let's put the token there
-            # TODO: make this properly configurable in bodhi
+            # TODO: implement once bodhi 6.1 will be out:
+            #       https://github.com/fedora-infra/bodhi/pull/4603
             if not os.access(self.oidc.storage.path, os.W_OK):
                 self.oidc.storage.path = os.path.join(
                     os.environ["HOME"], "bodhi-client.json"
