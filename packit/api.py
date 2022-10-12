@@ -20,6 +20,7 @@ from typing import (
     Sequence,
     Callable,
     List,
+    Literal,
     Tuple,
     Dict,
     Iterable,
@@ -28,13 +29,7 @@ from typing import (
     overload,
 )
 
-# Literal is available only since Python3.8, workaround for el8
 from packit.vm_image_build import ImageBuilder
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
 
 import git
 from git.exc import GitCommandError
