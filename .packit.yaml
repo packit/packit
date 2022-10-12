@@ -39,7 +39,6 @@ jobs:
     # Use the stage instance once it works in downstream.
     dist_git_branches:
       - fedora-all
-      - epel-8
       - epel-9
 
   - job: sync_from_downstream
@@ -49,13 +48,11 @@ jobs:
     trigger: pull_request
     targets:
       - fedora-stable
-      - epel-8
       - epel-9
   - job: tests
     trigger: pull_request
     targets:
       - fedora-stable
-      - epel-8
       - epel-9
 
   - job: copr_build
@@ -63,7 +60,6 @@ jobs:
     branch: main
     targets:
       - fedora-stable
-      - epel-8
       - epel-9
     project: packit-dev
     list_on_homepage: True
@@ -74,7 +70,6 @@ jobs:
     branch: stable
     targets:
       - fedora-stable
-      - epel-8
       - epel-9
     project: packit-stable
     list_on_homepage: True
@@ -84,7 +79,6 @@ jobs:
     trigger: release
     targets:
       - fedora-stable
-      - epel-8
       - epel-9
     project: packit-releases
     list_on_homepage: True
@@ -97,7 +91,6 @@ jobs:
     allowed_pr_authors: ["packit-stg", "packit"]
     dist_git_branches:
       - fedora-all
-      - epel-8
       - epel-9
 
   - job: bodhi_update
@@ -105,7 +98,6 @@ jobs:
     packit_instances: ["stg"]
     dist_git_branches:
       - fedora-branched
-      - epel-8
       - epel-9
 #  - job: vm_image_build
 #    trigger: pull_request
