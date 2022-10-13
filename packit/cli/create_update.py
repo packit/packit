@@ -41,6 +41,11 @@ class BugzillaIDs(click.ParamType):
     "(defaults to repo's default branch)",
 )
 @click.option(
+    "--dist-git-path",
+    help="Path to dist-git repo to work in. "
+    "Otherwise clone the repo in a temporary directory.",
+)
+@click.option(
     "--koji-build",
     help="Koji build (NVR) to add to the bodhi update (can be specified multiple times)",
     required=False,
@@ -75,6 +80,7 @@ class BugzillaIDs(click.ParamType):
 def create_update(
     config,
     dist_git_branch,
+    dist_git_path,
     koji_build,
     update_notes,
     update_type,
@@ -87,7 +93,9 @@ def create_update(
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    api = get_packit_api(config=config, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+    )
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
     branches_to_update = get_branches(
