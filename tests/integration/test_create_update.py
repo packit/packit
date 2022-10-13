@@ -284,6 +284,7 @@ def test_basic_bodhi_update(
         OurBodhiClient,
         save=lambda **kwargs: bodhi_response,
         ensure_auth=lambda: None,  # this is where the browser/OIDC fun happens
+        login_with_kerberos=lambda: None,
     )
 
     api.create_update(
@@ -343,6 +344,8 @@ def test_bodhi_update_with_bugs(
                 "bugs": ["1", "2", "3"],
             },
         ),
+        ensure_auth=lambda: None,
+        login_with_kerberos=lambda: None,
     )
     flexmock(OurBodhiClient).should_receive("login_with_kerberos").and_return(None)
 
@@ -377,6 +380,7 @@ def test_bodhi_update_auth_with_fas(
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
         ensure_auth=lambda: None,
+        login_with_kerberos=lambda: None,
     )
 
     api.create_update(
