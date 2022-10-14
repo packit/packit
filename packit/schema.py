@@ -281,7 +281,7 @@ def validate_repo_name(value):
 
 class CommonConfigSchema(Schema):
     """
-    Common methods for JobConfigSchema and PackageConfigSchema
+    Common configuration options and methods for a package.
     """
 
     config_file_path = fields.String(missing=None)
@@ -402,13 +402,16 @@ class CommonConfigSchema(Schema):
         return data
 
 
-class JobConfigSchema(CommonConfigSchema):
+class JobConfigSchema(Schema):
     """
     Schema for processing JobConfig config data.
     """
 
     job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
+    packages = fields.Dict(
+        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+    )
     # 'metadata' is deprecated
     metadata = fields.Nested(JobMetadataSchema)
 
@@ -465,7 +468,7 @@ class JobConfigSchema(CommonConfigSchema):
         return JobConfig(**data)
 
 
-class PackageConfigSchema(CommonConfigSchema):
+class PackageConfigSchema(Schema):
     """
     Schema for processing PackageConfig config data.
 
@@ -483,18 +486,33 @@ class PackageConfigSchema(CommonConfigSchema):
     """
 
     jobs = fields.Nested(JobConfigSchema, many=True)
+    packages = fields.Dict(
+        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+    )
 
     # list of deprecated keys and their replacement (new,old)
     deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
 
     @pre_load
-    def ordered_preprocess(self, data, **kwargs):
-        data = self.rename_deprecated_keys(data, **kwargs)
+    def ordered_preprocess(self, data: dict, **_) -> dict:
+        data = self.rename_deprecated_keys(data)
+        # Don't use 'setdefault' in this case, as we should expect
+        # downstream_package_name only if there is no 'packages' key.
+        if "packages" not in data:
+            package_name = data.pop("downstream_package_name")
+            data["packages"] = {
+                package_name: {
+                    "downstream_package_name": package_name,
+                }
+            }
         data.setdefault("jobs", get_default_jobs())
-        data = self.propagate_options_to_jobs(data, **kwargs)
+        # By this point, we expect both 'packages' and 'jobs' to be present
+        # in the config.
+        data = self.rearrange_packages(data)
+        data = self.rearrange_jobs(data)
         return data
 
-    def rename_deprecated_keys(self, data, **kwargs):
+    def rename_deprecated_keys(self, data: dict) -> dict:
         """
         Based on tuples stored in tuple cls.deprecated_keys, reassigns old keys values to new keys,
         in case new key is None and logs warning
@@ -519,22 +537,63 @@ class PackageConfigSchema(CommonConfigSchema):
         return data
 
     @staticmethod
-    def propagate_options_to_jobs(data, **_):
-        """
-        add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
-        """
-        if not data:  # data is None when .packit.yaml is empty
-            return data
-        for job in data.get("jobs", []):
-            for k, v in data.items():
-                if k == "jobs":
-                    # overriding jobs doesn't make any sense
-                    continue
-                job.setdefault(k, v)
+    def rearrange_packages(data: dict) -> dict:
+        packages = data.pop("packages")
+        jobs = data.pop("jobs")
+        for k, v in packages.items():
+            # First set the defaults which are not inherited from
+            # the top-level, in case they are not set yet.
+            v.setdefault("downstream_package_name", k)
+            # Inherit default values from the top-level.
+            v.update(data | v)
+        data = {"packages": packages, "jobs": jobs}
+        return data
+
+    @staticmethod
+    def rearrange_jobs(data: dict) -> dict:
+        packages = data.pop("packages")
+        jobs = data.pop("jobs")
+        for i, job in enumerate(jobs):
+            job_type = job.pop("job")
+            trigger = job.pop("trigger")
+            selected_packages = job.pop("packages", None)
+            # There is no 'packages' key in the job, so
+            # the job should handle all the top-level packages.
+            if not selected_packages:
+                jobs[i] = {
+                    "job": job_type,
+                    "trigger": trigger,
+                    "packages": {k: v | job for k, v in packages.items()},
+                }
+            # Some top-level packages are selected to be
+            # handled by the job.
+            elif isinstance(selected_packages, list):
+                jobs[i] = {
+                    "job": job_type,
+                    "trigger": trigger,
+                    "packages": {
+                        k: v | job
+                        for k, v in packages.items()
+                        if k in selected_packages
+                    },
+                }
+            # Some top-level packages are selected to be
+            # handled by the job AND have some custom config.
+            elif isinstance(selected_packages, dict):
+                jobs[i] = {
+                    "job": job_type,
+                    "trigger": trigger,
+                    "packages": {
+                        k: packages[k] | job | v for k, v in selected_packages.items()
+                    },
+                }
+            else:
+                raise ValidationError("unknown type")
+        data = {"packages": packages, "jobs": jobs}
         return data
 
     @validates_schema
-    def specfile_path_defined(self, data, **_):
+    def specfile_path_defined(self, data: dict, **_):
         """Check that 'specfile_path' is specified when needed
 
         The only time 'specfile_path' is not required, is when all jobs
@@ -558,7 +617,7 @@ class PackageConfigSchema(CommonConfigSchema):
             )
 
     @post_load
-    def make_instance(self, data, **kwargs):
+    def make_instance(self, data: dict, **_) -> PackageConfig:
         return PackageConfig(**data)
 
 
