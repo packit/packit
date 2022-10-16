@@ -47,9 +47,9 @@ from packit.utils.commands import cwd
                         successful_build: 55
             """
             ),
-            "* field notifications has an incorrect value:\n"
-            "** field pull_request has an incorrect value:\n"
-            "*** value at index successful_build: Not a valid boolean.",
+            "**** field notifications has an incorrect value:\n"
+            "***** field pull_request has an incorrect value:\n"
+            "****** value at index successful_build: Not a valid boolean.",
         ),
         ("", "packit.yaml is valid and ready to be used"),
         (
@@ -139,7 +139,7 @@ from packit.utils.commands import cwd
                 dist_git_namespace: awesome
             """
             ),
-            "* field downstream_package_name: Not a valid string.",
+            "downstream_package_name: Not a valid string.",
         ),
         (
             dedent(
@@ -153,7 +153,7 @@ from packit.utils.commands import cwd
                 create_pr: ""
             """
             ),
-            "* field create_pr: Not a valid boolean.",
+            "create_pr: Not a valid boolean.",
         ),
         (
             dedent(
@@ -185,7 +185,7 @@ from packit.utils.commands import cwd
                 dist_git_namespace: awesome
             """
             ),
-            "* field allowed_gpg_keys: Not a valid list.",
+            "allowed_gpg_keys: Not a valid list.",
         ),
         (
             dedent(

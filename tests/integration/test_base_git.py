@@ -8,7 +8,7 @@ from flexmock import flexmock
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.exceptions import PackitException
-from packit.config import Config, PackageConfig, RunCommandType
+from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
 from packit.local_project import LocalProject
 from tests.spellbook import can_a_module_be_imported
 
@@ -24,7 +24,15 @@ from tests.spellbook import can_a_module_be_imported
 def test_get_output_from_action_defined(echo_cmd, expected_output):
     packit_repository_base = PackitRepositoryBase(
         config=flexmock(Config()),
-        package_config=flexmock(PackageConfig(actions={ActionName.pre_sync: echo_cmd})),
+        package_config=flexmock(
+            PackageConfig(
+                packages={
+                    "package": CommonPackageConfig(
+                        actions={ActionName.pre_sync: echo_cmd}
+                    )
+                }
+            )
+        ),
     )
 
     packit_repository_base.local_project = flexmock(working_dir=".")
@@ -45,7 +53,12 @@ def test_get_output_from_action_defined_in_sandcastle():
     c = Config()
     c.command_handler = RunCommandType.sandcastle
     packit_repository_base = PackitRepositoryBase(
-        config=c, package_config=PackageConfig(actions={ActionName.pre_sync: echo_cmd})
+        config=c,
+        package_config=PackageConfig(
+            packages={
+                "package": CommonPackageConfig(actions={ActionName.pre_sync: echo_cmd})
+            }
+        ),
     )
     packit_repository_base.local_project = LocalProject(working_dir="/tmp")
 
@@ -62,7 +75,11 @@ def test_get_output_from_action_defined_in_sandcastle():
 def test_run_in_sandbox():
     packit_repository_base = PackitRepositoryBase(
         config=Config(),
-        package_config=PackageConfig(actions={ActionName.pre_sync: "ls -lha"}),
+        package_config=PackageConfig(
+            packages={
+                "package": CommonPackageConfig(actions={ActionName.pre_sync: "ls -lha"})
+            }
+        ),
     )
     packit_repository_base.config.actions_handler = "sandcastle"
 
@@ -74,7 +91,10 @@ def test_run_in_sandbox():
 def test_base_push_bad(distgit_and_remote):
     distgit, _ = distgit_and_remote
 
-    b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
+    b = PackitRepositoryBase(
+        config=Config(),
+        package_config=PackageConfig(packages={"package": CommonPackageConfig()}),
+    )
     b.local_project = LocalProject(
         working_dir=distgit, git_url="https://github.com/packit/lol"
     )
@@ -98,7 +118,10 @@ def test_base_push_bad(distgit_and_remote):
 def test_base_push_good(distgit_and_remote):
     distgit, _ = distgit_and_remote
 
-    b = PackitRepositoryBase(config=Config(), package_config=PackageConfig())
+    b = PackitRepositoryBase(
+        config=Config(),
+        package_config=PackageConfig(packages={"package": CommonPackageConfig()}),
+    )
     b.local_project = LocalProject(
         working_dir=distgit, git_url="https://github.com/packit/lol"
     )

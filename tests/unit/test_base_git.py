@@ -12,7 +12,7 @@ from specfile.changelog import ChangelogEntry
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase, requests
 from packit.command_handler import LocalCommandHandler
-from packit.config import Config, RunCommandType, PackageConfig
+from packit.config import Config, CommonPackageConfig, RunCommandType, PackageConfig
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
@@ -27,11 +27,15 @@ def distgit_with_actions():
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
-                downstream_package_name="beer",
-                actions={
-                    ActionName.pre_sync: "command --a",
-                    ActionName.get_current_version: "command --b",
-                },
+                packages={
+                    "package": CommonPackageConfig(
+                        downstream_package_name="beer",
+                        actions={
+                            ActionName.pre_sync: "command --a",
+                            ActionName.get_current_version: "command --b",
+                        },
+                    )
+                }
             )
         ),
     )
@@ -43,9 +47,13 @@ def upstream_with_actions():
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(
-                actions={
-                    ActionName.pre_sync: "command --a",
-                    ActionName.get_current_version: "command --b",
+                packages={
+                    "package": CommonPackageConfig(
+                        actions={
+                            ActionName.pre_sync: "command --a",
+                            ActionName.get_current_version: "command --b",
+                        }
+                    )
                 }
             )
         ),
@@ -63,9 +71,13 @@ def packit_repository_base():
     return PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(
-            actions={
-                ActionName.pre_sync: "command --a",
-                ActionName.get_current_version: "command --b",
+            packages={
+                "package": CommonPackageConfig(
+                    actions={
+                        ActionName.pre_sync: "command --a",
+                        ActionName.get_current_version: "command --b",
+                    }
+                )
             }
         ),
     )
@@ -76,9 +88,13 @@ def packit_repository_base_more_actions():
     return PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(
-            actions={
-                ActionName.pre_sync: ["command --a", "command --a"],
-                ActionName.get_current_version: "command --b",
+            packages={
+                "package": CommonPackageConfig(
+                    actions={
+                        ActionName.pre_sync: ["command --a", "command --a"],
+                        ActionName.get_current_version: "command --b",
+                    }
+                )
             }
         ),
     )
@@ -91,9 +107,13 @@ def packit_repository_base_with_sandcastle_object(tmp_path):
     b = PackitRepositoryBase(
         config=c,
         package_config=PackageConfig(
-            actions={
-                ActionName.pre_sync: "command -a",
-                ActionName.get_current_version: "command -b",
+            packages={
+                "package": CommonPackageConfig(
+                    actions={
+                        ActionName.pre_sync: "command -a",
+                        ActionName.get_current_version: "command -b",
+                    }
+                )
             }
         ),
     )
@@ -285,13 +305,17 @@ def test_get_output_from_action_not_defined(packit_repository_base):
         pytest.param(
             "https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz",
             PackageConfig(
-                specfile_path="rsync.spec",
-                sources=[
-                    SourcesItem(
-                        path="rsync-3.1.3.tar.gz",
-                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
-                    ),
-                ],
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="rsync.spec",
+                        sources=[
+                            SourcesItem(
+                                path="rsync-3.1.3.tar.gz",
+                                url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                            ),
+                        ],
+                    )
+                },
                 jobs=[],
             ),
             "https://git.centos.org/sources/rsync/c8s/82e7829",
@@ -299,13 +323,17 @@ def test_get_output_from_action_not_defined(packit_repository_base):
         pytest.param(
             "https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz",
             PackageConfig(
-                specfile_path="rsync.spec",
-                sources=[
-                    SourcesItem(
-                        path="rsync-3.1.3.tar.gz",
-                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
-                    ),
-                ],
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="rsync.spec",
+                        sources=[
+                            SourcesItem(
+                                path="rsync-3.1.3.tar.gz",
+                                url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                            ),
+                        ],
+                    )
+                },
                 jobs=[],
             ),
             "https://git.centos.org/sources/rsync/c8s/82e7829",
@@ -313,13 +341,17 @@ def test_get_output_from_action_not_defined(packit_repository_base):
         pytest.param(
             "rsync-3.1.3.tar.gz",
             PackageConfig(
-                specfile_path="rsync.spec",
-                sources=[
-                    SourcesItem(
-                        path="rsync-3.1.3.tar.gz",
-                        url="https://git.centos.org/sources/rsync/c8s/82e7829",
-                    ),
-                ],
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="rsync.spec",
+                        sources=[
+                            SourcesItem(
+                                path="rsync-3.1.3.tar.gz",
+                                url="https://git.centos.org/sources/rsync/c8s/82e7829",
+                            ),
+                        ],
+                    )
+                },
                 jobs=[],
             ),
             "https://git.centos.org/sources/rsync/c8s/82e7829",
