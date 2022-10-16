@@ -24,6 +24,9 @@ from tests.spellbook import (
     UPSTREAM_WEIRD_SOURCES,
 )
 
+from packit.config import JobConfig, PackageConfig
+from deepdiff import DeepDiff
+
 
 # define own tmp_path fixture for older version of pytest (Centos)
 try:
@@ -220,3 +223,25 @@ def configure_git():
         return
     for item in CMDS:
         subprocess.call(item)
+
+
+def pytest_assertrepr_compare(op, left, right):
+    """Use DeepDiff to show the difference between dictionaries and config objects
+    when they are not equal.
+
+    Makes figuring out test failures somewhat easier.
+    """
+    if isinstance(left, JobConfig) and isinstance(right, JobConfig) and op == "==":
+        from packit.schema import JobConfigSchema
+
+        schema = JobConfigSchema()
+        return [str(DeepDiff(schema.dump(left), schema.dump(right)))]
+    elif (
+        isinstance(left, PackageConfig)
+        and isinstance(right, PackageConfig)
+        and op == "=="
+    ):
+        from packit.schema import PackageConfigSchema
+
+        schema = PackageConfigSchema()
+        return [str(DeepDiff(schema.dump(left), schema.dump(right)))]
