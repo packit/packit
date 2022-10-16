@@ -7,7 +7,7 @@ from typing import Dict, List, Set, Tuple
 
 from ogr.abstract import Release
 from packit.config import Config
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import MultiplePackages
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -26,7 +26,7 @@ class Status:
     def __init__(
         self,
         config: Config,
-        package_config: CommonPackageConfig,
+        package_config: MultiplePackages,
         upstream: Upstream,
         distgit: DistGit,
     ):

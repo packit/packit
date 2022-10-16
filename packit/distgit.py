@@ -17,10 +17,10 @@ from specfile.utils import NEVR
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
+    MultiplePackages,
     PackageConfig,
     get_local_package_config,
 )
-from packit.config.common_package_config import CommonPackageConfig
 from packit.exceptions import PackitException, PackitConfigException
 from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
@@ -56,7 +56,7 @@ class DistGit(PackitRepositoryBase):
     def __init__(
         self,
         config: Config,
-        package_config: CommonPackageConfig,
+        package_config: MultiplePackages,
         local_project: LocalProject = None,
         clone_path: Optional[str] = None,
     ):
@@ -90,7 +90,7 @@ class DistGit(PackitRepositoryBase):
     def clone(
         cls,
         config: Config,
-        package_config: CommonPackageConfig,
+        package_config: MultiplePackages,
         path: Path,
         branch: Optional[str] = None,
     ) -> "DistGit":

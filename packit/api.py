@@ -40,7 +40,7 @@ from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
@@ -123,7 +123,7 @@ class PackitAPI:
         self,
         config: Config,
         package_config: Optional[
-            CommonPackageConfig
+            MultiplePackages
         ],  # validate doesn't want PackageConfig
         upstream_local_project: LocalProject = None,
         downstream_local_project: LocalProject = None,
@@ -131,7 +131,7 @@ class PackitAPI:
         dist_git_clone_path: Optional[str] = None,
     ) -> None:
         self.config = config
-        self.package_config: CommonPackageConfig = package_config
+        self.package_config: MultiplePackages = package_config
         self.upstream_local_project = upstream_local_project
         self.downstream_local_project = downstream_local_project
         self.stage = stage

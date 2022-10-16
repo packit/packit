@@ -19,6 +19,7 @@ from packit.config.notifications import (
 )
 from packit.config.sources import SourcesItem
 from packit.constants import PROD_DISTGIT_URL, DISTGIT_NAMESPACE
+from packit.exceptions import PackitConfigException
 from packit.sync import SyncFilesItem, iter_srcs
 
 
@@ -30,16 +31,6 @@ class Deployment(Enum):
 
 class CommonPackageConfig:
     """Common configuration
-
-    We want JobConfig to hold all the attributes from PackageConfig so we don't need to
-    pass both PackageConfig and JobConfig to handlers in p-s. We also want people
-    to be able to override global PackageConfig attributes per job.
-
-                        CommonPackageConfig
-                              /      \
-                   PackageConfig   JobConfig
-                          //
-              contains [JobConfig]
 
     Attributes:
         config_file_path: Path of the configuration file from which this
@@ -320,6 +311,18 @@ class CommonPackageConfig:
         # Mind the 's'!
         return f"CommonPackageConfig: {s.dumps(self)}"
 
+    def __eq__(self, other: object):
+        if not isinstance(other, CommonPackageConfig):
+            raise PackitConfigException(
+                "Provided object is not a CommonPackageConfig instance."
+            )
+        # required to avoid cyclical imports
+        from packit.schema import CommonConfigSchema
+
+        s = CommonConfigSchema()
+        # Compare the serialized objects.
+        return s.dump(self) == s.dump(other)
+
     @property
     def downstream_project_url(self) -> str:
         if not self._downstream_project_url:
@@ -380,3 +383,18 @@ class CommonPackageConfig:
                 )
 
         return files
+
+
+class MultiplePackages:
+    def __init__(self, packages: Dict[str, CommonPackageConfig]):
+        self.packages = packages
+        self._first_package = list(self.packages)[0]
+
+    def __getattr__(self, name):
+        if len(self.packages) == 1:
+            return getattr(self.packages[self._first_package], name)
+        else:
+            raise AttributeError(
+                f"It is ambiguous to get {name}: "
+                "there is more than one package in the config."
+            )
