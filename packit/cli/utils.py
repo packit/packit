@@ -12,8 +12,8 @@ from github import GithubException
 
 from ogr.parsing import parse_git_repo
 
-from packit.config.common_package_config import CommonPackageConfig
 from packit.config.package_config import PackageConfig
+from packit.config.common_package_config import MultiplePackages
 
 from packit.api import PackitAPI
 from packit.config import Config, get_local_package_config, JobType
@@ -92,41 +92,36 @@ def get_packit_api(
     config: Config,
     local_project: LocalProject,
     dist_git_path: Optional[str] = None,
-    load_packit_yaml: bool = True,
     job_config_index: Optional[int] = None,
     job_type: Optional[JobType] = None,
 ) -> PackitAPI:
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config: CommonPackageConfig
-    if load_packit_yaml:
-        package_config = get_local_package_config(
-            local_project.working_dir,
-            repo_name=local_project.repo_name,
-            try_local_dir_last=True,
-            package_config_path=config.package_config_path,
-        )
-        logger.debug(f"job_config_index: {job_config_index}")
-        if job_config_index is not None and isinstance(package_config, PackageConfig):
-            if job_config_index >= len(package_config.jobs):
-                raise PackitException(
-                    "job_config_index is bigger than number of jobs in package config!"
-                )
-            package_config = package_config.jobs[job_config_index]
-            logger.debug(f"Final package (job) config: {package_config}")
-        elif job_type is not None:
-            try:
-                package_config = [
-                    job for job in package_config.jobs if job.type == job_type
-                ][0]
-            except IndexError:
-                raise PackitException(
-                    f"No job with type {job_type} found in package config."
-                )
-            logger.debug(f"Final package (job) config: {package_config}")
-    else:
-        package_config = PackageConfig()
+    package_config: MultiplePackages = get_local_package_config(
+        local_project.working_dir,
+        repo_name=local_project.repo_name,
+        try_local_dir_last=True,
+        package_config_path=config.package_config_path,
+    )
+    logger.debug(f"job_config_index: {job_config_index}")
+    if job_config_index is not None and isinstance(package_config, PackageConfig):
+        if job_config_index >= len(package_config.jobs):
+            raise PackitException(
+                "job_config_index is bigger than number of jobs in package config!"
+            )
+        package_config = package_config.jobs[job_config_index]
+        logger.debug(f"Final package (job) config: {package_config}")
+    elif job_type is not None:
+        try:
+            package_config = [
+                job for job in package_config.jobs if job.type == job_type
+            ][0]
+        except IndexError:
+            raise PackitException(
+                f"No job with type {job_type} found in package config."
+            )
+        logger.debug(f"Final package (job) config: {package_config}")
 
     if dist_git_path and Path(dist_git_path) == local_project.working_dir:
         return PackitAPI(

@@ -16,7 +16,12 @@ from marshmallow import (
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
-from packit.config import PackageConfig, Config, CommonPackageConfig, Deployment
+from packit.config import (
+    PackageConfig,
+    Config,
+    CommonPackageConfig,
+    Deployment,
+)
 from packit.config.job_config import (
     JobType,
     JobConfig,
@@ -378,6 +383,10 @@ class CommonConfigSchema(Schema):
                 value = f"Source{value}"
         return value
 
+    @post_load
+    def make_instance(self, data, **_):
+        return CommonPackageConfig(**data)
+
     @post_dump(pass_original=True)
     def adjust_files_to_sync(
         self, data: dict, original: CommonPackageConfig, **kwargs
@@ -417,54 +426,85 @@ class JobConfigSchema(Schema):
 
     @pre_load
     def ordered_preprocess(self, data, **_):
-        if "metadata" in data:
-            logger.warning(
-                "The 'metadata' key in jobs is deprecated and can be removed."
-                "Nest config options from 'metadata' directly under the job object."
-            )
-
-            not_nested_metadata_keys = [
-                k
-                for k in (
-                    "_targets",
-                    "timeout",
-                    "owner",
-                    "project",
-                    "dist_git_branches",
-                    "branch",
-                    "scratch",
-                    "list_on_homepage",
-                    "preserve_project",
-                    "use_internal_tf",
-                    "additional_packages",
-                    "additional_repos",
-                    "fmf_url",
-                    "fmf_ref",
-                    "skip_build",
-                    "env",
-                    "enable_net",
-                )
-                if k in data
-            ]
-            if not_nested_metadata_keys:
-                raise ValidationError(
-                    f"Keys: {not_nested_metadata_keys} are defined outside job metadata dictionary."
-                    "Mixing obsolete metadata dictionary and new job keys is not possible."
-                    "Remove obsolete nested job metadata dictionary."
+        for package, config in data.get("packages", {}).items():
+            if "metadata" in config:
+                logger.warning(
+                    "The 'metadata' key in jobs is deprecated and can be removed. "
+                    "Nest config options from 'metadata' directly under the job object."
                 )
 
-        for key in ("targets", "dist_git_branches"):
-            if isinstance(data, dict) and isinstance(data.get(key), str):
-                # allow key value being specified as string, convert to list
-                data[key] = [data.pop(key)]
+                not_nested_metadata_keys = [
+                    k
+                    for k in (
+                        "_targets",
+                        "timeout",
+                        "owner",
+                        "project",
+                        "dist_git_branches",
+                        "branch",
+                        "scratch",
+                        "list_on_homepage",
+                        "preserve_project",
+                        "use_internal_tf",
+                        "additional_packages",
+                        "additional_repos",
+                        "fmf_url",
+                        "fmf_ref",
+                        "skip_build",
+                        "env",
+                        "enable_net",
+                    )
+                    if k in config
+                ]
+                if not_nested_metadata_keys:
+                    raise ValidationError(
+                        f"Keys: {not_nested_metadata_keys} are defined outside job metadata "
+                        "dictionary. Mixing obsolete metadata dictionary and new job keys "
+                        "is not possible. Remove obsolete nested job metadata dictionary."
+                    )
+                metadata = config.pop("metadata")
+                config.update(metadata)
+
+            for key in ("targets", "dist_git_branches"):
+                if isinstance(config, dict) and isinstance(config.get(key), str):
+                    # allow key value being specified as string, convert to list
+                    data["packages"][package][key] = [config.pop(key)]
 
         return data
 
+    @validates_schema
+    def specfile_path_defined(self, data, **_):
+        """Check if a 'specfile_path' is specified for each package
+
+        The only time 'specfile_path' is not required, is when the job is a
+        'test' job.
+
+        Args:
+            data: partially loaded configuration data.
+
+        Raises:
+            ValidationError, if 'specfile_path' is not specified when
+            it should be.
+        """
+        # This is somewhat weird: while 'data' is still a dict,
+        # elements in 'jobs' was already loaded, so those are JobConfig objects.
+        if (data["type"] == JobType.tests.value and data.get("skip_build")) or data.get(
+            "specfile_path"
+        ):
+            return
+
+        errors = {}
+        for package, config in data.get("packages", {}).items():
+            if not config.specfile_path:
+                errors[package] = [
+                    "'specfile_path' is not specified or "
+                    "no specfile was found in the repo"
+                ]
+        if errors:
+            raise ValidationError(errors)
+
     @post_load
     def make_instance(self, data, **_):
-        if "metadata" in data:
-            metadata = data.pop("metadata")
-            data.update(metadata)
         return JobConfig(**data)
 
 
@@ -591,30 +631,6 @@ class PackageConfigSchema(Schema):
                 raise ValidationError("unknown type")
         data = {"packages": packages, "jobs": jobs}
         return data
-
-    @validates_schema
-    def specfile_path_defined(self, data: dict, **_):
-        """Check that 'specfile_path' is specified when needed
-
-        The only time 'specfile_path' is not required, is when all jobs
-        are of 'test' type and all of them are configured to skip building
-        the package.
-
-        Args:
-            data: partially loaded configuration data.
-
-        Raises:
-            ValidationError, if 'specfile_path' is not specified when
-            it should be.
-        """
-        # This is somewhat weird: while 'data' is still a dict,
-        # elements in 'jobs' was already loaded, so those are JobConfig objects.
-        if not data.get("specfile_path") and not all(
-            job.type == JobType.tests and job.skip_build for job in data.get("jobs", [])
-        ):
-            raise ValidationError(
-                "'specfile_path' is not specified or no specfile was found in the repo"
-            )
 
     @post_load
     def make_instance(self, data: dict, **_) -> PackageConfig:

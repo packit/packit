@@ -18,7 +18,7 @@ from ogr.abstract import PullRequest
 from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, RunCommandType
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import MultiplePackages
 from packit.exceptions import PackitException, PackitDownloadFailedException
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
@@ -37,7 +37,7 @@ class PackitRepositoryBase:
     def __init__(
         self,
         config: Config,
-        package_config: CommonPackageConfig,
+        package_config: MultiplePackages,
     ) -> None:
         """
         :param config: global configuration

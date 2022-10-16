@@ -22,6 +22,7 @@ from packit.config.package_config import (
 from packit.config.common_package_config import (
     CommonPackageConfig,
     Deployment,
+    MultiplePackages,
 )
 
 __all__ = [
@@ -31,6 +32,7 @@ __all__ = [
     JobConfig.__name__,
     JobConfigTriggerType.__name__,
     JobType.__name__,
+    MultiplePackages.__name__,
     PackageConfig.__name__,
     RunCommandType.__name__,
     "get_context_settings",
