@@ -1174,7 +1174,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         dist_git_branch: str,
         update_type: str,
-        update_notes: str,
+        update_notes: Optional[str] = None,
         koji_builds: Sequence[str] = None,
         bugzilla_ids: Optional[List[int]] = None,
     ):
@@ -1184,7 +1184,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             dist_git_branch: Git reference.
             update_type: Type of the update, check CLI.
-            update_notes: Notes about the update to be displayed in Bodhi.
+            update_notes: Notes about the update to be displayed in Bodhi. If not specified,
+              automatic update notes including a changelog diff since the latest stable build
+              will be generated.
             koji_builds: List of Koji builds or `None` (picks latest).
             bugzilla_ids: List of Bugzillas that are resolved with the update.
         """

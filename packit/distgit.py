@@ -12,8 +12,8 @@ import git
 import requests
 from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
-from koji import ClientSession
 from ogr.abstract import PullRequest
+from specfile.utils import NEVR
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
@@ -21,11 +21,11 @@ from packit.config import (
     get_local_package_config,
 )
 from packit.config.common_package_config import CommonPackageConfig
-from packit.constants import KOJI_BASEURL
 from packit.exceptions import PackitException, PackitConfigException
 from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
+from packit.utils.koji_helper import KojiHelper
 from packit.utils.commands import cwd
 
 logger = logging.getLogger(__name__)
@@ -412,54 +412,82 @@ class DistGit(PackitRepositoryBase):
         pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     @staticmethod
-    def get_latest_build_in_tag(downstream_package_name, dist_git_branch):
-        """Query Koji for the latest build of a package in a tag.
+    def get_latest_build_for_branch(downstream_package_name, dist_git_branch):
+        """Queries Koji for the latest build of a package for a dist-git branch.
 
         Args:
-            downstream_package_name (str): package name used for the Koji build
-            dist_git_branch (str): dist-git branch where to look for the build
-        Returns
-            The latest known build
-        """
+            downstream_package_name: Downstream package name.
+            dist_git_branch: Associated dist-git branch.
 
+        Returns:
+            NVR of the latest build found.
+
+        Raises:
+            PackitException if there is no such build.
+        """
         logger.debug(
             "Querying Koji for the latest build "
             f"of package {downstream_package_name!r} "
-            f"in dist-git-branch {dist_git_branch!r}"
+            f"for dist-git-branch {dist_git_branch!r}"
         )
 
-        # EPEL uses "testing-candidate" instead of "updates-candidate"
-        prefix = "testing" if dist_git_branch.startswith("epel") else "updates"
-        koji_tag = f"{dist_git_branch}-{prefix}-candidate"
-        session = ClientSession(baseurl=KOJI_BASEURL)
-        koji_build = session.listTagged(
-            tag=koji_tag,
-            package=downstream_package_name,
-            inherit=True,
-            latest=True,
-            strict=False,
-        )
+        koji_helper = KojiHelper()
+        tag = koji_helper.get_candidate_tag(dist_git_branch)
+        build = koji_helper.get_latest_build_in_tag(downstream_package_name, tag)
 
-        if not koji_build:
+        if not build:
             raise PackitException(
                 f"There is no build for {downstream_package_name!r} "
-                f"and koji tag {koji_tag}"
+                f"and koji tag {tag}"
             )
-        else:
-            koji_build_str = koji_build[0]["nvr"]
-            logger.info(
-                "Koji build for package "
-                f"{downstream_package_name!r} and koji tag {koji_tag}:"
-                f"\n{koji_build_str}"
-            )
+        logger.info(
+            "Koji build for package "
+            f"{downstream_package_name!r} and koji tag {tag}:"
+            f"\n{build}"
+        )
+        return build
 
-        return koji_build_str
+    @staticmethod
+    def get_changelog_since_latest_stable_build(
+        package: str, nvr: str
+    ) -> Optional[str]:
+        """
+        Retrieves changelog diff between the latest stable (tagged for a release)
+        build and a build with the specified NVR.
+
+        Args:
+            package: Downstream package name.
+            nvr: NVR of a build for which to get changelog diff.
+
+        Returns:
+            Changelog diff as a string or None if it wasn't possible to retrieve it.
+        """
+        koji_helper = KojiHelper()
+        stable_tags = []
+        for tag in koji_helper.get_build_tags(nvr):
+            stable_tags = koji_helper.get_stable_tags(tag)
+            if stable_tags:
+                break
+        latest_stable_nvr = None
+        for tag in stable_tags:
+            build = koji_helper.get_latest_build_in_tag(package, tag)
+            if build:
+                latest_stable_nvr = build
+                break
+        if not latest_stable_nvr or latest_stable_nvr == nvr:
+            return None
+        changelog = koji_helper.get_build_changelog(latest_stable_nvr)
+        if not changelog:
+            return None
+        since = changelog[0][0]
+        changelog = koji_helper.get_build_changelog(nvr)
+        return koji_helper.format_changelog(changelog, since)
 
     def create_bodhi_update(
         self,
         dist_git_branch: str,
         update_type: str,
-        update_notes: str,
+        update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
         bugzilla_ids: Optional[List[int]] = None,
     ):
@@ -480,7 +508,7 @@ class DistGit(PackitRepositoryBase):
 
         if not koji_builds:
             koji_builds = [
-                self.get_latest_build_in_tag(
+                self.get_latest_build_for_branch(
                     self.package_config.downstream_package_name,
                     dist_git_branch=dist_git_branch,
                 )
@@ -488,7 +516,18 @@ class DistGit(PackitRepositoryBase):
 
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
-        rendered_note = update_notes.format(version=self.specfile.expanded_version)
+        if update_notes is not None:
+            rendered_note = update_notes.format(version=self.specfile.expanded_version)
+        else:
+            builds = ", ".join(koji_builds)
+            rendered_note = f"Automatic update for {builds}."
+            for nvr in koji_builds:
+                package = NEVR.from_string(nvr).name
+                changelog = self.get_changelog_since_latest_stable_build(package, nvr)
+                if changelog:
+                    rendered_note += (
+                        "\n\n##### **Changelog for {package}**\n\n```\n{changelog}\n```"
+                    )
         try:
             save_kwargs = {
                 "builds": koji_builds,

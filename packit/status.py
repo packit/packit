@@ -5,8 +5,6 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Set, Tuple
 
-from koji import BUILD_STATES, ClientSession
-
 from ogr.abstract import Release
 from packit.config import Config
 from packit.config.common_package_config import CommonPackageConfig
@@ -15,7 +13,7 @@ from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
 from packit.utils.bodhi import get_bodhi_client
-from packit.constants import KOJI_BASEURL
+from packit.utils.koji_helper import KojiHelper
 
 logger = logging.getLogger(__name__)
 
@@ -100,30 +98,20 @@ class Status:
 
         return latest_releases[:number_of_releases]
 
-    def get_koji_builds(
-        self,
-    ) -> Dict:
-        """
-        Get latest koji builds as a dict of branch: latest build in that branch.
-        """
-        session = ClientSession(baseurl=KOJI_BASEURL)
-        package_id = session.getPackageID(
-            self.dg.package_config.downstream_package_name
-        )
+    def get_koji_builds(self) -> Dict[str, str]:
+        """Get latest koji builds as a dict of branch: latest build in that branch."""
         # This method returns only latest builds,
         # so we don't need to get whole build history from Koji,
         # get just recent year to speed things up.
         since = datetime.now() - timedelta(days=365)
-        builds_l = session.listBuilds(
-            packageID=package_id,
-            state=BUILD_STATES["COMPLETE"],
-            completeAfter=since.timestamp(),
+        builds = KojiHelper().get_builds(
+            self.dg.package_config.downstream_package_name, since
         )
-        logger.debug(f"Recent Koji builds fetched: {[b['nvr'] for b in builds_l]}")
+        logger.debug(f"Recent Koji builds fetched: {builds}")
         # Select latest build for each branch.
-        # [{'nvr': 'python-ogr-0.5.0-1.fc29'}, {'nvr':'python-ogr-0.6.0-1.fc29'}]
+        # ['python-ogr-0.5.0-1.fc29', 'python-ogr-0.6.0-1.fc29']
         # -> {'fc29': 'python-ogr-0.6.0-1.fc29'}
-        return {b["nvr"].rsplit(".", 1)[1]: b["nvr"] for b in reversed(builds_l)}
+        return {b.rsplit(".", 1)[1]: b for b in reversed(builds)}
 
     def get_updates(self, number_of_updates: int = 3) -> List:
         """
