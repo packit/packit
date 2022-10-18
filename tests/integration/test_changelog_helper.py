@@ -42,7 +42,7 @@ def test_srpm_action(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", True, None
     )
-    with upstream._specfile.sections() as sections:
+    with upstream.specfile.sections() as sections:
         assert "- hello from test_srpm_action" in sections.changelog
 
 
@@ -51,7 +51,7 @@ def test_srpm_commits(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", True, None
     )
-    with upstream._specfile.sections() as sections:
+    with upstream.specfile.sections() as sections:
         assert "- Development snapshot (abc123a)" in sections.changelog
 
 
@@ -62,7 +62,7 @@ def test_srpm_no_tags(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", True, None
     )
-    with upstream._specfile.sections() as sections:
+    with upstream.specfile.sections() as sections:
         assert "- Development snapshot (abc123a)" in sections.changelog
 
 
@@ -73,7 +73,7 @@ def test_srpm_no_bump(upstream, downstream):
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
         "0.1.0", "abc123a", False, None
     )
-    with upstream._specfile.sections() as sections:
+    with upstream.specfile.sections() as sections:
         assert "- Development snapshot (abc123a)" not in sections.changelog
 
 
