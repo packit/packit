@@ -387,14 +387,26 @@ class CommonPackageConfig:
 
 class MultiplePackages:
     def __init__(self, packages: Dict[str, CommonPackageConfig]):
-        self.packages = packages
-        self._first_package = list(self.packages)[0]
+        super().__setattr__("packages", packages)
+        super().__setattr__("_first_package", list(self.packages)[0])
 
     def __getattr__(self, name):
-        if len(self.packages) == 1:
+        if name == "packages":
+            return self.__dict__[name]
+        elif len(self.packages) == 1:
             return getattr(self.packages[self._first_package], name)
         else:
             raise AttributeError(
                 f"It is ambiguous to get {name}: "
                 "there is more than one package in the config."
+            )
+
+    def __setattr__(self, name, value):
+        if name == "packages":
+            super().__setattr__("packages", value)
+        elif len(self.packages) == 1:
+            setattr(self.packages[self._first_package], name, value)
+        else:
+            raise AttributeError(
+                f"Cannot set {name!r}, config has {len(self.packages)} packages"
             )
