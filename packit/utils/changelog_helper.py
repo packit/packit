@@ -146,7 +146,7 @@ class ChangelogHelper:
         version: str,
         commit: str,
         bump_version: bool,
-        release_suffix: Optional[str],
+        release: str,
     ) -> None:
         """
         Updates changelog when creating SRPM within upstream repository.
@@ -165,13 +165,10 @@ class ChangelogHelper:
             # no describe, no tag - just a boilerplate message w/ commit hash
             # or, there were no changes b/w HEAD and last_tag, which implies last_tag == HEAD
             msg = f"- Development snapshot ({commit})"
-        release = self.up.get_spec_release(
-            bump_version=bump_version,
-            release_suffix=release_suffix,
-        )
-        logger.debug(f"Setting Release in spec to {release!r}.")
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
-        self.up.specfile.set_version_and_release(version, release)
+        if bump_version:
+            logger.debug(f"Setting Release in spec to {release!r}.")
+            self.up.specfile.set_version_and_release(version, release)
         if msg is not None:
             self.up.specfile.add_changelog_entry(msg)
