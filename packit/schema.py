@@ -294,6 +294,7 @@ class CommonConfigSchema(Schema):
     downstream_package_name = fields.String(missing=None)
     upstream_project_url = fields.String(missing=None)
     upstream_package_name = fields.String(missing=None, validate=validate_repo_name)
+    paths = fields.List(fields.String())
     upstream_ref = fields.String(missing=None)
     upstream_tag_template = fields.String()
     archive_root_dir_template = fields.String()
@@ -540,9 +541,11 @@ class PackageConfigSchema(Schema):
         # downstream_package_name only if there is no 'packages' key.
         if "packages" not in data:
             package_name = data.pop("downstream_package_name")
+            paths = data.pop("paths", ["./"])
             data["packages"] = {
                 package_name: {
                     "downstream_package_name": package_name,
+                    "paths": paths,
                 }
             }
         data.setdefault("jobs", get_default_jobs())
@@ -584,6 +587,7 @@ class PackageConfigSchema(Schema):
             # First set the defaults which are not inherited from
             # the top-level, in case they are not set yet.
             v.setdefault("downstream_package_name", k)
+            v.setdefault("paths", [k])
             # Inherit default values from the top-level.
             v.update(data | v)
         data = {"packages": packages, "jobs": jobs}
