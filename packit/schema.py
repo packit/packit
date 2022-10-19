@@ -587,7 +587,6 @@ class PackageConfigSchema(Schema):
             # First set the defaults which are not inherited from
             # the top-level, in case they are not set yet.
             v.setdefault("downstream_package_name", k)
-            v.setdefault("paths", [k])
             # Inherit default values from the top-level.
             v.update(data | v)
         data = {"packages": packages, "jobs": jobs}
