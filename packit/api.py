@@ -1581,8 +1581,10 @@ The first dist-git commit to be synced is '{short_hash}'.
             fas_password=self.config.fas_password,
             kerberos_realm=self.config.kerberos_realm,
         )
+        # only use Kerberos when fas_user and kerberos_realm are set
+        if self.config.fas_user and self.config.kerberos_realm:
+            bodhi_client.login_with_kerberos()
         # make sure we have the credentials
-        bodhi_client.login_with_kerberos()
         bodhi_client.ensure_auth()
         try:
             response = bodhi_client.request(update=update_alias, request="stable")
