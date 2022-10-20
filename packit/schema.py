@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union, List
 
@@ -536,6 +537,18 @@ class PackageConfigSchema(Schema):
 
     @pre_load
     def ordered_preprocess(self, data: dict, **_) -> dict:
+        """Rename deprecated keys, and set defaults for 'packages' and 'jobs'
+
+        Args:
+            data: configuration dictionary as loaded from packit.yaml
+
+        Returns:
+            Transformed configuration dictionary with defaults
+            for 'packages' and 'jobs' set.
+        """
+        # Create a deepcopy(), so that loading doesn't modify the
+        # dictionary received.
+        data = copy.deepcopy(data)
         data = self.rename_deprecated_keys(data)
         # Don't use 'setdefault' in this case, as we should expect
         # downstream_package_name only if there is no 'packages' key.

@@ -245,3 +245,5 @@ def pytest_assertrepr_compare(op, left, right):
 
         schema = PackageConfigSchema()
         return [str(DeepDiff(schema.dump(left), schema.dump(right)))]
+    elif isinstance(left, dict) and isinstance(right, dict) and op == "==":
+        return [str(DeepDiff(left, right))]
