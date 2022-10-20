@@ -1892,3 +1892,10 @@ def test_deepcopy():
     """Make sure the config object can be deepcopied"""
     d = {"package_config": PackageConfig(packages={"package": CommonPackageConfig()})}
     copy.deepcopy(d)
+
+
+def test_load_is_not_destructive():
+    data = {"downstream_package_name": "package", "specfile_path": "package.spec"}
+    original = copy.deepcopy(data)
+    PackageConfigSchema().load(data)
+    assert data == original
