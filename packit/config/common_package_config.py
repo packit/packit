@@ -390,6 +390,19 @@ class CommonPackageConfig:
 
 
 class MultiplePackages:
+    """
+    Base class for configuration classes which have a "packages" attribute
+
+    Notes:
+        1. Need to define '__setattr__', b/c some properties of the config
+           objects are set here and there. This makes it necessary to use the
+           'super().__setattr__()' syntax when writing attributes of this
+           class.
+        2. In theory accessing attributes of this class with 'self.<attribute>'
+           works, until it doesn't. Objects being deepcopied is one such
+           case. Using 'self.__getattribute__("attribute")' solves this issue.
+    """
+
     def __init__(self, packages: Dict[str, CommonPackageConfig]):
         super().__setattr__("packages", packages)
         super().__setattr__("_first_package", list(self.packages)[0])
@@ -397,8 +410,11 @@ class MultiplePackages:
     def __getattr__(self, name):
         if name == "packages":
             return self.__dict__[name]
-        elif len(self.packages) == 1:
-            return getattr(self.packages[self._first_package], name)
+        elif len(self.__getattribute__("packages")) == 1:
+            package = self.__getattribute__("packages")[
+                self.__getattribute__("_first_package")
+            ]
+            return getattr(package, name)
         else:
             raise AttributeError(
                 f"It is ambiguous to get {name}: "
@@ -408,8 +424,11 @@ class MultiplePackages:
     def __setattr__(self, name, value):
         if name == "packages":
             super().__setattr__("packages", value)
-        elif len(self.packages) == 1:
-            setattr(self.packages[self._first_package], name, value)
+        elif len(self.__getattribute__("packages")) == 1:
+            package = self.__getattribute__("packages")[
+                self.__getattribute__("_first_package")
+            ]
+            setattr(package, name, value)
         else:
             raise AttributeError(
                 f"Cannot set {name!r}, config has {len(self.packages)} packages"

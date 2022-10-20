@@ -5,6 +5,7 @@ from pathlib import Path, PosixPath
 from typing import Optional
 
 import pytest
+import copy
 from flexmock import flexmock
 from marshmallow import ValidationError
 
@@ -1885,3 +1886,9 @@ def test_pc_dist_git_package_url_has_no_None(package_name, result):
         ).dist_git_package_url
         == result
     )
+
+
+def test_deepcopy():
+    """Make sure the config object can be deepcopied"""
+    d = {"package_config": PackageConfig(packages={"package": CommonPackageConfig()})}
+    copy.deepcopy(d)
