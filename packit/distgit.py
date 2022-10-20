@@ -472,8 +472,10 @@ class DistGit(PackitRepositoryBase):
             fas_password=self.config.fas_password,
             kerberos_realm=self.config.kerberos_realm,
         )
+        # only use Kerberos when fas_user and kerberos_realm are set
+        if self.config.fas_user and self.config.kerberos_realm:
+            bodhi_client.login_with_kerberos()
         # make sure we have the credentials
-        bodhi_client.login_with_kerberos()
         bodhi_client.ensure_auth()
 
         if not koji_builds:
@@ -503,7 +505,8 @@ class DistGit(PackitRepositoryBase):
                     f"Bodhi client raised a login error: {ex}. "
                     f"Let's clear the session, csrf token and retry."
                 )
-                bodhi_client.login_with_kerberos()
+                if self.config.fas_user and self.config.kerberos_realm:
+                    bodhi_client.login_with_kerberos()
                 bodhi_client.ensure_auth()
                 result = bodhi_client.save(**save_kwargs)
 
