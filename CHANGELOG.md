@@ -1,3 +1,8 @@
+# 0.61.0
+
+- Packit can now correctly authenticate with Bodhi 6 and therefore create Bodhi updates. 🚀 (#1746)
+- Packit now requires Python 3.9 or later. (#1745)
+
 # 0.60.0
 
 - Propose downstream job now pushes changes even when it's not creating a new pull request. This allows updating already existing pull requests. (#1725)
