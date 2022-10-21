@@ -370,7 +370,7 @@ def test_serialize_and_deserialize_job_config(config):
                     "package": {
                         "specfile_path": "packages.spec",
                         "enable_net": False,
-                        "metadata": {"branch": "main"},
+                        "branch": "main",
                     }
                 },
             },
@@ -385,7 +385,7 @@ def test_serialize_and_deserialize_job_config(config):
                     }
                 },
             },
-            "are defined outside job metadata dictionary",
+            False,
         ),
         (
             {
@@ -394,7 +394,8 @@ def test_serialize_and_deserialize_job_config(config):
                 "packages": {
                     "package": {
                         "specfile_path": "packages.spec",
-                        "metadata": {"enable_net": False, "branch": "main"},
+                        "enable_net": False,
+                        "branch": "main",
                     }
                 },
             },

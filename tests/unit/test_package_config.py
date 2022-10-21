@@ -1895,7 +1895,31 @@ def test_deepcopy():
 
 
 def test_load_is_not_destructive():
+    """Check that the data loaded by PackageConfigSchema is not modified,
+    and stays as it was passed for loading.
+    """
     data = {"downstream_package_name": "package", "specfile_path": "package.spec"}
     original = copy.deepcopy(data)
     PackageConfigSchema().load(data)
     assert data == original
+
+
+def test_handle_metadata():
+    """Check that the deprecated 'metadata' field in 'jobs' is handled
+    correctly.
+    """
+    data = {
+        "downstream_package_name": "package",
+        "specfile_path": "package.spec",
+        "jobs": [
+            {
+                "job": "copr_build",
+                "trigger": "pull_request",
+                "metadata": {
+                    "dist-git-branch": "shrek",
+                },
+            }
+        ],
+    }
+    pc = PackageConfigSchema().load(data)
+    assert pc.jobs[0].dist_git_branches == {"shrek"}
