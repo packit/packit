@@ -423,50 +423,10 @@ class JobConfigSchema(Schema):
     packages = fields.Dict(
         keys=fields.String(), values=fields.Nested(CommonConfigSchema())
     )
-    # 'metadata' is deprecated
-    metadata = fields.Nested(JobMetadataSchema)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
         for package, config in data.get("packages", {}).items():
-            if "metadata" in config:
-                logger.warning(
-                    "The 'metadata' key in jobs is deprecated and can be removed. "
-                    "Nest config options from 'metadata' directly under the job object."
-                )
-
-                not_nested_metadata_keys = [
-                    k
-                    for k in (
-                        "_targets",
-                        "timeout",
-                        "owner",
-                        "project",
-                        "dist_git_branches",
-                        "branch",
-                        "scratch",
-                        "list_on_homepage",
-                        "preserve_project",
-                        "use_internal_tf",
-                        "additional_packages",
-                        "additional_repos",
-                        "fmf_url",
-                        "fmf_ref",
-                        "skip_build",
-                        "env",
-                        "enable_net",
-                    )
-                    if k in config
-                ]
-                if not_nested_metadata_keys:
-                    raise ValidationError(
-                        f"Keys: {not_nested_metadata_keys} are defined outside job metadata "
-                        "dictionary. Mixing obsolete metadata dictionary and new job keys "
-                        "is not possible. Remove obsolete nested job metadata dictionary."
-                    )
-                metadata = config.pop("metadata")
-                config.update(metadata)
-
             for key in ("targets", "dist_git_branches"):
                 if isinstance(config, dict) and isinstance(config.get(key), str):
                     # allow key value being specified as string, convert to list
@@ -594,6 +554,24 @@ class PackageConfigSchema(Schema):
 
     @staticmethod
     def rearrange_packages(data: dict) -> dict:
+        """Update package objects with top-level configuration values
+
+        Top-level keys and values are copied to each package object if
+        the given key is not set in that object already.
+
+        Remove these keys from the top-level and return a dictionary
+        containing only a 'packages' and 'jobs' key.
+
+        Args:
+            data: configuration dictionary, before any of the leaves
+                having been loaded.
+
+        Returns:
+            A re-arranged configuration dictionary.
+        """
+        # Pop 'packages' and 'jobs' in order for 'data'
+        # to contain only keys other then these when it comes
+        # to merging it bellow.
         packages = data.pop("packages")
         jobs = data.pop("jobs")
         for k, v in packages.items():
@@ -607,11 +585,39 @@ class PackageConfigSchema(Schema):
 
     @staticmethod
     def rearrange_jobs(data: dict) -> dict:
-        packages = data.pop("packages")
-        jobs = data.pop("jobs")
+        """Set the selected package config objects in each job, and set defaults
+        according to the values specified on the level of job-objects (if any).
+
+        Args:
+            data: Configuration dict with 'packages' and 'jobs' already in place.
+
+        Returns:
+            Configuration dict where the package objects in jobs are correctly set.
+        """
+        packages = data["packages"]
+        jobs = data["jobs"]
         for i, job in enumerate(jobs):
             job_type = job.pop("job")
             trigger = job.pop("trigger")
+            # Validate the 'metadata' field if there is any, and merge its
+            # content with the job.
+            # Do this here in order to avoid complications further in the
+            # loading process.
+            if metadata := job.pop("metadata", {}):
+                logger.warning(
+                    "The 'metadata' key in jobs is deprecated and can be removed. "
+                    "Nest config options from 'metadata' directly under the job object."
+                )
+                schema = JobMetadataSchema()
+                if errors := schema.validate(metadata):
+                    raise ValidationError(errors)
+                if not_nested_metadata_keys := set(schema.fields).intersection(job):
+                    raise ValidationError(
+                        f"Keys: {not_nested_metadata_keys} are defined outside job metadata "
+                        "dictionary. Mixing obsolete metadata dictionary and new job keys "
+                        "is not possible. Remove obsolete nested job metadata dictionary."
+                    )
+                job.update(metadata)
             selected_packages = job.pop("packages", None)
             # There is no 'packages' key in the job, so
             # the job should handle all the top-level packages.
@@ -644,8 +650,8 @@ class PackageConfigSchema(Schema):
                     },
                 }
             else:
+                # TODO(csomh): error message
                 raise ValidationError("unknown type")
-        data = {"packages": packages, "jobs": jobs}
         return data
 
     @post_load
