@@ -2102,3 +2102,40 @@ def test_package_naming():
     # check the default value for 'paths'
     assert config1.paths == config2.paths == ["./"]
     assert config1.packages["baar"].paths == config2.packages["baar"].paths == ["./"]
+
+
+def test_multiple_packages():
+    """A configuration with multiple packages can be loaded.
+    Values can be accessed only through the 'packages' attribute."""
+    config = {
+        "packages": {
+            "foo": {
+                "specfile_path": "foo/foo.spec",
+                "paths": ["foo"],
+            },
+            "baar": {
+                "specfile_path": "baar/baar.spec",
+                "paths": ["baar"],
+            },
+            "jeee": {
+                "specfile_path": "jeee/jeee.spec",
+                "paths": ["jeee"],
+            },
+        }
+    }
+    pc = PackageConfigSchema().load(config)
+    assert pc.packages.keys() == pc.jobs[0].packages.keys() == config["packages"].keys()
+    # Attributes not related to packages are accessible
+    pc.packages = pc.packages
+    pc.jobs = pc.jobs
+    pc.jobs[0].type = pc.jobs[0].type
+    pc.jobs[0].trigger = pc.jobs[0].trigger
+    # Accessing package related attributes without 'packages' raises an error
+    with pytest.raises(AttributeError, match="ambiguous to get"):
+        pc.jobs[0].enable_net
+    with pytest.raises(AttributeError, match="ambiguous to get"):
+        pc.enable_net
+    with pytest.raises(AttributeError, match="ambiguous to set"):
+        pc.jobs[0].enable_net = False
+    with pytest.raises(AttributeError, match="ambiguous to set"):
+        pc.enable_net = False

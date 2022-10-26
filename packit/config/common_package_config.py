@@ -393,6 +393,9 @@ class MultiplePackages:
     """
     Base class for configuration classes which have a "packages" attribute
 
+    TODO: remove this once support to access the attributes of a single package
+          is dropped.
+
     Notes:
         1. Need to define '__setattr__', b/c some properties of the config
            objects are set here and there. This makes it necessary to use the
@@ -405,10 +408,10 @@ class MultiplePackages:
 
     def __init__(self, packages: Dict[str, CommonPackageConfig]):
         super().__setattr__("packages", packages)
-        super().__setattr__("_first_package", list(self.packages)[0])
+        super().__setattr__("_first_package", list(packages)[0])
 
     def __getattr__(self, name):
-        if name == "packages":
+        if name in self.__dict__:
             return self.__dict__[name]
         elif len(self.__getattribute__("packages")) == 1:
             package = self.__getattribute__("packages")[
@@ -422,8 +425,8 @@ class MultiplePackages:
             )
 
     def __setattr__(self, name, value):
-        if name == "packages":
-            super().__setattr__("packages", value)
+        if name in self.__dict__:
+            super().__setattr__(name, value)
         elif len(self.__getattribute__("packages")) == 1:
             package = self.__getattribute__("packages")[
                 self.__getattribute__("_first_package")
@@ -431,5 +434,6 @@ class MultiplePackages:
             setattr(package, name, value)
         else:
             raise AttributeError(
-                f"Cannot set {name!r}, config has {len(self.packages)} packages"
+                f"It is ambiguous to set {name}: "
+                "there is more than one package in the config."
             )
