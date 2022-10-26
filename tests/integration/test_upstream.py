@@ -257,7 +257,12 @@ def test_fix_spec(upstream_instance):
 
     ups.package_config.upstream_package_name = "beer"
     archive = ups.create_archive()
-    ups.fix_spec(archive=archive, version="_1.2.3", commit="_abcdef123")
+    ups.fix_spec(
+        archive=archive,
+        version="_1.2.3",
+        commit="_abcdef123",
+        release_suffix="1.20200710085501945230.master.0.g133ff39",
+    )
 
     release = ups.specfile.expanded_release
     # 1.20200710085501945230.master.0.g133ff39
