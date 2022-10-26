@@ -33,7 +33,11 @@ class PackageConfig(MultiplePackages):
         jobs: Optional[List[JobConfig]] = None,
     ):
         super().__init__(packages)
-        self.jobs: List[JobConfig] = jobs or []
+        # Directly manipulating __dict__ is not recommended.
+        # It is done here to avoid triggering __setattr__ and
+        # should be removed once support for a single package is
+        # dropped from config objects.
+        self.__dict__["jobs"] = jobs or []
 
     def __repr__(self):
         # required to avoid cyclical imports

@@ -66,8 +66,12 @@ class JobConfig(MultiplePackages):
         packages: Dict[str, CommonPackageConfig],
     ):
         super().__init__(packages)
-        self.type: JobType = type
-        self.trigger: JobConfigTriggerType = trigger
+        # Directly manipulating __dict__ is not recommended.
+        # It is done here to avoid triggering __setattr__ and
+        # should be removed once support for a single package is
+        # dropped from config objects.
+        self.__dict__["type"] = type
+        self.__dict__["trigger"] = trigger
 
     def __repr__(self):
         # required to avoid cyclical imports
