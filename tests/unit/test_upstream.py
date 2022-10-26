@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import sys
 from contextlib import suppress as does_not_raise
 
 import pytest
@@ -10,6 +11,7 @@ import packit
 from packit.actions import ActionName
 from packit.exceptions import PackitException
 from packit.upstream import Archive, SRPMBuilder, Upstream
+from packit.utils.changelog_helper import ChangelogHelper
 
 
 @pytest.fixture
@@ -314,18 +316,199 @@ def test_release_suffix(
     upstream_mock, archive, version, release_suffix, expanded_release_suffix
 ):
     flexmock(upstream_mock).should_receive("get_current_version").and_return(version)
-    flexmock(upstream_mock).should_receive("get_spec_release").and_return("1")
+    flexmock(upstream_mock).should_receive("get_spec_release").and_return(
+        expanded_release_suffix
+    )
+    flexmock(upstream_mock).should_receive("specfile").and_return(
+        flexmock(expanded_release=expanded_release_suffix)
+        .should_receive("reload")
+        .and_return(None)
+        .mock()
+    )
 
     flexmock(upstream_mock).should_receive("fix_spec").with_args(
         archive=archive,
         version=version,
         commit="_",
-        bump_version=False,
+        bump_version=True,
         release_suffix=expanded_release_suffix,
     )
-    upstream_mock._specfile = flexmock()
-    upstream_mock._specfile.should_receive("reload").once()
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, bump_version=False, release_suffix=release_suffix
+        archive=archive, bump_version=True, release_suffix=release_suffix
+    )
+
+
+@pytest.mark.parametrize(
+    "bump_version,release_suffix,expected_release_suffix",
+    (
+        # current_git_tag_version="4.5"
+        # original_release_number_from_spec = "2"
+        pytest.param(
+            True,
+            "",
+            # bump_version from command line wins over release_suffix on packit.yaml
+            "2.1234.mock_ref.",
+            id="Bump release, release_suffix is empty",
+        ),
+        pytest.param(
+            True,
+            None,
+            "2.1234.mock_ref.",
+            id="Bump release, release_suffix is None",
+        ),
+        pytest.param(True, "7", "2.7", id="Bump release, release_suffix value is 7"),
+        pytest.param(
+            True,
+            "{PACKIT_RPMSPEC_RELEASE}",
+            "2",
+            id="Bump release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
+        ),
+        pytest.param(
+            False,
+            "",
+            "2.1234.mock_ref.",
+            id="Do not modify release, release_suffix is empty",
+        ),
+        pytest.param(
+            False,
+            None,
+            "2.1234.mock_ref.",
+            id="Do not modify release, release_suffix is None",
+        ),
+        pytest.param(
+            False, "7", "2.7", id="Do not modify release, release_suffix value is 7"
+        ),
+        pytest.param(
+            False,
+            "{PACKIT_RPMSPEC_RELEASE}",
+            "2",
+            id="Do not modify release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
+        ),
+    ),
+)
+def test_get_spec_release(
+    upstream_mock, bump_version, release_suffix, expected_release_suffix
+):
+    archive = "an_archive_name"
+    current_git_tag_version = "4.5"
+    original_release_number_from_spec = "2"
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(
+        current_git_tag_version
+    )
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234")))
+    )
+
+    flexmock(upstream_mock).should_receive("fix_spec").with_args(
+        archive=archive,
+        version=current_git_tag_version,
+        commit="_",
+        bump_version=bump_version,
+        release_suffix=expected_release_suffix,
+    )
+    upstream_mock._specfile = flexmock(
+        expanded_release=original_release_number_from_spec
+    )
+    upstream_mock._specfile.should_receive("reload").once()
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("run_command").and_return(
+        flexmock(stdout=current_git_tag_version)
+    )
+
+    SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+        archive=archive, bump_version=bump_version, release_suffix=release_suffix
+    )
+
+
+@pytest.mark.parametrize(
+    "bump_version,release_suffix,expected_release_suffix",
+    (
+        # current_git_tag_version="4.5"
+        # original_release_number_from_spec = "2"
+        pytest.param(
+            True,
+            "",
+            # bump_version from command line wins over release_suffix on packit.yaml
+            "2.1234.mock_ref.",
+            id="Bump release, release_suffix is empty",
+        ),
+        pytest.param(
+            True,
+            None,
+            "2.1234.mock_ref.",
+            id="Bump release, release_suffix is None",
+        ),
+        pytest.param(True, "7", "2.7", id="Bump release, release_suffix value is 7"),
+        pytest.param(
+            True,
+            "{PACKIT_RPMSPEC_RELEASE}",
+            "2",
+            id="Bump release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
+        ),
+        pytest.param(
+            False,
+            "",
+            "2.1234.mock_ref.",
+            id="Do not modify release, release_suffix is empty",
+        ),
+        pytest.param(
+            False,
+            None,
+            "2.1234.mock_ref.",
+            id="Do not modify release, release_suffix is None",
+        ),
+        pytest.param(
+            False, "7", "2.7", id="Do not modify release, release_suffix value is 7"
+        ),
+        pytest.param(
+            False,
+            "{PACKIT_RPMSPEC_RELEASE}",
+            "2",
+            id="Do not modify release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
+        ),
+    ),
+)
+def test_fix_spec(upstream_mock, bump_version, release_suffix, expected_release_suffix):
+    archive = "an_archive_name"
+    current_git_tag_version = "4.5"
+    original_release_number_from_spec = "2"
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(
+        current_git_tag_version
+    )
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234")))
+    )
+
+    flexmock(upstream_mock).should_receive("_fix_spec_source").with_args(
+        archive=archive
+    )
+    flexmock(upstream_mock).should_receive("_fix_spec_prep").with_args(archive=archive)
+
+    upstream_mock._specfile = flexmock(
+        expanded_release=original_release_number_from_spec
+    )
+    upstream_mock._specfile.should_receive("reload").once()
+
+    if bump_version:
+        upstream_mock._specfile.should_receive("set_version_and_release").with_args(
+            current_git_tag_version, expected_release_suffix
+        ).once()
+        upstream_mock._specfile.should_receive("add_changelog_entry")
+    else:
+        flexmock(ChangelogHelper).should_receive("prepare_upstream_locally").with_args(
+            current_git_tag_version,
+            "_",
+            bump_version,
+            expected_release_suffix,
+        )
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("run_command").and_return(
+        flexmock(stdout=current_git_tag_version)
+    )
+
+    SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+        archive=archive, bump_version=bump_version, release_suffix=release_suffix
     )

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
+from functools import reduce
 import logging
 import os
 import re
@@ -353,9 +354,7 @@ class Upstream(PackitRepositoryBase):
             )
             raise
 
-    def get_spec_release(
-        self, bump_version: bool = True, release_suffix: Optional[str] = None
-    ) -> Optional[str]:
+    def get_spec_release(self, release_suffix: Optional[str] = None) -> Optional[str]:
         """Assemble pieces of the spec file %release field we intend to set
         within the default fix-spec-file action
 
@@ -369,15 +368,9 @@ class Upstream(PackitRepositoryBase):
             string which is meant to be put into a spec file %release field by packit
         """
         original_release_number = self.specfile.expanded_release.split(".", 1)[0]
-        if release_suffix is not None:
-            return (
-                f"{original_release_number}.{release_suffix}"
-                if release_suffix
-                else None
-            )
 
-        if not bump_version:
-            return None
+        if release_suffix:
+            return f"{original_release_number}.{release_suffix}"
 
         # we only care about the first number in the release
         # so that we can re-run `packit srpm`
@@ -418,8 +411,8 @@ class Upstream(PackitRepositoryBase):
         archive: str,
         version: str,
         commit: str,
+        release_suffix: str,
         bump_version: bool = True,
-        release_suffix: Optional[str] = None,
     ):
         """
         In order to create a SRPM from current git checkout, we need to have the spec reference
@@ -429,12 +422,10 @@ class Upstream(PackitRepositoryBase):
             archive: Relative path to the archive, used as `Source0`.
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
+            release_suffix: Specifies local release suffix.
             bump_version: Specifies whether version should be changed in the spec-file.
 
                 Defaults to `True`.
-            release_suffix: Specifies local release suffix.
-
-                Defaults to `None`, which means default generated suffix is used.
         """
         self._fix_spec_source(archive)
         self._fix_spec_prep(archive)
@@ -951,9 +942,7 @@ class SRPMBuilder:
         env = {
             "PACKIT_PROJECT_VERSION": self.current_git_describe_version,
             # Spec file %release field which packit sets by default
-            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(
-                bump_version, release_suffix
-            ),
+            "PACKIT_RPMSPEC_RELEASE": self.upstream.specfile.expanded_release,
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
             "PACKIT_PROJECT_BRANCH": sanitize_branch_name_for_rpm(
@@ -962,8 +951,14 @@ class SRPMBuilder:
         }
 
         # in case we are given template as a release suffix
-        if release_suffix:
-            release_suffix = release_suffix.format(**env)
+        if release_suffix and reduce(
+            lambda has_macro, macro: has_macro or (macro in release_suffix),
+            env.keys(),
+            False,
+        ):
+            new_release_suffix = release_suffix.format(**env)
+        else:
+            new_release_suffix = self.upstream.get_spec_release(release_suffix)
 
         if self.upstream.with_action(action=ActionName.fix_spec, env=env):
             self.upstream.fix_spec(
@@ -971,7 +966,7 @@ class SRPMBuilder:
                 version=self.current_git_describe_version,
                 commit=current_commit,
                 bump_version=bump_version,
-                release_suffix=release_suffix,
+                release_suffix=new_release_suffix,
             )
         self.upstream.specfile.reload()  # the specfile could have been changed by the action
 
