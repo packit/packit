@@ -1923,3 +1923,79 @@ def test_handle_metadata():
     }
     pc = PackageConfigSchema().load(data)
     assert pc.jobs[0].dist_git_branches == {"shrek"}
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "package.spec",
+                "upstream_project_name": "upstream_package",
+            },
+            id="top_level",
+        ),
+    ],
+)
+def test_deprecated_keys_renamed(config):
+    """Deprecated keys are renamed when defined on the top-level."""
+    pc = PackageConfigSchema().load(config)
+    assert pc.upstream_package_name == "upstream_package"
+    assert pc.packages["package"].upstream_package_name == "upstream_package"
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        pytest.param(
+            {
+                "packages": {
+                    "package": {
+                        "specfile_path": "package.spec",
+                        "upstream_project_name": "upstream_package",
+                    }
+                }
+            },
+            id="in_packages",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "packages.spec",
+                "upstream_package_name": "package",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "upstream_project_name": "upstream_package",
+                    }
+                ],
+            },
+            id="in_job",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "packages.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": {
+                            "package": {
+                                "upstream_project_name": "upstream_package",
+                            }
+                        },
+                    }
+                ],
+            },
+            id="in_job_packages",
+        ),
+    ],
+)
+def test_deprecated_keys_invalid(config):
+    """Deprecated keys are not renamed in job and package objects and trigger a
+    ValidationError."""
+    with pytest.raises(ValidationError, match=r"upstream_project_name.+Unknown field"):
+        PackageConfigSchema().load(config)
