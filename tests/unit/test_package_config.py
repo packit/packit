@@ -2077,3 +2077,28 @@ def test_loading_packageless_config():
         ],
     )
     assert loaded_config == expected_config
+
+
+def test_package_naming():
+    """Either the key from 'packages' or 'downstream_package_name' is used to name
+    a package."""
+    config1 = PackageConfigSchema().load(
+        {
+            "downstream_package_name": "baar",
+            "specfile_path": "fedora/baar.spec",
+        }
+    )
+    config2 = PackageConfigSchema().load(
+        {
+            "packages": {
+                "baar": {
+                    "specfile_path": "fedora/baar.spec",
+                }
+            }
+        }
+    )
+    assert config1 == config2
+    assert config1.downstream_package_name == config2.downstream_package_name == "baar"
+    # check the default value for 'paths'
+    assert config1.paths == config2.paths == ["./"]
+    assert config1.packages["baar"].paths == config2.packages["baar"].paths == ["./"]
