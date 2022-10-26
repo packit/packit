@@ -1999,3 +1999,81 @@ def test_deprecated_keys_invalid(config):
     ValidationError."""
     with pytest.raises(ValidationError, match=r"upstream_project_name.+Unknown field"):
         PackageConfigSchema().load(config)
+
+
+def test_loading_packageless_config():
+    """Check that configuration data without any 'packages' key is correctly
+    loaded."""
+    config_data = {
+        "downstream_package_name": "foo",
+        "upstream_package_name": "foo",
+        "issue_repository": "https://github.com/foo/bar",
+        "actions": {
+            "get-current-version": [
+                "python3 setup.py --version",
+            ],
+        },
+        "files_to_sync": ["packaging/foo.spec", "packit.yaml"],
+        "srpm_build_deps": ["git", "python"],
+        "specfile_path": "packaging/foo.spec",
+        "jobs": [
+            {
+                "job": "copr_build",
+                "trigger": "pull_request",
+                "targets": ["fedora-stable", "epel-9"],
+            },
+            {
+                "job": "copr_build",
+                "trigger": "commit",
+                "targets": ["fedora-stable", "epel-9"],
+                "project": "foo-dev",
+                "list_on_homepage": True,
+                "preserve_project": True,
+            },
+        ],
+    }
+    loaded_config = PackageConfigSchema().load(config_data)
+
+    # Prepare objects in the expected configuration
+    top_level_config = {k: v for k, v in config_data.items() if k != "jobs"}
+    top_level_config["files_to_sync"] = [
+        SyncFilesItem(src=[item], dest=item)
+        for item in top_level_config["files_to_sync"]
+    ]
+    top_level_config["actions"] = {
+        ActionName(k): v for k, v in top_level_config["actions"].items()
+    }
+    job_config = []
+    for job in config_data["jobs"]:
+        job_config.append(
+            {
+                f"_{k}" if k == "targets" else k: v
+                for k, v in job.items()
+                if k not in {"job", "trigger"}
+            }
+        )
+
+    expected_config = PackageConfig(
+        packages={"foo": CommonPackageConfig(paths=["./"], **top_level_config)},
+        jobs=[
+            JobConfig(
+                type=JobType.copr_build,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={
+                    "foo": CommonPackageConfig(
+                        paths=["./"], **(top_level_config | job_config[0])
+                    )
+                },
+            ),
+            JobConfig(
+                type=JobType.copr_build,
+                trigger=JobConfigTriggerType.commit,
+                packages={
+                    "foo": CommonPackageConfig(
+                        paths=["./"], **(top_level_config | job_config[1])
+                    )
+                },
+            ),
+        ],
+    )
+    assert loaded_config == expected_config
