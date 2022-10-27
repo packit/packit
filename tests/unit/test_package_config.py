@@ -2139,3 +2139,232 @@ def test_multiple_packages():
         pc.jobs[0].enable_net = False
     with pytest.raises(AttributeError, match="ambiguous to set"):
         pc.enable_net = False
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(
+            {
+                "downstream_package_name": "apple",
+                "specfile_path": "apple.spec",
+                "jobs": [
+                    {"job": "copr_build", "trigger": "pull_request"},
+                    {"job": "tests", "trigger": "pull_request"},
+                ],
+            },
+            id="no_package_selected",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "apple",
+                "specfile_path": "apple.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": ["apple"],
+                    },
+                    {
+                        "job": "tests",
+                        "trigger": "pull_request",
+                        "packages": {"apple": {}},
+                    },
+                ],
+            },
+            id="package_selected",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "apple",
+                "specfile_path": "apple.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": {"apple": {}},
+                    },
+                    {"job": "tests", "trigger": "pull_request", "packages": ["apple"]},
+                ],
+            },
+            id="package_selected",
+        ),
+    ],
+)
+def test_selecting_packages_in_jobs(data):
+    """Jobs can select to work with all or just a subset of the packages defined top-level"""
+    expected_config = PackageConfig(
+        packages={
+            "apple": CommonPackageConfig(
+                downstream_package_name="apple", specfile_path="apple.spec"
+            )
+        },
+        jobs=[
+            JobConfig(
+                type=JobType.copr_build,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={
+                    "apple": CommonPackageConfig(
+                        downstream_package_name="apple", specfile_path="apple.spec"
+                    )
+                },
+            ),
+            JobConfig(
+                type=JobType.tests,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={
+                    "apple": CommonPackageConfig(
+                        downstream_package_name="apple", specfile_path="apple.spec"
+                    )
+                },
+            ),
+        ],
+    )
+    loaded_config = PackageConfigSchema().load(data)
+    assert loaded_config == expected_config
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(
+            {
+                "packages": {
+                    "apple": {
+                        "specfile_path": "apple.spec",
+                        "paths": ["apple"],
+                    },
+                    "pear": {
+                        "specfile_path": "pear.spec",
+                        "paths": ["pear"],
+                    },
+                },
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                    },
+                    {"job": "tests", "trigger": "pull_request", "packages": ["pear"]},
+                ],
+            },
+            id="none_selected",
+        ),
+        pytest.param(
+            {
+                "packages": {
+                    "apple": {
+                        "specfile_path": "apple.spec",
+                        "paths": ["apple"],
+                    },
+                    "pear": {
+                        "specfile_path": "pear.spec",
+                        "paths": ["pear"],
+                    },
+                },
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": ["pear", "apple"],
+                    },
+                    {"job": "tests", "trigger": "pull_request", "packages": ["pear"]},
+                ],
+            },
+            id="multiple_selected",
+        ),
+    ],
+)
+def test_multiple_packages_in_jobs(data):
+    """Check that it's possible to select one or more packages in jobs."""
+    apple_config = CommonPackageConfig(
+        downstream_package_name="apple", specfile_path="apple.spec", paths=["apple"]
+    )
+    pear_config = CommonPackageConfig(
+        downstream_package_name="pear", specfile_path="pear.spec", paths=["pear"]
+    )
+    expected_config = PackageConfig(
+        packages={
+            "apple": apple_config,
+            "pear": pear_config,
+        },
+        jobs=[
+            JobConfig(
+                type=JobType.copr_build,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={
+                    "apple": apple_config,
+                    "pear": pear_config,
+                },
+            ),
+            JobConfig(
+                type=JobType.tests,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={
+                    "pear": pear_config,
+                },
+            ),
+        ],
+    )
+    loaded_config = PackageConfigSchema().load(data)
+    assert loaded_config == expected_config
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(
+            {
+                "specfile_path": "fedora/foo.spec",
+                "packages": {
+                    "foo": {},
+                },
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "specfile_path": "copr/foo.spec",
+                    }
+                ],
+            },
+            id="override_in_job",
+        ),
+        pytest.param(
+            {
+                "specfile_path": "fedora/foo.spec",
+                "downstream_package_name": "foo",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": {
+                            "foo": {
+                                "specfile_path": "copr/foo.spec",
+                            }
+                        },
+                    }
+                ],
+            },
+            id="override_in_job",
+        ),
+    ],
+)
+def test_configuring_packages_in_jobs(data):
+    """Configuration of individual or all packages can be overwritten in jobs"""
+    package_foo_config = CommonPackageConfig(
+        downstream_package_name="foo", specfile_path="fedora/foo.spec"
+    )
+    job_foo_config = CommonPackageConfig(
+        downstream_package_name="foo", specfile_path="copr/foo.spec"
+    )
+    expected_config = PackageConfig(
+        packages={"foo": package_foo_config},
+        jobs=[
+            JobConfig(
+                type=JobType.copr_build,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={"foo": job_foo_config},
+            )
+        ],
+    )
+    loaded_config = PackageConfigSchema().load(data)
+    assert loaded_config == expected_config
