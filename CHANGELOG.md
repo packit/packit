@@ -1,6 +1,6 @@
 # 0.62.0
 
-- Version and revision are no more updated in  `SPEC` files when the `--no-bump` flag is specified and `None` revisions are no more created. (#1753)
+- Fixed an issue with version and release being updated even if `--no-bump` flag was specified. Also fixed an issue when `None` appeared in release instead of a number. (#1753)
 
 # 0.61.0
 
