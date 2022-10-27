@@ -1,3 +1,7 @@
+# 0.62.0
+
+- Version and revision are no more updated in  `SPEC` files when the `--no-bump` flag is specified and `None` revisions are no more created. (#1753)
+
 # 0.61.0
 
 - Packit can now correctly authenticate with Bodhi 6 and therefore create Bodhi updates. 🚀 (#1746)
