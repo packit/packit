@@ -2225,6 +2225,49 @@ def test_selecting_packages_in_jobs(data):
 
 
 @pytest.mark.parametrize(
+    "data, error",
+    [
+        pytest.param(
+            {
+                "downstream_package_name": "apple",
+                "specfile_path": "apple.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": "apple",
+                    },
+                ],
+            },
+            r"'str'.+instead of 'list' or 'dict'",
+            id="package_is_str",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "apple",
+                "specfile_path": "apple.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "pull_request",
+                        "packages": ["pear"],
+                    },
+                ],
+            },
+            r"Undefined.+: pear\.",
+            id="package_is_not_present",
+        ),
+    ],
+)
+def test_package_error_in_job(data, error):
+    """The 'packages' key in a job is of a wrong type, or references a
+    packages which is not defined on the top-level 'packages' dict.
+    """
+    with pytest.raises(ValidationError, match=error):
+        PackageConfigSchema().load(data)
+
+
+@pytest.mark.parametrize(
     "data",
     [
         pytest.param(
