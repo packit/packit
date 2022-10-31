@@ -596,6 +596,7 @@ class PackageConfigSchema(Schema):
         """
         packages = data["packages"]
         jobs = data["jobs"]
+        errors = {}
         for i, job in enumerate(jobs):
             job_type = job.pop("job")
             trigger = job.pop("trigger")
@@ -618,7 +619,21 @@ class PackageConfigSchema(Schema):
                         "is not possible. Remove obsolete nested job metadata dictionary."
                     )
                 job.update(metadata)
+
             selected_packages = job.pop("packages", None)
+            # Check that only packages which are defined on the top-level are selected.
+            # Do this here b/c the code further down requires this to be correct.
+            incorrect_packages = (
+                set(selected_packages).difference(packages)
+                if isinstance(selected_packages, (dict, list))
+                else None
+            )
+            if incorrect_packages:
+                errors[
+                    f"jobs[{i}].packages"
+                ] = f"Undefined package(s) referenced: {', '.join(incorrect_packages)}."
+                continue
+
             # There is no 'packages' key in the job, so
             # the job should handle all the top-level packages.
             if not selected_packages:
@@ -650,8 +665,15 @@ class PackageConfigSchema(Schema):
                     },
                 }
             else:
-                # TODO(csomh): error message
-                raise ValidationError("unknown type")
+                errors[f"'jobs[{i}].packages'"] = [
+                    f"Type is {type(selected_packages)} instead of 'list' or 'dict'."
+                ]
+
+        if errors:
+            # This will shadow all other possible errors in the configuration,
+            # as the process doesn't even get to the validation phase.
+            raise ValidationError(errors)
+
         return data
 
     @post_load
