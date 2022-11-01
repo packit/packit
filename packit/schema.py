@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import copy
+import json
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union, List
 
@@ -526,6 +527,7 @@ class PackageConfigSchema(Schema):
         # in the config.
         data = self.rearrange_packages(data)
         data = self.rearrange_jobs(data)
+        logger.debug(f"Repo config after pre-loading:\n{json.dumps(data, indent=4)}")
         return data
 
     def rename_deprecated_keys(self, data: dict) -> dict:
