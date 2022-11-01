@@ -60,25 +60,26 @@ class PackageConfig(MultiplePackages):
         # required to avoid cyclical imports
         from packit.schema import PackageConfigSchema
 
-        if config_file_path and not raw_dict.get("config_file_path", None):
-            raw_dict.update(config_file_path=config_file_path)
-
         # we need to process defaults first so they get propagated to JobConfigs
 
-        if not raw_dict.get("upstream_package_name", None) and repo_name:
-            raw_dict["upstream_package_name"] = repo_name
+        raw_dict.setdefault("config_file_path", config_file_path)
 
-        if not raw_dict.get("downstream_package_name", None) and repo_name:
-            raw_dict["downstream_package_name"] = repo_name
-
-        if not raw_dict.get("specfile_path", None):
+        if not raw_dict.get("specfile_path"):
+            default_specfile_path = None
             # we default to <downstream_package_name>.spec
             # https://packit.dev/docs/configuration/#specfile_path
-            downstream_package_name = raw_dict.get("downstream_package_name", None)
-            if downstream_package_name:
-                raw_dict["specfile_path"] = f"{downstream_package_name}.spec"
+            if downstream_package_name := raw_dict.get("downstream_package_name", None):
+                default_specfile_path = f"{downstream_package_name}.spec"
             elif search_specfile:
-                raw_dict["specfile_path"] = search_specfile(**specfile_search_args)
+                default_specfile_path = search_specfile(**specfile_search_args)
+            raw_dict["specfile_path"] = default_specfile_path
+
+        # Do this _after_ setting the default for 'specfile_path',
+        # so that 'downstream_package_name' is considered for setting
+        # 'specfile_path' _only_ when set in packit.yaml.
+        if repo_name:
+            raw_dict.setdefault("upstream_package_name", repo_name)
+            raw_dict.setdefault("downstream_package_name", repo_name)
 
         package_config = PackageConfigSchema().load(raw_dict)
 
