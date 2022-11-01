@@ -273,7 +273,9 @@ def parse_loaded_config(
     **specfile_search_args,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
-    logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
+    logger.debug(
+        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}"
+    )
 
     try:
         return PackageConfig.get_from_dict(
