@@ -32,3 +32,9 @@
     name: flexmock
     state: latest
   become: true
+
+- name: Install DeepDiff from PyPI
+  ansible.builtin.pip:
+    name: deepdiff
+    state: latest
+  become: true

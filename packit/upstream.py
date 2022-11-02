@@ -18,7 +18,7 @@ from packaging import version
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import MultiplePackages
 from packit.constants import DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
 from packit.exceptions import (
     PackitException,
@@ -47,7 +47,7 @@ class Upstream(PackitRepositoryBase):
     def __init__(
         self,
         config: Config,
-        package_config: CommonPackageConfig,
+        package_config: MultiplePackages,
         local_project: LocalProject,
     ):
         """

@@ -9,6 +9,7 @@ from marshmallow import ValidationError
 from ogr import GithubService, PagureService
 
 from packit.config import (
+    CommonPackageConfig,
     Config,
     JobConfig,
     JobType,
@@ -19,15 +20,21 @@ from packit.schema import JobConfigSchema, JobMetadataSchema
 
 
 def get_job_config_dict_simple(**update):
-    result = {"job": "copr_build", "trigger": "release"}
+    result = {
+        "job": "copr_build",
+        "trigger": "release",
+    }
     result.update(update)
     return result
 
 
 def get_job_config_simple(**kwargs):
     """pass kwargs to JobConfig constructor"""
+    package_name = kwargs.get("downstream_package_name", "package")
     return JobConfig(
-        type=JobType.copr_build, trigger=JobConfigTriggerType.release, **kwargs
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.release,
+        packages={package_name: CommonPackageConfig(**kwargs)},
     )
 
 
@@ -46,11 +53,13 @@ def get_job_config_dict_full():
 
 def get_job_config_full(**kwargs):
     """pass kwargs to JobConfig constructor"""
+    package_name = kwargs.get("downstream_package_name", "package")
     return JobConfig(
         type=JobType.propose_downstream,
         trigger=JobConfigTriggerType.pull_request,
-        dist_git_branches=["master"],
-        **kwargs,
+        packages={
+            package_name: CommonPackageConfig(dist_git_branches=["master"], **kwargs)
+        },
     )
 
 
@@ -70,35 +79,44 @@ def get_job_config_dict_build_for_branch():
 
 def get_job_config_build_for_branch(**kwargs):
     """pass kwargs to JobConfig constructor"""
+    package_name = kwargs.get("downstream_package_name", "package")
     return JobConfig(
         type=JobType.copr_build,
         trigger=JobConfigTriggerType.commit,
-        branch="build-branch",
-        scratch=True,
-        **kwargs,
+        packages={
+            package_name: CommonPackageConfig(
+                branch="build-branch", scratch=True, **kwargs
+            )
+        },
     )
 
 
 def get_default_job_config(**kwargs):
     """pass kwargs to JobConfig constructor"""
+    package_name = kwargs.get("downstream_package_name", "package")
     return [
         JobConfig(
             type=JobType.copr_build,
             trigger=JobConfigTriggerType.pull_request,
-            _targets=[DEFAULT_VERSION],
-            **kwargs,
+            packages={
+                package_name: CommonPackageConfig(_targets=[DEFAULT_VERSION], **kwargs)
+            },
         ),
         JobConfig(
             type=JobType.tests,
             trigger=JobConfigTriggerType.pull_request,
-            _targets=[DEFAULT_VERSION],
-            **kwargs,
+            packages={
+                package_name: CommonPackageConfig(_targets=[DEFAULT_VERSION], **kwargs)
+            },
         ),
         JobConfig(
             type=JobType.propose_downstream,
             trigger=JobConfigTriggerType.release,
-            dist_git_branches=["fedora-all"],
-            **kwargs,
+            packages={
+                package_name: CommonPackageConfig(
+                    dist_git_branches=["fedora-all"], **kwargs
+                )
+            },
         ),
     ]
 
@@ -118,16 +136,34 @@ def test_job_config_blah():
     assert "'job': ['Invalid enum member asdqwe']" in str(ex.value)
 
 
+def expanded_job_config_dict(**kwargs):
+    config = {
+        "job": "copr_build",
+        "trigger": "pull_request",
+        "packages": {"package": {"specfile_path": "package.spec"}},
+    }
+    config["packages"]["package"].update(**kwargs)
+    return config
+
+
+def expanded_job_config_object(**kwargs):
+    package_config = {"specfile_path": "package.spec"}
+    package_config.update(**kwargs)
+    return JobConfig(
+        type=JobType.copr_build,
+        trigger=JobConfigTriggerType.pull_request,
+        packages={"package": CommonPackageConfig(**package_config)},
+    )
+
+
 @pytest.mark.parametrize(
     "raw,is_valid",
     [
         ({}, False),
         ({"trigger": "release"}, False),
         ({"release_to": ["f28"]}, False),
-        ([], False),
-        ({"asd"}, False),
-        (get_job_config_dict_simple(), True),
-        (get_job_config_dict_full(), True),
+        (expanded_job_config_dict(), True),
+        (expanded_job_config_dict(dist_git_branches=["main"]), True),
     ],
 )
 def test_job_config_validate(raw, is_valid):
@@ -141,19 +177,22 @@ def test_job_config_validate(raw, is_valid):
 @pytest.mark.parametrize(
     "raw,expected_config",
     [
-        (get_job_config_dict_simple(), get_job_config_simple()),
-        (get_job_config_dict_full(), get_job_config_full()),
+        (expanded_job_config_dict(), expanded_job_config_object()),
         (
-            get_job_config_dict_simple(),
-            get_job_config_simple(preserve_project=False),
+            expanded_job_config_dict(dist_git_branches=["main"]),
+            expanded_job_config_object(dist_git_branches=["main"]),
         ),
         (
-            get_job_config_dict_simple(preserve_project=False),
-            get_job_config_simple(preserve_project=False),
+            expanded_job_config_dict(),
+            expanded_job_config_object(preserve_project=False),
         ),
         (
-            get_job_config_dict_simple(preserve_project=True),
-            get_job_config_simple(preserve_project=True),
+            expanded_job_config_dict(preserve_project=False),
+            expanded_job_config_object(preserve_project=False),
+        ),
+        (
+            expanded_job_config_dict(preserve_project=True),
+            expanded_job_config_object(preserve_project=True),
         ),
     ],
 )
@@ -169,10 +208,12 @@ def test_job_config_parse(raw, expected_config):
             {
                 "job": "koji_build",
                 "trigger": "commit",
+                "packages": {"package": {"specfile_path": "package.spec"}},
             },
             JobConfig(
                 type=JobType.koji_build,
                 trigger=JobConfigTriggerType.commit,
+                packages={"package": CommonPackageConfig(specfile_path="package.spec")},
             ),
             ["packit"],
             [],
@@ -181,12 +222,22 @@ def test_job_config_parse(raw, expected_config):
             {
                 "job": "koji_build",
                 "trigger": "commit",
-                "allowed_committers": ["me"],
+                "packages": {
+                    "package": {
+                        "specfile_path": "package.spec",
+                        "allowed_committers": ["me"],
+                    }
+                },
             },
             JobConfig(
                 type=JobType.koji_build,
                 trigger=JobConfigTriggerType.commit,
-                allowed_committers=["me"],
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="package.spec",
+                        allowed_committers=["me"],
+                    )
+                },
             ),
             ["packit"],
             ["me"],
@@ -195,14 +246,24 @@ def test_job_config_parse(raw, expected_config):
             {
                 "job": "koji_build",
                 "trigger": "commit",
-                "allowed_committers": ["me"],
-                "allowed_pr_authors": [],
+                "packages": {
+                    "package": {
+                        "specfile_path": "package.spec",
+                        "allowed_committers": ["me"],
+                        "allowed_pr_authors": [],
+                    }
+                },
             },
             JobConfig(
                 type=JobType.koji_build,
                 trigger=JobConfigTriggerType.commit,
-                allowed_committers=["me"],
-                allowed_pr_authors=[],
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="package.spec",
+                        allowed_committers=["me"],
+                        allowed_pr_authors=[],
+                    )
+                },
             ),
             [],
             ["me"],
@@ -286,7 +347,10 @@ def test_user_config_fork_token(tmp_path, recwarn):
 
 @pytest.mark.parametrize(
     "config",
-    [get_job_config_simple(), get_job_config_full()],
+    [
+        expanded_job_config_object(),
+        expanded_job_config_object(dist_git_branches=["main"]),
+    ],
 )
 def test_serialize_and_deserialize_job_config(config):
     schema = JobConfigSchema()
@@ -302,28 +366,24 @@ def test_serialize_and_deserialize_job_config(config):
             {
                 "job": "build",
                 "trigger": "release",
-                "enable_net": False,
-                "metadata": {"branch": "main"},
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    }
+                },
             },
             {
                 "job": "build",
                 "trigger": "release",
-                "enable_net": False,
-                "branch": "main",
-            },
-            True,
-        ),
-        (
-            {
-                "job": "build",
-                "trigger": "release",
-                "metadata": {"enable_net": False, "branch": "main"},
-            },
-            {
-                "job": "build",
-                "trigger": "release",
-                "enable_net": False,
-                "branch": "main",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    }
+                },
             },
             False,
         ),
@@ -331,14 +391,49 @@ def test_serialize_and_deserialize_job_config(config):
             {
                 "job": "build",
                 "trigger": "release",
-                "enable_net": False,
-                "branch": "main",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    }
+                },
             },
             {
                 "job": "build",
                 "trigger": "release",
-                "enable_net": False,
-                "branch": "main",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    }
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "job": "build",
+                "trigger": "release",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    }
+                },
+            },
+            {
+                "job": "build",
+                "trigger": "release",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    }
+                },
             },
             False,
         ),
@@ -347,7 +442,7 @@ def test_serialize_and_deserialize_job_config(config):
 def test_deserialize_and_serialize_job_config(config_in, config_out, validation_error):
     schema = JobConfigSchema()
     if validation_error:
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError, match=validation_error):
             schema.dump(schema.load(config_in))
     else:
         serialized_from_in = schema.dump(schema.load(config_in))

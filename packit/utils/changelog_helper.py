@@ -6,7 +6,7 @@ import logging
 from typing import Optional
 
 from packit.actions import ActionName
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import MultiplePackages
 from packit.distgit import DistGit
 import packit.upstream
 
@@ -18,7 +18,7 @@ class ChangelogHelper:
         self,
         upstream: "packit.upstream.Upstream",
         downstream: Optional[DistGit] = None,
-        package_config: Optional[CommonPackageConfig] = None,
+        package_config: Optional[MultiplePackages] = None,
     ) -> None:
         self.up = upstream
         self.dg = downstream
@@ -26,7 +26,7 @@ class ChangelogHelper:
 
     @staticmethod
     def resolve_release_suffix(
-        package_config: CommonPackageConfig,
+        package_config: MultiplePackages,
         release_suffix: Optional[str] = None,
         default_release_suffix: bool = False,
     ) -> Optional[str]:
