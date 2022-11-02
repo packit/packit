@@ -10,7 +10,7 @@ from ogr.abstract import GitProject
 from ogr.exceptions import GithubAppNotInstalledError
 from yaml import safe_load
 
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
 from packit.config.job_config import JobConfig, JobType
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
@@ -18,10 +18,10 @@ from packit.exceptions import PackitConfigException
 logger = logging.getLogger(__name__)
 
 
-class PackageConfig(CommonPackageConfig):
+class PackageConfig(MultiplePackages):
     """
-    Config class for upstream/downstream packages;
-    this is the config people put in their repos
+    Config class capturing the configuration of a upstream or
+    downstream repository, aka "packit.yaml"
 
     Attributes:
         jobs: List of job configs.
@@ -29,11 +29,15 @@ class PackageConfig(CommonPackageConfig):
 
     def __init__(
         self,
+        packages: Dict[str, CommonPackageConfig],
         jobs: Optional[List[JobConfig]] = None,
-        **kwargs,
     ):
-        super().__init__(**kwargs)
-        self.jobs: List[JobConfig] = jobs or []
+        super().__init__(packages)
+        # Directly manipulating __dict__ is not recommended.
+        # It is done here to avoid triggering __setattr__ and
+        # should be removed once support for a single package is
+        # dropped from config objects.
+        self.__dict__["jobs"] = jobs or []
 
     def __repr__(self):
         # required to avoid cyclical imports
@@ -269,7 +273,9 @@ def parse_loaded_config(
     **specfile_search_args,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
-    logger.debug(f"Package config:\n{json.dumps(loaded_config, indent=4)}")
+    logger.debug(
+        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}"
+    )
 
     try:
         return PackageConfig.get_from_dict(

@@ -1,6 +1,8 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
+import json
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union, List
 
@@ -16,7 +18,12 @@ from marshmallow import (
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
-from packit.config import PackageConfig, Config, CommonPackageConfig, Deployment
+from packit.config import (
+    PackageConfig,
+    Config,
+    CommonPackageConfig,
+    Deployment,
+)
 from packit.config.job_config import (
     JobType,
     JobConfig,
@@ -281,7 +288,7 @@ def validate_repo_name(value):
 
 class CommonConfigSchema(Schema):
     """
-    Common methods for JobConfigSchema and PackageConfigSchema
+    Common configuration options and methods for a package.
     """
 
     config_file_path = fields.String(missing=None)
@@ -289,6 +296,7 @@ class CommonConfigSchema(Schema):
     downstream_package_name = fields.String(missing=None)
     upstream_project_url = fields.String(missing=None)
     upstream_package_name = fields.String(missing=None, validate=validate_repo_name)
+    paths = fields.List(fields.String())
     upstream_ref = fields.String(missing=None)
     upstream_tag_template = fields.String()
     archive_root_dir_template = fields.String()
@@ -378,6 +386,10 @@ class CommonConfigSchema(Schema):
                 value = f"Source{value}"
         return value
 
+    @post_load
+    def make_instance(self, data, **_):
+        return CommonPackageConfig(**data)
+
     @post_dump(pass_original=True)
     def adjust_files_to_sync(
         self, data: dict, original: CommonPackageConfig, **kwargs
@@ -402,70 +414,64 @@ class CommonConfigSchema(Schema):
         return data
 
 
-class JobConfigSchema(CommonConfigSchema):
+class JobConfigSchema(Schema):
     """
     Schema for processing JobConfig config data.
     """
 
     job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
-    # 'metadata' is deprecated
-    metadata = fields.Nested(JobMetadataSchema)
+    packages = fields.Dict(
+        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+    )
 
     @pre_load
     def ordered_preprocess(self, data, **_):
-        if "metadata" in data:
-            logger.warning(
-                "The 'metadata' key in jobs is deprecated and can be removed."
-                "Nest config options from 'metadata' directly under the job object."
-            )
-
-            not_nested_metadata_keys = [
-                k
-                for k in (
-                    "_targets",
-                    "timeout",
-                    "owner",
-                    "project",
-                    "dist_git_branches",
-                    "branch",
-                    "scratch",
-                    "list_on_homepage",
-                    "preserve_project",
-                    "use_internal_tf",
-                    "additional_packages",
-                    "additional_repos",
-                    "fmf_url",
-                    "fmf_ref",
-                    "skip_build",
-                    "env",
-                    "enable_net",
-                )
-                if k in data
-            ]
-            if not_nested_metadata_keys:
-                raise ValidationError(
-                    f"Keys: {not_nested_metadata_keys} are defined outside job metadata dictionary."
-                    "Mixing obsolete metadata dictionary and new job keys is not possible."
-                    "Remove obsolete nested job metadata dictionary."
-                )
-
-        for key in ("targets", "dist_git_branches"):
-            if isinstance(data, dict) and isinstance(data.get(key), str):
-                # allow key value being specified as string, convert to list
-                data[key] = [data.pop(key)]
+        for package, config in data.get("packages", {}).items():
+            for key in ("targets", "dist_git_branches"):
+                if isinstance(config, dict) and isinstance(config.get(key), str):
+                    # allow key value being specified as string, convert to list
+                    data["packages"][package][key] = [config.pop(key)]
 
         return data
 
+    @validates_schema
+    def specfile_path_defined(self, data, **_):
+        """Check if a 'specfile_path' is specified for each package
+
+        The only time 'specfile_path' is not required, is when the job is a
+        'test' job.
+
+        Args:
+            data: partially loaded configuration data.
+
+        Raises:
+            ValidationError, if 'specfile_path' is not specified when
+            it should be.
+        """
+        # This is somewhat weird: while 'data' is still a dict,
+        # elements in 'jobs' was already loaded, so those are JobConfig objects.
+        if (data["type"] == JobType.tests.value and data.get("skip_build")) or data.get(
+            "specfile_path"
+        ):
+            return
+
+        errors = {}
+        for package, config in data.get("packages", {}).items():
+            if not config.specfile_path:
+                errors[package] = [
+                    "'specfile_path' is not specified or "
+                    "no specfile was found in the repo"
+                ]
+        if errors:
+            raise ValidationError(errors)
+
     @post_load
     def make_instance(self, data, **_):
-        if "metadata" in data:
-            metadata = data.pop("metadata")
-            data.update(metadata)
         return JobConfig(**data)
 
 
-class PackageConfigSchema(CommonConfigSchema):
+class PackageConfigSchema(Schema):
     """
     Schema for processing PackageConfig config data.
 
@@ -483,18 +489,48 @@ class PackageConfigSchema(CommonConfigSchema):
     """
 
     jobs = fields.Nested(JobConfigSchema, many=True)
+    packages = fields.Dict(
+        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+    )
 
     # list of deprecated keys and their replacement (new,old)
     deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
 
     @pre_load
-    def ordered_preprocess(self, data, **kwargs):
-        data = self.rename_deprecated_keys(data, **kwargs)
+    def ordered_preprocess(self, data: dict, **_) -> dict:
+        """Rename deprecated keys, and set defaults for 'packages' and 'jobs'
+
+        Args:
+            data: configuration dictionary as loaded from packit.yaml
+
+        Returns:
+            Transformed configuration dictionary with defaults
+            for 'packages' and 'jobs' set.
+        """
+        # Create a deepcopy(), so that loading doesn't modify the
+        # dictionary received.
+        data = copy.deepcopy(data)
+        data = self.rename_deprecated_keys(data)
+        # Don't use 'setdefault' in this case, as we should expect
+        # downstream_package_name only if there is no 'packages' key.
+        if "packages" not in data:
+            package_name = data.pop("downstream_package_name")
+            paths = data.pop("paths", ["./"])
+            data["packages"] = {
+                package_name: {
+                    "downstream_package_name": package_name,
+                    "paths": paths,
+                }
+            }
         data.setdefault("jobs", get_default_jobs())
-        data = self.propagate_options_to_jobs(data, **kwargs)
+        # By this point, we expect both 'packages' and 'jobs' to be present
+        # in the config.
+        data = self.rearrange_packages(data)
+        data = self.rearrange_jobs(data)
+        logger.debug(f"Repo config after pre-loading:\n{json.dumps(data, indent=4)}")
         return data
 
-    def rename_deprecated_keys(self, data, **kwargs):
+    def rename_deprecated_keys(self, data: dict) -> dict:
         """
         Based on tuples stored in tuple cls.deprecated_keys, reassigns old keys values to new keys,
         in case new key is None and logs warning
@@ -519,46 +555,131 @@ class PackageConfigSchema(CommonConfigSchema):
         return data
 
     @staticmethod
-    def propagate_options_to_jobs(data, **_):
-        """
-        add all the fields (except for jobs) to every job so we can process only jobconfig in p-s
-        """
-        if not data:  # data is None when .packit.yaml is empty
-            return data
-        for job in data.get("jobs", []):
-            for k, v in data.items():
-                if k == "jobs":
-                    # overriding jobs doesn't make any sense
-                    continue
-                job.setdefault(k, v)
-        return data
+    def rearrange_packages(data: dict) -> dict:
+        """Update package objects with top-level configuration values
 
-    @validates_schema
-    def specfile_path_defined(self, data, **_):
-        """Check that 'specfile_path' is specified when needed
+        Top-level keys and values are copied to each package object if
+        the given key is not set in that object already.
 
-        The only time 'specfile_path' is not required, is when all jobs
-        are of 'test' type and all of them are configured to skip building
-        the package.
+        Remove these keys from the top-level and return a dictionary
+        containing only a 'packages' and 'jobs' key.
 
         Args:
-            data: partially loaded configuration data.
+            data: configuration dictionary, before any of the leaves
+                having been loaded.
 
-        Raises:
-            ValidationError, if 'specfile_path' is not specified when
-            it should be.
+        Returns:
+            A re-arranged configuration dictionary.
         """
-        # This is somewhat weird: while 'data' is still a dict,
-        # elements in 'jobs' was already loaded, so those are JobConfig objects.
-        if not data.get("specfile_path") and not all(
-            job.type == JobType.tests and job.skip_build for job in data.get("jobs", [])
-        ):
-            raise ValidationError(
-                "'specfile_path' is not specified or no specfile was found in the repo"
+        # Pop 'packages' and 'jobs' in order for 'data'
+        # to contain only keys other then these when it comes
+        # to merging it bellow.
+        packages = data.pop("packages")
+        jobs = data.pop("jobs")
+        for k, v in packages.items():
+            # First set the defaults which are not inherited from
+            # the top-level, in case they are not set yet.
+            v.setdefault("downstream_package_name", k)
+            # Inherit default values from the top-level.
+            v.update(data | v)
+        data = {"packages": packages, "jobs": jobs}
+        return data
+
+    @staticmethod
+    def rearrange_jobs(data: dict) -> dict:
+        """Set the selected package config objects in each job, and set defaults
+        according to the values specified on the level of job-objects (if any).
+
+        Args:
+            data: Configuration dict with 'packages' and 'jobs' already in place.
+
+        Returns:
+            Configuration dict where the package objects in jobs are correctly set.
+        """
+        packages = data["packages"]
+        jobs = data["jobs"]
+        errors = {}
+        for i, job in enumerate(jobs):
+            job_type = job.pop("job")
+            trigger = job.pop("trigger")
+            # Validate the 'metadata' field if there is any, and merge its
+            # content with the job.
+            # Do this here in order to avoid complications further in the
+            # loading process.
+            if metadata := job.pop("metadata", {}):
+                logger.warning(
+                    "The 'metadata' key in jobs is deprecated and can be removed. "
+                    "Nest config options from 'metadata' directly under the job object."
+                )
+                schema = JobMetadataSchema()
+                if errors := schema.validate(metadata):
+                    raise ValidationError(errors)
+                if not_nested_metadata_keys := set(schema.fields).intersection(job):
+                    raise ValidationError(
+                        f"Keys: {not_nested_metadata_keys} are defined outside job metadata "
+                        "dictionary. Mixing obsolete metadata dictionary and new job keys "
+                        "is not possible. Remove obsolete nested job metadata dictionary."
+                    )
+                job.update(metadata)
+
+            selected_packages = job.pop("packages", None)
+            # Check that only packages which are defined on the top-level are selected.
+            # Do this here b/c the code further down requires this to be correct.
+            incorrect_packages = (
+                set(selected_packages).difference(packages)
+                if isinstance(selected_packages, (dict, list))
+                else None
             )
+            if incorrect_packages:
+                errors[
+                    f"jobs[{i}].packages"
+                ] = f"Undefined package(s) referenced: {', '.join(incorrect_packages)}."
+                continue
+
+            # There is no 'packages' key in the job, so
+            # the job should handle all the top-level packages.
+            if not selected_packages:
+                jobs[i] = {
+                    "job": job_type,
+                    "trigger": trigger,
+                    "packages": {k: v | job for k, v in packages.items()},
+                }
+            # Some top-level packages are selected to be
+            # handled by the job.
+            elif isinstance(selected_packages, list):
+                jobs[i] = {
+                    "job": job_type,
+                    "trigger": trigger,
+                    "packages": {
+                        k: v | job
+                        for k, v in packages.items()
+                        if k in selected_packages
+                    },
+                }
+            # Some top-level packages are selected to be
+            # handled by the job AND have some custom config.
+            elif isinstance(selected_packages, dict):
+                jobs[i] = {
+                    "job": job_type,
+                    "trigger": trigger,
+                    "packages": {
+                        k: packages[k] | job | v for k, v in selected_packages.items()
+                    },
+                }
+            else:
+                errors[f"'jobs[{i}].packages'"] = [
+                    f"Type is {type(selected_packages)} instead of 'list' or 'dict'."
+                ]
+
+        if errors:
+            # This will shadow all other possible errors in the configuration,
+            # as the process doesn't even get to the validation phase.
+            raise ValidationError(errors)
+
+        return data
 
     @post_load
-    def make_instance(self, data, **kwargs):
+    def make_instance(self, data: dict, **_) -> PackageConfig:
         return PackageConfig(**data)
 
 

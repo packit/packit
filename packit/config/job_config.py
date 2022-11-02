@@ -7,7 +7,7 @@ from logging import getLogger
 from typing import List, Dict
 
 from packit.config.aliases import DEFAULT_VERSION
-from packit.config.common_package_config import CommonPackageConfig
+from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
 from packit.exceptions import PackitConfigException
 
 logger = getLogger(__name__)
@@ -50,12 +50,9 @@ class JobConfigTriggerType(Enum):
     commit = "commit"
 
 
-class JobConfig(CommonPackageConfig):
+class JobConfig(MultiplePackages):
     """
     Definition of a job.
-
-    We want users to be able to override global attributes per job hence
-    this inherits from CommonPackageConfig which contains all the definitions.
 
     Attributes:
         type: Type of the job, that is: the action to be performed by Packit.
@@ -66,11 +63,15 @@ class JobConfig(CommonPackageConfig):
         self,
         type: JobType,
         trigger: JobConfigTriggerType,
-        **kwargs,
+        packages: Dict[str, CommonPackageConfig],
     ):
-        super().__init__(**kwargs)
-        self.type: JobType = type
-        self.trigger: JobConfigTriggerType = trigger
+        super().__init__(packages)
+        # Directly manipulating __dict__ is not recommended.
+        # It is done here to avoid triggering __setattr__ and
+        # should be removed once support for a single package is
+        # dropped from config objects.
+        self.__dict__["type"] = type
+        self.__dict__["trigger"] = trigger
 
     def __repr__(self):
         # required to avoid cyclical imports

@@ -40,6 +40,7 @@ class PackageConfigValidator:
                 config_file_path=str(self.config_file_path),
                 search_specfile=get_local_specfile_path,
                 dir=self.config_file_path.parent,
+                repo_name=self.project_path.name,
             )
         except ValidationError as e:
             schema_errors = e.messages

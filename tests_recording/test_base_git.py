@@ -10,7 +10,7 @@ from requre.online_replacing import (
 )
 
 from packit.base_git import PackitRepositoryBase
-from packit.config import PackageConfig
+from packit.config import CommonPackageConfig, PackageConfig
 from packit.config.sources import SourcesItem
 from tests_recording.testbase import PackitTest
 
@@ -30,13 +30,18 @@ class ProposeUpdate(PackitTest):
         # "https://git.centos.org/sources/rsync/c8s/82e7829c0b3cefbd33c233005341e2073c425629"
         git_centos_org_url = "https://example.org/"
         package_config = PackageConfig(
-            specfile_path="rsync.spec",
-            sources=[
-                SourcesItem(
-                    path="rsync-3.1.2.tar.gz",
-                    url=git_centos_org_url,
-                ),
-            ],
+            packages={
+                "rsync": CommonPackageConfig(
+                    downstream_package_name="rsync",
+                    specfile_path="rsync.spec",
+                    sources=[
+                        SourcesItem(
+                            path="rsync-3.1.2.tar.gz",
+                            url=git_centos_org_url,
+                        ),
+                    ],
+                )
+            },
             jobs=[],
         )
         # same drill here, let's not store tarballs in our git-history

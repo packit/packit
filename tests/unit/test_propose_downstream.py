@@ -9,6 +9,7 @@ from packit.config import PackageConfig
 from packit.cli.propose_downstream import get_dg_branches
 
 from packit.config import (
+    CommonPackageConfig,
     JobType,
     JobConfigTriggerType,
     JobConfig,
@@ -20,11 +21,20 @@ from packit.config import (
     [
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                            )
+                        },
                     )
                 ],
             ),
@@ -35,12 +45,21 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        dist_git_branches=["file"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                                dist_git_branches=["file"],
+                            )
+                        },
                     )
                 ],
             ),
@@ -51,11 +70,20 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                            )
+                        },
                     )
                 ],
             ),
@@ -66,12 +94,21 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        dist_git_branches=["file"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                                dist_git_branches=["file"],
+                            )
+                        },
                     )
                 ],
             ),
@@ -82,12 +119,21 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        dist_git_branches=["file1", "file2"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                                dist_git_branches=["file1", "file2"],
+                            )
+                        },
                     )
                 ],
             ),
@@ -99,11 +145,20 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                            )
+                        },
                     )
                 ],
             ),
@@ -115,11 +170,20 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                            )
+                        },
                     )
                 ],
             ),
@@ -130,12 +194,21 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        dist_git_branches=["rawhide"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                                dist_git_branches=["rawhide"],
+                            )
+                        },
                     )
                 ],
             ),
@@ -146,12 +219,21 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
-                        dist_git_branches=["file1", "rawhide"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                                dist_git_branches=["file1", "rawhide"],
+                            )
+                        },
                     )
                 ],
             ),
@@ -163,11 +245,20 @@ from packit.config import (
         ),
         (
             PackageConfig(
-                specfile_path="xxx",
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="xxx",
+                    )
+                },
                 jobs=[
                     JobConfig(
                         type=JobType.propose_downstream,
                         trigger=JobConfigTriggerType.pull_request,
+                        packages={
+                            "package": CommonPackageConfig(
+                                specfile_path="xxx",
+                            )
+                        },
                     )
                 ],
             ),

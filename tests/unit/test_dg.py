@@ -4,7 +4,7 @@
 import pytest
 from flexmock import flexmock
 
-from packit.config import Config, PackageConfig
+from packit.config import CommonPackageConfig, Config, PackageConfig
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
 
@@ -79,7 +79,9 @@ def test_existing_pr(title, description, branch, prs, exists):
     )
     distgit = DistGit(
         config=flexmock(Config()),
-        package_config=flexmock(PackageConfig()),
+        package_config=flexmock(
+            PackageConfig(packages={"package": CommonPackageConfig()})
+        ),
         local_project=local_project,
     )
     pr = distgit.existing_pr(title, description, branch)
