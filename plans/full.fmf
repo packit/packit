@@ -3,9 +3,9 @@ discover+:
   filter: tier:1
 adjust:
   - when: "distro == rhel-9 or distro == centos-9 or distro == centos-stream-9"
-    because: "flexmock is not in EPEL 9: https://bugzilla.redhat.com/show_bug.cgi?id=2120251"
+    because: "flexmock and deepdiff are not in EPEL 9: https://bugzilla.redhat.com/show_bug.cgi?id=2120251"
     prepare:
       - how: install
         package: python3-pip
       - how: shell
-        script: pip3 install flexmock
+        script: pip3 install flexmock deepdiff
