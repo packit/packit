@@ -1357,34 +1357,31 @@ def test_dist_git_package_url():
     "content,project,spec_path",
     [
         (
-            "synced_files:\n"
+            "files_to_sync:\n"
             "  - packit.spec\n"
             "  - src: .packit.yaml\n"
             "    dest: .packit2.yaml",
-            GitProject(repo="packit", service=GitService(), namespace=""),
+            flexmock(repo="packit"),
             "packit.spec",
         ),
         (
-            "synced_files:\n"
+            "files_to_sync:\n"
             "  - packit.spec\n"
             "  - src: .packit.yaml\n"
             "    dest: .packit2.yaml",
-            GitProject(repo="packit", service=GitService(), namespace=""),
+            flexmock(repo="packit"),
             "packit.spec",
         ),
     ],
 )
 def test_get_package_config_from_repo(
     content,
-    project: GitProject,
+    project,
     spec_path: Optional[str],
 ):
-    gp = flexmock(GitProject)
-    gp.should_receive("full_repo_name").and_return("a/b")
-    gp.should_receive("get_file_content").and_return(content)
-    # TODO(csomh): add this back, once we search for the specfile when
-    # downstream_package_name was not provided by the _user_.
-    # gp.should_receive("get_files").and_return(["packit.spec"]).once()
+    project.should_receive("get_file_content").and_return(content)
+    project.should_receive("full_repo_name").and_return("a/b")
+    project.should_receive("get_files").and_return([spec_path]).once()
     config = get_package_config_from_repo(project=project)
     assert isinstance(config, PackageConfig)
     assert config.specfile_path == spec_path
@@ -1563,21 +1560,16 @@ def test_get_local_package_config_path(
     )
 
 
-def test_get_local_package_config_no_spec():
-    """make sure specfile_path gets the proper default when not set"""
-    flexmock(PosixPath).should_receive("is_file").and_return(True)
-
+def test_specfile_path_from_downstream_package_name():
+    """
+    If 'downstream_package_name' is set in the package configuration,
+    'specfile_path' is set to '{downstream_package_name}.spec'
+    """
     (
         flexmock(packit.config.package_config)
         .should_receive("load_packit_yaml")
-        .and_return({})
+        .and_return({"downstream_package_name": "cockpit"})
     )
-    (
-        flexmock(packit.config.package_config)
-        .should_receive("get_local_specfile_path")
-        .and_return(None)
-    )
-
     assert (
         get_local_package_config(
             package_config_path=".packit.yaml", repo_name="cockpit"
