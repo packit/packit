@@ -5,7 +5,6 @@ import shutil
 from pathlib import Path
 from typing import Tuple
 import subprocess
-import tempfile
 
 import pytest
 from flexmock import flexmock
@@ -26,20 +25,6 @@ from tests.spellbook import (
 
 from packit.config import JobConfig, PackageConfig
 from deepdiff import DeepDiff
-
-
-# define own tmp_path fixture for older version of pytest (Centos)
-try:
-    from _pytest import tmpdir
-
-    _ = tmpdir.tmp_path
-except (ImportError, AttributeError, KeyError):
-
-    @pytest.fixture()
-    def tmp_path():
-        TMP_DIR = "/tmp/pytest_tmp_path/"
-        Path(TMP_DIR).mkdir(exist_ok=True, parents=True)
-        return Path(tempfile.mkdtemp(prefix=TMP_DIR))
 
 
 def get_git_repo_and_remote(
