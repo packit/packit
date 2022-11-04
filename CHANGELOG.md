@@ -1,3 +1,8 @@
+# 0.63.0
+
+- Fixed an issue due to which the repository was never searched for a specfile if 'specfile_path' was not specified, and 'specfile_path' was always set to '<repo_name>.spec'. (#1758)
+- Packit is now able to generate automatic Bodhi update notes including a changelog diff since the latest stable build of a package. (#1747)
+
 # 0.62.0
 
 - Fixed an issue with version and release being updated even if `--no-bump` flag was specified. Also fixed an issue when `None` appeared in release instead of a number. (#1753)
