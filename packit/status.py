@@ -104,7 +104,7 @@ class Status:
         # so we don't need to get whole build history from Koji,
         # get just recent year to speed things up.
         since = datetime.now() - timedelta(days=365)
-        builds = KojiHelper().get_builds(
+        builds = KojiHelper().get_nvrs(
             self.dg.package_config.downstream_package_name, since
         )
         logger.debug(f"Recent Koji builds fetched: {builds}")
