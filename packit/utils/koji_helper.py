@@ -26,7 +26,7 @@ class KojiHelper:
             session if session is not None else koji.ClientSession(baseurl=KOJI_BASEURL)
         )
 
-    def get_builds(self, package: str, since: datetime) -> List[str]:
+    def get_builds(self, package: str, since: datetime) -> List[dict]:
         """
         Gets list of builds of a package since the specified datetime.
 
@@ -35,7 +35,7 @@ class KojiHelper:
             since: Only builds newer than this datetime will be considered.
 
         Returns:
-            List of NVRs.
+            List of builds.
         """
         try:
             package_id = self.session.getPackageID(package, strict=True)
@@ -51,9 +51,25 @@ class KojiHelper:
         except Exception as e:
             logger.debug(f"Failed to get builds of package {package} from Koji: {e}")
             return []
-        return [b["nvr"] for b in builds]
+        if not builds:
+            logger.debug(f"No builds found for package {package} since {since}")
+            return []
+        return builds
 
-    def get_latest_build_in_tag(self, package: str, tag: str) -> Optional[str]:
+    def get_nvrs(self, package: str, since: datetime) -> List[str]:
+        """
+        Gets list of nvr for builds of a package since the specified datetime.
+
+        Args:
+            package: Package name.
+            since: Only builds newer than this datetime will be considered.
+
+        Returns:
+            List of NVRs.
+        """
+        return [b["nvr"] for b in self.get_builds(package, since)]
+
+    def get_latest_build_in_tag(self, package: str, tag: str) -> Optional[dict]:
         """
         Gets the latest build of a package tagged into the specified tag.
 
@@ -62,7 +78,7 @@ class KojiHelper:
             tag: Koji tag.
 
         Returns:
-            NVR of the latest build or None if there is no such build.
+            Latest build or None if there is no such build.
         """
         try:
             builds = self.session.listTagged(
@@ -75,7 +91,23 @@ class KojiHelper:
             return None
         if not builds:
             return None
-        return builds[0]["nvr"]
+        return builds[0]
+
+    def get_latest_nvr_in_tag(self, package: str, tag: str) -> Optional[str]:
+        """
+        Gets the latest build of a package tagged into the specified tag.
+
+        Args:
+            package: Package name.
+            tag: Koji tag.
+
+        Returns:
+            NVR of the latest build or None if there is no such build.
+        """
+        build = self.get_latest_build_in_tag(package, tag)
+        if not build:
+            return None
+        return build["nvr"]
 
     def get_build_tags(self, nvr: str) -> List[str]:
         """
