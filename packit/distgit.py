@@ -526,7 +526,8 @@ class DistGit(PackitRepositoryBase):
                 changelog = self.get_changelog_since_latest_stable_build(package, nvr)
                 if changelog:
                     rendered_note += (
-                        "\n\n##### **Changelog for {package}**\n\n```\n{changelog}\n```"
+                        f"\n\n##### **Changelog for {package}**\n\n```\n"
+                        f"{changelog}\n```"
                     )
         try:
             save_kwargs = {
