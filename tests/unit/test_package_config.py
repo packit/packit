@@ -27,6 +27,7 @@ from packit.config.package_config import (
 import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.constants import CONFIG_FILE_NAMES
+from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
@@ -1390,6 +1391,19 @@ def test_get_package_config_from_repo(
         SyncFilesItem(src=[".packit.yaml"], dest=".packit2.yaml"),
     ]
     assert config.create_pr
+
+
+def test_get_package_config_from_repo_empty_no_spec():
+    gp = flexmock(GitProject)
+    gp.should_receive("full_repo_name").and_return("a/b")
+    gp.should_receive("get_file_content").and_return("# this is a comment")
+    gp.should_receive("get_files").and_return([])
+    git_project = GitProject(repo="packit", service=GitService(), namespace="")
+    with pytest.raises(
+        PackitConfigException,
+        match="specfile_path' is not specified or no specfile was found in the repo",
+    ):
+        get_package_config_from_repo(project=git_project)
 
 
 @pytest.mark.parametrize(
