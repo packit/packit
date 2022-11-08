@@ -15,6 +15,7 @@ from packit.config import CommonPackageConfig, JobConfig, JobType, JobConfigTrig
             {
                 "job": "copr_build",
                 "trigger": "release",
+                "skip_build": false,
                 "packages": {
                     "package": {
                         "upstream_package_name": null,
@@ -38,7 +39,6 @@ from packit.config import CommonPackageConfig, JobConfig, JobType, JobConfigTrig
                         "additional_repos": [],
                         "env": {},
                         "additional_packages": [],
-                        "skip_build": false,
                         "scratch": false,
                         "targets": {},
                         "fmf_url": null,
