@@ -1843,7 +1843,6 @@ def test_package_config_specfile_not_present_raise(raw):
     "raw",
     [
         {
-            "downstream_package_name": "package",
             "jobs": [
                 {
                     "job": "tests",
@@ -1854,7 +1853,6 @@ def test_package_config_specfile_not_present_raise(raw):
             ],
         },
         {
-            "downstream_package_name": "package",
             "jobs": [
                 {
                     "job": "tests",
@@ -1865,15 +1863,23 @@ def test_package_config_specfile_not_present_raise(raw):
                 {
                     "job": "tests",
                     "trigger": "pull_request",
-                    "targets": ["fedora-stable", "fedora-development"],
-                    "skip_build": True,
+                    "metadata": {
+                        "targets": ["fedora-stable", "fedora-development"],
+                        "skip_build": True,
+                    },
                 },
             ],
         },
     ],
 )
-def test_package_config_specilfe_not_present_not_raise(raw):
-    assert PackageConfig.get_from_dict(raw_dict=raw)
+def test_specfile_path_not_defined_in_test_only_jobs(raw):
+    """Packages in test jobs, which are configured to not to require building
+    a package don't need a 'specfile_path' set.
+
+    Note: don't set 'downstream_package_name' either, as that implicitly sets
+    'specfile_path' :-)
+    """
+    assert PackageConfig.get_from_dict(raw_dict=raw, repo_name="package")
 
 
 @pytest.mark.parametrize(
