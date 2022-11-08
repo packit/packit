@@ -64,6 +64,7 @@ class JobConfig(MultiplePackages):
         type: JobType,
         trigger: JobConfigTriggerType,
         packages: Dict[str, CommonPackageConfig],
+        skip_build: bool = False,
     ):
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
@@ -72,6 +73,7 @@ class JobConfig(MultiplePackages):
         # dropped from config objects.
         self.__dict__["type"] = type
         self.__dict__["trigger"] = trigger
+        self.__dict__["skip_build"] = skip_build
 
     def __repr__(self):
         # required to avoid cyclical imports

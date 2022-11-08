@@ -345,7 +345,6 @@ class CommonConfigSchema(Schema):
     additional_repos = fields.List(fields.String(), missing=None)
     fmf_url = fields.String(missing=None)
     fmf_ref = fields.String(missing=None)
-    skip_build = fields.Boolean()
     env = fields.Dict(keys=fields.String(), missing=None)
     enable_net = fields.Boolean(missing=True)
     allowed_pr_authors = fields.List(fields.String(), missing=None)
@@ -421,6 +420,7 @@ class JobConfigSchema(Schema):
 
     job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
+    skip_build = fields.Boolean()
     packages = fields.Dict(
         keys=fields.String(), values=fields.Nested(CommonConfigSchema())
     )
@@ -449,14 +449,17 @@ class JobConfigSchema(Schema):
             ValidationError, if 'specfile_path' is not specified when
             it should be.
         """
-        # This is somewhat weird: while 'data' is still a dict,
-        # elements in 'jobs' was already loaded, so those are JobConfig objects.
-        if (data["type"] == JobType.tests.value and data.get("skip_build")) or data.get(
+        # Note: At this point, 'data' is still a dict, but values are already
+        # loaded, this is why 'data["type"]' is already a JobType and not a string,
+        # and the package configs below are PackageConfig objects, not dictionaries.
+        if (data["type"] == JobType.tests and data.get("skip_build")) or data.get(
             "specfile_path"
         ):
             return
 
         errors = {}
+        package: str
+        config: PackageConfig
         for package, config in data.get("packages", {}).items():
             if not config.specfile_path:
                 errors[package] = [
@@ -600,8 +603,6 @@ class PackageConfigSchema(Schema):
         jobs = data["jobs"]
         errors = {}
         for i, job in enumerate(jobs):
-            job_type = job.pop("job")
-            trigger = job.pop("trigger")
             # Validate the 'metadata' field if there is any, and merge its
             # content with the job.
             # Do this here in order to avoid complications further in the
@@ -622,7 +623,12 @@ class PackageConfigSchema(Schema):
                     )
                 job.update(metadata)
 
-            selected_packages = job.pop("packages", None)
+            top_keys = {}
+            for key in JobConfigSchema().fields:
+                if (value := job.pop(key, None)) is not None:
+                    top_keys[key] = value
+
+            selected_packages = top_keys.pop("packages", None)
             # Check that only packages which are defined on the top-level are selected.
             # Do this here b/c the code further down requires this to be correct.
             incorrect_packages = (
@@ -639,17 +645,13 @@ class PackageConfigSchema(Schema):
             # There is no 'packages' key in the job, so
             # the job should handle all the top-level packages.
             if not selected_packages:
-                jobs[i] = {
-                    "job": job_type,
-                    "trigger": trigger,
+                jobs[i] = top_keys | {
                     "packages": {k: v | job for k, v in packages.items()},
                 }
             # Some top-level packages are selected to be
             # handled by the job.
             elif isinstance(selected_packages, list):
-                jobs[i] = {
-                    "job": job_type,
-                    "trigger": trigger,
+                jobs[i] = top_keys | {
                     "packages": {
                         k: v | job
                         for k, v in packages.items()
@@ -659,9 +661,7 @@ class PackageConfigSchema(Schema):
             # Some top-level packages are selected to be
             # handled by the job AND have some custom config.
             elif isinstance(selected_packages, dict):
-                jobs[i] = {
-                    "job": job_type,
-                    "trigger": trigger,
+                jobs[i] = top_keys | {
                     "packages": {
                         k: packages[k] | job | v for k, v in selected_packages.items()
                     },
