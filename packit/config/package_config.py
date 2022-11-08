@@ -8,7 +8,7 @@ from typing import Callable, Optional, List, Dict, Union, Set
 
 from ogr.abstract import GitProject
 from ogr.exceptions import GithubAppNotInstalledError
-from yaml import safe_load
+from yaml import safe_load, YAMLError
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
 from packit.config.job_config import JobConfig, JobType
@@ -168,17 +168,31 @@ def find_packit_yaml(
     raise PackitConfigException("No packit config found.")
 
 
-def load_packit_yaml(config_file_path: Path) -> Dict:
+def load_packit_yaml(
+    config_file_path: Optional[Path] = None, raw_text: str = ""
+) -> Dict:
     """
-    load provided packit.yaml, raise PackitConfigException if something is wrong
+    Use yaml.safe_load to parse provided text as yaml
 
-    :return: Dict with the file content
+    When config_file_path is set, read the file, otherwise process content of raw_text.
+
+    Args:
+        config_file_path: local path to .packit.yaml
+        raw_text: content of .packit.yaml
+
+    Raises:
+        PackitConfigException when something goes wrong while loading the config
+
+    Returns:
+        Dict with the file content
     """
+    if config_file_path:
+        raw_text = config_file_path.read_text()
     try:
         # safe_load() returns None when the file is empty, but this needs
         # to return a dict.
-        return safe_load(config_file_path.read_text()) or {}
-    except Exception as ex:
+        return safe_load(raw_text) or {}
+    except YAMLError as ex:
         logger.error(f"Cannot load package config {config_file_path}.")
         raise PackitConfigException(f"Cannot load package config: {ex!r}.")
 
@@ -210,7 +224,7 @@ def get_local_package_config(
             try_local_dir_last=try_local_dir_last,
         )
 
-    loaded_config = load_packit_yaml(config_file_name)
+    loaded_config = load_packit_yaml(config_file_path=config_file_name)
 
     return parse_loaded_config(
         loaded_config=loaded_config,
@@ -247,13 +261,7 @@ def get_package_config_from_repo(
         )
         return None
 
-    try:
-        loaded_config = safe_load(config_file_content)
-    except Exception as ex:
-        logger.error(f"Cannot load package config {config_file_name!r}. {ex}")
-        raise PackitConfigException(
-            f"Cannot load package config {config_file_name!r}. {ex}"
-        )
+    loaded_config = load_packit_yaml(raw_text=config_file_content)
 
     return parse_loaded_config(
         loaded_config=loaded_config,
