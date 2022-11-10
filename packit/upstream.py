@@ -820,7 +820,9 @@ class SRPMBuilder:
         """
         logger.debug(f"The `rpmbuild` command output: {output}")
         # not doing 'Wrote: (.+)' since people can have different locales; hi Franto!
-        reg = r": (\S+\.src\.rpm)$"
+        reg = r": (\S+\.src\.rpm)"
+        # also, we can't suffix this with '$' because rpmbuild can put additional content after
+        # e.g. warnings when parsing the spec file
         try:
             the_srpm = re.findall(reg, output)[0]
         except IndexError:
