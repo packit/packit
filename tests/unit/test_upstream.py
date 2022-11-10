@@ -340,6 +340,30 @@ def test_release_suffix(
 
 
 @pytest.mark.parametrize(
+    "rpmbuild_output",
+    (
+        pytest.param(
+            "setting SOURCE_DATE_EPOCH=1668038400"
+            "Wrote: ./koji-c-1.1.0-1.20221110110837054647.pr257.1.g8477d03.fc35.src.rpm"
+            "RPM build warnings:"
+            "    extra tokens at the end of %endif directive in line 66:  %endif # with_python3",
+            id="output_after",
+        ),
+        pytest.param(
+            "setting SOURCE_DATE_EPOCH=1668038400"
+            "Wrote: ./koji-c-1.1.0-1.20221110110837054647.pr257.1.g8477d03.fc35.src.rpm",
+            id="common_output",
+        ),
+    ),
+)
+def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
+    srpm = "./koji-c-1.1.0-1.20221110110837054647.pr257.1.g8477d03.fc35.src.rpm"
+    assert srpm == SRPMBuilder(upstream_mock)._get_srpm_from_rpmbuild_output(
+        rpmbuild_output
+    )
+
+
+@pytest.mark.parametrize(
     "bump_version,release_suffix,expected_release_suffix",
     (
         # current_git_tag_version="4.5"
