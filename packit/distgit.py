@@ -433,7 +433,7 @@ class DistGit(PackitRepositoryBase):
 
         koji_helper = KojiHelper()
         tag = koji_helper.get_candidate_tag(dist_git_branch)
-        build = koji_helper.get_latest_build_in_tag(downstream_package_name, tag)
+        build = koji_helper.get_latest_nvr_in_tag(downstream_package_name, tag)
 
         if not build:
             raise PackitException(
@@ -470,7 +470,7 @@ class DistGit(PackitRepositoryBase):
                 break
         latest_stable_nvr = None
         for tag in stable_tags:
-            build = koji_helper.get_latest_build_in_tag(package, tag)
+            build = koji_helper.get_latest_nvr_in_tag(package, tag)
             if build:
                 latest_stable_nvr = build
                 break

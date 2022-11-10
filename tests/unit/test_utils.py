@@ -705,7 +705,7 @@ def test_koji_helper_get_builds(error):
         return [{"nvr": nvr} for nvr in nvrs]
 
     session = flexmock(getPackageID=getPackageID, listBuilds=listBuilds)
-    result = KojiHelper(session).get_builds("test", datetime.datetime(2022, 6, 1))
+    result = KojiHelper(session).get_nvrs("test", datetime.datetime(2022, 6, 1))
     if error:
         assert result == []
     else:
@@ -716,7 +716,7 @@ def test_koji_helper_get_builds(error):
     "error",
     [False, True],
 )
-def test_koji_helper_get_latest_build_in_tag(error):
+def test_koji_helper_get_latest_nvr_in_tag(error):
     nvr = "test-1.0-1.fc37"
 
     def listTagged(*_, **__):
@@ -725,9 +725,7 @@ def test_koji_helper_get_latest_build_in_tag(error):
         return [{"nvr": nvr}]
 
     session = flexmock(listTagged=listTagged)
-    result = KojiHelper(session).get_latest_build_in_tag(
-        "test", "f37-updates-candidate"
-    )
+    result = KojiHelper(session).get_latest_nvr_in_tag("test", "f37-updates-candidate")
     if error:
         assert result is None
     else:
