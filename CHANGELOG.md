@@ -1,3 +1,8 @@
+# 0.63.1
+
+- Packit now correctly finds SRPM when rpmbuild reports warnings when it parses the spec file. (#1772)
+- When packit.yaml is present in the repo but is empty, Packit now produces a better error message instead of an internal Python exception. (#1769)
+
 # 0.63.0
 
 - Fixed an issue due to which the repository was never searched for a specfile if 'specfile_path' was not specified, and 'specfile_path' was always set to '<repo_name>.spec'. (#1758)
