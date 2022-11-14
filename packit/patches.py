@@ -766,7 +766,7 @@ class PatchGenerator:
                 logger.debug(f"Previous patch-id: {prev_patch_id}")
 
             # current patch-id
-            with open(patch.path, "r") as fp:
+            with open(patch.path) as fp:
                 current_patch_id = repo.git.patch_id("--stable", istream=fp).split()[0]
                 logger.debug(f"Current patch-id: {current_patch_id}")
 
