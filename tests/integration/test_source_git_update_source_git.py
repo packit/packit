@@ -171,7 +171,7 @@ def test_update_source_git(
     api_instance_update_source_git.dg.commit("Rename", "")
     api_instance_update_source_git.update_source_git(revision_range)
     assert not (sourcegit / DISTRO_DIR / new_file).exists()
-    with open(sourcegit / DISTRO_DIR / new_name, "r") as file:
+    with open(sourcegit / DISTRO_DIR / new_name) as file:
         assert file.read() == content + extra_content
     assert (
         "Rename"
