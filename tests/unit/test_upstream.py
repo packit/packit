@@ -385,7 +385,7 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
         pytest.param(
             True,
             "{PACKIT_RPMSPEC_RELEASE}",
-            "2",
+            "2.1234.mock_ref.",
             id="Bump release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
         ),
         pytest.param(
@@ -406,7 +406,7 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
         pytest.param(
             False,
             "{PACKIT_RPMSPEC_RELEASE}",
-            "2",
+            "2.1234.mock_ref.",
             id="Do not modify release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
         ),
     ),
@@ -468,7 +468,7 @@ def test_get_spec_release(
         pytest.param(
             True,
             "{PACKIT_RPMSPEC_RELEASE}",
-            "2",
+            "2.1234.mock_ref.",
             id="Bump release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
         ),
         pytest.param(
@@ -489,7 +489,7 @@ def test_get_spec_release(
         pytest.param(
             False,
             "{PACKIT_RPMSPEC_RELEASE}",
-            "2",
+            "2.1234.mock_ref.",
             id="Do not modify release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
         ),
     ),

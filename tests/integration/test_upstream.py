@@ -6,6 +6,7 @@ Tests for Upstream class
 """
 import os
 import re
+import sys
 import shutil
 import subprocess
 from pathlib import Path
@@ -280,6 +281,41 @@ def test_fix_spec_persists(upstream_instance):
     )
 
     assert upstream.specfile.version == "1.0.0"
+
+
+def test_fix_spec_action_with_macros(upstream_instance):
+    """verify that macros are properly initialized for a fix spec action"""
+    _, upstream = upstream_instance
+    upstream.package_config.actions = {
+        ActionName.fix_spec: (
+            "sed -i 's/^Release:.*$/Release: "
+            "${PACKIT_RPMSPEC_RELEASE}%{?dist}/' beer.spec"
+        )
+    }
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234")))
+    )
+
+    flexmock(upstream.local_project).should_receive("commit_hexsha").and_return("4321")
+    flexmock(upstream).should_receive("get_spec_release").with_args(
+        release_suffix=""
+    ).and_return("1.1234.main.0.1221")
+
+    flexmock(upstream).should_receive("with_action").with_args(
+        action=ActionName.fix_spec,
+        env={
+            "PACKIT_PROJECT_VERSION": "0.1.0",
+            "PACKIT_RPMSPEC_RELEASE": "1.1234.main.0.1221",
+            "PACKIT_PROJECT_COMMIT": "4321",
+            "PACKIT_PROJECT_ARCHIVE": "archive.tar.gz",
+            "PACKIT_PROJECT_BRANCH": "main",
+        },
+    )
+
+    SRPMBuilder(upstream)._fix_specfile_to_use_local_archive(
+        "archive.tar.gz", bump_version=True, release_suffix=""
+    )
 
 
 @pytest.mark.parametrize(
