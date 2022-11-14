@@ -944,7 +944,7 @@ class SRPMBuilder:
         env = {
             "PACKIT_PROJECT_VERSION": self.current_git_describe_version,
             # Spec file %release field which packit sets by default
-            "PACKIT_RPMSPEC_RELEASE": self.upstream.specfile.expanded_release,
+            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(release_suffix),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
             "PACKIT_PROJECT_BRANCH": sanitize_branch_name_for_rpm(
@@ -958,6 +958,17 @@ class SRPMBuilder:
             env.keys(),
             False,
         ):
+            # The release_suffix contains macros to be expanded
+            # do not use it to format the PACKIT_RPMSPEC_RELEASE!
+            # Otherwise you will obtain something like
+            # 0.{PACKIT_RPMSPEC_RELEASE} as result.
+            # In this case PACKIT_RPMSPEC_RELEASE should be expanded
+            # like when no release_suffix is given: so use "" instead.
+            env.update(
+                {
+                    "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(""),
+                }
+            )
             new_release_suffix = release_suffix.format(**env)
         else:
             new_release_suffix = self.upstream.get_spec_release(release_suffix)
