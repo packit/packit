@@ -299,7 +299,11 @@ class DistGit(PackitRepositoryBase):
     @property
     def upstream_archive_names(self) -> List[str]:
         """
-        :return: name of the archive, e.g. sen-0.6.1.tar.gz
+        Files that are considered upstream and should be uploaded to lookaside.
+        Currently that's the source identified by spec_source_id (Source0 by default)
+        and all other sources specified as URLs in the spec file.
+
+        :return: names of the archives, e.g. ['sen-0.6.1.tar.gz']
         """
         with self.specfile.sources() as sources:
             archive_names = [s.expanded_filename for s in sources if s.remote or
