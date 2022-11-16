@@ -306,8 +306,11 @@ class DistGit(PackitRepositoryBase):
         :return: names of the archives, e.g. ['sen-0.6.1.tar.gz']
         """
         with self.specfile.sources() as sources:
-            archive_names = [s.expanded_filename for s in sources if s.remote or
-                             s.number == self.package_config.spec_source_id_number]
+            archive_names = [
+                s.expanded_filename
+                for s in sources
+                if s.remote or s.number == self.package_config.spec_source_id_number
+            ]
         logger.debug(f"Upstream archive names: {archive_names}")
         return archive_names
 
@@ -349,7 +352,9 @@ class DistGit(PackitRepositoryBase):
         )
         pkg_tool_.sources()
 
-    def upload_to_lookaside_cache(self, archives: Iterable[Path], pkg_tool: str = "") -> None:
+    def upload_to_lookaside_cache(
+        self, archives: Iterable[Path], pkg_tool: str = ""
+    ) -> None:
         """Upload files (archives) to the lookaside cache.
 
         If the archive is already uploaded, the rpkg tool doesn't do anything.

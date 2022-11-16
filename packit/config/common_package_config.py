@@ -348,9 +348,7 @@ class CommonPackageConfig:
         """
         Return spec_source_id as a number, reverse of spec_source_id_fm
         """
-        return int(
-            next(iter(split(r"(\d+)", self.spec_source_id)[1:]), 0)
-        )
+        return int(next(iter(split(r"(\d+)", self.spec_source_id)[1:]), 0))
 
     def get_specfile_sync_files_item(self, from_downstream: bool = False):
         """
