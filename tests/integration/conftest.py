@@ -144,8 +144,8 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
     )
     flexmock(DistGit).should_receive("existing_pr").and_return(None)
 
-    def mocked_new_sources(sources=None):
-        if not Path(sources).is_file():
+    def mocked_new_sources(sources=[]):
+        if not all(Path(s).is_file() for s in sources):
             raise RuntimeError("archive does not exist")
 
     flexmock(PkgTool, new_sources=mocked_new_sources)

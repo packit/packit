@@ -1096,25 +1096,37 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         # btw this is really naive: the name could be the same but the hash can be different
         # TODO: we should do something when such situation happens
-        archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-            self.dg.upstream_archive_name
-        )
+        archives_to_upload = False
         sources_file = self.dg.local_project.working_dir / "sources"
-        archive_name_in_sources_file = (
-            sources_file.is_file()
-            and self.dg.upstream_archive_name in sources_file.read_text()
-        )
+        for upstream_archive_name in self.dg.upstream_archive_names:
+            archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
+                upstream_archive_name
+            )
+            archive_name_in_sources_file = (
+                sources_file.is_file()
+                and upstream_archive_name in sources_file.read_text()
+            )
 
-        if (
-            archive_name_in_cache
-            and archive_name_in_sources_file
-            and not force_new_sources
-        ):
+            if (
+                archive_name_in_cache
+                and archive_name_in_sources_file
+            ):
+                continue
+            else:
+                archives_to_upload = True
+        if not archives_to_upload and not force_new_sources:
             return
 
-        archive = self.dg.download_upstream_archive()
+        # There is at least one archive to upload,
+        # because it is missing from lookaside, sources file, or both,
+        # or because force_new_sources is set.
+        archives = self.dg.download_upstream_archives()
         self.init_kerberos_ticket()
-        self.dg.upload_to_lookaside_cache(archive=archive, pkg_tool=pkg_tool)
+        # Upload all of archives. If we uploaded only those that need uploading,
+        # we would lose the unchanged ones from sources file,
+        # because upload_to_lookaside_cache maintains the sources file in addition
+        # to uploading, and it replaces it entirely, losing the previous content
+        self.dg.upload_to_lookaside_cache(archives=archives, pkg_tool=pkg_tool)
 
     def build(
         self,
