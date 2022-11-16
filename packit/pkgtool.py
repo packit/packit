@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Iterable
 
 from packit.exceptions import PackitCommandFailedError
 
@@ -39,13 +39,14 @@ class PkgTool:
             f"tool='{self.tool}')"
         )
 
-    def new_sources(self, sources: Optional[Path] = None, fail: bool = True):
+    def new_sources(self, sources: Optional[Iterable[Path]] = None, fail: bool = True):
+        sources = sources or []
         if not self.directory.is_dir():
             raise Exception(f"Cannot access {self.tool} repository: {self.directory}")
 
-        sources_ = str(sources) if sources else ""
+        sources_ = [str(source) for source in sources] if sources else []
         return commands.run_command_remote(
-            cmd=[self.tool, "new-sources", sources_],
+            cmd=[self.tool, "new-sources"] + sources_,
             cwd=self.directory,
             error_message="Adding new sources failed:",
             print_live=True,
