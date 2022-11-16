@@ -10,6 +10,7 @@ from enum import Enum
 
 from os import getenv
 from os.path import basename
+from re import split
 from typing import Dict, List, Optional, Union, Any, Set
 
 from packit.actions import ActionName
@@ -65,7 +66,8 @@ class CommonPackageConfig:
             and update to dist-git.
         create_sync_note: Whether to create README.packit when proposing an
             update to dist-git.
-        spec_source_id: ID of the 'Source' tag in the specfile to be updated.
+        spec_source_id: The 'Source' tag in the specfile to be updated.
+        spec_source_id_number: The numeric part of the above
         notifications: Notifications to send on a successful build.
         identifier: Suffix to be added to checks. Used to differentiate check flags
             which otherwise would have identical names.
@@ -340,6 +342,15 @@ class CommonPackageConfig:
                 f"{self.dist_git_base_url}{self.dist_git_namespace}/"
                 f"{self.downstream_package_name}.git"
             )
+
+    @property
+    def spec_source_id_number(self) -> int:
+        """
+        Return spec_source_id as a number, reverse of spec_source_id_fm
+        """
+        return int(
+            next(iter(split(r"(\d+)", self.spec_source_id)[1:]), 0)
+        )
 
     def get_specfile_sync_files_item(self, from_downstream: bool = False):
         """
