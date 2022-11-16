@@ -302,7 +302,8 @@ class DistGit(PackitRepositoryBase):
         :return: name of the archive, e.g. sen-0.6.1.tar.gz
         """
         with self.specfile.sources() as sources:
-            archive_names = [s.expanded_filename for s in sources if s.remote]
+            archive_names = [s.expanded_filename for s in sources if s.remote or
+                             s.number == self.package_config.spec_source_id_number]
         logger.debug(f"Upstream archive names: {archive_names}")
         return archive_names
 
