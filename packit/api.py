@@ -13,7 +13,6 @@ from packaging import version as version_imported
 import click
 import logging
 import re
-import sys
 from datetime import datetime
 from pathlib import Path
 from typing import (
@@ -1415,28 +1414,14 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def status(self) -> None:
         status = Status(self.config, self.package_config, self.up, self.dg)
-        if sys.version_info >= (3, 7, 0):
-            res = asyncio.run(self.status_main(status))
-        else:
-            # backward compatibility for Python 3.6
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                res = loop.run_until_complete(
-                    asyncio.gather(
-                        self.status_get_downstream_prs(status),
-                        self.status_get_dg_versions(status),
-                        self.status_get_up_releases(status),
-                        self.status_get_koji_builds(status),
-                        self.status_get_copr_builds(status),
-                        self.status_get_updates(status),
-                    )
-                )
-            finally:
-                asyncio.set_event_loop(None)
-                loop.close()
-
-        (ds_prs, dg_versions, up_releases, koji_builds, copr_builds, updates) = res
+        (
+            ds_prs,
+            dg_versions,
+            up_releases,
+            koji_builds,
+            copr_builds,
+            updates,
+        ) = asyncio.run(self.status_main(status))
 
         if ds_prs:
             click.echo("\nDownstream PRs:")
