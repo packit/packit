@@ -1107,9 +1107,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 and upstream_archive_name in sources_file.read_text()
             )
 
-            if archive_name_in_cache and archive_name_in_sources_file:
-                continue
-            else:
+            if not archive_name_in_cache or not archive_name_in_sources_file:
                 archives_to_upload = True
         if not archives_to_upload and not force_new_sources:
             return

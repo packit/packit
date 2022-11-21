@@ -40,7 +40,8 @@ def cockpit_ostree(tmp_path, upstream_without_config):
 def test_update_on_cockpit_ostree(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
-    def mocked_new_sources(sources=[]):
+    def mocked_new_sources(sources=None):
+        sources = sources or []
         if not all(Path(s).is_file() for s in sources):
             raise RuntimeError("archive does not exist")
 
@@ -80,7 +81,8 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
 def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
-    def mocked_new_sources(sources=[]):
+    def mocked_new_sources(sources=None):
+        sources = sources or []
         if not all(Path(s).is_file() for s in sources):
             raise RuntimeError("archive does not exist")
 
