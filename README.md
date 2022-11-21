@@ -37,7 +37,7 @@ This list contains workflows covered by packit tool and links to the documentati
 
 ## Requirements
 
-Packit is written in python 3 and is supported only on 3.6 and later.
+Packit is written in Python 3 and is supports version 3.9 or later.
 
 ## Installation
 
