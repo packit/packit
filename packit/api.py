@@ -1094,8 +1094,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             pkg_tool: Tool to upload sources.
         """
 
-        # btw this is really naive: the name could be the same but the hash can be different
-        # TODO: we should do something when such situation happens
         archives_to_upload = False
         sources_file = self.dg.local_project.working_dir / "sources"
         for upstream_archive_name in self.dg.upstream_archive_names:

@@ -381,6 +381,10 @@ class DistGit(PackitRepositoryBase):
             raise PackitException(ex)
 
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
+        """
+        We are using a name to check the presence in the lookaside cache.
+        (This is the same approach fedpkg itself uses.)
+        """
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(
