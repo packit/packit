@@ -1,3 +1,6 @@
+# 0.64.0
+
+
 # 0.63.1
 
 - Packit now correctly finds SRPM when rpmbuild reports warnings when it parses the spec file. (#1772)
