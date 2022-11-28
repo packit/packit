@@ -935,9 +935,12 @@ The first dist-git commit to be synced is '{short_hash}'.
     def _prepare_files_to_sync(
         self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
     ) -> List[SyncFilesItem]:
-        """Update the spec-file by setting the version and updating the changelog
+        """
+        Returns the list of files to sync to dist-git as is.
 
-        Skip everything if the changelog should be synced from upstream.
+        With spec-file, we have two modes:
+        * The `sync_changelog` option is set. => Spec-file can be synced as other files.
+        * Sync the content of the spec-file (but changelog) here and exclude spec-file otherwise.
 
         Args:
             synced_files: A list of SyncFilesItem.
@@ -1096,6 +1099,10 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         archives_to_upload = False
         sources_file = self.dg.local_project.working_dir / "sources"
+
+        # Here, dist-git spec-file has already been updated from the upstream spec-file.
+        # => Any update done to the Source tags in upstream
+        # is already available in the dist-git spec-file.
         for upstream_archive_name in self.dg.upstream_archive_names:
             archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
                 upstream_archive_name

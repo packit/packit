@@ -69,10 +69,14 @@ class ChangelogHelper:
 
     def update_dist_git(self, full_version: str, upstream_tag: str) -> None:
         """
-        Update the spec-file in dist-git by setting the 'Version' tag and
-        adding a new entry in the %changelog section.
-        If downstream spec file has the %autochangelog macro then
-        preserve it and do not write a comment to the %changelog section.
+        Update the spec-file in dist-git:
+        * Sync content from upstream spec-file.
+        * Set 'Version'.
+        * Add new entry in the %changelog section
+          (if %autochangelog macro is not used).
+
+        Copy the upstream spec-file as is if no spec-file is present in downstream.
+        (E.g. for new packages)
 
         Args:
             full_version: Version to be set in the spec-file.
