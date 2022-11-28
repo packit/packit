@@ -389,7 +389,12 @@ class PackitRepositoryBase:
         comment: Optional[str] = None,
     ):
         """
-        Update this specfile using provided specfile
+        Update the spec-file in this repository using the provided spec-file.
+
+        1. The whole content of the spec-file is copied.
+        2. The changelog is preserved.
+        3. If provided, new version is set.
+        4. If provided, new changelog entry is added.
 
         Args:
             specfile: specfile to get changes from (we update self.specfile)
