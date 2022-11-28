@@ -74,12 +74,17 @@ def mock_remote_functionality_sourcegit(sourcegit_and_remote, distgit_and_remote
 
 
 def mock_spec_download_remote_s(
-    repo_path: Path, spec_dir_path: Optional[Path] = None, archive_ref: str = "HEAD"
+    repo_path: Path,
+    spec_dir_path: Optional[Path] = None,
+    archive_ref: str = "HEAD",
+    files_to_create=None,
 ):
+    files_to_create = files_to_create or []
     spec_dir_path = spec_dir_path or repo_path
 
     def mock_download_remote_sources(*_):
         """mock download of the remote archive and place it into dist-git repo"""
+
         archive_cmd = [
             "git",
             "archive",
@@ -90,6 +95,8 @@ def mock_spec_download_remote_s(
             archive_ref,
         ]
         subprocess.check_call(archive_cmd, cwd=repo_path)
+        for f in files_to_create:
+            subprocess.check_call(["touch", f], cwd=repo_path)
 
     flexmock(PackitRepositoryBase, download_remote_sources=mock_download_remote_sources)
 

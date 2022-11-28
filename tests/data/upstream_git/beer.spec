@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        A tool to make you happy
 
 License:        Beerware
-Source:         %{upstream_name}-%{version}.tar.gz
+Source0:         %{upstream_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 ### patches ###
