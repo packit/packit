@@ -7,13 +7,13 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from specfile import Specfile
 
 from packit.actions import ActionName
-from packit.api import PackitAPI, Config
+from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
+from specfile import Specfile
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
 
@@ -53,6 +53,134 @@ def test_basic_local_update(
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
     assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
+def test_basic_local_update_with_multiple_sources(
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
+):
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d, files_to_create=["the_source.tar.gz"])
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    for git_path in [u, d]:
+        with Specfile(git_path / "beer.spec", autosave=True).sources() as sources:
+            sources.append("https://the.second.source/the_source.tar.gz")
+        subprocess.check_call(["git", "add", "beer.spec"], cwd=git_path)
+        subprocess.check_call(
+            ["git", "commit", "-m", "Added new source to specfile"], cwd=git_path
+        )
+    api.up.specfile.reload()
+    api.dg.specfile.reload()
+
+    dist_git_first_source = d / TARBALL_NAME
+    dist_git_second_source = d / "the_source.tar.gz"
+    flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
+        archives=[dist_git_first_source, dist_git_second_source], pkg_tool=""
+    )
+
+    api.sync_release(dist_git_branch="main", version="0.1.0")
+
+    assert dist_git_first_source.is_file()
+    assert dist_git_second_source.is_file()
+
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    with spec.sources() as sources:
+        newly_added_source = sources[1]
+        assert (
+            newly_added_source.expanded_location
+            == "https://the.second.source/the_source.tar.gz"
+        )
+        assert newly_added_source.filename == "the_source.tar.gz"
+    assert spec.sources()
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
+def test_basic_local_update_with_adding_second_source(
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
+):
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d, files_to_create=["the_source.tar.gz"])
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    with Specfile(u / "beer.spec", autosave=True).sources() as sources:
+        sources.append("https://the.second.source/the_source.tar.gz")
+    subprocess.check_call(["git", "add", "beer.spec"], cwd=u)
+    subprocess.check_call(
+        ["git", "commit", "-m", "Added new source to specfile"], cwd=u
+    )
+    api.up.specfile.reload()
+
+    dist_git_first_source = d / TARBALL_NAME
+    dist_git_second_source = d / "the_source.tar.gz"
+    flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
+        archives=[dist_git_first_source, dist_git_second_source], pkg_tool=""
+    )
+
+    api.sync_release(dist_git_branch="main", version="0.1.0")
+
+    assert dist_git_first_source.is_file()
+    assert dist_git_second_source.is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    with spec.sources() as sources:
+        newly_added_source = sources[1]
+        assert (
+            newly_added_source.expanded_location
+            == "https://the.second.source/the_source.tar.gz"
+        )
+        assert newly_added_source.filename == "the_source.tar.gz"
+    assert spec.sources()
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
+def test_basic_local_update_with_removing_second_source(
+    cwd_upstream, api_instance, mock_remote_functionality_upstream
+):
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d, files_to_create=[])
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    with Specfile(d / "beer.spec", autosave=True).sources() as sources:
+        sources.append("https://the.second.source/the_source.tar.gz")
+    subprocess.check_call(["git", "add", "beer.spec"], cwd=d)
+    subprocess.check_call(
+        ["git", "commit", "-m", "Added new source to specfile"], cwd=d
+    )
+    api.dg.specfile.reload()
+
+    dist_git_first_source = d / TARBALL_NAME
+    dist_git_second_source = d / "the_source.tar.gz"
+    flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
+        archives=[dist_git_first_source], pkg_tool=""
+    )
+
+    api.sync_release(dist_git_branch="main", version="0.1.0")
+
+    assert dist_git_first_source.is_file()
+    assert not dist_git_second_source.is_file()
+
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    with spec.sources() as sources:
+        assert len(sources) == 1  # The second source should be removed
+    assert spec.sources()
     assert (d / "README.packit").is_file()
     # assert that we have changelog entries for both versions
     with spec.sections() as sections:
