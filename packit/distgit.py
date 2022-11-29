@@ -5,7 +5,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional, Sequence, List, Union
+from typing import Optional, Sequence, List, Union, Iterable
 
 import cccolutils
 import git
@@ -297,33 +297,43 @@ class DistGit(PackitRepositoryBase):
         return dist_git_pr
 
     @property
-    def upstream_archive_name(self) -> str:
+    def upstream_archive_names(self) -> List[str]:
         """
-        :return: name of the archive, e.g. sen-0.6.1.tar.gz
+        Files that are considered upstream and should be uploaded to lookaside.
+        Currently that's the source identified by spec_source_id (Source0 by default)
+        and all other sources specified as URLs in the spec file.
+
+        :return: names of the archives, e.g. ['sen-0.6.1.tar.gz']
         """
         with self.specfile.sources() as sources:
-            source = next(s for s in sources if s.number == 0)
-            archive_name = source.expanded_filename
-        logger.debug(f"Upstream archive name: {archive_name}")
-        return archive_name
+            archive_names = [
+                s.expanded_filename
+                for s in sources
+                if s.remote or s.number == self.package_config.spec_source_id_number
+            ]
+        logger.debug(f"Upstream archive names: {archive_names}")
+        return archive_names
 
-    def download_upstream_archive(self) -> Path:
+    def download_upstream_archives(self) -> List[Path]:
         """
-        Fetch archive for the current upstream release defined in dist-git's spec
+        Fetch archives for the current upstream release defined in dist-git's spec
 
-        :return: path to the archive
+        :return: list of path to the archives
         """
-        logger.info(f"Downloading archive: {self.upstream_archive_name}")
+        archives = []
+        logger.info(f"Downloading archives: {self.upstream_archive_names}")
         with cwd(self.local_project.working_dir):
             self.download_remote_sources(self.config.pkg_tool)
-        archive = self.absolute_source_dir / self.upstream_archive_name
-        if not archive.exists():
-            raise PackitException(
-                "Upstream archive was not downloaded. Check that {} exists in dist-git.".format(
-                    self.upstream_archive_name
+        for upstream_archive_name in self.upstream_archive_names:
+            archive = self.absolute_source_dir / upstream_archive_name
+            if not archive.exists():
+                raise PackitException(
+                    "Upstream archive was not downloaded. Check that {} exists in dist-git.".format(
+                        upstream_archive_name
+                    )
                 )
-            )
-        return archive
+            archives.append(archive)
+        return archives
 
     def download_source_files(self, pkg_tool: str = ""):
         """Download source files from the lookaside cache
@@ -342,8 +352,10 @@ class DistGit(PackitRepositoryBase):
         )
         pkg_tool_.sources()
 
-    def upload_to_lookaside_cache(self, archive: Path, pkg_tool: str = "") -> None:
-        """Upload files (archive) to the lookaside cache.
+    def upload_to_lookaside_cache(
+        self, archives: Iterable[Path], pkg_tool: str = ""
+    ) -> None:
+        """Upload files (archives) to the lookaside cache.
 
         If the archive is already uploaded, the rpkg tool doesn't do anything.
 
@@ -361,7 +373,7 @@ class DistGit(PackitRepositoryBase):
             tool=pkg_tool or self.config.pkg_tool,
         )
         try:
-            pkg_tool_.new_sources(sources=archive)
+            pkg_tool_.new_sources(sources=archives)
         except Exception as ex:
             logger.error(
                 f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
@@ -369,6 +381,10 @@ class DistGit(PackitRepositoryBase):
             raise PackitException(ex)
 
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
+        """
+        We are using a name to check the presence in the lookaside cache.
+        (This is the same approach fedpkg itself uses.)
+        """
         archive_name = os.path.basename(archive_path)
         try:
             res = requests.head(

@@ -342,6 +342,7 @@ def test__fix_spec_source(upstream_instance, spec_source_id, expected_line):
     u, ups = upstream_instance
 
     data = u.joinpath("beer.spec").read_text()
+    data = re.sub(r"Source0", "Source", data)
     data = re.sub(r"(Source:.*)", "\\1\nSource100: extra-sources.tar.gz", data)
     with open(u.joinpath("beer.spec"), "w") as f:
         f.write(data)
