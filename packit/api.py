@@ -935,9 +935,12 @@ The first dist-git commit to be synced is '{short_hash}'.
     def _prepare_files_to_sync(
         self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
     ) -> List[SyncFilesItem]:
-        """Update the spec-file by setting the version and updating the changelog
+        """
+        Returns the list of files to sync to dist-git as is.
 
-        Skip everything if the changelog should be synced from upstream.
+        With spec-file, we have two modes:
+        * The `sync_changelog` option is set. => Spec-file can be synced as other files.
+        * Sync the content of the spec-file (but changelog) here and exclude spec-file otherwise.
 
         Args:
             synced_files: A list of SyncFilesItem.
@@ -1094,27 +1097,36 @@ The first dist-git commit to be synced is '{short_hash}'.
             pkg_tool: Tool to upload sources.
         """
 
-        # btw this is really naive: the name could be the same but the hash can be different
-        # TODO: we should do something when such situation happens
-        archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-            self.dg.upstream_archive_name
-        )
+        archives_to_upload = False
         sources_file = self.dg.local_project.working_dir / "sources"
-        archive_name_in_sources_file = (
-            sources_file.is_file()
-            and self.dg.upstream_archive_name in sources_file.read_text()
-        )
 
-        if (
-            archive_name_in_cache
-            and archive_name_in_sources_file
-            and not force_new_sources
-        ):
+        # Here, dist-git spec-file has already been updated from the upstream spec-file.
+        # => Any update done to the Source tags in upstream
+        # is already available in the dist-git spec-file.
+        for upstream_archive_name in self.dg.upstream_archive_names:
+            archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
+                upstream_archive_name
+            )
+            archive_name_in_sources_file = (
+                sources_file.is_file()
+                and upstream_archive_name in sources_file.read_text()
+            )
+
+            if not archive_name_in_cache or not archive_name_in_sources_file:
+                archives_to_upload = True
+        if not archives_to_upload and not force_new_sources:
             return
 
-        archive = self.dg.download_upstream_archive()
+        # There is at least one archive to upload,
+        # because it is missing from lookaside, sources file, or both,
+        # or because force_new_sources is set.
+        archives = self.dg.download_upstream_archives()
         self.init_kerberos_ticket()
-        self.dg.upload_to_lookaside_cache(archive=archive, pkg_tool=pkg_tool)
+        # Upload all of archives. If we uploaded only those that need uploading,
+        # we would lose the unchanged ones from sources file,
+        # because upload_to_lookaside_cache maintains the sources file in addition
+        # to uploading, and it replaces it entirely, losing the previous content
+        self.dg.upload_to_lookaside_cache(archives=archives, pkg_tool=pkg_tool)
 
     def build(
         self,

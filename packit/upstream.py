@@ -460,9 +460,7 @@ class Upstream(PackitRepositoryBase):
                 macro.options.n = archive_root_dir
 
     def _fix_spec_source(self, archive):
-        number = int(
-            next(iter(re.split(r"(\d+)", self.package_config.spec_source_id)[1:]), 0)
-        )
+        number = self.package_config.spec_source_id_number
         with self.specfile.sources() as sources:
             source = next((s for s in sources if s.number == number), None)
             if source:

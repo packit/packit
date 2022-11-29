@@ -41,7 +41,8 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
     def mocked_new_sources(sources=None):
-        if not Path(sources).is_file():
+        sources = sources or []
+        if not all(Path(s).is_file() for s in sources):
             raise RuntimeError("archive does not exist")
 
     flexmock(PkgTool, new_sources=mocked_new_sources)
@@ -51,8 +52,8 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,
         is_archive_in_lookaside_cache=lambda archive_path: False,
-        upload_to_lookaside_cache=lambda archive, pkg_tool: None,
-        download_upstream_archive=lambda: "the-archive",
+        upload_to_lookaside_cache=lambda archives, pkg_tool: None,
+        download_upstream_archives=lambda: ["the-archive"],
     )
     flexmock(DistGit).should_receive("existing_pr").and_return(None)
     flexmock(
@@ -81,7 +82,8 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
     def mocked_new_sources(sources=None):
-        if not Path(sources).is_file():
+        sources = sources or []
+        if not all(Path(s).is_file() for s in sources):
             raise RuntimeError("archive does not exist")
 
     flexmock(PkgTool, new_sources=mocked_new_sources)
@@ -91,8 +93,8 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
         DistGit,
         push_to_fork=lambda *args, **kwargs: None,
         is_archive_in_lookaside_cache=lambda archive_path: False,
-        upload_to_lookaside_cache=lambda archive, pkg_tool: None,
-        download_upstream_archive=lambda: "the-archive",
+        upload_to_lookaside_cache=lambda archives, pkg_tool: None,
+        download_upstream_archives=lambda: ["the-archive"],
     )
     pr = flexmock(url="https://example.com/pull/1")
     flexmock(DistGit).should_receive("existing_pr").and_return(pr)
