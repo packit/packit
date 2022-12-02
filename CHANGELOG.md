@@ -1,3 +1,9 @@
+# 0.64.0
+
+- `packit propose-downstream` now uploads all remote sources (those specified as URLs) and the source specified by `spec_source_id` (whether remote or not) to lookaside. Previously, only Source0 was uploaded.
+
+Source0 is no longer treated specially, but as `spec_source_id` is `Source0` by default, Source0 is still being uploaded by default unless `spec_source_id` is overriden. (#1778)
+
 # 0.63.1
 
 - Packit now correctly finds SRPM when rpmbuild reports warnings when it parses the spec file. (#1772)
