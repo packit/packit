@@ -395,12 +395,16 @@ class PackitRepositoryBase:
         2. The changelog is preserved.
         3. If provided, new version is set.
         4. If provided, new changelog entry is added.
+        5. Release is reset to 1, if the version has changed and the release
+           stayed the same.
 
         Args:
             specfile: specfile to get changes from (we update self.specfile)
             version: version to set in self.specfile
             comment: new comment for the version in %changelog
         """
+        previous_release = self.specfile.release
+        previous_version = self.specfile.expanded_version
         with self.specfile.sections() as sections, specfile.sections() as other_sections:
             try:
                 previous_changelog = sections.changelog[:]
@@ -415,6 +419,18 @@ class PackitRepositoryBase:
             self.specfile.version = version
         if comment is not None:
             self.specfile.add_changelog_entry(comment)
+        if (
+            previous_version != self.specfile.expanded_version
+            and previous_release == self.specfile.release
+        ):
+            # This may occur if the upstream forgets to reset release after
+            # bumping the version, or if the specfile is not maintained in
+            # upstream at all (e.g. post-upstream-clone that uses wget to
+            # get the specfile from Fedora).
+            # Either way, it seems better to fix it at least in downstream
+            # at the cost of upstream and downstream having different
+            # Release fields.
+            self.specfile.release = "1"
 
     def refresh_specfile(self):
         self._specfile = None
