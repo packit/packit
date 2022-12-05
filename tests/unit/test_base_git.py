@@ -457,6 +457,57 @@ def test_set_spec_content(tmp_path):
     assert "1.1" == dist_git.specfile.expanded_version
 
 
+@pytest.mark.parametrize(
+    "up_release,reset",
+    [
+        ("2", True),
+        ("3", False),
+    ],
+)
+def test_set_spec_content_reset_release(tmp_path, up_release, reset):
+    distgit_spec_contents = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1.0\n"
+        "Release: 2%{?dist}\n"
+        "Source0: foo.bar\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    distgit_spec_path = tmp_path / "life.spec"
+    distgit_spec_path.write_text(distgit_spec_contents)
+
+    upstream_spec_contents = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1.0\n"
+        f"Release: {up_release}%{{?dist}}\n"
+        "Source0: foo.bor\n"
+        "License: MIT\n"
+        "Summary: evanescence, I was brought to life\n"
+        "%description\n-\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    upstream_spec_path = tmp_path / "e-life.spec"
+    upstream_spec_path.write_text(upstream_spec_contents)
+    upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
+
+    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git._specfile_path = distgit_spec_path
+
+    dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
+    if reset:
+        assert dist_git.specfile.release == "1"
+        assert dist_git.specfile.raw_release == "1%{?dist}"
+    else:
+        assert dist_git.specfile.release == up_release
+        assert dist_git.specfile.raw_release == f"{up_release}%{{?dist}}"
+
+
 @pytest.mark.parametrize("changelog_section", ["\n%changelog\n", ""])
 def test_set_spec_content_no_changelog(tmp_path, changelog_section):
     distgit_spec_contents = (
