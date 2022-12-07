@@ -84,6 +84,12 @@ jobs:
     list_on_homepage: True
     preserve_project: True
 
+  - job: pull_from_upstream
+    trigger: release
+    dist_git_branches:
+      - fedora-all
+      - epel-9
+
   # downstream automation:
   - job: koji_build
     trigger: commit
