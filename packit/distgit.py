@@ -558,17 +558,7 @@ class DistGit(PackitRepositoryBase):
 
             if bugzilla_ids:
                 save_kwargs["bugs"] = list(map(str, bugzilla_ids))
-            try:
-                result = bodhi_client.save(**save_kwargs)
-            except BodhiClientException as ex:
-                logger.debug(
-                    f"Bodhi client raised a login error: {ex}. "
-                    f"Let's clear the session, csrf token and retry."
-                )
-                if self.config.fas_user and self.config.kerberos_realm:
-                    bodhi_client.login_with_kerberos()
-                bodhi_client.ensure_auth()
-                result = bodhi_client.save(**save_kwargs)
+            result = bodhi_client.save(**save_kwargs)
 
             logger.debug(f"Bodhi response:\n{result}")
             logger.info(
