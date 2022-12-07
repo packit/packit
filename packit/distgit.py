@@ -21,7 +21,11 @@ from packit.config import (
     PackageConfig,
     get_local_package_config,
 )
-from packit.exceptions import PackitException, PackitConfigException
+from packit.exceptions import (
+    PackitException,
+    PackitConfigException,
+    PackitBodhiException,
+)
 from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
@@ -584,9 +588,11 @@ class DistGit(PackitRepositoryBase):
                 f"There is an authentication problem with Bodhi:\n{ex}"
             ) from ex
         except BodhiClientException as ex:
-            logger.error(ex)
-            raise PackitException(
-                f"There is a problem with creating the bodhi update:\n{ex}"
+            # don't logger.error here as it will end in sentry and it may just
+            # be a transient issue: e.g. waiting for a build to be tagged
+            logger.info(ex)
+            raise PackitBodhiException(
+                f"There is a problem with creating a bodhi update:\n{ex}"
             ) from ex
         return result["alias"]
 

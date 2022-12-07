@@ -3,10 +3,12 @@
 
 import pytest
 import koji
+from bodhi.client.bindings import BodhiClientException
 from flexmock import flexmock
 from munch import Munch
 
 from packit import distgit
+from packit.exceptions import PackitBodhiException
 from packit.utils.bodhi import OurBodhiClient
 
 
@@ -389,3 +391,54 @@ def test_bodhi_update_auth_with_fas(
         update_notes="This is the best upstream release ever: {version}",
         koji_builds=("foo-1-1",),
     )
+
+
+def test_bodhi_update_fails(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+):
+    """This test checks that bugzilla IDs can be passed and that bodhi
+    authentication works using kerberos."""
+    build_nvr = "python-specfile-0.10.0-1.fc37"
+
+    u, d, api = api_instance
+    api.config.fas_user = "packit"
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    flexmock(
+        OurBodhiClient,
+        ensure_auth=lambda: None,
+        login_with_kerberos=lambda: None,
+    )
+    flexmock(OurBodhiClient).should_receive("login_with_kerberos").and_return(None)
+    flexmock(OurBodhiClient).should_receive("save").and_raise(
+        BodhiClientException,
+        {
+            "status": "error",
+            "errors": [
+                {
+                    "location": "body",
+                    "name": "builds",
+                    "description": "Cannot find any tags associated with build: "
+                    "python-specfile-0.10.0-1.fc37",
+                },
+                {
+                    "location": "body",
+                    "name": "builds",
+                    "description": "Cannot find release associated with build: "
+                    "python-specfile-0.10.0-1.fc37",
+                    "tags": [],
+                },
+            ],
+        },
+    )
+
+    with pytest.raises(PackitBodhiException) as ex:
+        api.create_update(
+            dist_git_branch="f37",
+            update_type="enhancement",
+            update_notes="asd",
+            koji_builds=[build_nvr],
+        )
+    assert str(ex.value).startswith("There is a problem with creating a bodhi update")
