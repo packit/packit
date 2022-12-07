@@ -2,12 +2,12 @@
 - name: This is a recipe for how to run packit tests
   hosts: all
   tasks:
-    - include_tasks: tasks/project-dir.yaml
-    - include_tasks: tasks/rpm-test-deps.yaml
-    - include_tasks: tasks/install-packit.yaml
-    - include_tasks: tasks/sandcastle.yaml
+    - ansible.builtin.include_tasks: tasks/project-dir.yaml
+    - ansible.builtin.include_tasks: tasks/rpm-test-deps.yaml
+    - ansible.builtin.include_tasks: tasks/install-packit.yaml
+    - ansible.builtin.include_tasks: tasks/sandcastle.yaml
     - name: Run session recorded tests
-      command: make check TEST_TARGET=tests_recording
+      ansible.builtin.command: make check TEST_TARGET=tests_recording
       environment:
         REQURE_MODE: read
       args:
