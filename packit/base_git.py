@@ -89,12 +89,13 @@ class PackitRepositoryBase:
         """get dir where the spec file is"""
         return self.absolute_specfile_path.parent
 
+    def get_absolute_specfile_path(self) -> Path:
+        return self.local_project.working_dir / self.package_config.specfile_path
+
     @property
     def absolute_specfile_path(self) -> Path:
         if not self._specfile_path:
-            self._specfile_path = (
-                self.local_project.working_dir / self.package_config.specfile_path
-            )
+            self._specfile_path = self.get_absolute_specfile_path()
             if not self._specfile_path.exists():
                 # since propose-downstream checks out a tag, we should inform user
                 # on which ref this has happened: https://github.com/packit/packit/issues/1625
@@ -434,6 +435,9 @@ class PackitRepositoryBase:
 
     def refresh_specfile(self):
         self._specfile = None
+
+    def set_specfile(self, specfile: Specfile):
+        self._specfile = specfile
 
     def is_dirty(self) -> bool:
         """is the git repo dirty?"""
