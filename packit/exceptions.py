@@ -113,3 +113,7 @@ class PackitGitException(PackitException):
 
 class PackitNotAGitRepoException(PackitGitException):
     """Target directory is not a git repository as we expected"""
+
+
+class PackitBodhiException(PackitException):
+    """There was a problem while interacting with Bodhi"""
