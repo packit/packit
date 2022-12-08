@@ -11,6 +11,7 @@ from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
 from packit.constants import DEFAULT_BODHI_NOTE
+from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
 
@@ -117,10 +118,22 @@ def create_update(
         click.echo("Please provide Bodhi username and password when asked for.")
 
     for branch in branches_to_update:
-        api.create_update(
-            koji_builds=koji_build,
-            dist_git_branch=branch,
-            update_notes=update_notes,
-            update_type=update_type,
-            bugzilla_ids=resolve_bugzillas,
-        )
+        try:
+            api.create_update(
+                koji_builds=koji_build,
+                dist_git_branch=branch,
+                update_notes=update_notes,
+                update_type=update_type,
+                bugzilla_ids=resolve_bugzillas,
+            )
+        except PackitException as ex:
+            click.echo(
+                f"There was a problem while creating an update for {branch}:\n{ex}\n\n"
+                "Please try again later if this looks like a transient issue.\n"
+                "If you believe this is a bug, please contact Fedora infrastructure:\n"
+                "  https://pagure.io/fedora-infrastructure\n\n"
+                "You are always welcome to contact the Packit team:\n"
+                "  https://github.com/packit/packit/issues",
+                err=True,
+            )
+            return

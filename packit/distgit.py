@@ -21,7 +21,11 @@ from packit.config import (
     PackageConfig,
     get_local_package_config,
 )
-from packit.exceptions import PackitException, PackitConfigException
+from packit.exceptions import (
+    PackitException,
+    PackitConfigException,
+    PackitBodhiException,
+)
 from packit.local_project import LocalProject
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
@@ -554,17 +558,7 @@ class DistGit(PackitRepositoryBase):
 
             if bugzilla_ids:
                 save_kwargs["bugs"] = list(map(str, bugzilla_ids))
-            try:
-                result = bodhi_client.save(**save_kwargs)
-            except BodhiClientException as ex:
-                logger.debug(
-                    f"Bodhi client raised a login error: {ex}. "
-                    f"Let's clear the session, csrf token and retry."
-                )
-                if self.config.fas_user and self.config.kerberos_realm:
-                    bodhi_client.login_with_kerberos()
-                bodhi_client.ensure_auth()
-                result = bodhi_client.save(**save_kwargs)
+            result = bodhi_client.save(**save_kwargs)
 
             logger.debug(f"Bodhi response:\n{result}")
             logger.info(
@@ -584,9 +578,11 @@ class DistGit(PackitRepositoryBase):
                 f"There is an authentication problem with Bodhi:\n{ex}"
             ) from ex
         except BodhiClientException as ex:
-            logger.error(ex)
-            raise PackitException(
-                f"There is a problem with creating the bodhi update:\n{ex}"
+            # don't logger.error here as it will end in sentry and it may just
+            # be a transient issue: e.g. waiting for a build to be tagged
+            logger.info(ex)
+            raise PackitBodhiException(
+                f"There is a problem with creating a bodhi update:\n{ex}"
             ) from ex
         return result["alias"]
 
