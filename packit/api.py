@@ -6,14 +6,11 @@ This is the official python interface for packit.
 """
 
 import asyncio
-import tempfile
-from distutils.dir_util import copy_tree
-from packaging import version as version_imported
-
-import click
 import logging
 import re
+import tempfile
 from datetime import datetime
+from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import (
     Sequence,
@@ -28,12 +25,11 @@ from typing import (
     overload,
 )
 
-from packit.vm_image_build import ImageBuilder
-
+import click
 import git
 from git.exc import GitCommandError
-
 from ogr.abstract import PullRequest
+from packaging import version as version_imported
 from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
@@ -79,6 +75,7 @@ from packit.utils.repo import (
     get_commit_hunks,
     is_the_repo_pristine,
 )
+from packit.vm_image_build import ImageBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -657,6 +654,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
+        use_downstream_specfile: bool = False,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -678,6 +676,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
+        use_downstream_specfile: bool = False,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -698,6 +697,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
+        use_downstream_specfile: bool = False,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -724,6 +724,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 dg branch at one time.
             mark_commit_origin: Whether to include a Git-trailer in the dist-git
                 commit message to mark the hash of the upstream (source-git) commit.
+            use_downstream_specfile: Use the downstream specfile instead
+                of getting the upstream one (used by packit-service in pull_from_upstream)
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -785,9 +787,16 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.local_project.checkout_release(upstream_tag)
             self.up.run_action(actions=ActionName.post_upstream_clone)
 
-            spec_ver = self.up.get_specfile_version()
-            if version_imported.parse(version) > version_imported.parse(spec_ver):
-                logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
+            if use_downstream_specfile:
+                logger.info(
+                    "Using the downstream specfile instead of the upstream one."
+                )
+                self.up.set_specfile(self.dg.specfile)
+
+            else:
+                spec_ver = self.up.get_specfile_version()
+                if version_imported.parse(version) > version_imported.parse(spec_ver):
+                    logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
 
             self.dg.check_last_commit()
 
@@ -962,7 +971,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         # exclude spec, we have special plans for it
         return list(
             filter(
-                None, [x.drop_src(self.up.absolute_specfile_path) for x in synced_files]
+                None,
+                [
+                    x.drop_src(self.up.get_absolute_specfile_path())
+                    for x in synced_files
+                ],
             )
         )
 
