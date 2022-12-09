@@ -1,3 +1,8 @@
+# 0.65.0
+
+- Packit now correctly handles a race condition when it tries to create bodhi updates for builds that are not yet tagged properly. CLI exprience was also improved for this case. (#1803)
+- Packit now resets the `Release` tag during `propose-downstream` if the version is updated and the `Release` tag has not explicitly been overridden in the upstream specfile. (#1801)
+
 # 0.64.0
 
 - `packit propose-downstream` now uploads all remote sources (those specified as URLs) and the source specified by `spec_source_id` (whether remote or not) to lookaside. Previously, only Source0 was uploaded.
