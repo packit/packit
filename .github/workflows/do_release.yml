@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: |
+      - name: Create GitHub release
+        run: |
           VERSION=$(grep -oP '^# \K[0-9.]*' CHANGELOG.md | head -n 1)
           # Take the lines between the first two headers from CHANGELOG.md,
           # and use it as a description for the new release.
