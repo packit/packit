@@ -8,8 +8,6 @@ on:
 
 jobs:
   prepare-release:
-    # To not run in forks
-    if: github.repository_owner == 'packit'
     runs-on: ubuntu-latest
 
     steps:
@@ -21,13 +19,10 @@ jobs:
         with:
           version: ${{ inputs.version }}
           specfiles: packit.spec
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
           labels: release
-          token: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
           commit-message: Release ${{ inputs.version }}
           title: Release ${{ inputs.version }}
           body: Update the changelog and the specfile for release ${{ inputs.version }}.
