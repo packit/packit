@@ -14,6 +14,36 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger("packit")
 
 
+def build_rpms_from_specfile(api, upstream_ref, release_suffix, default_release_suffix):
+    """
+    Build RPMs from the specfile definition and return the paths to the built RPMs.
+    """
+    release_suffix = ChangelogHelper.resolve_release_suffix(
+        api.package_config, release_suffix, default_release_suffix
+    )
+
+    return api.create_rpms(
+        upstream_ref=upstream_ref,
+        release_suffix=release_suffix,
+    )
+
+
+def build_rpms_from_srpm(api, srpm):
+    """
+    Build RPMs from the SRPM and return the paths to the built RPMs.
+    """
+    return api.up.create_rpms_from_srpm(srpm)
+
+
+def log_rpms(rpms):
+    """
+    Print out built RPMs after the RPM build is finished.
+    """
+    logger.info("RPMs:")
+    for path in rpms:
+        logger.info(f" * {path}")
+
+
 @click.command("locally", context_settings=get_context_settings())
 @click.option(
     "--upstream-ref",
@@ -53,15 +83,13 @@ def local(config, upstream_ref, release_suffix, default_release_suffix, path_or_
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
-    release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+
+    rpms = (
+        build_rpms_from_srpm(api, config.srpm_path)
+        if config.srpm_path is not None
+        else build_rpms_from_specfile(
+            api, upstream_ref, release_suffix, default_release_suffix
+        )
     )
 
-    rpm_paths = api.create_rpms(
-        upstream_ref=upstream_ref,
-        release_suffix=release_suffix,
-        # srpm_path=config.srpm_path,
-    )
-    logger.info("RPMs:")
-    for path in rpm_paths:
-        logger.info(f" * {path}")
+    log_rpms(rpms)
