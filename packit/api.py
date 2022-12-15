@@ -787,13 +787,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.local_project.checkout_release(upstream_tag)
             self.up.run_action(actions=ActionName.post_upstream_clone)
 
-            if use_downstream_specfile:
-                logger.info(
-                    "Using the downstream specfile instead of the upstream one."
-                )
-                self.up.set_specfile(self.dg.specfile)
-
-            else:
+            if not use_downstream_specfile:
                 spec_ver = self.up.get_specfile_version()
                 if version_imported.parse(version) > version_imported.parse(spec_ver):
                     logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
@@ -811,6 +805,12 @@ The first dist-git commit to be synced is '{short_hash}'.
             logger.info(f"Using {dist_git_branch!r} dist-git branch.")
             self.dg.update_branch(dist_git_branch)
             self.dg.checkout_branch(dist_git_branch)
+
+            if use_downstream_specfile:
+                logger.info(
+                    "Using the downstream specfile instead of the upstream one."
+                )
+                self.up.set_specfile(self.dg.specfile)
 
             if create_pr:
                 local_pr_branch = (
