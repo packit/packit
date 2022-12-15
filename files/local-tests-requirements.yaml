@@ -2,13 +2,13 @@
 - name: Install dependencies for packit tests
   hosts: all
   tasks:
-    - include_tasks: tasks/project-dir.yaml
-    - include_tasks: tasks/rpm-test-deps.yaml
-    - include_tasks: tasks/ogr.yaml
-    - include_tasks: tasks/sandcastle.yaml
-    - include_tasks: tasks/centpkg.yaml
+    - ansible.builtin.include_tasks: tasks/project-dir.yaml
+    - ansible.builtin.include_tasks: tasks/rpm-test-deps.yaml
+    - ansible.builtin.include_tasks: tasks/ogr.yaml
+    - ansible.builtin.include_tasks: tasks/sandcastle.yaml
+    - ansible.builtin.include_tasks: tasks/centpkg.yaml
     # To (re-)generate tests_recording/test_data/
-    - include_tasks: tasks/requre.yaml
+    - ansible.builtin.include_tasks: tasks/requre.yaml
     - name: Install pre-commit
-      dnf:
+      ansible.builtin.dnf:
         name: pre-commit

@@ -2,9 +2,9 @@
 - name: Install ogr & sandcastle & requre from git
   hosts: all
   tasks:
-    - include_tasks: tasks/generic-dnf-requirements.yaml
-    - include_tasks: tasks/python-compile-deps.yaml
-    - include_tasks: tasks/ogr.yaml
-    - include_tasks: tasks/specfile.yaml
-    - include_tasks: tasks/sandcastle.yaml
-    - include_tasks: tasks/requre.yaml
+    - ansible.builtin.include_tasks: tasks/generic-dnf-requirements.yaml
+    - ansible.builtin.include_tasks: tasks/python-compile-deps.yaml
+    - ansible.builtin.include_tasks: tasks/ogr.yaml
+    - ansible.builtin.include_tasks: tasks/specfile.yaml
+    - ansible.builtin.include_tasks: tasks/sandcastle.yaml
+    - ansible.builtin.include_tasks: tasks/requre.yaml
