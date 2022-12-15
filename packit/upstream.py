@@ -570,11 +570,17 @@ class Upstream(PackitRepositoryBase):
             print_live=True,
         ).stdout
 
-    def create_rpms(self, rpm_dir: Union[str, Path] = None) -> List[Path]:
+    def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> List[Path]:
         """
         Create RPMs from the actual content of the repo.
-        :param rpm_dir: path to the directory where the rpms are meant to be placed
-        :return: paths to the RPMs
+
+        Args:
+            rpm_dir: Path to the directory where the RPMs are meant to be placed.
+
+                Defaults to current working directory, if not given.
+
+        Returns:
+            List of paths to the built RPMs.
         """
         rpm_dir = rpm_dir or os.getcwd()
         src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
@@ -597,6 +603,70 @@ class Upstream(PackitRepositoryBase):
             "--define",
             f"_buildrootdir {rpmbuild_dir}",
             self.package_config.specfile_path,
+        ]
+
+        escaped_command = " ".join(cmd)
+        logger.debug(f"RPM build command: {escaped_command}")
+        try:
+            out = self.command_handler.run_command(
+                cmd, return_output=True
+            ).stdout.strip()
+        except PackitCommandFailedError as ex:
+            logger.error(f"The `rpmbuild` command failed: {ex!r}")
+            raise PackitFailedToCreateRPMException(
+                f"reason:\n"
+                f"{ex}\n"
+                f"command:\n"
+                f"{escaped_command}\n"
+                f"stdout:\n"
+                f"{ex.stdout_output}\n"
+                f"stderr:\n"
+                f"{ex.stderr_output}"
+            ) from ex
+        except PackitException as ex:
+            logger.error(f"The `rpmbuild` command failed: {ex!r}")
+            raise PackitFailedToCreateRPMException(
+                f"The `rpmbuild` command failed:\n{ex}"
+            ) from ex
+
+        rpms = Upstream._get_rpms_from_rpmbuild_output(out)
+        return [Path(rpm) for rpm in rpms]
+
+    def create_rpms_from_srpm(
+        self, srpm: Union[str, Path], rpm_dir: Union[str, Path, None] = None
+    ) -> List[Path]:
+        """
+        Build RPMs from the given path to the SRPM.
+
+        Args:
+            srpm: Path to the SRPM to be built.
+            rpm_dir: Path to the directory where the RPMs are meant to be placed.
+
+                Defaults to current working directory, if not given.
+
+        Returns:
+            Paths to the built RPMs.
+        """
+        rpm_dir = rpm_dir or os.getcwd()
+
+        cmd = [
+            "rpmbuild",
+            "-rb",
+            "--define",
+            f"_sourcedir {rpm_dir}",
+            # "--define",
+            # f"_srcdir {rpm_dir}",
+            "--define",
+            f"_specdir {rpm_dir}",
+            "--define",
+            f"_topdir {rpm_dir}",
+            "--define",
+            f"_builddir {rpm_dir}",
+            "--define",
+            f"_rpmdir {rpm_dir}",
+            "--define",
+            f"_buildrootdir {rpm_dir}",
+            str(srpm),
         ]
 
         escaped_command = " ".join(cmd)
