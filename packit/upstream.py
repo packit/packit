@@ -570,24 +570,33 @@ class Upstream(PackitRepositoryBase):
             print_live=True,
         ).stdout
 
-    def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> List[Path]:
+    def _build_rpms(
+        self,
+        mode: str,
+        rpm_dir: Union[str, Path],
+        rpmbuild_dir: Union[str, Path],
+        src_dir: Union[str, Path],
+        source: Union[str, Path],
+    ) -> List[Path]:
         """
-        Create RPMs from the actual content of the repo.
+        Wrapper for building RPMs either from SRPM or specfile.
 
         Args:
+            mode:
             rpm_dir: Path to the directory where the RPMs are meant to be placed.
-
-                Defaults to current working directory, if not given.
+            rpmbuild_dir: Path to the directory used during an RPM build.
+            src_dir: Path to the directory with sources.
+            source: Path to the source used for the build. Either SRPM or specfile.
 
         Returns:
-            List of paths to the built RPMs.
+            Paths to the built RPMs.
         """
         rpm_dir = rpm_dir or os.getcwd()
         src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
 
         cmd = [
             "rpmbuild",
-            "-bb",
+            mode,
             "--define",
             f"_sourcedir {rpmbuild_dir}",
             "--define",
@@ -602,7 +611,7 @@ class Upstream(PackitRepositoryBase):
             f"_rpmdir {rpm_dir}",
             "--define",
             f"_buildrootdir {rpmbuild_dir}",
-            self.package_config.specfile_path,
+            str(source),
         ]
 
         escaped_command = " ".join(cmd)
@@ -631,6 +640,24 @@ class Upstream(PackitRepositoryBase):
 
         rpms = Upstream._get_rpms_from_rpmbuild_output(out)
         return [Path(rpm) for rpm in rpms]
+
+    def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> List[Path]:
+        """
+        Create RPMs from the actual content of the repo.
+
+        Args:
+            rpm_dir: Path to the directory where the RPMs are meant to be placed.
+
+                Defaults to current working directory, if not given.
+
+        Returns:
+            List of paths to the built RPMs.
+        """
+        rpm_dir = rpm_dir or os.getcwd()
+        src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
+        return self._build_rpms(
+            "-bb", rpm_dir, rpmbuild_dir, src_dir, self.package_config.specfile_path
+        )
 
     def create_rpms_from_srpm(
         self, srpm: Union[str, Path], rpm_dir: Union[str, Path, None] = None
@@ -648,53 +675,7 @@ class Upstream(PackitRepositoryBase):
             Paths to the built RPMs.
         """
         rpm_dir = rpm_dir or os.getcwd()
-
-        cmd = [
-            "rpmbuild",
-            "-rb",
-            "--define",
-            f"_sourcedir {rpm_dir}",
-            # "--define",
-            # f"_srcdir {rpm_dir}",
-            "--define",
-            f"_specdir {rpm_dir}",
-            "--define",
-            f"_topdir {rpm_dir}",
-            "--define",
-            f"_builddir {rpm_dir}",
-            "--define",
-            f"_rpmdir {rpm_dir}",
-            "--define",
-            f"_buildrootdir {rpm_dir}",
-            str(srpm),
-        ]
-
-        escaped_command = " ".join(cmd)
-        logger.debug(f"RPM build command: {escaped_command}")
-        try:
-            out = self.command_handler.run_command(
-                cmd, return_output=True
-            ).stdout.strip()
-        except PackitCommandFailedError as ex:
-            logger.error(f"The `rpmbuild` command failed: {ex!r}")
-            raise PackitFailedToCreateRPMException(
-                f"reason:\n"
-                f"{ex}\n"
-                f"command:\n"
-                f"{escaped_command}\n"
-                f"stdout:\n"
-                f"{ex.stdout_output}\n"
-                f"stderr:\n"
-                f"{ex.stderr_output}"
-            ) from ex
-        except PackitException as ex:
-            logger.error(f"The `rpmbuild` command failed: {ex!r}")
-            raise PackitFailedToCreateRPMException(
-                f"The `rpmbuild` command failed:\n{ex}"
-            ) from ex
-
-        rpms = Upstream._get_rpms_from_rpmbuild_output(out)
-        return [Path(rpm) for rpm in rpms]
+        return self._build_rpms("-rb", rpm_dir, rpm_dir, rpm_dir, srpm)
 
     @staticmethod
     def _get_rpms_from_rpmbuild_output(output: str) -> List[str]:
