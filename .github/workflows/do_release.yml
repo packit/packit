@@ -11,8 +11,9 @@ jobs:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release') && github.repository_owner == 'packit'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: |
+      - uses: actions/checkout@v3
+      - name: Create GitHub release
+        run: |
           VERSION=$(grep -oP '^# \K[0-9.]*' CHANGELOG.md | head -n 1)
           # Take the lines between the first two headers from CHANGELOG.md,
           # and use it as a description for the new release.

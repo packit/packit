@@ -2,10 +2,10 @@
 - name: pip install packit dependencies
   hosts: all
   tasks:
-    - include_tasks: tasks/generic-dnf-requirements.yaml
-    - include_tasks: tasks/python-compile-deps.yaml
+    - ansible.builtin.include_tasks: tasks/generic-dnf-requirements.yaml
+    - ansible.builtin.include_tasks: tasks/python-compile-deps.yaml
     - name: Install deps from PyPI
-      pip:
+      ansible.builtin.pip:
         name: "{{ item }}"
       with_items:
         - ogr
@@ -14,4 +14,4 @@
         - requre
         - cachetools
       become: true
-    - include_tasks: tasks/requre.yaml
+    - ansible.builtin.include_tasks: tasks/requre.yaml
