@@ -1081,8 +1081,9 @@ The first dist-git commit to be synced is '{short_hash}'.
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
         repo.push_to_fork(repo.local_project.ref, force=True)
-
-        pr = repo.existing_pr(pr_title, pr_description.rstrip(), git_branch)
+        pr = repo.existing_pr(
+            pr_title, pr_description.rstrip(), git_branch, repo.local_project.ref
+        )
         if pr is None:
             pr = repo.create_pull(
                 pr_title,
