@@ -7,12 +7,7 @@
       - dnf-utils
       - python3-pip
       - rpmdevtools
-      - python3-bodhi-client
-      # workaround for https://github.com/fedora-infra/bodhi/issues/4660
-      # we need to explicitly install here so that `install-requirements-rpms.yaml` and the rev-dep p-s test
-      # install bpdhi 5 and not 6
-      - https://kojipkgs.fedoraproject.org/packages/bodhi/5.7.5/1.fc35/noarch/python3-bodhi-5.7.5-1.fc35.noarch.rpm
-      - https://kojipkgs.fedoraproject.org/packages/bodhi/5.7.5/1.fc35/noarch/python3-bodhi-client-5.7.5-1.fc35.noarch.rpm
+      - bodhi-client
       - fedpkg
       - rsync
     state: present
