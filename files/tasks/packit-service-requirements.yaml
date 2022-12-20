@@ -40,3 +40,9 @@
     src: "{{ reverse_dir}}/files/packit-service.yaml"
     dest: "{{ ansible_user_dir }}/.config/packit-service.yaml"
     state: link
+
+- name: Get up-to-date version of flexmock from PyPI
+  ansible.builtin.pip:
+    name: flexmock
+    state: latest
+  become: true
