@@ -418,8 +418,6 @@ class PackitRepositoryBase:
                 sections.append(Section("changelog", previous_changelog))
         if version is not None:
             self.specfile.version = version
-        if comment is not None:
-            self.specfile.add_changelog_entry(comment)
         if (
             previous_version != self.specfile.expanded_version
             and previous_release == self.specfile.release
@@ -432,6 +430,8 @@ class PackitRepositoryBase:
             # at the cost of upstream and downstream having different
             # Release fields.
             self.specfile.release = "1"
+        if comment is not None:
+            self.specfile.add_changelog_entry(comment)
 
     def refresh_specfile(self):
         self._specfile = None
