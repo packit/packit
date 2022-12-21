@@ -503,6 +503,8 @@ def test_set_spec_content_reset_release(tmp_path, up_release, reset):
     if reset:
         assert dist_git.specfile.release == "1"
         assert dist_git.specfile.raw_release == "1%{?dist}"
+        with dist_git.specfile.sections() as sections:
+            assert "1.1-1" in sections.changelog[0]
     else:
         assert dist_git.specfile.release == up_release
         assert dist_git.specfile.raw_release == f"{up_release}%{{?dist}}"
