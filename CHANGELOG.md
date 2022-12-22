@@ -1,3 +1,7 @@
+# 0.65.1
+
+- Packit now puts the correct release number into the changelog when the `Release` tag is reset during `propose-downstream`. (#1816)
+
 # 0.65.0
 
 - Packit now correctly handles a race condition when it tries to create bodhi updates for builds that are not yet tagged properly. CLI exprience was also improved for this case. (#1803)
