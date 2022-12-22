@@ -89,6 +89,23 @@ def test_basic_local_update_use_downstream_specfile(
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
 
+    # do this second time to see whether the specfile is updated correctly
+    api.sync_release(
+        dist_git_branch="main", version="0.1.0", use_downstream_specfile=True
+    )
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+    assert changelog.count("0.1.0") == 1
+
 
 def test_basic_local_update_with_multiple_sources(
     cwd_upstream, api_instance, mock_remote_functionality_upstream

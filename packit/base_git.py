@@ -532,7 +532,7 @@ class PackitRepositoryBase:
                 raise PackitDownloadFailedException(f"{msg}:\n{e}") from e
 
     def existing_pr(
-        self, title: str, description: str, branch: str
+        self, title: str, description: str, target_branch: str, source_branch: str
     ) -> Optional[PullRequest]:
         """Look for an already created PR with the same:
         title, description and branch name
@@ -552,7 +552,8 @@ class PackitRepositoryBase:
             if (
                 pr.title == title
                 and pr.description == description
-                and pr.target_branch == branch
+                and pr.target_branch == target_branch
+                and pr.source_branch == source_branch
                 and pr.author == current_user
             ):
                 return pr
