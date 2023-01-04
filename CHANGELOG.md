@@ -1,3 +1,7 @@
+# 0.65.2
+
+- No changes. This is a fixup release for sake of Packit deployment.
+
 # 0.65.1
 
 - Packit now puts the correct release number into the changelog when the `Release` tag is reset during `propose-downstream`. (#1816)
