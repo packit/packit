@@ -431,7 +431,7 @@ class PackitRepositoryBase:
             # Release fields.
             self.specfile.release = "1"
         if comment is not None:
-            self.specfile.add_changelog_entry(comment)
+            self.specfile.add_changelog_entry(comment.splitlines())
 
     def refresh_specfile(self):
         self._specfile = None
