@@ -33,6 +33,7 @@ from packit.config.job_config import (
 from packit.config.notifications import NotificationsConfig
 from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
+from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.sync import SyncFilesItem
 from packit.config.aliases import DEPRECATED_TARGET_MAP
 
@@ -196,10 +197,11 @@ class TargetsListOrDict(fields.Field):
             or not all(isinstance(v, dict) for v in value.values())
         ):
             return False
-        # check the 'attributes', e.g. {'distros': ['centos-7']}
+        # check the 'attributes', e.g. {'distros': ['centos-7']} or
+        # {"additional_modules": ["ruby:2.7,", "nodejs:12,",...], "additional_packages": []}
         for attr in value.values():
             for key, value in attr.items():
-                if key != "distros":
+                if key not in ("distros",) + CHROOT_SPECIFIC_COPR_CONFIGURATION:
                     raise ValidationError(f"Unknown key {key!r} in {attr!r}")
                 if isinstance(value, list) and all(
                     isinstance(distro, str) for distro in value
