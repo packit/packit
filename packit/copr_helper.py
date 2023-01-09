@@ -15,6 +15,7 @@ from copr.v3.exceptions import (
     CoprAuthException,
 )
 from munch import Munch
+from packit.config import aliases  # so we can mock in tests
 
 from packit.constants import COPR2GITHUB_STATE, CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsException
@@ -65,6 +66,26 @@ class CoprHelper:
             owner = f"g/{owner[1:]}"
 
         return f"{copr_url}/coprs/{owner}/{project}/{section}/"
+
+    def get_valid_build_targets(
+        self, *name: str, default: str = aliases.DEFAULT_VERSION
+    ) -> set:
+        """
+        For the provided iterable of names, expand them using get_build_targets() into valid
+        Copr chhroot names and intersect this set with current available Copr chroots.
+
+        :param name: name(s) of the system and version or target name. (passed to
+                    packit.config.aliases.get_build_targets() function)
+                or target name (e.g. "fedora-30-x86_64" or "fedora-stable-x86_64")
+        :param default: used if no positional argument was given
+        :return: set of build targets available also in copr chroots
+        """
+        build_targets = aliases.get_build_targets(*name, default=default)
+        logger.info(f"Build targets: {build_targets} ")
+        copr_chroots = self.get_available_chroots()
+        logger.info(f"Copr chroots: {copr_chroots} ")
+        logger.info(f"Result set: {set(build_targets) & set(copr_chroots)}")
+        return set(build_targets) & set(copr_chroots)
 
     def _update_chroot_specific_configuration(
         self,

@@ -3,6 +3,7 @@
 from collections import Counter
 
 import pytest
+from copr.v3 import Client
 from flexmock import flexmock
 
 import packit
@@ -14,8 +15,8 @@ from packit.config.aliases import (
     get_koji_targets,
     get_all_koji_targets,
     get_aliases,
-    get_valid_build_targets,
 )
+from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
 from tests.spellbook import ALL_KOJI_TARGETS_SNAPSHOT
 
@@ -356,14 +357,14 @@ class TestGetAliases:
     ],
 )
 def test_get_valid_build_targets(targets, chroots, expected_result):
+    copr_helper = CoprHelper(flexmock())
+    flexmock(Client).should_receive("create_from_config_file")
     flexmock(packit.config.aliases).should_receive("get_build_targets").and_return(
         targets
     )
-    flexmock(packit.config.aliases.CoprHelper).should_receive(
-        "get_available_chroots"
-    ).and_return(chroots)
+    flexmock(CoprHelper).should_receive("get_available_chroots").and_return(chroots)
 
-    assert get_valid_build_targets() == expected_result
+    assert copr_helper.get_valid_build_targets(*targets) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -379,7 +380,5 @@ def test_get_valid_build_targets_get_aliases_call(name, default):
     flexmock(packit.config.aliases).should_receive("get_build_targets").with_args(
         *name, **default
     ).and_return(set())
-    flexmock(packit.config.aliases.CoprHelper).should_receive(
-        "get_available_chroots"
-    ).and_return(set())
-    get_valid_build_targets(*name, **default)
+    flexmock(CoprHelper).should_receive("get_available_chroots").and_return(set())
+    CoprHelper(flexmock()).get_valid_build_targets(*name, **default)
