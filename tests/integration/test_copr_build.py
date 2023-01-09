@@ -6,7 +6,6 @@ from copr.v3 import (
     BuildProxy,
     Client,
     CoprNoResultException,
-    CoprRequestException,
     ProjectProxy,
     CoprAuthException,
 )
@@ -648,9 +647,17 @@ def test_create_copr_project(copr_client_mock):
     ).and_return(copr_client_mock)
 
     copr_client_mock.project_proxy = flexmock()
-    flexmock(copr_client_mock.project_proxy).should_receive("add").and_raise(
-        CoprRequestException, "You already have a project named 'already-present'."
+    copr_client_mock.project_chroot_proxy = flexmock()
+    flexmock(copr_client_mock.project_proxy).should_receive("add").and_return({})
+    flexmock(copr_client_mock.project_chroot_proxy).should_receive("get").and_return(
+        {"additional_packages": []}
     )
+    flexmock(copr_client_mock.project_chroot_proxy).should_receive("edit").with_args(
+        ownername="me",
+        projectname="already-present",
+        chrootname="centos-stream-8-x86_64",
+        additional_packages=["foo"],
+    ).and_return({})
 
     copr_helper.create_copr_project(
         chroots=["centos-stream-8-x86_64"],
@@ -658,4 +665,5 @@ def test_create_copr_project(copr_client_mock):
         instructions=None,
         owner="me",
         project="already-present",
+        targets_dict={"centos-stream-8": {"additional_packages": ["foo"]}},
     )
