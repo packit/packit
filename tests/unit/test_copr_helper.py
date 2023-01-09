@@ -53,3 +53,67 @@ class TestCoprHelper:
             copr_helper.get_copr_settings_url(owner, project, section)
             == f"https://fedoracloud.org/coprs/{expected_suffix}"
         )
+
+    @pytest.mark.parametrize(
+        "targets_dict,expect_call_args",
+        [
+            (
+                {"x": {}},
+                None,
+            ),
+            (
+                {"x": {"distros": ["y"]}},
+                None,
+            ),
+            (
+                {"x": {"additional_repos": ["y"]}},
+                {
+                    "additional_repos": ["y"],
+                },
+            ),
+            (
+                {"x": {"additional_modules": ["r"], "distros": ["z"]}},
+                {
+                    "additional_modules": ["r"],
+                },
+            ),
+        ],
+    )
+    def test_update_chroot_specific_configuration(self, targets_dict, expect_call_args):
+        project_proxy_mock = flexmock()
+        copr_client_mock = flexmock(
+            config={"copr_url": "https://fedoracloud.org"},
+            project_chroot_proxy=project_proxy_mock,
+        )
+
+        flexmock(packit.copr_helper.CoprClient).should_receive(
+            "create_from_config_file"
+        ).and_return(copr_client_mock)
+
+        if expect_call_args:
+            project_proxy_mock.should_receive("get").and_return(
+                {
+                    "additional_modules": [],
+                    "additional_packages": [],
+                    "additional_repos": [],
+                    "comps_name": None,
+                    "delete_after_days": None,
+                    "isolation": "unchanged",
+                    "mock_chroot": "centos-stream-8-x86_64",
+                    "ownername": "@theforeman",
+                    "projectname": "pr-testing-playground",
+                    "with_opts": [],
+                    "without_opts": [],
+                }
+            )
+            project_proxy_mock.should_receive("edit").with_args(
+                ownername="owner",
+                projectname="project",
+                chrootname="x",
+                **expect_call_args,
+            )
+
+        copr_helper = CoprHelper("_upstream_local_project")
+        copr_helper._update_chroot_specific_configuration(
+            "project", "owner", targets_dict=targets_dict
+        )

@@ -161,3 +161,9 @@ REPO_NOT_PRISTINE_HINT = (
 )
 
 KOJI_BASEURL = "https://koji.fedoraproject.org/kojihub"
+
+CHROOT_SPECIFIC_COPR_CONFIGURATION = (
+    "additional_packages",
+    "additional_repos",
+    "additional_modules",
+)

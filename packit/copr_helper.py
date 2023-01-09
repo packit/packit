@@ -16,7 +16,7 @@ from copr.v3.exceptions import (
 )
 from munch import Munch
 
-from packit.constants import COPR2GITHUB_STATE
+from packit.constants import COPR2GITHUB_STATE, CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsException
 from packit.local_project import LocalProject
 
@@ -66,6 +66,42 @@ class CoprHelper:
 
         return f"{copr_url}/coprs/{owner}/{project}/{section}/"
 
+    def _update_chroot_specific_configuration(
+        self,
+        project: str,
+        owner: Optional[str] = None,
+        targets_dict: Optional[Dict] = None,  # chroot specific configuration
+    ):
+        """
+        Using the provided targets_dict, update chroot specific configuration
+        """
+        if targets_dict:
+            # let's update chroot specific configuration
+            for chroot_name, chroot_configuration in targets_dict.items():
+                if set(chroot_configuration.keys()).intersection(
+                    CHROOT_SPECIFIC_COPR_CONFIGURATION
+                ):
+                    # only update when needed
+                    copr_chroot_configuration = (
+                        self.copr_client.project_chroot_proxy.get(
+                            ownername=owner, projectname=project, chrootname=chroot_name
+                        )
+                    )
+                    update_dict = {}
+                    for c in CHROOT_SPECIFIC_COPR_CONFIGURATION:
+                        # all 3 options have a default of `[]`
+                        if copr_chroot_configuration.get(
+                            c, []
+                        ) != chroot_configuration.get(c, []):
+                            update_dict[c] = chroot_configuration.get(c, [])
+                    if update_dict:
+                        self.copr_client.project_chroot_proxy.edit(
+                            ownername=owner,
+                            projectname=project,
+                            chrootname=chroot_name,
+                            **update_dict,
+                        )
+
     def create_copr_project_if_not_exists(
         self,
         project: str,
@@ -78,6 +114,7 @@ class CoprHelper:
         additional_packages: Optional[List[str]] = None,
         additional_repos: Optional[List[str]] = None,
         request_admin_if_needed: bool = False,
+        targets_dict: Optional[Dict] = None,  # chroot specific configuration
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -120,6 +157,10 @@ class CoprHelper:
 
         delete_after_days: Optional[int] = (
             None if preserve_project is None else -1 if preserve_project else 60
+        )
+
+        self._update_chroot_specific_configuration(
+            project, owner=owner, targets_dict=targets_dict
         )
 
         fields_to_change = self.get_fields_to_change(
