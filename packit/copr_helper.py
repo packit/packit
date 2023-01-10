@@ -15,6 +15,8 @@ from copr.v3.exceptions import (
     CoprAuthException,
 )
 from munch import Munch
+from packit.config import aliases  # so we can mock in tests
+from packit.config.aliases import get_build_targets
 
 from packit.constants import COPR2GITHUB_STATE, CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsException
@@ -66,6 +68,26 @@ class CoprHelper:
 
         return f"{copr_url}/coprs/{owner}/{project}/{section}/"
 
+    def get_valid_build_targets(
+        self, *name: str, default: Optional[str] = aliases.DEFAULT_VERSION
+    ) -> set:
+        """
+        For the provided iterable of names, expand them using get_build_targets() into valid
+        Copr chhroot names and intersect this set with current available Copr chroots.
+
+        :param name: name(s) of the system and version or target name. (passed to
+                    packit.config.aliases.get_build_targets() function)
+                or target name (e.g. "fedora-30-x86_64" or "fedora-stable-x86_64")
+        :param default: used if no positional argument was given
+        :return: set of build targets available also in copr chroots
+        """
+        build_targets = aliases.get_build_targets(*name, default=default)
+        logger.info(f"Build targets: {build_targets} ")
+        copr_chroots = self.get_available_chroots()
+        logger.info(f"Copr chroots: {copr_chroots} ")
+        logger.info(f"Result set: {set(build_targets) & set(copr_chroots)}")
+        return set(build_targets) & set(copr_chroots)
+
     def _update_chroot_specific_configuration(
         self,
         project: str,
@@ -77,30 +99,40 @@ class CoprHelper:
         """
         if targets_dict:
             # let's update chroot specific configuration
-            for chroot_name, chroot_configuration in targets_dict.items():
-                if set(chroot_configuration.keys()).intersection(
-                    CHROOT_SPECIFIC_COPR_CONFIGURATION
-                ):
-                    # only update when needed
-                    copr_chroot_configuration = (
-                        self.copr_client.project_chroot_proxy.get(
-                            ownername=owner, projectname=project, chrootname=chroot_name
+            for target, chroot_configuration in targets_dict.items():
+                chroot_names = get_build_targets(target)
+                for chroot_name in chroot_names:
+                    if set(chroot_configuration.keys()).intersection(
+                        CHROOT_SPECIFIC_COPR_CONFIGURATION
+                    ):
+                        logger.info(
+                            f"There is chroot-specific configuration for {chroot_name}"
                         )
-                    )
-                    update_dict = {}
-                    for c in CHROOT_SPECIFIC_COPR_CONFIGURATION:
-                        # all 3 options have a default of `[]`
-                        if copr_chroot_configuration.get(
-                            c, []
-                        ) != chroot_configuration.get(c, []):
-                            update_dict[c] = chroot_configuration.get(c, [])
-                    if update_dict:
-                        self.copr_client.project_chroot_proxy.edit(
-                            ownername=owner,
-                            projectname=project,
-                            chrootname=chroot_name,
-                            **update_dict,
+                        # only update when needed
+                        copr_chroot_configuration = (
+                            self.copr_client.project_chroot_proxy.get(
+                                ownername=owner,
+                                projectname=project,
+                                chrootname=chroot_name,
+                            )
                         )
+                        update_dict = {}
+                        for c in CHROOT_SPECIFIC_COPR_CONFIGURATION:
+                            # all 3 options have a default of `[]`
+                            if copr_chroot_configuration.get(
+                                c, []
+                            ) != chroot_configuration.get(c, []):
+                                update_dict[c] = chroot_configuration.get(c, [])
+                        if update_dict:
+                            logger.info(
+                                f"Update {owner}/{project} {chroot_name}: {update_dict}"
+                            )
+                            self.copr_client.project_chroot_proxy.edit(
+                                ownername=owner,
+                                projectname=project,
+                                chrootname=chroot_name,
+                                **update_dict,
+                            )
 
     def create_copr_project_if_not_exists(
         self,
@@ -146,6 +178,7 @@ class CoprHelper:
                 preserve_project=preserve_project,
                 additional_packages=additional_packages,
                 additional_repos=additional_repos,
+                targets_dict=targets_dict,
             )
             return
         except CoprRequestException as ex:
@@ -296,6 +329,7 @@ class CoprHelper:
         preserve_project: bool = False,
         additional_packages: Optional[List[str]] = None,
         additional_repos: Optional[List[str]] = None,
+        targets_dict: Optional[Dict] = None,  # chroot specific configuration
     ) -> None:
 
         try:
@@ -320,7 +354,10 @@ class CoprHelper:
                 f"This copr project is created and handled by the packit project "
                 "(https://packit.dev/).",
             )
-            # TODO: additional_packages
+            # once created: update chroot-specific configuration if there is any
+            self._update_chroot_specific_configuration(
+                project, owner=owner, targets_dict=targets_dict
+            )
         except CoprException as ex:
             # TODO: Remove once Copr doesn't throw for existing projects or new
             # API endpoint is established.

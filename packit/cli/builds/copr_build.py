@@ -10,7 +10,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api
 from packit.config import pass_config, get_context_settings, PackageConfig
-from packit.config.aliases import get_valid_build_targets, DEPRECATED_TARGET_MAP
+from packit.config.aliases import DEPRECATED_TARGET_MAP
 from packit.utils import sanitize_branch_name
 from packit.utils.changelog_helper import ChangelogHelper
 
@@ -156,7 +156,7 @@ def copr(
                 f"Target '{target}' is deprecated. "
                 f"Please use '{DEPRECATED_TARGET_MAP[target]}' instead."
             )
-    targets_to_build = get_valid_build_targets(
+    targets_to_build = api.copr_helper.get_valid_build_targets(
         *targets_list, default="fedora-rawhide-x86_64"
     )
 

@@ -58,21 +58,21 @@ class TestCoprHelper:
         "targets_dict,expect_call_args",
         [
             (
-                {"x": {}},
+                {"fedora-rawhide": {}},
                 None,
             ),
             (
-                {"x": {"distros": ["y"]}},
+                {"fedora-rawhide": {"distros": ["y"]}},
                 None,
             ),
             (
-                {"x": {"additional_repos": ["y"]}},
+                {"fedora-rawhide": {"additional_repos": ["y"]}},
                 {
                     "additional_repos": ["y"],
                 },
             ),
             (
-                {"x": {"additional_modules": ["r"], "distros": ["z"]}},
+                {"fedora-rawhide": {"additional_modules": ["r"], "distros": ["z"]}},
                 {
                     "additional_modules": ["r"],
                 },
@@ -109,7 +109,7 @@ class TestCoprHelper:
             project_proxy_mock.should_receive("edit").with_args(
                 ownername="owner",
                 projectname="project",
-                chrootname="x",
+                chrootname="fedora-rawhide-x86_64",
                 **expect_call_args,
             )
 
