@@ -159,7 +159,7 @@ class ChangelogHelper:
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
             bump_version: Specifies whether version should be changed in the spec-file.
-            release_suffix: Specifies local release suffix. `None` represents default suffix.
+            release: Release to be set in the spec-file.
         """
         last_tag = self.up.get_last_tag()
         msg = self.entry_from_action

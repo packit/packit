@@ -331,7 +331,7 @@ def test_release_suffix(
         version=version,
         commit="_",
         bump_version=True,
-        release_suffix=expanded_release_suffix,
+        release=expanded_release_suffix,
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
@@ -364,7 +364,7 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
 
 
 @pytest.mark.parametrize(
-    "bump_version,release_suffix,expected_release_suffix",
+    "bump_version,release_suffix,expected_release",
     (
         # current_git_tag_version="4.5"
         # original_release_number_from_spec = "2"
@@ -412,7 +412,7 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
     ),
 )
 def test_get_spec_release(
-    upstream_mock, bump_version, release_suffix, expected_release_suffix
+    upstream_mock, bump_version, release_suffix, expected_release
 ):
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
@@ -430,7 +430,7 @@ def test_get_spec_release(
         version=current_git_tag_version,
         commit="_",
         bump_version=bump_version,
-        release_suffix=expected_release_suffix,
+        release=expected_release,
     )
     upstream_mock._specfile = flexmock(
         expanded_release=original_release_number_from_spec

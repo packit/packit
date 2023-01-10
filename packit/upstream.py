@@ -411,7 +411,7 @@ class Upstream(PackitRepositoryBase):
         archive: str,
         version: str,
         commit: str,
-        release_suffix: str,
+        release: str,
         bump_version: bool = True,
     ):
         """
@@ -422,7 +422,7 @@ class Upstream(PackitRepositoryBase):
             archive: Relative path to the archive, used as `Source0`.
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
-            release_suffix: Specifies local release suffix.
+            release: Release to be set in the spec-file.
             bump_version: Specifies whether version should be changed in the spec-file.
 
                 Defaults to `True`.
@@ -431,7 +431,7 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_prep(archive)
 
         ChangelogHelper(self).prepare_upstream_locally(
-            version, commit, bump_version, release_suffix
+            version, commit, bump_version, release
         )
 
     def _fix_spec_prep(self, archive):
@@ -958,18 +958,14 @@ class SRPMBuilder:
         ):
             # The release_suffix contains macros to be expanded
             # do not use it to format the PACKIT_RPMSPEC_RELEASE!
-            # Otherwise you will obtain something like
+            # Otherwise, you will obtain something like
             # 0.{PACKIT_RPMSPEC_RELEASE} as result.
             # In this case PACKIT_RPMSPEC_RELEASE should be expanded
             # like when no release_suffix is given: so use "" instead.
-            env.update(
-                {
-                    "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(""),
-                }
-            )
-            new_release_suffix = release_suffix.format(**env)
+            env["PACKIT_RPMSPEC_RELEASE"] = self.upstream.get_spec_release("")
+            new_release = release_suffix.format(**env)
         else:
-            new_release_suffix = self.upstream.get_spec_release(release_suffix)
+            new_release = self.upstream.get_spec_release(release_suffix)
 
         if self.upstream.with_action(action=ActionName.fix_spec, env=env):
             self.upstream.fix_spec(
@@ -977,7 +973,7 @@ class SRPMBuilder:
                 version=self.current_git_describe_version,
                 commit=current_commit,
                 bump_version=bump_version,
-                release_suffix=new_release_suffix,
+                release=new_release,
             )
         self.upstream.specfile.reload()  # the specfile could have been changed by the action
 
