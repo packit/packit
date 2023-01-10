@@ -165,7 +165,7 @@ class CommonPackageConfig:
         use_internal_tf: bool = False,
         skip_build: bool = False,
         env: Optional[Dict[str, Any]] = None,
-        enable_net: bool = True,
+        enable_net: bool = False,
         allowed_pr_authors: Optional[List[str]] = None,
         allowed_committers: Optional[List[str]] = None,
         tmt_plan: Optional[str] = None,
