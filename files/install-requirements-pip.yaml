@@ -6,12 +6,11 @@
     - ansible.builtin.include_tasks: tasks/python-compile-deps.yaml
     - name: Install deps from PyPI
       ansible.builtin.pip:
-        name: "{{ item }}"
-      with_items:
-        - ogr
-        - specfile
-        - sandcastle
-        - requre
-        - cachetools
+        name:
+          - ogr
+          - specfile
+          - sandcastle
+          - requre
+          - cachetools
       become: true
     - ansible.builtin.include_tasks: tasks/requre.yaml

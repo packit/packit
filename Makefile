@@ -4,6 +4,7 @@ TEST_IMAGE=packit-tests
 CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
 TEST_RECORDING_PATH=tests_recording
 TEST_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
+TEST_TIMEOUT ?= 120
 CONTAINER_RUN_WITH_OPTS=$(CONTAINER_ENGINE) run --rm -ti -v $(CURDIR):/src --security-opt label=disable
 CONTAINER_TEST_COMMAND=bash -c "pip3 install .; make check"
 
@@ -22,7 +23,7 @@ install:
 
 check:
 	find . -name "*.pyc" -exec rm {} \;
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals --timeout=$(TEST_TIMEOUT) $(TEST_TARGET)
 
 requre-data-cleanup:
 	requre-patch purge --replaces ":set-cookie:str:a 'b';" --replaces "copr.v3.helpers:login:str:somelogin" --replaces "copr.v3.helpers:token:str:sometoken" $(TEST_RECORDING_PATH)/test_data/*/*yaml
