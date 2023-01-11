@@ -198,19 +198,27 @@ class TargetsListOrDict(fields.Field):
         ):
             return False
         # check the 'attributes', e.g. {'distros': ['centos-7']} or
-        # {"additional_modules": ["ruby:2.7,", "nodejs:12,",...], "additional_packages": []}
+        # {"additional_modules": "ruby:2.7,nodejs:12", "additional_packages": []}
         for attr in value.values():
             for key, value in attr.items():
-                if key not in ("distros",) + CHROOT_SPECIFIC_COPR_CONFIGURATION:
-                    raise ValidationError(f"Unknown key {key!r} in {attr!r}")
-                if isinstance(value, list) and all(
-                    isinstance(distro, str) for distro in value
-                ):
-                    return True
-                else:
+                # distros is a list of str
+                if key == "distros":
+                    if isinstance(value, list) and all(
+                        isinstance(distro, str) for distro in value
+                    ):
+                        return True
                     raise ValidationError(
                         f"Expected list[str], got {value!r} (type {type(value)!r})"
                     )
+                # chroot-specific configuration:
+                if key in CHROOT_SPECIFIC_COPR_CONFIGURATION.keys():
+                    expected_type = CHROOT_SPECIFIC_COPR_CONFIGURATION[key].__class__
+                    if isinstance(value, expected_type):
+                        return True
+                    raise ValidationError(
+                        f"Expected {expected_type}, got {value!r} (type {type(value)!r})"
+                    )
+                raise ValidationError(f"Unknown key {key!r} in {attr!r}")
         return True
 
     def _deserialize(self, value, attr, data, **kwargs) -> Dict[str, Dict[str, Any]]:

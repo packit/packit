@@ -103,7 +103,7 @@ class CoprHelper:
                 chroot_names = get_build_targets(target)
                 for chroot_name in chroot_names:
                     if set(chroot_configuration.keys()).intersection(
-                        CHROOT_SPECIFIC_COPR_CONFIGURATION
+                        CHROOT_SPECIFIC_COPR_CONFIGURATION.keys()
                     ):
                         logger.info(
                             f"There is chroot-specific configuration for {chroot_name}"
@@ -117,12 +117,11 @@ class CoprHelper:
                             )
                         )
                         update_dict = {}
-                        for c in CHROOT_SPECIFIC_COPR_CONFIGURATION:
-                            # all 3 options have a default of `[]`
+                        for c, default in CHROOT_SPECIFIC_COPR_CONFIGURATION.items():
                             if copr_chroot_configuration.get(
-                                c, []
-                            ) != chroot_configuration.get(c, []):
-                                update_dict[c] = chroot_configuration.get(c, [])
+                                c, default
+                            ) != chroot_configuration.get(c, default):
+                                update_dict[c] = chroot_configuration.get(c, default)
                         if update_dict:
                             logger.info(
                                 f"Update {owner}/{project} {chroot_name}: {update_dict}"
