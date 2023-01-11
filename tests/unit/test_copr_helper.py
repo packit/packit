@@ -72,9 +72,14 @@ class TestCoprHelper:
                 },
             ),
             (
-                {"fedora-rawhide": {"additional_modules": ["r"], "distros": ["z"]}},
                 {
-                    "additional_modules": ["r"],
+                    "fedora-rawhide": {
+                        "additional_modules": "httpd:2.4,nodejs:12",
+                        "distros": ["z"],
+                    }
+                },
+                {
+                    "additional_modules": "httpd:2.4,nodejs:12",
                 },
             ),
         ],
@@ -93,7 +98,7 @@ class TestCoprHelper:
         if expect_call_args:
             project_proxy_mock.should_receive("get").and_return(
                 {
-                    "additional_modules": [],
+                    "additional_modules": "",
                     "additional_packages": [],
                     "additional_repos": [],
                     "comps_name": None,
