@@ -458,7 +458,23 @@ def test_deserialize_and_serialize_job_config(config_in, config_out, validation_
         ({"targets": {}}, True),
         ({"targets": ["this", "is", "list"]}, True),
         ({"targets": {"a": {}, "b": {"distros": ["rhel-7"]}}}, True),
-        ({"targets": {"a": {}, "b": {"additional_modules": []}}}, True),
+        ({"targets": {"a": {}, "b": {"additional_modules": ""}}}, True),
+        (
+            {
+                "targets": {
+                    "a": {},
+                    "b": {
+                        "additional_modules": "asd:1.2",
+                        "additional_repos": ["http://foo.bar/"],
+                    },
+                }
+            },
+            True,
+        ),
+        (
+            {"targets": {"b": {"additional_modules": None, "additional_repos": False}}},
+            False,
+        ),
         ({"targets": {"a": {}, "b": {"unknown": ["rhel-7"]}}}, False),
         ({"targets": {"a": {}, "b": {"distros": "not a list"}}}, False),
         ({"targets": {"this", "is", "set"}}, False),
