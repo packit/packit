@@ -424,7 +424,6 @@ class Upstream(PackitRepositoryBase):
             commit: Commit to be set in the changelog.
             release: Release to be set in the spec-file.
             bump_version: Specifies whether version should be changed in the spec-file.
-
                 Defaults to `True`.
         """
         self._fix_spec_source(archive)

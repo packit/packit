@@ -27,8 +27,11 @@ logger = logging.getLogger("packit")
 )
 @click.option(
     "--bump/--no-bump",
-    default=True,
-    help="Specifies whether to bump version or not.",
+    default=None,
+    help=(
+        "Specifies whether to update Version and Release. "
+        "Defaults to value set in configuration, which defaults to yes."
+    ),
 )
 @click.option(
     "--release-suffix",
