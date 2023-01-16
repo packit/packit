@@ -39,12 +39,17 @@ def load_job_config(job_config):
     "(this option implies the repository is source-git).",
 )
 @click.option(
-    "--bump/--no-bump",
+    "--update-release/--no-update-release",
     default=None,
     help=(
         "Specifies whether to update Version and Release. "
         "Defaults to value set in configuration, which defaults to yes."
     ),
+)
+@click.option(
+    "--bump/--no-bump",
+    default=None,
+    help="Deprecated. Use --[no-]update-release instead.",
 )
 @click.option(
     "--release-suffix",
@@ -117,6 +122,7 @@ def prepare_sources(
     path_or_url,
     job_config_index,
     upstream_ref,
+    update_release,
     bump,
     release_suffix,
     default_release_suffix,
@@ -144,13 +150,20 @@ def prepare_sources(
     api = get_packit_api(
         config=config, local_project=path_or_url, job_config_index=job_config_index
     )
+    if bump is not None:
+        if update_release is not None:
+            raise click.UsageError(
+                "--[no-]bump and --[no-]update-release are mutually exclusive"
+            )
+        logger.warning("--[no-]bump is deprecated. Use --[no-]update-release instead.")
+        update_release = bump
     release_suffix = ChangelogHelper.resolve_release_suffix(
         api.package_config, release_suffix, default_release_suffix
     )
 
     api.prepare_sources(
         upstream_ref=upstream_ref,
-        update_release=bump,
+        update_release=update_release,
         release_suffix=release_suffix,
         result_dir=result_dir,
         create_symlinks=create_symlinks,
