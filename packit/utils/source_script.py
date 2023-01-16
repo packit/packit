@@ -10,7 +10,7 @@ def create_source_script(
     merge_pr: Optional[bool] = True,
     target_branch: Optional[str] = None,
     job_config_index: Optional[int] = None,
-    bump_version: bool = True,
+    update_release: bool = True,
     release_suffix: Optional[str] = None,
 ):
     options = []
@@ -22,7 +22,7 @@ def create_source_script(
             options += ["--target-branch", target_branch]
     if job_config_index is not None:
         options += ["--job-config-index", str(job_config_index)]
-    if not bump_version:
+    if not update_release:
         options += ["--no-bump"]
     if release_suffix:
         options += ["--release-suffix", f"'{release_suffix}'"]

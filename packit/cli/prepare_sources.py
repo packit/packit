@@ -150,7 +150,7 @@ def prepare_sources(
 
     api.prepare_sources(
         upstream_ref=upstream_ref,
-        bump_version=bump,
+        update_release=bump,
         release_suffix=release_suffix,
         result_dir=result_dir,
         create_symlinks=create_symlinks,
