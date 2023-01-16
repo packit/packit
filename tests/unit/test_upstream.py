@@ -371,7 +371,7 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
         pytest.param(
             True,
             "",
-            # bump_version from command line wins over release_suffix on packit.yaml
+            # update-release from command line wins over release_suffix on packit.yaml
             "2.1234.mock_ref.",
             id="Bump release, release_suffix is empty",
         ),
@@ -454,7 +454,7 @@ def test_get_spec_release(
         pytest.param(
             True,
             "",
-            # bump_version from command line wins over release_suffix on packit.yaml
+            # update-release from command line wins over release_suffix on packit.yaml
             "2.1234.mock_ref.",
             id="Bump release, release_suffix is empty",
         ),

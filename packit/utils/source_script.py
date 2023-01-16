@@ -23,7 +23,7 @@ def create_source_script(
     if job_config_index is not None:
         options += ["--job-config-index", str(job_config_index)]
     if not update_release:
-        options += ["--no-bump"]
+        options += ["--no-update-release"]
     if release_suffix:
         options += ["--release-suffix", f"'{release_suffix}'"]
 
