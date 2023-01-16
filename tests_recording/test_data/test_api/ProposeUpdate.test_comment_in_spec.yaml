@@ -2258,7 +2258,7 @@ requests.sessions:
             raw: !!binary ""
             reason: OK
             status_code: 200
-      https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?status=Open:
+      https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?page=1&status=Open:
         all:
           metadata:
             latency: 0.6465277671813965
