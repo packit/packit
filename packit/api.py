@@ -1241,7 +1241,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             upstream_ref: git ref to upstream commit used in source-git
             release_suffix: specifies local release suffix. `None` represents default suffix.
-            bump_version: specifies whether Version and Release should be changed in the spec-file.
+            bump_version: whether to change Version and Release in the spec-file
             result_dir: directory where the specfile directory content should be copied
             create_symlinks: whether symlinks should be created instead of copying the files
                 (currently when the archive is created outside the specfile dir, or in the future
@@ -1254,7 +1254,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         try:
             self.up.prepare_upstream_for_srpm_creation(
                 upstream_ref=upstream_ref,
-                bump_version=bump_version,
+                update_release=bump_version,
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
             )
@@ -1298,7 +1298,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             output_file: path + filename where the srpm should be written, defaults to cwd
             srpm_dir: path to the directory where the srpm is meant to be placed
             release_suffix: specifies local release suffix. `None` represents default suffix.
-            bump_version: specifies whether Version and Release should be changed in the spec-file.
+            bump_version: whether to change Version and Release in the spec-file
 
         Returns:
             a path to the srpm
