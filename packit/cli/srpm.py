@@ -81,7 +81,7 @@ def srpm(
     srpm_path = api.create_srpm(
         output_file=output,
         upstream_ref=upstream_ref,
-        bump_version=bump,
+        update_release=bump,
         release_suffix=release_suffix,
     )
     logger.info(f"SRPM: {srpm_path}")
