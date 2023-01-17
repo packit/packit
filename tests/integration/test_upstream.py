@@ -262,7 +262,7 @@ def test_fix_spec(upstream_instance):
         archive=archive,
         version="_1.2.3",
         commit="_abcdef123",
-        release_suffix="1.20200710085501945230.master.0.g133ff39",
+        release="1.20200710085501945230.master.0.g133ff39",
     )
 
     release = ups.specfile.expanded_release
@@ -277,7 +277,7 @@ def test_fix_spec_persists(upstream_instance):
         ActionName.fix_spec: "sed -i 's/^Version:.*$/Version: 1.0.0/' beer.spec"
     }
     SRPMBuilder(upstream)._fix_specfile_to_use_local_archive(
-        "archive.tar.gz", bump_version=False, release_suffix="1.%dist"
+        "archive.tar.gz", update_release=False, release_suffix="1.%dist"
     )
 
     assert upstream.specfile.version == "1.0.0"
@@ -314,7 +314,7 @@ def test_fix_spec_action_with_macros(upstream_instance):
     )
 
     SRPMBuilder(upstream)._fix_specfile_to_use_local_archive(
-        "archive.tar.gz", bump_version=True, release_suffix=""
+        "archive.tar.gz", update_release=True, release_suffix=""
     )
 
 
