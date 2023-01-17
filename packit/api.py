@@ -1230,9 +1230,9 @@ The first dist-git commit to be synced is '{short_hash}'.
     def prepare_sources(
         self,
         upstream_ref: Optional[str] = None,
-        bump_version: bool = True,
+        update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
-        result_dir: Union[Path, str] = None,
+        result_dir: Optional[Union[Path, str]] = None,
         create_symlinks: Optional[bool] = True,
     ) -> None:
         """
@@ -1241,7 +1241,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             upstream_ref: git ref to upstream commit used in source-git
             release_suffix: specifies local release suffix. `None` represents default suffix.
-            bump_version: specifies whether version should be changed in the spec-file.
+            update_release: whether to change Version and Release in the spec-file
             result_dir: directory where the specfile directory content should be copied
             create_symlinks: whether symlinks should be created instead of copying the files
                 (currently when the archive is created outside the specfile dir, or in the future
@@ -1249,10 +1249,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         self.up.run_action(actions=ActionName.post_upstream_clone)
 
+        if update_release is None:
+            update_release = self.package_config.update_release
         try:
             self.up.prepare_upstream_for_srpm_creation(
                 upstream_ref=upstream_ref,
-                bump_version=bump_version,
+                update_release=update_release,
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
             )
@@ -1285,7 +1287,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         output_file: Optional[str] = None,
         upstream_ref: Optional[str] = None,
         srpm_dir: Union[Path, str] = None,
-        bump_version: bool = True,
+        update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
     ) -> Path:
         """
@@ -1296,13 +1298,13 @@ The first dist-git commit to be synced is '{short_hash}'.
             output_file: path + filename where the srpm should be written, defaults to cwd
             srpm_dir: path to the directory where the srpm is meant to be placed
             release_suffix: specifies local release suffix. `None` represents default suffix.
-            bump_version: specifies whether version should be changed in the spec-file.
+            update_release: whether to change Version and Release in the spec-file
 
         Returns:
             a path to the srpm
         """
         try:
-            self.prepare_sources(upstream_ref, bump_version, release_suffix)
+            self.prepare_sources(upstream_ref, update_release, release_suffix)
             try:
                 srpm_path = self.up.create_srpm(
                     srpm_path=output_file, srpm_dir=srpm_dir

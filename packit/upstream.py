@@ -411,8 +411,8 @@ class Upstream(PackitRepositoryBase):
         archive: str,
         version: str,
         commit: str,
-        release_suffix: str,
-        bump_version: bool = True,
+        release: str,
+        update_release: bool = True,
     ):
         """
         In order to create a SRPM from current git checkout, we need to have the spec reference
@@ -422,16 +422,15 @@ class Upstream(PackitRepositoryBase):
             archive: Relative path to the archive, used as `Source0`.
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
-            release_suffix: Specifies local release suffix.
-            bump_version: Specifies whether version should be changed in the spec-file.
-
+            release: Release to be set in the spec-file.
+            update_release: Whether to change Version and Release in the spec-file.
                 Defaults to `True`.
         """
         self._fix_spec_source(archive)
         self._fix_spec_prep(archive)
 
         ChangelogHelper(self).prepare_upstream_locally(
-            version, commit, bump_version, release_suffix
+            version, commit, update_release, release
         )
 
     def _fix_spec_prep(self, archive):
@@ -498,7 +497,7 @@ class Upstream(PackitRepositoryBase):
     def prepare_upstream_for_srpm_creation(
         self,
         upstream_ref: Optional[str] = None,
-        bump_version: bool = True,
+        update_release: bool = True,
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
     ):
@@ -510,13 +509,13 @@ class Upstream(PackitRepositoryBase):
 
         Args:
             upstream_ref: the base git ref for the source git
-            bump_version: increase version in spec file
+            update_release: update Version and Release in spec file
             release_suffix: suffix %release part of NVR with this
             create_symlinks: whether symlinks should be created instead of copying the files
                 (e.g. when the archive is created outside the specfile dir)
         """
         SRPMBuilder(upstream=self, ref=upstream_ref).prepare(
-            bump_version=bump_version,
+            update_release=update_release,
             release_suffix=release_suffix,
             create_symlinks=create_symlinks,
         )
@@ -910,7 +909,7 @@ class SRPMBuilder:
         return self.get_path(out)
 
     def _prepare_upstream_using_source_git(
-        self, bump_version: bool, release_suffix: Optional[str]
+        self, update_release: bool, release_suffix: Optional[str]
     ) -> None:
         """
         Fetch the tarball and don't check out the upstream ref.
@@ -919,18 +918,18 @@ class SRPMBuilder:
         self.upstream.create_patches_and_update_specfile(self.upstream_ref)
 
         ChangelogHelper(self.upstream).prepare_upstream_using_source_git(
-            bump_version, release_suffix
+            update_release, release_suffix
         )
 
     def _fix_specfile_to_use_local_archive(
-        self, archive: str, bump_version: bool, release_suffix: Optional[str]
+        self, archive: str, update_release: bool, release_suffix: Optional[str]
     ) -> None:
         """
         Update specfile to use the archive with the right version.
 
         Args:
             archive: Path to the archive.
-            bump_version: Should version be increased?
+            update_release: Should Version and Release be updated?
             release_suffix: Append this suffix to the %release.
         """
         current_commit = self.upstream.local_project.commit_hexsha
@@ -958,37 +957,33 @@ class SRPMBuilder:
         ):
             # The release_suffix contains macros to be expanded
             # do not use it to format the PACKIT_RPMSPEC_RELEASE!
-            # Otherwise you will obtain something like
+            # Otherwise, you will obtain something like
             # 0.{PACKIT_RPMSPEC_RELEASE} as result.
             # In this case PACKIT_RPMSPEC_RELEASE should be expanded
             # like when no release_suffix is given: so use "" instead.
-            env.update(
-                {
-                    "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(""),
-                }
-            )
-            new_release_suffix = release_suffix.format(**env)
+            env["PACKIT_RPMSPEC_RELEASE"] = self.upstream.get_spec_release("")
+            new_release = release_suffix.format(**env)
         else:
-            new_release_suffix = self.upstream.get_spec_release(release_suffix)
+            new_release = self.upstream.get_spec_release(release_suffix)
 
         if self.upstream.with_action(action=ActionName.fix_spec, env=env):
             self.upstream.fix_spec(
                 archive=archive,
                 version=self.current_git_describe_version,
                 commit=current_commit,
-                bump_version=bump_version,
-                release_suffix=new_release_suffix,
+                update_release=update_release,
+                release=new_release,
             )
         self.upstream.specfile.reload()  # the specfile could have been changed by the action
 
     def prepare(
         self,
-        bump_version: bool,
+        update_release: bool,
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
     ):
         if self.upstream_ref:
-            self._prepare_upstream_using_source_git(bump_version, release_suffix)
+            self._prepare_upstream_using_source_git(update_release, release_suffix)
         else:
             created_archive = self.upstream.create_archive(
                 version=self.current_git_describe_version,
@@ -996,7 +991,7 @@ class SRPMBuilder:
             )
             self._fix_specfile_to_use_local_archive(
                 archive=created_archive,
-                bump_version=bump_version,
+                update_release=update_release,
                 release_suffix=release_suffix,
             )
 

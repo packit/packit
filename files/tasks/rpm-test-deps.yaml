@@ -5,36 +5,30 @@
       - python3-setuptools_scm_git_archive
       - python3-setuptools_scm
       - python3-distro
+      - rpmautospec-rpm-macros
     state: present
   become: true
 
-- name: Install pytest & rpmautospec-rpm-macros
+- name: (Fedora) Install dependencies as RPMs
   ansible.builtin.dnf:
     name:
       - python3-pytest-cov
-      - rpmautospec-rpm-macros
+      - python3-pytest-timeout
+      - python3-flexmock
+      - python3-deepdiff
     state: present
-  # rpmautospec-rpm-macros is not in epel
-  when: ansible_distribution == 'Fedora'
+  when: ansible_facts['distribution'] == 'Fedora'
   become: true
 
-# We need >=3.9 for tmp_path fixture, there's 3.4 in epel
-- name: Install pytest from PyPI
+# packages not in epel, install from PyPI
+# flexmock: https://bugzilla.redhat.com/show_bug.cgi?id=2120251
+- name: (EPEL) Install dependencies from PyPI
   ansible.builtin.pip:
-    name: pytest-cov
-  when: ansible_distribution != 'Fedora'
-  become: true
-
-# flexmock is not in EPEL 9 (https://bugzilla.redhat.com/show_bug.cgi?id=2120251),
-# install it from PyPI
-- name: Install flexmock from PyPI
-  ansible.builtin.pip:
-    name: flexmock
+    name:
+      - pytest-cov
+      - pytest-timeout
+      - flexmock
+      - deepdiff
     state: latest
-  become: true
-
-- name: Install DeepDiff from PyPI
-  ansible.builtin.pip:
-    name: deepdiff
-    state: latest
+  when: ansible_facts['distribution'] != 'Fedora'
   become: true

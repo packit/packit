@@ -339,6 +339,7 @@ class CommonConfigSchema(Schema):
     packit_instances = fields.List(EnumField(Deployment), missing=[Deployment.prod])
     issue_repository = fields.String(missing=None)
     release_suffix = fields.String(missing=None)
+    update_release = fields.Bool(default=True)
 
     # Former 'metadata' keys
     _targets = TargetsListOrDict(missing=None, data_key="targets")

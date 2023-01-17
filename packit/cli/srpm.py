@@ -26,9 +26,17 @@ logger = logging.getLogger("packit")
     "(this option implies the repository is source-git).",
 )
 @click.option(
+    "--update-release/--no-update-release",
+    default=None,
+    help=(
+        "Specifies whether to update Version and Release. "
+        "Defaults to value set in configuration, which defaults to yes."
+    ),
+)
+@click.option(
     "--bump/--no-bump",
-    default=True,
-    help="Specifies whether to bump version or not.",
+    default=None,
+    help="Deprecated. Use --[no-]update-release instead.",
 )
 @click.option(
     "--release-suffix",
@@ -58,6 +66,7 @@ def srpm(
     output,
     path_or_url,
     upstream_ref,
+    update_release,
     bump,
     release_suffix,
     default_release_suffix,
@@ -69,6 +78,13 @@ def srpm(
     it defaults to the current working directory
     """
     api = get_packit_api(config=config, local_project=path_or_url)
+    if bump is not None:
+        if update_release is not None:
+            raise click.UsageError(
+                "--[no-]bump and --[no-]update-release are mutually exclusive"
+            )
+        logger.warning("--[no-]bump is deprecated. Use --[no-]update-release instead.")
+        update_release = bump
     release_suffix = ChangelogHelper.resolve_release_suffix(
         api.package_config,
         release_suffix,
@@ -78,7 +94,7 @@ def srpm(
     srpm_path = api.create_srpm(
         output_file=output,
         upstream_ref=upstream_ref,
-        bump_version=bump,
+        update_release=update_release,
         release_suffix=release_suffix,
     )
     logger.info(f"SRPM: {srpm_path}")

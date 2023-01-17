@@ -330,12 +330,12 @@ def test_release_suffix(
         archive=archive,
         version=version,
         commit="_",
-        bump_version=True,
-        release_suffix=expanded_release_suffix,
+        update_release=True,
+        release=expanded_release_suffix,
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, bump_version=True, release_suffix=release_suffix
+        archive=archive, update_release=True, release_suffix=release_suffix
     )
 
 
@@ -364,14 +364,14 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
 
 
 @pytest.mark.parametrize(
-    "bump_version,release_suffix,expected_release_suffix",
+    "update_release,release_suffix,expected_release",
     (
         # current_git_tag_version="4.5"
         # original_release_number_from_spec = "2"
         pytest.param(
             True,
             "",
-            # bump_version from command line wins over release_suffix on packit.yaml
+            # update-release from command line wins over release_suffix on packit.yaml
             "2.1234.mock_ref.",
             id="Bump release, release_suffix is empty",
         ),
@@ -412,7 +412,7 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
     ),
 )
 def test_get_spec_release(
-    upstream_mock, bump_version, release_suffix, expected_release_suffix
+    upstream_mock, update_release, release_suffix, expected_release
 ):
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
@@ -429,8 +429,8 @@ def test_get_spec_release(
         archive=archive,
         version=current_git_tag_version,
         commit="_",
-        bump_version=bump_version,
-        release_suffix=expected_release_suffix,
+        update_release=update_release,
+        release=expected_release,
     )
     upstream_mock._specfile = flexmock(
         expanded_release=original_release_number_from_spec
@@ -442,19 +442,19 @@ def test_get_spec_release(
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, bump_version=bump_version, release_suffix=release_suffix
+        archive=archive, update_release=update_release, release_suffix=release_suffix
     )
 
 
 @pytest.mark.parametrize(
-    "bump_version,release_suffix,expected_release_suffix",
+    "update_release,release_suffix,expected_release_suffix",
     (
         # current_git_tag_version="4.5"
         # original_release_number_from_spec = "2"
         pytest.param(
             True,
             "",
-            # bump_version from command line wins over release_suffix on packit.yaml
+            # update-release from command line wins over release_suffix on packit.yaml
             "2.1234.mock_ref.",
             id="Bump release, release_suffix is empty",
         ),
@@ -494,7 +494,9 @@ def test_get_spec_release(
         ),
     ),
 )
-def test_fix_spec(upstream_mock, bump_version, release_suffix, expected_release_suffix):
+def test_fix_spec(
+    upstream_mock, update_release, release_suffix, expected_release_suffix
+):
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
     original_release_number_from_spec = "2"
@@ -516,7 +518,7 @@ def test_fix_spec(upstream_mock, bump_version, release_suffix, expected_release_
     )
     upstream_mock._specfile.should_receive("reload").once()
 
-    if bump_version:
+    if update_release:
         upstream_mock._specfile.should_receive("set_version_and_release").with_args(
             current_git_tag_version, expected_release_suffix
         ).once()
@@ -525,7 +527,7 @@ def test_fix_spec(upstream_mock, bump_version, release_suffix, expected_release_
         flexmock(ChangelogHelper).should_receive("prepare_upstream_locally").with_args(
             current_git_tag_version,
             "_",
-            bump_version,
+            update_release,
             expected_release_suffix,
         )
 
@@ -534,5 +536,5 @@ def test_fix_spec(upstream_mock, bump_version, release_suffix, expected_release_
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, bump_version=bump_version, release_suffix=release_suffix
+        archive=archive, update_release=update_release, release_suffix=release_suffix
     )

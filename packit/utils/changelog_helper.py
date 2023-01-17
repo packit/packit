@@ -110,13 +110,13 @@ class ChangelogHelper:
             )
 
     def _get_release_for_source_git(
-        self, current_commit: str, bump_version: bool, release_suffix: Optional[str]
+        self, current_commit: str, update_release: bool, release_suffix: Optional[str]
     ) -> Optional[str]:
         old_release = self.up.specfile.expanded_release
         if release_suffix:
             return f"{old_release}.{release_suffix}"
 
-        if not bump_version:
+        if not update_release:
             return None
 
         try:
@@ -128,18 +128,18 @@ class ChangelogHelper:
         return f"{new_release}.g{current_commit}"
 
     def prepare_upstream_using_source_git(
-        self, bump_version: bool, release_suffix: Optional[str]
+        self, update_release: bool, release_suffix: Optional[str]
     ) -> None:
         """
         Updates changelog when creating SRPM within source-git repository.
         """
         current_commit = self.up.local_project.commit_hexsha
         release_to_update = self._get_release_for_source_git(
-            current_commit, bump_version, release_suffix
+            current_commit, update_release, release_suffix
         )
 
         msg = self.entry_from_action
-        if not msg and bump_version:
+        if not msg and update_release:
             msg = f"- Downstream changes ({current_commit})"
         self.up.specfile.release = release_to_update
         if msg is not None:
@@ -149,7 +149,7 @@ class ChangelogHelper:
         self,
         version: str,
         commit: str,
-        bump_version: bool,
+        update_release: bool,
         release: str,
     ) -> None:
         """
@@ -158,20 +158,20 @@ class ChangelogHelper:
         Args:
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
-            bump_version: Specifies whether version should be changed in the spec-file.
-            release_suffix: Specifies local release suffix. `None` represents default suffix.
+            update_release: Whether to change Version and Release in the spec-file.
+            release: Release to be set in the spec-file.
         """
         last_tag = self.up.get_last_tag()
         msg = self.entry_from_action
-        if not msg and last_tag and bump_version:
+        if not msg and last_tag and update_release:
             msg = self.up.get_commit_messages(after=last_tag)
-        if not msg and bump_version:
+        if not msg and update_release:
             # no describe, no tag - just a boilerplate message w/ commit hash
             # or, there were no changes b/w HEAD and last_tag, which implies last_tag == HEAD
             msg = f"- Development snapshot ({commit})"
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
-        if bump_version:
+        if update_release:
             logger.debug(f"Setting Release in spec to {release!r}.")
             self.up.specfile.set_version_and_release(version, release)
         if msg is not None:
