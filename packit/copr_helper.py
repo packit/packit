@@ -146,6 +146,7 @@ class CoprHelper:
         additional_repos: Optional[List[str]] = None,
         request_admin_if_needed: bool = False,
         targets_dict: Optional[Dict] = None,  # chroot specific configuration
+        module_hotfixes: bool = False,
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -178,6 +179,7 @@ class CoprHelper:
                 additional_packages=additional_packages,
                 additional_repos=additional_repos,
                 targets_dict=targets_dict,
+                module_hotfixes=module_hotfixes,
             )
             return
         except CoprRequestException as ex:
@@ -203,6 +205,7 @@ class CoprHelper:
             instructions=instructions,
             list_on_homepage=list_on_homepage,
             delete_after_days=delete_after_days,
+            module_hotfixes=module_hotfixes,
         )
 
         if fields_to_change:
@@ -252,6 +255,7 @@ class CoprHelper:
         instructions: Optional[str] = None,
         list_on_homepage: Optional[bool] = True,
         delete_after_days: Optional[int] = None,
+        module_hotfixes: Optional[bool] = False,
     ) -> Dict[str, Tuple[Any, Any]]:
 
         fields_to_change: Dict[str, Tuple[Any, Any]] = {}
@@ -315,6 +319,12 @@ class CoprHelper:
                 additional_repos,
             )
 
+        if module_hotfixes is not None and copr_proj.module_hotfixes != module_hotfixes:
+            fields_to_change["module_hotfixes"] = (
+                copr_proj.module_hotfixes,
+                module_hotfixes,
+            )
+
         return fields_to_change
 
     def create_copr_project(
@@ -329,6 +339,7 @@ class CoprHelper:
         additional_packages: Optional[List[str]] = None,
         additional_repos: Optional[List[str]] = None,
         targets_dict: Optional[Dict] = None,  # chroot specific configuration
+        module_hotfixes: bool = False,
     ) -> None:
 
         try:
@@ -352,6 +363,7 @@ class CoprHelper:
                 f"{self.upstream_local_project.git_url} to find out how to consume these builds. "
                 f"This copr project is created and handled by the packit project "
                 "(https://packit.dev/).",
+                module_hotfixes=module_hotfixes,
             )
             # once created: update chroot-specific configuration if there is any
             self._update_chroot_specific_configuration(
