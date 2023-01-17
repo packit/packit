@@ -6,7 +6,13 @@
     - ansible.builtin.include_tasks: tasks/rpm-test-deps.yaml
     - ansible.builtin.include_tasks: tasks/install-packit.yaml
     - ansible.builtin.include_tasks: tasks/sandcastle.yaml
-    - name: Run unit, integration and functional tests
-      ansible.builtin.command: make check
+    - name: Run integration tests
+      ansible.builtin.command: python3 -m pytest --timeout=120 --verbose --showlocals ./tests/unit/ ./tests/functional/ ./tests/integration/
+      environment:
+        PYTHONPATH: "{{ project_dir }}"
+        PYTHONDONTWRITEBYTECODE: "1"
       args:
         chdir: "{{ project_dir }}"
+      register: myoutput
+    - debug:
+        var: myoutput
