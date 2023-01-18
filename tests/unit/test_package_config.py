@@ -524,6 +524,23 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             False,
         ),
+        (
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "release",
+                        "targets": [
+                            "fedora-stable",
+                        ],
+                        "module_hotfixes": True,
+                    }
+                ],
+            },
+            True,
+        ),
     ],
 )
 def test_package_config_validate(raw, is_valid):

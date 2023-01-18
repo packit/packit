@@ -2160,6 +2160,1409 @@ requests.sessions:
             raw: !!binary ""
             reason: OK
             status_code: 200
+      https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?status=Open:
+        all:
+          metadata:
+            latency: 1.5055491924285889
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_status
+            - packit.status
+            - ogr.services.pagure.project
+            - ogr.services.pagure.pull_request
+            - ogr.services.pagure.project
+            - ogr.services.pagure.service
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              args:
+                assignee: null
+                author: null
+                page: 1
+                per_page: 20
+                status: Open
+                tags: []
+              pagination:
+                first: https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?per_page=20&status=Open&page=1
+                last: https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?per_page=20&status=Open&page=1
+                next: null
+                page: 1
+                pages: 1
+                per_page: 20
+                prev: null
+              requests:
+              - assignee: null
+                branch: rawhide
+                branch_from: 0.8.1-rawhide-update
+                cached_merge_status: unknown
+                closed_at: null
+                closed_by: null
+                comments: []
+                commit_start: 96831cf962cf4157c234d5856a5ed067dc514dac
+                commit_stop: 96831cf962cf4157c234d5856a5ed067dc514dac
+                date_created: '1628841221'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/172
+                id: 172
+                initial_comment: 'Upstream tag: 0.8.1
+
+                  Upstream commit: ca3e9378'
+                last_updated: '1628841221'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - dhodovsk
+                    - jpopelka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mmarusak
+                    - packit
+                    - ttomecek
+                    - usercont
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1611220001'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600700802'
+                  date_modified: '1600700802'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
+                  fullname: forks/jscotka/rpms/python-requre
+                  id: 45827
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - dhodovsk
+                      - jpopelka
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mmarusak
+                      - packit
+                      - ttomecek
+                      - usercont
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1611220001'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/jscotka/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.8.1
+                uid: 207cf90a281b4f15968a9f27ff4a2102
+                updated_on: '1628841221'
+                user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
+                  fullname: "Jan \u0160\u010Dotka"
+                  name: jscotka
+                  url_path: user/jscotka
+              - assignee: null
+                branch: rawhide
+                branch_from: 0.8.1-rawhide-update
+                cached_merge_status: FFORWARD
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: 'Build failed. More information on how to proceed and troubleshoot
+                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/aa255733cb894d8ea82f35eeafaf3d88)
+                    : SUCCESS in 1m 14s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/1de43a5269b142f286a90156399c1ad1)
+                    : SUCCESS in 6m 57s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/f0e29c9d5b7640008567c74a4a19a6ea)
+                    : FAILURE in 2m 51s
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/51c61cbab9414c10b1d2ea6f580a8b6a)
+                    : SUCCESS in 4m 23s (non-voting)
+
+                    - [check-for-tests ](https://fedora.softwarefactory-project.io/zuul/build/a196e3b30d214a43b979859691fb17a1)
+                    : SUCCESS in 42s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/cafdd11522f344afb6f24038b4e195f1)
+                    : SUCCESS in 42s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/b497b796069646b5880f356c93afa230)
+                    : SUCCESS in 2m 09s
+
+                    - [rpm-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    - [rpm-tmt-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    '
+                  commit: null
+                  date_created: '1628770256'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83180
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                - comment: rebased onto 96831cf962cf4157c234d5856a5ed067dc514dac
+                  commit: null
+                  date_created: '1628841218'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83224
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                commit_start: 96831cf962cf4157c234d5856a5ed067dc514dac
+                commit_stop: 96831cf962cf4157c234d5856a5ed067dc514dac
+                date_created: '1628769498'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/171
+                id: 171
+                initial_comment: 'Upstream tag: 0.8.1
+
+                  Upstream commit: 6eb4f867'
+                last_updated: '1628841219'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - dhodovsk
+                    - jpopelka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mmarusak
+                    - packit
+                    - ttomecek
+                    - usercont
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1611220001'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600700802'
+                  date_modified: '1600700802'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
+                  fullname: forks/jscotka/rpms/python-requre
+                  id: 45827
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - dhodovsk
+                      - jpopelka
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mmarusak
+                      - packit
+                      - ttomecek
+                      - usercont
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1611220001'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/jscotka/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.8.1
+                uid: 2f01c130c04c4a9f98f97c69b9466262
+                updated_on: '1628841218'
+                user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
+                  fullname: "Jan \u0160\u010Dotka"
+                  name: jscotka
+                  url_path: user/jscotka
+              - assignee: null
+                branch: rawhide
+                branch_from: 0.8.1-rawhide-update
+                cached_merge_status: FFORWARD
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: rebased onto c7948d1171a3e996c039690b21dfd2a3a717f019
+                  commit: null
+                  date_created: '1628769494'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83176
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                - comment: 'Build failed. More information on how to proceed and troubleshoot
+                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/78d030d44f124324ad4d95773a4989df)
+                    : SUCCESS in 1m 10s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/440034950f2e4037ab4fef3b9b7738f5)
+                    : SUCCESS in 6m 57s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/52d3b23af5ff43d38dc608ec6ea1f6ed)
+                    : FAILURE in 2m 53s
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/fcb6f9c4782f4050aac54e1601d92391)
+                    : SUCCESS in 4m 38s (non-voting)
+
+                    - [check-for-tests ](https://fedora.softwarefactory-project.io/zuul/build/9938675d586c46c59a1eee9617982319)
+                    : SUCCESS in 42s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/ec2c4198a01b42ababce6d9a3abba21a)
+                    : SUCCESS in 55s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/91687ac842d44545add34c314ac62588)
+                    : SUCCESS in 2m 02s
+
+                    - [rpm-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    - [rpm-tmt-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    '
+                  commit: null
+                  date_created: '1628770263'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83181
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                - comment: rebased onto 96831cf962cf4157c234d5856a5ed067dc514dac
+                  commit: null
+                  date_created: '1628841220'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83227
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                commit_start: 96831cf962cf4157c234d5856a5ed067dc514dac
+                commit_stop: 96831cf962cf4157c234d5856a5ed067dc514dac
+                date_created: '1628769375'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/170
+                id: 170
+                initial_comment: 'Upstream tag: 0.8.1
+
+                  Upstream commit: c73a2afb'
+                last_updated: '1628841220'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - dhodovsk
+                    - jpopelka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mmarusak
+                    - packit
+                    - ttomecek
+                    - usercont
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1611220001'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600700802'
+                  date_modified: '1600700802'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
+                  fullname: forks/jscotka/rpms/python-requre
+                  id: 45827
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - dhodovsk
+                      - jpopelka
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mmarusak
+                      - packit
+                      - ttomecek
+                      - usercont
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1611220001'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/jscotka/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.8.1
+                uid: 43e13ab866914c3fb49c34b0d652d8b1
+                updated_on: '1628841220'
+                user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
+                  fullname: "Jan \u0160\u010Dotka"
+                  name: jscotka
+                  url_path: user/jscotka
+              - assignee: null
+                branch: rawhide
+                branch_from: 0.8.1-rawhide-update
+                cached_merge_status: FFORWARD
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: rebased onto 7834d4010b13367c5370d91378b4f3f96d4983aa
+                  commit: null
+                  date_created: '1628769372'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83175
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                - comment: rebased onto c7948d1171a3e996c039690b21dfd2a3a717f019
+                  commit: null
+                  date_created: '1628769495'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83177
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                - comment: 'Build failed. More information on how to proceed and troubleshoot
+                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/fe9a1ecf399c45ef92f4cff5100852f0)
+                    : SUCCESS in 1m 10s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/192c6395275943a38b941a80d90349d5)
+                    : SUCCESS in 8m 04s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/733a8e9eda2748d8a12b4c4cc8e7f5fb)
+                    : FAILURE in 3m 04s
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/2f348f76279744fd9f55b18d9673398c)
+                    : SUCCESS in 4m 54s (non-voting)
+
+                    - [check-for-tests ](https://fedora.softwarefactory-project.io/zuul/build/b339468a23b04c3a81af8057e47f59b2)
+                    : SUCCESS in 54s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/39f9dbe73c054a2ea4ed22deb69b7df3)
+                    : SUCCESS in 45s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/15c25fa1c3a649dc961200cf34d42399)
+                    : SUCCESS in 2m 09s
+
+                    - [rpm-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    - [rpm-tmt-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    '
+                  commit: null
+                  date_created: '1628770325'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83182
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                - comment: rebased onto 96831cf962cf4157c234d5856a5ed067dc514dac
+                  commit: null
+                  date_created: '1628841219'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83225
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                commit_start: 96831cf962cf4157c234d5856a5ed067dc514dac
+                commit_stop: 96831cf962cf4157c234d5856a5ed067dc514dac
+                date_created: '1628769121'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/169
+                id: 169
+                initial_comment: 'Upstream tag: 0.8.1
+
+                  Upstream commit: fde855fd'
+                last_updated: '1628841219'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - dhodovsk
+                    - jpopelka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mmarusak
+                    - packit
+                    - ttomecek
+                    - usercont
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1611220001'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600700802'
+                  date_modified: '1600700802'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
+                  fullname: forks/jscotka/rpms/python-requre
+                  id: 45827
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - dhodovsk
+                      - jpopelka
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mmarusak
+                      - packit
+                      - ttomecek
+                      - usercont
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1611220001'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/jscotka/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.8.1
+                uid: 30d44c1e224044ea99622370b529c402
+                updated_on: '1628841219'
+                user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
+                  fullname: "Jan \u0160\u010Dotka"
+                  name: jscotka
+                  url_path: user/jscotka
+              - assignee: null
+                branch: rawhide
+                branch_from: 0.8.1-rawhide-update
+                cached_merge_status: FFORWARD
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: rebased onto 99342b021a16088f482f30461111c6b94332b20b
+                  commit: null
+                  date_created: '1628769115'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83173
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                - comment: rebased onto 7834d4010b13367c5370d91378b4f3f96d4983aa
+                  commit: null
+                  date_created: '1628769372'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83174
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                - comment: rebased onto c7948d1171a3e996c039690b21dfd2a3a717f019
+                  commit: null
+                  date_created: '1628769495'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83178
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                - comment: 'Build failed. More information on how to proceed and troubleshoot
+                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/3a42bfcf188245988bb0069045468f01)
+                    : SUCCESS in 1m 10s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/3142a9b463c84b8cbd40231ca40629ae)
+                    : SUCCESS in 9m 43s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/0108c99fc04a4e919bb301019675d7b1)
+                    : FAILURE in 3m 05s
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/3e4fb324b2e14fa4b3882e81cb3a8fea)
+                    : SUCCESS in 8m 03s (non-voting)
+
+                    - [check-for-tests ](https://fedora.softwarefactory-project.io/zuul/build/70cb4037fce54029ab326ff4b9c75b40)
+                    : SUCCESS in 2m 05s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/f4c84dc5cf9b4d5bb627708f41268c47)
+                    : SUCCESS in 2m 05s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/5b271a68c21c48c6a5a100ce593fab51)
+                    : SUCCESS in 3m 28s
+
+                    - [rpm-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    - [rpm-tmt-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    '
+                  commit: null
+                  date_created: '1628770609'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83183
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                - comment: rebased onto 96831cf962cf4157c234d5856a5ed067dc514dac
+                  commit: null
+                  date_created: '1628841220'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 83226
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                commit_start: 96831cf962cf4157c234d5856a5ed067dc514dac
+                commit_stop: 96831cf962cf4157c234d5856a5ed067dc514dac
+                date_created: '1628769085'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/168
+                id: 168
+                initial_comment: 'Upstream tag: 0.8.1
+
+                  Upstream commit: b5cfd73a'
+                last_updated: '1628841220'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - dhodovsk
+                    - jpopelka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mmarusak
+                    - packit
+                    - ttomecek
+                    - usercont
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1611220001'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1600700802'
+                  date_modified: '1600700802'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/jscotka/rpms/python-requre
+                  fullname: forks/jscotka/rpms/python-requre
+                  id: 45827
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - dhodovsk
+                      - jpopelka
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mmarusak
+                      - packit
+                      - ttomecek
+                      - usercont
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1611220001'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/jscotka/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.8.1
+                uid: 8132f2b3c7ce41ecaa767c9798cab3f3
+                updated_on: '1628841220'
+                user:
+                  full_url: https://src.fedoraproject.org/user/jscotka
+                  fullname: "Jan \u0160\u010Dotka"
+                  name: jscotka
+                  url_path: user/jscotka
+              - assignee: null
+                branch: rawhide
+                branch_from: 0.8.1-rawhide-update
+                cached_merge_status: unknown
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: 'Build failed. More information on how to proceed and troubleshoot
+                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/c8adbc7e22814655ba4fdf3938afc189)
+                    : SUCCESS in 1m 18s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/1cd2cc65c445452ba621e06f96ccfb8d)
+                    : SUCCESS in 7m 39s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-armv7hl ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/28e7c4d27e4446b5a2a607054f64ce3d)
+                    : FAILURE in 2m 53s
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/541612c68d1a47ada83d42fa469f3ae0)
+                    : SUCCESS in 4m 25s (non-voting)
+
+                    - [check-for-tests ](https://fedora.softwarefactory-project.io/zuul/build/56e01805971842e9b91086fb03c41a1f)
+                    : SUCCESS in 1m 01s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/6564a01a0a76473f94d35f0dd3228d14)
+                    : SUCCESS in 43s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/3d817589bc9c4153b3c27d717ad791ff)
+                    : SUCCESS in 3m 06s
+
+                    - [rpm-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    - [rpm-tmt-test ](https://fedora.softwarefactory-project.io/zuul/build/None)
+                    : SKIPPED
+
+                    '
+                  commit: null
+                  date_created: '1628265471'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 82761
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                commit_start: f31c5e023fb75bc3cc828682f88cd848dc770992
+                commit_stop: f31c5e023fb75bc3cc828682f88cd848dc770992
+                date_created: '1628264621'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/167
+                id: 167
+                initial_comment: 'Upstream tag: 0.8.1
+
+                  Upstream commit: 46ce5af6'
+                last_updated: '1628841218'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - dhodovsk
+                    - jpopelka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mmarusak
+                    - packit
+                    - ttomecek
+                    - usercont
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - jscotka
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1611220001'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/jscotka
+                    fullname: "Jan \u0160\u010Dotka"
+                    name: jscotka
+                    url_path: user/jscotka
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - ttomecek
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1628244829'
+                  date_modified: '1628244829'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/ttomecek/rpms/python-requre
+                  fullname: forks/ttomecek/rpms/python-requre
+                  id: 51908
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - dhodovsk
+                      - jpopelka
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mmarusak
+                      - packit
+                      - ttomecek
+                      - usercont
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - jscotka
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1611220001'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/jscotka
+                      fullname: "Jan \u0160\u010Dotka"
+                      name: jscotka
+                      url_path: user/jscotka
+                  priorities: {}
+                  tags: []
+                  url_path: fork/ttomecek/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/ttomecek
+                    fullname: Tomas Tomecek
+                    name: ttomecek
+                    url_path: user/ttomecek
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Update to upstream release 0.8.1
+                uid: 50199b251a2c409dbb0dad6107357f16
+                updated_on: '1628265471'
+                user:
+                  full_url: https://src.fedoraproject.org/user/ttomecek
+                  fullname: Tomas Tomecek
+                  name: ttomecek
+                  url_path: user/ttomecek
+              total_requests: 6
+            _next: null
+            elapsed: 1.153865
+            encoding: null
+            headers:
+              Connection: Keep-Alive
+              Date: Fri, 13 Aug 2021 07:55:09 GMT
+              Keep-Alive: timeout=15, max=500
+              Referrer-Policy: same-origin
+              Server: Apache
+              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+              X-Content-Type-Options: nosniff
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: YRYlXY7c1zMQot6ln6TLQgAAA04
+              X-Frame-Options: SAMEORIGIN
+              X-Xss-Protection: 1; mode=block
+              apptime: D=681550
+              content-length: '48460'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-x7o8lNZgDlXkkUMRTpSmEuLKC'
+                https://apps.fedoraproject.org https://mdapi.fedoraproject.org; style-src
+                'self' 'nonce-x7o8lNZgDlXkkUMRTpSmEuLKC'; object-src 'none'; base-uri
+                'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
+                https://apps.fedoraproject.org https://mdapi.fedoraproject.org;
+              content-type: application/json
+              set-cookie: a 'b';
+              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
 tempfile:
   mkdtemp:
     all:

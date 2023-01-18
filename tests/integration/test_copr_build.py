@@ -37,6 +37,7 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
             delete_after_days=60,
             additional_repos=[],
             ownername=owner,
+            module_hotfixes=False,
         )
     )
 
@@ -84,6 +85,7 @@ def test_copr_build_existing_project_change_settings(
             delete_after_days=60,
             additional_repos=[],
             ownername=owner,
+            module_hotfixes=False,
         )
     )
 
@@ -162,6 +164,7 @@ def test_copr_build_existing_project_munch_no_settings_change(
                 "homepage": "",
                 "id": 34245,
                 "ownername": owner,
+                "module_hotfixes": False,
             }
         )
     )
@@ -219,6 +222,7 @@ def test_copr_build_existing_project_munch_additional_repos_change(
                 "homepage": "",
                 "id": 34245,
                 "ownername": owner,
+                "module_hotfixes": False,
             }
         )
     )
@@ -280,6 +284,7 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
                 "homepage": "",
                 "id": 34245,
                 "ownername": owner,
+                "module_hotfixes": False,
             }
         )
     )
@@ -339,6 +344,7 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
                 "homepage": "",
                 "id": 34245,
                 "ownername": owner,
+                "module_hotfixes": False,
             }
         )
     )
@@ -417,6 +423,7 @@ def test_copr_build_existing_project_munch_chroot_updates(
                 "homepage": "",
                 "id": 34245,
                 "ownername": owner,
+                "module_hotfixes": False,
             }
         )
     )
@@ -473,6 +480,7 @@ def test_copr_build_existing_project_error_on_change_settings(
             delete_after_days=60,
             additional_repos=[],
             ownername=owner,
+            module_hotfixes=False,
         )
     )
 
@@ -571,6 +579,7 @@ def test_copr_build_cli_no_project_configured(upstream_and_remote, copr_client_m
         enable_net=True,
         release_suffix=None,
         srpm_path=None,
+        module_hotfixes=False,
     ).and_return(("id", "url")).once()
 
     flexmock(packit.copr_helper.CoprClient).should_receive(
@@ -597,6 +606,7 @@ def test_copr_build_cli_project_set_via_cli(upstream_and_remote, copr_client_moc
         enable_net=True,
         release_suffix=None,
         srpm_path=None,
+        module_hotfixes=False,
     ).and_return(("id", "url")).once()
 
     flexmock(packit.copr_helper.CoprClient).should_receive(
@@ -635,6 +645,7 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
         enable_net=True,
         release_suffix=None,
         srpm_path=None,
+        module_hotfixes=False,
     ).and_return(("id", "url")).once()
 
     run_packit(["build", "in-copr", "--no-wait"], working_dir=upstream)

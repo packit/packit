@@ -1510,6 +1510,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         enable_net: bool = True,
         release_suffix: Optional[str] = None,
         srpm_path: Optional[Path] = None,
+        module_hotfixes: bool = False,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -1536,6 +1537,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             release_suffix: Release suffix that is used during generation of SRPM.
             srpm_path: Specifies the path to the prebuilt SRPM. It is preferred
                 to the implicit creation of the SRPM.
+            module_hotfixes: Specifies whether copr should make packages from this
+                project available along with packages from the active module streams.
 
         Returns:
             ID of the created build and URL to the build web page.
@@ -1565,6 +1568,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             additional_packages=additional_packages,
             additional_repos=additional_repos,
             request_admin_if_needed=request_admin_if_needed,
+            module_hotfixes=module_hotfixes,
         )
         logger.debug(
             f"Submitting a build to copr build system,"
