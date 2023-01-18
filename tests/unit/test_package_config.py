@@ -1108,6 +1108,63 @@ def test_package_config_parse_error(raw):
                 "specfile_path": "fedora/package.spec",
                 "jobs": [
                     {
+                        "job": "copr_build",
+                        "trigger": "release",
+                        "tf_extra_params": {
+                            "environments": [
+                                {
+                                    "pool": "new-pool",
+                                    "tmt": {
+                                        "context": {
+                                            "how": "full",
+                                        }
+                                    },
+                                }
+                            ],
+                            "test": {"fmf": {"name": "foo"}},
+                        },
+                    },
+                ],
+            },
+            PackageConfig(
+                packages={
+                    "package": CommonPackageConfig(
+                        downstream_package_name="package",
+                        specfile_path="fedora/package.spec",
+                        sync_changelog=False,
+                    )
+                },
+                jobs=[
+                    JobConfig(
+                        type=JobType.copr_build,
+                        trigger=JobConfigTriggerType.release,
+                        packages={
+                            "package": CommonPackageConfig(
+                                downstream_package_name="package",
+                                specfile_path="fedora/package.spec",
+                                sync_changelog=False,
+                                tf_extra_params={
+                                    "environments": [
+                                        {
+                                            "pool": "new-pool",
+                                            "tmt": {"context": {"how": "full"}},
+                                        }
+                                    ],
+                                    "test": {"fmf": {"name": "foo"}},
+                                },
+                            )
+                        },
+                    ),
+                ],
+            ),
+            id="extra_tf_api_parameters_freeform",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
                         "job": "vm_image_build",
                         "trigger": "pull_request",
                         "image_distribution": "rhel-90",
