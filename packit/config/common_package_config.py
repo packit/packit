@@ -110,6 +110,8 @@ class CommonPackageConfig:
             will run koji builds.
         tmt_plan: Test to run in Testing Farm.
         tf_post_install_script: post install script to run before the tf tests
+        tf_extra_params: Additional Testing Farm parameters to merge into the
+            payload of TF requests.
         module_hotfixes: if set, copr will generate repo files with module_hotfixes=1
 
     """
@@ -170,6 +172,7 @@ class CommonPackageConfig:
         allowed_committers: Optional[List[str]] = None,
         tmt_plan: Optional[str] = None,
         tf_post_install_script: Optional[str] = None,
+        tf_extra_params: Optional[Dict[Any, Any]] = None,
         module_hotfixes: bool = False,
         # # vm-image-build
         # example: "rhel-86"
@@ -262,6 +265,7 @@ class CommonPackageConfig:
         )
         self.allowed_committers = allowed_committers or []
         self.tmt_plan = tmt_plan
+        self.tf_extra_params = tf_extra_params or {}
         self.tf_post_install_script = tf_post_install_script
         self.module_hotfixes = module_hotfixes
 
