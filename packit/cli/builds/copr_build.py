@@ -99,6 +99,12 @@ logger = logging.getLogger(__name__)
         "release_suffix is specified in the configuration."
     ),
 )
+@click.option(
+    "--module-hotfixes",
+    help="Created copr project will have module_hotfixes set to True",
+    default=False,
+    is_flag=True,
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
@@ -119,6 +125,7 @@ def copr(
     release_suffix,
     default_release_suffix,
     path_or_url,
+    module_hotfixes,
 ):
     """
     Build selected upstream project in Copr.
@@ -180,6 +187,7 @@ def copr(
         enable_net=enable_net,
         release_suffix=release_suffix,
         srpm_path=config.srpm_path,
+        module_hotfixes=module_hotfixes,
     )
     click.echo(f"Build id: {build_id}, repo url: {repo_url}")
     if wait:
