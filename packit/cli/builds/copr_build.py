@@ -80,7 +80,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--enable-net/--disable-net",
     help="Copr build is built with explicitly enabled network access or disabled",
-    default=True,
+    default=False,
     is_flag=True,
 )
 @click.option(

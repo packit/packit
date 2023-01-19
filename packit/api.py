@@ -1507,7 +1507,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         additional_packages: Optional[List[str]] = None,
         additional_repos: Optional[List[str]] = None,
         request_admin_if_needed: bool = False,
-        enable_net: bool = True,
+        enable_net: bool = False,
         release_suffix: Optional[str] = None,
         srpm_path: Optional[Path] = None,
         module_hotfixes: bool = False,
