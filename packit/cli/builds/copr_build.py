@@ -132,6 +132,9 @@ def copr(
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory.
+
+    Copr configuration needs to be set before usage. 
+    https://docs.pagure.org/copr.copr/user_documentation.html#quick-start
     """
     api = get_packit_api(config=config, local_project=path_or_url)
     release_suffix = ChangelogHelper.resolve_release_suffix(
