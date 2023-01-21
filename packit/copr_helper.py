@@ -242,7 +242,8 @@ class CoprHelper:
                             f"when using Packit CLI."
                         )
                 raise PackitCoprSettingsException(
-                    f"Copr project update failed for '{owner}/{project}' project.",
+                    f"Copr project update failed for '{owner}/{project}' project."
+                    "because the Copr token is missing, invalid or expired",
                     fields_to_change=fields_to_change,
                 ) from ex
 
