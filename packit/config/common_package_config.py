@@ -274,6 +274,21 @@ class CommonPackageConfig:
         self.image_customizations = image_customizations
         self.copr_chroot = copr_chroot
 
+        self._is_monorepo_sub_package = False
+
+    @property
+    def is_sub_package(self) -> bool:
+        """This config belongs to a monorepo subpackage?
+        By default it does not.
+        """
+        return self._is_monorepo_sub_package
+
+    @is_sub_package.setter
+    def is_sub_package(self, value: bool):
+        """Set config to belong/not belong to a monorepo subpackage.
+        The PackageConfig class knows it and can set this."""
+        self._is_monorepo_sub_package = value
+
     @property
     def targets_dict(self):
         return self._targets
@@ -444,7 +459,7 @@ class MultiplePackages:
             )
 
     def __setattr__(self, name, value):
-        if name in self.__dict__:
+        if name in self.__dict__ or "packages" not in self.__dict__:
             super().__setattr__(name, value)
         elif len(self.__getattribute__("packages")) == 1:
             package = self.__getattribute__("packages")[

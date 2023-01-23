@@ -7,10 +7,15 @@ from pathlib import Path
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.schema import JobConfigSchema
 from packit.utils.changelog_helper import ChangelogHelper
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger("packit")
 
@@ -105,6 +110,12 @@ def load_job_config(job_config):
     help="Specifies whether Packit should create symlinks or copy the "
     "files (e.g. archive outside specfile dir).",
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="prepare"),
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(
@@ -117,6 +128,7 @@ def load_job_config(job_config):
 )
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def prepare_sources(
     config,
     path_or_url,
@@ -132,6 +144,7 @@ def prepare_sources(
     merge_pr,
     target_branch,
     create_symlinks,
+    package_config,
 ):
     """
     Prepare sources for a new SRPM build using content of the upstream repository.
@@ -145,10 +158,17 @@ def prepare_sources(
     """
 
     if not result_dir:
-        result_dir = Path.cwd().joinpath("prepare_sources_result")
+        if package_config and package_config.is_sub_package:
+            path = package_config.paths[0].strip("./\\")
+            result_dir = Path.cwd().joinpath(f"prepare_sources_result_{path}")
+        else:
+            result_dir = Path.cwd().joinpath("prepare_sources_result")
         logger.debug(f"Setting result_dir to the default one: {result_dir}")
     api = get_packit_api(
-        config=config, local_project=path_or_url, job_config_index=job_config_index
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
+        job_config_index=job_config_index,
     )
     if bump is not None:
         if update_release is not None:

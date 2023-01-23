@@ -168,3 +168,11 @@ CHROOT_SPECIFIC_COPR_CONFIGURATION = {
     # modules default to string because Copr stores it as string in the DB
     "additional_modules": "",
 }
+
+PACKAGE_LONG_OPTION = "--package"
+PACKAGE_SHORT_OPTION = "-p"
+PACKAGE_OPTION_HELP = (
+    "Package to {action}, if more than one available, "
+    "like in a monorepo configuration. "
+    "Defaults to all the packages listed inside the config."
+)

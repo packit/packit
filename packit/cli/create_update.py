@@ -7,11 +7,16 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
 from packit.constants import DEFAULT_BODHI_NOTE
 from packit.exceptions import PackitException
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -75,9 +80,16 @@ class BugzillaIDs(click.ParamType):
     default=None,
     type=BugzillaIDs(),
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="update"),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def create_update(
     config,
     dist_git_branch,
@@ -86,6 +98,7 @@ def create_update(
     update_notes,
     update_type,
     resolve_bugzillas,
+    package_config,
     path_or_url,
 ):
     """
@@ -103,7 +116,10 @@ def create_update(
     it defaults to the current working directory
     """
     api = get_packit_api(
-        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        dist_git_path=dist_git_path,
+        local_project=path_or_url,
     )
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch

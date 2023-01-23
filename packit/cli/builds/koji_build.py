@@ -7,12 +7,17 @@ from os import getcwd
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches, get_koji_targets
 from packit.exceptions import PackitCommandFailedError, ensure_str
 from packit.exceptions import PackitConfigException
 from packit.utils.changelog_helper import ChangelogHelper
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +62,16 @@ logger = logging.getLogger(__name__)
         "release_suffix is specified in the configuration."
     ),
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="build"),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def koji(
     config,
     dist_git_path,
@@ -70,6 +82,7 @@ def koji(
     wait,
     release_suffix,
     default_release_suffix,
+    package_config,
     path_or_url,
 ):
     """
@@ -83,7 +96,10 @@ def koji(
     it defaults to the current working directory
     """
     api = get_packit_api(
-        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        dist_git_path=dist_git_path,
+        local_project=path_or_url,
     )
     release_suffix = ChangelogHelper.resolve_release_suffix(
         api.package_config, release_suffix, default_release_suffix

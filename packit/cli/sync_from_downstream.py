@@ -11,9 +11,14 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.config.aliases import get_branches
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,14 +60,21 @@ logger = logging.getLogger(__name__)
     is_flag=True,
     help="Don't discard changes in the git repo by default, unless this is set.",
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="sync back"),
+)
 @click.option("-x", "--exclude", help="File to exclude from sync", multiple=True)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
     default=os.path.curdir,
 )
-@cover_packit_exception
 @pass_config
+@cover_packit_exception
+@iterate_packages
 def sync_from_downstream(
     config,
     dist_git_branch,
@@ -73,6 +85,7 @@ def sync_from_downstream(
     remote_to_push,
     exclude,
     force,
+    package_config,
 ):
     """
     Copy synced files from Fedora dist-git into upstream by opening a pull request.
@@ -80,7 +93,9 @@ def sync_from_downstream(
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    api = get_packit_api(config=config, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, package_config=package_config, local_project=path_or_url
+    )
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
     branches_to_sync = get_branches(
