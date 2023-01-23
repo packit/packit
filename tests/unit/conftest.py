@@ -61,6 +61,7 @@ def package_config_mock():
         actions=[],
         patch_generation_ignore_paths=[],
         patch_generation_patch_id_digits=4,
+        is_sub_package=False,
     )
     mock.should_receive("get_all_files_to_sync").and_return([])
     return mock

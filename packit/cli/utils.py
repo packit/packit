@@ -1,11 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
 import functools
 import logging
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import click
 from github import GithubException
@@ -88,9 +89,82 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         return decorator_cover(_func)
 
 
+def iterate_packages(func):
+    """
+    Decorator for dealing with sub-packages in a package (Monorepo) configuration
+
+    * if packages are specified as an option in CLI then
+      call decorated function just for them
+    * if packages are not specified as an option in CLI but
+      there are multiple packages in the configuration
+      then call the decorated function for all of them
+    * if there is just one package in the configuration
+      then call the decorated function just once
+
+    This method (iterate_packages) **has not** `package_config` key
+    in its kwargs, it has `packages`, but calls a method
+    (func) who needs a `package_config` key and not `packages`!
+    """
+
+    @functools.wraps(func)
+    def covered_func(*args, **kwargs):
+        path_or_url = kwargs["path_or_url"]
+        config = kwargs["config"]
+        decorated_func_kwargs = kwargs.copy()
+        del decorated_func_kwargs["package"]
+        packages_config: MultiplePackages = get_local_package_config(
+            path_or_url.working_dir,
+            repo_name=path_or_url.repo_name,
+            try_local_dir_last=True,
+            package_config_path=config.package_config_path,
+        )
+        if kwargs.get("package"):
+            for package in kwargs["package"]:
+                decorated_func_kwargs["config"] = copy.deepcopy(
+                    config
+                )  # reset working variables like srpm_path
+                decorated_func_kwargs[
+                    "package_config"
+                ] = packages_config.get_package_config_views()[package]
+                func(*args, **decorated_func_kwargs)
+        elif hasattr(packages_config, "packages"):
+            for package_config in packages_config.get_package_config_views().values():
+                decorated_func_kwargs["config"] = copy.deepcopy(
+                    config
+                )  # reset working variables like srpm_path
+                decorated_func_kwargs["package_config"] = package_config
+                func(*args, **decorated_func_kwargs)
+        else:
+            logger.error("Given packages_config has no packages attribute")
+
+    return covered_func
+
+
+def checkout_package_workdir(
+    package_config: Optional[Union[PackageConfig, MultiplePackages]],
+    local_project: LocalProject,
+) -> LocalProject:
+    """If local_project is related to a sub-package in a Monorepo
+    then fix working dir to point to the sub-package given path.
+
+    Returns:
+        A LocalProject with a working dir moved to
+        the sub-package path, if a monorepo sub-package,
+        otherwise the same local project object.
+    """
+    if hasattr(package_config, "paths") and package_config.paths and local_project:
+        new_local_project = copy.deepcopy(local_project)
+        new_local_project.working_dir = new_local_project.working_dir.joinpath(
+            package_config.paths[0]
+        )
+        return new_local_project
+    return local_project
+
+
 def get_packit_api(
     config: Config,
     local_project: LocalProject,
+    package_config: Optional[Union[PackageConfig, MultiplePackages]] = None,
     dist_git_path: Optional[str] = None,
     job_config_index: Optional[int] = None,
     job_type: Optional[JobType] = None,
@@ -98,12 +172,14 @@ def get_packit_api(
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config: MultiplePackages = get_local_package_config(
-        local_project.working_dir,
-        repo_name=local_project.repo_name,
-        try_local_dir_last=True,
-        package_config_path=config.package_config_path,
-    )
+    if not package_config:
+        # TODO: to be removed when monorepo refactoring is finished!
+        package_config = get_local_package_config(
+            local_project.working_dir,
+            repo_name=local_project.repo_name,
+            try_local_dir_last=True,
+            package_config_path=config.package_config_path,
+        )
     logger.debug(f"job_config_index: {job_config_index}")
     if job_config_index is not None and isinstance(package_config, PackageConfig):
         if job_config_index >= len(package_config.jobs):
@@ -128,7 +204,9 @@ def get_packit_api(
             config=config,
             package_config=package_config,
             upstream_local_project=None,
-            downstream_local_project=local_project,
+            downstream_local_project=checkout_package_workdir(
+                package_config, local_project
+            ),
             dist_git_clone_path=dist_git_path,
         )
 
@@ -175,8 +253,10 @@ def get_packit_api(
     return PackitAPI(
         config=config,
         package_config=package_config,
-        upstream_local_project=lp_upstream,
-        downstream_local_project=lp_downstream,
+        upstream_local_project=checkout_package_workdir(package_config, lp_upstream),
+        downstream_local_project=checkout_package_workdir(
+            package_config, lp_downstream
+        ),
         dist_git_clone_path=dist_git_path,
     )
 
