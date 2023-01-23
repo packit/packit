@@ -49,21 +49,13 @@ class PackageConfig(MultiplePackages):
         return f"PackageConfig: {s.dumps(self)}"
 
     @classmethod
-    def get_from_dict(
+    def set_defaults(
         cls,
         raw_dict: dict,
-        config_file_path: Optional[str] = None,
         repo_name: Optional[str] = None,
         search_specfile: Optional[Callable[..., Optional[str]]] = None,
         **specfile_search_args,
-    ) -> "PackageConfig":
-        # required to avoid cyclical imports
-        from packit.schema import PackageConfigSchema
-
-        # we need to process defaults first so they get propagated to JobConfigs
-
-        raw_dict.setdefault("config_file_path", config_file_path)
-
+    ) -> None:
         if not raw_dict.get("specfile_path"):
             default_specfile_path = None
             # we default to <downstream_package_name>.spec
@@ -80,6 +72,31 @@ class PackageConfig(MultiplePackages):
         if repo_name:
             raw_dict.setdefault("upstream_package_name", repo_name)
             raw_dict.setdefault("downstream_package_name", repo_name)
+
+    @classmethod
+    def get_from_dict(
+        cls,
+        raw_dict: dict,
+        config_file_path: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        search_specfile: Optional[Callable[..., Optional[str]]] = None,
+        **specfile_search_args,
+    ) -> "PackageConfig":
+        # required to avoid cyclical imports
+        from packit.schema import PackageConfigSchema
+
+        # we need to process defaults first so they get propagated to JobConfigs
+        raw_dict.setdefault("config_file_path", config_file_path)
+
+        if packages := raw_dict.get("packages", None):
+            for package in packages.values():
+                cls.set_defaults(
+                    package, repo_name, search_specfile, **specfile_search_args
+                )
+        else:
+            cls.set_defaults(
+                raw_dict, repo_name, search_specfile, **specfile_search_args
+            )
 
         package_config = PackageConfigSchema().load(raw_dict)
 
