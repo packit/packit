@@ -101,13 +101,13 @@ MONOREPO_CONFIG_YAML = """
 
 
 @pytest.mark.parametrize(
-    "package_config_yaml",
+    "package_config_yaml, how_many_builds",
     [
-        pytest.param(DEFAULT_CONFIG_YAML, id="default package config"),
-        pytest.param(MONOREPO_CONFIG_YAML, id="monorepo package config"),
+        pytest.param(DEFAULT_CONFIG_YAML, 1, id="default package config"),
+        pytest.param(MONOREPO_CONFIG_YAML, 2, id="monorepo package config"),
     ],
 )
-def test_koji_build(package_config_yaml):
+def test_koji_build(package_config_yaml, how_many_builds):
     package_config_dict = json.loads(package_config_yaml)
     flexmock(package_config).should_receive("find_packit_yaml").and_return(
         flexmock(name=".packit.yaml", parent="/some/dir/teamcity-messages")
@@ -121,7 +121,10 @@ def test_koji_build(package_config_yaml):
     flexmock(DistGit).should_receive("__repr__").and_return("")
     flexmock(koji_build).should_receive("get_branches").and_return("rawhide")
     flexmock(PackitAPI).should_receive("init_kerberos_ticket").and_return()
-    flexmock(PackitAPI).should_receive("build").and_return().at_least().once()
+    if how_many_builds == 1:
+        flexmock(PackitAPI).should_receive("build").and_return().once()
+    if how_many_builds == 2:
+        flexmock(PackitAPI).should_receive("build").and_return().twice()
 
     runner = CliRunner()
     runner.invoke(packit_base, ["build", "in-koji"])

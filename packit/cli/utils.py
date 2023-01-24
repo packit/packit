@@ -5,7 +5,7 @@ import functools
 import logging
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import click
 from github import GithubException
@@ -94,7 +94,7 @@ def get_packit_api(
     dist_git_path: Optional[str] = None,
     job_config_index: Optional[int] = None,
     job_type: Optional[JobType] = None,
-) -> PackitAPI:
+) -> Union[PackitAPI, List[PackitAPI]]:
     """
     Load the package config, set other options and return the PackitAPI
     """
@@ -104,81 +104,107 @@ def get_packit_api(
         try_local_dir_last=True,
         package_config_path=config.package_config_path,
     )
-    logger.debug(f"job_config_index: {job_config_index}")
-    if job_config_index is not None and isinstance(package_config, PackageConfig):
-        if job_config_index >= len(package_config.jobs):
-            raise PackitException(
-                "job_config_index is bigger than number of jobs in package config!"
-            )
-        package_config = package_config.jobs[job_config_index]
-        logger.debug(f"Final package (job) config: {package_config}")
-    elif job_type is not None:
-        try:
-            package_config = [
-                job for job in package_config.jobs if job.type == job_type
-            ][0]
-        except IndexError:
-            raise PackitException(
-                f"No job with type {job_type} found in package config."
-            )
-        logger.debug(f"Final package (job) config: {package_config}")
 
-    if dist_git_path and Path(dist_git_path) == local_project.working_dir:
-        return PackitAPI(
+    packages_configs = [package_config]
+    multiple_packages = False
+    try:
+        package_config.upstream_project_url
+    except AttributeError as e:
+        if "there is more than one package in the config" in str(e):
+            packages_configs = [
+                package_config.packages[pkg] for pkg in package_config.packages.keys()
+            ]
+            multiple_packages = True
+
+    packit_api_collection = []
+    for package_config in packages_configs:
+
+        logger.debug(f"job_config_index: {job_config_index}")
+        if job_config_index is not None and isinstance(package_config, PackageConfig):
+            if job_config_index >= len(package_config.jobs):
+                raise PackitException(
+                    "job_config_index is bigger than number of jobs in package config!"
+                )
+            package_config = package_config.jobs[job_config_index]
+            logger.debug(f"Final package (job) config: {package_config}")
+        elif job_type is not None:
+            try:
+                package_config = [
+                    job for job in package_config.jobs if job.type == job_type
+                ][0]
+            except IndexError:
+                raise PackitException(
+                    f"No job with type {job_type} found in package config."
+                )
+            logger.debug(f"Final package (job) config: {package_config}")
+
+        if dist_git_path and Path(dist_git_path) == local_project.working_dir:
+            api = PackitAPI(
+                config=config,
+                package_config=package_config,
+                upstream_local_project=None,
+                downstream_local_project=local_project,
+                dist_git_clone_path=dist_git_path,
+            )
+            if multiple_packages:
+                packit_api_collection.append(api)
+                continue
+            else:
+                return api
+
+        if not local_project.git_repo:
+            raise PackitNotAGitRepoException(
+                f"{local_project.working_dir!r} is not a git repository."
+            )
+
+        remote_urls: List[str] = []
+        for remote in local_project.git_repo.remotes:
+            remote_urls += remote.urls
+
+        upstream_hostname = (
+            get_hostname_or_none(url=package_config.upstream_project_url)
+            if package_config.upstream_project_url
+            else None
+        )
+
+        lp_upstream = None
+        lp_downstream = None
+
+        for url in remote_urls:
+            remote_hostname = get_hostname_or_none(url=url)
+            if not remote_hostname:
+                continue
+
+            if upstream_hostname and remote_hostname == upstream_hostname:
+                lp_upstream = local_project
+                logger.debug("Input directory is an upstream repository.")
+                break
+
+            if package_config.dist_git_base_url and (
+                remote_hostname in package_config.dist_git_base_url
+                or remote_hostname in DIST_GIT_HOSTNAME_CANDIDATES
+            ):
+                lp_downstream = local_project
+                logger.debug("Input directory is a downstream repository.")
+                break
+        else:
+            lp_upstream = local_project
+            # fallback, this is the past behavior
+            logger.debug("Input directory is an upstream repository.")
+
+        api = PackitAPI(
             config=config,
             package_config=package_config,
-            upstream_local_project=None,
-            downstream_local_project=local_project,
+            upstream_local_project=lp_upstream,
+            downstream_local_project=lp_downstream,
             dist_git_clone_path=dist_git_path,
         )
+        if multiple_packages:
+            packit_api_collection.append(api)
+        else:
+            return api
 
-    if not local_project.git_repo:
-        raise PackitNotAGitRepoException(
-            f"{local_project.working_dir!r} is not a git repository."
-        )
-
-    remote_urls: List[str] = []
-    for remote in local_project.git_repo.remotes:
-        remote_urls += remote.urls
-
-    upstream_hostname = (
-        get_hostname_or_none(url=package_config.upstream_project_url)
-        if package_config.upstream_project_url
-        else None
-    )
-
-    lp_upstream = None
-    lp_downstream = None
-
-    for url in remote_urls:
-        remote_hostname = get_hostname_or_none(url=url)
-        if not remote_hostname:
-            continue
-
-        if upstream_hostname and remote_hostname == upstream_hostname:
-            lp_upstream = local_project
-            logger.debug("Input directory is an upstream repository.")
-            break
-
-        if package_config.dist_git_base_url and (
-            remote_hostname in package_config.dist_git_base_url
-            or remote_hostname in DIST_GIT_HOSTNAME_CANDIDATES
-        ):
-            lp_downstream = local_project
-            logger.debug("Input directory is a downstream repository.")
-            break
-    else:
-        lp_upstream = local_project
-        # fallback, this is the past behavior
-        logger.debug("Input directory is an upstream repository.")
-
-    return PackitAPI(
-        config=config,
-        package_config=package_config,
-        upstream_local_project=lp_upstream,
-        downstream_local_project=lp_downstream,
-        dist_git_clone_path=dist_git_path,
-    )
+    return packit_api_collection
 
 
 def get_hostname_or_none(url: str) -> Optional[str]:
