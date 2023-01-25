@@ -268,6 +268,7 @@ class JobMetadataSchema(Schema):
     enable_net = fields.Boolean(missing=False)
     tmt_plan = fields.String(missing=None)
     tf_post_install_script = fields.String(missing=None)
+    tf_extra_params = fields.Dict(missing=None)
     module_hotfixes = fields.Boolean()
 
     @pre_load
@@ -363,6 +364,7 @@ class CommonConfigSchema(Schema):
     allowed_committers = fields.List(fields.String(), missing=None)
     tmt_plan = fields.String(missing=None)
     tf_post_install_script = fields.String(missing=None)
+    tf_extra_params = fields.Dict(missing=None)
     module_hotfixes = fields.Boolean()
 
     # Image Builder integration
