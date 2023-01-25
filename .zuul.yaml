@@ -20,11 +20,6 @@
     description: Run tests with dependencies installed as RPMs
     pre-run: files/install-requirements-rpms.yaml
     run: files/zuul-tests.yaml
-    # TODO: remove
-    nodeset:
-      nodes:
-        - name: container
-          label: cloud-fedora-35
 
 - job:
     name: packit-tests-pip-deps
@@ -32,11 +27,6 @@
     description: Run tests with dependencies installed from PyPI
     pre-run: files/install-requirements-pip.yaml
     run: files/zuul-tests.yaml
-    # TODO: remove
-    nodeset:
-      nodes:
-        - name: container
-          label: cloud-fedora-35
 
 - job:
     name: packit-tests-git-main
@@ -44,11 +34,6 @@
     description: Run tests with dependencies installed from git main & PyPI
     pre-run: files/install-requirements-git.yaml
     run: files/zuul-tests.yaml
-    # TODO: remove
-    nodeset:
-      nodes:
-        - name: container
-          label: cloud-fedora-35
 
 - job:
     name: reverse-dep-packit-service-tests
