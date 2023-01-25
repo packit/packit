@@ -5,7 +5,7 @@ import functools
 import logging
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import click
 from github import GithubException
@@ -91,6 +91,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
 def get_packit_api(
     config: Config,
     local_project: LocalProject,
+    package_config: Optional[Union[PackageConfig, MultiplePackages]] = None,
     dist_git_path: Optional[str] = None,
     job_config_index: Optional[int] = None,
     job_type: Optional[JobType] = None,
@@ -98,12 +99,14 @@ def get_packit_api(
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config: MultiplePackages = get_local_package_config(
-        local_project.working_dir,
-        repo_name=local_project.repo_name,
-        try_local_dir_last=True,
-        package_config_path=config.package_config_path,
-    )
+    if not package_config:
+        # TODO: to be removed when monorepo refactoring is finished!
+        package_config = get_local_package_config(
+            local_project.working_dir,
+            repo_name=local_project.repo_name,
+            try_local_dir_last=True,
+            package_config_path=config.package_config_path,
+        )
     logger.debug(f"job_config_index: {job_config_index}")
     if job_config_index is not None and isinstance(package_config, PackageConfig):
         if job_config_index >= len(package_config.jobs):
