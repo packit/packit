@@ -114,3 +114,22 @@ def test_do_not_update_distgit_with_autochangelog(
 
     with downstream._specfile.sections() as sections:
         assert "%autochangelog" in sections.changelog
+
+
+def test_update_distgit_unsafe_commit_messages(upstream, distgit_instance):
+    _, downstream = distgit_instance
+    package_config = upstream.package_config
+    flexmock(upstream).should_receive("get_commit_messages").and_return(
+        "* 100% of tests now pass\n"
+        "* got rid of all shell (%(...)) and expression (%[...]) expansions\n"
+        "* removed all %global macros\n"
+        "* cleaned up %install section\n"
+    )
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0", full_version="0.1.0"
+    )
+
+    # FIXME: this doesn't currently work because of a RPM bug
+    # make sure only one changelog entry has been added
+    # assert len(downstream.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_CHANGELOGTEXT]) == 2
