@@ -27,6 +27,7 @@ from packit.utils.source_script import create_source_script
 from packit.utils.upstream_version import requests, get_upstream_version
 from packit.utils.lookaside import configparser, pyrpkg, get_lookaside_sources
 from packit.utils.koji_helper import KojiHelper
+from packit.utils.changelog_helper import ChangelogHelper
 
 
 @pytest.mark.parametrize(
@@ -844,3 +845,21 @@ def test_koji_helper_get_candidate_tag(branch, tag):
 )
 def test_koji_helper_get_stable_tags(tag, stable_tags):
     assert KojiHelper.get_stable_tags(tag) == stable_tags
+
+
+@pytest.mark.parametrize(
+    "original, sanitized",
+    [
+        ("- 100% of tests now pass", "- 100% of tests now pass"),
+        ("- removed all %global macros", "- removed all %%global macros"),
+        ("- cleaned up %install section", "- cleaned up %%install section"),
+        (
+            "- got rid of all shell (%(...)) and expression (%[...]) expansions",
+            "- got rid of all shell (%%(...)) and expression (%%[...]) expansions",
+        ),
+        ("- first item\n* second item", "- first item\n * second item"),
+        ("* first item\n* second item", " * first item\n * second item"),
+    ],
+)
+def test_changelog_helper_sanitize_entry(original, sanitized):
+    assert ChangelogHelper.sanitize_entry(original) == sanitized
