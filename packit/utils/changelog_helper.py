@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import re
 import shutil
 import logging
 from typing import Optional
@@ -67,6 +68,15 @@ class ChangelogHelper:
 
         return "\n".join(map(lambda line: line.rstrip(), messages))
 
+    @staticmethod
+    def sanitize_entry(entry: str) -> str:
+        # escape macro references and macro/shell/expression expansions
+        # that could break spec file parsing
+        entry = re.sub(r"(?<!%)%(?=(\w+|[{[(]))", "%%", entry)
+        # prepend asterisk at the start of a line with a space in order
+        # not to break identification of entry boundaries
+        return re.sub(r"^[*]", " *", entry, flags=re.MULTILINE)
+
     def update_dist_git(self, full_version: str, upstream_tag: str) -> None:
         """
         Update the spec-file in dist-git:
@@ -92,6 +102,7 @@ class ChangelogHelper:
                 after=self.up.get_last_tag(upstream_tag), before=upstream_tag
             )
         )
+        comment = self.sanitize_entry(comment)
         try:
             self.dg.set_specfile_content(
                 self.up.specfile,
