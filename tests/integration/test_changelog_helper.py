@@ -130,6 +130,7 @@ def test_update_distgit_unsafe_commit_messages(upstream, distgit_instance):
         upstream_tag="0.1.0", full_version="0.1.0"
     )
 
-    # FIXME: this doesn't currently work because of a RPM bug
-    # make sure only one changelog entry has been added
-    # assert len(downstream.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_CHANGELOGTEXT]) == 2
+    # make sure only one changelog entry (as seen by RPM) has been added
+    downstream.specfile.macros.append(("_changelog_trimage", "0"))
+    downstream.specfile.macros.append(("_changelog_trimtime", "0"))
+    assert len(downstream.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_CHANGELOGTEXT]) == 2
