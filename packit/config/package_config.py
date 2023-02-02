@@ -202,7 +202,7 @@ def get_local_package_config(
     repo_name: Optional[str] = None,
     try_local_dir_first: bool = False,
     try_local_dir_last: bool = False,
-    package_config_path: Optional[str] = None,
+    package_config_path: Optional[Union[Path, str]] = None,
 ) -> PackageConfig:
     """
     find packit.yaml in provided dirs, load it and return PackageConfig
