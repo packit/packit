@@ -444,7 +444,7 @@ class MultiplePackages:
             )
 
     def __setattr__(self, name, value):
-        if name in self.__dict__:
+        if name in self.__dict__ or "packages" not in self.__dict__:
             super().__setattr__(name, value)
         elif len(self.__getattribute__("packages")) == 1:
             package = self.__getattribute__("packages")[

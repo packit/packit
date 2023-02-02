@@ -9,6 +9,7 @@ from marshmallow import ValidationError
 from ogr import GithubService, PagureService
 
 from packit.config import (
+    PackageConfig,
     CommonPackageConfig,
     Config,
     JobConfig,
@@ -275,6 +276,134 @@ def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committ
     assert job_config == expected
     assert job_config.allowed_pr_authors == allowed_pr_authors
     assert job_config.allowed_committers == allowed_committers
+
+
+@pytest.mark.parametrize(
+    "raw,expected_packages_keys,identifiers",
+    [
+        pytest.param(
+            {
+                "upstream_project_url": "https://github.com/namespace/package",
+                "packages": {
+                    "package_a": {
+                        "downstream_package_name": "package_a",
+                        "paths": ["."],
+                        "specfile_path": "package_a.spec",
+                        "files_to_sync": ["package_a.spec", ".packit.yaml"],
+                        "upstream_package_name": "package",
+                    },
+                    "package_b": {
+                        "downstream_package_name": "package_b",
+                        "identifier": "identifier_for_package_b",
+                        "paths": ["."],
+                        "specfile_path": "package_b.spec",
+                        "files_to_sync": ["package_b.spec", ".packit.yaml"],
+                        "upstream_package_name": "package",
+                    },
+                    "package_c": {
+                        "downstream_package_name": "package_c",
+                        "paths": ["."],
+                        "specfile_path": "package_c.spec",
+                        "files_to_sync": ["package_c.spec", ".packit.yaml"],
+                        "upstream_package_name": "package_c",
+                    },
+                },
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "packages": {
+                            "package_a": {"specfile_path": "a/package.spec"},
+                            "package_b": {"specfile_path": "b/package.spec"},
+                        },
+                    },
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "packages": {
+                            "package_c": {"specfile_path": "c/package.spec"},
+                        },
+                    },
+                ],
+            },
+            [
+                ["package_a"],
+                ["package_b"],
+                ["package_c"],
+            ],
+            ["package_a", "identifier_for_package_b", None],
+        ),
+    ],
+)
+def test_job_config_views(raw, expected_packages_keys, identifiers):
+    pkg_config = PackageConfig.get_from_dict(raw_dict=raw)
+    job_views = pkg_config.get_job_views()
+    for (job_config_view, keys, identifier) in zip(
+        job_views, expected_packages_keys, identifiers
+    ):
+        assert job_config_view.identifier == identifier
+        assert set(job_config_view.packages.keys()) == set(keys)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        pytest.param(
+            {
+                "upstream_project_url": "https://github.com/namespace/package",
+                "packages": {
+                    "package_a": {
+                        "downstream_package_name": "package_a",
+                        "paths": ["."],
+                        "specfile_path": "package_a.spec",
+                        "files_to_sync": ["package_a.spec", ".packit.yaml"],
+                        "upstream_package_name": "package",
+                    },
+                    "package_b": {
+                        "downstream_package_name": "package_b",
+                        "identifier": "identifier_for_package_b",
+                        "paths": ["."],
+                        "specfile_path": "package_b.spec",
+                        "files_to_sync": ["package_b.spec", ".packit.yaml"],
+                        "upstream_package_name": "package",
+                    },
+                    "package_c": {
+                        "downstream_package_name": "package_c",
+                        "paths": ["."],
+                        "specfile_path": "package_c.spec",
+                        "files_to_sync": ["package_c.spec", ".packit.yaml"],
+                        "upstream_package_name": "package_c",
+                    },
+                },
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "packages": {
+                            "package_a": {"specfile_path": "a/package.spec"},
+                            "package_b": {"specfile_path": "b/package.spec"},
+                        },
+                    },
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "packages": {
+                            "package_c": {"specfile_path": "c/package.spec"},
+                        },
+                    },
+                ],
+            },
+        ),
+    ],
+)
+def test_grouped_job_config_views(raw):
+    pkg_config = PackageConfig.get_from_dict(raw_dict=raw)
+    grouped_job_config_views = pkg_config.get_grouped_job_views()
+    assert len(grouped_job_config_views) == 2
+    for job_description in grouped_job_config_views:
+        assert job_description.type == JobType.propose_downstream
+        assert job_description.trigger == JobConfigTriggerType.release
+    assert {len(configs) for configs in grouped_job_config_views.values()} == {1, 2}
 
 
 def test_get_user_config(tmp_path):

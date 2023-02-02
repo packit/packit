@@ -3,6 +3,7 @@
 
 import json
 import logging
+from collections import namedtuple
 from pathlib import Path
 from typing import Callable, Optional, List, Dict, Union, Set
 
@@ -11,7 +12,11 @@ from ogr.exceptions import GithubAppNotInstalledError
 from yaml import safe_load, YAMLError
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
-from packit.config.job_config import JobConfig, JobType
+from packit.config.job_config import (
+    JobConfig,
+    JobConfigView,
+    JobType,
+)
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 
@@ -27,11 +32,17 @@ class PackageConfig(MultiplePackages):
         jobs: List of job configs.
     """
 
+    JobDescription = namedtuple("JobDescription", ["type", "trigger", "packages"])
+
     def __init__(
         self,
         packages: Dict[str, CommonPackageConfig],
         jobs: Optional[List[JobConfig]] = None,
     ):
+        self._job_views: List[Union[JobConfig, JobConfigView]] = []
+        self._grouped_job_views: Dict[
+            PackageConfig.JobDescription, List[JobConfigView]
+        ] = {}
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
         # It is done here to avoid triggering __setattr__ and
@@ -142,6 +153,47 @@ class PackageConfig(MultiplePackages):
         logger.debug(f"our configuration:\n{serialized_self}")
         logger.debug(f"the other configuration:\n{serialized_other}")
         return serialized_self == serialized_other
+
+    def get_job_views(self) -> List[Union[JobConfig, JobConfigView]]:
+        """Get jobs views on a single package.
+        If a JobConfig reference more than a package, then
+        split it in many JobConfigView(s) one for any package
+        """
+        if self._job_views:
+            return self._job_views
+
+        for job in self.jobs:
+            if len(job.packages) > 1:
+                for name in job.packages:
+                    job_view = JobConfigView(job, name)
+                    self._job_views.append(job_view)
+            else:
+                self._job_views.append(job)
+        return self._job_views
+
+    def get_grouped_job_views(self) -> Dict[JobDescription, List[JobConfigView]]:
+        """For every job, which involves a monorepo,
+        get a list of the JobConfigView(s) for the monorepo packages,
+        grouped together.
+        """
+        if self._grouped_job_views:
+            return self._grouped_job_views
+
+        for job in self.jobs:
+            job_packages = list(job.packages)
+            job_packages.sort()
+            job_description = PackageConfig.JobDescription(
+                type=job.type, trigger=job.trigger, packages=str(job_packages)
+            )
+            if len(job.packages) > 1:
+                monorepo_job_packages = []
+                for name in job.packages:
+                    job_view = JobConfigView(job, name)
+                    monorepo_job_packages.append(job_view)
+                self._grouped_job_views[job_description] = monorepo_job_packages
+            else:
+                self._grouped_job_views[job_description] = [job]
+        return self._grouped_job_views
 
 
 def find_packit_yaml(

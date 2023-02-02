@@ -10,6 +10,7 @@ from packit.config.config import (
 )
 from packit.config.job_config import (
     JobConfig,
+    JobConfigView,
     JobConfigTriggerType,
     JobType,
 )
@@ -30,6 +31,7 @@ __all__ = [
     Config.__name__,
     Deployment.__name__,
     JobConfig.__name__,
+    JobConfigView.__name__,
     JobConfigTriggerType.__name__,
     JobType.__name__,
     MultiplePackages.__name__,
