@@ -1,3 +1,7 @@
+# 0.67.0
+
+- Packit now sanitizes changelog messages in order not to break spec file parsing. (#1841)
+
 # 0.66.0
 
 - When configuring Copr chroot (target in Packit terminology) specific configuration, make sure to specify `additional_modules` as a string containing module names separated with a comma, example: "httpd:2.4,python:4". (#1826)
