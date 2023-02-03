@@ -1,15 +1,14 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
-
+from bodhi.client.bindings import BodhiClient
 from flexmock import flexmock
 
 from packit.status import Status
-from packit.utils.bodhi import OurBodhiClient
 
 
 def test_status_updates(config_mock, package_config_mock, upstream_mock, distgit_mock):
     flexmock(
-        OurBodhiClient,
+        BodhiClient,
         query=lambda packages, page: {
             "updates": [
                 {
