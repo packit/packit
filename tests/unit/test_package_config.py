@@ -1429,49 +1429,74 @@ def test_dist_git_package_url():
 
 
 @pytest.mark.parametrize(
-    "content,project,spec_path",
+    "files,config_name,content,project,spec_path",
     [
         (
+            [".packit.yaml", "tox.ini", "setup.py", "packit.spec"],
+            ".packit.yaml",
             "files_to_sync:\n"
             "  - packit.spec\n"
-            "  - src: .packit.yaml\n"
+            "  - src: {config_name}\n"
             "    dest: .packit2.yaml",
             flexmock(repo="packit"),
             "packit.spec",
         ),
         (
+            ["packit.yml", "tox.ini", "setup.py", "packit.spec"],
+            "packit.yml",
             "files_to_sync:\n"
             "  - packit.spec\n"
-            "  - src: .packit.yaml\n"
+            "  - src: {config_name}\n"
             "    dest: .packit2.yaml",
+            flexmock(repo="packit"),
+            "packit.spec",
+        ),
+        (
+            ["setup.cfg", "setup.py", "packit.spec", ".zuul.yaml"],
+            None,
+            "",
             flexmock(repo="packit"),
             "packit.spec",
         ),
     ],
 )
 def test_get_package_config_from_repo(
+    files,
+    config_name,
     content,
     project,
     spec_path: Optional[str],
 ):
-    project.should_receive("get_file_content").and_return(content)
+    if config_name:
+        project.should_receive("get_files").and_return([spec_path]).once()
+        project.should_receive("get_file_content").with_args(
+            path=config_name, ref=None
+        ).and_return(content.format(config_name=config_name)).once()
     project.should_receive("full_repo_name").and_return("a/b")
-    project.should_receive("get_files").and_return([spec_path]).once()
+    project.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
+        files
+    )
     config = get_package_config_from_repo(project=project)
-    assert isinstance(config, PackageConfig)
-    assert config.specfile_path == spec_path
-    assert config.files_to_sync == [
-        SyncFilesItem(src=["packit.spec"], dest="packit.spec"),
-        SyncFilesItem(src=[".packit.yaml"], dest=".packit2.yaml"),
-    ]
-    assert config.create_pr
+    if config_name:
+        assert isinstance(config, PackageConfig)
+        assert config.specfile_path == spec_path
+        assert config.files_to_sync == [
+            SyncFilesItem(src=["packit.spec"], dest="packit.spec"),
+            SyncFilesItem(src=[config_name], dest=".packit2.yaml"),
+        ]
+        assert config.create_pr
+    else:
+        assert config is None
 
 
 def test_get_package_config_from_repo_empty_no_spec():
     gp = flexmock(GitProject)
+    gp.should_receive("get_files").and_return([])
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return("# this is a comment")
-    gp.should_receive("get_files").and_return([])
+    gp.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
+        ["packit.yaml", "tox.ini"]
+    )
     git_project = GitProject(repo="packit", service=GitService(), namespace="")
     with pytest.raises(
         PackitConfigException,
@@ -1497,9 +1522,12 @@ def test_get_package_config_from_repo_empty_no_spec():
 )
 def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_path):
     gp = flexmock(GitProject)
+    gp.should_receive("get_files").and_return([specfile_path])
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
-    gp.should_receive("get_files").and_return([specfile_path])
+    gp.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
+        ["packit.yaml", "tox.ini"]
+    )
     git_project = GitProject(repo="packit", service=GitService(), namespace="")
     config = get_package_config_from_repo(project=git_project)
     assert isinstance(config, PackageConfig)
@@ -1620,7 +1648,7 @@ def test_get_local_specfile_path():
 @pytest.mark.parametrize(
     "directory, local_first,local_last,config_file_name,res_pc_path",
     [
-        ([], False, True, None, Path.cwd() / CONFIG_FILE_NAMES[0]),
+        ([], False, True, None, Path.cwd() / list(CONFIG_FILE_NAMES)[0]),
         ([], False, False, "different_conf.yaml", "different_conf.yaml"),
     ],
 )
