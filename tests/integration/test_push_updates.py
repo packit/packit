@@ -5,8 +5,6 @@ import pytest
 from flexmock import flexmock
 from munch import Munch
 
-from packit.utils.bodhi import OurBodhiClient
-
 
 @pytest.fixture()
 def query_response():
@@ -406,9 +404,8 @@ def test_push_updates(
     ).and_return(request_response).once()
 
     flexmock(
-        OurBodhiClient,
+        BodhiClient,
         ensure_auth=lambda: None,  # this is where the browser/OIDC fun happens
-        login_with_kerberos=lambda: None,
     )
 
     api.push_updates()

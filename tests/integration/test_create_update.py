@@ -3,13 +3,12 @@
 
 import pytest
 import koji
-from bodhi.client.bindings import BodhiClientException
+from bodhi.client.bindings import BodhiClientException, BodhiClient
 from flexmock import flexmock
 from munch import Munch
 
 from packit import distgit
 from packit.exceptions import PackitBodhiException
-from packit.utils.bodhi import OurBodhiClient
 
 
 @pytest.fixture()
@@ -283,10 +282,9 @@ def test_basic_bodhi_update(
     )
 
     flexmock(
-        OurBodhiClient,
+        BodhiClient,
         save=lambda **kwargs: bodhi_response,
         ensure_auth=lambda: None,  # this is where the browser/OIDC fun happens
-        login_with_kerberos=lambda: None,
     )
 
     api.create_update(
@@ -335,7 +333,7 @@ def test_bodhi_update_with_bugs(
     )
 
     flexmock(
-        OurBodhiClient,
+        BodhiClient,
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: validate_save(
             kwargs,
@@ -347,9 +345,7 @@ def test_bodhi_update_with_bugs(
             },
         ),
         ensure_auth=lambda: None,
-        login_with_kerberos=lambda: None,
     )
-    flexmock(OurBodhiClient).should_receive("login_with_kerberos").and_return(None)
 
     api.create_update(
         dist_git_branch="f30",
@@ -372,17 +368,12 @@ def test_bodhi_update_auth_with_fas(
     api.config.fas_password = "the_fas_password"
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
-    flexmock(distgit).should_call("get_bodhi_client").with_args(
-        fas_username="the_fas_username",
-        fas_password="the_fas_password",
-        kerberos_realm="FEDORAPROJECT.ORG",
-    )
+    flexmock(distgit).should_call("get_bodhi_client")
     flexmock(
-        OurBodhiClient,
+        BodhiClient,
         latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
         ensure_auth=lambda: None,
-        login_with_kerberos=lambda: None,
     )
 
     api.create_update(
@@ -407,12 +398,10 @@ def test_bodhi_update_fails(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(
-        OurBodhiClient,
+        BodhiClient,
         ensure_auth=lambda: None,
-        login_with_kerberos=lambda: None,
     )
-    flexmock(OurBodhiClient).should_receive("login_with_kerberos").and_return(None)
-    flexmock(OurBodhiClient).should_receive("save").and_raise(
+    flexmock(BodhiClient).should_receive("save").and_raise(
         BodhiClientException,
         {
             "status": "error",

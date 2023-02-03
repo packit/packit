@@ -515,14 +515,7 @@ class DistGit(PackitRepositoryBase):
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
 
-        bodhi_client = get_bodhi_client(
-            fas_username=self.config.fas_user,
-            fas_password=self.config.fas_password,
-            kerberos_realm=self.config.kerberos_realm,
-        )
-        # only use Kerberos when fas_user and kerberos_realm are set
-        if self.config.fas_user and self.config.kerberos_realm:
-            bodhi_client.login_with_kerberos()
+        bodhi_client = get_bodhi_client()
         # make sure we have the credentials
         bodhi_client.ensure_auth()
 

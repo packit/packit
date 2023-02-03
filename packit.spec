@@ -31,7 +31,7 @@ BuildRequires:  python3-requests-kerberos
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(setuptools-scm)
 BuildRequires:  python3dist(setuptools-scm-git-archive)
-BuildRequires:  python3-bodhi-client
+BuildRequires:  python3-bodhi-client >= 7.0.0
 BuildRequires:  python3-cachetools
 BuildRequires:  python3-fedora
 %if 0%{?rhel}
