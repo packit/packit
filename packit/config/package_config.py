@@ -239,28 +239,42 @@ def get_package_config_from_repo(
     project: GitProject,
     ref: Optional[str] = None,
 ) -> Optional[PackageConfig]:
-    for config_file_name in CONFIG_FILE_NAMES:
-        try:
-            config_file_content = project.get_file_content(
-                path=config_file_name, ref=ref
-            )
-        except (FileNotFoundError, GithubAppNotInstalledError):
-            # do nothing
-            pass
-        else:
-            logger.debug(
-                f"Found a config file {config_file_name!r} "
-                f"on ref {ref!r} "
-                f"of the {project.full_repo_name!r} repository."
-            )
-            break
-    else:
+    """Search for the package config in a remote repo, load it and return
+    the package configuration object.
+
+    Args:
+        project: ogr Git-project object.  ref: Optional ref at which
+        the config should be searched for.
+
+    Returns:
+        PackageConfig object constructed from the config file found in
+        the repo.
+    """
+    try:
+        candidates = set(project.get_files(ref=ref, recursive=False))
+    except GithubAppNotInstalledError:
+        logger.warning(
+            "The Packit GitHub App is not installed"
+            f"for the {project.full_repo_name!r} repository."
+        )
+        return None
+
+    try:
+        config_file_name = (candidates & CONFIG_FILE_NAMES).pop()
+    except KeyError:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
             f"of the {project.full_repo_name!r} repository."
         )
         return None
 
+    logger.debug(
+        f"Found a config file {config_file_name!r} "
+        f"on ref {ref!r} "
+        f"of the {project.full_repo_name!r} repository."
+    )
+
+    config_file_content = project.get_file_content(path=config_file_name, ref=ref)
     loaded_config = load_packit_yaml(raw_text=config_file_content)
 
     return parse_loaded_config(
