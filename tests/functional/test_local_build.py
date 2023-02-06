@@ -5,6 +5,7 @@
 Functional tests for local-build command
 """
 from pathlib import Path
+import re
 from subprocess import CalledProcessError
 
 import pytest
@@ -52,3 +53,20 @@ def test_rpm_command_for_path(ogr_distgit_and_remote):
     )
     rpm_paths = Path.cwd().glob("noarch/*.rpm")
     assert all(rpm_path.exists() for rpm_path in rpm_paths)
+
+
+def test_local_build_from_srpm(ogr_distgit_and_remote):
+    call_real_packit(parameters=["--debug", "srpm"], cwd=ogr_distgit_and_remote[0])
+
+    the_chosen_srpm = list(ogr_distgit_and_remote[0].glob("*.src.rpm"))[0]
+
+    call_real_packit(
+        parameters=["--debug", "build", "--srpm", the_chosen_srpm, "locally"],
+        cwd=ogr_distgit_and_remote[0],
+    )
+    rpm_paths = ogr_distgit_and_remote[0].glob("noarch/*.rpm")
+
+    # we need to be able to find a part of version and release in the built RPMs
+    # if not ⇒ we ran RPM build from the CWD
+    version_release = re.search(r"ogr-(.*)\.main.*", str(the_chosen_srpm)).group(1)
+    assert all(version_release in str(path) for path in rpm_paths)
