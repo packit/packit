@@ -3,8 +3,6 @@
 
 from typing import Union, Any, Tuple, Dict
 
-from deprecated import deprecated
-
 
 def ensure_str(inp: Union[bytes, str]) -> str:
     """decode bytes on input or just return the string"""
@@ -64,11 +62,6 @@ class PackitCoprSettingsException(PackitException):
 
 class PackitInvalidConfigException(PackitConfigException):
     """provided configuration file is not valid"""
-
-
-@deprecated(reason="Use the PackitFailedToCreateSRPMException instead.")
-class FailedCreateSRPM(PackitException):
-    """Failed to create SRPM"""
 
 
 class PackitSRPMException(PackitException):
