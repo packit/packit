@@ -1595,14 +1595,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """Push selected bodhi update from testing to stable."""
         from bodhi.client.bindings import UpdateNotFound
 
-        bodhi_client = get_bodhi_client(
-            fas_username=self.config.fas_user,
-            fas_password=self.config.fas_password,
-            kerberos_realm=self.config.kerberos_realm,
-        )
-        # only use Kerberos when fas_user and kerberos_realm are set
-        if self.config.fas_user and self.config.kerberos_realm:
-            bodhi_client.login_with_kerberos()
+        bodhi_client = get_bodhi_client()
         # make sure we have the credentials
         bodhi_client.ensure_auth()
         try:
