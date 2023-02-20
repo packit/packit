@@ -134,3 +134,28 @@ def test_update_distgit_unsafe_commit_messages(upstream, distgit_instance):
     downstream.specfile.macros.append(("_changelog_trimage", "0"))
     downstream.specfile.macros.append(("_changelog_trimtime", "0"))
     assert len(downstream.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_CHANGELOGTEXT]) == 2
+
+
+def test_update_distgit_changelog_entry_action_pass_env_vars(
+    upstream, distgit_instance
+):
+    _, downstream = distgit_instance
+    package_config = upstream.package_config
+    package_config.actions = {ActionName.changelog_entry: "command"}
+    upstream.local_project.git_project = (
+        flexmock()
+        .should_receive("get_release")
+        .with_args(tag_name="0.1.0", name="0.1.0")
+        .and_return(flexmock(body="Some release 0.1.0"))
+        .mock()
+    )
+    expected_env = {
+        "PACKIT_PROJECT_VERSION": "0.1.0",
+    }
+    flexmock(upstream).should_receive("get_output_from_action").with_args(
+        ActionName.changelog_entry, env=expected_env
+    ).and_return("- entry").once()
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0", full_version="0.1.0"
+    )

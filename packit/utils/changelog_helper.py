@@ -1,15 +1,15 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import logging
 import re
 import shutil
-import logging
 from typing import Optional
 
+import packit.upstream
 from packit.actions import ActionName
 from packit.config.common_package_config import MultiplePackages
 from packit.distgit import DistGit
-import packit.upstream
 
 logger = logging.getLogger(__name__)
 
@@ -53,16 +53,19 @@ class ChangelogHelper:
             release_suffix = package_config.release_suffix
         return release_suffix
 
-    @property
-    def entry_from_action(self) -> Optional[str]:
+    def get_entry_from_action(self, version: Optional[str] = None) -> Optional[str]:
         """
         Runs changelog-entry action if present and returns string that can be
         used as a changelog entry.
 
+        Args:
+            version: version to be set in specfile
+
         Returns:
             Changelog entry or `None` if action is not present.
         """
-        messages = self.up.get_output_from_action(ActionName.changelog_entry)
+        env = {"PACKIT_PROJECT_VERSION": version}
+        messages = self.up.get_output_from_action(ActionName.changelog_entry, env=env)
         if not messages:
             return None
 
@@ -93,7 +96,7 @@ class ChangelogHelper:
             upstream_tag: The commit messages after last tag and before this tag are used
                 to update the changelog in the spec-file.
         """
-        comment = self.entry_from_action or (
+        comment = self.get_entry_from_action(version=full_version) or (
             self.up.local_project.git_project.get_release(
                 tag_name=upstream_tag, name=full_version
             ).body
@@ -149,7 +152,7 @@ class ChangelogHelper:
             current_commit, update_release, release_suffix
         )
 
-        msg = self.entry_from_action
+        msg = self.get_entry_from_action()
         if not msg and update_release:
             msg = f"- Downstream changes ({current_commit})"
         self.up.specfile.release = release_to_update
@@ -173,7 +176,7 @@ class ChangelogHelper:
             release: Release to be set in the spec-file.
         """
         last_tag = self.up.get_last_tag()
-        msg = self.entry_from_action
+        msg = self.get_entry_from_action(version=version)
         if not msg and last_tag and update_release:
             msg = self.up.get_commit_messages(after=last_tag)
         if not msg and update_release:
