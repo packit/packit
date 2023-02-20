@@ -1,3 +1,8 @@
+# 0.68.0
+
+- Packit now requires bodhi in version 7.0.0 at minimum. (#1844)
+- You can now use `--srpm` option with the `packit build locally` CLI command. (#1810)
+
 # 0.67.0
 
 - Packit now sanitizes changelog messages in order not to break spec file parsing. (#1841)
