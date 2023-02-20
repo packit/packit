@@ -30,9 +30,9 @@ class CommitVerifier:
             self.key_servers = [key_server]
         else:
             self.key_servers = [
-                "keys.openpgp.org",
                 "pgp.mit.edu",
                 "keyserver.ubuntu.com",
+                "keys.openpgp.org",
             ]
 
     @property
