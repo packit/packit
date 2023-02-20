@@ -42,7 +42,7 @@ def load_job_config(job_config):
     "--update-release/--no-update-release",
     default=None,
     help=(
-        "Specifies whether to update Version and Release. "
+        "Specifies whether to update Release. "
         "Defaults to value set in configuration, which defaults to yes."
     ),
 )

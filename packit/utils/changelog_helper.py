@@ -172,9 +172,10 @@ class ChangelogHelper:
         Args:
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
-            update_release: Whether to change Version and Release in the spec-file.
+            update_release: Whether to change Release in the spec-file.
             release: Release to be set in the spec-file.
         """
+        self.up.specfile.version = version
         last_tag = self.up.get_last_tag()
         msg = self.get_entry_from_action(version=version)
         if not msg and last_tag and update_release:
@@ -187,6 +188,6 @@ class ChangelogHelper:
         # upstream projects should take care of versions
         if update_release:
             logger.debug(f"Setting Release in spec to {release!r}.")
-            self.up.specfile.set_version_and_release(version, release)
+            self.up.specfile.release = release
         if msg is not None:
             self.up.specfile.add_changelog_entry(msg)
