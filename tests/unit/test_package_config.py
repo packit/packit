@@ -1489,6 +1489,39 @@ def test_get_package_config_from_repo(
         assert config is None
 
 
+def test_get_package_config_from_repo_explicit_path():
+    """Test getting the package config when the path is explicitly specified"""
+    project = flexmock(repo="packit")
+    config_name = ".distro/source-git.yaml"
+
+    project.should_receive("get_file_content").with_args(
+        path=config_name, ref=None
+    ).and_return(
+        """\
+upstream_project_url: https://github.com/packit/packit
+downstream_package_name: packit
+specfile_path: ".distro/packit.spec"
+files_to_sync:
+- src: .distro/
+  dest: .
+  delete: true
+  filters:
+  - "protect .git*"
+  - "protect sources"
+  - "exclude source-git.yaml"
+  - "exclude .gitignore"
+"""
+    ).once()
+    project.should_receive("full_repo_name").and_return("packit/packit")
+    config = get_package_config_from_repo(
+        project=project, package_config_path=config_name
+    )
+    assert config is not None
+    assert config.downstream_package_name == "packit"
+    assert config.upstream_project_url == "https://github.com/packit/packit"
+    assert config.specfile_path == ".distro/packit.spec"
+
+
 def test_get_package_config_from_repo_empty_no_spec():
     gp = flexmock(GitProject)
     gp.should_receive("get_files").and_return([])
