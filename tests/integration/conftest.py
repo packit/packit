@@ -310,7 +310,9 @@ def mock_api_for_source_git(
 ):
     with cwd(sourcegit):
         c = get_test_config()
-        pc = get_local_package_config(str(sourcegit))
+        pc = get_local_package_config(
+            package_config_path=sourcegit / ".distro" / "source-git.yaml"
+        )
         pc.upstream_project_url = str(sourcegit)
         return PackitAPI(c, pc, up_local_project, dist_git_clone_path=str(distgit))
 

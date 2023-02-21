@@ -9,6 +9,7 @@ import click
 
 from packit.config import pass_config
 from packit.config import Config, get_local_package_config
+from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
 from packit.api import PackitAPI
 from packit.local_project import LocalProject
 from packit.cli.utils import cover_packit_exception
@@ -33,7 +34,7 @@ def source_git_status(config: Config, source_git: str, dist_git: str):
     source_git_path = pathlib.Path(source_git).resolve()
     dist_git_path = pathlib.Path(dist_git).resolve()
     package_config = get_local_package_config(
-        source_git_path, package_config_path=config.package_config_path
+        package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
     )
     api = PackitAPI(
         config=config,

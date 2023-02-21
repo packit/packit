@@ -202,7 +202,7 @@ def get_local_package_config(
     repo_name: Optional[str] = None,
     try_local_dir_first: bool = False,
     try_local_dir_last: bool = False,
-    package_config_path: Optional[str] = None,
+    package_config_path: Optional[Union[Path, str]] = None,
 ) -> PackageConfig:
     """
     find packit.yaml in provided dirs, load it and return PackageConfig
@@ -235,37 +235,68 @@ def get_local_package_config(
     )
 
 
-def get_package_config_from_repo(
+def find_remote_packit_yaml(
     project: GitProject,
     ref: Optional[str] = None,
-) -> Optional[PackageConfig]:
-    for config_file_name in CONFIG_FILE_NAMES:
-        try:
-            config_file_content = project.get_file_content(
-                path=config_file_name, ref=ref
-            )
-        except (FileNotFoundError, GithubAppNotInstalledError):
-            # do nothing
-            pass
-        else:
-            logger.debug(
-                f"Found a config file {config_file_name!r} "
-                f"on ref {ref!r} "
-                f"of the {project.full_repo_name!r} repository."
-            )
-            break
-    else:
+) -> Optional[str]:
+    package_config_path = None
+
+    try:
+        candidates = set(project.get_files(ref=ref, recursive=False))
+    except GithubAppNotInstalledError:
+        logger.warning(
+            "The Packit GitHub App is not installed"
+            f"for the {project.full_repo_name!r} repository."
+        )
+        return None
+
+    try:
+        package_config_path = (candidates & CONFIG_FILE_NAMES).pop()
+    except KeyError:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
             f"of the {project.full_repo_name!r} repository."
         )
         return None
 
+    logger.debug(
+        f"Found a config file {package_config_path!r} "
+        f"on ref {ref!r} "
+        f"of the {project.full_repo_name!r} repository."
+    )
+    return package_config_path
+
+
+def get_package_config_from_repo(
+    project: GitProject,
+    ref: Optional[str] = None,
+    package_config_path: Optional[str] = None,
+) -> Optional[PackageConfig]:
+    """Search for the package config in a remote repo, load it and return
+    the package configuration object.
+
+    Args:
+        project: ogr Git-project object.
+        ref: Optional ref at which the config should be searched for.
+        package_config_path: path of the package config, relative to the repo root.
+            Load and parse this when specified instead of searching for one.
+
+    Returns:
+        PackageConfig object constructed from the config file found in
+        the repo.
+    """
+    if not (
+        package_config_path := package_config_path
+        or find_remote_packit_yaml(project, ref)
+    ):
+        return None
+
+    config_file_content = project.get_file_content(path=package_config_path, ref=ref)
     loaded_config = load_packit_yaml(raw_text=config_file_content)
 
     return parse_loaded_config(
         loaded_config=loaded_config,
-        config_file_path=config_file_name,
+        config_file_path=package_config_path,
         repo_name=project.repo,
         search_specfile=get_specfile_path_from_repo,
         project=project,
