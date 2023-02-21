@@ -423,7 +423,7 @@ class Upstream(PackitRepositoryBase):
             version: Version to be set in the spec-file.
             commit: Commit to be set in the changelog.
             release: Release to be set in the spec-file.
-            update_release: Whether to change Version and Release in the spec-file.
+            update_release: Whether to change Release in the spec-file.
                 Defaults to `True`.
         """
         self._fix_spec_source(archive)
@@ -509,7 +509,7 @@ class Upstream(PackitRepositoryBase):
 
         Args:
             upstream_ref: the base git ref for the source git
-            update_release: update Version and Release in spec file
+            update_release: update Release in spec file
             release_suffix: suffix %release part of NVR with this
             create_symlinks: whether symlinks should be created instead of copying the files
                 (e.g. when the archive is created outside the specfile dir)
@@ -980,7 +980,7 @@ class SRPMBuilder:
 
         Args:
             archive: Path to the archive.
-            update_release: Should Version and Release be updated?
+            update_release: Should Release be updated?
             release_suffix: Append this suffix to the %release.
         """
         current_commit = self.upstream.local_project.commit_hexsha

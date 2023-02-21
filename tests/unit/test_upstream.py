@@ -11,7 +11,6 @@ import packit
 from packit.actions import ActionName
 from packit.exceptions import PackitException
 from packit.upstream import Archive, SRPMBuilder, Upstream
-from packit.utils.changelog_helper import ChangelogHelper
 
 
 @pytest.fixture
@@ -519,17 +518,7 @@ def test_fix_spec(
     upstream_mock._specfile.should_receive("reload").once()
 
     if update_release:
-        upstream_mock._specfile.should_receive("set_version_and_release").with_args(
-            current_git_tag_version, expected_release_suffix
-        ).once()
         upstream_mock._specfile.should_receive("add_changelog_entry")
-    else:
-        flexmock(ChangelogHelper).should_receive("prepare_upstream_locally").with_args(
-            current_git_tag_version,
-            "_",
-            update_release,
-            expected_release_suffix,
-        )
 
     flexmock(sys.modules["packit.upstream"]).should_receive("run_command").and_return(
         flexmock(stdout=current_git_tag_version)
@@ -538,3 +527,8 @@ def test_fix_spec(
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
         archive=archive, update_release=update_release, release_suffix=release_suffix
     )
+
+    assert upstream_mock._specfile.version == current_git_tag_version
+
+    if update_release:
+        assert upstream_mock._specfile.release == expected_release_suffix
