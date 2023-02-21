@@ -451,7 +451,7 @@ class JobConfigSchema(Schema):
         return data
 
     @validates_schema
-    def specfile_path_defined(self, data, **_):
+    def specfile_path_defined(self, data: dict, **_):
         """Check if a 'specfile_path' is specified for each package
 
         The only time 'specfile_path' is not required, is when the job is a
