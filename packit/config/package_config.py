@@ -194,7 +194,19 @@ def load_packit_yaml(
         return safe_load(raw_text) or {}
     except YAMLError as ex:
         logger.error(f"Cannot load package config {config_file_path}.")
-        raise PackitConfigException(f"Cannot load package config: {ex!r}.")
+        if hasattr(ex, "problem_mark"):
+            msg = (
+                "  parser says\n"
+                + str(ex.problem_mark)
+                + "\n  "
+                + str(ex.problem)  # type: ignore
+            )  # type: ignore
+            if ex.context is not None:  # type: ignore
+                msg += f" {str(ex.context)}"  # type: ignore
+            logger.error(msg)
+        else:
+            logger.error(f"parser says: {ex!r}.")
+        raise PackitConfigException("Please correct data and retry.")
 
 
 def get_local_package_config(
