@@ -14,7 +14,7 @@ from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
 from packit.pkgtool import PkgTool
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder, CALCULATE
 from packit.utils import repo
 from packit.utils.commands import cwd
 from tests.spellbook import UP_COCKPIT_OSTREE, initiate_git_repo, get_test_config
@@ -62,11 +62,13 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
     )
 
     pc = get_local_package_config(str(upstream_path))
-    up_lp = LocalProject(working_dir=upstream_path)
+    up_lp = LocalProjectBuilder().build(working_dir=upstream_path, git_repo=CALCULATE)
     c = get_test_config()
     api = PackitAPI(c, pc, up_lp)
     api._dg = DistGit(c, pc)
-    api._dg._local_project = LocalProject(working_dir=dist_git_path)
+    api._dg._local_project = LocalProjectBuilder().build(
+        working_dir=dist_git_path, git_repo=CALCULATE
+    )
 
     with cwd(upstream_path):
         api.sync_release(
@@ -100,11 +102,13 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
     flexmock(DistGit).should_receive("existing_pr").and_return(pr)
 
     pc = get_local_package_config(str(upstream_path))
-    up_lp = LocalProject(working_dir=upstream_path)
+    up_lp = LocalProjectBuilder().build(working_dir=upstream_path, git_repo=CALCULATE)
     c = get_test_config()
     api = PackitAPI(c, pc, up_lp)
     api._dg = DistGit(c, pc)
-    api._dg._local_project = LocalProject(working_dir=dist_git_path)
+    api._dg._local_project = LocalProjectBuilder().build(
+        working_dir=dist_git_path, git_repo=CALCULATE
+    )
 
     with cwd(upstream_path):
         assert pr == api.sync_release(
@@ -120,7 +124,7 @@ def test_srpm_on_cockpit_ostree(cockpit_ostree):
     upstream_path, dist_git_path = cockpit_ostree
 
     pc = get_local_package_config(str(upstream_path))
-    up_lp = LocalProject(working_dir=upstream_path)
+    up_lp = LocalProjectBuilder().build(working_dir=upstream_path, git_repo=CALCULATE)
     c = get_test_config()
     api = PackitAPI(c, pc, up_lp)
 

@@ -19,7 +19,7 @@ import packit
 from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder
 from packit.upstream import Archive, Upstream, SRPMBuilder
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
@@ -129,7 +129,7 @@ def test_set_spec_macro_source(tmp_path):
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        lp = LocalProject(working_dir=u)
+        lp = LocalProjectBuilder().build(working_dir=u)
 
         ups = Upstream(c, pc, lp)
 
@@ -164,7 +164,7 @@ def test_set_spec_ver_empty_changelog(tmp_path):
 
         pc = get_local_package_config(str(u))
         pc.upstream_project_url = str(u)
-        lp = LocalProject(working_dir=u)
+        lp = LocalProjectBuilder().build(working_dir=u)
 
         ups = Upstream(c, pc, lp)
 
