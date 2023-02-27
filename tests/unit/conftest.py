@@ -10,7 +10,7 @@ from munch import munchify
 import packit
 from packit.config import Config
 from packit.distgit import DistGit
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder
 from packit.upstream import Upstream
 from tests.spellbook import get_test_config, CRONIE, initiate_git_repo
 
@@ -107,7 +107,7 @@ def upstream_mock(local_project_mock, package_config_mock):
     upstream = Upstream(
         config=get_test_config(),
         package_config=package_config_mock,
-        local_project=LocalProject(working_dir="test"),
+        local_project=LocalProjectBuilder().build(working_dir="test"),
     )
     flexmock(upstream)
     upstream.should_receive("local_project").and_return(local_project_mock)

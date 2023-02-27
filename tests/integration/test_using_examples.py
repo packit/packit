@@ -8,7 +8,7 @@ E2E tests which utilize cockpit projects
 import pytest
 
 from packit.cli.utils import get_packit_api
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder, CALCULATE
 from packit.utils.commands import cwd
 from tests.spellbook import (
     initiate_git_repo,
@@ -44,7 +44,12 @@ def example_repo(request, tmp_path):
 
 def test_srpm_on_example(example_repo):
     c = get_test_config()
-    api = get_packit_api(config=c, local_project=LocalProject(working_dir=example_repo))
+    api = get_packit_api(
+        config=c,
+        local_project=LocalProjectBuilder().build(
+            working_dir=example_repo, git_repo=CALCULATE
+        ),
+    )
     with cwd(example_repo):
         path = api.create_srpm()
     assert path.exists()
