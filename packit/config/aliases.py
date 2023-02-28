@@ -229,7 +229,9 @@ def get_aliases() -> Dict[str, List[str]]:
         pages = results.pages
     current_fedora_releases, pending_fedora_releases, epel_releases = [], [], []
 
-    for release in filter(lambda r: r.state in ["current", "pending"], releases):
+    for release in filter(
+        lambda r: r.state in ["current", "pending", "frozen"], releases
+    ):
         if release.id_prefix == "FEDORA" and release.name != "ELN":
             name = release.long_name.lower().replace(" ", "-")
             if release.state == "current":
