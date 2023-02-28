@@ -235,7 +235,7 @@ class TestGetAliases:
                     ("F31", "Fedora 31", "FEDORA", "archived"),
                     ("F32", "Fedora 32", "FEDORA", "current"),
                     ("F33", "Fedora 33", "FEDORA", "current"),
-                    ("F34", "Fedora 34", "FEDORA", "pending"),
+                    ("F34", "Fedora 34", "FEDORA", "frozen"),
                     ("F35", "Fedora 35", "FEDORA", "pending"),
                     ("F31F", "Fedora 31 Flatpaks", "FEDORA-FLATPAK", "current"),
                     ("EPEL-8", "Fedora EPEL 8", "FEDORA-EPEL", "current"),
