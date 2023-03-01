@@ -65,11 +65,49 @@ from packit.utils.commands import cwd
             "The following paths are configured to be synced but are not present "
             "in the repository: b.md, c.txt",
         ),
+        (
+            ["a.md", "./a_dir/file"],
+            ["./a_dir"],
+            """
+             {
+                 "config_file_path": "packit.json",
+                 "dist_git_base_url": "https://packit.dev/",
+                 "downstream_package_name": "packit",
+                 "upstream_ref": "last_commit",
+                 "upstream_package_name": "packit_upstream",
+                 "allowed_gpg_keys": ["gpg"],
+                 "dist_git_namespace": "awesome",
+                 "synced_files": ["a.md", "b.md", "c.txt", "./a_dir/*"]
+             }
+             """,
+            "The following paths are configured to be synced but are not present "
+            "in the repository: b.md, c.txt",
+        ),
+        (
+            ["a.md", "b.md"],
+            ["./a_dir"],
+            """
+             {
+                 "config_file_path": "packit.json",
+                 "dist_git_base_url": "https://packit.dev/",
+                 "downstream_package_name": "packit",
+                 "upstream_ref": "last_commit",
+                 "upstream_package_name": "packit_upstream",
+                 "allowed_gpg_keys": ["gpg"],
+                 "dist_git_namespace": "awesome",
+                 "synced_files": ["./a_dir/*", "a.md", "b.md", "c.txt"]
+             }
+             """,
+            "The following paths are configured to be synced but are not present "
+            "in the repository: ./a_dir/*, c.txt",
+        ),
     ],
     ids=[
         "none_missing",
         "one_missing",
         "two_missing",
+        "dir_with_globs",
+        "empty_dir_with_globs",
     ],
 )
 def test_validate_paths(
@@ -78,10 +116,10 @@ def test_validate_paths(
     with cwd(tmpdir):
         Path("packit.json").write_text(raw_package_config)
         Path("packit.spec").write_text("hello")
-        for existing_file in existing_files:
-            Path(existing_file).write_text("")
         for existing_directory in existing_directories:
             Path(existing_directory).mkdir()
+        for existing_file in existing_files:
+            Path(existing_file).write_text("")
 
         output = PackitAPI.validate_package_config(Path("."))
         assert expected_output in output
