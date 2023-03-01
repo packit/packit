@@ -305,7 +305,7 @@ def get_package_config_from_repo(
 
     Returns:
         PackageConfig object constructed from the config file found in
-        the repo.
+        the repo or None if there's no package config in the repo.
     """
     if not (
         package_config_path := package_config_path
@@ -313,7 +313,16 @@ def get_package_config_from_repo(
     ):
         return None
 
-    config_file_content = project.get_file_content(path=package_config_path, ref=ref)
+    try:
+        config_file_content = project.get_file_content(
+            path=package_config_path, ref=ref
+        )
+    except FileNotFoundError:
+        logger.warning(
+            f"No config file {package_config_path!r} found on ref {ref!r} "
+            f"of the {project.full_repo_name!r} repository."
+        )
+        return None
     loaded_config = load_packit_yaml(raw_text=config_file_content)
 
     return parse_loaded_config(
