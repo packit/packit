@@ -59,7 +59,7 @@ jobs:
     trigger: commit
     branch: main
     targets:
-      - fedora-stable
+      - fedora-all
       - epel-9
     project: packit-dev
     list_on_homepage: True
