@@ -99,7 +99,7 @@ class TestPackitAPI:
             "1.1.1",
             None,
             None,
-            "some.version",
+            "0",
             does_not_raise(),
             id="version_set(CLI_explicit)",
         ),
@@ -107,7 +107,7 @@ class TestPackitAPI:
             None,
             "v1.1.1",
             None,
-            "some.version",
+            "0",
             does_not_raise(),
             id="tag_set(service_mode)",
         ),
@@ -123,7 +123,7 @@ class TestPackitAPI:
             None,
             None,
             "1.1",
-            "some.version",
+            "0",
             does_not_raise(),
             id="none_set(CLI_version_from_upstream_release_monitoring)",
         ),
@@ -164,7 +164,7 @@ def test_sync_release_version_tag_processing(
 def test_sync_release_do_not_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").never()
-    api_mock.up.should_receive("get_specfile_version").and_return("some.version")
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.package_config.create_sync_note = False
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(version="1.1", dist_git_branch="_")
@@ -173,7 +173,7 @@ def test_sync_release_do_not_create_sync_note(api_mock):
 def test_sync_release_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").once()
-    api_mock.up.should_receive("get_specfile_version").and_return("some.version")
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(version="1.1", dist_git_branch="_")
 
