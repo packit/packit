@@ -247,11 +247,21 @@ def get_local_package_config(
     )
 
 
-def find_remote_packit_yaml(
+def find_remote_package_config(
     project: GitProject,
     ref: Optional[str] = None,
 ) -> Optional[str]:
-    package_config_path = None
+    """
+    Check if there's a package config file
+    in the given project (top-level directory only).
+
+    Args:
+        project: ogr Git-project object.
+        ref: Optional ref at which the config should be searched for.
+
+    Returns:
+        Name of the found config file or None if there's no such file.
+    """
 
     try:
         candidates = set(project.get_files(ref=ref, recursive=False))
@@ -263,7 +273,7 @@ def find_remote_packit_yaml(
         return None
 
     try:
-        package_config_path = (candidates & CONFIG_FILE_NAMES).pop()
+        package_config_name = (candidates & CONFIG_FILE_NAMES).pop()
     except KeyError:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
@@ -272,11 +282,11 @@ def find_remote_packit_yaml(
         return None
 
     logger.debug(
-        f"Found a config file {package_config_path!r} "
+        f"Found a config file {package_config_name!r} "
         f"on ref {ref!r} "
         f"of the {project.full_repo_name!r} repository."
     )
-    return package_config_path
+    return package_config_name
 
 
 def get_package_config_from_repo(
@@ -295,15 +305,24 @@ def get_package_config_from_repo(
 
     Returns:
         PackageConfig object constructed from the config file found in
-        the repo.
+        the repo or None if there's no package config in the repo.
     """
     if not (
         package_config_path := package_config_path
-        or find_remote_packit_yaml(project, ref)
+        or find_remote_package_config(project, ref)
     ):
         return None
 
-    config_file_content = project.get_file_content(path=package_config_path, ref=ref)
+    try:
+        config_file_content = project.get_file_content(
+            path=package_config_path, ref=ref
+        )
+    except FileNotFoundError:
+        logger.warning(
+            f"No config file {package_config_path!r} found on ref {ref!r} "
+            f"of the {project.full_repo_name!r} repository."
+        )
+        return None
     loaded_config = load_packit_yaml(raw_text=config_file_content)
 
     return parse_loaded_config(
