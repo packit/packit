@@ -118,6 +118,6 @@ class ProposeUpdate(PackitTest):
         changed_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()
         assert original_upstream_spec_content != changed_upstream_spec_content
         self.api.package_config.sync_changelog = True
-        self.api.sync_release(version="some.version", use_local_content=True)
+        self.api.sync_release(version="0", use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
