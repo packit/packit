@@ -47,12 +47,12 @@ jobs:
   - job: copr_build
     trigger: pull_request
     targets:
-      - fedora-stable
+      - fedora-all
       - epel-9
   - job: tests
     trigger: pull_request
     targets:
-      - fedora-stable
+      - fedora-all
       - epel-9
 
   - job: copr_build
