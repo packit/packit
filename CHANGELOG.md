@@ -1,3 +1,12 @@
+# 0.69.0
+
+- 'packit validate-config' now correctly checks glob-patterns in 'files_to_sync'. (#1865)
+- Aliases logic was updated to account for the upcoming Fedora release (Bodhi now marks such release as `frozen`). (#1863)
+- Command `packit validate-config` now provides details about errors when it cannot parse the config file. (#1861)
+- Packit does fewer API calls when searching for the package configuration file in remote repositories. (#1846)
+- `--update-release`/`--no-update-release` now affects only `Release`, not `Version`. (#1857)
+- Packit now provides `PACKIT_PROJECT_VERSION`  environment variable when running `changelog-entry` action. (#1853)
+
 # 0.68.0
 
 - Packit now requires bodhi in version 7.0.0 at minimum. (#1844)
