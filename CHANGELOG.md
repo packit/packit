@@ -5,7 +5,7 @@
 - Command `packit validate-config` now provides details about errors when it cannot parse the config file. (#1861)
 - Packit does fewer API calls when searching for the package configuration file in remote repositories. (#1846)
 - `--update-release`/`--no-update-release` now affects only `Release`, not `Version`. (#1857)
-- Packit now provides `PACKIT_PROJECT_VERSION`  environment variable when running `changelog-entry` action. (#1853)
+- Packit now provides `PACKIT_PROJECT_VERSION` environment variable when running `changelog-entry` action. (#1853)
 
 # 0.68.0
 
