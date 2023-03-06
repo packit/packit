@@ -12,10 +12,8 @@ import click
 
 from typing import Optional
 
-from packit.cli.utils import cover_packit_exception
-from packit.config import pass_config
-from packit.config import Config, get_local_package_config
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
+from packit.config import Config, PackageConfig, pass_config
 from packit.api import PackitAPI
 from packit.local_project import LocalProjectBuilder, CALCULATE
 
@@ -68,8 +66,10 @@ from packit.local_project import LocalProjectBuilder, CALCULATE
 @click.argument("dist-git", type=click.Path(exists=True, file_okay=False))
 @pass_config
 @cover_packit_exception
+@iterate_packages_source_git
 def update_dist_git(
     config: Config,
+    package_config: PackageConfig,
     source_git: str,
     dist_git: str,
     upstream_ref: Optional[str],
@@ -124,9 +124,6 @@ def update_dist_git(
 
     source_git_path = pathlib.Path(source_git).resolve()
     dist_git_path = pathlib.Path(dist_git).resolve()
-    package_config = get_local_package_config(
-        package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
-    )
     builder = LocalProjectBuilder(offline=True)
     api = PackitAPI(
         config=config,
