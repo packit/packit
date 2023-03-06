@@ -10,12 +10,10 @@ import pathlib
 
 import click
 
-from packit.config import pass_config
-from packit.config import Config, get_local_package_config
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
+from packit.config import Config, PackageConfig, pass_config
 from packit.api import PackitAPI
 from packit.local_project import LocalProjectBuilder, CALCULATE
-from packit.cli.utils import cover_packit_exception
 
 
 @click.command("update-source-git")
@@ -32,8 +30,10 @@ from packit.cli.utils import cover_packit_exception
 @click.argument("revision-range", required=False)
 @pass_config
 @cover_packit_exception
+@iterate_packages_source_git
 def update_source_git(
     config: Config,
+    package_config: PackageConfig,
     source_git: str,
     dist_git: str,
     revision_range: str,
@@ -91,9 +91,6 @@ def update_source_git(
 
     source_git_path = pathlib.Path(source_git).resolve()
     dist_git_path = pathlib.Path(dist_git).resolve()
-    package_config = get_local_package_config(
-        package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
-    )
     builder = LocalProjectBuilder(offline=True)
     api = PackitAPI(
         config=config,
