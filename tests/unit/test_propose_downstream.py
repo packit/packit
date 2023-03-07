@@ -271,7 +271,6 @@ from packit.config import (
     ],
 )
 def test_get_dist_git_branches(package_config, cmdline, expected):
-
     api = flexmock(PackitAPI)
     api.package_config = package_config
     git_project = flexmock(default_branch="default_br")
