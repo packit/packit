@@ -338,7 +338,7 @@ def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committ
 def test_job_config_views(raw, expected_packages_keys, identifiers):
     pkg_config = PackageConfig.get_from_dict(raw_dict=raw)
     job_views = pkg_config.get_job_views()
-    for (job_config_view, keys, identifier) in zip(
+    for job_config_view, keys, identifier in zip(
         job_views, expected_packages_keys, identifiers
     ):
         assert job_config_view.identifier == identifier
