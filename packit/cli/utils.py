@@ -207,7 +207,7 @@ def iterate_packages_source_git(func):
         # probably, if dist-git is not a git repo,
         # we would like to cycle over multiple dist-git repos
         elif (
-            dist_git_path.is_dir
+            dist_git_path.is_dir()
             and not dist_git_path.joinpath(".git").exists()
             and not found_func
         ):
