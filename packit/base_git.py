@@ -1,7 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import os
 import shlex
+from importlib.metadata import version
 from logging import getLogger
 from pathlib import Path
 from typing import Optional, Callable, List, Iterable, Dict, Tuple
@@ -483,6 +485,11 @@ class PackitRepositoryBase:
         Raises:
             PackitDownloadFailedException if download fails for any reason.
         """
+        user_agent = (
+            os.getenv("PACKIT_USER_AGENT")
+            or f"packit/{version('packitos')} (hello+cli@packit.dev)"
+        )
+
         sourcelist = []
         # Fetch all sources defined in packit.yaml -> sources
         for source in self.package_config.sources:
@@ -515,7 +522,9 @@ class PackitRepositoryBase:
             if source_path.is_file():
                 continue
             try:
-                with requests.get(url, stream=True) as response:
+                with requests.get(
+                    url, headers={"User-Agent": user_agent}, stream=True
+                ) as response:
                     response.raise_for_status()
                     with open(source_path, "wb") as f:
                         for chunk in response.iter_content(chunk_size=8192):
