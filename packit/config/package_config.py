@@ -7,7 +7,10 @@ from pathlib import Path
 from typing import Callable, Optional, List, Dict, Union, Set
 
 from ogr.abstract import GitProject
-from ogr.exceptions import GithubAppNotInstalledError, GithubAPIException
+from ogr.exceptions import (
+    GithubAppNotInstalledError,
+    APIException,
+)
 from yaml import safe_load, YAMLError
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
@@ -291,7 +294,7 @@ def find_remote_package_config(
             f"for the {project.full_repo_name!r} repository."
         )
         return None
-    except GithubAPIException as ex:
+    except APIException as ex:
         if ex.response_code == 404:
             # we couldn't find the project or git reference
             logger.warning(f"No project or ref was found: {ex}")
