@@ -7,7 +7,10 @@ from pathlib import Path
 from typing import Callable, Optional, List, Dict, Union, Set
 
 from ogr.abstract import GitProject
-from ogr.exceptions import GithubAppNotInstalledError
+from ogr.exceptions import (
+    GithubAppNotInstalledError,
+    APIException,
+)
 from yaml import safe_load, YAMLError
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
@@ -133,13 +136,24 @@ def find_packit_yaml(
     try_local_dir_last: bool = False,
 ) -> Path:
     """
-    find packit.yaml in provided directories: if a file matches, it's picked
-    if no config is found, raise PackitConfigException
+    Find packit config in provided directories.
 
-    :param directory: a list of dirs where we should find
-    :param try_local_dir_first: try in cwd first
-    :param try_local_dir_last: try cwd last
-    :return: Path to the config
+    Args:
+        directory: List of directories where we should look for the config.
+        try_local_dir_first: If set to `True` check the current working directory
+            first.
+
+            Defaults to `False`.
+        try_local_dir_last: If set to `True` check the current working directory
+            last.
+
+            Defautls to `False`.
+
+    Returns:
+        Path to the config.
+
+    Raises:
+        PackitConfigException: If no config is found.
     """
     directories = [Path(config_dir) for config_dir in directory]
     cwd = Path.cwd()
@@ -217,14 +231,23 @@ def get_local_package_config(
     package_config_path: Optional[Union[Path, str]] = None,
 ) -> PackageConfig:
     """
-    find packit.yaml in provided dirs, load it and return PackageConfig
+    Finds and loads packit config from the provided directories.
 
-    :param directory: a list of dirs where we should find
-    :param repo_name: name of the git repository (default for project name)
-    :param try_local_dir_first: try in cwd first
-    :param try_local_dir_last: try cwd last
-    :param package_config_path: Path to package configuration file
-    :return: local PackageConfig
+    Args:
+        directory: List of directories to look for packit config in.
+        repo_name: Name of the git repository (default for project name).
+        try_local_dir_first: If set to `True` check the current working directory
+            first.
+
+            Defaults to `False`.
+        try_local_dir_last: If set to `True` check the current working directory
+            last.
+
+            Defautls to `False`.
+        package_config_path: Path to the package configuration file.
+
+    Returns:
+        Loaded config as a `PackageConfig`.
     """
 
     if package_config_path:
@@ -271,6 +294,12 @@ def find_remote_package_config(
             f"for the {project.full_repo_name!r} repository."
         )
         return None
+    except APIException as ex:
+        if ex.response_code == 404:
+            # we couldn't find the project or git reference
+            logger.warning(f"No project or ref was found: {ex}")
+            return None
+        raise
 
     try:
         package_config_name = (candidates & CONFIG_FILE_NAMES).pop()
@@ -363,11 +392,17 @@ def parse_loaded_config(
 
 def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[str]:
     """
-    Get the path (relative to dir) of the local spec file if present.
-    If the spec is not found in dir directly, try to search it recursively (rglob)
-    :param dir: to find the spec file in
-    :param exclude: don't include files found in these dirs (default "tests")
-    :return: path (relative to dir) of the first found spec file
+    Get the path to the local specfile if present. If specfile is not found in
+    the directory itself, search for it recursively (rglob).
+
+    Args:
+        dir: Directory to find the specfile in.
+        exclude: Directories to be excluded from the recursive search.
+
+            Defaults to `["tests"]`.
+
+    Returns:
+        Path (relative to the `dir`) of the specfile that was found first.
     """
     files = [path.relative_to(dir) for path in dir.glob("*.spec")] or [
         path.relative_to(dir) for path in dir.rglob("*.spec")
@@ -386,10 +421,16 @@ def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[st
 
 def get_specfile_path_from_repo(project: GitProject, ref: str = None) -> Optional[str]:
     """
-    Get the path of the spec file in the given repo if present.
-    :param project: GitProject
-    :param ref: git ref (defaults to repo's default branch)
-    :return: str path of the spec file or None
+    Get the path of the specfile in the given repo if present.
+
+    Args:
+        project: Repository to look for the specfile in.
+        ref: Git reference where the specfile is to be found.
+
+            Defaults to repository's default branch.
+
+    Returns:
+        Path to the specfile or `None` if not found.
     """
     spec_files = project.get_files(ref=ref, filter_regex=r".+\.spec$")
 
