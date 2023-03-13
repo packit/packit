@@ -257,7 +257,6 @@ class LocalProject:
     def _parse_git_project_from_repo_namespace_and_git_service(
         self,
     ) -> bool:
-
         if (
             self.repo_name
             and self.namespace
