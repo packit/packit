@@ -4,12 +4,14 @@
 from pathlib import Path, PosixPath
 from typing import Optional
 
+from github import GithubException
 import pytest
 import copy
 from flexmock import flexmock
 from marshmallow import ValidationError
 
 from ogr.abstract import GitProject, GitService
+from ogr.exceptions import GithubAPIException
 from packit.actions import ActionName
 from packit.config import (
     CommonPackageConfig,
@@ -23,6 +25,7 @@ from packit.config.package_config import (
     PackageConfig,
     get_local_specfile_path,
     get_local_package_config,
+    find_remote_package_config,
 )
 import packit.config.package_config
 from packit.config.sources import SourcesItem
@@ -31,7 +34,7 @@ from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
-from tests.unit.test_config import (
+from tests.unit.test_config.test_config import (
     get_job_config_dict_full,
     get_job_config_dict_simple,
     get_job_config_simple,
@@ -2558,3 +2561,24 @@ def test_configuring_packages_in_jobs(data):
     )
     loaded_config = PackageConfigSchema().load(data)
     assert loaded_config == expected_config
+
+
+def test_find_remote_package_config_no_commit():
+    exception = GithubAPIException()
+    exception.__cause__ = GithubException(404, None, None)
+
+    project = flexmock()
+    project.should_receive("get_files").and_raise(exception)
+
+    assert find_remote_package_config(project, ref=None) is None
+
+
+def test_find_remote_package_config_should_raise():
+    exception = GithubAPIException()
+    exception.__cause__ = GithubException(403, None, None)
+
+    project = flexmock()
+    project.should_receive("get_files").and_raise(exception)
+
+    with pytest.raises(GithubAPIException):
+        find_remote_package_config(project, ref=None)
