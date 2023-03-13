@@ -31,7 +31,7 @@ from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
 from tests.spellbook import UP_OSBUILD, SYNC_FILES
-from tests.unit.test_config import (
+from tests.unit.test_config.test_config import (
     get_job_config_dict_full,
     get_job_config_dict_simple,
     get_job_config_simple,
