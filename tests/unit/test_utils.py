@@ -133,7 +133,6 @@ class TestFallbackReturnValue:
         ],
     )
     def test_fallback_return_value(self, raise_exception, decorator_exceptions):
-
         fallback_value = "test_fallback_value"
 
         @fallback_return_value(fallback_value, exceptions=decorator_exceptions)

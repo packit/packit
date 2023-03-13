@@ -257,7 +257,6 @@ class CoprHelper:
         delete_after_days: Optional[int] = None,
         module_hotfixes: Optional[bool] = False,
     ) -> Dict[str, Tuple[Any, Any]]:
-
         fields_to_change: Dict[str, Tuple[Any, Any]] = {}
         if chroots is not None:
             old_chroots = self.get_chroots(copr_project=copr_proj)
@@ -341,7 +340,6 @@ class CoprHelper:
         targets_dict: Optional[Dict] = None,  # chroot specific configuration
         module_hotfixes: bool = False,
     ) -> None:
-
         try:
             self.copr_client.project_proxy.add(
                 ownername=owner,

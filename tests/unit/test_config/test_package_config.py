@@ -1691,7 +1691,6 @@ def test_get_local_specfile_path():
 def test_get_local_package_config_path(
     directory, local_first, local_last, config_file_name, res_pc_path
 ):
-
     flexmock(PosixPath).should_receive("is_file").and_return(True)
 
     (
