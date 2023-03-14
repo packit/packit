@@ -15,7 +15,7 @@ from packit.command_handler import LocalCommandHandler
 from packit.config import Config, CommonPackageConfig, RunCommandType, PackageConfig
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder
 from packit.upstream import Upstream
 from packit.utils import commands
 from tests.spellbook import can_a_module_be_imported
@@ -117,7 +117,7 @@ def packit_repository_base_with_sandcastle_object(tmp_path):
             }
         ),
     )
-    b.local_project = LocalProject(working_dir=tmp_path)
+    b.local_project = LocalProjectBuilder().build(working_dir=tmp_path)
     return b
 
 

@@ -10,7 +10,7 @@ import packit.distgit
 import packit.upstream
 from packit.config import Config, get_package_config_from_repo
 from packit.exceptions import PackitException
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder, CALCULATE
 
 
 def socket_guard(*args, **kwargs):
@@ -74,7 +74,19 @@ class PackitTest(unittest.TestCase):
     @property
     def lp(self):
         if not self._lp:
-            self._lp = LocalProject(git_project=self.project)
+            # Fully construct LocalProject, the tests may need anything
+            builder = LocalProjectBuilder()
+            self._lp = builder.build(
+                working_dir=CALCULATE,
+                ref=CALCULATE,
+                git_repo=CALCULATE,
+                git_project=self.project,
+                git_service=CALCULATE,
+                full_name=CALCULATE,
+                namespace=CALCULATE,
+                repo_name=CALCULATE,
+                git_url=CALCULATE,
+            )
         return self._lp
 
     @property
