@@ -26,7 +26,7 @@ from packit.exceptions import (
     PackitConfigException,
     PackitBodhiException,
 )
-from packit.local_project import LocalProject
+from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.koji_helper import KojiHelper
@@ -109,7 +109,9 @@ class DistGit(PackitRepositoryBase):
         """
         dg = cls(config, package_config)
         dg.clone_package(target_path=path, branch=branch)
-        dg._local_project = LocalProject(working_dir=path)
+        dg._local_project = LocalProjectBuilder().build(
+            working_dir=path, git_repo=CALCULATE
+        )
         return dg
 
     @property
@@ -135,11 +137,22 @@ class DistGit(PackitRepositoryBase):
             )
             self._local_project.working_dir_temporary = not self._clone_path
             self._local_project.refresh_the_arguments()
+            # TODO: Turn this on once p-s mocks are updated
+            # builder = LocalProjectBuilder(cache=self.repository_cache)
+            # self._local_project = builder.build(
+            #    working_dir=working_dir,
+            #    git_url=self.package_config.dist_git_package_url,
+            #    namespace=self.package_config.dist_git_namespace,
+            #    repo_name=self.package_config.downstream_package_name,
+            #    git_project=self.config.get_project(
+            #        url=self.package_config.dist_git_package_url
+            #    ),
+            #    git_repo=CALCULATE,
+            # )
         elif not self._local_project.git_project:
             self._local_project.git_project = self.config.get_project(
                 url=self.package_config.dist_git_package_url
             )
-            self._local_project.refresh_the_arguments()
 
         return self._local_project
 

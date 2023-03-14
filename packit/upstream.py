@@ -78,6 +78,17 @@ class Upstream(PackitRepositoryBase):
                 cache=self.repository_cache,
                 merge_pr=self.package_config.merge_pr_in_ci,
             )
+            # TODO: Turn this on once p-s mocks are updated
+            # builder = LocalProjectBuilder(cache=self.repository_cache)
+            # self._local_project = builder.build(
+            #    git_url=self.package_config.upstream_project_url,
+            #    repo_name=self.package_config.upstream_package_name,
+            #    merge_pr=self.package_config.merge_pr_in_ci,
+            #    git_repo=CALCULATE,
+            #    working_dir=CALCULATE,
+            #    ref=CALCULATE,
+            #    git_project=CALCULATE,
+            # )
         if self._local_project.git_project is None:
             if not self.package_config.upstream_project_url:
                 self.package_config.upstream_project_url = git_remote_url_to_https_url(
@@ -87,7 +98,6 @@ class Upstream(PackitRepositoryBase):
             self._local_project.git_project = self.config.get_project(
                 url=self.package_config.upstream_project_url
             )
-            # self._local_project.refresh_the_arguments()
         return self._local_project
 
     @property

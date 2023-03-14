@@ -6,7 +6,7 @@ from flexmock import flexmock
 
 from packit.config import CommonPackageConfig, Config, PackageConfig
 from packit.distgit import DistGit
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder
 
 
 @pytest.mark.parametrize(
@@ -96,9 +96,8 @@ from packit.local_project import LocalProject
 )
 def test_existing_pr(title, description, branch, source_branch, prs, exists):
     user_mock = flexmock().should_receive("get_username").and_return("packit").mock()
-    local_project = LocalProject(
+    local_project = LocalProjectBuilder().build(
         git_project=flexmock(service="something", get_pr_list=lambda: prs),
-        refresh=False,
         git_service=flexmock(user=user_mock),
     )
     distgit = DistGit(

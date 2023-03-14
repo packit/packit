@@ -9,7 +9,7 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.exceptions import PackitException
 from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
-from packit.local_project import LocalProject
+from packit.local_project import LocalProject, LocalProjectBuilder
 from tests.spellbook import can_a_module_be_imported
 
 
@@ -60,7 +60,9 @@ def test_get_output_from_action_defined_in_sandcastle():
             }
         ),
     )
-    packit_repository_base.local_project = LocalProject(working_dir="/tmp")
+    packit_repository_base.local_project = LocalProjectBuilder().build(
+        working_dir="/tmp"
+    )
 
     flexmock(Sandcastle).should_receive("run")
     flexmock(Sandcastle).should_receive("exec").and_return(echo_cmd)
@@ -95,7 +97,7 @@ def test_base_push_bad(distgit_and_remote):
         config=Config(),
         package_config=PackageConfig(packages={"package": CommonPackageConfig()}),
     )
-    b.local_project = LocalProject(
+    b.local_project = LocalProjectBuilder().build(
         working_dir=distgit, git_url="https://github.com/packit/lol"
     )
     flexmock(LocalProject).should_receive("git_repo").and_return(
@@ -122,7 +124,7 @@ def test_base_push_good(distgit_and_remote):
         config=Config(),
         package_config=PackageConfig(packages={"package": CommonPackageConfig()}),
     )
-    b.local_project = LocalProject(
+    b.local_project = LocalProjectBuilder().build(
         working_dir=distgit, git_url="https://github.com/packit/lol"
     )
     flexmock(LocalProject).should_receive("git_repo").and_return(

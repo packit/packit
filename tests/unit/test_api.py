@@ -11,7 +11,7 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
-from packit.local_project import LocalProject
+from packit.local_project import LocalProjectBuilder
 from packit.patches import PatchGenerator
 
 
@@ -192,5 +192,5 @@ def test_dg_downstream_package_name_is_set(
 ):
     api_mock._dg = None
     api_mock.package_config.downstream_package_name = downstream_package_name
-    api_mock.downstream_local_project = LocalProject(working_dir=path)
+    api_mock.downstream_local_project = LocalProjectBuilder().build(working_dir=path)
     assert api_mock.dg.package_config.downstream_package_name == expectation
