@@ -243,11 +243,23 @@ class Upstream(PackitRepositoryBase):
         logger.info(f"Version in spec file is {version!r}.")
         return version
 
+    def get_version_from_action(self) -> str:
+        """provide version from action"""
+        action_output = self.get_output_from_action(
+            action=ActionName.get_current_version
+        )
+        version = action_output[-1].strip() if action_output else None
+        return version
+
     def get_version(self) -> str:
         """
-        Return version of the latest release available: prioritize bigger from upstream
+        Return version given by action, if any.
+        Or the latest release available: prioritize bigger from upstream
         package repositories or the version in spec
         """
+        if action_version := self.get_version_from_action():
+            return action_version
+
         ups_ver = self.get_latest_released_version()
         spec_ver = self.get_specfile_version()
 
@@ -271,12 +283,9 @@ class Upstream(PackitRepositoryBase):
             String containing version, e.g. `"0.1.1"`.
         """
         # Step 1
-        action_output = self.get_output_from_action(
-            action=ActionName.get_current_version
-        )
+        version = self.get_version_from_action()
 
         # Step 2
-        version = action_output[-1].strip() if action_output else None
         if version is None:
             version = self.get_version_from_tag(self.get_last_tag())
 
