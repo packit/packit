@@ -602,9 +602,10 @@ class PackitAPI:
 
         if status.source_git_range_start and status.dist_git_range_start:
             return f"""'{source_git}' and '{dist_git}' have diverged.
-Sync status needs to be reestablished manually.
 The first source-git commit to be synced is '{shorten_commit_hash(status.source_git_range_start)}'.
 The first dist-git commit to be synced is '{shorten_commit_hash(status.dist_git_range_start)}'.
+Sync status needs to be reestablished manually, see
+https://packit.dev/source-git/work-with-source-git/fix-diverged-history
 """
         elif status.source_git_range_start:
             number_of_commits = len(
