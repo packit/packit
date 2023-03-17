@@ -317,7 +317,16 @@ class Upstream(PackitRepositoryBase):
         )
 
         try:
-            cmd = ["git", "describe", "--tags", "--abbrev=0"]
+            version_tag_glob = self.package_config.upstream_tag_template.replace(
+                "{version}", "?*"
+            )
+            cmd = [
+                "git",
+                "describe",
+                "--tags",
+                "--abbrev=0",
+                f"--match={version_tag_glob}",
+            ]
             if before:
                 cmd += [f"{before}^"]
             last_tag = run_command(
