@@ -1,3 +1,7 @@
+# 0.70.0
+
+- Now packit uses the `get_current_version` action defined by the user to retrieve version before updating the specfile %setup macro (if any). (#1886)
+
 # 0.69.0
 
 - 'packit validate-config' now correctly checks glob-patterns in 'files_to_sync'. (#1865)
