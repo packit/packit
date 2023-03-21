@@ -129,6 +129,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         fork_create=lambda: None,
         get_fork=lambda: PagureProject("", "", PagureService()),
         create_pr=mocked_create_pr,
+        default_branch="main",
     )
     flexmock(
         GithubProject,
