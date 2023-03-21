@@ -879,6 +879,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def sync_push(
         self,
+        dist_git_branch: Optional[str] = None,
         source_git_branch: Optional[str] = None,
         create_pr: bool = True,
         title: Optional[str] = None,
@@ -889,6 +890,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         When dist-git is updated then update the source-git repository by opening a PR.
 
         Args:
+            dist_git_branch: Dist-git branch, defaults to repo's default branch.
             source_git_branch: Branch in source-git, defaults to repo's default branch.
             create_pr: Create a pull request if set to True.
             force: Ignore changes in the git index.
@@ -916,11 +918,16 @@ The first dist-git commit to be synced is '{short_hash}'.
                 " will not discard the changes. Use --force to bypass."
             )
 
+        dist_git_branch = (
+            dist_git_branch or self.dg.local_project.git_project.default_branch
+        )
         source_git_branch = (
             source_git_branch or self.up.local_project.git_project.default_branch
         )
+
         pr = None
         try:
+            self.dg.checkout_branch(dist_git_branch)
             self.up.checkout_branch(source_git_branch)
             self.update_source_git()
 
