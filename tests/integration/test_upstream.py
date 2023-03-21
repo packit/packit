@@ -426,9 +426,28 @@ def test_github_app(upstream_instance, tmp_path):
     )
 
 
-def test_get_last_tag(upstream_instance):
+@pytest.mark.parametrize(
+    "tags, upstream_tag_template, last_tag",
+    [
+        (["0.2.0"], None, "0.2.0"),
+        (["muse/0.3.0", "0.2.0"], "muse/{version}", "muse/0.3.0"),
+    ],
+)
+def test_get_last_tag(upstream_instance, tags, upstream_tag_template, last_tag):
+    # u is the local path of the upstream repository
     u, ups = upstream_instance
-    assert ups.get_last_tag() == "0.1.0"
+
+    # Tag more commits in the history
+    for tag in tags:
+        Path(u, "tags").write_text(tag)
+        subprocess.check_call(["git", "add", "tags"], cwd=u)
+        subprocess.check_call(["git", "commit", "-m", f"Tag with {tag}"], cwd=u)
+        subprocess.check_call(["git", "tag", "-a", "-m", f"Tag with {tag}", tag], cwd=u)
+
+    if upstream_tag_template:
+        ups.package_config.upstream_tag_template = upstream_tag_template
+
+    assert ups.get_last_tag() == last_tag
 
 
 @pytest.mark.parametrize(
