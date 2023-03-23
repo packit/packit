@@ -1088,7 +1088,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         repo: Union[Upstream, DistGit],
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
-        repo.push_to_fork(repo.local_project.ref, force=True)
+        try:
+            repo.push_to_fork(repo.local_project.ref, force=True)
+        except PackitException as exc:
+            logger.error(f"Push to fork failed: {exc}")
+            raise
         pr = repo.existing_pr(
             pr_title, pr_description.rstrip(), git_branch, repo.local_project.ref
         )
