@@ -1,3 +1,7 @@
+# 0.71.0
+
+- `upstream_tag_template` is now also used when looking for the latest version tag in Git. This allows upstream repositories to mix different tag-patterns in the same repository, but consider only one to tell the latest version. (#1891)
+
 # 0.70.0
 
 - Now packit uses the `get_current_version` action defined by the user to retrieve version before updating the specfile %setup macro (if any). (#1886)
