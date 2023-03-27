@@ -343,6 +343,7 @@ def test_job_config_views(raw, expected_packages_keys, identifiers):
     ):
         assert job_config_view.identifier == identifier
         assert set(job_config_view.packages.keys()) == set(keys)
+        assert pkg_config.get_package_config_for(job_config_view)
 
 
 def test_get_user_config(tmp_path):

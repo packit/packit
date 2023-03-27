@@ -210,6 +210,26 @@ class PackageConfig(MultiplePackages):
         """
         self._package_config_views = value
 
+    def get_package_config_for(
+        self, job_config: Union[JobConfigView, JobConfig]
+    ) -> Union["PackageConfigView", "PackageConfig"]:
+        """Select the PackageConfigView for the given JobConfig in
+        a multiple packages config.
+        """
+        package_config_views = self.get_package_config_views()
+        if not package_config_views:
+            # the package config views were not initialized
+            # we can continue if this is not a monorepo
+            if len(self.packages) == 1:
+                return self
+        else:
+            if not isinstance(job_config, JobConfigView):
+                # the job config should have just one package,
+                # choose that one
+                return package_config_views[next(iter(job_config.packages.keys()))]
+
+        return package_config_views[job_config.package]
+
 
 class PackageConfigView(PackageConfig):
     """A PackageConfig which holds:
