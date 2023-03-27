@@ -117,6 +117,11 @@ class JobConfigView(JobConfig):
             job_config.skip_build,
         )
 
+    @property
+    def package(self) -> str:
+        """The name for the package related with this JobConfigView?"""
+        return self._view_for_package
+
     def __eq__(self, other: object):
         if not isinstance(other, JobConfigView):
             if isinstance(other, JobConfig):
