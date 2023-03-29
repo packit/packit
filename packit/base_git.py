@@ -423,6 +423,7 @@ class PackitRepositoryBase:
         if (
             previous_version != self.specfile.expanded_version
             and previous_release == self.specfile.release
+            and self.specfile.release != "%autorelease"
         ):
             # This may occur if the upstream forgets to reset release after
             # bumping the version, or if the specfile is not maintained in

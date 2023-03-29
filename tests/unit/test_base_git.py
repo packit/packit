@@ -458,40 +458,48 @@ def test_set_spec_content(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "up_release,reset",
+    "dg_raw_release,up_raw_release,expected_dg_release",
     [
-        ("2", True),
-        ("3", False),
+        ("2%{?dist}", "2%{?dist}", "1"),
+        ("2%{?dist}", "3%{?dist}", "3"),
+        ("%autorelease", "%autorelease", "%autorelease"),
     ],
 )
-def test_set_spec_content_reset_release(tmp_path, up_release, reset):
+def test_set_spec_content_reset_release(
+    tmp_path, dg_raw_release, up_raw_release, expected_dg_release
+):
+    def changelog(release):
+        # %autorelease implies %autochangelog
+        if release == "%autorelease":
+            return "%autochangelog\n"
+        return (
+            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+            "- Initial package.\n"
+        )
+
     distgit_spec_contents = (
         "Name: bring-me-to-the-life\n"
         "Version: 1.0\n"
-        "Release: 2%{?dist}\n"
+        f"Release: {dg_raw_release}\n"
         "Source0: foo.bar\n"
         "License: GPLv3+\n"
         "Summary: evanescence\n"
         "%description\n-\n\n"
         "%changelog\n"
-        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
-        "- Initial package.\n"
-    )
+    ) + changelog(dg_raw_release)
     distgit_spec_path = tmp_path / "life.spec"
     distgit_spec_path.write_text(distgit_spec_contents)
 
     upstream_spec_contents = (
         "Name: bring-me-to-the-life\n"
         "Version: 1.0\n"
-        f"Release: {up_release}%{{?dist}}\n"
+        f"Release: {up_raw_release}\n"
         "Source0: foo.bor\n"
         "License: MIT\n"
         "Summary: evanescence, I was brought to life\n"
         "%description\n-\n"
         "%changelog\n"
-        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
-        "- Initial package.\n"
-    )
+    ) + changelog(up_raw_release)
     upstream_spec_path = tmp_path / "e-life.spec"
     upstream_spec_path.write_text(upstream_spec_contents)
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
@@ -500,14 +508,10 @@ def test_set_spec_content_reset_release(tmp_path, up_release, reset):
     dist_git._specfile_path = distgit_spec_path
 
     dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
-    if reset:
-        assert dist_git.specfile.release == "1"
-        assert dist_git.specfile.raw_release == "1%{?dist}"
+    assert dist_git.specfile.release == expected_dg_release
+    if not dist_git.specfile.has_autochangelog:
         with dist_git.specfile.sections() as sections:
-            assert "1.1-1" in sections.changelog[0]
-    else:
-        assert dist_git.specfile.release == up_release
-        assert dist_git.specfile.raw_release == f"{up_release}%{{?dist}}"
+            assert f"1.1-{expected_dg_release}" in sections.changelog[0]
 
 
 @pytest.mark.parametrize("changelog_section", ["\n%changelog\n", ""])
