@@ -1,3 +1,7 @@
+# 0.72.0
+
+- Packit now preserves `%autorelease` during `propose_downstream` and `pull_from_upstream`. (#1904)
+
 # 0.71.0
 
 - `upstream_tag_template` is now also used when looking for the latest version tag in Git. This allows upstream repositories to mix different tag-patterns in the same repository, but consider only one to tell the latest version. (#1891)
