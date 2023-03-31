@@ -9,10 +9,12 @@ from click.testing import CliRunner
 from packit.config import (
     package_config,
 )
+from packit.local_project import LocalProject
 from packit.api import PackitAPI
 from packit.cli.packit_base import packit_base
 from packit.cli.builds import koji_build
 from packit.distgit import DistGit
+
 
 DEFAULT_CONFIG_YAML = """
     {
@@ -202,6 +204,13 @@ def test_iterate_packages(package_config_yaml, mock_api_calls, how_many_times, o
     )
     flexmock(package_config).should_receive("load_packit_yaml").and_return(
         package_config_dict
+    )
+    flexmock(LocalProject).should_receive("git_repo").and_return(
+        flexmock(
+            remotes=[],
+            active_branch=flexmock(name="an active branch"),
+            head=flexmock(is_detached=False),
+        )
     )
     # otherwise _dg and _local_project objects will be created
     # by debugger threads and you are not able to debug them
