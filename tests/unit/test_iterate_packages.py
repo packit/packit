@@ -129,6 +129,16 @@ MONOREPO_COPR_PACKIT_YAML = """
         pytest.param(
             MONOREPO_COPR_PACKIT_YAML,
             [("run_copr_build", ("build_id", "repo_url")), ("watch_copr_build", None)],
+            0,
+            ["build", "in-copr", "--package=python", "--package=unknown"],
+            id=(
+                "monorepo build in copr fails before any action is taken "
+                "if a package does not exist"
+            ),
+        ),
+        pytest.param(
+            MONOREPO_COPR_PACKIT_YAML,
+            [("run_copr_build", ("build_id", "repo_url")), ("watch_copr_build", None)],
             3,
             ["build", "in-copr", "."],
             id="monorepo copr build for all copr packages",
