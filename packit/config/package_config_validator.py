@@ -61,13 +61,15 @@ class PackageConfigValidator:
 
         synced_files_errors = []
         if config:
-            synced_files_errors = [
-                f
-                for f in iter_srcs(config.files_to_sync)
-                if not (
-                    (self.project_path / f).exists() or any(self.project_path.glob(f))
-                )
-            ]
+            for package_config in config.get_package_config_views().values():
+                synced_files_errors = [
+                    f
+                    for f in iter_srcs(package_config.files_to_sync)
+                    if not (
+                        (self.project_path / package_config.paths[0] / f).exists()
+                        or any(self.project_path.glob(f))
+                    )
+                ]  # right now we use just the first path in a monorepo package
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
 
