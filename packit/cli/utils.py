@@ -120,7 +120,18 @@ def iterate_packages(func):
             try_local_dir_last=True,
             package_config_path=config.package_config_path,
         )
+        packages_config_views_names = set(
+            packages_config.get_package_config_views().keys()
+        )
         if kwargs.get("package"):
+            if not_defined_packages := set(kwargs["package"]).difference(
+                packages_config_views_names
+            ):
+                logger.error(
+                    "Packages %s are not defined in packit configuration.",
+                    not_defined_packages,
+                )
+                return None
             for package in kwargs["package"]:
                 decorated_func_kwargs["config"] = copy.deepcopy(
                     config
