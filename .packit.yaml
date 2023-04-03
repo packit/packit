@@ -18,10 +18,10 @@ issue_repository: https://github.com/packit/packit
 
 actions:
   create-archive:
-    - "python3 setup.py sdist --dist-dir ."
-    - "sh -c 'echo packitos-$(python3 setup.py --version).tar.gz'"
+    - "python3 -m build --sdist --outdir ."
+    - "sh -c 'echo packitos-$(python3 -m setuptools_scm).tar.gz'"
   get-current-version:
-    - "python3 setup.py --version"
+    - "python3 -m setuptools_scm"
   pre-sync:
     # FMF has to be installed on system where you are calling this tool.
     - python3 plans/git_reference.py
@@ -30,7 +30,7 @@ allowed_gpg_keys:
   - 5DE3E0509C47EA3CF04A42D34AEE18F83AFDEB23
 
 srpm_build_deps:
-  - python3-pip # "python3 setup.py --version" needs it
+  - python3-build
   - python3-setuptools_scm
 
 jobs:
