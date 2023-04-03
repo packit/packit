@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "packitos"
+authors = [
+    { name = "Red Hat", email = "user-cont-team@redhat.com" },
+]
+description = "A set of tools to integrate upstream open source projects into Fedora operating system."
+readme = "README.md"
+license = "MIT"
+license-files = { paths = ["LICENSE"] }
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+dynamic = ["version"]
+keywords = [
+    "git",
+    "packaging",
+    "fedora",
+    "rpm",
+    "dist-git",
+]
+dependencies = [
+    "GitPython",
+    "PyYAML",
+    "cccolutils",
+    "click",
+    "copr",
+    "lazy_object_proxy",
+    "marshmallow",
+    "marshmallow-enum",
+    "munch",
+    "ogr",
+    "packaging",
+    "python-gnupg",
+    "requests",
+    "requests-kerberos",
+    "setuptools", # Required for pkg_resources. Should move to importlib
+    "specfile",
+    "tabulate",
+    "bodhi-client >= 7.0.0",
+    "koji",
+    "rpkg",
+    "cachetools",
+    "python-fedora",
+]
+
+[project.urls]
+Homepage = "https://github.com/packit/packit"
+
+[project.optional-dependencies]
+testing = [
+    "pytest",
+    "flexmock",
+    "deepdiff",
+    "distro",
+    "setuptools", # Required for test_upstream.py/test_get_version_macro
+    "setuptools-scm", # Required for tests using python-ogr.spec
+    "setuptools-scm-git-archive", # Required for tests using python-ogr.spec
+]
+
+[project.scripts]
+packit = "packit.cli.packit_base:packit_base"
+
+[tool.setuptools]
+script-files = ["_packitpatch"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+
+[tool.pytest.ini_options]
+filterwarnings = "ignore::DeprecationWarning"
+addopts = '-m "not slow"'
+markers = [
+    "slow: Slow tests",
+]
+testpaths = [
+    "tests",
+]
