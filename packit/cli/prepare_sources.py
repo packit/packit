@@ -158,12 +158,13 @@ def prepare_sources(
     """
 
     if not result_dir:
-        if package_config and package_config.is_sub_package:
-            path = package_config.paths[0].strip("./\\")
-            result_dir = Path.cwd().joinpath(f"prepare_sources_result_{path}")
-        else:
-            result_dir = Path.cwd().joinpath("prepare_sources_result")
-        logger.debug(f"Setting result_dir to the default one: {result_dir}")
+        path = package_config.paths[0].strip("./\\")
+        result_dir = (
+            Path.cwd().joinpath(f"prepare_sources_result_{path}")
+            if path
+            else Path.cwd().joinpath("prepare_sources_result")
+        )
+        logger.debug(f"Setting result_dir to: {result_dir}")
     api = get_packit_api(
         config=config,
         package_config=package_config,
