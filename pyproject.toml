@@ -72,6 +72,10 @@ testing = [
     "setuptools-scm", # Required for tests using python-ogr.spec
     "setuptools-scm-git-archive", # Required for tests using python-ogr.spec
 ]
+dev = [
+    "packitos[testing]",
+    "pre-commit",
+]
 
 [project.scripts]
 packit = "packit.cli.packit_base:packit_base"
