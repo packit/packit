@@ -5,6 +5,7 @@
 This is the official python interface for packit.
 """
 
+import copy
 import asyncio
 import logging
 import re
@@ -34,7 +35,7 @@ from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
 from packit.actions import ActionName
-from packit.config import Config
+from packit.config import Config, PackageConfig
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -114,6 +115,27 @@ class SynchronizationStatus:
         )
 
 
+def checkout_package_workdir(
+    package_config: Optional[Union[PackageConfig, MultiplePackages]],
+    local_project: LocalProject,
+) -> LocalProject:
+    """If local_project is related to a sub-package in a Monorepo
+    then fix working dir to point to the sub-package given path.
+
+    Returns:
+        A LocalProject with a working dir moved to
+        the sub-package path, if a monorepo sub-package,
+        otherwise the same local project object.
+    """
+    if hasattr(package_config, "paths") and package_config.paths and local_project:
+        new_local_project = copy.deepcopy(local_project)
+        new_local_project.working_dir = new_local_project.working_dir.joinpath(
+            package_config.paths[0]
+        )
+        return new_local_project
+    return local_project
+
+
 class PackitAPI:
     def __init__(
         self,
@@ -157,7 +179,9 @@ class PackitAPI:
             self._up = Upstream(
                 config=self.config,
                 package_config=self.package_config,
-                local_project=self.upstream_local_project,
+                local_project=checkout_package_workdir(
+                    self.package_config, self.upstream_local_project
+                ),
             )
         return self._up
 
@@ -181,7 +205,9 @@ class PackitAPI:
             self._dg = DistGit(
                 config=self.config,
                 package_config=self.package_config,
-                local_project=self.downstream_local_project,
+                local_project=checkout_package_workdir(
+                    self.package_config, self.downstream_local_project
+                ),
                 clone_path=self._dist_git_clone_path,
             )
         return self._dg

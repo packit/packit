@@ -246,27 +246,6 @@ def iterate_packages_source_git(func):
     return covered_func
 
 
-def checkout_package_workdir(
-    package_config: Optional[Union[PackageConfig, MultiplePackages]],
-    local_project: LocalProject,
-) -> LocalProject:
-    """If local_project is related to a sub-package in a Monorepo
-    then fix working dir to point to the sub-package given path.
-
-    Returns:
-        A LocalProject with a working dir moved to
-        the sub-package path, if a monorepo sub-package,
-        otherwise the same local project object.
-    """
-    if hasattr(package_config, "paths") and package_config.paths and local_project:
-        new_local_project = copy.deepcopy(local_project)
-        new_local_project.working_dir = new_local_project.working_dir.joinpath(
-            package_config.paths[0]
-        )
-        return new_local_project
-    return local_project
-
-
 def get_packit_api(
     config: Config,
     local_project: LocalProject,
@@ -310,9 +289,7 @@ def get_packit_api(
             config=config,
             package_config=package_config,
             upstream_local_project=None,
-            downstream_local_project=checkout_package_workdir(
-                package_config, local_project
-            ),
+            downstream_local_project=local_project,
             dist_git_clone_path=dist_git_path,
         )
 
@@ -359,10 +336,8 @@ def get_packit_api(
     return PackitAPI(
         config=config,
         package_config=package_config,
-        upstream_local_project=checkout_package_workdir(package_config, lp_upstream),
-        downstream_local_project=checkout_package_workdir(
-            package_config, lp_downstream
-        ),
+        upstream_local_project=lp_upstream,
+        downstream_local_project=lp_downstream,
         dist_git_clone_path=dist_git_path,
     )
 
