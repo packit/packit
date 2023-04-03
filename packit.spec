@@ -11,33 +11,7 @@ URL:            https://github.com/packit/packit
 Source0:        %pypi_source
 BuildArch:      noarch
 BuildRequires:  python3-devel
-BuildRequires:  python3-click-man
-BuildRequires:  python3-GitPython
-BuildRequires:  python3-gnupg
-BuildRequires:  python3-ogr
-BuildRequires:  python3-packaging
-BuildRequires:  python3-pyyaml
-BuildRequires:  python3-specfile
-BuildRequires:  python3-tabulate
-BuildRequires:  python3-cccolutils
-BuildRequires:  python3-copr
-BuildRequires:  python3-koji
-BuildRequires:  python3-rpkg
-BuildRequires:  python3-lazy-object-proxy
-BuildRequires:  python3-marshmallow
-BuildRequires:  python3-marshmallow-enum
-BuildRequires:  python3-requests
-BuildRequires:  python3-requests-kerberos
-BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(setuptools-scm)
-BuildRequires:  python3dist(setuptools-scm-git-archive)
-BuildRequires:  python3-bodhi-client >= 7.0.0
-BuildRequires:  python3-cachetools
-BuildRequires:  python3-fedora
-%if 0%{?rhel}
-# epel-8 requires typing-extensions due to old python version
-BuildRequires:  python3-typing-extensions
-%endif
+BuildRequires:  python3dist(click-man)
 Requires:       python3-%{real_name} = %{version}-%{release}
 
 %description
@@ -57,11 +31,6 @@ Requires:       rpm-build
 Requires:       rpmdevtools
 # Copying files between repositories
 Requires:       rsync
-%if 0%{?rhel}
-# rhbz#1968618 still not fixed for epel-8
-Requires:       python3-koji
-%endif
-%{?python_provide:%python_provide python3-%{real_name}}
 
 %description -n python3-%{real_name}
 Python library for Packit,
@@ -70,35 +39,34 @@ check out packit package for the executable.
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
-# Remove bundled egg-info
-rm -rf %{pypi_name}.egg-info
 
-%if 0%{?rhel}
-# rhbz#1968618 still not fixed for epel-8
-sed -i -e 's|koji|# koji|' setup.cfg
-%endif
+
+%generate_buildrequires
+%pyproject_buildrequires -x testing
+
 
 %build
-%py3_build
+%pyproject_wheel
+
 
 %install
-%py3_install
-python3 setup.py --command-packages=click_man.commands man_pages --target %{buildroot}%{_mandir}/man1
+%pyproject_install
+%pyproject_save_files %{real_name}
+PYTHONPATH="%{buildroot}%{python3_sitelib}" click-man %{real_name} --target %{buildroot}%{_mandir}/man1
 
-install -d -m 755 %{buildroot}%{_datadir}/bash-completion/completions
-cp files/bash-completion/packit %{buildroot}%{_datadir}/bash-completion/completions/packit
+install -d -m 755 %{buildroot}%{bash_completions_dir}
+cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
+
 
 %files
 %license LICENSE
 %{_bindir}/packit
 %{_mandir}/man1/packit*.1*
-%dir %{_datadir}/bash-completion/completions
-%{_datadir}/bash-completion/completions/%{real_name}
+%{bash_completions_dir}/%{real_name}
 
-%files -n python3-%{real_name}
+%files -n python3-%{real_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.md
-%{python3_sitelib}/*
 
 %changelog
 * Sun Apr 16 2023 Packit Team <hello@packit.dev> - 0.74.0-1
