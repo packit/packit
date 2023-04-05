@@ -145,7 +145,7 @@ class JobConfigView(JobConfig):
         original_identifier = super().__getattr__("identifier")
         if original_identifier is None:
             return self._view_for_package
-        return original_identifier
+        return original_identifier + ":" + self._view_for_package
 
 
 def get_default_jobs() -> List[Dict]:

@@ -294,7 +294,7 @@ def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committ
                     },
                     "package_b": {
                         "downstream_package_name": "package_b",
-                        "identifier": "identifier_for_package_b",
+                        "identifier": "an_identifier",
                         "paths": ["."],
                         "specfile_path": "package_b.spec",
                         "files_to_sync": ["package_b.spec", ".packit.yaml"],
@@ -331,7 +331,7 @@ def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committ
                 ["package_b"],
                 ["package_c"],
             ],
-            ["package_a", "identifier_for_package_b", None],
+            ["package_a", "an_identifier:package_b", None],
         ),
     ],
 )
