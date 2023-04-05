@@ -1,11 +1,13 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
 import functools
 import logging
 import sys
+import pathlib
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import click
 from github import GithubException
@@ -18,6 +20,7 @@ from packit.config.common_package_config import MultiplePackages
 from packit.api import PackitAPI
 from packit.config import Config, get_local_package_config, JobType
 from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
+from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
@@ -88,9 +91,165 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         return decorator_cover(_func)
 
 
+def iterate_packages(func):
+    """
+    Decorator for dealing with sub-packages in a package (Monorepo) configuration
+
+    * if packages are specified as an option in CLI then
+      call decorated function just for them
+    * if packages are not specified as an option in CLI but
+      there are multiple packages in the configuration
+      then call the decorated function for all of them
+    * if there is just one package in the configuration
+      then call the decorated function just once
+
+    This method (iterate_packages) **has not** `package_config` key
+    in its kwargs, it has `packages`, but calls a method
+    (func) who needs a `package_config` key and not `packages`!
+    """
+
+    @functools.wraps(func)
+    def covered_func(*args, **kwargs):
+        path_or_url = kwargs["path_or_url"]
+        config = kwargs["config"]
+        decorated_func_kwargs = kwargs.copy()
+        del decorated_func_kwargs["package"]
+        packages_config: MultiplePackages = get_local_package_config(
+            path_or_url.working_dir,
+            repo_name=path_or_url.repo_name,
+            try_local_dir_last=True,
+            package_config_path=config.package_config_path,
+        )
+        packages_config_views_names = set(
+            packages_config.get_package_config_views().keys()
+        )
+        if kwargs.get("package"):
+            if not_defined_packages := set(kwargs["package"]).difference(
+                packages_config_views_names
+            ):
+                logger.error(
+                    "Packages %s are not defined in packit configuration.",
+                    not_defined_packages,
+                )
+                return None
+            for package in kwargs["package"]:
+                decorated_func_kwargs["config"] = copy.deepcopy(
+                    config
+                )  # reset working variables like srpm_path
+                decorated_func_kwargs[
+                    "package_config"
+                ] = packages_config.get_package_config_views()[package]
+                func(*args, **decorated_func_kwargs)
+        elif hasattr(packages_config, "packages"):
+            for package_config in packages_config.get_package_config_views().values():
+                decorated_func_kwargs["config"] = copy.deepcopy(
+                    config
+                )  # reset working variables like srpm_path
+                decorated_func_kwargs["package_config"] = package_config
+                func(*args, **decorated_func_kwargs)
+        else:
+            logger.error("Given packages_config has no packages attribute")
+
+    return covered_func
+
+
+def iterate_packages_source_git(func):
+    """
+    Decorator for dealing with sub-packages in a package (Monorepo) configuration
+    Designed for source-git related commands.
+
+    * if dist-git-path is a git repo
+      then search for a downstream repo name match
+      in the configuration and find out its PackageConfig(View)
+      but if there is just one package config and not matches
+      then try going on with the found package config
+    * if there are multiple package configs and
+      dist-git-path is a dir (and not a git repo)
+      for every sub-dir which is also a git repo
+      search for a downstream repo name match
+      in the configuration and find out its PackageConfig(View)
+      Invoke the decorated function as many time as we
+      found a match
+
+    This method (iterate_packages) **has not** `package_config` key
+    in its kwargs, but calls a method
+    (func) who needs a `package_config` key!
+    """
+
+    @functools.wraps(func)
+    def covered_func(*args, **kwargs):
+        source_git = kwargs["source_git"]
+        dist_git = kwargs["dist_git"]
+        config = kwargs["config"]
+        decorated_func_kwargs = kwargs.copy()
+
+        source_git_path = pathlib.Path(source_git).resolve()
+        dist_git_path = pathlib.Path(dist_git).resolve()
+
+        packages_config = get_local_package_config(
+            package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
+        )
+
+        found_func = False
+        for package in packages_config.get_package_config_views().values():
+            if package.downstream_package_name == dist_git_path.name:
+                decorated_func_kwargs["config"] = copy.deepcopy(
+                    config
+                )  # reset working variables like srpm_path
+                decorated_func_kwargs["package_config"] = package
+                func(*args, **decorated_func_kwargs)
+                found_func = True
+
+        # if names does not match but there is just one package try it
+        if (
+            len(packages_config.get_package_config_views()) == 1
+            and dist_git_path.joinpath(".git").exists()
+            and not found_func
+        ):
+            decorated_func_kwargs["config"] = copy.deepcopy(
+                config
+            )  # reset working variables like srpm_path
+            decorated_func_kwargs["package_config"] = list(
+                packages_config.get_package_config_views().values()
+            )[0]
+            func(*args, **decorated_func_kwargs)
+            found_func = True
+
+        # probably, if dist-git is not a git repo,
+        # we would like to cycle over multiple dist-git repos
+        elif (
+            dist_git_path.is_dir()
+            and not dist_git_path.joinpath(".git").exists()
+            and not found_func
+        ):
+            repo_dirs = [
+                p
+                for p in dist_git_path.glob("*")
+                if p.is_dir() and p.joinpath(".git").exists()
+            ]
+            for package in packages_config.get_package_config_views().values():
+                for repo_dir in repo_dirs:
+                    if package.downstream_package_name == repo_dir.name:
+                        decorated_func_kwargs["config"] = copy.deepcopy(
+                            config
+                        )  # reset working variables like srpm_path
+                        decorated_func_kwargs["dist_git"] = str(repo_dir)
+                        decorated_func_kwargs["package_config"] = package
+                        func(*args, **decorated_func_kwargs)
+                        found_func = True
+
+        if not found_func:
+            logger.error(
+                f"No match found for source git {source_git} and dist git {dist_git}."
+            )
+
+    return covered_func
+
+
 def get_packit_api(
     config: Config,
     local_project: LocalProject,
+    package_config: Optional[Union[PackageConfig, MultiplePackages]] = None,
     dist_git_path: Optional[str] = None,
     job_config_index: Optional[int] = None,
     job_type: Optional[JobType] = None,
@@ -98,12 +257,14 @@ def get_packit_api(
     """
     Load the package config, set other options and return the PackitAPI
     """
-    package_config: MultiplePackages = get_local_package_config(
-        local_project.working_dir,
-        repo_name=local_project.repo_name,
-        try_local_dir_last=True,
-        package_config_path=config.package_config_path,
-    )
+    if not package_config:
+        # TODO: to be removed when monorepo refactoring is finished!
+        package_config = get_local_package_config(
+            local_project.working_dir,
+            repo_name=local_project.repo_name,
+            try_local_dir_last=True,
+            package_config_path=config.package_config_path,
+        )
     logger.debug(f"job_config_index: {job_config_index}")
     if job_config_index is not None and isinstance(package_config, PackageConfig):
         if job_config_index >= len(package_config.jobs):

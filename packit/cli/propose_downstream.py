@@ -11,9 +11,14 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings, PackageConfig
 from packit.config.aliases import get_branches
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +86,12 @@ def get_dg_branches(api, dist_git_branch):
     is_flag=True,
     help="Don't discard changes in the git repo by default, unless this is set.",
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="sync downstream"),
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
@@ -89,6 +100,7 @@ def get_dg_branches(api, dist_git_branch):
 @click.argument("version", required=False)
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def propose_downstream(
     config,
     dist_git_path,
@@ -100,6 +112,7 @@ def propose_downstream(
     upstream_ref,
     version,
     force,
+    package_config,
 ):
     """
     Land a new upstream release in Fedora.
@@ -112,7 +125,10 @@ def propose_downstream(
     """
 
     api = get_packit_api(
-        config=config, dist_git_path=dist_git_path, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        dist_git_path=dist_git_path,
+        local_project=path_or_url,
     )
     if pr is None:
         pr = api.package_config.create_pr

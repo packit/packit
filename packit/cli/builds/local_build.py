@@ -7,9 +7,14 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.utils.changelog_helper import ChangelogHelper
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger("packit")
 
@@ -68,6 +73,12 @@ def log_rpms(rpms):
         "release_suffix is specified in the configuration."
     ),
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="build"),
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
@@ -75,14 +86,24 @@ def log_rpms(rpms):
 )
 @pass_config
 @cover_packit_exception
-def local(config, upstream_ref, release_suffix, default_release_suffix, path_or_url):
+@iterate_packages
+def local(
+    config,
+    upstream_ref,
+    release_suffix,
+    default_release_suffix,
+    package_config,
+    path_or_url,
+):
     """
     Create RPMs using content of the upstream repository.
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory
     """
-    api = get_packit_api(config=config, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, package_config=package_config, local_project=path_or_url
+    )
 
     rpms = (
         build_rpms_from_srpm(api, config.srpm_path)

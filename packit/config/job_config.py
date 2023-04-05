@@ -105,6 +105,49 @@ class JobConfig(MultiplePackages):
         return s.dump(self) == s.dump(other)
 
 
+class JobConfigView(JobConfig):
+    def __init__(self, job_config: JobConfig, package: str):
+        self._view_for_package = package
+        self._job_config_packages = job_config.packages
+        job_config_view_packages = {package: job_config.packages[package]}
+        super().__init__(
+            job_config.type,
+            job_config.trigger,
+            job_config_view_packages,
+            job_config.skip_build,
+        )
+
+    @property
+    def package(self) -> str:
+        """The name for the package related with this JobConfigView?"""
+        return self._view_for_package
+
+    def __eq__(self, other: object):
+        if not isinstance(other, JobConfigView):
+            if isinstance(other, JobConfig):
+                return False
+            raise PackitConfigException(
+                "Provided object is not a JobConfigView instance."
+            )
+        # required to avoid cyclical imports
+        from packit.schema import JobConfigSchema
+
+        s = JobConfigSchema()
+        # Compare the serialized objects.
+        return s.dump(self) == s.dump(other)
+
+    @property
+    def identifier(self):
+        """
+        Decorate any identifier attribute with the
+        reference to the package.
+        """
+        original_identifier = super().__getattr__("identifier")
+        if original_identifier is None:
+            return self._view_for_package
+        return original_identifier
+
+
 def get_default_jobs() -> List[Dict]:
     """
     this returns a list of dicts so it can be properly parsed and defaults would be set

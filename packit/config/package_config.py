@@ -14,7 +14,11 @@ from ogr.exceptions import (
 from yaml import safe_load, YAMLError
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
-from packit.config.job_config import JobConfig, JobType
+from packit.config.job_config import (
+    JobConfig,
+    JobConfigView,
+    JobType,
+)
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 
@@ -35,6 +39,8 @@ class PackageConfig(MultiplePackages):
         packages: Dict[str, CommonPackageConfig],
         jobs: Optional[List[JobConfig]] = None,
     ):
+        self._job_views: List[Union[JobConfig, JobConfigView]] = []
+        self._package_config_views: Dict[str, "PackageConfigView"] = {}
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
         # It is done here to avoid triggering __setattr__ and
@@ -52,21 +58,13 @@ class PackageConfig(MultiplePackages):
         return f"PackageConfig: {s.dumps(self)}"
 
     @classmethod
-    def get_from_dict(
+    def set_defaults(
         cls,
         raw_dict: dict,
-        config_file_path: Optional[str] = None,
         repo_name: Optional[str] = None,
         search_specfile: Optional[Callable[..., Optional[str]]] = None,
         **specfile_search_args,
-    ) -> "PackageConfig":
-        # required to avoid cyclical imports
-        from packit.schema import PackageConfigSchema
-
-        # we need to process defaults first so they get propagated to JobConfigs
-
-        raw_dict.setdefault("config_file_path", config_file_path)
-
+    ) -> None:
         if not raw_dict.get("specfile_path"):
             default_specfile_path = None
             # we default to <downstream_package_name>.spec
@@ -84,7 +82,53 @@ class PackageConfig(MultiplePackages):
             raw_dict.setdefault("upstream_package_name", repo_name)
             raw_dict.setdefault("downstream_package_name", repo_name)
 
+    @classmethod
+    def get_from_dict(
+        cls,
+        raw_dict: dict,
+        config_file_path: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        search_specfile: Optional[Callable[..., Optional[str]]] = None,
+        **specfile_search_args,
+    ) -> "PackageConfig":
+        # required to avoid cyclical imports
+        from packit.schema import PackageConfigSchema
+
+        # we need to process defaults first so they get propagated to JobConfigs
+        raw_dict.setdefault("config_file_path", config_file_path)
+
+        if packages := raw_dict.get("packages", None):
+            for package in packages.values():
+                up_url_key = "upstream_project_url"
+                if up_url_key in raw_dict:
+                    # propagate it to any monorepo sub-package
+                    package[up_url_key] = raw_dict[up_url_key]
+                cls.set_defaults(
+                    package, repo_name, search_specfile, **specfile_search_args
+                )
+        else:
+            cls.set_defaults(
+                raw_dict, repo_name, search_specfile, **specfile_search_args
+            )
+
         package_config = PackageConfigSchema().load(raw_dict)
+
+        package_config_views: Dict[str, "PackageConfigView"] = {}
+        # only package_config knows it through the raw_dict
+        is_monorepo = "package" in raw_dict
+        for name, package in package_config.packages.items():
+            # inject is_sub_package info,
+            package.is_sub_package = is_monorepo
+            # filter out job data for this package
+            jobs = [
+                job
+                for job in package_config.get_job_views()
+                if name in job.packages.keys()
+            ]
+            package_config_views[name] = PackageConfigView(
+                packages={name: package}, jobs=jobs
+            )
+        package_config.set_package_config_views(package_config_views)
 
         return package_config
 
@@ -128,6 +172,84 @@ class PackageConfig(MultiplePackages):
         logger.debug(f"our configuration:\n{serialized_self}")
         logger.debug(f"the other configuration:\n{serialized_other}")
         return serialized_self == serialized_other
+
+    def get_job_views(self) -> List[Union[JobConfig, JobConfigView]]:
+        """Get jobs views on a single package.
+        If a JobConfig reference more than a package, then
+        split it in many JobConfigView(s) one for any package
+        """
+        if self._job_views:
+            return self._job_views
+
+        for job in self.jobs:
+            if len(job.packages) > 1:
+                for name in job.packages:
+                    job_view = JobConfigView(job, name)
+                    self._job_views.append(job_view)
+            else:
+                self._job_views.append(job)
+        return self._job_views
+
+    def get_package_config_views(self) -> Dict[str, "PackageConfigView"]:
+        """Return a dictionary of package name -> PackageConfigView
+        every PackageConfigView holds just one package (the named one)
+        and its associated jobs.
+        A Monorepo PackageConfig will be splitted in many of them.
+
+        NOTE: not using a property because of the custom __getattr__
+        """
+        return self._package_config_views
+
+    def set_package_config_views(self, value: Dict[str, "PackageConfigView"]):
+        """Set a dictionary of package name -> PackageConfigView
+        every PackageConfigView holds just one package (the named one)
+        and its associated jobs.
+        A Monorepo PackageConfig will be splitted in many of them.
+
+        NOTE: not using a property because of the custom __setattr__
+        """
+        self._package_config_views = value
+
+    def get_package_config_for(
+        self, job_config: Union[JobConfigView, JobConfig]
+    ) -> Union["PackageConfigView", "PackageConfig"]:
+        """Select the PackageConfigView for the given JobConfig in
+        a multiple packages config.
+        """
+        package_config_views = self.get_package_config_views()
+        if not package_config_views:
+            # the package config views were not initialized
+            # we can continue if this is not a monorepo
+            if len(self.packages) == 1:
+                return self
+        else:
+            if not isinstance(job_config, JobConfigView):
+                # the job config should have just one package,
+                # choose that one
+                return package_config_views[next(iter(job_config.packages.keys()))]
+
+        return package_config_views[job_config.package]
+
+
+class PackageConfigView(PackageConfig):
+    """A PackageConfig which holds:
+    - one single package config (no more than one CommonPackageConfig object)
+    - only jobs related with the given package config
+
+    The PackageConfig is responsible to build this object
+    filtering out all the data related to a single package
+    """
+
+    def __init__(
+        self,
+        packages: Dict[str, CommonPackageConfig],
+        jobs: Optional[List[JobConfig]] = None,
+    ):
+        if len(packages) > 1:
+            logger.error(
+                "The PackageConfigView class deals with just one single package"
+            )
+        super().__init__(packages, jobs)
 
 
 def find_packit_yaml(

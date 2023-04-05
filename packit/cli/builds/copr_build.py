@@ -8,11 +8,20 @@ from typing import Optional, List
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
-from packit.config import pass_config, get_context_settings, PackageConfig
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
+from packit.config import (
+    pass_config,
+    get_context_settings,
+    PackageConfig,
+)
 from packit.config.aliases import DEPRECATED_TARGET_MAP
 from packit.utils import sanitize_branch_name
 from packit.utils.changelog_helper import ChangelogHelper
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -105,9 +114,16 @@ logger = logging.getLogger(__name__)
     default=False,
     is_flag=True,
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="build"),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def copr(
     config,
     wait,
@@ -124,6 +140,7 @@ def copr(
     enable_net,
     release_suffix,
     default_release_suffix,
+    package_config,
     path_or_url,
     module_hotfixes,
 ):
@@ -133,7 +150,9 @@ def copr(
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory.
     """
-    api = get_packit_api(config=config, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, package_config=package_config, local_project=path_or_url
+    )
     release_suffix = ChangelogHelper.resolve_release_suffix(
         api.package_config, release_suffix, default_release_suffix
     )

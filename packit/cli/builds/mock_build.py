@@ -7,9 +7,14 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, get_context_settings
 from packit.utils.changelog_helper import ChangelogHelper
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger("packit")
 
@@ -47,6 +52,12 @@ logger = logging.getLogger("packit")
         "treated as full path to the mock configuration."
     ),
 )
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="build"),
+)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
@@ -54,8 +65,15 @@ logger = logging.getLogger("packit")
 )
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def mock(
-    config, upstream_ref, release_suffix, default_release_suffix, root, path_or_url
+    config,
+    upstream_ref,
+    release_suffix,
+    default_release_suffix,
+    root,
+    package_config,
+    path_or_url,
 ):
     """
     Build RPMs in mock using content of the upstream repository.
@@ -63,7 +81,9 @@ def mock(
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
     it defaults to the current working directory.
     """
-    api = get_packit_api(config=config, local_project=path_or_url)
+    api = get_packit_api(
+        config=config, package_config=package_config, local_project=path_or_url
+    )
     release_suffix = ChangelogHelper.resolve_release_suffix(
         api.package_config, release_suffix, default_release_suffix
     )

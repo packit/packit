@@ -8,11 +8,10 @@ import pathlib
 import click
 
 from packit.config import pass_config
-from packit.config import Config, get_local_package_config
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.config import Config, PackageConfig
 from packit.api import PackitAPI
 from packit.local_project import LocalProjectBuilder, CALCULATE
-from packit.cli.utils import cover_packit_exception
+from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
 
 
 @click.command("status")
@@ -20,7 +19,10 @@ from packit.cli.utils import cover_packit_exception
 @click.argument("dist-git", type=click.Path(exists=True, file_okay=False))
 @pass_config
 @cover_packit_exception
-def source_git_status(config: Config, source_git: str, dist_git: str):
+@iterate_packages_source_git
+def source_git_status(
+    config: Config, package_config: PackageConfig, source_git: str, dist_git: str
+):
     """Tell the synchronization status of a source-git and a dist-git repo.
 
     This command checks the commit history in the provided source-git
@@ -33,9 +35,6 @@ def source_git_status(config: Config, source_git: str, dist_git: str):
     """
     source_git_path = pathlib.Path(source_git).resolve()
     dist_git_path = pathlib.Path(dist_git).resolve()
-    package_config = get_local_package_config(
-        package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
-    )
     builder = LocalProjectBuilder(offline=True)
     api = PackitAPI(
         config=config,
