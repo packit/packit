@@ -8,8 +8,13 @@ from os import getcwd
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_packit_api
+from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
 from packit.config import pass_config, JobType
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_OPTION_HELP,
+)
 
 logger = logging.getLogger("packit")
 
@@ -24,14 +29,22 @@ logger = logging.getLogger("packit")
 )
 @click.option("--wait/--no-wait", default=False, help="Wait for the build to finish")
 @click.argument("image_name", default=None, type=click.STRING)
+@click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="build"),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=getcwd())
 @pass_config
 @cover_packit_exception
+@iterate_packages
 def in_image_builder(
     config,
     wait,
     image_name,
     job_config_index,
+    package_config,
     path_or_url,
 ):
     """
@@ -56,6 +69,7 @@ def in_image_builder(
     """
     api = get_packit_api(
         config=config,
+        package_config=package_config,
         local_project=path_or_url,
         job_config_index=job_config_index,
         job_type=JobType.vm_image_build,
