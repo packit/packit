@@ -94,7 +94,6 @@ cp files/bash-completion/packit %{buildroot}%{_datadir}/bash-completion/completi
 %{_mandir}/man1/packit*.1*
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/%{real_name}
-%{_bindir}/_packitpatch
 
 %files -n python3-%{real_name}
 %license LICENSE

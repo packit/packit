@@ -6,7 +6,7 @@ packit started as source-git and we're making a source-git module after such a l
 """
 
 import logging
-import shutil
+import importlib.resources
 import textwrap
 from pathlib import Path
 from typing import Optional
@@ -119,37 +119,36 @@ class SourceGitGenerator:
         run `rpmbuild -bp` in the dist-git repo to get a git-repo
         in the %prep phase so we can pick the commits in the source-git repo
         """
-        _packitpatch_path = shutil.which("_packitpatch")
-        if not _packitpatch_path:
-            raise PackitException(
-                "We are trying to unpack a dist-git archive and lay patches on top "
-                'by running `rpmbuild -bp` but we cannot find "_packitpatch" command on PATH: '
-                "please install packit as an RPM."
+        files = importlib.resources.files("packit.data")
+        with importlib.resources.as_file(
+            files.joinpath("_packitpatch")
+        ) as _packitpatch:
+            logger.info(f"expanding %prep section in {self.dist_git.working_dir}")
+
+            rpmbuild_args = [
+                "rpmbuild",
+                "--nodeps",
+                "--define",
+                f"_packitpatch {_packitpatch}",
+                "--define",
+                f"_topdir {str(self.dist_git.working_dir)}",
+                "-bp",
+                "--define",
+                f"_specdir {self.dist_git.working_dir}",
+                "--define",
+                f"_sourcedir {self.dist_git.working_dir}",
+            ]
+
+            rpmbuild_args += RPM_MACROS_FOR_PREP
+            if logger.level <= logging.DEBUG:  # -vv can be super-duper verbose
+                rpmbuild_args.append("-v")
+            rpmbuild_args.append(str(self.dist_git_specfile.path))
+
+            run_command(
+                rpmbuild_args,
+                cwd=self.dist_git.working_dir,
+                print_live=True,
             )
-        logger.info(f"expanding %prep section in {self.dist_git.working_dir}")
-
-        rpmbuild_args = [
-            "rpmbuild",
-            "--nodeps",
-            "--define",
-            f"_topdir {str(self.dist_git.working_dir)}",
-            "-bp",
-            "--define",
-            f"_specdir {self.dist_git.working_dir}",
-            "--define",
-            f"_sourcedir {self.dist_git.working_dir}",
-        ]
-
-        rpmbuild_args += RPM_MACROS_FOR_PREP
-        if logger.level <= logging.DEBUG:  # -vv can be super-duper verbose
-            rpmbuild_args.append("-v")
-        rpmbuild_args.append(str(self.dist_git_specfile.path))
-
-        run_command(
-            rpmbuild_args,
-            cwd=self.dist_git.working_dir,
-            print_live=True,
-        )
 
     def get_BUILD_dir(self):
         path = Path(self.dist_git.working_dir)
