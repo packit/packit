@@ -1,3 +1,9 @@
+# Testing dependencies: deepdiff, flexmock are missing on EPEL 9. Cannot use testing environment
+%if 0%{?el9}
+%bcond_with tests
+%else
+%bcond_without tests
+%endif
 %global pypi_name packitos
 %global real_name packit
 
@@ -42,7 +48,8 @@ check out packit package for the executable.
 
 
 %generate_buildrequires
-%pyproject_buildrequires -x testing
+# The -w flag is required for EPEL 9's older hatchling
+%pyproject_buildrequires %{?with_tests:-x testing} %{?el9:-w}
 
 
 %build
