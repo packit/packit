@@ -19,9 +19,9 @@ issue_repository: https://github.com/packit/packit
 actions:
   create-archive:
     - "python3 -m build --sdist --outdir ."
-    - "sh -c 'echo packitos-$(python3 -m setuptools_scm).tar.gz'"
+    - "sh -c 'echo packitos-$(hatch version).tar.gz'"
   get-current-version:
-    - "python3 -m setuptools_scm"
+    - "hatch version"
   pre-sync:
     # FMF has to be installed on system where you are calling this tool.
     - python3 plans/git_reference.py
@@ -31,7 +31,8 @@ allowed_gpg_keys:
 
 srpm_build_deps:
   - python3-build
-  - python3-setuptools_scm
+  - hatch
+  - python3-hatch-vcs
 
 jobs:
   - job: propose_downstream
