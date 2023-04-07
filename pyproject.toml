@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "packitos"
@@ -80,11 +80,12 @@ dev = [
 [project.scripts]
 packit = "packit.cli.packit_base:packit_base"
 
-[tool.setuptools]
-script-files = ["_packitpatch"]
+[tool.hatch.version]
+source = "vcs"
+raw-options.version_scheme = "post-release"
 
-[tool.setuptools_scm]
-version_scheme = "post-release"
+[tool.hatch.build.targets.wheel]
+packages = ["packit"]
 
 [tool.pytest.ini_options]
 filterwarnings = "ignore::DeprecationWarning"
