@@ -4,27 +4,25 @@
 %else
 %bcond_without tests
 %endif
-%global pypi_name packitos
-%global real_name packit
 
-Name:           %{real_name}
+Name:           packit
 Version:        0.73.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
 URL:            https://github.com/packit/packit
-Source0:        %pypi_source
+Source0:        %{pypi_source packitos}
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(click-man)
-Requires:       python3-%{real_name} = %{version}-%{release}
+Requires:       python3-packit = %{version}-%{release}
 
 %description
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
 
-%package -n     python3-%{real_name}
+%package -n     python3-packit
 Summary:        %{summary}
 # new-sources
 Requires:       fedpkg
@@ -38,13 +36,13 @@ Requires:       rpmdevtools
 # Copying files between repositories
 Requires:       rsync
 
-%description -n python3-%{real_name}
+%description -n python3-packit
 Python library for Packit,
 check out packit package for the executable.
 
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n packitos-%{version}
 
 
 %generate_buildrequires
@@ -58,7 +56,7 @@ check out packit package for the executable.
 
 %install
 %pyproject_install
-%pyproject_save_files %{real_name}
+%pyproject_save_files packit
 PYTHONPATH="%{buildroot}%{python3_sitelib}" click-man packit --target %{buildroot}%{_mandir}/man1
 
 install -d -m 755 %{buildroot}%{bash_completions_dir}
@@ -69,9 +67,9 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %license LICENSE
 %{_bindir}/packit
 %{_mandir}/man1/packit*.1*
-%{bash_completions_dir}/%{real_name}
+%{bash_completions_dir}/packit
 
-%files -n python3-%{real_name} -f %{pyproject_files}
+%files -n python3-packit -f %{pyproject_files}
 %license LICENSE
 %doc README.md
 
