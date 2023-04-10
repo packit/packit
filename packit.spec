@@ -16,6 +16,14 @@ Source0:        %{pypi_source packitos}
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(click-man)
+# Additional test packages
+BuildRequires:  fedpkg
+BuildRequires:  git
+BuildRequires:  krb5-workstation
+BuildRequires:  rpm-build
+BuildRequires:  rpmdevtools
+BuildRequires:  rsync
+
 Requires:       python3-packit = %{version}-%{release}
 
 %description
@@ -68,6 +76,11 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %{_bindir}/packit
 %{_mandir}/man1/packit*.1*
 %{bash_completions_dir}/packit
+
+%check
+%if %{with tests}
+%pytest
+%endif
 
 %files -n python3-packit -f %{pyproject_files}
 %if 0%{?el9}
