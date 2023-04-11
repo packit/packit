@@ -110,11 +110,11 @@ RPM_MACROS_FOR_PREP = [
     # %{2} = patch ID
     "-D",
     "__scm_apply_patch(qp:m:) "
-    "_packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} "
+    "%_packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} --fuzz=%{_default_patch_fuzz} "
     "%{_default_patch_flags}",
     # override patch program with _packitpatch
     "-D",
-    "__patch _packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} "
+    "__patch %_packitpatch %{1} %{2} %{-p:-p%{-p*}} %{-q:-s} "
     "--fuzz=%{_default_patch_fuzz} %{_default_patch_flags}",
     "-D",
     "__scm_setup_git(q) "
