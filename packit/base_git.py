@@ -141,7 +141,7 @@ class PackitRepositoryBase:
             branch_name=branch_name, base=base, setup_tracking=setup_tracking
         )
 
-    def checkout_branch(self, branch: str = None) -> None:
+    def switch_branch(self, branch: str = None) -> None:
         """
         Switch to a specified branch.
 
