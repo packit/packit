@@ -70,7 +70,9 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %{bash_completions_dir}/packit
 
 %files -n python3-packit -f %{pyproject_files}
+%if 0%{?el9}
 %license LICENSE
+%endif
 %doc README.md
 
 %changelog
