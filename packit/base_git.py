@@ -10,12 +10,11 @@ from typing import Optional, Callable, List, Iterable, Dict, Tuple
 
 import git
 import requests
-from git import PushInfo
+from git import GitCommandError, PushInfo
+from ogr.abstract import PullRequest
 from specfile import Specfile
 from specfile.exceptions import DuplicateSourceException, SourceNumberException
 from specfile.sections import Section
-
-from ogr.abstract import PullRequest
 
 from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
@@ -142,19 +141,19 @@ class PackitRepositoryBase:
             branch_name=branch_name, base=base, setup_tracking=setup_tracking
         )
 
-    def checkout_branch(self, git_ref: str = None):
+    def checkout_branch(self, branch: str = None) -> None:
         """
-        Perform a `git checkout`
+        Switch to a specified branch.
 
-        :param git_ref: ref to check out, defaults to repo's default branch
+        Args:
+            branch: branch to switch to, defaults to repo's default branch
         """
-        git_ref = git_ref or self.local_project.git_project.default_branch
-        logger.debug(f"Checking out branch {git_ref}.")
-        if git_ref in self.local_project.git_repo.heads:
-            head = self.local_project.git_repo.heads[git_ref]
-        else:
-            raise PackitException(f"Branch {git_ref} does not exist")
-        head.checkout()
+        branch = branch or self.local_project.git_project.default_branch
+        logger.debug(f"Switching to branch {branch!r}")
+        try:
+            self.local_project.git_repo.git.switch(branch)
+        except GitCommandError as exc:
+            raise PackitException(f"Failed to switch branch to {branch!r}") from exc
 
     def commit(
         self,
