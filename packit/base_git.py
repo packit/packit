@@ -453,7 +453,7 @@ class PackitRepositoryBase:
         )
         push_infos_list: Iterable[PushInfo] = self.local_project.git_repo.remote(
             name=remote_name
-        ).push(refspec=refspec, force=force)
+        ).push(refspec=refspec, force=force, no_verify=True)
         for pi in push_infos_list:
             logger.info(f"Push summary: {pi.summary}")
             push_failed = [
