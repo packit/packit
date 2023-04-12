@@ -831,7 +831,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             # fetch and reset --hard upstream/$branch?
             logger.info(f"Using {dist_git_branch!r} dist-git branch.")
             self.dg.update_branch(dist_git_branch)
-            self.dg.checkout_branch(dist_git_branch)
+            self.dg.switch_branch(dist_git_branch)
 
             if use_downstream_specfile:
                 logger.info(
@@ -844,7 +844,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     f"{version}-{dist_git_branch}-{local_pr_branch_suffix}"
                 )
                 self.dg.create_branch(local_pr_branch)
-                self.dg.checkout_branch(local_pr_branch)
+                self.dg.switch_branch(local_pr_branch)
 
             if create_sync_note and self.package_config.create_sync_note:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
@@ -953,8 +953,8 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         pr = None
         try:
-            self.dg.checkout_branch(dist_git_branch)
-            self.up.checkout_branch(source_git_branch)
+            self.dg.switch_branch(dist_git_branch)
+            self.up.switch_branch(source_git_branch)
             self.update_source_git()
 
             (
@@ -1050,16 +1050,16 @@ The first dist-git commit to be synced is '{short_hash}'.
                 "The repository is dirty, will not discard the changes. Use --force to bypass."
             )
         self.dg.update_branch(dist_git_branch)
-        self.dg.checkout_branch(dist_git_branch)
+        self.dg.switch_branch(dist_git_branch)
 
         logger.info(f"Using {dist_git_branch!r} dist-git branch.")
 
         if no_pr:
-            self.up.checkout_branch(upstream_branch)
+            self.up.switch_branch(upstream_branch)
         else:
             local_pr_branch = f"{dist_git_branch}-downstream-sync"
             self.up.create_branch(local_pr_branch)
-            self.up.checkout_branch(local_pr_branch)
+            self.up.switch_branch(local_pr_branch)
 
         files = (
             [self.package_config.get_specfile_sync_files_item(from_downstream=True)]
@@ -1229,7 +1229,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         )
 
         self.dg.update_branch(dist_git_branch)
-        self.dg.checkout_branch(dist_git_branch)
+        self.dg.switch_branch(dist_git_branch)
 
         self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
