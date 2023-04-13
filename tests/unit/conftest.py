@@ -132,7 +132,7 @@ def distgit_mock(local_project_mock, config_mock, package_config_mock):
     distgit.should_receive("downstream_config").and_return(package_config_mock)
     distgit.should_receive("create_branch")
     distgit.should_receive("update_branch")
-    distgit.should_receive("checkout_branch")
+    distgit.should_receive("switch_branch")
     distgit.should_receive("commit")
     distgit.should_receive("push")
     distgit.should_receive("absolute_specfile_dir").and_return(Path("/mock_path"))
