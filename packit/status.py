@@ -66,7 +66,7 @@ class Status:
                 self.dg.create_branch(
                     branch, base=f"remotes/origin/{branch}", setup_tracking=False
                 )
-                self.dg.checkout_branch(branch)
+                self.dg.switch_branch(branch)
                 self.dg.specfile.reload()
             except Exception as ex:
                 logger.debug(f"Branch {branch!r} is not present: {ex!r}.")
@@ -75,7 +75,7 @@ class Status:
                 dg_versions[branch] = self.dg.specfile.expanded_version
             except AttributeError:
                 logger.debug(f"Can't figure out the version of branch: {branch}.")
-        self.dg.checkout_branch()
+        self.dg.switch_branch()
 
         return dg_versions
 
