@@ -177,8 +177,7 @@ class PackitRepositoryBase:
         self.local_project.git_repo.index.write()
 
         with commit_message_file(main_msg, msg, trailers) as commit_message:
-            # TODO: make -s configurable
-            commit_args = ["-s", "-F", commit_message]
+            commit_args = ["-F", commit_message]
             self.local_project.git_repo.git.commit(*commit_args)
 
     def run_action(self, actions: ActionName, method: Callable = None, *args, **kwargs):
