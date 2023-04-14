@@ -1037,6 +1037,7 @@ def test_package_config_parse_error(raw):
                         "trigger": "release",
                         "fmf_url": "https://example.com",
                         "fmf_ref": "test_ref",
+                        "fmf_path": "test/path",
                     },
                 ],
             },
@@ -1059,6 +1060,7 @@ def test_package_config_parse_error(raw):
                                 sync_changelog=False,
                                 fmf_url="https://example.com",
                                 fmf_ref="test_ref",
+                                fmf_path="test/path",
                             )
                         },
                     ),

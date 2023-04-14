@@ -43,6 +43,7 @@ from packit.config import CommonPackageConfig, JobConfig, JobType, JobConfigTrig
                         "targets": {},
                         "fmf_url": null,
                         "fmf_ref": null,
+                        "fmf_path": null,
                         "owner": null,
                         "use_internal_tf": false,
                         "list_on_homepage": false,
