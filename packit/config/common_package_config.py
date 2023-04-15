@@ -100,6 +100,7 @@ class CommonPackageConfig:
         additional_repos: buildroot additional additional_repos
         fmf_url: - git repository containing the metadata (FMF) tree
         fmf_ref: - branch, tag or commit specifying the desired git revision
+        fmf_path: - path to the fmf root
         use_internal_tf: if we want to use internal instance of Testing Farm
         skip_build: if we want to skip build phase for Testing Farm job
         env: environment variables
@@ -164,6 +165,7 @@ class CommonPackageConfig:
         additional_repos: Optional[List[str]] = None,
         fmf_url: Optional[str] = None,
         fmf_ref: Optional[str] = None,
+        fmf_path: Optional[str] = None,
         use_internal_tf: bool = False,
         skip_build: bool = False,
         env: Optional[Dict[str, Any]] = None,
@@ -256,6 +258,7 @@ class CommonPackageConfig:
         self.additional_repos: List[str] = additional_repos or []
         self.fmf_url: str = fmf_url
         self.fmf_ref: str = fmf_ref
+        self.fmf_path: str = fmf_path
         self.use_internal_tf: bool = use_internal_tf
         self.skip_build: bool = skip_build
         self.env: Dict[str, Any] = env or {}
