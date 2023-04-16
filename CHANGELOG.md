@@ -1,3 +1,9 @@
+# 0.74.0
+
+- Allow running tmt tests with fmf root outside of git root (#1936)
+- Removed adding the "Signed-off-by" tag to commits created by Packit. (#1934)
+- Packit's source_git functionality installs/loads the `_packitpatch` script in a more reliable manner that doesn't rely on deprecated setuptools functionality. (#1926)
+
 # 0.73.0
 
 - Packit now supports monorepo configuration in CLI (#1864)
