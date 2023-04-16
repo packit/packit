@@ -1,50 +1,36 @@
-%global pypi_name packitos
-%global real_name packit
+# Testing dependencies: deepdiff, flexmock are missing on EPEL 9. Cannot use testing environment
+%if 0%{?el9}
+%bcond_with tests
+%else
+%bcond_without tests
+%endif
 
-Name:           %{real_name}
+Name:           packit
 Version:        0.73.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
 URL:            https://github.com/packit/packit
-Source0:        %pypi_source
+Source0:        %{pypi_source packitos}
 BuildArch:      noarch
 BuildRequires:  python3-devel
-BuildRequires:  python3-click-man
-BuildRequires:  python3-GitPython
-BuildRequires:  python3-gnupg
-BuildRequires:  python3-ogr
-BuildRequires:  python3-packaging
-BuildRequires:  python3-pyyaml
-BuildRequires:  python3-specfile
-BuildRequires:  python3-tabulate
-BuildRequires:  python3-cccolutils
-BuildRequires:  python3-copr
-BuildRequires:  python3-koji
-BuildRequires:  python3-rpkg
-BuildRequires:  python3-lazy-object-proxy
-BuildRequires:  python3-marshmallow
-BuildRequires:  python3-marshmallow-enum
-BuildRequires:  python3-requests
-BuildRequires:  python3-requests-kerberos
-BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(setuptools-scm)
-BuildRequires:  python3dist(setuptools-scm-git-archive)
-BuildRequires:  python3-bodhi-client >= 7.0.0
-BuildRequires:  python3-cachetools
-BuildRequires:  python3-fedora
-%if 0%{?rhel}
-# epel-8 requires typing-extensions due to old python version
-BuildRequires:  python3-typing-extensions
-%endif
-Requires:       python3-%{real_name} = %{version}-%{release}
+BuildRequires:  python3dist(click-man)
+# Additional test packages
+BuildRequires:  fedpkg
+BuildRequires:  git
+BuildRequires:  krb5-workstation
+BuildRequires:  rpm-build
+BuildRequires:  rpmdevtools
+BuildRequires:  rsync
+
+Requires:       python3-packit = %{version}-%{release}
 
 %description
 This project provides tooling and automation to integrate upstream open source
 projects into Fedora operating system.
 
-%package -n     python3-%{real_name}
+%package -n     python3-packit
 Summary:        %{summary}
 # new-sources
 Requires:       fedpkg
@@ -57,48 +43,50 @@ Requires:       rpm-build
 Requires:       rpmdevtools
 # Copying files between repositories
 Requires:       rsync
-%if 0%{?rhel}
-# rhbz#1968618 still not fixed for epel-8
-Requires:       python3-koji
-%endif
-%{?python_provide:%python_provide python3-%{real_name}}
 
-%description -n python3-%{real_name}
+%description -n python3-packit
 Python library for Packit,
 check out packit package for the executable.
 
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
-# Remove bundled egg-info
-rm -rf %{pypi_name}.egg-info
+%autosetup -n packitos-%{version}
 
-%if 0%{?rhel}
-# rhbz#1968618 still not fixed for epel-8
-sed -i -e 's|koji|# koji|' setup.cfg
-%endif
+
+%generate_buildrequires
+# The -w flag is required for EPEL 9's older hatchling
+%pyproject_buildrequires %{?with_tests:-x testing} %{?el9:-w}
+
 
 %build
-%py3_build
+%pyproject_wheel
+
 
 %install
-%py3_install
-python3 setup.py --command-packages=click_man.commands man_pages --target %{buildroot}%{_mandir}/man1
+%pyproject_install
+%pyproject_save_files packit
+PYTHONPATH="%{buildroot}%{python3_sitelib}" click-man packit --target %{buildroot}%{_mandir}/man1
 
-install -d -m 755 %{buildroot}%{_datadir}/bash-completion/completions
-cp files/bash-completion/packit %{buildroot}%{_datadir}/bash-completion/completions/packit
+install -d -m 755 %{buildroot}%{bash_completions_dir}
+cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
+
 
 %files
 %license LICENSE
 %{_bindir}/packit
 %{_mandir}/man1/packit*.1*
-%dir %{_datadir}/bash-completion/completions
-%{_datadir}/bash-completion/completions/%{real_name}
+%{bash_completions_dir}/packit
 
-%files -n python3-%{real_name}
+%check
+%if %{with tests}
+%pytest
+%endif
+
+%files -n python3-packit -f %{pyproject_files}
+%if 0%{?el9}
 %license LICENSE
+%endif
 %doc README.md
-%{python3_sitelib}/*
 
 %changelog
 * Thu Apr 06 2023 Packit Team <hello@packit.dev> - 0.73.0-1
