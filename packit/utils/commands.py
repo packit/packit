@@ -7,6 +7,7 @@ import shlex
 import subprocess
 import sys
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -16,7 +17,7 @@ from packit.utils.logging import StreamLogger
 logger = logging.getLogger(__name__)
 
 
-# TODO: Switch to dataclass when possible
+@dataclass
 class CommandResult:
     """
     Structure to represent a result of the command that was run.
@@ -27,15 +28,9 @@ class CommandResult:
         stderr: Holds standard error output of the command, in case it was requsted.
     """
 
-    def __init__(
-        self,
-        success: bool = False,
-        stdout: Optional[str] = None,
-        stderr: Optional[str] = None,
-    ) -> None:
-        self.success = success
-        self.stdout = stdout
-        self.stderr = stderr
+    success: bool = False
+    stdout: Optional[str] = None
+    stderr: Optional[str] = None
 
 
 def run_command(
