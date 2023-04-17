@@ -30,7 +30,6 @@ import click
 import git
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
-from packaging import version as version_imported
 from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
@@ -76,6 +75,7 @@ from packit.utils.repo import (
     get_commit_hunks,
     is_the_repo_pristine,
 )
+from packit.utils.versions import compare_versions
 from packit.vm_image_build import ImageBuilder
 
 logger = logging.getLogger(__name__)
@@ -816,7 +816,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             if not use_downstream_specfile:
                 spec_ver = self.up.get_specfile_version()
-                if version_imported.parse(version) > version_imported.parse(spec_ver):
+                if compare_versions(version, spec_ver) > 0:
                     logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
 
             self.dg.check_last_commit()
