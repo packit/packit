@@ -156,6 +156,19 @@ class SandcastleCommandHandler(CommandHandler):
             self._sandcastle.run()
         return self._sandcastle
 
+    @staticmethod
+    def _print_logs(logs: str) -> None:
+        """
+        Print out logs line-by-line using logger with the INFO level.
+
+        Args:
+            logs: Logs gathered from the Sandcastle.
+        """
+        # out = 'make po-pull\nmake[1]: Entering directory \'/sand
+        for output_line in logs.split("\n"):
+            if output_line:
+                logger.info(output_line)
+
     def run_command(
         self,
         command: List[str],
@@ -168,20 +181,21 @@ class SandcastleCommandHandler(CommandHandler):
 
         logger.info(f"Running command: {' '.join(command)}")
 
-        success, out = True, ""
+        out = ""
         try:
             out = self.sandcastle.exec(command=command, env=env, cwd=cwd)
 
             logger.info(f"Output of {command!r}:")
-            # out = 'make po-pull\nmake[1]: Entering directory \'/sand
-            for output_line in out.split("\n"):
-                if output_line:
-                    logger.info(output_line)
+            self._print_logs(out)
         except SandcastleCommandFailed as ex:
-            # command failed in the sandcastle, return the logs anyways
-            success, out = False, ex.output
+            # TODO: Maybe consider logging as an error? Would spam Sentry though
+            logger.info(f"Command {command!r} failed:")
+            self._print_logs(ex.output)
+            raise  # reraise the error to halt the execution of the job
 
-        return commands.CommandResult(success, stdout=out if return_output else None)
+        return commands.CommandResult(
+            success=True, stdout=out if return_output else None
+        )
 
     def clean(self) -> None:
         if self._sandcastle:
