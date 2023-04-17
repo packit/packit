@@ -164,16 +164,24 @@ class SandcastleCommandHandler(CommandHandler):
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:
+        from sandcastle.exceptions import SandcastleCommandFailed
+
         logger.info(f"Running command: {' '.join(command)}")
-        out: str = self.sandcastle.exec(command=command, env=env, cwd=cwd)
 
-        logger.info(f"Output of {command!r}:")
-        # out = 'make po-pull\nmake[1]: Entering directory \'/sand
-        for output_line in out.split("\n"):
-            if output_line:
-                logger.info(output_line)
+        success, out = True, ""
+        try:
+            out = self.sandcastle.exec(command=command, env=env, cwd=cwd)
 
-        return commands.CommandResult(stdout=out if return_output else None)
+            logger.info(f"Output of {command!r}:")
+            # out = 'make po-pull\nmake[1]: Entering directory \'/sand
+            for output_line in out.split("\n"):
+                if output_line:
+                    logger.info(output_line)
+        except SandcastleCommandFailed as ex:
+            # command failed in the sandcastle, return the logs anyways
+            success, out = False, ex.output
+
+        return commands.CommandResult(success, stdout=out if return_output else None)
 
     def clean(self) -> None:
         if self._sandcastle:
