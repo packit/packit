@@ -28,6 +28,7 @@ from packit.utils.upstream_version import requests, get_upstream_version
 from packit.utils.lookaside import configparser, pyrpkg, get_lookaside_sources
 from packit.utils.koji_helper import KojiHelper
 from packit.utils.changelog_helper import ChangelogHelper
+from packit.utils.versions import compare_versions
 
 
 @pytest.mark.parametrize(
@@ -862,3 +863,22 @@ def test_koji_helper_get_stable_tags(tag, stable_tags):
 )
 def test_changelog_helper_sanitize_entry(original, sanitized):
     assert ChangelogHelper.sanitize_entry(original) == sanitized
+
+
+@pytest.mark.parametrize(
+    "a, b, result",
+    [
+        ("1.0", "1.0", 0),
+        ("1.0", "2.0", -1),
+        ("2.0", "1.0", 1),
+        ("invalid", "invalid", 0),
+        ("", "invalid", -1),
+        ("invalid", "0.0", -1),
+        ("0.0", "", 1),
+    ],
+)
+def test_compare_versions(a, b, result):
+    if result == 0:
+        assert compare_versions(a, b) == result
+    else:
+        assert compare_versions(a, b) / result > 0
