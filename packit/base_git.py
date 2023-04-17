@@ -419,10 +419,15 @@ class PackitRepositoryBase:
         if version is not None:
             self.specfile.version = version
         if (
-            previous_version != self.specfile.expanded_version
+            # version in upstream spec doesn't match the desired version
+            # -> ignore release from upstream spec and reset it to 1
+            specfile.expanded_version != self.specfile.expanded_version
+            # previous version in dist-git spec doesn't match the desired version
+            # and previous release in dist-git spec matches release in upstream spec
+            # -> reset release to 1
+            or previous_version != self.specfile.expanded_version
             and previous_release == self.specfile.release
-            and self.specfile.release != "%autorelease"
-        ):
+        ) and self.specfile.release != "%autorelease":
             # This may occur if the upstream forgets to reset release after
             # bumping the version, or if the specfile is not maintained in
             # upstream at all (e.g. post-upstream-clone that uses wget to

@@ -458,15 +458,23 @@ def test_set_spec_content(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "dg_raw_release,up_raw_release,expected_dg_release",
+    "dg_raw_version,dg_raw_release,up_raw_version,up_raw_release,expected_dg_release",
     [
-        ("2%{?dist}", "2%{?dist}", "1"),
-        ("2%{?dist}", "3%{?dist}", "3"),
-        ("%autorelease", "%autorelease", "%autorelease"),
+        ("1.0", "2%{?dist}", "1.0", "2%{?dist}", "1"),
+        ("1.0", "2%{?dist}", "1.0", "3%{?dist}", "1"),
+        ("1.0", "2%{?dist}", "1.1", "2%{?dist}", "1"),
+        ("1.0", "2%{?dist}", "1.1", "3%{?dist}", "3"),
+        ("1.0", "%autorelease", "1.0", "%autorelease", "%autorelease"),
+        ("1.0", "%autorelease", "1.1", "%autorelease", "%autorelease"),
     ],
 )
 def test_set_spec_content_reset_release(
-    tmp_path, dg_raw_release, up_raw_release, expected_dg_release
+    tmp_path,
+    dg_raw_version,
+    dg_raw_release,
+    up_raw_version,
+    up_raw_release,
+    expected_dg_release,
 ):
     def changelog(release):
         # %autorelease implies %autochangelog
@@ -479,7 +487,7 @@ def test_set_spec_content_reset_release(
 
     distgit_spec_contents = (
         "Name: bring-me-to-the-life\n"
-        "Version: 1.0\n"
+        f"Version: {dg_raw_version}\n"
         f"Release: {dg_raw_release}\n"
         "Source0: foo.bar\n"
         "License: GPLv3+\n"
@@ -492,7 +500,7 @@ def test_set_spec_content_reset_release(
 
     upstream_spec_contents = (
         "Name: bring-me-to-the-life\n"
-        "Version: 1.0\n"
+        f"Version: {up_raw_version}\n"
         f"Release: {up_raw_release}\n"
         "Source0: foo.bor\n"
         "License: MIT\n"
