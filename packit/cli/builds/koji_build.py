@@ -110,7 +110,15 @@ def koji(
     branches_to_build = get_branches(
         *dist_git_branch.split(","), default_dg_branch=default_dg_branch
     )
-    click.echo(f"Building from the following branches: {', '.join(branches_to_build)}")
+    package = (
+        package_config.downstream_package_name
+        if package_config.downstream_package_name
+        else package_config.upstream_package_name
+    )
+    click.echo(
+        f"Building from the following branches: {', '.join(branches_to_build)}, "
+        f"for package {package}"
+    )
 
     if koji_target is None:
         targets_to_build = {None}
