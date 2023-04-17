@@ -235,7 +235,13 @@ def iterate_packages_source_git(func):
                         )  # reset working variables like srpm_path
                         decorated_func_kwargs["dist_git"] = str(repo_dir)
                         decorated_func_kwargs["package_config"] = package
-                        func(*args, **decorated_func_kwargs)
+                        try:
+                            func(*args, **decorated_func_kwargs)
+                        except PackitException as ex:
+                            if "git trailer does not exist" in str(ex):
+                                pass
+                            else:
+                                raise ex
                         found_func = True
 
         if not found_func:
