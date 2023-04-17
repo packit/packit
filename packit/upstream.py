@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Dict, Optional, List, Tuple, Union
 
 import git
-from packaging import version
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
@@ -35,6 +34,7 @@ from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.commands import run_command
 from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
 from packit.utils.upstream_version import get_upstream_version
+from packit.utils.versions import compare_versions
 from packit.sync import iter_srcs
 
 
@@ -263,7 +263,7 @@ class Upstream(PackitRepositoryBase):
         ups_ver = self.get_latest_released_version()
         spec_ver = self.get_specfile_version()
 
-        if ups_ver and version.parse(ups_ver) > version.parse(spec_ver):
+        if ups_ver and compare_versions(ups_ver, spec_ver) > 0:
             logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
             logger.info(f"Picking version {ups_ver!r} from upstream registry.")
             return ups_ver
