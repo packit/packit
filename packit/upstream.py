@@ -746,7 +746,7 @@ class Upstream(PackitRepositoryBase):
 
         tag = self.command_handler.run_command(
             get_current_version_command(
-                ref.lstrip("branches/"),
+                ref.removeprefix("branches/"),
                 refs="all" if ref.startswith("branches/") else "tags",
             ),
             return_output=True,
