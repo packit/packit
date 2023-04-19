@@ -13,6 +13,7 @@ from packit.config import (
     CommonPackageConfig,
     Config,
     JobConfig,
+    JobConfigView,
     JobType,
     JobConfigTriggerType,
 )
@@ -200,6 +201,24 @@ def test_job_config_validate(raw, is_valid):
 def test_job_config_parse(raw, expected_config):
     job_config = JobConfig.get_from_dict(raw_dict=raw)
     assert job_config == expected_config
+
+
+def test_deserialize_job_config_view():
+    job_config = JobConfig(
+        type=JobType.build,
+        trigger=JobConfigTriggerType.commit,
+        packages={
+            "a": CommonPackageConfig(specfile_path="a.spec"),
+            "b": CommonPackageConfig(specfile_path="b.spec"),
+        },
+    )
+
+    job_config_view = JobConfigView(job_config, "a")
+    assert job_config_view.identifier == "a"
+    dump = JobConfigSchema().dump(job_config_view)
+    job_config_view_deserialization = JobConfig.get_from_dict(dump)
+    assert isinstance(job_config_view_deserialization, JobConfigView)
+    assert job_config_view.identifier == "a"
 
 
 @pytest.mark.parametrize(
