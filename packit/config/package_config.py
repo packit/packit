@@ -114,11 +114,7 @@ class PackageConfig(MultiplePackages):
         package_config = PackageConfigSchema().load(raw_dict)
 
         package_config_views: Dict[str, "PackageConfigView"] = {}
-        # only package_config knows it through the raw_dict
-        is_monorepo = "package" in raw_dict
         for name, package in package_config.packages.items():
-            # inject is_sub_package info,
-            package.is_sub_package = is_monorepo
             # filter out job data for this package
             jobs = [
                 job
