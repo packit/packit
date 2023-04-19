@@ -27,6 +27,7 @@ from packit.config import (
 from packit.config.job_config import (
     JobType,
     JobConfig,
+    JobConfigView,
     JobConfigTriggerType,
     get_default_jobs,
 )
@@ -441,6 +442,7 @@ class JobConfigSchema(Schema):
     packages = fields.Dict(
         keys=fields.String(), values=fields.Nested(CommonConfigSchema())
     )
+    package = fields.String(missing=None)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
@@ -488,7 +490,12 @@ class JobConfigSchema(Schema):
 
     @post_load
     def make_instance(self, data, **_):
-        return JobConfig(**data)
+        package = data.pop("package")
+        job_config = JobConfig(**data)
+        if package:
+            return JobConfigView(job_config, package)
+        else:
+            return job_config
 
 
 class PackageConfigSchema(Schema):

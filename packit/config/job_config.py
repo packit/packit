@@ -75,6 +75,12 @@ class JobConfig(MultiplePackages):
         self.__dict__["trigger"] = trigger
         self.__dict__["skip_build"] = skip_build
 
+        # Data for a JobConfigView:
+        # a JobConfigView is seraialized/deserialized as a JobConfig
+        # If the following data is not None a JobConfigView is
+        # re-built at runtime
+        self.__dict__["_view_for_package"] = None
+
     def __repr__(self):
         # required to avoid cyclical imports
         from packit.schema import JobConfigSchema
@@ -104,11 +110,16 @@ class JobConfig(MultiplePackages):
         # Compare the serialized objects.
         return s.dump(self) == s.dump(other)
 
+    @property
+    def package(self) -> str:
+        """The package's name for which a JobConfigView has been built,
+        None if this is a JobConfig
+        """
+        return self._view_for_package
+
 
 class JobConfigView(JobConfig):
     def __init__(self, job_config: JobConfig, package: str):
-        self._view_for_package = package
-        self._job_config_packages = job_config.packages
         job_config_view_packages = {package: job_config.packages[package]}
         super().__init__(
             job_config.type,
@@ -116,11 +127,7 @@ class JobConfigView(JobConfig):
             job_config_view_packages,
             job_config.skip_build,
         )
-
-    @property
-    def package(self) -> str:
-        """The name for the package related with this JobConfigView?"""
-        return self._view_for_package
+        self.__dict__["_view_for_package"] = package
 
     def __eq__(self, other: object):
         if not isinstance(other, JobConfigView):
