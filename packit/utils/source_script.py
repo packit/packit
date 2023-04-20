@@ -12,6 +12,7 @@ def create_source_script(
     job_config_index: Optional[int] = None,
     update_release: bool = True,
     release_suffix: Optional[str] = None,
+    package: Optional[str] = None,
 ):
     options = []
     if ref:
@@ -31,4 +32,6 @@ def create_source_script(
     options += ["--no-create-symlinks"]
 
     options += [url]
-    return COPR_SOURCE_SCRIPT.format(options=" ".join(options))
+    return COPR_SOURCE_SCRIPT.format(
+        package=f" -p {package}" if package else "", options=" ".join(options)
+    )
