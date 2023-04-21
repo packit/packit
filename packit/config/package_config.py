@@ -184,7 +184,7 @@ class PackageConfig(MultiplePackages):
             return self._job_views
 
         for job in self.jobs:
-            if len(job.packages) > 1:
+            if len(self.packages) > 1:
                 for name in job.packages:
                     job_view = JobConfigView(job, name)
                     self._job_views.append(job_view)

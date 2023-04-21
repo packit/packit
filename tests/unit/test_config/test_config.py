@@ -350,7 +350,34 @@ def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committ
                 ["package_b"],
                 ["package_c"],
             ],
-            ["package_a", "identifier_for_package_b", None],
+            ["package_a", "identifier_for_package_b", "package_c"],
+        ),
+        pytest.param(
+            {
+                "upstream_project_url": "https://github.com/namespace/package",
+                "packages": {
+                    "package_a": {
+                        "downstream_package_name": "package_a",
+                        "paths": ["."],
+                        "specfile_path": "package_a.spec",
+                        "files_to_sync": ["package_a.spec", ".packit.yaml"],
+                        "upstream_package_name": "package",
+                    },
+                },
+                "jobs": [
+                    {
+                        "job": "propose_downstream",
+                        "trigger": "release",
+                        "packages": {
+                            "package_a": {"specfile_path": "a/package.spec"},
+                        },
+                    },
+                ],
+            },
+            [
+                ["package_a"],
+            ],
+            [None],
         ),
     ],
 )
