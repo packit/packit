@@ -383,6 +383,82 @@ class PackitRepositoryBase:
         with cwd(self.absolute_specfile_dir):
             self.download_remote_sources()
 
+    @staticmethod
+    def determine_new_distgit_release(
+        distgit_spec: Specfile, upstream_spec: Specfile, version: Optional[str] = None
+    ) -> str:
+        """
+        Determines new release string to use in dist-git spec file, based on upstream spec file
+        and given version.
+
+        Uses the following logic:
+
+        - If dist-git spec uses %autorelease, the dist-git release remains unchanged,
+          unless upstream spec also uses %autorelease, in which case it is replaced
+          with the upstream release to remain in sync.
+
+        - If upstream spec uses %autorelease and dist-git spec doesn't,
+          the dist-git release is reset.
+
+        - If the version to be set doesn't match version in upstream spec,
+          the upstream release is ignored and the dist-git release is reset.
+
+        - If the upstream release and the dist-git release are equal,
+          the dist-git release is reset.
+
+        - In all other cases the dist-git release is replaced with the upstream release.
+
+        Here are some examples of the respective cases:
+
+        | dist-git release         | upstream release | ups. version | req. version | result       |
+        |--------------------------|------------------|--------------|--------------|--------------|
+        | %autorelease             | 3%{?dist}        | 1.0          | 1.0          | %autorelease |
+        | %autorelease -p -e beta2 | %autorelease     | 1.0          | 1.0          | %autorelease |
+        | 2%{?dist}                | %autorelease     | 1.0          | 1.0          | 1%{?dist}    |
+        | 2%{?dist}                | 5%{?dist}        | 1.0          | 2.0          | 1%{?dist}    |
+        | 3%{?dist}                | 3%{?dist}        | 1.0          | 1.0          | 1%{?dist}    |
+        | 3%{?dist}                | 4%{?dist}        | 1.0          | 1.0          | 4%{?dist}    |
+
+        Args:
+            distgit_spec: dist-git spec file.
+            upstream_spec: Upstream spec file.
+            version: Version to use, if not specified it will be taken from the upstream spec file.
+
+        Returns:
+            New release string (including dist tag, if appropriate).
+        """
+        version = upstream_spec.expand(version or upstream_spec.version)
+        initial_release = "1%{?dist}"
+        if distgit_spec.has_autorelease:
+            # dist-git spec uses %autorelease, preserve it but prefer the raw value
+            # from upstream spec if it also uses %autorelease
+            if upstream_spec.has_autorelease:
+                return upstream_spec.raw_release
+            else:
+                logger.warning(
+                    "dist-git spec file uses %autorelease but upstream spec file doesn't, "
+                    "consider synchronizing them."
+                )
+                return distgit_spec.raw_release
+        if upstream_spec.has_autorelease:
+            # upstream spec uses %autorelease but dist-git spec doesn't, reset it
+            logger.warning(
+                "Upstream spec file uses %autorelease but dist-git spec file doesn't, "
+                "consider synchronizing them."
+            )
+            return initial_release
+        if upstream_spec.expanded_version != version:
+            # version in upstream spec doesn't match the desired version
+            # so we can't use release from upstream spec, reset it
+            return initial_release
+        if distgit_spec.expanded_release == upstream_spec.expanded_release:
+            # releases in dist-git spec and upstream spec are equal, so upstream either
+            # forgot to reset it or the upstream spec doesn't actually come from upstream
+            # (it could be for example fetched from dist-git in post-upstream-clone),
+            # either way, reset the release
+            return initial_release
+        return upstream_spec.raw_release
+
     def set_specfile_content(
         self,
         specfile: Specfile,
@@ -395,17 +471,17 @@ class PackitRepositoryBase:
         1. The whole content of the spec-file is copied.
         2. The changelog is preserved.
         3. If provided, new version is set.
-        4. If provided, new changelog entry is added.
-        5. Release is reset to 1, if the version has changed and the release
-           stayed the same.
+        4. New release is determined and set (see `determine_new_distgit_release()`).
+        5. If provided, new changelog entry is added.
 
         Args:
             specfile: specfile to get changes from (we update self.specfile)
             version: version to set in self.specfile
             comment: new comment for the version in %changelog
         """
-        previous_release = self.specfile.release
-        previous_version = self.specfile.expanded_version
+        new_release = self.determine_new_distgit_release(
+            self.specfile, specfile, version
+        )
         with self.specfile.sections() as sections, specfile.sections() as other_sections:
             try:
                 previous_changelog = sections.changelog[:]
@@ -418,24 +494,7 @@ class PackitRepositoryBase:
                 sections.append(Section("changelog", previous_changelog))
         if version is not None:
             self.specfile.version = version
-        if (
-            # version in upstream spec doesn't match the desired version
-            # -> ignore release from upstream spec and reset it to 1
-            specfile.expanded_version != self.specfile.expanded_version
-            # previous version in dist-git spec doesn't match the desired version
-            # and previous release in dist-git spec matches release in upstream spec
-            # -> reset release to 1
-            or previous_version != self.specfile.expanded_version
-            and previous_release == self.specfile.release
-        ) and self.specfile.release != "%autorelease":
-            # This may occur if the upstream forgets to reset release after
-            # bumping the version, or if the specfile is not maintained in
-            # upstream at all (e.g. post-upstream-clone that uses wget to
-            # get the specfile from Fedora).
-            # Either way, it seems better to fix it at least in downstream
-            # at the cost of upstream and downstream having different
-            # Release fields.
-            self.specfile.release = "1"
+        self.specfile.raw_release = new_release
         if comment is not None:
             self.specfile.add_changelog_entry(comment.splitlines())
 
