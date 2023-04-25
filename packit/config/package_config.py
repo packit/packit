@@ -206,7 +206,7 @@ class PackageConfig(MultiplePackages):
         """Set a dictionary of package name -> PackageConfigView
         every PackageConfigView holds just one package (the named one)
         and its associated jobs.
-        A Monorepo PackageConfig will be splitted in many of them.
+        A Monorepo PackageConfig will be split in many of them.
 
         NOTE: not using a property because of the custom __setattr__
         """
@@ -219,7 +219,7 @@ class PackageConfig(MultiplePackages):
         a multiple packages config.
         """
         package_config_views = self.get_package_config_views()
-        if not package_config_views:
+        if not package_config_views or not job_config:
             # the package config views were not initialized
             # we can continue if this is not a monorepo
             if len(self.packages) == 1:
