@@ -1,6 +1,13 @@
 summary: Unit, integration & functional tests.
 discover+:
   filter: tier:1
+prepare:
+  # enable packit-dev Copr repo to get the latest builds of ogr and specfile
+  - how: install
+    copr: packit/packit-dev
+  # make sure the Copr repo has higher priority than TF Tag Repository
+  - how: shell
+    script: dnf -y config-manager --save --setopt="*:packit:packit-dev.priority=5"
 adjust:
   - when: "distro == rhel-9 or distro == centos-9 or distro == centos-stream-9"
     because: "flexmock and deepdiff are not in EPEL 9: https://bugzilla.redhat.com/show_bug.cgi?id=2120251"
