@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Union
 
 import pytest
+from distro import linux_distribution
 from flexmock import flexmock
 from specfile import Specfile
 from specfile.changelog import ChangelogEntry
@@ -464,8 +465,72 @@ def test_set_spec_content(tmp_path):
         ("1.0", "2%{?dist}", "1.0", "3%{?dist}", "1"),
         ("1.0", "2%{?dist}", "1.1", "2%{?dist}", "1"),
         ("1.0", "2%{?dist}", "1.1", "3%{?dist}", "3"),
-        ("1.0", "%autorelease", "1.0", "%autorelease", "%autorelease"),
-        ("1.0", "%autorelease", "1.1", "%autorelease", "%autorelease"),
+        pytest.param(
+            "1.0",
+            "%autorelease",
+            "1.0",
+            "%autorelease",
+            "%autorelease",
+            marks=pytest.mark.skipif(
+                linux_distribution()[0].startswith("CentOS"),
+                reason="No rpmautospec-rpm-macros installed",
+            ),
+        ),
+        pytest.param(
+            "1.0",
+            "%{autorelease}",
+            "1.1",
+            "%{autorelease}",
+            "%{autorelease}",
+            marks=pytest.mark.skipif(
+                linux_distribution()[0].startswith("CentOS"),
+                reason="No rpmautospec-rpm-macros installed",
+            ),
+        ),
+        pytest.param(
+            "1.0",
+            "%autorelease -b 100",
+            "1.1",
+            "%autorelease -b 100",
+            "%autorelease -b 100",
+            marks=pytest.mark.skipif(
+                linux_distribution()[0].startswith("CentOS"),
+                reason="No rpmautospec-rpm-macros installed",
+            ),
+        ),
+        pytest.param(
+            "1.0",
+            "%autorelease -p -e pre1",
+            "1.0",
+            "%autorelease",
+            "%autorelease",
+            marks=pytest.mark.skipif(
+                linux_distribution()[0].startswith("CentOS"),
+                reason="No rpmautospec-rpm-macros installed",
+            ),
+        ),
+        pytest.param(
+            "1.0",
+            "2%{?dist}",
+            "1.1",
+            "%autorelease",
+            "1",
+            marks=pytest.mark.skipif(
+                linux_distribution()[0].startswith("CentOS"),
+                reason="No rpmautospec-rpm-macros installed",
+            ),
+        ),
+        pytest.param(
+            "1.0",
+            "%autorelease",
+            "1.1",
+            "1%{?dist}",
+            "%autorelease",
+            marks=pytest.mark.skipif(
+                linux_distribution()[0].startswith("CentOS"),
+                reason="No rpmautospec-rpm-macros installed",
+            ),
+        ),
     ],
 )
 def test_set_spec_content_reset_release(
@@ -478,7 +543,7 @@ def test_set_spec_content_reset_release(
 ):
     def changelog(release):
         # %autorelease implies %autochangelog
-        if release == "%autorelease":
+        if "autorelease" in release:
             return "%autochangelog\n"
         return (
             "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
