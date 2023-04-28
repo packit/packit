@@ -10,6 +10,8 @@ on:
 jobs:
   build-n-publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # for trusted publishing
 
     steps:
       - uses: actions/checkout@v3
@@ -25,6 +27,4 @@ jobs:
         # https://github.com/pypa/gh-action-pypi-publish
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          # secrets.PYPI_API_TOKEN is set to usercont-release-bot user token
-          password: ${{ secrets.PYPI_API_TOKEN }}
           verbose: true
