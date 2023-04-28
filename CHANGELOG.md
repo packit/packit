@@ -1,3 +1,13 @@
+# 0.75.0
+
+- Detection of `%autorelease` usage in dist-git spec file during `propose-downstream` and `pull-from-upstream` has been improved and Packit will always preserve it. (#1949)
+- Changed build tool to hatchling and moved metadata to `pyproject.toml`. (PEP621) (#1913)
+- Respect `upstream_ref` for tags that start with "a", "b", "c", "e", "n", "r", "s". This was caused by an issue with a `branches` prefix being treated as a set of letters to remove. (#1943)
+- Reset `Release` field in dist-git spec file to `1` when the version in upstream spec file is not up-to-date with the release that triggered `propose_downstream`. (#1940)
+- Correctly catch the logs, if any of the user actions fail during the propose-downstream. (#1939)
+- `packit source-git` related commands can skip dist-git repos, where the git trailer is not found, when looking for the right dist-git dir where to work. (#1938)
+- More monorepo related fixes. (#1946, #1947, #1948)
+
 # 0.74.0
 
 - Allow configuring tmt tests with fmf root outside of git root (#1936)
