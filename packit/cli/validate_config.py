@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 @cover_packit_exception
 def validate_config(path_or_url: LocalProject):
     """
-    Validate PackageConfig validation.
+    Validate PackageConfig.
 
     \b
     - checks missing values
@@ -32,7 +32,6 @@ def validate_config(path_or_url: LocalProject):
 
     PATH_OR_URL argument is a local path or a URL to a git repository with packit configuration file
     """
-    # we use PackageConfig.load_from_dict for the validation, hence we don't parse it here
     output = PackitAPI.validate_package_config(path_or_url.working_dir)
     logger.info(output)
     # TODO: print more if config.debug
