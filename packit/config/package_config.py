@@ -271,7 +271,7 @@ def find_packit_yaml(
         try_local_dir_last: If set to `True` check the current working directory
             last.
 
-            Defautls to `False`.
+            Defaults to `False`.
 
     Returns:
         Path to the config.

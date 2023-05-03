@@ -7,11 +7,12 @@ from textwrap import dedent
 import pytest
 
 from packit.api import PackitAPI
+from packit.exceptions import PackitConfigException
 from packit.utils.commands import cwd
 
 
 @pytest.mark.parametrize(
-    "raw_package_config,expected_output",
+    "raw_package_config,valid, expected_output",
     [
         (
             dedent(
@@ -31,6 +32,7 @@ from packit.utils.commands import cwd
                   targets: fedora-stable
             """
             ),
+            True,
             "packit.yaml is valid and ready to be used",
         ),
         (
@@ -47,11 +49,12 @@ from packit.utils.commands import cwd
                         successful_build: 55
             """
             ),
+            False,
             "**** field notifications has an incorrect value:\n"
             "***** field pull_request has an incorrect value:\n"
             "****** value at index successful_build: Not a valid boolean.",
         ),
-        ("", "packit.yaml is valid and ready to be used"),
+        ("", True, "packit.yaml is valid and ready to be used"),
         (
             dedent(
                 """\
@@ -71,6 +74,7 @@ from packit.utils.commands import cwd
                   dist_git_branches: fedora-latest
             """
             ),
+            True,
             "packit.yaml is valid and ready to be used",
         ),
         (
@@ -89,6 +93,7 @@ from packit.utils.commands import cwd
                 - c.txt
             """
             ),
+            False,
             "Expected 'list[str]' or 'str', got <class 'int'>.",
         ),
         (
@@ -107,6 +112,7 @@ from packit.utils.commands import cwd
                   dest: True
             """
             ),
+            False,
             "dest: Not a valid string.",
         ),
         (
@@ -126,6 +132,7 @@ from packit.utils.commands import cwd
                   - centos-stream-9
             """
             ),
+            True,
             "packit.yaml is valid and ready to be used",
         ),
         (
@@ -139,6 +146,7 @@ from packit.utils.commands import cwd
                 dist_git_namespace: awesome
             """
             ),
+            False,
             "downstream_package_name: Not a valid string.",
         ),
         (
@@ -153,6 +161,7 @@ from packit.utils.commands import cwd
                 create_pr: ""
             """
             ),
+            False,
             "create_pr: Not a valid boolean.",
         ),
         (
@@ -172,6 +181,7 @@ from packit.utils.commands import cwd
                   - f36
             """
             ),
+            True,
             "packit.yaml is valid and ready to be used",
         ),
         (
@@ -185,6 +195,7 @@ from packit.utils.commands import cwd
                 dist_git_namespace: awesome
             """
             ),
+            False,
             "allowed_gpg_keys: Not a valid list.",
         ),
         (
@@ -198,6 +209,7 @@ from packit.utils.commands import cwd
                 dist_git_namespace: awesome
             """
             ),
+            False,
             " Repository name must be a valid filename.",
         ),
     ],
@@ -216,7 +228,7 @@ from packit.utils.commands import cwd
         "slash_in_package_name",
     ],
 )
-def test_schema_validation(tmpdir, raw_package_config, expected_output):
+def test_schema_validation(tmpdir, raw_package_config, valid, expected_output):
     with cwd(tmpdir):
         Path("test_dir").mkdir()
         Path("test_dir/packit.yaml").write_text(raw_package_config)
@@ -225,5 +237,10 @@ def test_schema_validation(tmpdir, raw_package_config, expected_output):
         Path("test_dir/b.md").write_text("b")
         Path("test_dir/c.txt").write_text("c")
 
-        output = PackitAPI.validate_package_config(Path("test_dir"))
-        assert expected_output in output
+        if valid:
+            output = PackitAPI.validate_package_config(Path("test_dir"))
+            assert expected_output in output
+        else:
+            with pytest.raises(PackitConfigException) as exc:
+                PackitAPI.validate_package_config(Path("test_dir"))
+                assert expected_output in exc
