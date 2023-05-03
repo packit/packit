@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import logging
-import os
+from pathlib import Path
 from typing import Optional
 
 import click
@@ -66,13 +66,16 @@ class LocalProjectParameter(click.ParamType):
             if self.target_branch_param_name:
                 target_branch = self.get_param(self.target_branch_param_name, ctx)
 
+            path = Path(value)
+            if path.is_file():
+                logger.debug(f"Input is file {path}, taking its parent dir.")
+                path = path.parent
             # General use-case, create fully featured project
             builder = LocalProjectBuilder()
-            if os.path.isdir(value):
-                absolute_path = os.path.abspath(value)
-                logger.debug(f"Input is a directory: {absolute_path}")
+            if path.is_dir():
+                logger.debug(f"Input is a directory: {path.absolute()}")
                 local_project = builder.build(
-                    working_dir=absolute_path,
+                    working_dir=path.absolute(),
                     ref=ref,
                     remote=ctx.obj.upstream_git_remote,
                     merge_pr=merge_pr,
