@@ -1740,7 +1740,18 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     @staticmethod
     def validate_package_config(working_dir: Path) -> str:
-        """validate .packit.yaml on the provided path and return human readable report"""
+        """Validate package config.
+
+        Args:
+            working_dir: Directory with the package config.
+
+        Returns:
+            String that the config is valid.
+
+        Raises:
+            PackitConfigException: when the config is not valid
+        """
+
         config_path = find_packit_yaml(
             working_dir,
             try_local_dir_last=True,

@@ -6,11 +6,12 @@ from pathlib import Path
 import pytest
 
 from packit.api import PackitAPI
+from packit.exceptions import PackitConfigException
 from packit.utils.commands import cwd
 
 
 @pytest.mark.parametrize(
-    "existing_files,existing_directories,raw_package_config,expected_output",
+    "existing_files,existing_directories,raw_package_config,valid,expected_output",
     [
         (
             ["a.md", "b.md"],
@@ -31,6 +32,7 @@ files_to_sync:
   dest: aaa.md
 - a_dir
             """,
+            True,
             ".packit.yaml is valid and ready to be used",
         ),
         (
@@ -53,6 +55,7 @@ files_to_sync:
 - c.txt
 - a_dir
             """,
+            False,
             "The following path is configured to be synced but is not present "
             "in the repository: c.txt",
         ),
@@ -74,7 +77,8 @@ files_to_sync:
 - a.md
 - b.md
 - c.txt
-             """,
+            """,
+            False,
             "The following paths are configured to be synced but are not present "
             "in the repository: b.md, c.txt",
         ),
@@ -97,7 +101,8 @@ files_to_sync:
 - b.md
 - c.txt
 - ./a_dir/*
-             """,
+            """,
+            False,
             "The following paths are configured to be synced but are not present "
             "in the repository: b.md, c.txt",
         ),
@@ -120,7 +125,8 @@ files_to_sync:
 - a.md
 - b.md
 - c.txt
-             """,
+            """,
+            False,
             "The following paths are configured to be synced but are not present "
             "in the repository: ./a_dir/*, c.txt",
         ),
@@ -142,7 +148,8 @@ files_to_sync:
 - ./a_dir
 - a.md
 - b.md
-             """,
+            """,
+            True,
             ".packit.yaml is valid and ready to be used",
         ),
     ],
@@ -156,7 +163,12 @@ files_to_sync:
     ],
 )
 def test_validate_paths(
-    tmpdir, existing_files, existing_directories, raw_package_config, expected_output
+    tmpdir,
+    existing_files,
+    existing_directories,
+    raw_package_config,
+    valid,
+    expected_output,
 ):
     with cwd(tmpdir):
         Path(".packit.yaml").write_text(raw_package_config)
@@ -166,5 +178,10 @@ def test_validate_paths(
         for existing_file in existing_files:
             Path(existing_file).write_text("")
 
-        output = PackitAPI.validate_package_config(Path("."))
-        assert expected_output in output
+        if valid:
+            output = PackitAPI.validate_package_config(Path("."))
+            assert expected_output in output
+        else:
+            with pytest.raises(PackitConfigException) as exc:
+                PackitAPI.validate_package_config(Path("."))
+                assert expected_output in exc
