@@ -31,7 +31,14 @@ class PackageConfigValidator:
         self.project_path = project_path
 
     def validate(self) -> str:
-        """Create output for PackageConfig validation."""
+        """Validate PackageConfig.
+
+        Returns:
+            String that the config is valid.
+
+        Raises:
+            PackitConfigException: when the config is not valid
+        """
         schema_errors: Union[List[Any], Dict[Any, Any]] = None
         config = None
         try:
@@ -44,8 +51,6 @@ class PackageConfigValidator:
             )
         except ValidationError as e:
             schema_errors = e.messages
-        except PackitConfigException as e:
-            return str(e)
 
         specfile_path = self.content.get("specfile_path", None)
         if specfile_path and not (self.project_path / specfile_path).is_file():
@@ -97,7 +102,7 @@ class PackageConfigValidator:
             )
 
         if schema_errors or synced_files_errors:
-            return output
+            raise PackitConfigException(output)
         else:
             return f"{self.config_file_path.name} is valid and ready to be used"
 
@@ -109,11 +114,8 @@ class PackageConfigValidator:
         level: int = 1,
     ) -> str:
         if isinstance(errors, list):
-            field_output = f"{field_category} {field_name}: {errors[0]}\n"
-            return field_output
-
-        field_output = self.validate_get_field_item_output(errors, field_name, level)
-        return field_output
+            return f"{field_category} {field_name}: {errors[0]}\n"
+        return self.validate_get_field_item_output(errors, field_name, level)
 
     def validate_get_field_item_output(
         self, errors: dict, field_name: str, level: int
