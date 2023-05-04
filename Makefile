@@ -2,9 +2,11 @@ IMAGE=quay.io/packit/packit
 TEST_IMAGE=packit-tests
 
 CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
+COLOR ?= yes
 TEST_RECORDING_PATH=tests_recording
 TEST_TARGET ?= ./tests/unit ./tests/integration ./tests/functional
 TEST_TIMEOUT ?= 120
+COV_REPORT ?= --cov=packit --cov-report=term-missing
 CONTAINER_RUN_WITH_OPTS=$(CONTAINER_ENGINE) run --rm -ti -v $(CURDIR):/src --security-opt label=disable
 CONTAINER_TEST_COMMAND=bash -c "pip3 install .; make check"
 
@@ -23,7 +25,7 @@ install:
 
 check:
 	find . -name "*.pyc" -exec rm {} \;
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --verbose --showlocals --timeout=$(TEST_TIMEOUT) $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=1 python3 -m pytest --color=$(COLOR) --verbose --showlocals --timeout=$(TEST_TIMEOUT) $(COV_REPORT) $(TEST_TARGET)
 
 requre-data-cleanup:
 	requre-patch purge --replaces ":set-cookie:str:a 'b';" --replaces "copr.v3.helpers:login:str:somelogin" --replaces "copr.v3.helpers:token:str:sometoken" $(TEST_RECORDING_PATH)/test_data/*/*yaml
@@ -31,7 +33,11 @@ requre-data-cleanup:
 
 # example: TEST_TARGET=tests/unit/test_api.py make check-in-container
 check-in-container:
-	$(CONTAINER_RUN_WITH_OPTS) --env TEST_TARGET $(TEST_IMAGE) $(CONTAINER_TEST_COMMAND)
+	$(CONTAINER_RUN_WITH_OPTS) \
+		--env TEST_TARGET \
+		--env COV_REPORT \
+		--env COLOR \
+		$(TEST_IMAGE) $(CONTAINER_TEST_COMMAND)
 
 # Mounts your ~/.config/ where .packit.yaml with your github/gitlab tokens is expected
 # Mounts ssh connfig dir, to have ssh keys for fedpkg cloning
