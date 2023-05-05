@@ -21,7 +21,9 @@ REDHAT_SSO_AUTH_URL = (
     "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
 )
 REDHAT_API_GET_USER_URL = "https://api.access.redhat.com/account/v1/user"
-IMAGE_BUILDER_API_URL = "https://console.redhat.com/api/image-builder/v1"
+API_ROOT = "https://console.redhat.com/api/"
+IMAGE_BUILDER_API_URL = f"{API_ROOT}image-builder/v1"
+LAUNCH_API_URL = f"{API_ROOT}provisioning/v1"
 
 
 class ImageBuilder:
@@ -41,7 +43,7 @@ class ImageBuilder:
         self.refresh_token = refresh_token
         self._access_token: Optional[str] = None
 
-        self.image_builder_session = requests.Session()
+        self.session = requests.Session()
         self.refresh_auth()
 
     def refresh_auth(self):
@@ -53,12 +55,35 @@ class ImageBuilder:
             raise PackitException(
                 "Unable to obtain access token. You may need to regenerate the refresh token."
             )
-        self.image_builder_session.headers.update(
+        self.session.headers.update(
             {
                 "Authorization": f"Bearer {self._access_token}",
                 "Accept": "application/json",
             }
         )
+
+    def request(self, method: str, url: str, payload: Optional[dict] = None):
+        """
+        Request to the Image Builder API.
+
+        Args:
+            method: HTTP method to use (GET, POST, PUT, DELETE)
+            url: complete URL for the request
+            payload: payload to send with the request
+
+        Returns:
+            requests.Response object.
+        """
+        # don't try to refresh twice
+        token_is_fresh = False
+        while True:
+            response = self.session.request(method, url, json=payload)
+            if response.status_code == 401 and not token_is_fresh:
+                token_is_fresh = True
+                self.refresh_auth()
+                continue
+            response.raise_for_status()
+            return response
 
     def image_builder_request(
         self, method: str, path: str, payload: Optional[dict] = None
@@ -68,25 +93,29 @@ class ImageBuilder:
 
         Args:
             method: HTTP method to use (GET, POST, PUT, DELETE)
-            path: path to the API endpoint
+            path: path part in the URL to the API endpoint
             payload: payload to send with the request
 
         Returns:
             requests.Response object.
         """
-        # don't try to refresh twice
-        token_is_fresh = False
-        while True:
-            # TODO: figure out retries if something goes wrong here
-            response = self.image_builder_session.request(
-                method, f"{IMAGE_BUILDER_API_URL}/{path}", json=payload
-            )
-            if response.status_code == 401 and not token_is_fresh:
-                token_is_fresh = True
-                self.refresh_auth()
-                continue
-            response.raise_for_status()
-            return response
+        return self.request(
+            method, url=f"{IMAGE_BUILDER_API_URL}/{path}", payload=payload
+        )
+
+    def launch_request(self, method: str, path: str, payload: Optional[dict] = None):
+        """
+        Request to the Launch API.
+
+        Args:
+            method: HTTP method to use (GET, POST, PUT, DELETE)
+            path: path part in the URL to the API endpoint
+            payload: payload to send with the request
+
+        Returns:
+            requests.Response object.
+        """
+        return self.request(method, url=f"{LAUNCH_API_URL}/{path}", payload=payload)
 
     def _get_access_token(self) -> Optional[str]:
         """
