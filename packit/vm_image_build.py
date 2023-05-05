@@ -269,3 +269,40 @@ class ImageBuilder:
         response_json = self.image_builder_request("GET", f"composes/{build_id}").json()
         logger.debug(f"Image build metadata: {response_json}")
         return response_json["image_status"]["status"]
+
+    def clone(self, build_id: str, region: str, share_with_accounts: List[str]):
+        """
+        Clone existing image into a new AWS region.
+
+        Args:
+            build_id: Build ID of the image.
+            region: AWS region
+            share_with_accounts: List of str of accounts to share the new image with
+
+        Returns:
+            Metadata of the clone build
+        """
+        response_json = self.image_builder_request(
+            "POST",
+            f"composes/{build_id}/clone",
+            payload={
+                "region": region,
+                "share_with_accounts": share_with_accounts,
+            },
+        ).json()
+        logger.debug(f"Image clone metadata: {response_json}")
+        return response_json
+
+    def get_clone(self, build_id: str):
+        """
+        Get image clone status.
+
+        Args:
+            build_id: Build ID of the clone image.
+
+        Returns:
+            Metadata of the clone build
+        """
+        response_json = self.image_builder_request("GET", f"/clones/{build_id}").json()
+        logger.debug(f"Image build metadata: {response_json}")
+        return response_json
