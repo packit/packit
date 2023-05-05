@@ -49,7 +49,10 @@ class ImageBuilder:
         Refresh the access token and the image_builder_session headers.
         """
         self._access_token = self._get_access_token()
-        # TODO: raise if access token is None
+        if not self._access_token:
+            raise PackitException(
+                "Unable to obtain access token. You may need to regenerate the refresh token."
+            )
         self.image_builder_session.headers.update(
             {
                 "Authorization": f"Bearer {self._access_token}",
