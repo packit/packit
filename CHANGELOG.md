@@ -1,6 +1,5 @@
 # 0.76.0
 
-
 # 0.75.0
 
 - Detection of `%autorelease` usage in dist-git spec file during `propose-downstream` and `pull-from-upstream` has been improved and Packit will always preserve it. (#1949)
