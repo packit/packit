@@ -182,6 +182,7 @@ class CommonPackageConfig:
         image_request: Optional[Dict] = None,
         image_customizations: Optional[Dict] = None,
         copr_chroot: Optional[str] = None,
+        follow_fedora_branching: bool = False,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -276,6 +277,8 @@ class CommonPackageConfig:
         self.image_request = image_request
         self.image_customizations = image_customizations
         self.copr_chroot = copr_chroot
+
+        self.follow_fedora_branching = follow_fedora_branching
 
     @property
     def targets_dict(self):
