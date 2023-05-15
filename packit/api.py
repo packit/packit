@@ -1549,6 +1549,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_suffix: Optional[str] = None,
         srpm_path: Optional[Path] = None,
         module_hotfixes: bool = False,
+        follow_fedora_branching: bool = False,
     ) -> Tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
@@ -1577,6 +1578,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 to the implicit creation of the SRPM.
             module_hotfixes: Specifies whether copr should make packages from this
                 project available along with packages from the active module streams.
+            follow_fedora_branching: If newly branched chroots should be
+                automatically enabled and populated.
 
         Returns:
             ID of the created build and URL to the build web page.
@@ -1607,6 +1610,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             additional_repos=additional_repos,
             request_admin_if_needed=request_admin_if_needed,
             module_hotfixes=module_hotfixes,
+            follow_fedora_branching=follow_fedora_branching,
         )
         logger.debug(
             f"Submitting a build to copr build system,"
