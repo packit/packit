@@ -183,15 +183,16 @@ def test_check_signature_of_commit_key_not_found():
 @pytest.mark.parametrize(
     "keyid, ok",
     [
-        (
+        (  # Jirka's key id
             "A3E9A812AAB73DA7",
             True,
         ),
-        (
-            "NOTEXISTING",
-            False,
-        ),
-    ],  # Jirka's key id
+        # Don't, it times out if any key server is not responding
+        # (
+        #     "NOTEXISTING",
+        #     False,
+        # ),
+    ],
 )
 def test_download_gpg_key_if_needed(keyid, ok):
     cf = CommitVerifier()
