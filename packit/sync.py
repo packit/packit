@@ -4,7 +4,7 @@
 """
 Functions and classes dealing with syncing files between repositories
 """
-
+import copy
 import os
 import glob
 import logging
@@ -174,7 +174,11 @@ class SyncFilesItem:
             Otherwise returns None.
         """
         new_src = [s for s in self.src if not criteria(s, src)]
-        return SyncFilesItem(new_src, self.dest) if new_src else None
+        if new_src:
+            self_copy = copy.copy(self)
+            self_copy.src = new_src
+            return self_copy
+        return None
 
 
 def iter_srcs(synced_files: Sequence[SyncFilesItem]) -> Iterator[str]:
