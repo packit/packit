@@ -1,9 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+import logging
+
 import pytest
 from flexmock import flexmock
+from requests import Session, HTTPError
 
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, ImageBuilderError
 from packit.vm_image_build import ImageBuilder
 
 
@@ -71,3 +74,34 @@ def test_refresh_fails():
             "Unable to obtain access token. You may need to regenerate the refresh token."
             in str(exc)
         )
+
+
+def test_bad_request(caplog):
+    def _raise_for_status(*args, **_):
+        raise HTTPError()
+
+    response_json = {
+        "errors": [
+            {
+                "detail": (
+                    "request body has an error: doesn't match schema... "
+                    'value "fedora-rawhide" is not one of the allowed values'
+                )
+            }
+        ]
+    }
+
+    r = flexmock(
+        ok=False,
+        status_code=400,
+        text=str(response_json),
+        raise_for_status=_raise_for_status,
+    )
+    flexmock(ImageBuilder).should_receive("refresh_auth").and_return(None)
+    flexmock(Session).should_receive("request").and_return(r)
+    with caplog.at_level(logging.INFO, logger="packit"):
+        ib = ImageBuilder("foobar")
+        with pytest.raises(ImageBuilderError):
+            ib.create_image("fedora-rawhide", "foo-bar", {}, {}, "")
+        assert "request body has an error" in caplog.text
+        assert 'value "fedora-rawhide" is not one of the allowed values' in caplog.text

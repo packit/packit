@@ -1,8 +1,10 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+import pytest
 from requre.cassette import DataTypes
 from requre.modules_decorate_all_methods import record_requests_module
 
+from packit.exceptions import ImageBuilderError
 from packit.vm_image_build import ImageBuilder
 from tests_recording.testbase import PackitTest
 
@@ -33,3 +35,8 @@ class TestLocalProject(PackitTest):
             "GET", "composes/e31d475a-1d32-4cac-844e-a6a613f80439"
         ).json()
         assert response_json["image_status"]["status"] == "success"
+
+    def test_bad_request(self):
+        ib = ImageBuilder(refresh_token=self.config.redhat_api_refresh_token)
+        with pytest.raises(ImageBuilderError):
+            ib.create_image("fedora-rawhide", "foo-bar", {}, {}, "")
