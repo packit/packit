@@ -147,6 +147,7 @@ class CoprHelper:
         request_admin_if_needed: bool = False,
         targets_dict: Optional[Dict] = None,  # chroot specific configuration
         module_hotfixes: bool = False,
+        follow_fedora_branching: bool = False,
     ) -> None:
         """
         Create a project in copr if it does not exists.
@@ -180,6 +181,7 @@ class CoprHelper:
                 additional_repos=additional_repos,
                 targets_dict=targets_dict,
                 module_hotfixes=module_hotfixes,
+                follow_fedora_branching=follow_fedora_branching,
             )
             return
         except CoprRequestException as ex:
@@ -339,6 +341,7 @@ class CoprHelper:
         additional_repos: Optional[List[str]] = None,
         targets_dict: Optional[Dict] = None,  # chroot specific configuration
         module_hotfixes: bool = False,
+        follow_fedora_branching: bool = False,
     ) -> None:
         try:
             self.copr_client.project_proxy.add(
@@ -362,6 +365,7 @@ class CoprHelper:
                 f"This copr project is created and handled by the packit project "
                 "(https://packit.dev/).",
                 module_hotfixes=module_hotfixes,
+                follow_fedora_branching=follow_fedora_branching,
             )
             # once created: update chroot-specific configuration if there is any
             self._update_chroot_specific_configuration(
