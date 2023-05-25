@@ -13,8 +13,9 @@ import logging
 from typing import Optional, Dict, List, Union
 
 import requests
+from requests import HTTPError
 
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, ImageBuilderError
 
 logger = logging.getLogger("packit")
 REDHAT_SSO_AUTH_URL = (
@@ -82,7 +83,11 @@ class ImageBuilder:
                 token_is_fresh = True
                 self.refresh_auth()
                 continue
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except HTTPError as ex:
+                logger.error(f"Image Builder Errors: {response.text}")
+                raise ImageBuilderError(errors=response.text) from ex
             return response
 
     def image_builder_request(
