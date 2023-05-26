@@ -1,3 +1,11 @@
+# 0.76.0
+
+- Unsuccessful Image Builder requests now provide error details so you can fix the Image configuration. (#1981)
+- Copr projects created by Packit will not follow the Fedora branching from now on.
+  This decision has been made to lower the load on Copr from the temporary Copr projects created, mainly, for the PR builds.
+  If you are releasing your packages to Copr, please use the new setting `follow_fedora_branching`.
+  Already existing projects are not affected by this change and it is also not enforced with the custom Copr repositories. (#1970)
+
 # 0.75.0
 
 - Detection of `%autorelease` usage in dist-git spec file during `propose-downstream` and `pull-from-upstream` has been improved and Packit will always preserve it. (#1949)
