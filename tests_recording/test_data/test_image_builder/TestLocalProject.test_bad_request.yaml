@@ -1,0 +1,106 @@
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+requests.sessions:
+  send:
+    POST:
+      https://console.redhat.com/api/image-builder/v1/compose:
+      - metadata:
+          latency: 0.6750068664550781
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_image_builder
+          - packit.vm_image_build
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            errors:
+            - detail: "request body has an error: doesn't match schema #/components/schemas/ComposeRequest:\
+                \ Error at \"/distribution\": value \"fedora-rawhide\" is not one\
+                \ of the allowed values\nSchema:\n  {\n    \"enum\": [\n      \"rhel-8\"\
+                ,\n      \"rhel-84\",\n      \"rhel-85\",\n      \"rhel-86\",\n  \
+                \    \"rhel-87\",\n      \"rhel-9\",\n      \"rhel-90\",\n      \"\
+                rhel-91\",\n      \"rhel-92\",\n      \"centos-8\",\n      \"centos-9\"\
+                ,\n      \"fedora-35\",\n      \"fedora-36\",\n      \"fedora-37\"\
+                ,\n      \"fedora-38\"\n    ],\n    \"type\": \"string\"\n  }\n\n\
+                Value:\n  \"fedora-rawhide\"\n"
+              title: '400'
+          _next: null
+          elapsed: 0.674167
+          encoding: UTF-8
+          headers:
+            Connection: close
+            Content-Length: '622'
+            Content-Type: application/json; charset=UTF-8
+            Date: Thu, 25 May 2023 08:37:56 GMT
+            Server: openresty
+            Set-Cookie: foo=bar;
+              path=/; HttpOnly; Secure; SameSite=None
+            Strict-Transport-Security: max-age=31536000; includeSubDomains
+            X-Frame-Options: SAMEORIGIN
+            x-content-type-options: nosniff
+            x-rh-edge-cache-status: Miss from child, Miss from parent
+            x-rh-edge-reference-id: 0.9c477b5c.1685003876.627e5004
+            x-rh-edge-request-id: 627e5021
+            x-rh-insights-request-id: f17d03454ab44fd4bc3f495c246062b1
+          raw: !!binary ""
+          reason: Bad Request
+          status_code: 400
+      https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token:
+      - metadata:
+          latency: 0.34032130241394043
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_image_builder
+          - packit.vm_image_build
+          - requests.sessions
+          - requre.objects
+          - requre.cassette
+          - requests.sessions
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            access_token: foo
+            expires_in: 900
+            not-before-policy: 0
+            refresh_expires_in: 0
+            refresh_token: bar
+            scope: offline_access
+            session_state: baw
+            token_type: Bearer
+          _next: null
+          elapsed: 0.339693
+          encoding: utf-8
+          headers:
+            Cache-Control: no-store
+            Connection: keep-alive
+            Content-Encoding: gzip
+            Content-Length: '1813'
+            Content-Type: application/json
+            Date: Thu, 25 May 2023 08:37:55 GMT
+            Keep-Alive: timeout=300
+            Pragma: no-cache
+            Set-Cookie: baz=baq;
+              path=/; HttpOnly; Secure; SameSite=None
+            Vary: Accept-Encoding
+            referrer-policy: strict-origin
+            strict-transport-security: max-age=31536000; includeSubDomains
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-rh-edge-cache-status: Miss from child, Miss from parent
+            x-rh-edge-reference-id: 0.9f477b5c.1685003875.3f80d828
+            x-rh-edge-request-id: 3f80d828
+            x-site: prod-spoke-aws-us-east-1
+            x-xss-protection: 1; mode=block
+          raw: !!binary ""
+          reason: OK
+          status_code: 200

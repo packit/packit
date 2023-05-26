@@ -110,3 +110,10 @@ class PackitNotAGitRepoException(PackitGitException):
 
 class PackitBodhiException(PackitException):
     """There was a problem while interacting with Bodhi"""
+
+
+class ImageBuilderError(PackitException):
+    """An error happened during the Image Builder interaction"""
+
+    def __init__(self, errors):
+        self.errors = errors
