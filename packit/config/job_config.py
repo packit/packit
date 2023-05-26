@@ -65,6 +65,7 @@ class JobConfig(MultiplePackages):
         trigger: JobConfigTriggerType,
         packages: Dict[str, CommonPackageConfig],
         skip_build: bool = False,
+        manual_trigger: bool = False,
     ):
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
@@ -74,6 +75,7 @@ class JobConfig(MultiplePackages):
         self.__dict__["type"] = type
         self.__dict__["trigger"] = trigger
         self.__dict__["skip_build"] = skip_build
+        self.__dict__["manual_trigger"] = manual_trigger
 
         # Data for a JobConfigView:
         # a JobConfigView is seraialized/deserialized as a JobConfig
@@ -126,6 +128,7 @@ class JobConfigView(JobConfig):
             job_config.trigger,
             job_config_view_packages,
             job_config.skip_build,
+            job_config.manual_trigger,
         )
         self.__dict__["_view_for_package"] = package
 
