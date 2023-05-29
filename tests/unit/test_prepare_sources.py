@@ -16,6 +16,7 @@ from packit.config import CommonPackageConfig, JobConfig, JobType, JobConfigTrig
                 "job": "copr_build",
                 "trigger": "release",
                 "skip_build": false,
+                "manual_trigger": false,
                 "packages": {
                     "package": {
                         "upstream_package_name": null,
