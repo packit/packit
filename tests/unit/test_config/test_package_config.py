@@ -1988,6 +1988,7 @@ def test_package_config_specfile_not_present_raise(raw):
                     "trigger": "commit",
                     "targets": ["fedora-stable", "fedora-development"],
                     "skip_build": True,
+                    "manual_trigger": True,
                 }
             ],
         },
@@ -1998,6 +1999,7 @@ def test_package_config_specfile_not_present_raise(raw):
                     "trigger": "commit",
                     "targets": ["fedora-stable", "fedora-development"],
                     "skip_build": True,
+                    "manual_trigger": True,
                 },
                 {
                     "job": "tests",

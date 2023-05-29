@@ -439,6 +439,7 @@ class JobConfigSchema(Schema):
     job = EnumField(JobType, required=True, attribute="type")
     trigger = EnumField(JobConfigTriggerType, required=True)
     skip_build = fields.Boolean()
+    manual_trigger = fields.Boolean()
     packages = fields.Dict(
         keys=fields.String(), values=fields.Nested(CommonConfigSchema())
     )
