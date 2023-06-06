@@ -9,10 +9,14 @@ import pytest
 from flexmock import flexmock
 
 from packit.api import PackitAPI
+from packit.config import PackageConfig, CommonPackageConfig
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
 from packit.local_project import LocalProjectBuilder
 from packit.patches import PatchGenerator
+from packit.sync import SyncFilesItem
+from packit.utils.changelog_helper import ChangelogHelper
+from packit import api as packit_api
 
 
 def build_dict(copr_url, id):
@@ -194,3 +198,53 @@ def test_dg_downstream_package_name_is_set(
     api_mock.package_config.downstream_package_name = downstream_package_name
     api_mock.downstream_local_project = LocalProjectBuilder().build(working_dir=path)
     assert api_mock.dg.package_config.downstream_package_name == expectation
+
+
+def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
+    pc = PackageConfig(
+        packages={
+            "package": CommonPackageConfig(
+                specfile_path="xxx",
+                files_to_sync=[
+                    SyncFilesItem(
+                        ["src/a"],
+                        "dest",
+                        filters=["dummy filter"],
+                        mkpath=True,
+                        delete=True,
+                    )
+                ],
+                upstream_package_name="test_package_name",
+                downstream_package_name="test_package_name",
+                upstream_tag_template="_",
+                upstream_project_url="_",
+                upstream_ref="_",
+            )
+        },
+    )
+    upstream_mock.package_config = pc
+    distgit_mock.package_config = pc
+    api = PackitAPI(config=config_mock, package_config=pc)
+    flexmock(api)
+    api._up = upstream_mock
+    api._dg = distgit_mock
+    api.should_receive("_handle_sources")
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    flexmock(pathlib.Path).should_receive("write_text").once()
+    api.up.should_receive("get_specfile_version").and_return("0")
+    api.should_receive("push_and_create_pr").and_return(flexmock())
+    flexmock(ChangelogHelper).should_receive("update_dist_git")
+
+    flexmock(packit_api).should_receive("sync_files").with_args(
+        [
+            SyncFilesItem(
+                src=["/mock_dir/src/a"],
+                dest="/mock_dir/dest",
+                mkpath=True,
+                delete=True,
+                filters=["dummy filter"],
+            )
+        ]
+    )
+
+    api.sync_release(version="1.1", dist_git_branch="_")
