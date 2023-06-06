@@ -62,6 +62,15 @@ def test_check_subpath(subpath, path, trailing_slash, result):
             {"src": "a", "criteria": lambda x, y: Path(x).name == y},
             SyncFilesItem(["src/b"], "dest"),
         ),
+        (
+            SyncFilesItem(
+                ["src/a"], "dest", filters=["dummy filter"], mkpath=True, delete=True
+            ),
+            {"src": "c"},
+            SyncFilesItem(
+                ["src/a"], "dest", filters=["dummy filter"], mkpath=True, delete=True
+            ),
+        ),
     ],
 )
 def test_drop_src(item, drop, result):
