@@ -873,7 +873,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             pr = None
             if create_pr:
                 pr = self.push_and_create_pr(
-                    pr_title=title or f"Update to upstream release {version}",
+                    pr_title=title
+                    or f"Update {dist_git_branch} to upstream release {version}",
                     pr_description=description,
                     git_branch=dist_git_branch,
                     repo=self.dg,
