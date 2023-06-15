@@ -13,6 +13,8 @@ from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
 
 ALIASES: Dict[str, List[str]] = {
+    "centos-stream-all": ["centos-stream-8", "centos-stream-9"],
+    "centos-stream+epel-next-all": ["centos-stream+epel-next-8", "centos-stream+epel-next-9"],
     "fedora-all": ["fedora-36", "fedora-37", "fedora-38", "fedora-rawhide"],
     "fedora-stable": ["fedora-36", "fedora-37"],
     "fedora-development": ["fedora-rawhide", "fedora-38"],
