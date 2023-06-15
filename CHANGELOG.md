@@ -1,3 +1,8 @@
+# 0.77.0
+
+- Packit now includes dist-git branch in the title of the PRs for `propose-downstream` and `pull-from-upstream`. (#1996)
+- We have fixed an issue with `files_to_sync` filters not being applied properly. (#1977)
+
 # 0.76.0
 
 - Unsuccessful Image Builder requests now provide error details so you can fix the Image configuration. (#1981)
