@@ -3,16 +3,24 @@
 # For downstream, we need to pick just one instance (`stg` in our case)
 # and redefine it for the `koji_build` and `bodhi_update` jobs.
 packit_instances: ["prod", "stg"]
-files_to_sync:
-  - packit.spec
-  - .packit.yaml
-  - src: plans/
-    dest: plans/
-  - src: .fmf/
-    dest: .fmf/
-# packit was already taken on PyPI
-upstream_package_name: packitos
-upstream_project_url: https://github.com/packit/packit
+
+packages:
+  packit:
+    downstream_package_name: packit
+    # packit was already taken on PyPI
+    upstream_package_name: packitos
+    upstream_project_url: https://github.com/packit/packit
+    paths:
+      - ./
+    specfile_path: packit.spec
+    files_to_sync:
+      - packit.spec
+      - .packit.yaml
+      - src: plans/
+        dest: plans/
+      - src: .fmf/
+        dest: .fmf/
+
 copy_upstream_release_description: true
 issue_repository: https://github.com/packit/packit
 
@@ -50,11 +58,16 @@ jobs:
     targets:
       - fedora-all
       - epel-9
+    packages:
+      - packit
+
   - job: tests
     trigger: pull_request
     targets:
       - fedora-all
       - epel-9
+    packages:
+      - packit
 
   - job: copr_build
     trigger: commit
