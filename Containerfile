@@ -1,6 +1,6 @@
 # pip3 install packit from this repo.
 
-FROM quay.io/packit/base
+FROM quay.io/packit/base:c9s
 
 WORKDIR /src
 
