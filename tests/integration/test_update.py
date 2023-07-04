@@ -47,6 +47,7 @@ def test_basic_local_update(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(Specfile).should_call("reload").once()
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
 

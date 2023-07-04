@@ -822,6 +822,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.dg.check_last_commit()
 
             self.up.run_action(actions=ActionName.pre_sync)
+            if not use_downstream_specfile:
+                self.up.specfile.reload()
             self.dg.create_branch(
                 dist_git_branch,
                 base=f"remotes/origin/{dist_git_branch}",
