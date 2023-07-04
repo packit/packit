@@ -11,5 +11,5 @@
     # To (re-)generate tests_recording/test_data/
     - ansible.builtin.include_tasks: tasks/requre.yaml
     - name: Install pre-commit
-      ansible.builtin.dnf:
+      ansible.builtin.pip:
         name: pre-commit
