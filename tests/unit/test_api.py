@@ -156,6 +156,9 @@ def test_sync_release_version_tag_processing(
     api_mock.up.should_receive("get_specfile_version").and_return(
         get_specfile_version_return
     )
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock()
+    )
     api_mock.should_receive("_prepare_files_to_sync").with_args(
         synced_files=[], full_version=version, upstream_tag=tag
     )
@@ -169,6 +172,9 @@ def test_sync_release_do_not_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").never()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock()
+    )
     api_mock.up.package_config.create_sync_note = False
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(version="1.1", dist_git_branch="_")
@@ -178,6 +184,9 @@ def test_sync_release_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").once()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock()
+    )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(version="1.1", dist_git_branch="_")
 
@@ -232,6 +241,9 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").once()
     api.up.should_receive("get_specfile_version").and_return("0")
+    api.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock()
+    )
     api.should_receive("push_and_create_pr").and_return(flexmock())
     flexmock(ChangelogHelper).should_receive("update_dist_git")
 
