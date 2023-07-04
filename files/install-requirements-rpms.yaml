@@ -5,8 +5,4 @@
     - ansible.builtin.include_tasks: tasks/project-dir.yaml
     - ansible.builtin.include_tasks: tasks/generic-dnf-requirements.yaml
     - ansible.builtin.include_tasks: tasks/build-rpm-deps.yaml
-    - name: Install python3-requre rpm
-      ansible.builtin.dnf:
-        name: python3-requre
-      become: true
     - ansible.builtin.include_tasks: tasks/requre.yaml
