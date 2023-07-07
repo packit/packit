@@ -1,3 +1,7 @@
+# 0.78.0
+
+- Packit now correctly reloads upstream specfile after running `pre-sync` action. (#2006)
+
 # 0.77.0
 
 - Packit now includes dist-git branch in the title of the PRs for `propose-downstream` and `pull-from-upstream`. (#1996)
