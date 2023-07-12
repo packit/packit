@@ -44,6 +44,7 @@ from packit.constants import (
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
+    SYNC_RELEASE_PR_INSTRUCTIONS,
 )
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
@@ -682,6 +683,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
+        add_pr_instructions: bool = False,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -704,6 +706,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
+        add_pr_instructions: bool = False,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -725,6 +728,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
+        add_pr_instructions: bool = False,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -753,6 +757,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 commit message to mark the hash of the upstream (source-git) commit.
             use_downstream_specfile: Use the downstream specfile instead
                 of getting the upstream one (used by packit-service in pull_from_upstream)
+            add_pr_instructions: Whether to add instructions on how to change the content
+                of the created PR (used by packit-service)
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -855,10 +861,22 @@ The first dist-git commit to be synced is '{short_hash}'.
                     SYNCING_NOTE.format(packit_version=get_packit_version())
                 )
 
+            pr_instructions = (
+                SYNC_RELEASE_PR_INSTRUCTIONS.format(
+                    package=self.dg.local_project.repo_name,
+                    branch=local_pr_branch,
+                    user=self.config.fas_user,
+                )
+                if create_pr and add_pr_instructions
+                else ""
+            )
+
             description = description or (
                 f"Upstream tag: {upstream_tag}\n"
-                f"Upstream commit: {self.up.local_project.commit_hexsha}\n"
+                f"Upstream commit: {self.up.local_project.commit_hexsha}\n\n"
+                f"{pr_instructions}"
             )
+
             self.update_dist_git(
                 version,
                 upstream_ref,
