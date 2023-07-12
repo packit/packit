@@ -11,6 +11,7 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.config import PackageConfig, CommonPackageConfig
 from packit.copr_helper import CoprHelper
+from packit.distgit import DistGit
 from packit.exceptions import PackitException
 from packit.local_project import LocalProjectBuilder
 from packit.patches import PatchGenerator
@@ -260,3 +261,26 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     )
 
     api.sync_release(version="1.1", dist_git_branch="_")
+
+
+def test_sync_release_check_pr_instructions(api_mock):
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock()
+    )
+    api_mock.should_receive("push_and_create_pr").with_args(
+        pr_title=str,
+        pr_description=(
+            "Upstream tag: _\nUpstream commit: _\n\n"
+            "If you need to do any change in this pull request, you need to locally fetch the "
+            "source branch of it and push it (with a fix) to your fork "
+            "(as it is not possible to push to the branch created in the Packit’s fork):\n"
+            "```\ngit fetch https://src.fedoraproject.org/forks/packit/rpms/package.git "
+            "refs/heads/*:refs/remotes/packit/*\n"
+            "git checkout packit/1.1-_-update\n```\n"
+        ),
+        git_branch=str,
+        repo=DistGit,
+    ).and_return(flexmock())
+    api_mock.sync_release(version="1.1", dist_git_branch="_", add_pr_instructions=True)
