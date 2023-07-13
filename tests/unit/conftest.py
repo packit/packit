@@ -72,6 +72,7 @@ def config_mock():
     conf = Config()
     conf._pagure_user_token = "test"
     conf._github_token = "test"
+    conf.fas_user = "packit"
     return conf
 
 
@@ -100,6 +101,7 @@ def local_project_mock(git_project_mock, git_repo_mock):
         git_repo=git_repo_mock,
         checkout_release=lambda *_: None,
         commit_hexsha="_",
+        repo_name="package",
     )
 
 
