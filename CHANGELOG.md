@@ -1,3 +1,7 @@
+# 0.78.1
+
+- Temporarily disabled test dependencies on Fedora Rawhide because of missing `python3-deepdiff`. (#2008)
+
 # 0.78.0
 
 - Packit now correctly reloads upstream specfile after running `pre-sync` action. (#2006)
