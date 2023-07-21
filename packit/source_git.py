@@ -95,7 +95,7 @@ class SourceGitGenerator:
                 f"called '{upstream_remote or 'origin'}' in {self.source_git.working_dir}. "
                 "Please specify the correct upstream remote using '--upstream-remote' or the "
                 "upstream URL, using '--upstream-url'."
-            )
+            ) from exc
         self.pkg_tool = pkg_tool
         self.pkg_name = pkg_name or Path(self.dist_git.working_dir).name
         self.ignore_missing_autosetup = ignore_missing_autosetup
@@ -256,40 +256,36 @@ class SourceGitGenerator:
                 patch_id_digits = patches[0].number_digits
             except (IndexError, AttributeError):
                 patch_id_digits = 1
-        package_config = {}
-        package_config.update(
-            {
-                "upstream_project_url": self.upstream_url,
-                "upstream_ref": self.upstream_ref,
-                "downstream_package_name": self.pkg_name,
-                "specfile_path": f"{DISTRO_DIR}/{self.pkg_name}.spec",
-                "patch_generation_ignore_paths": [DISTRO_DIR],
-                "patch_generation_patch_id_digits": patch_id_digits,
-                "sync_changelog": True,
-                "files_to_sync": [
-                    {
-                        # The trailing-slash is important, as we want to
-                        # sync the content of the directory, not the directory
-                        # as a whole.
-                        "src": f"{DISTRO_DIR}/",
-                        "dest": ".",
-                        "delete": True,
-                        "filters": [
-                            "protect .git*",
-                            "protect sources",
-                            f"exclude {SRC_GIT_CONFIG}",
-                            "exclude .gitignore",
-                        ],
-                    }
-                ],
-            }
-        )
-        lookaside_sources = get_lookaside_sources(
+        package_config = {
+            "upstream_project_url": self.upstream_url,
+            "upstream_ref": self.upstream_ref,
+            "downstream_package_name": self.pkg_name,
+            "specfile_path": f"{DISTRO_DIR}/{self.pkg_name}.spec",
+            "patch_generation_ignore_paths": [DISTRO_DIR],
+            "patch_generation_patch_id_digits": patch_id_digits,
+            "sync_changelog": True,
+            "files_to_sync": [
+                {
+                    # The trailing-slash is important, as we want to
+                    # sync the content of the directory, not the directory
+                    # as a whole.
+                    "src": f"{DISTRO_DIR}/",
+                    "dest": ".",
+                    "delete": True,
+                    "filters": [
+                        "protect .git*",
+                        "protect sources",
+                        f"exclude {SRC_GIT_CONFIG}",
+                        "exclude .gitignore",
+                    ],
+                }
+            ],
+        }
+        if lookaside_sources := get_lookaside_sources(
             self.pkg_tool or self.config.pkg_tool,
             self.pkg_name,
             self.dist_git.working_dir,
-        )
-        if lookaside_sources:
+        ):
             package_config["sources"] = lookaside_sources
 
         Path(self.distro_dir, SRC_GIT_CONFIG).write_text(
