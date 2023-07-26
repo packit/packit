@@ -9,11 +9,11 @@ from typing import Optional
 import click
 import git
 
+from packit.api import PackitAPI
 from packit.cli.types import GitRepoParameter
 from packit.cli.utils import cover_packit_exception
-from packit.api import PackitAPI
-from packit.config.config import pass_config
 from packit.config import get_context_settings
+from packit.config.config import pass_config
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +50,9 @@ logger = logging.getLogger(__name__)
     "--ignore-missing-autosetup",
     is_flag=True,
     default=False,
-    help="Do not require %autosetup macro to be used in %prep section of specfile. "
-    "By default, %autosetup is required.",
+    help="""Do not require %autosetup macro to be used in %prep section of specfile.
+    Use this at your own risk - the package may be not initialized properly
+    or work with other packit commands.""",
 )
 @pass_config
 @cover_packit_exception

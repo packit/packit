@@ -5,8 +5,8 @@
 packit started as source-git and we're making a source-git module after such a long time, weird
 """
 
-import logging
 import importlib.resources
+import logging
 import textwrap
 from pathlib import Path
 from typing import Optional
@@ -33,7 +33,7 @@ from packit.utils import (
     get_file_author,
 )
 from packit.utils.lookaside import get_lookaside_sources
-from packit.utils.repo import is_the_repo_pristine
+from packit.utils.repo import is_git_repo, is_the_repo_pristine
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ class SourceGitGenerator:
                 f"called '{upstream_remote or 'origin'}' in {self.source_git.working_dir}. "
                 "Please specify the correct upstream remote using '--upstream-remote' or the "
                 "upstream URL, using '--upstream-url'."
-            )
+            ) from exc
         self.pkg_tool = pkg_tool
         self.pkg_name = pkg_name or Path(self.dist_git.working_dir).name
         self.ignore_missing_autosetup = ignore_missing_autosetup
@@ -163,6 +163,11 @@ class SourceGitGenerator:
         """Rebase current branch against the from_branch."""
         to_branch = "dist-git-commits"  # temporary branch to store the dist-git history
         BUILD_dir = self.get_BUILD_dir()
+        if not is_git_repo(BUILD_dir):
+            raise RuntimeError(
+                "Running %prep section wasn't successful. "
+                "Make sure the package uses %autosetup."
+            )
         prep_repo = git.Repo(BUILD_dir)
         from_branch = get_default_branch(prep_repo)
         logger.info(f"Rebase patches from dist-git {from_branch}.")
@@ -256,40 +261,36 @@ class SourceGitGenerator:
                 patch_id_digits = patches[0].number_digits
             except (IndexError, AttributeError):
                 patch_id_digits = 1
-        package_config = {}
-        package_config.update(
-            {
-                "upstream_project_url": self.upstream_url,
-                "upstream_ref": self.upstream_ref,
-                "downstream_package_name": self.pkg_name,
-                "specfile_path": f"{DISTRO_DIR}/{self.pkg_name}.spec",
-                "patch_generation_ignore_paths": [DISTRO_DIR],
-                "patch_generation_patch_id_digits": patch_id_digits,
-                "sync_changelog": True,
-                "files_to_sync": [
-                    {
-                        # The trailing-slash is important, as we want to
-                        # sync the content of the directory, not the directory
-                        # as a whole.
-                        "src": f"{DISTRO_DIR}/",
-                        "dest": ".",
-                        "delete": True,
-                        "filters": [
-                            "protect .git*",
-                            "protect sources",
-                            f"exclude {SRC_GIT_CONFIG}",
-                            "exclude .gitignore",
-                        ],
-                    }
-                ],
-            }
-        )
-        lookaside_sources = get_lookaside_sources(
+        package_config = {
+            "upstream_project_url": self.upstream_url,
+            "upstream_ref": self.upstream_ref,
+            "downstream_package_name": self.pkg_name,
+            "specfile_path": f"{DISTRO_DIR}/{self.pkg_name}.spec",
+            "patch_generation_ignore_paths": [DISTRO_DIR],
+            "patch_generation_patch_id_digits": patch_id_digits,
+            "sync_changelog": True,
+            "files_to_sync": [
+                {
+                    # The trailing-slash is important, as we want to
+                    # sync the content of the directory, not the directory
+                    # as a whole.
+                    "src": f"{DISTRO_DIR}/",
+                    "dest": ".",
+                    "delete": True,
+                    "filters": [
+                        "protect .git*",
+                        "protect sources",
+                        f"exclude {SRC_GIT_CONFIG}",
+                        "exclude .gitignore",
+                    ],
+                }
+            ],
+        }
+        if lookaside_sources := get_lookaside_sources(
             self.pkg_tool or self.config.pkg_tool,
             self.pkg_name,
             self.dist_git.working_dir,
-        )
-        if lookaside_sources:
+        ):
             package_config["sources"] = lookaside_sources
 
         Path(self.distro_dir, SRC_GIT_CONFIG).write_text(
@@ -313,17 +314,17 @@ class SourceGitGenerator:
             )
         with self.dist_git_specfile.prep() as prep:
             if "%autosetup" not in prep:
+                logger.warning(
+                    "Source-git repos for packages not using %autosetup may be not initialized "
+                    "properly or may not work with other packit commands."
+                )
                 if not self.ignore_missing_autosetup:
                     raise PackitException(
                         "Initializing source-git repos for packages "
                         "not using %autosetup is not allowed by default. "
-                        "You can use --ignore-missing-autosetup option to enforce "
-                        "running the command without %autosetup."
+                        "You can use --ignore-missing-autosetup option at your own risk "
+                        "to enforce running the command without %autosetup."
                     )
-                logger.warning(
-                    "Source-git repos for packages not using %autosetup may be not initialized"
-                    "properly or may not work with other packit commands."
-                )
 
         self._populate_distro_dir()
         self._reset_gitignore()
