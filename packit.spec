@@ -1,5 +1,5 @@
 # Testing dependencies: deepdiff, flexmock are missing on EPEL 9. Cannot use testing environment
-%if 0%{?el9} || 0%{?fedora} >= 39
+%if 0%{?el9}
 %bcond_with tests
 %else
 %bcond_without tests
