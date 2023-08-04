@@ -1,3 +1,8 @@
+# 0.78.2
+
+- Packit's license in RPM specfile is now confirmed to be SPDX compatible. (#2026)
+- `source-git init --ignore-missing-autosetup` help was improved to be less confusing. (#2016) (#2017)
+
 # 0.78.1
 
 - Temporarily disabled test dependencies on Fedora Rawhide because of missing `python3-deepdiff`. (#2008)
