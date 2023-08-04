@@ -6,8 +6,8 @@
 %endif
 
 Name:           packit
-Version:        0.78.1
-Release:        2%{?dist}
+Version:        0.78.2
+Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
 License:        MIT
@@ -77,7 +77,8 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %doc README.md
 
 %changelog
-* Fri Aug 04 2023 Tomas Tomecek <ttomecek@redhat.com> - 0.78.1-2
+* Fri Aug 04 2023 Packit Team <hello@packit.dev> - 0.78.2-1
+- New upstream release 0.78.2
 - Confirm License is SPDX compatible.
 
 * Thu Jul 13 2023 Packit Team <hello@packit.dev> - 0.78.1-1
