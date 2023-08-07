@@ -220,7 +220,25 @@ class Config:
 
         return services
 
-    def _get_project(self, url: str, get_project_kwargs: dict = None) -> GitProject:
+    def _get_project(
+        self, url: str, required: bool = True, get_project_kwargs: dict = None
+    ) -> Optional[GitProject]:
+        """
+        Gets a GitProject for the given URL.
+
+        Args:
+            url: Project URL.
+            required: Whether to raise an exception on failure or return None.
+            get_project_kwargs: Keyword arguments to be passed to ogr's get_project().
+
+        Returns:
+            GitProject instance or None if the underlying get_project() call fails
+            and required is False.
+
+        Raises:
+            PackitConfigException if the underlying get_project() call fails
+            and required is True.
+        """
         get_project_kwargs = get_project_kwargs or {}
         try:
             project = get_project(
@@ -229,11 +247,30 @@ class Config:
         except OgrException as ex:
             msg = f"Authentication for url {url!r} is missing in the config."
             logger.warning(msg)
-            raise PackitConfigException(msg, ex)
+            if required:
+                raise PackitConfigException(msg, ex)
+            else:
+                return None
         return project
 
-    def get_project(self, url: str, get_project_kwargs: dict = None) -> GitProject:
-        return Proxy(partial(self._get_project, url, get_project_kwargs))
+    def get_project(
+        self, url: str, required: bool = True, get_project_kwargs: dict = None
+    ) -> Proxy:
+        """
+        Gets a proxy of GitProject for the given URL. On access, if the underlying
+        get_project() call fails, the behaviour depends on the `required` argument.
+        If set to True (the default), a PackitConfigException is raised, otherwise
+        the proxy acts as it was None.
+
+        Args:
+            url: Project URL.
+            required: Whether to raise an exception on failure or act as None.
+            get_project_kwargs: Keyword arguments to be passed to ogr's get_project().
+
+        Returns:
+            Proxy of a GitProject instance or None.
+        """
+        return Proxy(partial(self._get_project, url, required, get_project_kwargs))
 
 
 pass_config = click.make_pass_decorator(Config)
