@@ -496,6 +496,8 @@ def test_get_spec_release(
 def test_fix_spec(
     upstream_mock, update_release, release_suffix, expected_release_suffix
 ):
+    upstream_mock.package_config.upstream_tag_include = None
+    upstream_mock.package_config.upstream_tag_exclude = None
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
     original_release_number_from_spec = "2"
