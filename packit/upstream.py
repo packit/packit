@@ -37,7 +37,6 @@ from packit.utils.upstream_version import get_upstream_version
 from packit.utils.versions import compare_versions
 from packit.sync import iter_srcs
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -305,41 +304,87 @@ class Upstream(PackitRepositoryBase):
     ) -> str:
         return Archive(self, version).create(create_symlink=create_symlink)
 
-    def get_last_tag(self, before: str = None) -> Optional[str]:
+    def list_tags(self) -> List[str]:
         """
-        Get last git-tag from the repo.
-        :param before: get last tag before the given tag
+        List tags in the repository sorted by created date from the most recent.
+
+        Returns:
+            List of tags.
         """
-
-        logger.debug(
-            f"We're about to `git-describe` the upstream repository "
-            f"{self.local_project.working_dir}."
-        )
-
         try:
-            version_tag_glob = self.package_config.upstream_tag_template.replace(
-                "{version}", "?*"
-            )
             cmd = [
                 "git",
-                "describe",
-                "--tags",
-                "--abbrev=0",
-                f"--match={version_tag_glob}",
+                "tag",
+                "--list",
+                "--sort=-creatordate",
             ]
-            if before:
-                cmd += [f"{before}^"]
-            last_tag = run_command(
+            tags = run_command(
                 cmd,
                 output=True,
                 cwd=self.local_project.working_dir,
-            ).stdout.strip()
+            ).stdout.split()
         except PackitCommandFailedError as ex:
             logger.debug(f"{ex!r}")
-            logger.info("Can't describe this repository, are there any git tags?")
-            # no tags in the git repo
+            logger.info("Can't list the tags in this repository.")
+            return []
+
+        return tags
+
+    def get_last_tag(self, before: str = None) -> Optional[str]:
+        """
+        Get last git-tag (matching the configuration) from the repo.
+
+        Args:
+            before: get the last tag before this tag
+
+        Returns:
+            Last matching tag.
+        """
+
+        logger.debug(
+            f"We're about to get latest matching tag in "
+            f"the upstream repository {self.local_project.working_dir}."
+        )
+
+        tags = self.list_tags()
+
+        if not tags:
+            logger.info("No tags found in the repository.")
             return None
-        return last_tag
+
+        if before:
+            if before not in tags:
+                logger.debug(f"{before} not present in the obtained list of tags.")
+                return None
+            index = tags.index(before)
+            tags = tags[(index + 1) :]  # noqa
+
+        matching_tags = self.filter_tags(tags)
+        return matching_tags[0] if matching_tags else None
+
+    def filter_tags(self, tags: List[str]):
+        """
+        Filter the given tags using `upstream_tag_include` and
+        `upstream_tag_exclude` if they are present.
+
+        Args:
+            tags: list of tags that should be filtered
+
+        Returns:
+            Tags that match with `upstream_tag_include` and
+            `upstream_tag_exclude`.
+        """
+        if self.package_config.upstream_tag_include:
+            include_pattern = re.compile(self.package_config.upstream_tag_include)
+            tags = [tag for tag in tags if include_pattern.match(tag)]
+            logger.debug(f"Filtered tags after matching upstream_tag_include: {tags}")
+
+        if self.package_config.upstream_tag_exclude:
+            exclude_pattern = re.compile(self.package_config.upstream_tag_exclude)
+            tags = [tag for tag in tags if not exclude_pattern.match(tag)]
+            logger.debug(f"Filtered tags after matching upstream_tag_exclude: {tags}")
+
+        return tags
 
     def get_commit_messages(
         self, after: Optional[str] = None, before: str = "HEAD"
@@ -858,7 +903,7 @@ class SRPMBuilder:
         self.srpm_path = srpm_path
         self.__ref = ref
 
-        self._current_git_describe_version = None
+        self._current_version = None
         self._upstream_ref = None
 
         if self.upstream.running_in_service():
@@ -871,10 +916,10 @@ class SRPMBuilder:
             self.rpmbuild_dir = self.upstream.absolute_specfile_dir
 
     @property
-    def current_git_describe_version(self):
-        if self._current_git_describe_version is None:
-            self._current_git_describe_version = self.upstream.get_current_version()
-        return self._current_git_describe_version
+    def current_version(self):
+        if self._current_version is None:
+            self._current_version = self.upstream.get_current_version()
+        return self._current_version
 
     @property
     def upstream_ref(self):
@@ -1018,7 +1063,7 @@ class SRPMBuilder:
         # * PACKIT_RPMSPEC - data for the project's specfile assembled by us
         #                  - RPMSPEC is more descriptive than just SPEC
         env = {
-            "PACKIT_PROJECT_VERSION": self.current_git_describe_version,
+            "PACKIT_PROJECT_VERSION": self.current_version,
             # Spec file %release field which packit sets by default
             "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(release_suffix),
             "PACKIT_PROJECT_COMMIT": current_commit,
@@ -1048,7 +1093,7 @@ class SRPMBuilder:
         if self.upstream.with_action(action=ActionName.fix_spec, env=env):
             self.upstream.fix_spec(
                 archive=archive,
-                version=self.current_git_describe_version,
+                version=self.current_version,
                 commit=current_commit,
                 update_release=update_release,
                 release=new_release,
@@ -1065,7 +1110,7 @@ class SRPMBuilder:
             self._prepare_upstream_using_source_git(update_release, release_suffix)
         else:
             created_archive = self.upstream.create_archive(
-                version=self.current_git_describe_version,
+                version=self.current_version,
                 create_symlink=create_symlinks,
             )
             self._fix_specfile_to_use_local_archive(

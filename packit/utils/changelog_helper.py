@@ -102,7 +102,8 @@ class ChangelogHelper:
             ).body
             if self.package_config.copy_upstream_release_description
             else self.up.get_commit_messages(
-                after=self.up.get_last_tag(upstream_tag), before=upstream_tag
+                after=self.up.get_last_tag(before=upstream_tag),
+                before=upstream_tag,
             )
         )
         comment = self.sanitize_entry(comment)
