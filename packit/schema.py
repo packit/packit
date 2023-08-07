@@ -733,6 +733,8 @@ class UserConfigSchema(Schema):
     command_handler_image_reference = fields.String()
     command_handler_k8s_namespace = fields.String()
     command_handler_pvc_volume_specs = fields.List(fields.Dict())
+    command_handler_storage_class = fields.String()
+    appcode = fields.String()
     kerberos_realm = fields.String()
     package_config_path = fields.String(default=None)
     koji_build_command = fields.String()

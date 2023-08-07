@@ -48,6 +48,8 @@ class Config:
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
         command_handler_pvc_volume_specs: List[Dict[str, str]] = None,
+        command_handler_storage_class: str = "",
+        appcode: str = "",
         package_config_path=None,
         repository_cache=None,
         add_repositories_to_repository_cache=True,
@@ -91,6 +93,11 @@ class Config:
         self.command_handler_pvc_volume_specs: List[Dict[str, str]] = (
             command_handler_pvc_volume_specs or []
         )
+        # To specify PVCs' storage class (differes in auto-prod and MP+)
+        self.command_handler_storage_class = command_handler_storage_class
+
+        # Needs to be used for requesting PVCs in Sandcastle
+        self.appcode = appcode
 
         # path to a file where OGR should store HTTP requests
         # this is used for packit testing: don't expose this to users
@@ -121,6 +128,8 @@ class Config:
             f"command_handler_image_reference='{self.command_handler_image_reference}', "
             f"command_handler_k8s_namespace='{self.command_handler_k8s_namespace}', "
             f"command_handler_pvc_volume_specs='{self.command_handler_pvc_volume_specs}', "
+            f"command_handler_storage_class='{self.command_handler_storage_class}', "
+            f"appcode='{self.appcode}', "
             f"repository_cache='{self.repository_cache}')"
         )
 
