@@ -151,6 +151,8 @@ class SandcastleCommandHandler(CommandHandler):
                 k8s_namespace_name=self.config.command_handler_k8s_namespace,
                 mapped_dir=self._mapped_dir,
                 volume_mounts=pvc_volume_specs,
+                storage_class=self.config.command_handler_storage_class,
+                appcode=self.config.appcode,
             )
             logger.debug("running the sandcastle pod")
             self._sandcastle.run()
