@@ -183,6 +183,8 @@ class CommonPackageConfig:
         image_customizations: Optional[Dict] = None,
         copr_chroot: Optional[str] = None,
         follow_fedora_branching: bool = False,
+        upstream_tag_include: str = "",
+        upstream_tag_exclude: str = "",
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -238,6 +240,8 @@ class CommonPackageConfig:
         self.issue_repository = issue_repository
         self.release_suffix = release_suffix
         self.update_release = update_release
+        self.upstream_tag_include = upstream_tag_include
+        self.upstream_tag_exclude = upstream_tag_exclude
 
         # from deprecated JobMetadataConfig
         self._targets: Dict[str, Dict[str, Any]]
