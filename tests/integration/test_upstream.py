@@ -6,16 +6,17 @@ Tests for Upstream class
 """
 import os
 import re
-import sys
 import shutil
 import subprocess
+import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from ogr import GithubService
 
 import packit
+from ogr import GithubService
 from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
@@ -23,7 +24,6 @@ from packit.local_project import LocalProjectBuilder
 from packit.upstream import Archive, Upstream, SRPMBuilder
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
-
 from tests.spellbook import (
     EMPTY_CHANGELOG,
     UPSTREAM_MACRO_IN_SOURCE,
@@ -426,28 +426,94 @@ def test_github_app(upstream_instance, tmp_path):
     )
 
 
+def create_git_tag(u, tag_name, time_to_set):
+    timestamp = time_to_set.strftime("%Y-%m-%dT%H:%M:%S")
+    # Set the environment variable to ensure the tag's timestamp
+    env = {"GIT_COMMITTER_DATE": timestamp}
+
+    Path(u, "tags").write_text(tag_name)
+    subprocess.check_call(["git", "add", "tags"], cwd=u, env=env)
+    subprocess.check_call(
+        ["git", "commit", "-m", f"Tag with {tag_name}"], cwd=u, env=env
+    )
+    subprocess.check_call(
+        ["git", "tag", "-a", "-m", f"Tag with {tag_name}", tag_name], cwd=u, env=env
+    )
+
+
 @pytest.mark.parametrize(
-    "tags, upstream_tag_template, last_tag",
+    "tags, before, last_tag",
     [
         (["0.2.0"], None, "0.2.0"),
-        (["muse/0.3.0", "0.2.0"], "muse/{version}", "muse/0.3.0"),
+        (["0.2.0", "0.3.0"], None, "0.3.0"),
+        (["0.2.0", "0.3.0"], "0.3.0", "0.2.0"),
+        (["0.2.0", "0.3.0", "0.4.0"], "0.4.0", "0.3.0"),
     ],
 )
-def test_get_last_tag(upstream_instance, tags, upstream_tag_template, last_tag):
-    # u is the local path of the upstream repository
+def test_get_last_tag(upstream_instance, tags, before, last_tag):
     u, ups = upstream_instance
+    now_time = datetime.now()
 
     # Tag more commits in the history
-    for tag in tags:
-        Path(u, "tags").write_text(tag)
-        subprocess.check_call(["git", "add", "tags"], cwd=u)
-        subprocess.check_call(["git", "commit", "-m", f"Tag with {tag}"], cwd=u)
-        subprocess.check_call(["git", "tag", "-a", "-m", f"Tag with {tag}", tag], cwd=u)
+    for i, tag in enumerate(tags):
+        create_git_tag(u, tag, now_time + timedelta(minutes=i + 1))
 
-    if upstream_tag_template:
-        ups.package_config.upstream_tag_template = upstream_tag_template
+    assert ups.get_last_tag(before=before) == last_tag
 
-    assert ups.get_last_tag() == last_tag
+
+@pytest.mark.parametrize(
+    "tags, upstream_tag_include, upstream_tag_exclude, before, last_tag",
+    [
+        (["2.0.0", "3.0.0"], r"^2\..+", None, None, "2.0.0"),
+        (["2.0.0", "2.1.0", "2.1.1", "2.2.0"], r"^.+\.1\..+", None, None, "2.1.1"),
+        (
+            [
+                "2.0.0",
+                "2.1.0",
+                "2.2.0",
+                "2.1.1",
+            ],
+            None,
+            r"^.+\.1\..+",
+            None,
+            "2.2.0",
+        ),
+        (
+            ["2.0.0", "2.1.0", "2.2.0", "2.1.1", "2.2.1"],
+            r"^.+\.1\..+",
+            None,
+            "2.1.1",
+            "2.1.0",
+        ),
+        (
+            ["2.0.0", "2.1.0", "2.2.0", "2.1.1", "3.0.0"],
+            r"^2\..+",
+            r"^.+\.1\..+",
+            None,
+            "2.2.0",
+        ),
+    ],
+)
+def test_get_last_tag_matching_config(
+    upstream_instance,
+    tags,
+    upstream_tag_include,
+    upstream_tag_exclude,
+    before,
+    last_tag,
+):
+    u, ups = upstream_instance
+
+    ups.package_config.upstream_tag_include = upstream_tag_include
+    ups.package_config.upstream_tag_exclude = upstream_tag_exclude
+
+    now_time = datetime.now()
+
+    # Tag more commits in the history
+    for i, tag in enumerate(tags):
+        create_git_tag(u, tag, now_time + timedelta(minutes=i + 1))
+
+    assert ups.get_last_tag(before=before) == last_tag
 
 
 @pytest.mark.parametrize(
