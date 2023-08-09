@@ -101,6 +101,8 @@ class ChangelogHelper:
                 tag_name=upstream_tag, name=full_version
             ).body
             if self.package_config.copy_upstream_release_description
+            # in pull_from_upstream workflow, upstream git_project can be None
+            and self.up.local_project.git_project
             else self.up.get_commit_messages(
                 after=self.up.get_last_tag(before=upstream_tag),
                 before=upstream_tag,

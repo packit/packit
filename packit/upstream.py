@@ -58,6 +58,7 @@ class Upstream(PackitRepositoryBase):
         super().__init__(config=config, package_config=package_config)
         self.config = config
         self.package_config = package_config
+        self._project_required = True
 
     def __repr__(self):
         return (
@@ -95,7 +96,8 @@ class Upstream(PackitRepositoryBase):
                 )
 
             self._local_project.git_project = self.config.get_project(
-                url=self.package_config.upstream_project_url
+                url=self.package_config.upstream_project_url,
+                required=self._project_required,
             )
         return self._local_project
 
