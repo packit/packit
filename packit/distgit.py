@@ -593,6 +593,14 @@ class DistGit(PackitRepositoryBase):
         return result["alias"]
 
     def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[List[str]]:
-        if self.downstream_config:
-            return self.downstream_config.allowed_gpg_keys
-        return None
+        if not self.downstream_config:
+            return None
+
+        # SAFETY: Taking first package instead of specific package should be
+        # safe, since we have put a requirement on »one« ‹upstream_project_url›
+        # per Packit config, i.e. even if we're dealing with a monorepo, there
+        # is only »one« upstream. If there is one upstream, there is only one
+        # set of GPG keys that can be allowed.
+        return self.downstream_config.packages[
+            self.downstream_config._first_package
+        ].allowed_gpg_keys
