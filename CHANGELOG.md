@@ -1,3 +1,7 @@
+# 0.79.0
+
+- 2 new configuration options for filtering when getting latest upstream release tag were introduced: `upstream_tag_include` and `upstream_tag_exclude`. They should contain a Python regex that can be used as an argument in `re.match`. (#2030)
+
 # 0.78.2
 
 - Packit's license in RPM specfile is now confirmed to be SPDX compatible. (#2026)
