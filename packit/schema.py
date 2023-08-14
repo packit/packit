@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import copy
-import json
 from logging import getLogger
 from typing import Dict, Any, Optional, Mapping, Union, List
 
@@ -24,6 +23,7 @@ from packit.config import (
     CommonPackageConfig,
     Deployment,
 )
+from packit.config.aliases import DEPRECATED_TARGET_MAP
 from packit.config.job_config import (
     JobType,
     JobConfig,
@@ -36,7 +36,6 @@ from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.sync import SyncFilesItem
-from packit.config.aliases import DEPRECATED_TARGET_MAP
 
 logger = getLogger(__name__)
 
@@ -558,7 +557,7 @@ class PackageConfigSchema(Schema):
         # in the config.
         data = self.rearrange_packages(data)
         data = self.rearrange_jobs(data)
-        logger.debug(f"Repo config after pre-loading:\n{json.dumps(data, indent=4)}")
+        logger.debug(f"Repo config after pre-loading:\n{data}")
         return data
 
     def rename_deprecated_keys(self, data: dict) -> dict:
