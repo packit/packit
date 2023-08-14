@@ -112,3 +112,28 @@ def test_existing_pr(title, description, branch, source_branch, prs, exists):
         assert pr is not None
     else:
         assert pr is None
+
+
+# Test covers the regression from monorepo refactoring that affects sync-release
+# on downstream, since it directly accessed the attribute on the dist-git config
+# instead of accessing specific package, which can cause ambiguity…
+def test_monorepo_regression():
+    config = flexmock(fas_user="mf")
+
+    # Construct the package config; DON'T MOCK TO ENSURE IT CAN BE REPRODUCED
+    package_a = flexmock(allowed_gpg_keys=["0xDEADBEEF"])
+    package_b = flexmock(allowed_gpg_keys=["0xDEADBEEF"])
+    package_config = PackageConfig(
+        {
+            "a": package_a,
+            "b": package_b,
+        }
+    )
+
+    dg = DistGit(config, package_config)
+
+    # Assume the config has been synced to dist-git, therefore is 1:1 to the
+    # one passed to DistGit class
+    dg._downstream_config = package_config
+
+    assert dg.get_allowed_gpg_keys_from_downstream_config() == ["0xDEADBEEF"]

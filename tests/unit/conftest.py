@@ -64,6 +64,11 @@ def package_config_mock():
         is_sub_package=False,
     )
     mock.should_receive("get_all_files_to_sync").and_return([])
+
+    # simulate ‹MultiplePackages›
+    mock._first_package = "default"
+    mock.packages = {"default": mock}
+
     return mock
 
 
