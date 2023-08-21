@@ -1,3 +1,8 @@
+# 0.79.1
+
+- We have fixed a bug in getting allowed GPG keys when syncing the release for projects with Packit config
+  in monorepo format in dist-git. (#2037)
+
 # 0.79.0
 
 - 2 new configuration options for filtering when getting latest upstream release tag were introduced: `upstream_tag_include` and `upstream_tag_exclude`. They should contain a Python regex that can be used as an argument in `re.match`. (#2030)
