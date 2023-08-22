@@ -311,8 +311,8 @@ def test_iterate_packages_source_git(
     dist_git_is_git_repo,
 ):
     package_config_dict = json.loads(package_config_yaml)
-
     flexmock(PosixPath).should_receive("name").and_return(dist_git)
+    flexmock(PosixPath).should_call("joinpath").with_args(str)
     flexmock(PosixPath).should_receive("joinpath").with_args(".git").and_return(
         flexmock().should_receive("exists").and_return(dist_git_is_git_repo).mock()
     )
