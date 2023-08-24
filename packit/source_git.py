@@ -152,9 +152,16 @@ class SourceGitGenerator:
 
     def get_BUILD_dir(self):
         path = Path(self.dist_git.working_dir)
-        build_dirs = [d for d in (path / "BUILD").iterdir() if d.is_dir()]
+        build_dirs = [
+            d
+            for d in (path / "BUILD").iterdir()
+            # ignore the specparts dir
+            if d.is_dir() and not d.name.endswith("-SPECPARTS")
+        ]
         if len(build_dirs) > 1:
-            raise RuntimeError(f"More than one directory found in {path / 'BUILD'}")
+            raise RuntimeError(
+                f"More than one matching directory found in {path / 'BUILD'}"
+            )
         if not build_dirs:
             raise RuntimeError(f"No subdirectory found in {path / 'BUILD'}")
         return build_dirs[0]
