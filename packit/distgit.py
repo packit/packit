@@ -5,6 +5,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
+import re
 from typing import Optional, Sequence, List, Union, Iterable
 
 import cccolutils
@@ -21,6 +22,7 @@ from packit.config import (
     PackageConfig,
     get_local_package_config,
 )
+from packit.constants import EXISTING_BODHI_UPDATE_REGEX
 from packit.exceptions import (
     PackitException,
     PackitConfigException,
@@ -587,6 +589,10 @@ class DistGit(PackitRepositoryBase):
             # don't logger.error here as it will end in sentry and it may just
             # be a transient issue: e.g. waiting for a build to be tagged
             logger.info(ex)
+
+            if re.match(EXISTING_BODHI_UPDATE_REGEX, str(ex)):
+                return
+
             raise PackitBodhiException(
                 f"There is a problem with creating a bodhi update:\n{ex}"
             ) from ex

@@ -1,10 +1,13 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import re
+
 import pytest
 from flexmock import flexmock
 
 from packit.config import CommonPackageConfig, Config, PackageConfig
+from packit.constants import EXISTING_BODHI_UPDATE_REGEX
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
 
@@ -137,3 +140,31 @@ def test_monorepo_regression():
     dg._downstream_config = package_config
 
     assert dg.get_allowed_gpg_keys_from_downstream_config() == ["0xDEADBEEF"]
+
+
+# Test covers regex used for silencing of Bodhi exceptions for existing updates
+@pytest.mark.parametrize(
+    "exception_message, matches",
+    [
+        (
+            (
+                '{"status": "error", "errors": ['
+                '{"location": "body", "name": "builds", "description": '
+                '"Cannot find any tags associated with build: packit-0.79.1-1.el9"},'
+                '{"location": "body", "name": "builds", "description": "Cannot '
+                'find release associated with build: packit-0.79.1-1.el9, tags: []"}]}'
+            ),
+            False,
+        ),
+        (
+            (
+                '{"status": "error", "errors": ['
+                '{"location": "body", "name": "builds", '
+                '"description": "Update for linux-system-roles-1.53.4-1.fc39 already exists"}]}'
+            ),
+            True,
+        ),
+    ],
+)
+def test_bodhi_regex(exception_message, matches):
+    assert bool(re.match(EXISTING_BODHI_UPDATE_REGEX, exception_message)) == matches
