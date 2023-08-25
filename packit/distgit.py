@@ -526,6 +526,18 @@ class DistGit(PackitRepositoryBase):
         koji_builds: Optional[Sequence[str]] = None,
         bugzilla_ids: Optional[List[int]] = None,
     ):
+        """
+        Create bodhi update.
+
+        Args:
+            dist_git_branch: Git reference.
+            update_type: Type of the update, check CLI.
+            update_notes: Notes about the update to be displayed in Bodhi. If not specified,
+              automatic update notes including a changelog diff since the latest stable build
+              will be generated.
+            koji_builds: List of Koji builds or `None` (picks latest).
+            bugzilla_ids: List of Bugzillas that are resolved with the update.
+        """
         logger.debug(
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
         )
@@ -590,13 +602,13 @@ class DistGit(PackitRepositoryBase):
             # be a transient issue: e.g. waiting for a build to be tagged
             logger.info(ex)
 
+            # early return in case update already exists
             if re.match(EXISTING_BODHI_UPDATE_REGEX, str(ex)):
                 return
 
             raise PackitBodhiException(
                 f"There is a problem with creating a bodhi update:\n{ex}"
             ) from ex
-        return result["alias"]
 
     def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[List[str]]:
         if not self.downstream_config:
