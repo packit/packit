@@ -182,13 +182,13 @@ def test_run_action_not_defined(packit_repository_base):
         .action_function
     )
     packit_repository_base.run_action(
-        ActionName.create_patches, action_method, "arg", kwarg="kwarg"
+        ActionName.create_patches, action_method, {}, "arg", kwarg="kwarg"
     )
 
 
 def test_run_action_defined(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env=None, print_live=True
+        command=["command", "--a"], env={}, print_live=True
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -203,7 +203,7 @@ def test_run_action_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        ActionName.pre_sync, action_method, "arg", "kwarg"
+        ActionName.pre_sync, action_method, {}, "arg", "kwarg"
     )
 
 
