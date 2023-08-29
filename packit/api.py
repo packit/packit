@@ -221,6 +221,13 @@ class PackitAPI:
             )
         return self._copr_helper
 
+    @property
+    def sync_release_env(self):
+        return {
+            "PACKIT_DOWNSTREAM_REPO": str(self.dg.local_project.working_dir),
+            "PACKIT_UPSTREAM_REPO": str(self.up.local_project.working_dir),
+        }
+
     def update_dist_git(
         self,
         version: Optional[str],
@@ -295,7 +302,9 @@ class PackitAPI:
                 dest_base=self.dg.local_project.working_dir,
             )
 
-        if self.up.with_action(action=ActionName.prepare_files):
+        if self.up.with_action(
+            action=ActionName.prepare_files, env=self.sync_release_env
+        ):
             synced_files = self._prepare_files_to_sync(
                 synced_files=synced_files,
                 full_version=version,
@@ -304,7 +313,9 @@ class PackitAPI:
 
         sync_files(synced_files)
 
-        if upstream_ref and self.up.with_action(action=ActionName.create_patches):
+        if upstream_ref and self.up.with_action(
+            action=ActionName.create_patches, env=self.sync_release_env
+        ):
             patches = self.up.create_patches(
                 upstream=upstream_ref,
                 destination=str(self.dg.absolute_specfile_dir),
@@ -818,7 +829,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                 )
             elif not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
-            self.up.run_action(actions=ActionName.post_upstream_clone)
+            self.up.run_action(
+                actions=ActionName.post_upstream_clone, env=self.sync_release_env
+            )
 
             if not use_downstream_specfile:
                 spec_ver = self.up.get_specfile_version()
@@ -827,7 +840,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             self.dg.check_last_commit()
 
-            self.up.run_action(actions=ActionName.pre_sync)
+            self.up.run_action(actions=ActionName.pre_sync, env=self.sync_release_env)
             if not use_downstream_specfile:
                 self.up.specfile.reload()
             self.dg.create_branch(
