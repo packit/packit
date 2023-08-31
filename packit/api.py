@@ -226,7 +226,7 @@ class PackitAPI:
         return {
             "PACKIT_DOWNSTREAM_REPO": str(self.dg.local_project.working_dir),
             "PACKIT_UPSTREAM_REPO": str(self.up.local_project.working_dir),
-        }
+        } | self.up.package_config.get_package_names_as_env()
 
     def update_dist_git(
         self,
@@ -1319,7 +1319,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                 (currently when the archive is created outside the specfile dir, or in the future
                  if we will create symlinks in some other places)
         """
-        self.up.run_action(actions=ActionName.post_upstream_clone)
+        self.up.run_action(
+            actions=ActionName.post_upstream_clone,
+            env=self.up.package_config.get_package_names_as_env(),
+        )
 
         if update_release is None:
             update_release = self.package_config.update_release
@@ -1413,7 +1416,10 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             List of paths to the built RPMs.
         """
-        self.up.run_action(actions=ActionName.post_upstream_clone)
+        self.up.run_action(
+            actions=ActionName.post_upstream_clone,
+            env=self.up.package_config.get_package_names_as_env(),
+        )
 
         try:
             self.up.prepare_upstream_for_srpm_creation(

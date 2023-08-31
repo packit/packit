@@ -247,7 +247,8 @@ class Upstream(PackitRepositoryBase):
     def get_version_from_action(self) -> str:
         """provide version from action"""
         action_output = self.get_output_from_action(
-            action=ActionName.get_current_version
+            action=ActionName.get_current_version,
+            env=self.package_config.get_package_names_as_env(),
         )
         version = action_output[-1].strip() if action_output else None
         return version
@@ -601,7 +602,8 @@ class Upstream(PackitRepositoryBase):
 
         :param upstream_ref: the base git ref for the source git
         """
-        if self.with_action(action=ActionName.create_patches):
+        env = self.package_config.get_package_names_as_env()
+        if self.with_action(action=ActionName.create_patches, env=env):
             patches = self.create_patches(
                 upstream=upstream_ref, destination=str(self.absolute_specfile_dir)
             )
@@ -1091,6 +1093,7 @@ class SRPMBuilder:
             new_release = release_suffix.format(**env)
         else:
             new_release = self.upstream.get_spec_release(release_suffix)
+        env = env | self.upstream.package_config.get_package_names_as_env()
 
         if self.upstream.with_action(action=ActionName.fix_spec, env=env):
             self.upstream.fix_spec(
@@ -1182,6 +1185,7 @@ class Archive:
             "PACKIT_PROJECT_VERSION": self.version,
             "PACKIT_PROJECT_NAME_VERSION": dir_name,
         }
+        env = env | self.upstream.package_config.get_package_names_as_env()
         if self.upstream.has_action(action=ActionName.create_archive):
             outputs = self.upstream.get_output_from_action(
                 action=ActionName.create_archive, env=env
