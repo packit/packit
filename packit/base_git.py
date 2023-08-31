@@ -180,7 +180,14 @@ class PackitRepositoryBase:
             commit_args = ["-F", commit_message]
             self.local_project.git_repo.git.commit(*commit_args)
 
-    def run_action(self, actions: ActionName, method: Callable = None, *args, **kwargs):
+    def run_action(
+        self,
+        actions: ActionName,
+        method: Callable = None,
+        env: Optional[dict] = None,
+        *args,
+        **kwargs,
+    ):
         """
         Run the method in the self._with_action block.
 
@@ -205,7 +212,7 @@ class PackitRepositoryBase:
         """
         if not method:
             logger.debug(f"Running {actions} hook.")
-        if self.with_action(action=actions) and method:
+        if self.with_action(action=actions, env=env) and method:
             method(*args, **kwargs)
 
     def has_action(self, action: ActionName) -> bool:
