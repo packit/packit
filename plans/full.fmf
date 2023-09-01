@@ -15,4 +15,6 @@ adjust:
       - how: install
         package: python3-pip
       - how: shell
-        script: pip3 install flexmock deepdiff
+        # the version lock on deepdiff can be removed once this is resolved:
+        # https://github.com/seperman/deepdiff/issues/416
+        script: pip3 install flexmock deepdiff==6.3.1
