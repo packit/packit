@@ -310,6 +310,9 @@ def test_fix_spec_action_with_macros(upstream_instance):
             "PACKIT_PROJECT_COMMIT": "4321",
             "PACKIT_PROJECT_ARCHIVE": "archive.tar.gz",
             "PACKIT_PROJECT_BRANCH": "main",
+            "PACKIT_CONFIG_PACKAGE_NAME": "beer",
+            "PACKIT_UPSTREAM_PACKAGE_NAME": "beerware",
+            "PACKIT_DOWNSTREAM_PACKAGE_NAME": "beer",
         },
     )
 
