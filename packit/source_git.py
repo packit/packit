@@ -64,8 +64,6 @@ class SourceGitGenerator:
             of the upstream project to be saved in the source-git configuration.
         pkg_tool: Packaging tool to be used to interact with the dist-git repo.
         pkg_name: Name of the package in dist-git.
-        ignore_missing_autosetup: Do not require %autosetup to be used in
-            the %prep section of specfile.
     """
 
     def __init__(
@@ -78,7 +76,6 @@ class SourceGitGenerator:
         upstream_remote: Optional[str] = None,
         pkg_tool: Optional[str] = None,
         pkg_name: Optional[str] = None,
-        ignore_missing_autosetup: bool = False,
     ):
         self.config = config
         self.source_git = source_git
@@ -98,7 +95,6 @@ class SourceGitGenerator:
             ) from exc
         self.pkg_tool = pkg_tool
         self.pkg_name = pkg_name or Path(self.dist_git.working_dir).name
-        self.ignore_missing_autosetup = ignore_missing_autosetup
 
         self._dist_git_specfile: Optional[Specfile] = None
         self.distro_dir = Path(self.source_git.working_dir, DISTRO_DIR)
@@ -321,17 +317,10 @@ class SourceGitGenerator:
             )
         with self.dist_git_specfile.prep() as prep:
             if "%autosetup" not in prep:
-                logger.warning(
-                    "Source-git repos for packages not using %autosetup may be not initialized "
-                    "properly or may not work with other packit commands."
+                raise PackitException(
+                    "Initializing source-git repos for packages "
+                    "not using %autosetup is not supported."
                 )
-                if not self.ignore_missing_autosetup:
-                    raise PackitException(
-                        "Initializing source-git repos for packages "
-                        "not using %autosetup is not allowed by default. "
-                        "You can use --ignore-missing-autosetup option at your own risk "
-                        "to enforce running the command without %autosetup."
-                    )
 
         self._populate_distro_dir()
         self._reset_gitignore()
