@@ -466,3 +466,25 @@ class MultiplePackages:
                 f"It is ambiguous to set {name}: "
                 "there is more than one package in the config."
             )
+
+    def get_package_names_as_env(self) -> dict[str, str]:
+        """Creates a dict with package_name,
+        downstream_package_name and upstream_package_name.
+
+        If the config contains multiple packages
+        raise an Exception.
+        """
+        if len(self.packages) == 1:
+            for packit_package_name, package_config in self.packages.items():
+                env = {}
+                env["PACKIT_CONFIG_PACKAGE_NAME"] = packit_package_name
+                env["PACKIT_UPSTREAM_PACKAGE_NAME"] = (
+                    package_config.upstream_package_name or ""
+                )
+                env["PACKIT_DOWNSTREAM_PACKAGE_NAME"] = (
+                    package_config.downstream_package_name or ""
+                )
+                return env
+            raise PackitConfigException("No packages in config")
+        else:
+            raise PackitConfigException("Multiple packages in config")
