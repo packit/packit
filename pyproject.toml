@@ -65,6 +65,8 @@ Homepage = "https://github.com/packit/packit"
 [project.optional-dependencies]
 testing = [
     "pytest",
+    "pytest-cov",
+    "pytest-timeout",
     "flexmock",
     "deepdiff",
     "distro",
