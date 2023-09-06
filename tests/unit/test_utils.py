@@ -4,16 +4,20 @@
 import datetime
 import os
 import sys
-import pytest
 import textwrap
+from importlib.metadata import PackageNotFoundError
 
+import pytest
 from flexmock import flexmock
-from pkg_resources import DistributionNotFound, Distribution
 
 from packit.api import get_packit_version
 from packit.exceptions import PackitException, PackitLookasideCacheException, ensure_str
 from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
+from packit.utils.changelog_helper import ChangelogHelper
+from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
+from packit.utils.koji_helper import KojiHelper
+from packit.utils.lookaside import configparser, pyrpkg, get_lookaside_sources
 from packit.utils.repo import (
     get_namespace_and_repo_name,
     git_remote_url_to_https_url,
@@ -22,12 +26,8 @@ from packit.utils.repo import (
     get_message_from_metadata,
     get_commit_hunks,
 )
-from packit.utils.commands import run_command
 from packit.utils.source_script import create_source_script
 from packit.utils.upstream_version import requests, get_upstream_version
-from packit.utils.lookaside import configparser, pyrpkg, get_lookaside_sources
-from packit.utils.koji_helper import KojiHelper
-from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.versions import compare_versions
 
 
@@ -98,14 +98,14 @@ def test_run_command_w_env():
 
 
 def test_get_packit_version_not_installed():
-    flexmock(sys.modules["packit.api"]).should_receive("get_distribution").and_raise(
-        DistributionNotFound
+    flexmock(sys.modules["packit.api"]).should_receive("version").and_raise(
+        PackageNotFoundError
     )
     assert get_packit_version() == "NOT_INSTALLED"
 
 
 def test_get_packit_version():
-    flexmock(Distribution).should_receive("version").and_return("0.1.0")
+    flexmock(sys.modules["packit.api"]).should_receive("version").and_return("0.1.0")
     assert get_packit_version() == "0.1.0"
 
 
