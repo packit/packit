@@ -58,6 +58,8 @@ dependencies = [
     "cachetools",
     "python-bugzilla",
     "backoff",
+    # osc 1.8.2 introduced a regression that was fixed via https://github.com/openSUSE/osc/pull/1595 in 1.8.3
+    "osc >= 1.6.2, != 1.8.2",
     "opensuse-distro-aliases",
 ]
 
