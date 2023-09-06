@@ -58,6 +58,7 @@ dependencies = [
     "cachetools",
     "python-bugzilla",
     "backoff",
+    "osc >= 1.6.2, != 1.8.2",
     "opensuse-distro-aliases",
 ]
 
