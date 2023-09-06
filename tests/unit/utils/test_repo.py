@@ -6,6 +6,7 @@ import textwrap
 import pytest
 from flexmock import flexmock
 
+from packit.constants import COMMIT_ACTION_DIVIDER
 from packit.exceptions import PackitException
 from packit.utils.repo import (
     get_namespace_and_repo_name,
@@ -14,6 +15,7 @@ from packit.utils.repo import (
     get_metadata_from_message,
     get_message_from_metadata,
     get_commit_hunks,
+    get_commit_message_from_action,
 )
 
 
@@ -345,3 +347,83 @@ index 0000000..6178079
     assert "+a" in hunks[0]
     assert "diff --git a/b.txt b/b.txt" in hunks[1]
     assert "+b" in hunks[1]
+
+
+@pytest.mark.parametrize(
+    "action_output",
+    (
+        pytest.param(
+            None,
+            id="no action defined",
+        ),
+        pytest.param(
+            [],
+            id="no output produced",
+        ),
+        pytest.param(
+            ["some debug from first command", "some debug from 2nd command"],
+            id="no actual commit message has been provided",
+        ),
+        pytest.param(
+            [
+                "debug output",
+                f"debug including divider\n{COMMIT_ACTION_DIVIDER.rstrip()}",
+            ],
+            id="nothing after divider",
+        ),
+        pytest.param(
+            [COMMIT_ACTION_DIVIDER.rstrip()],
+            id="only divider",
+        ),
+        pytest.param(
+            [COMMIT_ACTION_DIVIDER.rstrip(), "\n\n\n\n\n\ncommit body"],
+            id="lot of newlines, no commit title",
+        ),
+    ),
+)
+def test_get_commit_message_from_action_default(action_output):
+    # This test case contains only outputs that produce defaults
+    title, body = get_commit_message_from_action(
+        action_output, "default title", "default description"
+    )
+
+    assert title == "default title"
+    assert body == "default description"
+
+
+@pytest.mark.parametrize(
+    "action_output, expected_title, expected_body",
+    (
+        pytest.param(
+            ["debug", COMMIT_ACTION_DIVIDER.rstrip(), "commit title"],
+            "commit title",
+            "",
+            id="only commit title given",
+        ),
+        pytest.param(
+            ["debug", COMMIT_ACTION_DIVIDER.rstrip(), "commit title\n\ncommit body"],
+            "commit title",
+            "commit body",
+            id="both title and body given",
+        ),
+        pytest.param(
+            [COMMIT_ACTION_DIVIDER.rstrip(), "commit title"],
+            "commit title",
+            "",
+            id="only commit title given; no debug messages",
+        ),
+        pytest.param(
+            [COMMIT_ACTION_DIVIDER.rstrip(), "commit title\n\ncommit body"],
+            "commit title",
+            "commit body",
+            id="both title and body given; no debug messages",
+        ),
+    ),
+)
+def test_get_commit_message_from_action(action_output, expected_title, expected_body):
+    title, body = get_commit_message_from_action(
+        action_output, "default title", "default description"
+    )
+
+    assert title == expected_title
+    assert body == expected_body
