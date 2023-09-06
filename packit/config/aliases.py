@@ -20,6 +20,10 @@ ALIASES: dict[str, list[str]] = {
     "fedora-latest-stable": ["fedora-39"],
     "fedora-branched": ["fedora-38", "fedora-39"],
     "epel-all": ["epel-7", "epel-8", "epel-9"],
+    "opensuse-leap-all": (
+        leap_all := ["opensuse-leap-15.6", "opensuse-leap-15.5", "opensuse-leap-15.4"]
+    ),
+    "opensuse-all": ["opensuse-tumbleweed", *leap_all],
 }
 
 ARCHITECTURE_LIST: list[str] = [
@@ -79,7 +83,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
     names = list(name) or [default]
     possible_sys_and_versions: set[str] = set()
     for one_name in names:
-        name_split = one_name.rsplit("-", maxsplit=2)
+        name_split = one_name.rsplit("-", maxsplit=3)
         l_name_split = len(name_split)
 
         if l_name_split < 2:  # only one part
@@ -99,7 +103,8 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
             architecture = "x86_64"  # use the x86_64 as a default
 
         else:  # "name-version-architecture"
-            sys_name, version, architecture = name_split
+            sys_name, architecture = name_split[0], name_split[-1]
+            version = "-".join(name_split[1:-1])
             if architecture not in ARCHITECTURE_LIST:
                 # we don't know the architecture => probably wrongly parsed
                 # (e.g. "opensuse-leap-15.0")

@@ -1,0 +1,40 @@
+name: build in-obs smoke test
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+  workflow_dispatch:
+
+jobs:
+  build-packit-in-obs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - name: Create osc config
+        env:
+          OBS_USERNAME: ${{ secrets.OBS_USERNAME }}
+          OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
+
+        run: |
+          mkdir -p $HOME/.config/osc/
+          cat << EOF > $HOME/.config/osc/oscrc
+          [general]
+          apiurl=https://api.opensuse.org
+          [https://api.opensuse.org]
+          user=$OBS_USERNAME
+          pass=$OBS_PASSWORD
+          credentials_mgr_class=osc.credentials.PlaintextConfigFileCredentialsManager
+          EOF
+
+      - name: build_packit
+        run: |
+          sudo apt-get install -y libkrb5-dev rpm python3-rpm
+          pip install rpm hatch
+          python -m pip install build
+          pip3 install --user --editable .
+          packit build in-obs --targets fedora-rawhide-aarch64,fedora-rawhide-x86_64,opensuse-leap-15.6-x86_64,opensuse-tumbleweed-x86_64,opensuse-tumbleweed-aarch64 --no-wait
