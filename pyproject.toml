@@ -49,7 +49,6 @@ dependencies = [
     "python-gnupg",
     "requests",
     "requests-kerberos",
-    "setuptools", # Required for pkg_resources. Should move to importlib
     "specfile",
     "tabulate",
     "bodhi-client >= 7.0.0",
