@@ -5,13 +5,14 @@
 This is the official python interface for packit.
 """
 
-import copy
 import asyncio
+import copy
 import logging
 import re
 import tempfile
 from datetime import datetime
 from distutils.dir_util import copy_tree
+from importlib.metadata import version, PackageNotFoundError
 from pathlib import Path
 from typing import (
     Sequence,
@@ -30,7 +31,6 @@ import click
 import git
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
-from pkg_resources import get_distribution, DistributionNotFound
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -84,8 +84,8 @@ logger = logging.getLogger(__name__)
 
 def get_packit_version() -> str:
     try:
-        return get_distribution("packitos").version
-    except DistributionNotFound:
+        return version("packitos")
+    except PackageNotFoundError:
         return "NOT_INSTALLED"
 
 

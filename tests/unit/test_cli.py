@@ -1,8 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+from importlib.metadata import version
+
 import pytest
-from pkg_resources import get_distribution
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
@@ -21,7 +22,7 @@ def test_base_version():
     # This test requires packit on pythonpath
     result = call_packit(parameters=["--version"])
     assert result.exit_code == 0
-    assert result.output.strip() == get_distribution("packitos").version
+    assert result.output.strip() == version("packitos")
 
 
 @pytest.mark.parametrize("cmd_function", [propose_downstream, build, create_update])
