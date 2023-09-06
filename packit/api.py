@@ -81,7 +81,7 @@ from packit.source_git import SourceGitGenerator
 from packit.status import Status
 from packit.sync import SyncFilesItem, sync_files
 from packit.upstream import GitUpstream, NonGitUpstream, Upstream
-from packit.utils import commands
+from packit.utils import commands, obs_helper
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
@@ -2316,6 +2316,37 @@ The first dist-git commit to be synced is '{short_hash}'.
             return None
 
         return cmd_result.stdout
+
+    def run_obs_build(
+        self,
+        build_dir: str,
+        package_name: str,
+        project_name: str,
+        upstream_ref: Optional[str],
+        wait: bool = False,
+    ):
+        """
+        Commit a build to the Open Build Service
+        """
+
+        # Initialise project directory
+        package_dir = obs_helper.init_obs_project(
+            build_dir,
+            package_name,
+            project_name,
+        )
+        logger.info(f"build: dir: {build_dir}")
+        srpm = self.create_srpm(upstream_ref=upstream_ref, release_suffix="0")
+
+        # Commit srpm to OBS
+        obs_helper.commit_srpm_and_get_build_results(
+            srpm,
+            project_name,
+            package_name,
+            package_dir,
+            upstream_ref,
+            wait,
+        )
 
     def push_bodhi_update(self, update_alias: str):
         """Push selected bodhi update from testing to stable."""
