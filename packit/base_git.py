@@ -610,6 +610,11 @@ class PackitRepositoryBase:
                 logger.error(f"{msg}: {e!r}")
                 raise PackitDownloadFailedException(f"{msg}:\n{e}") from e
 
+    def get_user(self) -> Optional[str]:
+        if self.local_project.git_service:
+            return self.local_project.git_service.user.get_username()
+        return None
+
     def existing_pr(
         self, title: str, description: str, target_branch: str, source_branch: str
     ) -> Optional[PullRequest]:
@@ -625,7 +630,7 @@ class PackitRepositoryBase:
             PullRequest: if one is found otherwise None
         """
         pull_requests = self.local_project.git_project.get_pr_list()
-        current_user = self.local_project.git_service.user.get_username()
+        user = self.get_user()
 
         for pr in pull_requests:
             if (
@@ -633,7 +638,7 @@ class PackitRepositoryBase:
                 and pr.description == description
                 and pr.target_branch == target_branch
                 and pr.source_branch == source_branch
-                and pr.author == current_user
+                and pr.author == user
             ):
                 return pr
         return None

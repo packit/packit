@@ -622,3 +622,10 @@ class DistGit(PackitRepositoryBase):
         return self.downstream_config.packages[
             self.downstream_config._first_package
         ].allowed_gpg_keys
+
+    def get_user(self) -> Optional[str]:
+        user = super().get_user()
+        if user:
+            return user
+        else:
+            return self.fas_user
