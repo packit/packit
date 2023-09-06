@@ -4,11 +4,16 @@
 from importlib.metadata import version
 
 import pytest
+from flexmock import flexmock
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
 from packit.cli.propose_downstream import propose_downstream
+from packit.cli import propose_downstream as propose_downstream_module
+from packit.config import Config, PackageConfig
+from packit.local_project import LocalProject
+from packit.cli import utils
 from tests.spellbook import call_packit
 
 
@@ -36,3 +41,47 @@ def test_base_subcommand_help(subcommand):
     result = call_packit(packit_base, parameters=[subcommand, "--help"])
     assert result.exit_code == 0
     assert f"Usage: packit {subcommand} [OPTIONS]" in result.output
+
+
+def test_propose_downstream_command():
+    flexmock(utils).should_receive("get_local_package_config").and_return(
+        flexmock().should_receive("get_package_config_views").and_return({}).mock()
+    )
+    flexmock(propose_downstream_module).should_receive("sync_release").with_args(
+        config=Config,
+        dist_git_path=None,
+        dist_git_branch=None,
+        force_new_sources=False,
+        pr=None,
+        path_or_url=LocalProject,
+        version=None,
+        force=False,
+        local_content=False,
+        upstream_ref=None,
+        use_downstream_specfile=False,
+        package_config=PackageConfig,
+    ).and_return()
+    result = call_packit(packit_base, parameters=["propose-downstream", "."])
+    assert result.exit_code == 0
+
+
+def test_pull_from_upstream_command():
+    flexmock(utils).should_receive("get_local_package_config").and_return(
+        flexmock().should_receive("get_package_config_views").and_return({}).mock()
+    )
+    flexmock(propose_downstream_module).should_receive("sync_release").with_args(
+        config=Config,
+        dist_git_path=None,
+        dist_git_branch=None,
+        force_new_sources=False,
+        pr=None,
+        path_or_url=LocalProject,
+        version=None,
+        force=False,
+        local_content=False,
+        upstream_ref=None,
+        use_downstream_specfile=True,
+        package_config=PackageConfig,
+    ).and_return()
+    result = call_packit(packit_base, parameters=["pull-from-upstream", "."])
+    assert result.exit_code == 0
