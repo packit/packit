@@ -14,6 +14,7 @@ import yaml
 from git.exc import GitCommandError
 
 from ogr.parsing import RepoUrl, parse_git_repo
+from packit.constants import COMMIT_ACTION_DIVIDER
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -485,3 +486,49 @@ def commit_message_file(
             # so a plain Git command can be used here.
             git.cmd.Git().interpret_trailers(*args, fp.name)
         yield fp.name
+
+
+def get_commit_message_from_action(
+    output: Optional[List[str]], default_title: str, default_description: str
+) -> Tuple[str, str]:
+    """
+    Parse the output of the commit action and in case the action is not defined,
+    no output has been produced or it couldn't be parsed, return the defaults.
+
+    Args:
+        output: Output produced by the `commit-message` action.
+        default_title: Commit title that is used in case the produced commit
+            message hasn't been produced, is malformed or couldn't be parsed.
+        default_description: Commit description that is used in case the
+            produced commit message hasn't been produced, is malformed or
+            couldn't be parsed.
+
+    Returns:
+        Pair of the commit title and commit message that will be used.
+    """
+    # no output has been produced, or action doesn't exist
+    if not output:
+        return (default_title, default_description)
+
+    # split by the divider
+    split_output = "\n".join(output).rsplit(sep=COMMIT_ACTION_DIVIDER, maxsplit=1)
+
+    # nothing found
+    if len(split_output) < 2:
+        return default_title, default_description
+
+    # -1 ensures we're taking just the message, ignoring, if any, debugging
+    # output
+    whole_message = split_output[-1]
+
+    # we split only once, cause we separate the commit title
+    split_commit_message = whole_message.split("\n\n", 1)
+
+    # nothing found or empty title
+    if len(split_commit_message) < 1 or not split_commit_message[0]:
+        return default_title, default_description
+
+    title = split_commit_message[0]
+    description = split_commit_message[1] if len(split_commit_message) > 1 else ""
+
+    return title, description

@@ -187,3 +187,5 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
     "refs/heads/*:refs/remotes/{user}/*\n"
     "git checkout {user}/{branch}\n```\n"
 )
+
+COMMIT_ACTION_DIVIDER = "---%<--- snip ---%<--- here ---%<---\n"
