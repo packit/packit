@@ -2,21 +2,21 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+from importlib.metadata import version
 
 import click
-from pkg_resources import get_distribution
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.init import init
+from packit.cli.prepare_sources import prepare_sources
+from packit.cli.propose_downstream import propose_downstream
 from packit.cli.push_updates import push_updates
+from packit.cli.source_git import source_git
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
-from packit.cli.prepare_sources import prepare_sources
-from packit.cli.propose_downstream import propose_downstream
 from packit.cli.validate_config import validate_config
-from packit.cli.source_git import source_git
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
 
@@ -54,9 +54,7 @@ class AliasedGroup(click.Group):
     "package_config_path",
     help="Path to package configuration file (defaults to .packit.yaml or packit.yaml)",
 )
-@click.version_option(
-    version=get_distribution("packitos").version, message="%(version)s"
-)
+@click.version_option(version=version("packitos"), message="%(version)s")
 @click.pass_context
 def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):
     """Integrate upstream open source projects into Fedora operating system."""
@@ -78,7 +76,7 @@ def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):
     else:
         set_logging(level=logging.INFO)
 
-    packit_version = get_distribution("packitos").version
+    packit_version = version("packitos")
     logger.debug(f"Packit {packit_version} is being used.")
 
 
