@@ -10,7 +10,7 @@ from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.init import init
 from packit.cli.prepare_sources import prepare_sources
-from packit.cli.propose_downstream import propose_downstream
+from packit.cli.propose_downstream import propose_downstream, pull_from_upstream
 from packit.cli.push_updates import push_updates
 from packit.cli.source_git import source_git
 from packit.cli.srpm import srpm
@@ -81,6 +81,7 @@ def packit_base(ctx, debug, fas_user, keytab, remote, package_config_path):
 
 
 packit_base.add_command(propose_downstream)
+packit_base.add_command(pull_from_upstream)
 packit_base.add_command(sync_from_downstream)
 packit_base.add_command(build)
 packit_base.add_command(create_update)
