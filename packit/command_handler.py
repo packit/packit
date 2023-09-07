@@ -125,8 +125,8 @@ class SandcastleCommandHandler(CommandHandler):
             from sandcastle.api import MappedDir, Sandcastle, VolumeSpec
 
             self._mapped_dir = MappedDir(
-                local_dir=self.local_project.working_dir,
-                path=self.config.command_handler_work_dir,
+                local_dir=self.config.command_handler_work_dir,  # path on worker
+                path=self.config.command_handler_work_dir,  # path on sandcastle, it's the same!
                 with_interim_pvc=True,
             )
 
@@ -181,7 +181,10 @@ class SandcastleCommandHandler(CommandHandler):
     ) -> commands.CommandResult:
         from sandcastle.exceptions import SandcastleCommandFailed
 
-        logger.info(f"Running command: {' '.join(command)}")
+        cwd = cwd or Path(self.local_project.working_dir).relative_to(
+            self.config.command_handler_work_dir
+        )
+        logger.info(f"Running command: {' '.join(command)} on dir {cwd}")
 
         out = ""
         try:
