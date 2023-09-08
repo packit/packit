@@ -364,7 +364,7 @@ index 0000000..6178079
             # we keep a newline at the end of stdout, because we assume it's been
             # printed out and follows the convention of finishing with ‹\n›
             [
-                "debug output",
+                "debug output\n",
                 f"debug including divider\n{COMMIT_ACTION_DIVIDER}",
             ],
             id="nothing after divider",
@@ -376,7 +376,7 @@ index 0000000..6178079
             id="only divider",
         ),
         pytest.param(
-            [COMMIT_ACTION_DIVIDER.rstrip(), "\n\n\n\n\n\ncommit body"],
+            [COMMIT_ACTION_DIVIDER, "\n\n\n\n\n\ncommit body"],
             id="lot of newlines, no commit title",
         ),
     ),
@@ -395,37 +395,37 @@ def test_get_commit_message_from_action_default(action_output):
     "action_output, expected_title, expected_body",
     (
         pytest.param(
-            ["debug", COMMIT_ACTION_DIVIDER.rstrip(), "commit title"],
+            ["debug\n", COMMIT_ACTION_DIVIDER, "commit title\n"],
             "commit title",
             "",
             id="only commit title given",
         ),
         pytest.param(
-            ["debug", COMMIT_ACTION_DIVIDER.rstrip(), "commit title\n\ncommit body"],
+            ["debug\n", COMMIT_ACTION_DIVIDER, "commit title\n\ncommit body\n"],
             "commit title",
             "commit body",
             id="both title and body given",
         ),
         pytest.param(
-            [COMMIT_ACTION_DIVIDER.rstrip(), "commit title"],
+            [COMMIT_ACTION_DIVIDER, "commit title\n"],
             "commit title",
             "",
             id="only commit title given; no debug messages",
         ),
         pytest.param(
-            [COMMIT_ACTION_DIVIDER.rstrip(), "commit title\n\ncommit body"],
+            [COMMIT_ACTION_DIVIDER, "commit title\n\ncommit body\n"],
             "commit title",
             "commit body",
             id="both title and body given; no debug messages",
         ),
         pytest.param(
-            ["commit title\n", "commit body"],
+            ["commit title\n\n", "commit body\n"],
             "commit title",
             "commit body",
             id="both title and body given; no divider and debug output present",
         ),
         pytest.param(
-            ["commit title"],
+            ["commit title\n"],
             "commit title",
             "",
             id="only commit title given; no divider and debug output present",
