@@ -511,7 +511,7 @@ def get_commit_message_from_action(
         return (default_title, default_description)
 
     # split by the divider
-    split_output = "\n".join(output).rsplit(sep=COMMIT_ACTION_DIVIDER, maxsplit=1)
+    split_output = "".join(output).rsplit(sep=COMMIT_ACTION_DIVIDER, maxsplit=1)
 
     # -1 ensures we're taking just the message, ignoring, if any, debugging
     # output
@@ -527,4 +527,6 @@ def get_commit_message_from_action(
     title = split_commit_message[0]
     description = split_commit_message[1] if len(split_commit_message) > 1 else ""
 
-    return title, description
+    # it is later reconstructed in a generic way for both defaults and override,
+    # so we don't care about the whitespace at the beginning and the end
+    return title.strip(), description.strip()
