@@ -39,6 +39,7 @@ from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
+    COMMIT_ACTION_DIVIDER,
     SYNCING_NOTE,
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
@@ -897,6 +898,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "PACKIT_PROJECT_VERSION": version,
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
                     "PACKIT_UPSTREAM_COMMIT": self.up.local_project.commit_hexsha,
+                    "PACKIT_DEBUG_DIVIDER": COMMIT_ACTION_DIVIDER.strip(),
                 }
                 | self.sync_release_env,
             )
