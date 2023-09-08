@@ -513,10 +513,6 @@ def get_commit_message_from_action(
     # split by the divider
     split_output = "\n".join(output).rsplit(sep=COMMIT_ACTION_DIVIDER, maxsplit=1)
 
-    # nothing found
-    if len(split_output) < 2:
-        return default_title, default_description
-
     # -1 ensures we're taking just the message, ignoring, if any, debugging
     # output
     whole_message = split_output[-1]

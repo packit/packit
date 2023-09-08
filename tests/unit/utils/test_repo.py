@@ -361,18 +361,18 @@ index 0000000..6178079
             id="no output produced",
         ),
         pytest.param(
-            ["some debug from first command", "some debug from 2nd command"],
-            id="no actual commit message has been provided",
-        ),
-        pytest.param(
+            # we keep a newline at the end of stdout, because we assume it's been
+            # printed out and follows the convention of finishing with ‹\n›
             [
                 "debug output",
-                f"debug including divider\n{COMMIT_ACTION_DIVIDER.rstrip()}",
+                f"debug including divider\n{COMMIT_ACTION_DIVIDER}",
             ],
             id="nothing after divider",
         ),
         pytest.param(
-            [COMMIT_ACTION_DIVIDER.rstrip()],
+            # we keep a newline at the end of stdout, because we assume it's been
+            # printed out and follows the convention of finishing with ‹\n›
+            [COMMIT_ACTION_DIVIDER],
             id="only divider",
         ),
         pytest.param(
@@ -417,6 +417,18 @@ def test_get_commit_message_from_action_default(action_output):
             "commit title",
             "commit body",
             id="both title and body given; no debug messages",
+        ),
+        pytest.param(
+            ["commit title\n", "commit body"],
+            "commit title",
+            "commit body",
+            id="both title and body given; no divider and debug output present",
+        ),
+        pytest.param(
+            ["commit title"],
+            "commit title",
+            "",
+            id="only commit title given; no divider and debug output present",
         ),
     ),
 )
