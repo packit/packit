@@ -29,6 +29,7 @@ class ActionName(Enum):
     get_current_version = "get-current-version"
     fix_spec = "fix-spec-file"
     changelog_entry = "changelog-entry"
+    commit_message = "commit-message"
 
     @classmethod
     def is_valid_action(cls, action: str) -> bool:
