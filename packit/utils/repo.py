@@ -518,7 +518,7 @@ def get_commit_message_from_action(
     whole_message = split_output[-1]
 
     # we split only once, cause we separate the commit title
-    split_commit_message = whole_message.split("\n\n", 1)
+    split_commit_message = whole_message.split("\n\n", maxsplit=1)
 
     # nothing found or empty title
     if len(split_commit_message) < 1 or not split_commit_message[0]:
