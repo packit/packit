@@ -1,3 +1,9 @@
+# 0.80.0
+
+- Packit CLI now provides a new command `pull-from-upstream`, offering the same functionality as `propose-downstream` but suited for usage from the dist-git repository with Packit configuration placed there. This was primarily added to help reproduce the behaviour of the service's [pull_from_upstream job](https://packit.dev/docs/configuration/downstream/pull_from_upstream). (#2063)
+- Packit now exposes `PACKIT_PACKAGE_NAME`, `PACKIT_UPSTREAM_PACKAGE_NAME` and `PACKIT_DOWNSTREAM_PACKAGE_NAME` environment variables to all actions. (#2061)
+- We have fixed a bug in `packit source-git init` caused by changed behaviour in a newer version of rpmbuild. (#2048)
+
 # 0.79.1
 
 - We have fixed a bug in getting allowed GPG keys when syncing the release for projects with Packit config
