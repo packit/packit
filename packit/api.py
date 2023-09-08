@@ -45,6 +45,7 @@ from packit.constants import (
     FROM_SOURCE_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
     SYNC_RELEASE_PR_INSTRUCTIONS,
+    SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
 )
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
@@ -75,6 +76,7 @@ from packit.utils.repo import (
     get_commit_diff,
     get_commit_hunks,
     is_the_repo_pristine,
+    get_commit_message_from_action,
 )
 from packit.utils.versions import compare_versions
 from packit.vm_image_build import ImageBuilder
@@ -874,6 +876,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                     SYNCING_NOTE.format(packit_version=get_packit_version())
                 )
 
+            # Preset the PR title and instructions
+            pr_title = (
+                title or f"Update {dist_git_branch} to upstream release {version}"
+            )
             pr_instructions = (
                 SYNC_RELEASE_PR_INSTRUCTIONS.format(
                     package=self.dg.local_project.repo_name,
@@ -884,10 +890,25 @@ The first dist-git commit to be synced is '{short_hash}'.
                 else ""
             )
 
-            description = description or (
-                f"Upstream tag: {upstream_tag}\n"
-                f"Upstream commit: {self.up.local_project.commit_hexsha}\n\n"
-                f"{pr_instructions}"
+            # Evaluate the commit title and message
+            commit_msg_action_output = self.up.get_output_from_action(
+                ActionName.commit_message,
+                env={
+                    "PACKIT_PROJECT_VERSION": version,
+                    "PACKIT_UPSTREAM_TAG": upstream_tag,
+                    "PACKIT_UPSTREAM_COMMIT": self.up.local_project.commit_hexsha,
+                }
+                | self.sync_release_env,
+            )
+
+            commit_title, commit_description = get_commit_message_from_action(
+                output=commit_msg_action_output,
+                default_title=title or f"[packit] {version} upstream release",
+                default_description=description
+                or SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION.format(
+                    upstream_tag=upstream_tag,
+                    upstream_commit=self.up.local_project.commit_hexsha,
+                ),
             )
 
             self.update_dist_git(
@@ -896,8 +917,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 add_new_sources=add_new_sources,
                 force_new_sources=force_new_sources,
                 upstream_tag=upstream_tag,
-                commit_title=title or f"[packit] {version} upstream release",
-                commit_msg=description,
+                commit_title=commit_title,
+                commit_msg=commit_description,
                 sync_default_files=sync_default_files,
                 mark_commit_origin=mark_commit_origin,
                 check_dist_git_pristine=False,
@@ -906,9 +927,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             pr = None
             if create_pr:
                 pr = self.push_and_create_pr(
-                    pr_title=title
-                    or f"Update {dist_git_branch} to upstream release {version}",
-                    pr_description=description,
+                    pr_title=pr_title,
+                    pr_description=f"{commit_description}{pr_instructions}",
                     git_branch=dist_git_branch,
                     repo=self.dg,
                 )
