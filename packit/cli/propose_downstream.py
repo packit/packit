@@ -5,6 +5,7 @@
 Update selected component from upstream in Fedora
 """
 
+import copy
 import logging
 import functools
 import os
@@ -12,13 +13,19 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
+from packit.cli.utils import (
+    cover_packit_exception,
+    iterate_packages,
+    get_packit_api,
+)
 from packit.config import pass_config, get_context_settings, PackageConfig
 from packit.config.aliases import get_branches
+from packit.config.job_config import JobType
 from packit.constants import (
     PACKAGE_LONG_OPTION,
     PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    CENTOS_STREAM_DISTGIT_URL,
 )
 
 logger = logging.getLogger(__name__)
@@ -63,6 +70,45 @@ def sync_release(
     )
     if pr is None:
         pr = api.package_config.create_pr
+
+    # The `PackitAPI` is not supporting mulitple pkg_tool, so when
+    # user is mixing `c9s` with other fedora branches, we need to
+    # create two instances of `PackitAPI`.
+    centos_stream_job = get_centos_stream_job(api)
+    if centos_stream_job:
+        api_centos = copy.deepcopy(api)
+        api_centos.config.pkg_tool = "centpkg"
+        api_centos.package_config.dist_git_base_url = CENTOS_STREAM_DISTGIT_URL
+        new_job = get_centos_stream_job(api_centos)
+        if new_job:
+            for pkg_conf in new_job.packages.values():
+                if "c9s" in pkg_conf.dist_git_branches:
+                    pkg_conf.dist_git_branches = ["c9s"]
+
+        propose_downstream_centos_stream(
+            api_centos,
+            local_content,
+            version,
+            force_new_sources,
+            upstream_ref,
+            pr,
+            force,
+        )
+
+    # Check whether we still have Fedora branches to build
+    pending_fedora_works = False
+    for job in api.package_config.jobs:
+        if job.type == JobType.propose_downstream:
+            for pkg_conf in job.packages.values():
+                new_branches = []
+                for branch in pkg_conf.dist_git_branches:
+                    if branch != "c9s":
+                        new_branches.append(branch)
+                        pending_fedora_works = True
+                pkg_conf.dist_git_branches = new_branches
+
+    if not pending_fedora_works:
+        return
 
     branches_to_update = get_dg_branches(api, dist_git_branch)
 
@@ -230,3 +276,27 @@ def pull_from_upstream(
         use_downstream_specfile=True,
         package_config=package_config,
     )
+
+
+def propose_downstream_centos_stream(
+    api, local_content, version, force_new_sources, upstream_ref, pr, force
+):
+    api.sync_release(
+        dist_git_branch="c9s",
+        use_local_content=local_content,
+        version=version,
+        force_new_sources=force_new_sources,
+        upstream_ref=upstream_ref,
+        create_pr=pr,
+        force=force,
+    )
+
+
+def get_centos_stream_job(api):
+    for job in api.package_config.jobs:
+        if job.type == JobType.propose_downstream and any(
+            pkg_conf.dist_git_branches and "c9s" in pkg_conf.dist_git_branches
+            for pkg_conf in job.packages.values()
+        ):
+            return job
+    return None
