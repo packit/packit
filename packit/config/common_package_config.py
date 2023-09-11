@@ -4,10 +4,9 @@
 """
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
-import warnings
 import logging
+import warnings
 from enum import Enum
-
 from os import getenv
 from os.path import basename
 from re import split
@@ -16,7 +15,6 @@ from typing import Dict, List, Optional, Union, Any, Set
 from packit.actions import ActionName
 from packit.config.notifications import (
     NotificationsConfig,
-    PullRequestNotificationsConfig,
 )
 from packit.config.sources import SourcesItem
 from packit.constants import PROD_DISTGIT_URL, DISTGIT_NAMESPACE
@@ -218,9 +216,7 @@ class CommonPackageConfig:
         self.sync_changelog: bool = sync_changelog
         self.create_sync_note: bool = create_sync_note
         self.spec_source_id: str = spec_source_id
-        self.notifications = notifications or NotificationsConfig(
-            pull_request=PullRequestNotificationsConfig()
-        )
+        self.notifications = notifications or NotificationsConfig()
         self.identifier = identifier
 
         # The default is set also on schema level,
