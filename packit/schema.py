@@ -178,6 +178,7 @@ class NotificationsSchema(Schema):
     """Configuration of notifications."""
 
     pull_request = fields.Nested(PullRequestNotificationsSchema)
+    failure_comment_message = fields.String(missing=None)
 
     @post_load
     def make_instance(self, data, **kwargs):
