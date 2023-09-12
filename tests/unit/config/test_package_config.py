@@ -493,7 +493,7 @@ def test_package_config_not_equal(not_equal_package_config):
                 "specfile_path": "fedora/package.spec",
                 "notifications": {
                     "pull_request": {"successful_build": False},
-                    "failure_comment_message": "my comment",
+                    "failure_comment": {"message": "my comment"},
                 },
             },
             True,
@@ -502,7 +502,7 @@ def test_package_config_not_equal(not_equal_package_config):
             {
                 "downstream_package_name": "package",
                 "specfile_path": "fedora/package.spec",
-                "notifications": {"failure_comment_message": "my comment"},
+                "notifications": {"failure_comment": {"message": "my comment"}},
             },
             True,
         ),
@@ -1695,7 +1695,7 @@ def test_notifications_section():
         {"specfile_path": "package.spec"}, repo_name="package"
     )
     assert not pc.notifications.pull_request.successful_build
-    assert pc.notifications.failure_comment_message is None
+    assert pc.notifications.failure_comment.message is None
 
 
 def test_notifications_section_failure_comment_message():
@@ -1703,12 +1703,12 @@ def test_notifications_section_failure_comment_message():
     pc = PackageConfig.get_from_dict(
         {
             "specfile_path": "package.spec",
-            "notifications": {"failure_comment_message": message},
+            "notifications": {"failure_comment": {"message": message}},
         },
         repo_name="package",
     )
     assert not pc.notifications.pull_request.successful_build
-    assert pc.notifications.failure_comment_message == message
+    assert pc.notifications.failure_comment.message == message
 
 
 def test_get_local_specfile_path():

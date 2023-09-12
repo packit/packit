@@ -31,7 +31,10 @@ from packit.config.job_config import (
     JobConfigTriggerType,
     get_default_jobs,
 )
-from packit.config.notifications import NotificationsConfig
+from packit.config.notifications import (
+    NotificationsConfig,
+    FailureCommentNotificationsConfig,
+)
 from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
@@ -174,11 +177,21 @@ class PullRequestNotificationsSchema(Schema):
         return PullRequestNotificationsConfig(**data)
 
 
+class FailureCommentNotificationsSchema(Schema):
+    """Configuration of commenting on failures."""
+
+    message = fields.String(missing=None)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return FailureCommentNotificationsConfig(**data)
+
+
 class NotificationsSchema(Schema):
     """Configuration of notifications."""
 
     pull_request = fields.Nested(PullRequestNotificationsSchema)
-    failure_comment_message = fields.String(missing=None)
+    failure_comment = fields.Nested(FailureCommentNotificationsSchema)
 
     @post_load
     def make_instance(self, data, **kwargs):
