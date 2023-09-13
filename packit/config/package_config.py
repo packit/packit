@@ -1,7 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import json
 import logging
 from pathlib import Path
 from typing import Callable, Optional, List, Dict, Union, Set
@@ -497,9 +496,7 @@ def parse_loaded_config(
     **specfile_search_args,
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
-    logger.debug(
-        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}"
-    )
+    logger.debug(f"Package config before loading:\n{loaded_config}")
 
     try:
         return PackageConfig.get_from_dict(
@@ -511,7 +508,7 @@ def parse_loaded_config(
         )
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
-        raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
+        raise PackitConfigException(f"Cannot parse package config: {ex!r}.") from ex
 
 
 def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[str]:
