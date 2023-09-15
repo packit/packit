@@ -10,7 +10,7 @@ import shlex
 import shutil
 import tarfile
 from pathlib import Path
-from typing import Dict, Optional, List, Tuple, Union
+from typing import Optional, Union
 
 import git
 
@@ -111,7 +111,7 @@ class Upstream(PackitRepositoryBase):
         force: bool = False,
         fork: bool = True,
         remote_name: Optional[str] = None,
-    ) -> Tuple[str, Optional[str]]:
+    ) -> tuple[str, Optional[str]]:
         """
         push current branch to fork if fork=True, else to origin
 
@@ -196,7 +196,7 @@ class Upstream(PackitRepositoryBase):
 
     def create_patches(
         self, upstream: Optional[str] = None, destination: Union[str, Path] = None
-    ) -> List[PatchMetadata]:
+    ) -> list[PatchMetadata]:
         """
         Create patches from downstream commits.
 
@@ -307,7 +307,7 @@ class Upstream(PackitRepositoryBase):
     ) -> str:
         return Archive(self, version).create(create_symlink=create_symlink)
 
-    def list_tags(self) -> List[str]:
+    def list_tags(self) -> list[str]:
         """
         List tags in the repository sorted by created date from the most recent.
 
@@ -365,7 +365,7 @@ class Upstream(PackitRepositoryBase):
         matching_tags = self.filter_tags(tags)
         return matching_tags[0] if matching_tags else None
 
-    def filter_tags(self, tags: List[str]):
+    def filter_tags(self, tags: list[str]):
         """
         Filter the given tags using `upstream_tag_include` and
         `upstream_tag_exclude` if they are present.
@@ -654,7 +654,7 @@ class Upstream(PackitRepositoryBase):
         rpmbuild_dir: Union[str, Path],
         src_dir: Union[str, Path],
         source: Union[str, Path],
-    ) -> List[Path]:
+    ) -> list[Path]:
         """
         Wrapper for building RPMs either from SRPM or specfile.
 
@@ -718,7 +718,7 @@ class Upstream(PackitRepositoryBase):
         rpms = Upstream._get_rpms_from_rpmbuild_output(out)
         return [Path(rpm) for rpm in rpms]
 
-    def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> List[Path]:
+    def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> list[Path]:
         """
         Create RPMs from the actual content of the repo.
 
@@ -738,7 +738,7 @@ class Upstream(PackitRepositoryBase):
 
     def create_rpms_from_srpm(
         self, srpm: Union[str, Path], rpm_dir: Union[str, Path, None] = None
-    ) -> List[Path]:
+    ) -> list[Path]:
         """
         Build RPMs from the given path to the SRPM.
 
@@ -755,7 +755,7 @@ class Upstream(PackitRepositoryBase):
         return self._build_rpms("-rb", rpm_dir, rpm_dir, rpm_dir, srpm)
 
     @staticmethod
-    def _get_rpms_from_rpmbuild_output(output: str) -> List[str]:
+    def _get_rpms_from_rpmbuild_output(output: str) -> list[str]:
         """
         Try to find the rpm files in the `rpmbuild -bb` command output.
 
@@ -866,7 +866,7 @@ class Upstream(PackitRepositoryBase):
         return tag
 
     @staticmethod
-    def _get_rpms_from_mock_output(output: str) -> List[str]:
+    def _get_rpms_from_mock_output(output: str) -> list[str]:
         """
         Try to find the rpm files in the `mock` command output.
 
@@ -956,7 +956,7 @@ class SRPMBuilder:
             )
         return the_srpm
 
-    def get_build_command(self) -> Tuple[List[str], str]:
+    def get_build_command(self) -> tuple[list[str], str]:
         """
         Constructs `rpmbuild` command.
 
@@ -1237,7 +1237,7 @@ class Archive:
 
         return None
 
-    def _get_archive_path_from_output(self, outputs: List[str]) -> Optional[Path]:
+    def _get_archive_path_from_output(self, outputs: list[str]) -> Optional[Path]:
         """
         Parse the archive name from the output in the reverse order.
         Check if the line is a path and if it exists.
@@ -1295,7 +1295,7 @@ class Archive:
                 shutil.copy2(archive_path, archive_in_spec_dir)
 
     def _create_archive_using_default_way(
-        self, dir_name: str, env: Dict[str, str]
+        self, dir_name: str, env: dict[str, str]
     ) -> str:
         """
         Create an archive using `git archive`.

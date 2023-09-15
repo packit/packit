@@ -3,7 +3,7 @@
 
 import logging
 from datetime import date, datetime
-from typing import List, Optional, Tuple
+from typing import Optional
 
 import koji
 
@@ -26,7 +26,7 @@ class KojiHelper:
             session if session is not None else koji.ClientSession(baseurl=KOJI_BASEURL)
         )
 
-    def get_builds(self, package: str, since: datetime) -> List[dict]:
+    def get_builds(self, package: str, since: datetime) -> list[dict]:
         """
         Gets list of builds of a package since the specified datetime.
 
@@ -56,7 +56,7 @@ class KojiHelper:
             return []
         return builds
 
-    def get_nvrs(self, package: str, since: datetime) -> List[str]:
+    def get_nvrs(self, package: str, since: datetime) -> list[str]:
         """
         Gets list of nvr for builds of a package since the specified datetime.
 
@@ -109,7 +109,7 @@ class KojiHelper:
             return None
         return build["nvr"]
 
-    def get_build_tags(self, nvr: str) -> List[str]:
+    def get_build_tags(self, nvr: str) -> list[str]:
         """
         Gets tags the specified build is tagged into.
 
@@ -126,7 +126,7 @@ class KojiHelper:
             return []
         return [t["name"] for t in tags]
 
-    def get_build_changelog(self, nvr: str) -> List[Tuple[int, str, str]]:
+    def get_build_changelog(self, nvr: str) -> list[tuple[int, str, str]]:
         """
         Gets changelog associated with SRPM of the specified build.
 
@@ -150,7 +150,7 @@ class KojiHelper:
         return list(zip(*[headers[h] for h in requested_headers]))
 
     @staticmethod
-    def format_changelog(changelog: List[Tuple[int, str, str]], since: int = 0) -> str:
+    def format_changelog(changelog: list[tuple[int, str, str]], since: int = 0) -> str:
         """
         Formats changelog entries since the specified timestamp.
 
@@ -200,7 +200,7 @@ class KojiHelper:
         return f"{dist_git_branch}-updates-candidate"
 
     @staticmethod
-    def get_stable_tags(tag: str) -> List[str]:
+    def get_stable_tags(tag: str) -> list[str]:
         """
         Gets a list of stable tags from the specified tag name.
 

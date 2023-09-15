@@ -4,7 +4,7 @@
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Callable, List, Optional, Dict, Tuple, Any, Set
+from typing import Callable, Optional, Any
 
 from cachetools.func import ttl_cache
 from copr.v3 import Client as CoprClient
@@ -92,7 +92,7 @@ class CoprHelper:
         self,
         project: str,
         owner: Optional[str] = None,
-        targets_dict: Optional[Dict] = None,  # chroot specific configuration
+        targets_dict: Optional[dict] = None,  # chroot specific configuration
     ):
         """
         Using the provided targets_dict, update chroot specific configuration
@@ -136,16 +136,16 @@ class CoprHelper:
     def create_copr_project_if_not_exists(
         self,
         project: str,
-        chroots: List[str],
+        chroots: list[str],
         owner: Optional[str] = None,
         description: Optional[str] = None,
         instructions: Optional[str] = None,
         list_on_homepage: Optional[bool] = False,
         preserve_project: Optional[bool] = False,
-        additional_packages: Optional[List[str]] = None,
-        additional_repos: Optional[List[str]] = None,
+        additional_packages: Optional[list[str]] = None,
+        additional_repos: Optional[list[str]] = None,
         request_admin_if_needed: bool = False,
-        targets_dict: Optional[Dict] = None,  # chroot specific configuration
+        targets_dict: Optional[dict] = None,  # chroot specific configuration
         module_hotfixes: bool = False,
         follow_fedora_branching: bool = False,
     ) -> None:
@@ -216,7 +216,7 @@ class CoprHelper:
                 logger.debug(f"{field}: {old} -> {new}")
 
             try:
-                kwargs: Dict[str, Any] = {
+                kwargs: dict[str, Any] = {
                     arg_name: new for arg_name, (old, new) in fields_to_change.items()
                 }
                 logger.debug(f"Copr edit arguments: {kwargs}")
@@ -251,15 +251,15 @@ class CoprHelper:
     def get_fields_to_change(
         self,
         copr_proj,
-        additional_repos: Optional[List[str]] = None,
-        chroots: Optional[List[str]] = None,
+        additional_repos: Optional[list[str]] = None,
+        chroots: Optional[list[str]] = None,
         description: Optional[str] = None,
         instructions: Optional[str] = None,
         list_on_homepage: Optional[bool] = True,
         delete_after_days: Optional[int] = None,
         module_hotfixes: Optional[bool] = False,
-    ) -> Dict[str, Tuple[Any, Any]]:
-        fields_to_change: Dict[str, Tuple[Any, Any]] = {}
+    ) -> dict[str, tuple[Any, Any]]:
+        fields_to_change: dict[str, tuple[Any, Any]] = {}
         if chroots is not None:
             old_chroots = self.get_chroots(copr_project=copr_proj)
 
@@ -330,16 +330,16 @@ class CoprHelper:
 
     def create_copr_project(
         self,
-        chroots: List[str],
+        chroots: list[str],
         description: str,
         instructions: str,
         owner: str,
         project: str,
         list_on_homepage: bool = False,
         preserve_project: bool = False,
-        additional_packages: Optional[List[str]] = None,
-        additional_repos: Optional[List[str]] = None,
-        targets_dict: Optional[Dict] = None,  # chroot specific configuration
+        additional_packages: Optional[list[str]] = None,
+        additional_repos: Optional[list[str]] = None,
+        targets_dict: Optional[dict] = None,  # chroot specific configuration
         module_hotfixes: bool = False,
         follow_fedora_branching: bool = False,
     ) -> None:
@@ -421,7 +421,7 @@ class CoprHelper:
                 return state_reported
             time.sleep(10)
 
-    def get_copr_builds(self, number_of_builds: int = 5) -> List:
+    def get_copr_builds(self, number_of_builds: int = 5) -> list:
         """
         Get the copr builds of this project done by packit.
         :return: list of builds
@@ -436,7 +436,7 @@ class CoprHelper:
             )
         ][:5]
 
-        builds: List = []
+        builds: list = []
         for project in projects:
             builds += client.build_proxy.get_list(
                 ownername="packit", projectname=project
@@ -465,7 +465,7 @@ class CoprHelper:
             )
         )
 
-    def get_build(self, build_id: int) -> Dict:
+    def get_build(self, build_id: int) -> dict:
         """
         Get build details from Copr.
 
@@ -493,7 +493,7 @@ class CoprHelper:
         owner: Optional[str] = None,
         project: Optional[str] = None,
         copr_project=None,
-    ) -> Set[str]:
+    ) -> set[str]:
         """
         Get chroots set on a specific project. Use either `owner`+`project` or
         directly `copr_project`.

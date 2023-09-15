@@ -4,7 +4,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Callable, Optional, List, Dict, Union, Set
+from typing import Callable, Optional, Union
 
 from ogr.abstract import GitProject
 from ogr.exceptions import (
@@ -36,11 +36,11 @@ class PackageConfig(MultiplePackages):
 
     def __init__(
         self,
-        packages: Dict[str, CommonPackageConfig],
-        jobs: Optional[List[JobConfig]] = None,
+        packages: dict[str, CommonPackageConfig],
+        jobs: Optional[list[JobConfig]] = None,
     ):
-        self._job_views: List[Union[JobConfig, JobConfigView]] = []
-        self._package_config_views: Dict[str, "PackageConfigView"] = {}
+        self._job_views: list[Union[JobConfig, JobConfigView]] = []
+        self._package_config_views: dict[str, "PackageConfigView"] = {}
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
         # It is done here to avoid triggering __setattr__ and
@@ -119,7 +119,7 @@ class PackageConfig(MultiplePackages):
         if not package_config:
             return None
 
-        package_config_views: Dict[str, "PackageConfigView"] = {}
+        package_config_views: dict[str, "PackageConfigView"] = {}
         for name, package in package_config.packages.items():
             # filter out job data for the package
             jobs = [
@@ -155,7 +155,7 @@ class PackageConfig(MultiplePackages):
             )
         return projects_list[0]
 
-    def get_propose_downstream_dg_branches_value(self) -> Optional[Set]:
+    def get_propose_downstream_dg_branches_value(self) -> Optional[set]:
         for job in self.jobs:
             if job.type == JobType.propose_downstream:
                 return job.dist_git_branches
@@ -175,7 +175,7 @@ class PackageConfig(MultiplePackages):
         logger.debug(f"the other configuration:\n{serialized_other}")
         return serialized_self == serialized_other
 
-    def get_job_views(self) -> List[Union[JobConfig, JobConfigView]]:
+    def get_job_views(self) -> list[Union[JobConfig, JobConfigView]]:
         """Get jobs views on a single package.
         If a JobConfig reference more than a package, then
         split it in many JobConfigView(s) one for any package
@@ -192,7 +192,7 @@ class PackageConfig(MultiplePackages):
                 self._job_views.append(job)
         return self._job_views
 
-    def get_package_config_views(self) -> Dict[str, "PackageConfigView"]:
+    def get_package_config_views(self) -> dict[str, "PackageConfigView"]:
         """Return a dictionary of package name -> PackageConfigView
         every PackageConfigView holds just one package (the named one)
         and its associated jobs.
@@ -202,7 +202,7 @@ class PackageConfig(MultiplePackages):
         """
         return self._package_config_views
 
-    def set_package_config_views(self, value: Dict[str, "PackageConfigView"]):
+    def set_package_config_views(self, value: dict[str, "PackageConfigView"]):
         """Set a dictionary of package name -> PackageConfigView
         every PackageConfigView holds just one package (the named one)
         and its associated jobs.
@@ -244,8 +244,8 @@ class PackageConfigView(PackageConfig):
 
     def __init__(
         self,
-        packages: Dict[str, CommonPackageConfig],
-        jobs: Optional[List[JobConfig]] = None,
+        packages: dict[str, CommonPackageConfig],
+        jobs: Optional[list[JobConfig]] = None,
     ):
         if len(packages) > 1:
             logger.error(
@@ -308,7 +308,7 @@ def find_packit_yaml(
 
 def load_packit_yaml(
     config_file_path: Optional[Path] = None, raw_text: str = ""
-) -> Dict:
+) -> dict:
     """
     Use yaml.safe_load to parse provided text as yaml
 
@@ -514,7 +514,7 @@ def parse_loaded_config(
         raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
 
 
-def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[str]:
+def get_local_specfile_path(dir: Path, exclude: list[str] = None) -> Optional[str]:
     """
     Get the path to the local specfile if present. If specfile is not found in
     the directory itself, search for it recursively (rglob).

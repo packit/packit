@@ -9,7 +9,7 @@ from enum import Enum
 from functools import lru_cache, partial
 from pathlib import Path
 from shutil import which
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import click
 from lazy_object_proxy import Proxy
@@ -47,7 +47,7 @@ class Config:
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
-        command_handler_pvc_volume_specs: List[Dict[str, str]] = None,
+        command_handler_pvc_volume_specs: list[dict[str, str]] = None,
         command_handler_storage_class: str = "",
         appcode: str = "",
         package_config_path=None,
@@ -67,7 +67,7 @@ class Config:
         self.pkg_tool: str = pkg_tool
         self.upstream_git_remote = upstream_git_remote
 
-        self.services: Set[GitService] = set()
+        self.services: set[GitService] = set()
 
         # %%% ACTIONS HANDLER CONFIGURATION %%%
         # these values are specific to packit service when we run actions in a sandbox
@@ -90,7 +90,7 @@ class Config:
         # To be able to mount other volumes (like repository cache) to the sandcastle pod.
         # The keys are not checked by marshmallow to support any argument supported by Sandcastle.
         # e.g. you can set `path` and `pvc`/`pvc_from_env`
-        self.command_handler_pvc_volume_specs: List[Dict[str, str]] = (
+        self.command_handler_pvc_volume_specs: list[dict[str, str]] = (
             command_handler_pvc_volume_specs or []
         )
         # To specify PVCs' storage class (differes in auto-prod and MP+)
@@ -283,7 +283,7 @@ def get_default_map_from_file() -> Optional[dict]:
     return None
 
 
-@lru_cache()
+@lru_cache
 def get_context_settings() -> dict:
     return dict(
         help_option_names=["-h", "--help"],

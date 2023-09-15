@@ -4,7 +4,7 @@
 import configparser
 
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Union
 
 import pyrpkg
 
@@ -15,7 +15,7 @@ def get_lookaside_sources(
     pkg_tool: str,
     package: str,
     basepath: Union[Path, str],
-) -> List[Dict[str, str]]:
+) -> list[dict[str, str]]:
     """
     Gets URLs to sources stored in lookaside cache.
 

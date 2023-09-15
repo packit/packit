@@ -7,7 +7,8 @@ import shutil
 import subprocess
 import tarfile
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Optional
+from collections.abc import Iterator
 
 import git
 import pytest

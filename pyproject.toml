@@ -102,6 +102,7 @@ testpaths = [
 select = [
     "E",   # pycodestyle Error
     "F",   # Pyflakes
+    "UP",  # pyupgrade
     "W",   # pycodestyle Warning
 ]
 line-length = 100

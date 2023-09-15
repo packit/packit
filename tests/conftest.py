@@ -3,7 +3,6 @@
 
 import shutil
 from pathlib import Path
-from typing import Tuple
 import subprocess
 
 import pytest
@@ -29,7 +28,7 @@ from deepdiff import DeepDiff
 
 def get_git_repo_and_remote(
     target_dir: Path, repo_template_path: Path
-) -> Tuple[Path, Path]:
+) -> tuple[Path, Path]:
     """
     :param target_dir: tmpdir from pytest - we'll work here
     :param repo_template_path: git repo template from tests/data/
@@ -46,27 +45,27 @@ def get_git_repo_and_remote(
 
 
 @pytest.fixture()
-def upstream_and_remote(tmp_path) -> Tuple[Path, Path]:
+def upstream_and_remote(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM)
 
 
 @pytest.fixture()
-def upstream_and_remote_with_multiple_sources(tmp_path) -> Tuple[Path, Path]:
+def upstream_and_remote_with_multiple_sources(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM_WITH_MUTLIPLE_SOURCES)
 
 
 @pytest.fixture()
-def upstream_and_remote_weird_sources(tmp_path) -> Tuple[Path, Path]:
+def upstream_and_remote_weird_sources(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM_WEIRD_SOURCES)
 
 
 @pytest.fixture()
-def upstream_spec_not_in_root(tmp_path) -> Tuple[Path, Path]:
+def upstream_spec_not_in_root(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM_SPEC_NOT_IN_ROOT)
 
 
 @pytest.fixture()
-def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
+def distgit_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     create_new_repo(d_remote_path, ["--bare"])
@@ -87,7 +86,7 @@ def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
 
 
 @pytest.fixture()
-def distgit_with_autochangelog_and_remote(tmp_path) -> Tuple[Path, Path]:
+def distgit_with_autochangelog_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "autochangelog_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     create_new_repo(d_remote_path, ["--bare"])
@@ -108,7 +107,7 @@ def distgit_with_autochangelog_and_remote(tmp_path) -> Tuple[Path, Path]:
 
 
 @pytest.fixture()
-def ogr_distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
+def ogr_distgit_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "ogr_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     create_new_repo(d_remote_path, ["--bare"])

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 import logging
 from pathlib import Path
-from typing import List, Optional, Dict, Union
+from typing import Optional, Union
 
 import pytest
 from distro import linux_distribution
@@ -219,8 +219,8 @@ def test_run_action_in_sandcastle(
     flexmock(Sandcastle).should_receive("run").and_return(None).once()
 
     def mocked_exec(
-        command: List[str],
-        env: Optional[Dict] = None,
+        command: list[str],
+        env: Optional[dict] = None,
         cwd: Union[str, Path] = None,
     ):
         if command == ["command", "-b"]:

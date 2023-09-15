@@ -1,7 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from typing import Union, Any, Tuple, Dict
+from typing import Union, Any
 
 
 def ensure_str(inp: Union[bytes, str]) -> str:
@@ -54,7 +54,7 @@ class PackitCoprSettingsException(PackitException):
     """
 
     def __init__(
-        self, *args: object, fields_to_change: Dict[str, Tuple[Any, Any]]
+        self, *args: object, fields_to_change: dict[str, tuple[Any, Any]]
     ) -> None:
         self.fields_to_change = fields_to_change
         super().__init__(*args)

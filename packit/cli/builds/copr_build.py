@@ -3,7 +3,7 @@
 
 import logging
 import os
-from typing import Optional, List
+from typing import Optional
 
 import click
 
@@ -188,7 +188,7 @@ def copr(
 
     logger.info(f"Targets to build: {targets_to_build}.")
 
-    additional_repos_list: Optional[List[str]] = (
+    additional_repos_list: Optional[list[str]] = (
         additional_repos.split(",") if additional_repos else None
     )
 
