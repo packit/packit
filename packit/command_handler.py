@@ -4,7 +4,7 @@
 import logging
 from os import getenv
 from pathlib import Path
-from typing import Dict, List, Optional, Type, Union
+from typing import Optional, Union
 
 from packit.config import Config, RunCommandType
 from packit.local_project import LocalProject
@@ -12,10 +12,10 @@ from packit.utils import commands
 
 logger = logging.getLogger(__name__)
 
-RUN_COMMAND_HANDLER_MAPPING: Dict[RunCommandType, Type["CommandHandler"]] = {}
+RUN_COMMAND_HANDLER_MAPPING: dict[RunCommandType, type["CommandHandler"]] = {}
 
 
-def add_run_command(kls: Type["CommandHandler"]):
+def add_run_command(kls: type["CommandHandler"]):
     RUN_COMMAND_HANDLER_MAPPING[kls.name] = kls
     return kls
 
@@ -31,9 +31,9 @@ class CommandHandler:
 
     def run_command(
         self,
-        command: List[str],
+        command: list[str],
         return_output: bool = True,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:
@@ -80,9 +80,9 @@ class LocalCommandHandler(CommandHandler):
 
     def run_command(
         self,
-        command: List[str],
+        command: list[str],
         return_output: bool = True,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:
@@ -173,9 +173,9 @@ class SandcastleCommandHandler(CommandHandler):
 
     def run_command(
         self,
-        command: List[str],
+        command: list[str],
         return_output: bool = True,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:

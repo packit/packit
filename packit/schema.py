@@ -4,7 +4,8 @@
 import copy
 import json
 from logging import getLogger
-from typing import Dict, Any, Optional, Mapping, Union, List
+from typing import Any, Optional, Union
+from collections.abc import Mapping
 
 from marshmallow import (
     Schema,
@@ -47,10 +48,10 @@ logger = getLogger(__name__)
 class StringOrListOfStringsField(fields.Field):
     """Field type expecting a string or a list"""
 
-    def _serialize(self, value, attr, obj, **kwargs) -> List[str]:
+    def _serialize(self, value, attr, obj, **kwargs) -> list[str]:
         return [str(item) for item in value]
 
-    def _deserialize(self, value, attr, data, **kwargs) -> List[str]:
+    def _deserialize(self, value, attr, data, **kwargs) -> list[str]:
         if isinstance(value, list) and all(isinstance(v, str) for v in value):
             return value
         elif isinstance(value, str):
@@ -79,7 +80,7 @@ class FilesToSyncField(fields.Field):
     of a dict matching SyncFilesItemSchema.
     """
 
-    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs) -> List[dict]:
+    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs) -> list[dict]:
         return SyncFilesItemSchema().dump(value)
 
     def _deserialize(
@@ -111,7 +112,7 @@ class ActionField(fields.Field):
         attr: Optional[str],
         data: Optional[Mapping[str, Any]],
         **kwargs,
-    ) -> Dict:
+    ) -> dict:
         if not isinstance(value, dict):
             raise ValidationError(f"'dict' required, got {type(value)!r}.")
 
@@ -236,8 +237,8 @@ class TargetsListOrDict(fields.Field):
                 raise ValidationError(f"Unknown key {key!r} in {attr!r}")
         return True
 
-    def _deserialize(self, value, attr, data, **kwargs) -> Dict[str, Dict[str, Any]]:
-        targets_dict: Dict[str, Dict[str, Any]]
+    def _deserialize(self, value, attr, data, **kwargs) -> dict[str, dict[str, Any]]:
+        targets_dict: dict[str, dict[str, Any]]
         if isinstance(value, list) and all(isinstance(v, str) for v in value):
             targets_dict = {key: {} for key in value}
         elif self.__is_targets_dict(value):

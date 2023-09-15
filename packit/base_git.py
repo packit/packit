@@ -6,7 +6,8 @@ import shlex
 from importlib.metadata import version
 from logging import getLogger
 from pathlib import Path
-from typing import Optional, Callable, List, Iterable, Dict, Tuple
+from typing import Optional, Callable
+from collections.abc import Iterable
 
 import git
 import requests
@@ -48,7 +49,7 @@ class PackitRepositoryBase:
         self.package_config = package_config
         self._specfile_path: Optional[Path] = None
         self._specfile: Optional[Specfile] = None
-        self.allowed_gpg_keys: Optional[List[str]] = None
+        self.allowed_gpg_keys: Optional[list[str]] = None
 
         self._handler_kls = None
         self._command_handler: Optional[CommandHandler] = None
@@ -160,7 +161,7 @@ class PackitRepositoryBase:
         title: str,
         msg: str,
         prefix: str = "[packit] ",
-        trailers: Optional[List[Tuple[str, str]]] = None,
+        trailers: Optional[list[tuple[str, str]]] = None,
     ) -> None:
         """
         Perform `git add -A` and `git commit`
@@ -221,7 +222,7 @@ class PackitRepositoryBase:
         """
         return action in self.package_config.actions
 
-    def get_commands_for_actions(self, action: ActionName) -> List[List[str]]:
+    def get_commands_for_actions(self, action: ActionName) -> list[list[str]]:
         """
         Parse the following types of the structure and return list of commands in the form of list.
 
@@ -265,7 +266,7 @@ class PackitRepositoryBase:
                 )
         return parsed_commands
 
-    def with_action(self, action: ActionName, env: Optional[Dict] = None) -> bool:
+    def with_action(self, action: ActionName, env: Optional[dict] = None) -> bool:
         """
         If the action is defined in the self.package_config.actions,
         we run it and return False (so we can skip the if block)
@@ -299,8 +300,8 @@ class PackitRepositoryBase:
         return True
 
     def get_output_from_action(
-        self, action: ActionName, env: Optional[Dict] = None
-    ) -> Optional[List[str]]:
+        self, action: ActionName, env: Optional[dict] = None
+    ) -> Optional[list[str]]:
         """
         Run self.actions[action] command(s) and return their outputs.
         """
@@ -318,7 +319,7 @@ class PackitRepositoryBase:
         ]
 
     def specfile_add_patches(
-        self, patch_list: List[PatchMetadata], patch_id_digits: int = 4
+        self, patch_list: list[PatchMetadata], patch_id_digits: int = 4
     ) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.

@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Optional, Union, Iterable
+from typing import Optional, Union
+from collections.abc import Iterable
 
 from packit.exceptions import PackitCommandFailedError
 

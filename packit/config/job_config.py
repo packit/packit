@@ -4,7 +4,6 @@
 from copy import deepcopy
 from enum import Enum
 from logging import getLogger
-from typing import List, Dict
 
 from packit.config.aliases import DEFAULT_VERSION
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
@@ -63,10 +62,10 @@ class JobConfig(MultiplePackages):
         self,
         type: JobType,
         trigger: JobConfigTriggerType,
-        packages: Dict[str, CommonPackageConfig],
+        packages: dict[str, CommonPackageConfig],
         skip_build: bool = False,
         manual_trigger: bool = False,
-        labels: List[str] = None,
+        labels: list[str] = None,
     ):
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
@@ -161,7 +160,7 @@ class JobConfigView(JobConfig):
         return original_identifier
 
 
-def get_default_jobs() -> List[Dict]:
+def get_default_jobs() -> list[dict]:
     """
     this returns a list of dicts so it can be properly parsed and defaults would be set
     """

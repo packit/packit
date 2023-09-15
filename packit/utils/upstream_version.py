@@ -3,7 +3,7 @@
 
 import requests
 
-from typing import Dict, Optional
+from typing import Optional
 
 
 def get_upstream_version(package_name: str) -> Optional[str]:
@@ -34,7 +34,7 @@ def get_upstream_version(package_name: str) -> Optional[str]:
         # if there is no Fedora mapping, try using package name as project name
         result = query("projects", pattern=package_name)
         projects = result.get("projects", [])
-        project: Dict = next(
+        project: dict = next(
             iter(p for p in projects if p.get("name") == package_name), {}
         )
         version = project.get("version")

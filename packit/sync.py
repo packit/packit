@@ -9,7 +9,8 @@ import os
 import glob
 import logging
 from pathlib import Path
-from typing import List, Optional, Union, Sequence, Iterator
+from typing import Optional, Union
+from collections.abc import Sequence, Iterator
 
 from packit.exceptions import PackitException
 from packit.utils import run_command
@@ -63,7 +64,7 @@ class SyncFilesItem:
         dest: Union[str, Path],
         mkpath: bool = False,
         delete: bool = False,
-        filters: Optional[List[str]] = None,
+        filters: Optional[list[str]] = None,
     ):
         # pathlib.Path has no support for trailing slashes, but
         # a trailing slash has a meaning for rsync.
@@ -111,7 +112,7 @@ class SyncFilesItem:
             other.filters,
         )
 
-    def command(self, fail_on_missing: bool = False) -> List[str]:
+    def command(self, fail_on_missing: bool = False) -> list[str]:
         """Provide to command to do the sync
 
         Args:

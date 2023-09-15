@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Dict, Union, List, Any
+from typing import Union, Any
 import logging
 
 from marshmallow import ValidationError
@@ -24,7 +24,7 @@ class PackageConfigValidator:
     """
 
     def __init__(
-        self, config_file_path: Path, config_content: Dict, project_path: Path
+        self, config_file_path: Path, config_content: dict, project_path: Path
     ):
         self.config_file_path = config_file_path
         self.content = config_content
@@ -39,7 +39,7 @@ class PackageConfigValidator:
         Raises:
             PackitConfigException: when the config is not valid
         """
-        schema_errors: Union[List[Any], Dict[Any, Any]] = None
+        schema_errors: Union[list[Any], dict[Any, Any]] = None
         config = None
         try:
             config = PackageConfig.get_from_dict(

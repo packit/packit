@@ -7,7 +7,8 @@ import subprocess
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator, List, Optional, Tuple, Union
+from typing import Optional, Union
+from collections.abc import Generator
 
 import git
 import yaml
@@ -38,11 +39,11 @@ class RepositoryCache:
             f"Instantiation of the repository cache at {self.cache_path}. "
             f"New projects will {'not ' if not self.add_new else ''}be added."
         )
-        self.projects_added: List[str] = []
-        self.projects_cloned_using_cache: List[str] = []
+        self.projects_added: list[str] = []
+        self.projects_cloned_using_cache: list[str] = []
 
     @property
-    def cached_projects(self) -> List[str]:
+    def cached_projects(self) -> list[str]:
         """Project names we have in the cache."""
         if not self.cache_path.is_dir():
             self.cache_path.mkdir(parents=True)
@@ -121,7 +122,7 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
         return git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
 
-def get_namespace_and_repo_name(url: str) -> Tuple[Optional[str], str]:
+def get_namespace_and_repo_name(url: str) -> tuple[Optional[str], str]:
     parsed_git_repo = parse_git_repo(url)
     if parsed_git_repo is None or not parsed_git_repo.repo:
         raise PackitException(
@@ -182,7 +183,7 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
 def get_current_version_command(
     glob_pattern: str, refs: Optional[str] = "tags"
-) -> List[str]:
+) -> list[str]:
     """
     Returns command that find latest git reference matching given pattern.
 
@@ -203,7 +204,7 @@ def get_current_version_command(
     ]
 
 
-def create_new_repo(cwd: Path, switches: List[str]):
+def create_new_repo(cwd: Path, switches: list[str]):
     subprocess.check_call(["git", "init"] + switches + [str(cwd)])
     # TODO: Replace with -b / --initial-branch in `git init` when possible
     if "--bare" not in switches:
@@ -367,7 +368,7 @@ def commit_exists(repo: git.Repo, commit: str) -> bool:
         return True
 
 
-def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
+def get_commit_diff(commit: git.Commit) -> list[git.Diff]:
     """Get modified files of the given commit.
 
     Args:
@@ -387,7 +388,7 @@ def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
         return []
 
 
-def get_commit_hunks(repo: git.Repo, commit: git.Commit) -> List[str]:
+def get_commit_hunks(repo: git.Repo, commit: git.Commit) -> list[str]:
     """Get a list of hunks of the given commit.
 
     Args:
@@ -454,7 +455,7 @@ def get_file_author(repo: git.Repo, filename: str) -> str:
 
 @contextmanager
 def commit_message_file(
-    subject: str, message: str = None, trailers: Optional[List[Tuple[str, str]]] = None
+    subject: str, message: str = None, trailers: Optional[list[tuple[str, str]]] = None
 ) -> Generator[str, None, None]:
     """Context manager to yield a commit message file
 
@@ -489,8 +490,8 @@ def commit_message_file(
 
 
 def get_commit_message_from_action(
-    output: Optional[List[str]], default_title: str, default_description: str
-) -> Tuple[str, str]:
+    output: Optional[list[str]], default_title: str, default_description: str
+) -> tuple[str, str]:
     """
     Parse the output of the commit action and in case the action is not defined,
     no output has been produced or it couldn't be parsed, return the defaults.

@@ -7,7 +7,7 @@ This module contains code related to security, signing and verification.
 
 import logging
 from enum import Enum
-from typing import Optional, List
+from typing import Optional
 
 import git
 from gnupg import GPG, ListKeys
@@ -55,7 +55,7 @@ class CommitVerifier:
         return self.gpg.list_keys()
 
     @property
-    def _gpg_fingerprints(self) -> List[str]:
+    def _gpg_fingerprints(self) -> list[str]:
         """List of fingerprints of the saved keys"""
         return self._gpg_keys.fingerprints
 
@@ -80,7 +80,7 @@ class CommitVerifier:
         raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
 
     def check_signature_of_commit(
-        self, commit: git.Commit, possible_key_fingerprints: List[str]
+        self, commit: git.Commit, possible_key_fingerprints: list[str]
     ) -> bool:
         """
         Check the validity of the commit signature

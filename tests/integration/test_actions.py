@@ -1,7 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from typing import Dict
 
 import pytest
 
@@ -19,7 +18,7 @@ from packit.exceptions import PackitException
     ),
 )
 def test_with_action(
-    upstream_instance, action: ActionName, command, env_vars: Dict, should_raise
+    upstream_instance, action: ActionName, command, env_vars: dict, should_raise
 ):
     _, upstream = upstream_instance
     upstream.package_config.actions = {action: command}
@@ -46,7 +45,7 @@ def test_get_output_from_action(
     upstream_instance,
     action: ActionName,
     command,
-    env_vars: Dict,
+    env_vars: dict,
     should_raise,
     expected_output: str,
 ):

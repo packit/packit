@@ -7,7 +7,7 @@ import logging
 import sys
 import pathlib
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import click
 from github import GithubException
@@ -304,7 +304,7 @@ def get_packit_api(
             f"{local_project.working_dir!r} is not a git repository."
         )
 
-    remote_urls: List[str] = []
+    remote_urls: list[str] = []
     for remote in local_project.git_repo.remotes:
         remote_urls += remote.urls
 

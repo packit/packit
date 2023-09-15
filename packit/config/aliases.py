@@ -3,7 +3,6 @@
 
 import logging
 from datetime import timedelta
-from typing import Dict, List, Set
 
 from cachetools.func import ttl_cache
 
@@ -12,7 +11,7 @@ from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
 
-ALIASES: Dict[str, List[str]] = {
+ALIASES: dict[str, list[str]] = {
     "fedora-all": ["fedora-36", "fedora-37", "fedora-38", "fedora-rawhide"],
     "fedora-stable": ["fedora-36", "fedora-37"],
     "fedora-development": ["fedora-rawhide", "fedora-38"],
@@ -22,7 +21,7 @@ ALIASES: Dict[str, List[str]] = {
     "epel-all": ["epel-7", "epel-8", "epel-9"],
 }
 
-ARCHITECTURE_LIST: List[str] = [
+ARCHITECTURE_LIST: list[str] = [
     "aarch64",
     "armhfp",
     "i386",
@@ -43,7 +42,7 @@ DEFAULT_VERSION = "fedora-stable"
 logger = logging.getLogger(__name__)
 
 
-def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+def get_versions(*name: str, default=DEFAULT_VERSION) -> set[str]:
     """
     Expand the aliases to the name(s).
 
@@ -55,13 +54,13 @@ def get_versions(*name: str, default=DEFAULT_VERSION) -> Set[str]:
         return set()
 
     names = list(name) or [default]
-    versions: Set[str] = set()
+    versions: set[str] = set()
     for one_name in names:
         versions.update(get_aliases().get(one_name, [one_name]))
     return versions
 
 
-def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
+def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
     """
     Expand the aliases to the name(s) and transfer to the build targets.
 
@@ -74,7 +73,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> Set[str]:
         return set()
 
     names = list(name) or [default]
-    possible_sys_and_versions: Set[str] = set()
+    possible_sys_and_versions: set[str] = set()
     for one_name in names:
         name_split = one_name.rsplit("-", maxsplit=2)
         l_name_split = len(name_split)
@@ -125,7 +124,7 @@ def get_branches(
     default: str = DEFAULT_VERSION,
     default_dg_branch: str = "main",
     with_aliases: bool = False,
-) -> Set[str]:
+) -> set[str]:
     """
     Expand the aliases to the name(s) and transfer to the dist-git branch name.
 
@@ -174,7 +173,7 @@ def get_branches(
     return branches
 
 
-def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
+def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> set[str]:
     if not (default or name):
         return set()
 
@@ -204,13 +203,13 @@ def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> Set[str]:
     return targets
 
 
-def get_all_koji_targets() -> List[str]:
+def get_all_koji_targets() -> list[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).stdout.split()
 
 
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
 @fallback_return_value(ALIASES)
-def get_aliases() -> Dict[str, List[str]]:
+def get_aliases() -> dict[str, list[str]]:
     """
     Function to automatically determine fedora-* and epel-* aliases.
     Current data are fetched via bodhi client, with default base url

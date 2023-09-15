@@ -6,7 +6,8 @@ import os
 import tempfile
 from pathlib import Path
 import re
-from typing import Optional, Sequence, List, Union, Iterable
+from typing import Optional, Union
+from collections.abc import Sequence, Iterable
 
 import cccolutils
 import git
@@ -316,7 +317,7 @@ class DistGit(PackitRepositoryBase):
         return dist_git_pr
 
     @property
-    def upstream_archive_names(self) -> List[str]:
+    def upstream_archive_names(self) -> list[str]:
         """
         Files that are considered upstream and should be uploaded to lookaside.
         Currently that's the source identified by spec_source_id (Source0 by default)
@@ -333,7 +334,7 @@ class DistGit(PackitRepositoryBase):
         logger.debug(f"Upstream archive names: {archive_names}")
         return archive_names
 
-    def download_upstream_archives(self) -> List[Path]:
+    def download_upstream_archives(self) -> list[Path]:
         """
         Fetch archives for the current upstream release defined in dist-git's spec
 
@@ -524,7 +525,7 @@ class DistGit(PackitRepositoryBase):
         update_type: str,
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
-        bugzilla_ids: Optional[List[int]] = None,
+        bugzilla_ids: Optional[list[int]] = None,
     ):
         """
         Create bodhi update.
@@ -610,7 +611,7 @@ class DistGit(PackitRepositoryBase):
                 f"There is a problem with creating a bodhi update:\n{ex}"
             ) from ex
 
-    def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[List[str]]:
+    def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[list[str]]:
         if not self.downstream_config:
             return None
 

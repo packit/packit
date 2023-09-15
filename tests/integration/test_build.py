@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Union, List, Optional, Dict
+from typing import Union, Optional
 
 from flexmock import flexmock
 
@@ -31,12 +31,12 @@ def test_build_from_upstream(
     u, d, api = api_instance
 
     def mocked_run_command(
-        cmd: Union[List[str], str],
+        cmd: Union[list[str], str],
         error_message: str = None,
         cwd: Union[str, Path] = None,
         fail: bool = True,
         output: bool = False,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         decode=True,
         print_live=False,
     ):

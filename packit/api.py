@@ -15,17 +15,13 @@ from distutils.dir_util import copy_tree
 from importlib.metadata import version, PackageNotFoundError
 from pathlib import Path
 from typing import (
-    Sequence,
     Callable,
-    List,
     Literal,
-    Tuple,
-    Dict,
-    Iterable,
     Optional,
     Union,
     overload,
 )
+from collections.abc import Sequence, Iterable
 
 import click
 import git
@@ -355,7 +351,7 @@ class PackitAPI:
             )
 
     @staticmethod
-    def _transform_patch_to_source_git(patch: str, diffs: List[git.Diff]) -> str:
+    def _transform_patch_to_source_git(patch: str, diffs: list[git.Diff]) -> str:
         """Transforms a dist-git patch to source-git.
 
         It's necessary to insert .distro directory to paths in the patch.
@@ -428,8 +424,8 @@ class PackitAPI:
 
         # Do the checks beforehand but store commits and diffs to avoid recomputing.
         # Getting patch of a git commit is costly as per GitPython docs.
-        commits: List[git.Commit] = []
-        diffs: List[List[git.Diff]] = []
+        commits: list[git.Commit] = []
+        diffs: list[list[git.Diff]] = []
         patch_suffix = ".patch"
         distro_path = self.up.local_project.working_dir / DISTRO_DIR
         for commit in self.dg.local_project.git_repo.iter_commits(
@@ -515,7 +511,7 @@ class PackitAPI:
                     f"Commit {commit} had no changes to be applied, skipping it."
                 )
 
-    def _get_latest_commit_update_pair(self) -> Tuple[str, str]:
+    def _get_latest_commit_update_pair(self) -> tuple[str, str]:
         """Finds the latest pair of commits which was created by updating
         source-git from dist-git (or vice versa) denoted by git trailers.
 
@@ -1032,8 +1028,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         return pr
 
     def _prepare_files_to_sync(
-        self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
-    ) -> List[SyncFilesItem]:
+        self, synced_files: list[SyncFilesItem], full_version: str, upstream_tag: str
+    ) -> list[SyncFilesItem]:
         """
         Returns the list of files to sync to dist-git as is.
 
@@ -1293,7 +1289,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         update_type: str,
         update_notes: Optional[str] = None,
         koji_builds: Sequence[str] = None,
-        bugzilla_ids: Optional[List[int]] = None,
+        bugzilla_ids: Optional[list[int]] = None,
     ):
         """
         Create bodhi update.
@@ -1424,7 +1420,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_ref: Optional[str] = None,
         rpm_dir: str = None,
         release_suffix: Optional[str] = None,
-    ) -> List[Path]:
+    ) -> list[Path]:
         """
         Create RPMs from the upstream repository.
 
@@ -1467,7 +1463,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         return rpm_paths
 
     @staticmethod
-    async def status_get_downstream_prs(status) -> List[Tuple[int, str, str]]:
+    async def status_get_downstream_prs(status) -> list[tuple[int, str, str]]:
         try:
             await asyncio.sleep(0)
             return status.get_downstream_prs()
@@ -1477,7 +1473,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_get_dg_versions(status) -> Dict:
+    async def status_get_dg_versions(status) -> dict:
         try:
             await asyncio.sleep(0)
             return status.get_dg_versions()
@@ -1486,7 +1482,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return {}
 
     @staticmethod
-    async def status_get_up_releases(status) -> List:
+    async def status_get_up_releases(status) -> list:
         try:
             await asyncio.sleep(0)
             return status.get_up_releases()
@@ -1495,7 +1491,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_get_koji_builds(status) -> Dict:
+    async def status_get_koji_builds(status) -> dict:
         try:
             await asyncio.sleep(0)
             return status.get_koji_builds()
@@ -1504,7 +1500,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return {}
 
     @staticmethod
-    async def status_get_copr_builds(status) -> List:
+    async def status_get_copr_builds(status) -> list:
         try:
             await asyncio.sleep(0)
             return status.get_copr_builds()
@@ -1513,7 +1509,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_get_updates(status) -> List:
+    async def status_get_updates(status) -> list:
         try:
             await asyncio.sleep(0)
             return status.get_updates()
@@ -1522,7 +1518,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_main(status: Status) -> List:
+    async def status_main(status: Status) -> list:
         """
         Schedule repository data retrieval calls concurrently.
         :param status: status of the package
@@ -1595,22 +1591,22 @@ The first dist-git commit to be synced is '{short_hash}'.
     def run_copr_build(
         self,
         project: str,
-        chroots: List[str],
+        chroots: list[str],
         owner: Optional[str] = None,
         description: Optional[str] = None,
         instructions: Optional[str] = None,
         upstream_ref: Optional[str] = None,
         list_on_homepage: bool = False,
         preserve_project: bool = False,
-        additional_packages: Optional[List[str]] = None,
-        additional_repos: Optional[List[str]] = None,
+        additional_packages: Optional[list[str]] = None,
+        additional_repos: Optional[list[str]] = None,
         request_admin_if_needed: bool = False,
         enable_net: bool = False,
         release_suffix: Optional[str] = None,
         srpm_path: Optional[Path] = None,
         module_hotfixes: bool = False,
         follow_fedora_branching: bool = False,
-    ) -> Tuple[int, str]:
+    ) -> tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
 
@@ -1713,7 +1709,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         except UpdateNotFound:
             logger.error("Update was not found.")
 
-    def get_testing_updates(self, update_alias: Optional[str]) -> List:
+    def get_testing_updates(self, update_alias: Optional[str]) -> list:
         bodhi_client = get_bodhi_client()
         updates = []
         page = pages = 1
@@ -1866,7 +1862,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         srpm_path: Path,
         root: str = "default",
-    ) -> List[Path]:
+    ) -> list[Path]:
         """
         Performs a mock build with given SRPM and root.
 
@@ -1911,8 +1907,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         image_distribution: str,
         image_name: str,
-        image_request: Dict,
-        image_customizations: Dict,
+        image_request: dict,
+        image_customizations: dict,
         copr_namespace: str,
         copr_project: str,
         copr_chroot: str,

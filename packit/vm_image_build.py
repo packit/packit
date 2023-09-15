@@ -10,7 +10,7 @@ Guides and more info about Image Builder:
     https://github.com/packit/research/tree/main/image-builder
 """
 import logging
-from typing import Optional, Dict, List, Union
+from typing import Optional, Union
 
 import requests
 from requests import HTTPError
@@ -170,8 +170,8 @@ class ImageBuilder:
         self,
         image_distribution: str,
         image_name: str,
-        image_request: Dict,
-        image_customizations: Dict,
+        image_request: dict,
+        image_customizations: dict,
         repo_url: str,
     ):
         """
@@ -217,7 +217,7 @@ class ImageBuilder:
         image_customizations.setdefault("payload_repositories", [])
         # variable assignment is done for sake of mypy:
         #   https://stackoverflow.com/a/54788883/909579
-        payload_repositories: List[Dict[str, Union[str, bool]]] = image_customizations[
+        payload_repositories: list[dict[str, Union[str, bool]]] = image_customizations[
             "payload_repositories"
         ]
         logger.debug(
@@ -275,7 +275,7 @@ class ImageBuilder:
         logger.debug(f"Image build metadata: {response_json}")
         return response_json["image_status"]["status"]
 
-    def clone(self, build_id: str, region: str, share_with_accounts: List[str]):
+    def clone(self, build_id: str, region: str, share_with_accounts: list[str]):
         """
         Clone existing image into a new AWS region.
 

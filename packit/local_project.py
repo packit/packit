@@ -5,7 +5,8 @@ import dataclasses
 import logging
 import shutil
 from pathlib import Path
-from typing import Optional, Union, Iterable, Any, Set, TypeVar
+from typing import Optional, Union, Any, TypeVar
+from collections.abc import Iterable
 from functools import partial
 
 import git
@@ -649,7 +650,7 @@ class LocalProjectBuilder:
         self._cache = cache
         self.offline = offline
 
-    def _add_prerequisites_to_calculations(self, to_calculate: Set[str]) -> None:
+    def _add_prerequisites_to_calculations(self, to_calculate: set[str]) -> None:
         """Adds calculation prerequisites into to_calculate set.
 
         If a caller of this class requests git_repo to be calculated, they should not
@@ -672,7 +673,7 @@ class LocalProjectBuilder:
         logger.debug(f"Transitive dependencies: {', '.join(dep_list)}")
 
     def _refresh_the_state(
-        self, state: LocalProjectCalculationState, to_calculate: Set[str]
+        self, state: LocalProjectCalculationState, to_calculate: set[str]
     ) -> None:
         """Calculates the requested attributes while also considering transitive relations.
 
@@ -999,7 +1000,7 @@ class LocalProjectBuilder:
                     ref="develop",
                 )
         """
-        to_calculate: Set[str] = set()
+        to_calculate: set[str] = set()
 
         def check_and_set(
             calc_state: LocalProjectCalculationState, attr: str, value: Any
