@@ -106,6 +106,7 @@ select = [
     "E",   # pycodestyle Error
     "F",   # Pyflakes
     "I",   # isort
+    "PERF",# Perflint
     "PIE", # flake8-pie
     "RET", # flake8-return
     "SIM", # flake8-simplify

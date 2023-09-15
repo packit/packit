@@ -150,7 +150,7 @@ def koji(
                     release_suffix=release_suffix,
                     srpm_path=config.srpm_path,
                 )
-            except PackitCommandFailedError as ex:
+            except PackitCommandFailedError as ex:  # noqa: PERF203
                 logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
                 logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
                 click.echo(

@@ -25,19 +25,14 @@ class BugzillaIDs(click.ParamType):
     name = "bugzilla_ids"
 
     def convert(self, value, param, ctx):
-        ids = []
-
         str_ids = value.split(",")
-        for bugzilla_id in str_ids:
-            try:
-                ids.append(int(bugzilla_id))
-            except ValueError as err:
-                raise click.BadParameter(
-                    "cannot parse non-integer bugzilla ID. Please use following "
-                    "format: id[,id]",
-                ) from err
-
-        return ids
+        try:
+            return [int(bugzilla_id) for bugzilla_id in str_ids]
+        except ValueError as err:
+            raise click.BadParameter(
+                "cannot parse non-integer bugzilla ID. Please use following "
+                "format: id[,id]",
+            ) from err
 
 
 @click.command("create-update", context_settings=get_context_settings())
@@ -143,7 +138,7 @@ def create_update(
                 update_type=update_type,
                 bugzilla_ids=resolve_bugzillas,
             )
-        except PackitException as ex:
+        except PackitException as ex:  # noqa: PERF203
             click.echo(
                 f"There was a problem while creating an update for {branch}:\n{ex}\n\n"
                 "Please try again later if this looks like a transient issue.\n"

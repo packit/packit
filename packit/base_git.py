@@ -578,10 +578,8 @@ class PackitRepositoryBase:
             or f"packit/{version('packitos')} (hello+cli@packit.dev)"
         )
 
-        sourcelist = []
         # Fetch all sources defined in packit.yaml -> sources
-        for source in self.package_config.sources:
-            sourcelist.append((source.url, source.path, False))
+        sourcelist = [(s.url, s.path, False) for s in self.package_config.sources]
         if pkg_tool:
             # Fetch sources defined in "sources" file from lookaside cache
             lookaside_sources = get_lookaside_sources(
@@ -589,21 +587,18 @@ class PackitRepositoryBase:
                 self.specfile.expanded_name,
                 self.specfile.path.parent,
             )
-            for lookaside_source in lookaside_sources:
-                sourcelist.append(
-                    (lookaside_source["url"], lookaside_source["path"], True),
-                )
+            sourcelist.extend((ls["url"], ls["path"], True) for ls in lookaside_sources)
         # Fetch all remote sources defined in the spec file
         with self.specfile.sources() as sources, self.specfile.patches() as patches:
-            for spec_source in sources + patches:
-                if spec_source.remote:
-                    sourcelist.append(
-                        (
-                            spec_source.expanded_location,
-                            spec_source.expanded_filename,
-                            False,
-                        ),
-                    )
+            sourcelist.extend(
+                (
+                    spec_source.expanded_location,
+                    spec_source.expanded_filename,
+                    False,
+                )
+                for spec_source in sources + patches
+                if spec_source.remote
+            )
         # Download all sources
         for url, filename, optional in sourcelist:
             source_path = self.specfile.sourcedir.joinpath(filename)

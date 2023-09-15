@@ -2264,16 +2264,14 @@ def test_loading_packageless_config():
     top_level_config["actions"] = {
         ActionName(k): v for k, v in top_level_config["actions"].items()
     }
-    job_config = []
-    for job in config_data["jobs"]:
-        job_config.append(
-            {
-                f"_{k}" if k == "targets" else k: v
-                for k, v in job.items()
-                if k not in {"job", "trigger"}
-            },
-        )
-
+    job_config = [
+        {
+            f"_{k}" if k == "targets" else k: v
+            for k, v in job.items()
+            if k not in {"job", "trigger"}
+        }
+        for job in config_data["jobs"]
+    ]
     expected_config = PackageConfig(
         packages={"foo": CommonPackageConfig(paths=["./"], **top_level_config)},
         jobs=[
