@@ -17,20 +17,20 @@ from specfile import Specfile
 
 from packit.config import Config
 from packit.constants import (
-    RPM_MACROS_FOR_PREP,
     DISTRO_DIR,
-    SRC_GIT_CONFIG,
     FROM_DIST_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
+    RPM_MACROS_FOR_PREP,
+    SRC_GIT_CONFIG,
 )
 from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
 from packit.pkgtool import PkgTool
 from packit.utils import (
     commit_message_file,
-    run_command,
     get_default_branch,
     get_file_author,
+    run_command,
 )
 from packit.utils.lookaside import get_lookaside_sources
 from packit.utils.repo import is_git_repo, is_the_repo_pristine

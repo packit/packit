@@ -4,9 +4,9 @@ from requre.cassette import DataTypes
 from requre.helpers.files import StoreFiles
 from requre.helpers.simple_object import Simple
 from requre.modules_decorate_all_methods import (
-    record_tempfile_module,
     record_git_module,
     record_requests_module,
+    record_tempfile_module,
 )
 from requre.online_replacing import (
     apply_decorator_to_all_methods,

@@ -5,16 +5,16 @@ import logging
 import re
 import subprocess
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional, Union
-from collections.abc import Generator
 
 import git
 import yaml
 from git.exc import GitCommandError
-
 from ogr.parsing import RepoUrl, parse_git_repo
+
 from packit.constants import COMMIT_ACTION_DIVIDER
 from packit.exceptions import PackitException
 

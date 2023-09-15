@@ -1,9 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import requests
-
 from typing import Optional
+
+import requests
 
 
 def get_upstream_version(package_name: str) -> Optional[str]:

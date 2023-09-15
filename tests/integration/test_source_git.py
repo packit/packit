@@ -16,14 +16,14 @@ from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import (
     TARBALL_NAME,
-    git_add_and_commit,
     build_srpm,
-    create_merge_commit_in_source_git,
     create_git_am_style_history,
-    create_patch_mixed_history,
     create_history_with_empty_commit,
-    run_prep_for_srpm,
     create_history_with_patch_ids,
+    create_merge_commit_in_source_git,
+    create_patch_mixed_history,
+    git_add_and_commit,
+    run_prep_for_srpm,
 )
 
 

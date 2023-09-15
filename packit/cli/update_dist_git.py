@@ -7,15 +7,14 @@ Update a dist-git repo from a source-git repo
 
 import pathlib
 from shutil import which
+from typing import Optional
 
 import click
 
-from typing import Optional
-
+from packit.api import PackitAPI
 from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
 from packit.config import Config, PackageConfig, pass_config
-from packit.api import PackitAPI
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProjectBuilder
 
 
 @click.command("update-dist-git")

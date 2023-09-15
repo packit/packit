@@ -4,7 +4,7 @@
 import pytest
 from flexmock import flexmock
 
-from packit.utils.upstream_version import requests, get_upstream_version
+from packit.utils.upstream_version import get_upstream_version, requests
 
 
 @pytest.mark.parametrize(

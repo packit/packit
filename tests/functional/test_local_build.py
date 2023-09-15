@@ -4,8 +4,8 @@
 """
 Functional tests for local-build command
 """
-from pathlib import Path
 import re
+from pathlib import Path
 from subprocess import CalledProcessError
 
 import pytest

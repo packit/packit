@@ -3,10 +3,10 @@
 
 import pytest
 
-from packit.exceptions import PackitException
 from packit.api import PackitAPI, SynchronizationStatus
+from packit.constants import DISTRO_DIR, FROM_DIST_GIT_TOKEN, FROM_SOURCE_GIT_TOKEN
+from packit.exceptions import PackitException
 from tests.integration.conftest import mock_spec_download_remote_s
-from packit.constants import DISTRO_DIR, FROM_SOURCE_GIT_TOKEN, FROM_DIST_GIT_TOKEN
 
 
 @pytest.fixture

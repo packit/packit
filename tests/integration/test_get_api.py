@@ -8,8 +8,8 @@ from packit.api import PackitAPI
 from packit.cli import utils
 from packit.cli.utils import get_packit_api
 from packit.config import CommonPackageConfig, JobConfig
-from packit.config.job_config import JobType, JobConfigTriggerType
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.config.job_config import JobConfigTriggerType, JobType
+from packit.local_project import CALCULATE, LocalProjectBuilder
 from tests.spellbook import get_test_config, initiate_git_repo
 
 

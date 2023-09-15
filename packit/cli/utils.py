@@ -4,23 +4,20 @@
 import copy
 import functools
 import logging
-import sys
 import pathlib
+import sys
 from pathlib import Path
 from typing import Optional, Union
 
 import click
 from github import GithubException
-
 from ogr.parsing import parse_git_repo
 
-from packit.config.package_config import PackageConfig
-from packit.config.common_package_config import MultiplePackages
-
 from packit.api import PackitAPI
-from packit.config import Config, get_local_package_config, JobType
-from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.config import Config, JobType, get_local_package_config
+from packit.config.common_package_config import MultiplePackages
+from packit.config.package_config import PackageConfig
+from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES, DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 

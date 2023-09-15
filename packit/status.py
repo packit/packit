@@ -5,6 +5,7 @@ import logging
 from datetime import datetime, timedelta
 
 from ogr.abstract import Release
+
 from packit.config import Config
 from packit.config.common_package_config import MultiplePackages
 from packit.copr_helper import CoprHelper

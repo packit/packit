@@ -4,11 +4,11 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from flexmock import flexmock
 from ogr import GithubService, GitlabService
+
 from packit.local_project import LocalProject
 from packit.utils.repo import create_new_repo
-
-from flexmock import flexmock
 from tests.spellbook import initiate_git_repo
 
 

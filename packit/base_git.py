@@ -3,11 +3,11 @@
 
 import os
 import shlex
+from collections.abc import Iterable
 from importlib.metadata import version
 from logging import getLogger
 from pathlib import Path
-from typing import Optional, Callable
-from collections.abc import Iterable
+from typing import Callable, Optional
 
 import git
 import requests
@@ -21,7 +21,7 @@ from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, RunCommandType
 from packit.config.common_package_config import MultiplePackages
-from packit.exceptions import PackitException, PackitDownloadFailedException
+from packit.exceptions import PackitDownloadFailedException, PackitException
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.security import CommitVerifier

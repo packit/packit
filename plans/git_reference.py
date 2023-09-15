@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-import fmf
-from pathlib import Path
 import subprocess
+from pathlib import Path
+
+import fmf
 
 tree_root = Path.cwd().absolute()
 node = fmf.Tree(tree_root).find("/plans")

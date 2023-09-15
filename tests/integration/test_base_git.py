@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 import pytest
+from flexmock import flexmock
 from git import PushInfo
 
-from flexmock import flexmock
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.exceptions import PackitException
 from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject, LocalProjectBuilder
 from tests.spellbook import can_a_module_be_imported
 

@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import configparser
-
 from pathlib import Path
 from typing import Union
 

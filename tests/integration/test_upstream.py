@@ -14,22 +14,22 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from ogr import GithubService
 
 import packit
-from ogr import GithubService
 from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProjectBuilder
-from packit.upstream import Archive, Upstream, SRPMBuilder
+from packit.upstream import Archive, SRPMBuilder, Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 from tests.spellbook import (
     EMPTY_CHANGELOG,
     UPSTREAM_MACRO_IN_SOURCE,
-    initiate_git_repo,
-    get_test_config,
     build_srpm,
+    get_test_config,
+    initiate_git_repo,
 )
 
 

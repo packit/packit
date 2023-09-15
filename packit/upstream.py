@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
-from functools import reduce
 import logging
 import os
 import re
 import shlex
 import shutil
 import tarfile
+from functools import reduce
 from pathlib import Path
 from typing import Optional, Union
 
@@ -18,24 +18,24 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config
 from packit.config.common_package_config import MultiplePackages
-from packit.constants import DEFAULT_ARCHIVE_EXT, DATETIME_FORMAT
+from packit.constants import DATETIME_FORMAT, DEFAULT_ARCHIVE_EXT
 from packit.exceptions import (
-    PackitException,
-    PackitSRPMNotFoundException,
-    PackitFailedToCreateSRPMException,
     PackitCommandFailedError,
+    PackitException,
     PackitFailedToCreateRPMException,
+    PackitFailedToCreateSRPMException,
     PackitRPMNotFoundException,
+    PackitSRPMNotFoundException,
 )
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator, PatchMetadata
+from packit.sync import iter_srcs
 from packit.utils import commands, sanitize_branch_name_for_rpm
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.commands import run_command
-from packit.utils.repo import git_remote_url_to_https_url, get_current_version_command
+from packit.utils.repo import get_current_version_command, git_remote_url_to_https_url
 from packit.utils.upstream_version import get_upstream_version
 from packit.utils.versions import compare_versions
-from packit.sync import iter_srcs
 
 logger = logging.getLogger(__name__)
 

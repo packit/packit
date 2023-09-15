@@ -5,8 +5,8 @@
 Functional tests for srpm command
 """
 import json
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit

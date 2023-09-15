@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 from packit.utils.commands import cwd
-
 from tests.spellbook import call_packit
 
 

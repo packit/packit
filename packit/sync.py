@@ -5,12 +5,12 @@
 Functions and classes dealing with syncing files between repositories
 """
 import copy
-import os
 import glob
 import logging
+import os
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 from typing import Optional, Union
-from collections.abc import Sequence, Iterator
 
 from packit.exceptions import PackitException
 from packit.utils import run_command

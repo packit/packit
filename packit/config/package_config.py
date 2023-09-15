@@ -8,10 +8,10 @@ from typing import Callable, Optional, Union
 
 from ogr.abstract import GitProject
 from ogr.exceptions import (
-    GithubAppNotInstalledError,
     APIException,
+    GithubAppNotInstalledError,
 )
-from yaml import safe_load, YAMLError
+from yaml import YAMLError, safe_load
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
 from packit.config.job_config import (

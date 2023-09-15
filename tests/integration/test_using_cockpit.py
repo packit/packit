@@ -13,11 +13,11 @@ from flexmock import flexmock
 from packit.api import PackitAPI
 from packit.config import get_local_package_config
 from packit.distgit import DistGit
+from packit.local_project import CALCULATE, LocalProjectBuilder
 from packit.pkgtool import PkgTool
-from packit.local_project import LocalProjectBuilder, CALCULATE
 from packit.utils import repo
 from packit.utils.commands import cwd
-from tests.spellbook import UP_COCKPIT_OSTREE, initiate_git_repo, get_test_config
+from tests.spellbook import UP_COCKPIT_OSTREE, get_test_config, initiate_git_repo
 
 
 @pytest.fixture()

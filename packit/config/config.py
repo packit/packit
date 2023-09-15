@@ -13,17 +13,17 @@ from typing import Optional
 
 import click
 from lazy_object_proxy import Proxy
-from yaml import safe_load
-
-from ogr import GithubService, get_instances_from_dict, PagureService, get_project
+from ogr import GithubService, PagureService, get_instances_from_dict, get_project
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import OgrException
+from yaml import safe_load
+
 from packit.constants import (
     CONFIG_FILE_NAMES,
-    SANDCASTLE_WORK_DIR,
-    SANDCASTLE_PVC,
     SANDCASTLE_DEFAULT_PROJECT,
     SANDCASTLE_IMAGE,
+    SANDCASTLE_PVC,
+    SANDCASTLE_WORK_DIR,
 )
 from packit.exceptions import PackitConfigException, PackitException
 

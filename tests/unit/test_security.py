@@ -4,11 +4,11 @@
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
-from packit.exceptions import PackitException
 
+from packit.exceptions import PackitException
 from packit.security import (
-    CommitSignatureStatus,
     VALID_SIGNATURE_STATUSES,
+    CommitSignatureStatus,
     CommitVerifier,
 )
 

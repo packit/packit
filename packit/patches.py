@@ -20,7 +20,7 @@ from packit.constants import DATETIME_FORMAT, PATCH_META_TRAILER_TOKENS
 from packit.exceptions import PackitException, PackitGitException
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import is_a_git_ref, git_patch_ish, get_metadata_from_message
+from packit.utils.repo import get_metadata_from_message, git_patch_ish, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 

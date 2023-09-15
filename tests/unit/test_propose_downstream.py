@@ -5,14 +5,13 @@ import pytest
 from flexmock import flexmock
 
 from packit.api import PackitAPI
-from packit.config import PackageConfig
 from packit.cli.propose_downstream import get_dg_branches
-
 from packit.config import (
     CommonPackageConfig,
-    JobType,
-    JobConfigTriggerType,
     JobConfig,
+    JobConfigTriggerType,
+    JobType,
+    PackageConfig,
 )
 
 

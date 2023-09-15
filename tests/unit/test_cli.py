@@ -6,14 +6,14 @@ from importlib.metadata import version
 import pytest
 from flexmock import flexmock
 
+from packit.cli import propose_downstream as propose_downstream_module
+from packit.cli import utils
 from packit.cli.build import build
 from packit.cli.create_update import create_update
 from packit.cli.packit_base import packit_base
 from packit.cli.propose_downstream import propose_downstream
-from packit.cli import propose_downstream as propose_downstream_module
 from packit.config import Config, PackageConfig
 from packit.local_project import LocalProject
-from packit.cli import utils
 from tests.spellbook import call_packit
 
 

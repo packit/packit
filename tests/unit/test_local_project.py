@@ -10,9 +10,9 @@ from flexmock import flexmock
 
 from packit import local_project
 from packit.local_project import (
+    CALCULATE,
     LocalProject,
     LocalProjectBuilder,
-    CALCULATE,
     LocalProjectCalculationState,
 )
 from packit.utils import repo

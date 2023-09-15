@@ -6,9 +6,9 @@ import io
 import shutil
 import subprocess
 import tarfile
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Optional
-from collections.abc import Iterator
 
 import git
 import pytest
@@ -16,7 +16,7 @@ from flexmock import flexmock
 from gnupg import GPG
 from ogr.abstract import PRStatus
 from ogr.read_only import PullRequestReadOnly
-from ogr.services.github import GithubService, GithubProject
+from ogr.services.github import GithubProject, GithubService
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
 
 from packit.api import PackitAPI
@@ -25,24 +25,23 @@ from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
-from packit.upstream import Upstream
+from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.pkgtool import PkgTool
-from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
+from packit.upstream import Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
-
 from tests.integration.utils import remove_gpg_key_pair
 from tests.spellbook import (
-    get_test_config,
-    SOURCEGIT_UPSTREAM,
-    SOURCEGIT_SOURCEGIT,
-    git_add_and_commit,
-    TARBALL_NAME,
-    UPSTREAM,
-    initiate_git_repo,
+    DATA_DIR,
     DISTGIT,
     NAME_VERSION,
-    DATA_DIR,
+    SOURCEGIT_SOURCEGIT,
+    SOURCEGIT_UPSTREAM,
+    TARBALL_NAME,
+    UPSTREAM,
+    get_test_config,
+    git_add_and_commit,
+    initiate_git_repo,
 )
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"

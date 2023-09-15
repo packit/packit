@@ -1,15 +1,15 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
 from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
-# from flexmock import flexmock
-
-from packit.sync import check_subpath, SyncFilesItem
 from packit.exceptions import PackitException
+
+# from flexmock import flexmock
+from packit.sync import SyncFilesItem, check_subpath
 
 
 @contextmanager

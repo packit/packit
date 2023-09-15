@@ -4,21 +4,21 @@
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Callable, Optional, Any
+from typing import Any, Callable, Optional
 
 from cachetools.func import ttl_cache
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import (
-    CoprNoResultException,
-    CoprException,
-    CoprRequestException,
     CoprAuthException,
+    CoprException,
+    CoprNoResultException,
+    CoprRequestException,
 )
 from munch import Munch
+
 from packit.config import aliases  # so we can mock in tests
 from packit.config.aliases import get_build_targets
-
-from packit.constants import COPR2GITHUB_STATE, CHROOT_SPECIFIC_COPR_CONFIGURATION
+from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION, COPR2GITHUB_STATE
 from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsException
 from packit.local_project import LocalProject
 

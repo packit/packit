@@ -8,15 +8,15 @@ E2E tests which utilize cockpit projects
 import pytest
 
 from packit.cli.utils import get_packit_api
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProjectBuilder
 from packit.utils.commands import cwd
 from tests.spellbook import (
-    initiate_git_repo,
-    get_test_config,
-    UP_EDD,
     DG_OGR,
-    build_srpm,
+    UP_EDD,
     UP_VSFTPD,
+    build_srpm,
+    get_test_config,
+    initiate_git_repo,
 )
 
 

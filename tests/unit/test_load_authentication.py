@@ -4,6 +4,7 @@
 import logging
 
 import pytest
+
 from packit.config.config import Config
 
 logger = logging.getLogger(__name__)

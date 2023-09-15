@@ -1,7 +1,7 @@
+from bodhi.client.oidcclient import OIDCClient
 from flexmock import flexmock
 from requests import Session
 
-from bodhi.client.oidcclient import OIDCClient
 from packit.utils.bodhi import get_bodhi_client
 
 
