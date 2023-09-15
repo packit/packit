@@ -25,7 +25,7 @@ def tar_mock():
             archive_items = []
         tarfile_mock = flexmock(packit.upstream.tarfile)
         tarinfo_mock_list = [
-            flexmock(
+            flexmock(  # noqa: PIE804
                 **{
                     "name": name,
                     "isdir": lambda v=isdir: v,
