@@ -104,6 +104,7 @@ select = [
     "E",   # pycodestyle Error
     "F",   # Pyflakes
     "I",   # isort
+    "RET", # flake8-return
     "UP",  # pyupgrade
     "W",   # pycodestyle Warning
 ]

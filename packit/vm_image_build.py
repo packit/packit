@@ -163,8 +163,7 @@ class ImageBuilder:
             REDHAT_API_GET_USER_URL,
             headers={"Authorization": f"Bearer {self._access_token}"},
         )
-        json_output = response.json()
-        return json_output
+        return response.json()
 
     def create_image(
         self,

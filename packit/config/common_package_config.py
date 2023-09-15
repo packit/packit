@@ -319,10 +319,9 @@ class CommonPackageConfig:
 
         if self._files_to_sync_used:
             return self._files_to_sync
-        elif self.synced_files:
+        if self.synced_files:
             return self.synced_files
-        else:
-            return []
+        return []
 
     def __repr__(self):
         # required to avoid cyclical imports
@@ -358,6 +357,7 @@ class CommonPackageConfig:
                 f"{self.dist_git_base_url}{self.dist_git_namespace}/"
                 f"{self.downstream_package_name}.git"
             )
+        return None
 
     @property
     def spec_source_id_number(self) -> int:
@@ -438,16 +438,15 @@ class MultiplePackages:
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
-        elif len(self.__getattribute__("packages")) == 1:
+        if len(self.__getattribute__("packages")) == 1:
             package = self.__getattribute__("packages")[
                 self.__getattribute__("_first_package")
             ]
             return getattr(package, name)
-        else:
-            raise AttributeError(
-                f"It is ambiguous to get {name}: "
-                "there is more than one package in the config."
-            )
+        raise AttributeError(
+            f"It is ambiguous to get {name}: "
+            "there is more than one package in the config."
+        )
 
     def __setattr__(self, name, value):
         if name in self.__dict__ or "packages" not in self.__dict__:
@@ -482,5 +481,4 @@ class MultiplePackages:
                 )
                 return env
             raise PackitConfigException("No packages in config")
-        else:
-            raise PackitConfigException("Multiple packages in config")
+        raise PackitConfigException("Multiple packages in config")

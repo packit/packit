@@ -54,12 +54,9 @@ class StringOrListOfStringsField(fields.Field):
     def _deserialize(self, value, attr, data, **kwargs) -> list[str]:
         if isinstance(value, list) and all(isinstance(v, str) for v in value):
             return value
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return [value]
-        else:
-            raise ValidationError(
-                f"Expected 'list[str]' or 'str', got {type(value)!r}."
-            )
+        raise ValidationError(f"Expected 'list[str]' or 'str', got {type(value)!r}.")
 
 
 class SyncFilesItemSchema(Schema):
@@ -92,10 +89,9 @@ class FilesToSyncField(fields.Field):
     ) -> SyncFilesItem:
         if isinstance(value, dict):
             return SyncFilesItem(**SyncFilesItemSchema().load(value))
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return SyncFilesItem(src=[value], dest=value)
-        else:
-            raise ValidationError(f"Expected 'dict' or 'str', got {type(value)!r}.")
+        raise ValidationError(f"Expected 'dict' or 'str', got {type(value)!r}.")
 
 
 class ActionField(fields.Field):
@@ -511,10 +507,7 @@ class JobConfigSchema(Schema):
     def make_instance(self, data, **_):
         package = data.pop("package")
         job_config = JobConfig(**data)
-        if package:
-            return JobConfigView(job_config, package)
-        else:
-            return job_config
+        return JobConfigView(job_config, package) if package else job_config
 
 
 class PackageConfigSchema(Schema):
@@ -628,8 +621,7 @@ class PackageConfigSchema(Schema):
             v.setdefault("downstream_package_name", k)
             # Inherit default values from the top-level.
             v.update(data | v)
-        data = {"packages": packages, "jobs": jobs}
-        return data
+        return {"packages": packages, "jobs": jobs}
 
     @staticmethod
     def rearrange_jobs(data: dict) -> dict:

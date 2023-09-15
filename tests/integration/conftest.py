@@ -196,15 +196,13 @@ def sourcegit_and_remote(tmp_path):
 @pytest.fixture()
 def source_git_repo(sourcegit_and_remote):
     source_git_dir, _ = sourcegit_and_remote
-    source_git_repo = git.Repo(source_git_dir)
-    return source_git_repo
+    return git.Repo(source_git_dir)
 
 
 @pytest.fixture()
 def dist_git_repo(distgit_and_remote):
     dist_git_dir, _ = distgit_and_remote
-    dist_git_repo = git.Repo(dist_git_dir)
-    return dist_git_repo
+    return git.Repo(dist_git_dir)
 
 
 @pytest.fixture()

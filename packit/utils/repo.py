@@ -117,9 +117,8 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
     if is_git_repo(directory=directory):
         logger.debug(f"Repo already exists in {directory}.")
         return git.repo.Repo(directory)
-    else:
-        logger.info(f"Cloning repo {url} -> {directory}")
-        return git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
+    logger.info(f"Cloning repo {url} -> {directory}")
+    return git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
 
 def get_namespace_and_repo_name(url: str) -> tuple[Optional[str], str]:
@@ -380,12 +379,11 @@ def get_commit_diff(commit: git.Commit) -> list[git.Diff]:
     """
     if len(commit.parents) == 1:
         return commit.parents[0].diff(commit, create_patch=True)
-    elif len(commit.parents) == 0:
+    if len(commit.parents) == 0:
         # First commit in the repo
         return commit.diff(git.NULL_TREE, create_patch=True)
-    else:
-        # Probably a merge commit, we can't do much about it
-        return []
+    # Probably a merge commit, we can't do much about it
+    return []
 
 
 def get_commit_hunks(repo: git.Repo, commit: git.Commit) -> list[str]:
