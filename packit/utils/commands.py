@@ -135,8 +135,8 @@ def run_command(
     if not output:
         return CommandResult(success=success)
 
-    command_output = map(
-        lambda out: out.get_output().decode(sys.getdefaultencoding()), (stdout, stderr)
+    command_output = (
+        out.get_output().decode(sys.getdefaultencoding()) for out in (stdout, stderr)
     )
 
     out, err = command_output
