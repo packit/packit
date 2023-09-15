@@ -44,12 +44,11 @@ def test_get_upstream_version(package, version):
             )
             items = [{"name": project, "version": version}] if project else []
             return flexmock(ok=True, json=lambda: {"projects": items})
-        else:
-            package_name = url.split("/")[-1]
-            project = packages.get(package_name)
-            version = projects.get(project)
-            if version:
-                return flexmock(ok=True, json=lambda: {"version": version})
+        package_name = url.split("/")[-1]
+        project = packages.get(package_name)
+        version = projects.get(project)
+        if version:
+            return flexmock(ok=True, json=lambda: {"version": version})
         return flexmock(ok=False)
 
     flexmock(requests).should_receive("get").replace_with(mocked_get)

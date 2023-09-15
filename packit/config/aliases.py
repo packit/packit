@@ -111,12 +111,10 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
                 for sys_and_version in get_versions(f"{sys_name}-{version}")
             }
         )
-    possible_sys_and_versions = {
+    return {
         DEPRECATED_TARGET_MAP.get(target, target)
         for target in possible_sys_and_versions
     }
-
-    return possible_sys_and_versions
 
 
 def get_branches(

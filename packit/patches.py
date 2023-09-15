@@ -706,8 +706,7 @@ class PatchGenerator:
         """
         if any(commit.squash_commits for commit in patch_list):
             return PatchGenerator.squash_by_squash_commits(patch_list)
-        else:
-            return PatchGenerator.squash_by_patch_name(patch_list)
+        return PatchGenerator.squash_by_patch_name(patch_list)
 
     @staticmethod
     def rename_patches(patch_list: list[PatchMetadata]):

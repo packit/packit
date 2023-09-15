@@ -32,8 +32,7 @@ class AliasedGroup(click.Group):
                 fg="yellow",
             )
             return click.Group.get_command(self, ctx, "propose-downstream")
-        else:
-            return click.Group.get_command(self, ctx, cmd_name)
+        return click.Group.get_command(self, ctx, cmd_name)
 
 
 @click.group("packit", cls=AliasedGroup, context_settings=get_context_settings())

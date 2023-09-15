@@ -249,8 +249,7 @@ class Config:
             logger.warning(msg)
             if required:
                 raise PackitConfigException(msg, ex)
-            else:
-                return None
+            return None
         return project
 
     def get_project(

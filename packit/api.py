@@ -586,16 +586,14 @@ class PackitAPI:
                 sg_update_commits[0][0], dg_update_commits[0][0]
             ):
                 return dg_update_commits[0]
-            else:
-                return sg_update_commits[0]
-        elif sg_update_commits:
             return sg_update_commits[0]
-        elif dg_update_commits:
+        if sg_update_commits:
+            return sg_update_commits[0]
+        if dg_update_commits:
             return dg_update_commits[0]
-        else:
-            raise PackitException(
-                "No git commits with trailers to mark synchronization points were found."
-            )
+        raise PackitException(
+            "No git commits with trailers to mark synchronization points were found."
+        )
 
     def sync_status(self) -> SynchronizationStatus:
         """Checks the sync status of source-git and dist-git.
@@ -644,7 +642,7 @@ The first dist-git commit to be synced is '{shorten_commit_hash(status.dist_git_
 Sync status needs to be reestablished manually, see
 https://packit.dev/source-git/work-with-source-git/fix-diverged-history
 """
-        elif status.source_git_range_start:
+        if status.source_git_range_start:
             number_of_commits = len(
                 list(
                     self.up.local_project.git_repo.iter_commits(
@@ -657,7 +655,7 @@ Use "packit source-git update-dist-git {source_git} {dist_git}"
 to transform changes from '{source_git}' to '{dist_git}'.
 The first source-git commit to be synced is '{shorten_commit_hash(status.source_git_range_start)}'.
 """
-        elif status.dist_git_range_start:
+        if status.dist_git_range_start:
             number_of_commits = len(
                 list(
                     self.dg.local_project.git_repo.iter_commits(
@@ -671,8 +669,7 @@ Use "packit source-git update-source-git {dist_git} {source_git}
 {short_hash}~..\" to transform changes from '{dist_git}' to '{source_git}'.
 The first dist-git commit to be synced is '{short_hash}'.
 """
-        else:
-            return f"'{source_git}' is up to date with '{dist_git}'."
+        return f"'{source_git}' is up to date with '{dist_git}'."
 
     @overload
     def sync_release(
@@ -787,7 +784,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             raise PackitException(
                 "Function parameters version and tag are mutually exclusive."
             )
-        elif not tag:
+        if not tag:
             version = version or self.up.get_latest_released_version()
             if not version:
                 raise PackitException(
@@ -1282,6 +1279,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self.dg.switch_branch(dist_git_branch)
 
         self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        return None
 
     def create_update(
         self,
@@ -1524,7 +1522,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         :param status: status of the package
         :return: awaitable tasks
         """
-        res = await asyncio.gather(
+        return await asyncio.gather(
             PackitAPI.status_get_downstream_prs(status),
             PackitAPI.status_get_dg_versions(status),
             PackitAPI.status_get_up_releases(status),
@@ -1532,7 +1530,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             PackitAPI.status_get_copr_builds(status),
             PackitAPI.status_get_updates(status),
         )
-        return res
 
     def status(self) -> None:
         status = Status(self.config, self.package_config, self.up, self.dg)

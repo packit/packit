@@ -250,8 +250,7 @@ class Upstream(PackitRepositoryBase):
             action=ActionName.get_current_version,
             env=self.package_config.get_package_names_as_env(),
         )
-        version = action_output[-1].strip() if action_output else None
-        return version
+        return action_output[-1].strip() if action_output else None
 
     def get_version(self) -> str:
         """

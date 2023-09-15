@@ -626,8 +626,4 @@ class DistGit(PackitRepositoryBase):
         ].allowed_gpg_keys
 
     def get_user(self) -> Optional[str]:
-        user = super().get_user()
-        if user:
-            return user
-        else:
-            return self.fas_user
+        return user if (user := super().get_user()) else self.fas_user

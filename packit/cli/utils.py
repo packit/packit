@@ -82,10 +82,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
 
         return covered_func
 
-    if _func is None:
-        return decorator_cover
-    else:
-        return decorator_cover(_func)
+    return decorator_cover if _func is None else decorator_cover(_func)
 
 
 def iterate_packages(func):
@@ -128,7 +125,7 @@ def iterate_packages(func):
                     "Packages %s are not defined in packit configuration.",
                     not_defined_packages,
                 )
-                return None
+                return
             for package in kwargs["package"]:
                 decorated_func_kwargs["config"] = copy.deepcopy(
                     config

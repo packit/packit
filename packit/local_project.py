@@ -178,8 +178,7 @@ class LocalProject:
         """
         if self.git_repo.head.is_detached:
             return shorten_commit_hash(self.git_repo.head.commit.hexsha)
-        else:
-            return shorten_commit_hash(self.git_repo.active_branch.commit.hexsha)
+        return shorten_commit_hash(self.git_repo.active_branch.commit.hexsha)
 
     def clean(self):
         """Remove the git tree when cloned into a temporary directory"""
@@ -248,7 +247,7 @@ class LocalProject:
                 self._git_repo = git.Repo(path=self.working_dir)
                 return True
 
-            elif self.git_url and not self.offline:
+            if self.git_url and not self.offline:
                 self._git_repo = self._get_repo(
                     url=self.git_url, directory=self.working_dir
                 )
@@ -256,7 +255,6 @@ class LocalProject:
                     f"We just cloned git repo {self.git_url} to {self.working_dir}."
                 )
                 return True
-
         return False
 
     def _parse_git_project_from_repo_namespace_and_git_service(
@@ -390,8 +388,7 @@ class LocalProject:
     def _get_ref_from_git_repo(self) -> str:
         if self.git_repo.head.is_detached:
             return self.git_repo.head.commit.hexsha
-        else:
-            return self.git_repo.active_branch.name
+        return self.git_repo.active_branch.name
 
     def _get_repo(self, url, directory=None):
         if self.cache:
@@ -760,7 +757,7 @@ class LocalProjectBuilder:
                 state.git_repo = git.Repo(path=state.working_dir)
                 return True
 
-            elif state.git_url and not self.offline:
+            if state.git_url and not self.offline:
                 state.git_repo = self._get_repo(
                     url=state.git_url, directory=state.working_dir
                 )
@@ -935,8 +932,7 @@ class LocalProjectBuilder:
     def _get_ref_from_git_repo(git_repo: git.Repo) -> str:
         if git_repo.head.is_detached:
             return git_repo.head.commit.hexsha
-        else:
-            return git_repo.active_branch.name
+        return git_repo.active_branch.name
 
     def _get_repo(self, url, directory=None):
         if self._cache:

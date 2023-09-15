@@ -442,12 +442,11 @@ class PackitRepositoryBase:
             # from upstream spec if it also uses %autorelease
             if upstream_spec.has_autorelease:
                 return upstream_spec.raw_release
-            else:
-                logger.warning(
-                    "dist-git spec file uses %autorelease but upstream spec file doesn't, "
-                    "consider synchronizing them."
-                )
-                return distgit_spec.raw_release
+            logger.warning(
+                "dist-git spec file uses %autorelease but upstream spec file doesn't, "
+                "consider synchronizing them."
+            )
+            return distgit_spec.raw_release
         if upstream_spec.has_autorelease:
             # upstream spec uses %autorelease but dist-git spec doesn't, reset it
             logger.warning(
@@ -456,7 +455,7 @@ class PackitRepositoryBase:
             )
             return initial_release
         if upstream_spec.expanded_version != version:
-            # version in upstream spec doesn't match the desired version
+            # version in upstream spec doesn't match the desired version,
             # so we can't use release from upstream spec, reset it
             return initial_release
         if distgit_spec.expanded_release == upstream_spec.expanded_release:

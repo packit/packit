@@ -58,7 +58,6 @@ def test_get_output_from_action(
             assert "Command " in str(ex)
             assert command.split(" ")[0] in str(ex)
             return
-        else:
-            raise
+        raise
     if expected_output:
         assert out[-1] == expected_output

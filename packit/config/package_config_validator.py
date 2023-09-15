@@ -103,8 +103,7 @@ class PackageConfigValidator:
 
         if schema_errors or synced_files_errors:
             raise PackitConfigException(output)
-        else:
-            return f"{self.config_file_path.name} is valid and ready to be used"
+        return f"{self.config_file_path.name} is valid and ready to be used"
 
     def validate_get_field_output(
         self,

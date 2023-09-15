@@ -225,15 +225,14 @@ def test_run_action_in_sandcastle(
     ):
         if command == ["command", "-b"]:
             return "1.2.3"
-        elif command == ["command", "-a"]:
+        if command == ["command", "-a"]:
             return (
                 "make po-pull\n"
                 "make[1]: Entering directory "
                 "'/sandcastle/docker-io-usercont-sandcastle-prod-20200820-160948197515'\n"
                 "TEMP_DIR=$(mktemp --tmpdir -d anaconda-localization-XXXXXXXXXX)\n"
             )
-        else:
-            raise Exception("This command was not expected")
+        raise Exception("This command was not expected")
 
     flexmock(Sandcastle, exec=mocked_exec)
     flexmock(Sandcastle).should_receive("delete_pod").once().and_return(None)
