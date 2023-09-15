@@ -100,6 +100,7 @@ testpaths = [
 
 [tool.ruff]
 select = [
+    "C4",  # flake8-comprehensions
     "E",   # pycodestyle Error
     "F",   # Pyflakes
     "I",   # isort

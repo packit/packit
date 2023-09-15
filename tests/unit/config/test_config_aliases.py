@@ -370,10 +370,10 @@ def test_get_valid_build_targets(targets, chroots, expected_result):
 @pytest.mark.parametrize(
     "name, default",
     [
-        pytest.param(["f1", "f2"], dict(default="test"), id="name_set-default_set"),
-        pytest.param(["f1", "f2"], dict(default="None"), id="name_set-default_None"),
-        pytest.param([], dict(default="test"), id="name_None-default_set"),
-        pytest.param([], dict(default=None), id="name_None-default_None"),
+        pytest.param(["f1", "f2"], {"default": "test"}, id="name_set-default_set"),
+        pytest.param(["f1", "f2"], {"default": "None"}, id="name_set-default_None"),
+        pytest.param([], {"default": "test"}, id="name_None-default_set"),
+        pytest.param([], {"default": None}, id="name_None-default_None"),
     ],
 )
 def test_get_valid_build_targets_get_aliases_call(name, default):

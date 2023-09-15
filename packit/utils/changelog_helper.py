@@ -69,7 +69,7 @@ class ChangelogHelper:
         if not messages:
             return None
 
-        return "\n".join(map(lambda line: line.rstrip(), messages))
+        return "\n".join(line.rstrip() for line in messages)
 
     @staticmethod
     def sanitize_entry(entry: str) -> str:

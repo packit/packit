@@ -285,11 +285,11 @@ def get_default_map_from_file() -> Optional[dict]:
 
 @lru_cache
 def get_context_settings() -> dict:
-    return dict(
-        help_option_names=["-h", "--help"],
-        auto_envvar_prefix="PACKIT",
-        default_map=get_default_map_from_file(),
-    )
+    return {
+        "help_option_names": ["-h", "--help"],
+        "auto_envvar_prefix": "PACKIT",
+        "default_map": get_default_map_from_file(),
+    }
 
 
 class RunCommandType(Enum):
