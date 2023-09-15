@@ -76,7 +76,9 @@ class CommitVerifier:
                 if result.fingerprints:
                     return result.fingerprints[0]
         except Exception as ex:
-            raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}", ex)
+            raise PackitException(
+                f"Cannot receive a gpg key: {key_fingerprint}"
+            ) from ex
 
         raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
 
@@ -148,8 +150,8 @@ class CommitVerifier:
             return commit.repo.git.show(commit.hexsha, pretty=f"format:{pretty_format}")
         except git.GitCommandError as error:
             raise PackitException(
-                f"Cannot find commit {commit.hexsha!r} to check its signature.", error
-            )
+                f"Cannot find commit {commit.hexsha!r} to check its signature."
+            ) from error
 
 
 class CommitSignatureStatus(Enum):

@@ -536,15 +536,15 @@ class LocalProject:
         except GitCommandError as ex:
             logger.warning(f"Merge failed with: {ex}")
             if "Merge conflict" in str(ex):
-                raise PackitMergeException(ex)
-            raise PackitException(ex)
+                raise PackitMergeException(ex) from ex
+            raise PackitException(ex) from ex
 
     def checkout_release(self, tag: str) -> None:
         logger.info(f"Checking out upstream version {tag}.")
         try:
             self.git_repo.git.checkout(tag)
         except Exception as ex:
-            raise PackitException(f"Cannot checkout release tag: {ex!r}.")
+            raise PackitException("Cannot checkout release tag.") from ex
 
     def fetch(self, remote: str, refspec: Optional[str] = None, force: bool = False):
         """

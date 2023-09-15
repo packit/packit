@@ -293,7 +293,7 @@ class CommonPackageConfig:
         logger = logging.getLogger(__name__)
         msg = "synced_files option is deprecated. Use files_to_sync option instead."
         logger.warning(msg)
-        warnings.warn(msg, DeprecationWarning)
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
         if self._files_to_sync_used:
             logger.warning(
                 "You are setting both files_to_sync and synced_files."

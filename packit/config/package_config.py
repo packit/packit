@@ -342,7 +342,7 @@ def load_packit_yaml(
             logger.error(msg)
         else:
             logger.error(f"parser says: {ex!r}.")
-        raise PackitConfigException("Please correct data and retry.")
+        raise PackitConfigException("Please correct data and retry.") from ex
 
 
 def get_local_package_config(
@@ -509,7 +509,7 @@ def parse_loaded_config(
         )
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
-        raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
+        raise PackitConfigException(f"Cannot parse package config. {ex!r}") from ex
 
 
 def get_local_specfile_path(dir: Path, exclude: list[str] = None) -> Optional[str]:

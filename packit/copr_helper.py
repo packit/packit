@@ -483,10 +483,10 @@ class CoprHelper:
         )
         try:
             return copr_proj["chroot_repos"][chroot]
-        except KeyError:
+        except KeyError as e:
             raise PackitCoprProjectException(
                 f"There is no such target {chroot} in {owner}/{project}."
-            )
+            ) from e
 
     def get_chroots(
         self,

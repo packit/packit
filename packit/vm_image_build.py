@@ -243,11 +243,11 @@ class ImageBuilder:
         response_json = response.json()
         try:
             return response_json["id"]
-        except KeyError:
+        except KeyError as e:
             logger.error(
                 f"Failed to create image ({response.status_code}): {response_json}"
             )
-            raise PackitException(f"Failed to create image: {response_json}")
+            raise PackitException(f"Failed to create image: {response_json}") from e
 
     def get_image_status(self, build_id: str):
         """

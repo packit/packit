@@ -31,11 +31,11 @@ class BugzillaIDs(click.ParamType):
         for bugzilla_id in str_ids:
             try:
                 ids.append(int(bugzilla_id))
-            except ValueError:
+            except ValueError as err:
                 raise click.BadParameter(
                     "cannot parse non-integer bugzilla ID. Please use following "
                     "format: id[,id]"
-                )
+                ) from err
 
         return ids
 
