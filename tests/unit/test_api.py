@@ -47,7 +47,7 @@ def build_dict(copr_url, id):
             "state": "succeeded",
             "submitted_on": 1566377764,
             "submitter": "packit",
-        }
+        },
     )
 
 
@@ -152,17 +152,19 @@ def test_sync_release_version_tag_processing(
 ):
     api_mock.up.package_config.upstream_tag_template = "v{version}"
     api_mock.up.should_receive("get_latest_released_version").and_return(
-        get_latest_released_return
+        get_latest_released_return,
     )
     api_mock.up.should_receive("get_specfile_version").and_return(
-        get_specfile_version_return
+        get_specfile_version_return,
     )
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("_prepare_files_to_sync").with_args(
-        synced_files=[], full_version=version, upstream_tag=tag
+        synced_files=[],
+        full_version=version,
+        upstream_tag=tag,
     )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     flexmock(PatchGenerator).should_receive("undo_identical")
@@ -175,7 +177,7 @@ def test_sync_release_do_not_create_sync_note(api_mock):
     flexmock(pathlib.Path).should_receive("write_text").never()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.up.package_config.create_sync_note = False
@@ -188,7 +190,7 @@ def test_sync_release_create_sync_note(api_mock):
     flexmock(pathlib.Path).should_receive("write_text").once()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
@@ -205,7 +207,10 @@ def test_sync_release_create_sync_note(api_mock):
     ],
 )
 def test_dg_downstream_package_name_is_set(
-    api_mock, path, downstream_package_name, expectation
+    api_mock,
+    path,
+    downstream_package_name,
+    expectation,
 ):
     api_mock._dg = None
     api_mock.package_config.downstream_package_name = downstream_package_name
@@ -225,14 +230,14 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
                         filters=["dummy filter"],
                         mkpath=True,
                         delete=True,
-                    )
+                    ),
                 ],
                 upstream_package_name="test_package_name",
                 downstream_package_name="test_package_name",
                 upstream_tag_template="_",
                 upstream_project_url="_",
                 upstream_ref="_",
-            )
+            ),
         },
     )
     upstream_mock.package_config = pc
@@ -246,7 +251,7 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     flexmock(pathlib.Path).should_receive("write_text").once()
     api.up.should_receive("get_specfile_version").and_return("0")
     api.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api.should_receive("push_and_create_pr").and_return(flexmock())
     flexmock(ChangelogHelper).should_receive("update_dist_git")
@@ -259,8 +264,8 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
                 mkpath=True,
                 delete=True,
                 filters=["dummy filter"],
-            )
-        ]
+            ),
+        ],
     )
 
     api.sync_release(version="1.1", dist_git_branch="_")
@@ -270,7 +275,7 @@ def test_sync_release_check_pr_instructions(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("push_and_create_pr").with_args(

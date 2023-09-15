@@ -36,7 +36,9 @@ def get_lookaside_sources(
         parser.read(f"/etc/rpkg/{pkg_tool}.conf")
         config = dict(parser.items(pkg_tool, raw=True))
         cache = pyrpkg.lookaside.CGILookasideCache(
-            config["lookasidehash"], config["lookaside"], config["lookaside_cgi"]
+            config["lookasidehash"],
+            config["lookaside"],
+            config["lookaside_cgi"],
         )
         if config.get("lookaside_namespaced", False):
             package = f"rpms/{package}"

@@ -31,7 +31,8 @@ def cockpit_ostree(tmp_path, upstream_without_config):
     initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)
 
     shutil.copy2(
-        UP_COCKPIT_OSTREE / "cockpit-ostree.spec.dg", d / "cockpit-ostree.spec"
+        UP_COCKPIT_OSTREE / "cockpit-ostree.spec.dg",
+        d / "cockpit-ostree.spec",
     )
 
     return u, d
@@ -67,7 +68,8 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
     api = PackitAPI(c, pc, up_lp)
     api._dg = DistGit(c, pc)
     api._dg._local_project = LocalProjectBuilder().build(
-        working_dir=dist_git_path, git_repo=CALCULATE
+        working_dir=dist_git_path,
+        git_repo=CALCULATE,
     )
 
     with cwd(upstream_path):
@@ -107,7 +109,8 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
     api = PackitAPI(c, pc, up_lp)
     api._dg = DistGit(c, pc)
     api._dg._local_project = LocalProjectBuilder().build(
-        working_dir=dist_git_path, git_repo=CALCULATE
+        working_dir=dist_git_path,
+        git_repo=CALCULATE,
     )
 
     with cwd(upstream_path):

@@ -21,7 +21,9 @@ logger = logging.getLogger("packit")
 
 @click.command("srpm", context_settings=get_context_settings())
 @click.option(
-    "--output", metavar="FILE", help="Write the SRPM to FILE instead of current dir."
+    "--output",
+    metavar="FILE",
+    help="Write the SRPM to FILE instead of current dir.",
 )
 @click.option(
     "--upstream-ref",
@@ -91,12 +93,14 @@ def srpm(
     it defaults to the current working directory
     """
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
     if bump is not None:
         if update_release is not None:
             raise click.UsageError(
-                "--[no-]bump and --[no-]update-release are mutually exclusive"
+                "--[no-]bump and --[no-]update-release are mutually exclusive",
             )
         logger.warning("--[no-]bump is deprecated. Use --[no-]update-release instead.")
         update_release = bump

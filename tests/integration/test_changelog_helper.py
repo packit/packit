@@ -36,11 +36,14 @@ def test_srpm_action(upstream, downstream):
     package_config.actions = {
         ActionName.changelog_entry: [
             "echo - hello from test_srpm_action   ",
-        ]
+        ],
     }
 
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
-        "0.1.0", "abc123a", True, None
+        "0.1.0",
+        "abc123a",
+        True,
+        None,
     )
     with upstream.specfile.sections() as sections:
         assert "- hello from test_srpm_action" in sections.changelog
@@ -49,7 +52,10 @@ def test_srpm_action(upstream, downstream):
 def test_srpm_commits(upstream, downstream):
     package_config = upstream.package_config
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
-        "0.1.0", "abc123a", True, None
+        "0.1.0",
+        "abc123a",
+        True,
+        None,
     )
     with upstream.specfile.sections() as sections:
         assert "- Development snapshot (abc123a)" in sections.changelog
@@ -60,7 +66,10 @@ def test_srpm_no_tags(upstream, downstream):
     flexmock(upstream).should_receive("get_last_tag").and_return(None).once()
 
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
-        "0.1.0", "abc123a", True, None
+        "0.1.0",
+        "abc123a",
+        True,
+        None,
     )
     with upstream.specfile.sections() as sections:
         assert "- Development snapshot (abc123a)" in sections.changelog
@@ -71,14 +80,18 @@ def test_srpm_no_bump(upstream, downstream):
     flexmock(upstream).should_receive("get_last_tag").and_return(None).once()
 
     ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
-        "0.1.0", "abc123a", False, None
+        "0.1.0",
+        "abc123a",
+        False,
+        None,
     )
     with upstream.specfile.sections() as sections:
         assert "- Development snapshot (abc123a)" not in sections.changelog
 
 
 def test_update_distgit_when_copy_upstream_release_description(
-    upstream, distgit_instance
+    upstream,
+    distgit_instance,
 ):
     _, downstream = distgit_instance
     package_config = upstream.package_config
@@ -92,7 +105,8 @@ def test_update_distgit_when_copy_upstream_release_description(
     )
 
     ChangelogHelper(upstream, downstream, package_config).update_dist_git(
-        upstream_tag="0.1.0", full_version="0.1.0"
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
     )
 
     with downstream._specfile.sections() as sections:
@@ -100,16 +114,19 @@ def test_update_distgit_when_copy_upstream_release_description(
 
 
 @pytest.mark.skipif(
-    rpm.__version__ < "4.16", reason="%autochangelog requires rpm 4.16 or higher"
+    rpm.__version__ < "4.16",
+    reason="%autochangelog requires rpm 4.16 or higher",
 )
 def test_do_not_update_distgit_with_autochangelog(
-    upstream, distgit_instance_with_autochangelog
+    upstream,
+    distgit_instance_with_autochangelog,
 ):
     _, downstream = distgit_instance_with_autochangelog
     package_config = upstream.package_config
 
     ChangelogHelper(upstream, downstream, package_config).update_dist_git(
-        upstream_tag="0.1.0", full_version="0.1.0"
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
     )
 
     with downstream._specfile.sections() as sections:
@@ -123,11 +140,12 @@ def test_update_distgit_unsafe_commit_messages(upstream, distgit_instance):
         "* 100% of tests now pass\n"
         "* got rid of all shell (%(...)) and expression (%[...]) expansions\n"
         "* removed all %global macros\n"
-        "* cleaned up %install section\n"
+        "* cleaned up %install section\n",
     )
 
     ChangelogHelper(upstream, downstream, package_config).update_dist_git(
-        upstream_tag="0.1.0", full_version="0.1.0"
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
     )
 
     # make sure only one changelog entry (as seen by RPM) has been added
@@ -137,7 +155,8 @@ def test_update_distgit_unsafe_commit_messages(upstream, distgit_instance):
 
 
 def test_update_distgit_changelog_entry_action_pass_env_vars(
-    upstream, distgit_instance
+    upstream,
+    distgit_instance,
 ):
     _, downstream = distgit_instance
     package_config = upstream.package_config
@@ -153,9 +172,11 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
         "PACKIT_PROJECT_VERSION": "0.1.0",
     }
     flexmock(upstream).should_receive("get_output_from_action").with_args(
-        ActionName.changelog_entry, env=expected_env
+        ActionName.changelog_entry,
+        env=expected_env,
     ).and_return("- entry").once()
 
     ChangelogHelper(upstream, downstream, package_config).update_dist_git(
-        upstream_tag="0.1.0", full_version="0.1.0"
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
     )

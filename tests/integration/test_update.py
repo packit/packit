@@ -41,7 +41,9 @@ def github_release_webhook():
 
 
 def test_basic_local_update(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -63,7 +65,10 @@ def test_basic_local_update(
 
 
 def test_basic_local_update_use_downstream_specfile(
-    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
     # remove the upstream specfile and push the tag that will be checked out
@@ -77,7 +82,9 @@ def test_basic_local_update_use_downstream_specfile(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     api.sync_release(
-        dist_git_branch="main", version="0.1.0", use_downstream_specfile=True
+        dist_git_branch="main",
+        version="0.1.0",
+        use_downstream_specfile=True,
     )
 
     assert (d / TARBALL_NAME).is_file()
@@ -92,7 +99,9 @@ def test_basic_local_update_use_downstream_specfile(
 
     # do this second time to see whether the specfile is updated correctly
     api.sync_release(
-        dist_git_branch="main", version="0.1.0", use_downstream_specfile=True
+        dist_git_branch="main",
+        version="0.1.0",
+        use_downstream_specfile=True,
     )
 
     assert (d / TARBALL_NAME).is_file()
@@ -109,7 +118,9 @@ def test_basic_local_update_use_downstream_specfile(
 
 
 def test_basic_local_update_with_multiple_sources(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -120,7 +131,8 @@ def test_basic_local_update_with_multiple_sources(
             sources.append("https://the.second.source/the_source.tar.gz")
         subprocess.check_call(["git", "add", "beer.spec"], cwd=git_path)
         subprocess.check_call(
-            ["git", "commit", "-m", "Added new source to specfile"], cwd=git_path
+            ["git", "commit", "-m", "Added new source to specfile"],
+            cwd=git_path,
         )
     api.up.specfile.reload()
     api.dg.specfile.reload()
@@ -128,7 +140,8 @@ def test_basic_local_update_with_multiple_sources(
     dist_git_first_source = d / TARBALL_NAME
     dist_git_second_source = d / "the_source.tar.gz"
     flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
-        archives=[dist_git_first_source, dist_git_second_source], pkg_tool=""
+        archives=[dist_git_first_source, dist_git_second_source],
+        pkg_tool="",
     )
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
@@ -155,7 +168,9 @@ def test_basic_local_update_with_multiple_sources(
 
 
 def test_basic_local_update_with_adding_second_source(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -165,14 +180,16 @@ def test_basic_local_update_with_adding_second_source(
         sources.append("https://the.second.source/the_source.tar.gz")
     subprocess.check_call(["git", "add", "beer.spec"], cwd=u)
     subprocess.check_call(
-        ["git", "commit", "-m", "Added new source to specfile"], cwd=u
+        ["git", "commit", "-m", "Added new source to specfile"],
+        cwd=u,
     )
     api.up.specfile.reload()
 
     dist_git_first_source = d / TARBALL_NAME
     dist_git_second_source = d / "the_source.tar.gz"
     flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
-        archives=[dist_git_first_source, dist_git_second_source], pkg_tool=""
+        archives=[dist_git_first_source, dist_git_second_source],
+        pkg_tool="",
     )
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
@@ -198,7 +215,9 @@ def test_basic_local_update_with_adding_second_source(
 
 
 def test_basic_local_update_with_removing_second_source(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -208,14 +227,16 @@ def test_basic_local_update_with_removing_second_source(
         sources.append("https://the.second.source/the_source.tar.gz")
     subprocess.check_call(["git", "add", "beer.spec"], cwd=d)
     subprocess.check_call(
-        ["git", "commit", "-m", "Added new source to specfile"], cwd=d
+        ["git", "commit", "-m", "Added new source to specfile"],
+        cwd=d,
     )
     api.dg.specfile.reload()
 
     dist_git_first_source = d / TARBALL_NAME
     dist_git_second_source = d / "the_source.tar.gz"
     flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
-        archives=[dist_git_first_source], pkg_tool=""
+        archives=[dist_git_first_source],
+        pkg_tool="",
     )
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
@@ -237,7 +258,9 @@ def test_basic_local_update_with_removing_second_source(
 
 
 def test_local_update_generated_spec(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """Check that specfile can be generated on clone."""
     u, d, api = api_instance
@@ -256,8 +279,8 @@ def test_local_update_generated_spec(
     subprocess.check_call(["git", "commit", "-m", "Spec removed from upstream"], cwd=u)
     api.up.package_config.actions = {
         ActionName.post_upstream_clone: [
-            f"mv {new_spec_location} {current_spec_location}"
-        ]
+            f"mv {new_spec_location} {current_spec_location}",
+        ],
     }
 
     api.sync_release(dist_git_branch="main")
@@ -274,7 +297,9 @@ def test_local_update_generated_spec(
 
 
 def test_basic_local_update_reset_after_exception(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """check whether the distgit repo is not dirty after exception is raised"""
     u, d, api = api_instance
@@ -288,7 +313,9 @@ def test_basic_local_update_reset_after_exception(
 
 
 def test_basic_local_update_copy_upstream_release_description(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git,
     set copy_upstream_release_description in package config to True"""
@@ -297,7 +324,7 @@ def test_basic_local_update_copy_upstream_release_description(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     release = flexmock(body="Some description of the upstream release")
     api.up.local_project.git_project = flexmock(
-        get_release=lambda name, tag_name: release
+        get_release=lambda name, tag_name: release,
     )
     api.package_config.copy_upstream_release_description = True
     api.sync_release(dist_git_branch="main", version="0.1.0")
@@ -322,7 +349,9 @@ Some description of the upstream release
 
 
 def test_basic_local_update_using_distgit(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -352,7 +381,10 @@ def test_basic_local_update_using_distgit(
 
 
 def test_basic_local_update_direct_push(
-    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -385,7 +417,10 @@ def test_update_downstream_changelog_even_if_has_autochangelog(
 
     api.package_config.sync_changelog = True
     api.sync_release(
-        dist_git_branch="main", version="0.1.0", create_pr=False, add_new_sources=False
+        dist_git_branch="main",
+        version="0.1.0",
+        create_pr=False,
+        add_new_sources=False,
     )
 
     assert api.dg.specfile.version == "0.1.0"
@@ -397,7 +432,10 @@ def test_update_downstream_changelog_even_if_has_autochangelog(
 
 
 def test_basic_local_update_direct_push_no_dg_spec(
-    cwd_upstream, api_instance, distgit_and_remote, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
     d.joinpath("beer.spec").unlink()
@@ -422,7 +460,9 @@ def test_basic_local_update_direct_push_no_dg_spec(
 
 
 def test_basic_local_update_from_downstream(
-    cwd_upstream, api_instance, mock_remote_functionality_upstream
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     flexmock(LocalProject, _parse_namespace_from_git_url=lambda: None)
     u, d, api = api_instance
@@ -445,7 +485,7 @@ def test_local_update_with_specified_tag_template():
             "downstream_package_name": "beer",
             "upstream_tag_template": "v{version}",
             "create_pr": False,
-        }
+        },
     )
     api = PackitAPI(c, pc)
 

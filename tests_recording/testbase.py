@@ -94,7 +94,9 @@ class PackitTest(unittest.TestCase):
     def upstream(self):
         if not self._upstream:
             self._upstream = packit.upstream.Upstream(
-                self.config, self.pc, local_project=self.lp
+                self.config,
+                self.pc,
+                local_project=self.lp,
             )
         return self._upstream
 
@@ -108,7 +110,7 @@ class PackitTest(unittest.TestCase):
             check_output(["git", "config", "--global", "-l"])
         except CalledProcessError:
             check_output(
-                ["git", "config", "--global", "user.email", "test@example.com"]
+                ["git", "config", "--global", "user.email", "test@example.com"],
             )
             check_output(["git", "config", "--global", "user.name", "Tester"])
             check_output(["git", "config", "--global", "safe.directory", "*"])

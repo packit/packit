@@ -77,13 +77,15 @@ class CommitVerifier:
                     return result.fingerprints[0]
         except Exception as ex:
             raise PackitException(
-                f"Cannot receive a gpg key: {key_fingerprint}"
+                f"Cannot receive a gpg key: {key_fingerprint}",
             ) from ex
 
         raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
 
     def check_signature_of_commit(
-        self, commit: git.Commit, possible_key_fingerprints: list[str]
+        self,
+        commit: git.Commit,
+        possible_key_fingerprints: list[str],
     ) -> bool:
         """
         Check the validity of the commit signature
@@ -150,7 +152,7 @@ class CommitVerifier:
             return commit.repo.git.show(commit.hexsha, pretty=f"format:{pretty_format}")
         except git.GitCommandError as error:
             raise PackitException(
-                f"Cannot find commit {commit.hexsha!r} to check its signature."
+                f"Cannot find commit {commit.hexsha!r} to check its signature.",
             ) from error
 
 

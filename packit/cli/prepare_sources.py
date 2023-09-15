@@ -174,12 +174,14 @@ def prepare_sources(
     if bump is not None:
         if update_release is not None:
             raise click.UsageError(
-                "--[no-]bump and --[no-]update-release are mutually exclusive"
+                "--[no-]bump and --[no-]update-release are mutually exclusive",
             )
         logger.warning("--[no-]bump is deprecated. Use --[no-]update-release instead.")
         update_release = bump
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     api.prepare_sources(

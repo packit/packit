@@ -115,7 +115,8 @@ def test_get_lookaside_sources(config, sources, package, result):
     flexmock(
         configparser,
         ConfigParser=lambda: flexmock(
-            read=lambda _: None, items=lambda _, **__: config
+            read=lambda _: None,
+            items=lambda _, **__: config,
         ),
     )
     flexmock(

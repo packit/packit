@@ -60,7 +60,9 @@ def check_ready_api_sg_first(
 
 
 def test_source_git_status_no_trailers(
-    sourcegit_and_remote, distgit_and_remote, api_instance_source_git
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api_instance_source_git,
 ):
     """Check that an error is thrown if no trailers are present."""
     with pytest.raises(PackitException):
@@ -68,38 +70,50 @@ def test_source_git_status_no_trailers(
 
 
 def test_source_git_status_dg_commit_not_exists(
-    sourcegit_and_remote, distgit_and_remote, api_instance_source_git
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api_instance_source_git,
 ):
     """Check that an error is thrown if dist-git commit referenced
     by a From-dist-git trailer does not exist."""
     sourcegit, _ = sourcegit_and_remote
     (sourcegit / "file").write_text("foo")
     api_instance_source_git.up.commit(
-        "change", "", trailers=[(FROM_SOURCE_GIT_TOKEN, "abcd")]
+        "change",
+        "",
+        trailers=[(FROM_SOURCE_GIT_TOKEN, "abcd")],
     )
     with pytest.raises(PackitException):
         api_instance_source_git.sync_status()
 
 
 def test_source_git_status_sg_commit_not_exists(
-    sourcegit_and_remote, distgit_and_remote, api_instance_source_git
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api_instance_source_git,
 ):
     """Check that an error is thrown if source-git commit referenced
     by a From-source-git trailer does not exist."""
     distgit, _ = distgit_and_remote
     (distgit / "file").write_text("foo")
     api_instance_source_git.dg.commit(
-        "change", "", trailers=[(FROM_DIST_GIT_TOKEN, "abcd")]
+        "change",
+        "",
+        trailers=[(FROM_DIST_GIT_TOKEN, "abcd")],
     )
     with pytest.raises(PackitException):
         api_instance_source_git.sync_status()
 
 
 @pytest.mark.parametrize(
-    "api", ["check_ready_api_dg_first", "check_ready_api_sg_first"]
+    "api",
+    ["check_ready_api_dg_first", "check_ready_api_sg_first"],
 )
 def test_source_git_status_synced(
-    sourcegit_and_remote, distgit_and_remote, api, request
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api,
+    request,
 ):
     """Dist-git and source-git are in sync."""
     api_instance = request.getfixturevalue(api)
@@ -107,10 +121,14 @@ def test_source_git_status_synced(
 
 
 @pytest.mark.parametrize(
-    "api", ["check_ready_api_dg_first", "check_ready_api_sg_first"]
+    "api",
+    ["check_ready_api_dg_first", "check_ready_api_sg_first"],
 )
 def test_source_git_status_dist_git_ahead(
-    sourcegit_and_remote, distgit_and_remote, api, request
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api,
+    request,
 ):
     """Dist-git has extra commits that must be synced."""
     api_instance = request.getfixturevalue(api)
@@ -124,10 +142,14 @@ def test_source_git_status_dist_git_ahead(
 
 
 @pytest.mark.parametrize(
-    "api", ["check_ready_api_dg_first", "check_ready_api_sg_first"]
+    "api",
+    ["check_ready_api_dg_first", "check_ready_api_sg_first"],
 )
 def test_source_git_status_source_git_ahead(
-    sourcegit_and_remote, distgit_and_remote, api, request
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api,
+    request,
 ):
     """Source-git has extra commits that must be synced."""
     api_instance = request.getfixturevalue(api)
@@ -139,10 +161,14 @@ def test_source_git_status_source_git_ahead(
 
 
 @pytest.mark.parametrize(
-    "api", ["check_ready_api_dg_first", "check_ready_api_sg_first"]
+    "api",
+    ["check_ready_api_dg_first", "check_ready_api_sg_first"],
 )
 def test_source_git_status_history_diverges(
-    sourcegit_and_remote, distgit_and_remote, api, request
+    sourcegit_and_remote,
+    distgit_and_remote,
+    api,
+    request,
 ):
     """Both source-git and dist-git have extra commits that must be
     synced (diversion)."""
@@ -159,5 +185,6 @@ def test_source_git_status_history_diverges(
     api_instance.up.commit("changes to source-git", "")
     sg_range_start = api_instance.up.local_project.git_repo.head.commit.hexsha
     assert api_instance.sync_status() == SynchronizationStatus(
-        sg_range_start, dg_range_start
+        sg_range_start,
+        dg_range_start,
     )

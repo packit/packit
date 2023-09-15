@@ -26,7 +26,10 @@ logger = logging.getLogger(__name__)
 @click.command("init", context_settings=get_context_settings())
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @click.option(
-    "-f", "--force", is_flag=True, help="Reset config to default if already exists."
+    "-f",
+    "--force",
+    is_flag=True,
+    help="Reset config to default if already exists.",
 )
 @pass_config
 @cover_packit_exception
@@ -47,7 +50,7 @@ def init(
         if not force:
             raise PackitException(
                 f"Packit config {config_path} already exists."
-                " If you want to regenerate it use `packit init --force`"
+                " If you want to regenerate it use `packit init --force`",
             )
     else:
         # Use default name
@@ -65,7 +68,9 @@ def init(
     }
 
     generate_config(
-        config_file=config_path, write_to_file=True, template_data=template_data
+        config_file=config_path,
+        write_to_file=True,
+        template_data=template_data,
     )
 
 
@@ -79,7 +84,9 @@ def get_existing_config(working_dir: Path) -> Optional[Path]:
 
 
 def generate_config(
-    config_file: Path, write_to_file: bool = False, template_data: dict = None
+    config_file: Path,
+    write_to_file: bool = False,
+    template_data: dict = None,
 ) -> str:
     """
     Generate config file from provided data

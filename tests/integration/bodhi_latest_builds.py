@@ -29,5 +29,5 @@ BODHI_LATEST_BUILDS = Munch(
         "f29-updates-pending": "colin-0.3.1-1.fc29",
         "f27-updates-pending": "colin-0.2.0-1.fc27",
         "f30-updates-pending": "colin-0.3.1-2.fc30",
-    }
+    },
 )

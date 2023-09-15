@@ -70,7 +70,9 @@ class RepositoryCacheTest(unittest.TestCase):
         cache_path = self.tmp_path / "cache"
         clone_path = self.tmp_path / "clone1"
         flexmock(RepositoryCache).should_call("_clone").with_args(
-            url=TEST_PROJECT_URL_TO_CLONE, to_path=str(clone_path), tags=True
+            url=TEST_PROJECT_URL_TO_CLONE,
+            to_path=str(clone_path),
+            tags=True,
         )
 
         repo_cache = RepositoryCache(cache_path=cache_path, add_new=False)

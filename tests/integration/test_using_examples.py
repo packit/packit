@@ -40,7 +40,8 @@ def test_srpm_on_example(example_repo):
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            working_dir=example_repo, git_repo=CALCULATE
+            working_dir=example_repo,
+            git_repo=CALCULATE,
         ),
     )
     with cwd(example_repo):

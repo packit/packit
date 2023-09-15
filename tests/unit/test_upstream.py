@@ -30,7 +30,7 @@ def tar_mock():
                     "name": name,
                     "isdir": lambda v=isdir: v,
                     "isfile": lambda v=isdir: not isdir,  # noqa: B023
-                }
+                },
             )
             for name, isdir in archive_items
         ]
@@ -91,7 +91,8 @@ def test_create_pull(upstream_mock, upstream_pr_mock, fork_username):
 def test_get_commands_for_actions(action_config, result):
     ups = Upstream(
         package_config=flexmock(
-            actions={ActionName.create_archive: action_config}, synced_files=flexmock()
+            actions={ActionName.create_archive: action_config},
+            synced_files=flexmock(),
         ),
         config=flexmock(),
         local_project=flexmock(),
@@ -103,7 +104,10 @@ def test_get_commands_for_actions(action_config, result):
     "action_output, version, expected_result",
     [
         pytest.param(
-            ("some_action_output", "1.0.1"), "_", "1.0.1", id="with_action_output"
+            ("some_action_output", "1.0.1"),
+            "_",
+            "1.0.1",
+            id="with_action_output",
         ),
         pytest.param(None, "1.0.2", "1.0.2", id="tag_valid_version"),
         pytest.param(None, "1.0-3", "1.0.3", id="tag_version_with_dash"),
@@ -115,7 +119,7 @@ def test_get_current_version(action_output, version, expected_result, upstream_m
     upstream_mock.should_receive("get_last_tag").and_return("_mocked")
     upstream_mock.should_receive("get_version_from_tag").and_return(version)
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
-        {}
+        {},
     )
     assert upstream_mock.get_current_version() == expected_result
 
@@ -154,7 +158,11 @@ def test_get_current_version(action_output, version, expected_result, upstream_m
     ],
 )
 def test_get_version_from_tag(
-    tag, tag_template, expected_output, expectation, upstream_mock
+    tag,
+    tag_template,
+    expected_output,
+    expectation,
+    upstream_mock,
 ):
     with expectation:
         upstream_mock.package_config.upstream_tag_template = tag_template
@@ -172,14 +180,14 @@ def test_get_archive_root_dir(archive_type, return_value, upstream_mock, tar_moc
     if archive_type == "tar":
         tar_mock(is_tarfile=True)
         flexmock(Archive).should_receive("get_archive_root_dir_from_tar").and_return(
-            return_value
+            return_value,
         ).with_args("_archive").once()
         assert (
             Archive(upstream_mock, "").get_archive_root_dir("_archive") == return_value
         )
     elif archive_type == "unknown":
         flexmock(Archive).should_receive(
-            "get_archive_root_dir_from_template"
+            "get_archive_root_dir_from_template",
         ).and_return(return_value)
         tar_mock(is_tarfile=False)
         assert (
@@ -225,17 +233,23 @@ def test_get_tar_archive_dir(archive_items, expected_result, upstream_mock, tar_
     "template, expected_return_value",
     [
         pytest.param(
-            "{upstream_pkg_name}-{version}", "test_package_name-1.0", id="default"
+            "{upstream_pkg_name}-{version}",
+            "test_package_name-1.0",
+            id="default",
         ),
         pytest.param(
-            "{version}-{upstream_pkg_name}", "1.0-test_package_name", id="custom"
+            "{version}-{upstream_pkg_name}",
+            "1.0-test_package_name",
+            id="custom",
         ),
         pytest.param("{unknown}-{version}", "{unknown}-1.0", id="unknown_tag"),
         pytest.param("static_string", "static_string", id="static_template"),
     ],
 )
 def test_get_archive_root_dir_from_template(
-    template, expected_return_value, upstream_mock
+    template,
+    expected_return_value,
+    upstream_mock,
 ):
     upstream_mock.package_config.archive_root_dir_template = template
     assert (
@@ -248,7 +262,11 @@ def test_get_archive_root_dir_from_template(
     "version, tag_template, expected_output, expectation",
     [
         pytest.param(
-            "1.0.0", "{version}", "1.0.0", does_not_raise(), id="valid_template"
+            "1.0.0",
+            "{version}",
+            "1.0.0",
+            does_not_raise(),
+            id="valid_template",
         ),
         pytest.param(
             "1.0.0",
@@ -260,7 +278,11 @@ def test_get_archive_root_dir_from_template(
     ],
 )
 def test_convert_version_to_tag(
-    version, tag_template, expected_output, expectation, upstream_mock
+    version,
+    tag_template,
+    expected_output,
+    expectation,
+    upstream_mock,
 ):
     with expectation:
         upstream_mock.package_config.upstream_tag_template = tag_template
@@ -273,7 +295,7 @@ def test_convert_version_to_tag(
         (
             "Wrote: packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
             [
-                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm"
+                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
             ],
         ),
         (
@@ -282,7 +304,7 @@ def test_convert_version_to_tag(
             "\nAnother false positive: random_rpm_named_with_space .rpm"
             "Wrote: packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
             [
-                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm"
+                "packit-0.37.1.dev13+gd57da48.rpm.regex.broken.13.gd57da48.fc35.noarch.rpm",
             ],
         ),
         (
@@ -317,20 +339,24 @@ def test_get_rpms_from_rpmbuild_output(output, expected):
     ],
 )
 def test_release_suffix(
-    upstream_mock, archive, version, release_suffix, expanded_release_suffix
+    upstream_mock,
+    archive,
+    version,
+    release_suffix,
+    expanded_release_suffix,
 ):
     flexmock(upstream_mock).should_receive("get_current_version").and_return(version)
     flexmock(upstream_mock).should_receive("get_spec_release").and_return(
-        expanded_release_suffix
+        expanded_release_suffix,
     )
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
-        {}
+        {},
     )
     flexmock(upstream_mock).should_receive("specfile").and_return(
         flexmock(expanded_release=expanded_release_suffix)
         .should_receive("reload")
         .and_return(None)
-        .mock()
+        .mock(),
     )
 
     flexmock(upstream_mock).should_receive("fix_spec").with_args(
@@ -342,7 +368,9 @@ def test_release_suffix(
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, update_release=True, release_suffix=release_suffix
+        archive=archive,
+        update_release=True,
+        release_suffix=release_suffix,
     )
 
 
@@ -366,7 +394,7 @@ def test_release_suffix(
 def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
     srpm = "./koji-c-1.1.0-1.20221110110837054647.pr257.1.g8477d03.fc35.src.rpm"
     assert srpm == SRPMBuilder(upstream_mock)._get_srpm_from_rpmbuild_output(
-        rpmbuild_output
+        rpmbuild_output,
     )
 
 
@@ -408,7 +436,10 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
             id="Do not modify release, release_suffix is None",
         ),
         pytest.param(
-            False, "7", "2.7", id="Do not modify release, release_suffix value is 7"
+            False,
+            "7",
+            "2.7",
+            id="Do not modify release, release_suffix value is 7",
         ),
         pytest.param(
             False,
@@ -419,20 +450,23 @@ def test_get_srpm_from_rpmbuild_output(upstream_mock, rpmbuild_output):
     ),
 )
 def test_get_spec_release(
-    upstream_mock, update_release, release_suffix, expected_release
+    upstream_mock,
+    update_release,
+    release_suffix,
+    expected_release,
 ):
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
     original_release_number_from_spec = "2"
     flexmock(upstream_mock).should_receive("get_current_version").and_return(
-        current_git_tag_version
+        current_git_tag_version,
     )
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
-        {}
+        {},
     )
 
     flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
-        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234")))
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234"))),
     )
 
     flexmock(upstream_mock).should_receive("fix_spec").with_args(
@@ -443,16 +477,18 @@ def test_get_spec_release(
         release=expected_release,
     )
     upstream_mock._specfile = flexmock(
-        expanded_release=original_release_number_from_spec
+        expanded_release=original_release_number_from_spec,
     )
     upstream_mock._specfile.should_receive("reload").once()
 
     flexmock(sys.modules["packit.upstream"]).should_receive("run_command").and_return(
-        flexmock(stdout=current_git_tag_version)
+        flexmock(stdout=current_git_tag_version),
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, update_release=update_release, release_suffix=release_suffix
+        archive=archive,
+        update_release=update_release,
+        release_suffix=release_suffix,
     )
 
 
@@ -494,7 +530,10 @@ def test_get_spec_release(
             id="Do not modify release, release_suffix is None",
         ),
         pytest.param(
-            False, "7", "2.7", id="Do not modify release, release_suffix value is 7"
+            False,
+            "7",
+            "2.7",
+            id="Do not modify release, release_suffix value is 7",
         ),
         pytest.param(
             False,
@@ -505,31 +544,34 @@ def test_get_spec_release(
     ),
 )
 def test_fix_spec(
-    upstream_mock, update_release, release_suffix, expected_release_suffix
+    upstream_mock,
+    update_release,
+    release_suffix,
+    expected_release_suffix,
 ):
     upstream_mock.package_config.upstream_tag_include = None
     upstream_mock.package_config.upstream_tag_exclude = None
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
-        {}
+        {},
     )
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
     original_release_number_from_spec = "2"
     flexmock(upstream_mock).should_receive("get_current_version").and_return(
-        current_git_tag_version
+        current_git_tag_version,
     )
 
     flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
-        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234")))
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234"))),
     )
 
     flexmock(upstream_mock).should_receive("_fix_spec_source").with_args(
-        archive=archive
+        archive=archive,
     )
     flexmock(upstream_mock).should_receive("_fix_spec_prep").with_args(archive=archive)
 
     upstream_mock._specfile = flexmock(
-        expanded_release=original_release_number_from_spec
+        expanded_release=original_release_number_from_spec,
     )
     upstream_mock._specfile.should_receive("reload").once()
 
@@ -537,11 +579,13 @@ def test_fix_spec(
         upstream_mock._specfile.should_receive("add_changelog_entry")
 
     flexmock(sys.modules["packit.upstream"]).should_receive("run_command").and_return(
-        flexmock(stdout=current_git_tag_version)
+        flexmock(stdout=current_git_tag_version),
     )
 
     SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
-        archive=archive, update_release=update_release, release_suffix=release_suffix
+        archive=archive,
+        update_release=update_release,
+        release_suffix=release_suffix,
     )
 
     assert upstream_mock._specfile.version == current_git_tag_version

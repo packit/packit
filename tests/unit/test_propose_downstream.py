@@ -23,7 +23,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -32,9 +32,9 @@ from packit.config import (
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             None,
@@ -47,7 +47,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -57,9 +57,9 @@ from packit.config import (
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 dist_git_branches=["file"],
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             None,
@@ -72,7 +72,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -81,9 +81,9 @@ from packit.config import (
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             "cmdline",
@@ -96,7 +96,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -106,9 +106,9 @@ from packit.config import (
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 dist_git_branches=["file"],
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             "cmdline",
@@ -121,7 +121,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -131,9 +131,9 @@ from packit.config import (
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 dist_git_branches=["file1", "file2"],
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             None,
@@ -147,7 +147,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -156,9 +156,9 @@ from packit.config import (
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             "cmdline1,cmdline2",
@@ -172,7 +172,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -181,9 +181,9 @@ from packit.config import (
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             "rawhide",
@@ -196,7 +196,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -206,9 +206,9 @@ from packit.config import (
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 dist_git_branches=["rawhide"],
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             None,
@@ -221,7 +221,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -231,9 +231,9 @@ from packit.config import (
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 dist_git_branches=["file1", "rawhide"],
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             None,
@@ -247,7 +247,7 @@ from packit.config import (
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -256,9 +256,9 @@ from packit.config import (
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             "cmdline1,rawhide",

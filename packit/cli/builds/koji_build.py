@@ -43,10 +43,14 @@ logger = logging.getLogger(__name__)
     default=False,
 )
 @click.option(
-    "--koji-target", help="Koji target to build inside (see `koji list-targets`)."
+    "--koji-target",
+    help="Koji target to build inside (see `koji list-targets`).",
 )
 @click.option(
-    "--scratch", is_flag=True, default=False, help="Submit a scratch koji build"
+    "--scratch",
+    is_flag=True,
+    default=False,
+    help="Submit a scratch koji build",
 )
 @click.option("--wait/--no-wait", default=True, help="Wait for the build to finish")
 @click.option(
@@ -105,13 +109,16 @@ def koji(
         local_project=path_or_url,
     )
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
     branches_to_build = get_branches(
-        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
+        *dist_git_branch.split(","),
+        default_dg_branch=default_dg_branch,
     )
     package = (
         package_config.downstream_package_name
@@ -120,7 +127,7 @@ def koji(
     )
     click.echo(
         f"Building from the following branches: {', '.join(branches_to_build)}, "
-        f"for package {package}"
+        f"for package {package}",
     )
 
     targets_to_build = {None} if koji_target is None else get_koji_targets(koji_target)
@@ -128,7 +135,7 @@ def koji(
     if len(targets_to_build) > 1 and len(branches_to_build) > 1:
         raise PackitConfigException(
             "Parameters --dist-git-branch and --koji-target cannot have "
-            "multiple values at the same time."
+            "multiple values at the same time.",
         )
 
     for target in targets_to_build:

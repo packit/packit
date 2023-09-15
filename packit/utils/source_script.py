@@ -33,5 +33,6 @@ def create_source_script(
 
     options += [url]
     return COPR_SOURCE_SCRIPT.format(
-        package=f" -p {package}" if package else "", options=" ".join(options)
+        package=f" -p {package}" if package else "",
+        options=" ".join(options),
     )

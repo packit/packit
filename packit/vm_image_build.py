@@ -54,13 +54,13 @@ class ImageBuilder:
         self._access_token = self._get_access_token()
         if not self._access_token:
             raise PackitException(
-                "Unable to obtain access token. You may need to regenerate the refresh token."
+                "Unable to obtain access token. You may need to regenerate the refresh token.",
             )
         self.session.headers.update(
             {
                 "Authorization": f"Bearer {self._access_token}",
                 "Accept": "application/json",
-            }
+            },
         )
 
     def request(self, method: str, url: str, payload: Optional[dict] = None):
@@ -91,7 +91,10 @@ class ImageBuilder:
             return response
 
     def image_builder_request(
-        self, method: str, path: str, payload: Optional[dict] = None
+        self,
+        method: str,
+        path: str,
+        payload: Optional[dict] = None,
     ):
         """
         Request to the Image Builder API.
@@ -105,7 +108,9 @@ class ImageBuilder:
             requests.Response object.
         """
         return self.request(
-            method, url=f"{IMAGE_BUILDER_API_URL}/{path}", payload=payload
+            method,
+            url=f"{IMAGE_BUILDER_API_URL}/{path}",
+            payload=payload,
         )
 
     def launch_request(self, method: str, path: str, payload: Optional[dict] = None):
@@ -147,7 +152,7 @@ class ImageBuilder:
             return response_json["access_token"]
         except KeyError:
             logger.info(
-                f"Failed to get access token ({response.status_code}): {response_json}"
+                f"Failed to get access token ({response.status_code}): {response_json}",
             )
             return None
 
@@ -220,7 +225,7 @@ class ImageBuilder:
             "payload_repositories"
         ]
         logger.debug(
-            f"image_customizations -> payload_repositories {payload_repositories}"
+            f"image_customizations -> payload_repositories {payload_repositories}",
         )
         payload = {
             "image_name": image_name,
@@ -236,7 +241,7 @@ class ImageBuilder:
                 # https://issues.redhat.com/browse/HMSIB-14
                 # "gpgkey": "https://download.copr.../@cockpit/cockpit-preview/pubkey.gpg",
                 "check_gpg": False,
-            }
+            },
         )
         response = self.image_builder_request("POST", "compose", payload=payload)
 
@@ -245,7 +250,7 @@ class ImageBuilder:
             return response_json["id"]
         except KeyError as e:
             logger.error(
-                f"Failed to create image ({response.status_code}): {response_json}"
+                f"Failed to create image ({response.status_code}): {response_json}",
             )
             raise PackitException(f"Failed to create image: {response_json}") from e
 

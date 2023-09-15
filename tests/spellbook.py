@@ -45,10 +45,12 @@ CRONIE = DATA_DIR / "cronie"
 
 def git_set_user_email(directory):
     subprocess.check_call(
-        ["git", "config", "user.email", "test@example.com"], cwd=directory
+        ["git", "config", "user.email", "test@example.com"],
+        cwd=directory,
     )
     subprocess.check_call(
-        ["git", "config", "user.name", "Packit Test Suite"], cwd=directory
+        ["git", "config", "user.name", "Packit Test Suite"],
+        cwd=directory,
     )
 
 
@@ -62,7 +64,8 @@ def get_test_config():
 def git_add_and_commit(directory, message):
     subprocess.check_call(["git", "add", "."], cwd=directory)
     subprocess.check_call(
-        ["git", "commit", "--allow-empty", "-m", message], cwd=directory
+        ["git", "commit", "--allow-empty", "-m", message],
+        cwd=directory,
     )
 
 
@@ -107,7 +110,8 @@ def initiate_git_repo(
     subprocess.check_call(["git", "commit", "-m", "commit with data"], cwd=directory)
     if tag:
         subprocess.check_call(
-            ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag], cwd=directory
+            ["git", "tag", "-a", "-m", f"tag {tag}, tests", tag],
+            cwd=directory,
         )
 
     for name, url in remotes:
@@ -118,7 +122,8 @@ def initiate_git_repo(
         # tox strips some env vars so your user gitconfig is not picked up
         # hence we need to be very explicit with git commands here
         subprocess.check_call(
-            ["git", "push", "--tags", "-u", "origin", "main:main"], cwd=directory
+            ["git", "push", "--tags", "-u", "origin", "main:main"],
+            cwd=directory,
         )
 
 
@@ -151,7 +156,8 @@ def create_merge_commit_in_source_git(sg: Path, go_nuts=False):
             cwd=sg,
         )
         subprocess.check_call(
-            ["git", "checkout", "-B", "ugly-merge2", "HEAD~2"], cwd=sg
+            ["git", "checkout", "-B", "ugly-merge2", "HEAD~2"],
+            cwd=sg,
         )
         malt.write_text("Pilsen\n")
         git_add_and_commit(directory=sg, message="let's try Pilsen instead")
@@ -192,14 +198,19 @@ def create_git_am_style_history(sg: Path):
 
     hops.write_text("Citra\n")
     meta = PatchMetadata(
-        name="citra.patch", squash_commits=True, present_in_specfile=False, patch_id=10
+        name="citra.patch",
+        squash_commits=True,
+        present_in_specfile=False,
+        patch_id=10,
     )
     git_add_and_commit(directory=sg, message=meta.commit_message)
 
     malt = sg.joinpath("malt")
     malt.write_text("Munich\n")
     meta = PatchMetadata(
-        name="malt.patch", squash_commits=True, present_in_specfile=False
+        name="malt.patch",
+        squash_commits=True,
+        present_in_specfile=False,
     )
     git_add_and_commit(directory=sg, message=meta.commit_message)
 

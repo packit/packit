@@ -92,7 +92,7 @@ class Upstream(PackitRepositoryBase):
         if self._local_project.git_project is None:
             if not self.package_config.upstream_project_url:
                 self.package_config.upstream_project_url = git_remote_url_to_https_url(
-                    self._local_project.git_url
+                    self._local_project.git_url,
                 )
 
             self._local_project.git_project = self.config.get_project(
@@ -123,7 +123,7 @@ class Upstream(PackitRepositoryBase):
         :return: name of the branch where we pushed
         """
         logger.debug(
-            f"About to {'force ' if force else ''}push changes to branch {branch_name!r}."
+            f"About to {'force ' if force else ''}push changes to branch {branch_name!r}.",
         )
         fork_username = None
 
@@ -144,14 +144,15 @@ class Upstream(PackitRepositoryBase):
                     pushurl = next(remote.urls)  # afaik this is what git does as well
                     if ssh_url.startswith(pushurl):
                         logger.info(
-                            f"Will use remote {remote!r} using URL {pushurl!r}."
+                            f"Will use remote {remote!r} using URL {pushurl!r}.",
                         )
                         remote_name = str(remote)
                         break
                 else:
                     logger.info(f"Creating remote fork-ssh with URL {ssh_url!r}.")
                     self.local_project.git_repo.create_remote(
-                        name="fork-ssh", url=ssh_url
+                        name="fork-ssh",
+                        url=ssh_url,
                     )
             else:
                 # push to origin and hope for the best
@@ -195,7 +196,9 @@ class Upstream(PackitRepositoryBase):
             logger.info(f"PR created: {upstream_pr.url}")
 
     def create_patches(
-        self, upstream: Optional[str] = None, destination: Union[str, Path] = None
+        self,
+        upstream: Optional[str] = None,
+        destination: Union[str, Path] = None,
     ) -> list[PatchMetadata]:
         """
         Create patches from downstream commits.
@@ -224,7 +227,9 @@ class Upstream(PackitRepositoryBase):
 
         pg = PatchGenerator(self.local_project)
         return pg.create_patches(
-            upstream, str(destination), files_to_ignore=files_to_ignore
+            upstream,
+            str(destination),
+            files_to_ignore=files_to_ignore,
         )
 
     def get_latest_released_version(self) -> Optional[str]:
@@ -302,7 +307,9 @@ class Upstream(PackitRepositoryBase):
         return version
 
     def create_archive(
-        self, version: str = None, create_symlink: Optional[bool] = True
+        self,
+        version: str = None,
+        create_symlink: Optional[bool] = True,
     ) -> str:
         return Archive(self, version).create(create_symlink=create_symlink)
 
@@ -345,7 +352,7 @@ class Upstream(PackitRepositoryBase):
 
         logger.debug(
             f"We're about to get latest matching tag in "
-            f"the upstream repository {self.local_project.working_dir}."
+            f"the upstream repository {self.local_project.working_dir}.",
         )
 
         tags = self.list_tags()
@@ -389,7 +396,9 @@ class Upstream(PackitRepositoryBase):
         return tags
 
     def get_commit_messages(
-        self, after: Optional[str] = None, before: str = "HEAD"
+        self,
+        after: Optional[str] = None,
+        before: str = "HEAD",
     ) -> str:
         """
         :param after: get commit messages after this revision,
@@ -405,7 +414,7 @@ class Upstream(PackitRepositoryBase):
             raise PackitException(
                 "Unable to get a list of commit messages in range "
                 f"{commits_range} because the upper bound is not "
-                f"defined ({before!r})."
+                f"defined ({before!r}).",
             )
         cmd = [
             "git",
@@ -417,7 +426,9 @@ class Upstream(PackitRepositoryBase):
         ]
         try:
             return run_command(
-                cmd, output=True, cwd=self.local_project.working_dir
+                cmd,
+                output=True,
+                cwd=self.local_project.working_dir,
             ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"We couldn't get commit messages for %changelog\n{ex}")
@@ -425,7 +436,7 @@ class Upstream(PackitRepositoryBase):
             logger.info(
                 "If the ref is a git tag, "
                 'you should consider setting "upstream_tag_template":\n  '
-                "https://packit.dev/docs/configuration/#upstream_tag_template"
+                "https://packit.dev/docs/configuration/#upstream_tag_template",
             )
             raise
 
@@ -459,7 +470,9 @@ class Upstream(PackitRepositoryBase):
         ]
         try:
             git_des_out = run_command(
-                git_des_command, output=True, cwd=self.local_project.working_dir
+                git_des_command,
+                output=True,
+                cwd=self.local_project.working_dir,
             ).stdout.strip()
         except PackitCommandFailedError as ex:
             # probably no tags in the git repo
@@ -505,7 +518,10 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_prep(archive)
 
         ChangelogHelper(self).prepare_upstream_locally(
-            version, commit, update_release, release
+            version,
+            commit,
+            update_release,
+            release,
         )
 
     def _fix_spec_prep(self, archive):
@@ -521,12 +537,12 @@ class Upstream(PackitRepositoryBase):
             else:
                 logger.warning(
                     "This package is not using %(auto)setup macro in prep. "
-                    "Packit will not update the %prep section."
+                    "Packit will not update the %prep section.",
                 )
                 return
 
             archive_root_dir = Archive(self, self.get_version()).get_archive_root_dir(
-                archive
+                archive,
             )
 
             if "n" in macro.options:
@@ -542,7 +558,7 @@ class Upstream(PackitRepositoryBase):
             else:
                 raise PackitException(
                     "The spec file doesn't have sources set "
-                    f"via {self.package_config.spec_source_id} nor Source."
+                    f"via {self.package_config.spec_source_id} nor Source.",
                 )
 
     def create_srpm(
@@ -566,7 +582,9 @@ class Upstream(PackitRepositoryBase):
             Path to the SRPM.
         """
         return SRPMBuilder(
-            upstream=self, srpm_path=srpm_path, srpm_dir=srpm_dir
+            upstream=self,
+            srpm_path=srpm_path,
+            srpm_dir=srpm_dir,
         ).build()
 
     def prepare_upstream_for_srpm_creation(
@@ -604,7 +622,8 @@ class Upstream(PackitRepositoryBase):
         env = self.package_config.get_package_names_as_env()
         if self.with_action(action=ActionName.create_patches, env=env):
             patches = self.create_patches(
-                upstream=upstream_ref, destination=str(self.absolute_specfile_dir)
+                upstream=upstream_ref,
+                destination=str(self.absolute_specfile_dir),
             )
             self.specfile_add_patches(patches)
 
@@ -625,7 +644,7 @@ class Upstream(PackitRepositoryBase):
         """
         if not koji_target:
             raise PackitException(
-                "koji target needs to be set when building directly from upstream"
+                "koji target needs to be set when building directly from upstream",
             )
         # we can't use fedpkg b/c upstream repo is not dist-git
         cmd = shlex.split(self.config.koji_build_command)
@@ -637,7 +656,7 @@ class Upstream(PackitRepositoryBase):
         logger.info("Starting a koji build.")
         if not nowait:
             logger.info(
-                "We will be actively waiting for the build to finish, it may take some time."
+                "We will be actively waiting for the build to finish, it may take some time.",
             )
         return commands.run_command_remote(
             cmd,
@@ -694,7 +713,8 @@ class Upstream(PackitRepositoryBase):
         logger.debug(f"RPM build command: {escaped_command}")
         try:
             out = self.command_handler.run_command(
-                cmd, return_output=True
+                cmd,
+                return_output=True,
             ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
@@ -706,12 +726,12 @@ class Upstream(PackitRepositoryBase):
                 f"stdout:\n"
                 f"{ex.stdout_output}\n"
                 f"stderr:\n"
-                f"{ex.stderr_output}"
+                f"{ex.stderr_output}",
             ) from ex
         except PackitException as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
             raise PackitFailedToCreateRPMException(
-                f"The `rpmbuild` command failed:\n{ex}"
+                f"The `rpmbuild` command failed:\n{ex}",
             ) from ex
 
         rpms = Upstream._get_rpms_from_rpmbuild_output(out)
@@ -732,11 +752,17 @@ class Upstream(PackitRepositoryBase):
         rpm_dir = rpm_dir or os.getcwd()
         src_dir = rpmbuild_dir = str(self.absolute_specfile_dir)
         return self._build_rpms(
-            "-bb", rpm_dir, rpmbuild_dir, src_dir, self.package_config.specfile_path
+            "-bb",
+            rpm_dir,
+            rpmbuild_dir,
+            src_dir,
+            self.package_config.specfile_path,
         )
 
     def create_rpms_from_srpm(
-        self, srpm: Union[str, Path], rpm_dir: Union[str, Path, None] = None
+        self,
+        srpm: Union[str, Path],
+        rpm_dir: Union[str, Path, None] = None,
     ) -> list[Path]:
         """
         Build RPMs from the given path to the SRPM.
@@ -773,7 +799,7 @@ class Upstream(PackitRepositoryBase):
 
         if not rpms:
             raise PackitRPMNotFoundException(
-                "RPMs cannot be found, something is wrong."
+                "RPMs cannot be found, something is wrong.",
             )
 
         return rpms
@@ -888,7 +914,7 @@ class Upstream(PackitRepositoryBase):
 
         if not rpms:
             raise PackitRPMNotFoundException(
-                "RPMs cannot be found, something is wrong."
+                "RPMs cannot be found, something is wrong.",
             )
 
         return rpms
@@ -912,7 +938,7 @@ class SRPMBuilder:
         if self.upstream.running_in_service():
             self.srpm_dir = Path(".")
             self.rpmbuild_dir = self.upstream.absolute_specfile_dir.relative_to(
-                self.upstream.local_project.working_dir
+                self.upstream.local_project.working_dir,
             )
         else:
             self.srpm_dir = Path(srpm_dir) if srpm_dir else Path.cwd()
@@ -928,7 +954,7 @@ class SRPMBuilder:
     def upstream_ref(self):
         if self._upstream_ref is None:
             self._upstream_ref = self.upstream._expand_git_ref(
-                self.__ref or self.upstream.package_config.upstream_ref
+                self.__ref or self.upstream.package_config.upstream_ref,
             )
         return self._upstream_ref
 
@@ -951,7 +977,7 @@ class SRPMBuilder:
             the_srpm = re.findall(reg, output)[0]
         except IndexError as e:
             raise PackitSRPMNotFoundException(
-                "SRPM cannot be found, something is wrong."
+                "SRPM cannot be found, something is wrong.",
             ) from e
         return the_srpm
 
@@ -1017,7 +1043,8 @@ class SRPMBuilder:
 
         try:
             out = self.upstream.command_handler.run_command(
-                cmd, return_output=True
+                cmd,
+                return_output=True,
             ).stdout.strip()
         except PackitCommandFailedError as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
@@ -1025,18 +1052,20 @@ class SRPMBuilder:
                 f"reason:\n{ex}\n"
                 f"command:\n{escaped_command}\n"
                 f"stdout:\n{ex.stdout_output}\n"
-                f"stderr:\n{ex.stderr_output}"
+                f"stderr:\n{ex.stderr_output}",
             ) from ex
         except PackitException as ex:
             logger.error(f"The `rpmbuild` command failed: {ex!r}")
             raise PackitFailedToCreateSRPMException(
-                f"The `rpmbuild` command failed:\n{ex}"
+                f"The `rpmbuild` command failed:\n{ex}",
             ) from ex
 
         return self.get_path(out)
 
     def _prepare_upstream_using_source_git(
-        self, update_release: bool, release_suffix: Optional[str]
+        self,
+        update_release: bool,
+        release_suffix: Optional[str],
     ) -> None:
         """
         Fetch the tarball and don't check out the upstream ref.
@@ -1045,11 +1074,15 @@ class SRPMBuilder:
         self.upstream.create_patches_and_update_specfile(self.upstream_ref)
 
         ChangelogHelper(self.upstream).prepare_upstream_using_source_git(
-            update_release, release_suffix
+            update_release,
+            release_suffix,
         )
 
     def _fix_specfile_to_use_local_archive(
-        self, archive: str, update_release: bool, release_suffix: Optional[str]
+        self,
+        archive: str,
+        update_release: bool,
+        release_suffix: Optional[str],
     ) -> None:
         """
         Update specfile to use the archive with the right version.
@@ -1072,7 +1105,7 @@ class SRPMBuilder:
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
             "PACKIT_PROJECT_BRANCH": sanitize_branch_name_for_rpm(
-                self.upstream.local_project.ref
+                self.upstream.local_project.ref,
             ),
         }
 
@@ -1128,7 +1161,7 @@ class SRPMBuilder:
             logger.warning('The upstream repo contains "sources" file or a directory.')
             logger.warning(
                 "We are unable to download remote sources from spec-file "
-                "because the file contains links to archives in Fedora downstream."
+                "because the file contains links to archives in Fedora downstream.",
             )
             logger.warning("Therefore skipping downloading of remote sources.")
         else:
@@ -1187,7 +1220,8 @@ class Archive:
         env = env | self.upstream.package_config.get_package_names_as_env()
         if self.upstream.has_action(action=ActionName.create_archive):
             outputs = self.upstream.get_output_from_action(
-                action=ActionName.create_archive, env=env
+                action=ActionName.create_archive,
+                env=env,
             )
             if not outputs:
                 raise PackitException("No output from create-archive action.")
@@ -1196,7 +1230,7 @@ class Archive:
             if not archive_path:
                 raise PackitException(
                     "The create-archive action did not output a path to the generated archive. "
-                    "Please make sure that you have valid path in the single line of the output."
+                    "Please make sure that you have valid path in the single line of the output.",
                 )
             self._handle_archive_outside_specdir_if_needed(archive_path, create_symlink)
             return archive_path.name
@@ -1229,7 +1263,7 @@ class Archive:
             # File too long
             if ex.errno == 36:
                 logger.error(
-                    "Skipping long output command output while getting archive name."
+                    "Skipping long output command output while getting archive name.",
                 )
                 return None
             raise ex
@@ -1255,7 +1289,9 @@ class Archive:
         return None
 
     def _handle_archive_outside_specdir_if_needed(
-        self, archive_path: Path, create_symlink: Optional[bool] = True
+        self,
+        archive_path: Path,
+        create_symlink: Optional[bool] = True,
     ) -> None:
         """
         Create a relative symlink to the archive from in the specfile directory
@@ -1276,25 +1312,28 @@ class Archive:
                 # [os.path.relpath()](https://docs.python.org/3/library/os.path.html#os.path.relpath)
                 # does not.
                 relative_archive_path = os.path.relpath(
-                    archive_path, absolute_specfile_dir
+                    archive_path,
+                    absolute_specfile_dir,
                 )
 
                 logger.info(
                     "Linking to the specfile directory:"
                     f" {archive_in_spec_dir} -> {relative_archive_path}"
-                    f" (given path to archive: {archive_path})"
+                    f" (given path to archive: {archive_path})",
                 )
                 archive_in_spec_dir.symlink_to(relative_archive_path)
 
             else:
                 logger.info(
                     "Copying the archive to the specfile directory: "
-                    f"{archive_path} -> {archive_in_spec_dir}"
+                    f"{archive_path} -> {archive_in_spec_dir}",
                 )
                 shutil.copy2(archive_path, archive_in_spec_dir)
 
     def _create_archive_using_default_way(
-        self, dir_name: str, env: dict[str, str]
+        self,
+        dir_name: str,
+        env: dict[str, str],
     ) -> str:
         """
         Create an archive using `git archive`.
@@ -1321,7 +1360,9 @@ class Archive:
             "HEAD",
         ]
         self.upstream.command_handler.run_command(
-            archive_cmd, return_output=True, env=env
+            archive_cmd,
+            return_output=True,
+            env=env,
         )
         return archive_name
 
@@ -1360,7 +1401,8 @@ class Archive:
             logger.debug(
                 "Using archive_root_dir_template config option. If not set it defaults to "
                 "{{upstream_pkg_name}}-{{version}}. Check "
-                "https://packit.dev/docs/configuration/#archive_root_dir_template for more details."
+                "https://packit.dev/docs/configuration/#archive_root_dir_template "
+                "for more details.",
             )
             archive_root_dir = self.get_archive_root_dir_from_template()
 
@@ -1389,7 +1431,7 @@ class Archive:
 
         root_dirs_count = len(root_dirs)
         archive_root_items_count = len(
-            {i.name for i in tar.getmembers() if "/" not in i.name}
+            {i.name for i in tar.getmembers() if "/" not in i.name},
         )
 
         if root_dirs_count == 1:
@@ -1403,12 +1445,12 @@ class Archive:
             logger.warning(
                 f"Archive {archive} contains multiple directories on the top level: "
                 f"the common practice in the industry is to have only one in the "
-                f'following format: "PACKAGE-VERSION"'
+                f'following format: "PACKAGE-VERSION"',
             )
         elif archive_root_items_count > 1:
             logger.warning(
                 f"Archive f{archive} contains multiple root items. It can be "
-                f"intentional or can signal incorrect archive structure."
+                f"intentional or can signal incorrect archive structure.",
             )
 
         return None
@@ -1423,15 +1465,16 @@ class Archive:
         """
         template = self.upstream.package_config.archive_root_dir_template
         logger.debug(
-            f"archive_root_dir_template is set or defaults to if not set to: {template}"
+            f"archive_root_dir_template is set or defaults to if not set to: {template}",
         )
         archive_root_dir = template.replace(
-            "{upstream_pkg_name}", self.upstream.package_config.upstream_package_name
+            "{upstream_pkg_name}",
+            self.upstream.package_config.upstream_package_name,
         ).replace("{version}", self.version)
         not_replaced = re.findall("{.*?}", archive_root_dir)
         if not_replaced:
             logger.warning(
                 f"Probably not all archive_root_dir_template tags were "
-                f"replaced: {' ,'.join(not_replaced)}"
+                f"replaced: {' ,'.join(not_replaced)}",
             )
         return archive_root_dir

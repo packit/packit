@@ -75,7 +75,7 @@ from packit.config import CommonPackageConfig, JobConfig, JobConfigTriggerType, 
                         downstream_package_name="package",
                         specfile_path="package.spec",
                         project="example1",
-                    )
+                    ),
                 },
             ),
             id="valid",

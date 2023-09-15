@@ -20,7 +20,8 @@ def get_upstream_version(package_name: str) -> Optional[str]:
 
     def query(endpoint, **kwargs):
         response = requests.get(
-            f"https://release-monitoring.org/api/{endpoint}", params=kwargs
+            f"https://release-monitoring.org/api/{endpoint}",
+            params=kwargs,
         )
         if not response.ok:
             return {}
@@ -35,7 +36,8 @@ def get_upstream_version(package_name: str) -> Optional[str]:
         result = query("projects", pattern=package_name)
         projects = result.get("projects", [])
         project: dict = next(
-            iter(p for p in projects if p.get("name") == package_name), {}
+            iter(p for p in projects if p.get("name") == package_name),
+            {},
         )
         version = project.get("version")
     return version

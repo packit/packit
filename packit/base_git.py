@@ -65,7 +65,8 @@ class PackitRepositoryBase:
     def command_handler(self) -> CommandHandler:
         if self._command_handler is None:
             self._command_handler = self.handler_kls(
-                local_project=self.local_project, config=self.config
+                local_project=self.local_project,
+                config=self.config,
             )
         return self._command_handler
 
@@ -102,7 +103,7 @@ class PackitRepositoryBase:
                 # since propose-downstream checks out a tag, we should inform user
                 # on which ref this has happened: https://github.com/packit/packit/issues/1625
                 raise FileNotFoundError(
-                    f"Specfile {self._specfile_path} not found on ref {self.local_project.ref}."
+                    f"Specfile {self._specfile_path} not found on ref {self.local_project.ref}.",
                 )
 
         return self._specfile_path
@@ -126,7 +127,10 @@ class PackitRepositoryBase:
         return self.absolute_specfile_dir
 
     def create_branch(
-        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+        self,
+        branch_name: str,
+        base: str = "HEAD",
+        setup_tracking: bool = False,
     ) -> git.Head:
         """
         Create a new git branch in dist-git
@@ -139,7 +143,9 @@ class PackitRepositoryBase:
         """
         # keeping the method in this class to preserve compatibility
         return self.local_project.create_branch(
-            branch_name=branch_name, base=base, setup_tracking=setup_tracking
+            branch_name=branch_name,
+            base=base,
+            setup_tracking=setup_tracking,
         )
 
     def switch_branch(self, branch: str = None) -> None:
@@ -173,7 +179,7 @@ class PackitRepositoryBase:
         self.local_project.git_repo.git.add("-A")
         if not self.local_project.git_repo.is_dirty():
             raise PackitException(
-                "No changes are present in the dist-git repo: nothing to commit."
+                "No changes are present in the dist-git repo: nothing to commit.",
             )
         self.local_project.git_repo.index.write()
 
@@ -250,7 +256,7 @@ class PackitRepositoryBase:
         if not isinstance(configured_action, list):
             raise ValueError(
                 f"Expecting 'str' or 'list' as a command, got '{type(configured_action)}'. "
-                f"The value: {configured_action}"
+                f"The value: {configured_action}",
             )
 
         parsed_commands = []
@@ -262,7 +268,7 @@ class PackitRepositoryBase:
             else:
                 raise ValueError(
                     f"Expecting 'str' or 'list' as a command, got '{type(cmd)}'. "
-                    f"The value: {cmd}"
+                    f"The value: {cmd}",
                 )
         return parsed_commands
 
@@ -300,7 +306,9 @@ class PackitRepositoryBase:
         return True
 
     def get_output_from_action(
-        self, action: ActionName, env: Optional[dict] = None
+        self,
+        action: ActionName,
+        env: Optional[dict] = None,
     ) -> Optional[list[str]]:
         """
         Run self.actions[action] command(s) and return their outputs.
@@ -313,13 +321,18 @@ class PackitRepositoryBase:
         logger.info(f"Using user-defined script for {action}: {commands_to_run}")
         return [
             self.command_handler.run_command(
-                cmd, return_output=True, env=env, print_live=True
+                cmd,
+                return_output=True,
+                env=env,
+                print_live=True,
             ).stdout
             for cmd in commands_to_run
         ]
 
     def specfile_add_patches(
-        self, patch_list: list[PatchMetadata], patch_id_digits: int = 4
+        self,
+        patch_list: list[PatchMetadata],
+        patch_id_digits: int = 4,
     ) -> None:
         """
         Add the given list of (patch_name, msg) to the specfile.
@@ -333,7 +346,7 @@ class PackitRepositoryBase:
 
         if all(p.present_in_specfile for p in patch_list):
             logger.debug(
-                "All patches are present in the spec file, nothing to do here 🚀"
+                "All patches are present in the spec file, nothing to do here 🚀",
             )
             return
 
@@ -344,7 +357,7 @@ class PackitRepositoryBase:
         for patch_metadata in patch_list:
             if patch_metadata.present_in_specfile:
                 logger.debug(
-                    f"Patch {patch_metadata.name} is already present in the spec file."
+                    f"Patch {patch_metadata.name} is already present in the spec file.",
                 )
                 continue
 
@@ -359,7 +372,7 @@ class PackitRepositoryBase:
                 )
             except DuplicateSourceException:
                 logger.debug(
-                    f"Patch {patch_metadata.name} is already defined in the spec file."
+                    f"Patch {patch_metadata.name} is already defined in the spec file.",
                 )
             except SourceNumberException as e:
                 raise PackitException(
@@ -367,7 +380,7 @@ class PackitRepositoryBase:
                     f"{patch_metadata.name} is less than or equal to the last used patch ID."
                     "Re-ordering the patches using 'patch_id' is not allowed - "
                     "if you want to change the order of those patches, "
-                    "please reorder the commits in your source-git repository."
+                    "please reorder the commits in your source-git repository.",
                 ) from e
 
         self.local_project.git_repo.index.write()
@@ -380,7 +393,8 @@ class PackitRepositoryBase:
         ver = CommitVerifier()
         last_commit = self.local_project.git_repo.head.commit
         valid = ver.check_signature_of_commit(
-            commit=last_commit, possible_key_fingerprints=self.allowed_gpg_keys
+            commit=last_commit,
+            possible_key_fingerprints=self.allowed_gpg_keys,
         )
         if not valid:
             msg = f"Last commit {last_commit.hexsha!r} not signed by the authorized gpg key."
@@ -393,7 +407,9 @@ class PackitRepositoryBase:
 
     @staticmethod
     def determine_new_distgit_release(
-        distgit_spec: Specfile, upstream_spec: Specfile, version: Optional[str] = None
+        distgit_spec: Specfile,
+        upstream_spec: Specfile,
+        version: Optional[str] = None,
     ) -> str:
         """
         Determines new release string to use in dist-git spec file, based on upstream spec file
@@ -444,14 +460,14 @@ class PackitRepositoryBase:
                 return upstream_spec.raw_release
             logger.warning(
                 "dist-git spec file uses %autorelease but upstream spec file doesn't, "
-                "consider synchronizing them."
+                "consider synchronizing them.",
             )
             return distgit_spec.raw_release
         if upstream_spec.has_autorelease:
             # upstream spec uses %autorelease but dist-git spec doesn't, reset it
             logger.warning(
                 "Upstream spec file uses %autorelease but dist-git spec file doesn't, "
-                "consider synchronizing them."
+                "consider synchronizing them.",
             )
             return initial_release
         if upstream_spec.expanded_version != version:
@@ -487,7 +503,9 @@ class PackitRepositoryBase:
             comment: new comment for the version in %changelog
         """
         new_release = self.determine_new_distgit_release(
-            self.specfile, specfile, version
+            self.specfile,
+            specfile,
+            version,
         )
         with self.specfile.sections() as sections, specfile.sections() as other_sections:
             try:
@@ -518,10 +536,10 @@ class PackitRepositoryBase:
     def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
         """push selected refspec to a git remote"""
         logger.info(
-            f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}."
+            f"Pushing changes to remote {remote_name!r} using refspec {refspec!r}.",
         )
         push_infos_list: Iterable[PushInfo] = self.local_project.git_repo.remote(
-            name=remote_name
+            name=remote_name,
         ).push(refspec=refspec, force=force, no_verify=True)
         for pi in push_infos_list:
             logger.info(f"Push summary: {pi.summary}")
@@ -539,7 +557,7 @@ class PackitRepositoryBase:
             if any(push_failed):
                 logger.debug(f"Push flags: {pi.flags}")
                 raise PackitException(
-                    f"We were unable to push to dist-git: {pi.summary}."
+                    f"We were unable to push to dist-git: {pi.summary}.",
                 )
 
     def download_remote_sources(self, pkg_tool: Optional[str] = None) -> None:
@@ -573,7 +591,7 @@ class PackitRepositoryBase:
             )
             for lookaside_source in lookaside_sources:
                 sourcelist.append(
-                    (lookaside_source["url"], lookaside_source["path"], True)
+                    (lookaside_source["url"], lookaside_source["path"], True),
                 )
         # Fetch all remote sources defined in the spec file
         with self.specfile.sources() as sources, self.specfile.patches() as patches:
@@ -584,7 +602,7 @@ class PackitRepositoryBase:
                             spec_source.expanded_location,
                             spec_source.expanded_filename,
                             False,
-                        )
+                        ),
                     )
         # Download all sources
         for url, filename, optional in sourcelist:
@@ -593,7 +611,9 @@ class PackitRepositoryBase:
                 continue
             try:
                 with requests.get(
-                    url, headers={"User-Agent": user_agent}, stream=True
+                    url,
+                    headers={"User-Agent": user_agent},
+                    stream=True,
                 ) as response:
                     response.raise_for_status()
                     with open(source_path, "wb") as f:
@@ -616,7 +636,10 @@ class PackitRepositoryBase:
         return None
 
     def existing_pr(
-        self, title: str, target_branch: str, source_branch: str
+        self,
+        title: str,
+        target_branch: str,
+        source_branch: str,
     ) -> Optional[PullRequest]:
         """
         Look for an already created PR.

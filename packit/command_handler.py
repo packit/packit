@@ -196,7 +196,8 @@ class SandcastleCommandHandler(CommandHandler):
             raise  # reraise the error to halt the execution of the job
 
         return commands.CommandResult(
-            success=True, stdout=out if return_output else None
+            success=True,
+            stdout=out if return_output else None,
         )
 
     def clean(self) -> None:

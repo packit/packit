@@ -139,7 +139,7 @@ class JobConfigView(JobConfig):
             if isinstance(other, JobConfig):
                 return False
             raise PackitConfigException(
-                "Provided object is not a JobConfigView instance."
+                "Provided object is not a JobConfigView instance.",
             )
         # required to avoid cyclical imports
         from packit.schema import JobConfigSchema
@@ -183,5 +183,5 @@ def get_default_jobs() -> list[dict]:
                 "trigger": "release",
                 "dist_git_branches": ["fedora-all"],
             },
-        ]
+        ],
     )

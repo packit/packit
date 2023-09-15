@@ -82,10 +82,14 @@ def mock(
     it defaults to the current working directory.
     """
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     if not config.srpm_path:

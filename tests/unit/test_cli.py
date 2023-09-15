@@ -45,7 +45,7 @@ def test_base_subcommand_help(subcommand):
 
 def test_propose_downstream_command():
     flexmock(utils).should_receive("get_local_package_config").and_return(
-        flexmock().should_receive("get_package_config_views").and_return({}).mock()
+        flexmock().should_receive("get_package_config_views").and_return({}).mock(),
     )
     flexmock(propose_downstream_module).should_receive("sync_release").with_args(
         config=Config,
@@ -67,7 +67,7 @@ def test_propose_downstream_command():
 
 def test_pull_from_upstream_command():
     flexmock(utils).should_receive("get_local_package_config").and_return(
-        flexmock().should_receive("get_package_config_views").and_return({}).mock()
+        flexmock().should_receive("get_package_config_views").and_return({}).mock(),
     )
     flexmock(propose_downstream_module).should_receive("sync_release").with_args(
         config=Config,

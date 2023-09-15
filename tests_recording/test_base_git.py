@@ -40,7 +40,7 @@ class ProposeUpdate(PackitTest):
                             url=git_centos_org_url,
                         ),
                     ],
-                )
+                ),
             },
             jobs=[],
         )
@@ -49,7 +49,8 @@ class ProposeUpdate(PackitTest):
         source = "https://httpbin.org/anything/rsync-3.1.3.tar.gz"
 
         base_git = PackitRepositoryBase(
-            config=flexmock(), package_config=package_config
+            config=flexmock(),
+            package_config=package_config,
         )
         specfile_content = (
             "Name: rsync\n"
