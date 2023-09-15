@@ -137,7 +137,7 @@ def test_with_action_non_defined(packit_repository_base):
         # this is the style we are using that function
         return
 
-    assert False
+    raise AssertionError()
 
 
 def test_with_action_defined(packit_repository_base):
@@ -147,7 +147,7 @@ def test_with_action_defined(packit_repository_base):
 
     if packit_repository_base.with_action(action=ActionName.pre_sync):
         # this is the style we are using that function
-        assert False
+        raise AssertionError()
 
 
 def test_with_action_working_dir(packit_repository_base):

@@ -44,7 +44,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         def covered_func(config=None, *args, **kwargs):
             try:
                 if config:
-                    func(config=config, *args, **kwargs)
+                    func(config=config, *args, **kwargs)  # noqa: B026
                 else:
                     func(*args, **kwargs)
             except KeyboardInterrupt:
@@ -278,10 +278,10 @@ def get_packit_api(
             package_config = [
                 job for job in package_config.jobs if job.type == job_type
             ][0]
-        except IndexError:
+        except IndexError as e:
             raise PackitException(
                 f"No job with type {job_type} found in package config."
-            )
+            ) from e
         logger.debug(f"Final package (job) config: {package_config}")
 
     if dist_git_path and Path(dist_git_path) == local_project.working_dir:

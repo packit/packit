@@ -236,14 +236,14 @@ class DistGit(PackitRepositoryBase):
         origin.fetch()
         try:
             head = self.local_project.git_repo.heads[branch_name]
-        except IndexError:
-            raise PackitException(f"Branch {branch_name!r} does not exist.")
+        except IndexError as e:
+            raise PackitException(f"Branch {branch_name!r} does not exist.") from e
         try:
             remote_ref = origin.refs[branch_name]
-        except IndexError:
+        except IndexError as e:
             raise PackitException(
                 f"Branch {branch_name} does not exist in the origin remote."
-            )
+            ) from e
         head.set_commit(remote_ref)
 
     def push_to_fork(
@@ -284,7 +284,7 @@ class DistGit(PackitRepositoryBase):
                 f"Unable to push to remote fork {fork_remote_name!r} using branch {branch_name!r}, "
                 f"the error is:\n{ex}"
             )
-            raise PackitException(msg)
+            raise PackitException(msg) from ex
 
     def create_pull(
         self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
@@ -399,7 +399,7 @@ class DistGit(PackitRepositoryBase):
             logger.error(
                 f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
             )
-            raise PackitException(ex)
+            raise PackitException(ex) from ex
 
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
         """

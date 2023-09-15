@@ -20,14 +20,16 @@ def upstream_pr_mock():
 
 @pytest.fixture
 def tar_mock():
-    def tar_mock_factory(archive_items=[], is_tarfile=True):
+    def tar_mock_factory(archive_items=None, is_tarfile=True):
+        if archive_items is None:
+            archive_items = []
         tarfile_mock = flexmock(packit.upstream.tarfile)
         tarinfo_mock_list = [
             flexmock(
                 **{
                     "name": name,
                     "isdir": lambda v=isdir: v,
-                    "isfile": lambda v=isdir: not isdir,
+                    "isfile": lambda v=isdir: not isdir,  # noqa: B023
                 }
             )
             for name, isdir in archive_items

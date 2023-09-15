@@ -164,7 +164,7 @@ class Upstream(PackitRepositoryBase):
                 f"Unable to push to remote {remote_name!r} using branch {branch_name!r}, "
                 f"the error is:\n{ex}"
             )
-            raise PackitException(msg)
+            raise PackitException(msg) from ex
         return str(branch_name), fork_username
 
     def create_pull(
@@ -854,13 +854,13 @@ class Upstream(PackitRepositoryBase):
         """
         try:
             tag = self.package_config.upstream_tag_template.format(version=version_)
-        except KeyError:
+        except KeyError as e:
             msg = (
                 f"Invalid upstream_tag_template: {self.package_config.upstream_tag_template} - "
                 f'"version" placeholder is missing'
             )
             logger.error(msg)
-            raise PackitException(msg)
+            raise PackitException(msg) from e
 
         return tag
 
@@ -949,10 +949,10 @@ class SRPMBuilder:
         # e.g. warnings when parsing the spec file
         try:
             the_srpm = re.findall(reg, output)[0]
-        except IndexError:
+        except IndexError as e:
             raise PackitSRPMNotFoundException(
                 "SRPM cannot be found, something is wrong."
-            )
+            ) from e
         return the_srpm
 
     def get_build_command(self) -> tuple[list[str], str]:

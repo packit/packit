@@ -379,7 +379,7 @@ def test_create_srpm(upstream_instance, tmp_path):
             if r.match(line):
                 break
         else:
-            assert False, "Didn't find the correct line in the spec file."
+            raise AssertionError("Didn't find the correct line in the spec file.")
     assert srpm.exists()
     build_srpm(srpm)
 

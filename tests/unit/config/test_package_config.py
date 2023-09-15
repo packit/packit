@@ -2318,9 +2318,9 @@ def test_multiple_packages():
     pc.jobs[0].trigger = pc.jobs[0].trigger
     # Accessing package related attributes without 'packages' raises an error
     with pytest.raises(AttributeError, match="ambiguous to get"):
-        pc.jobs[0].enable_net
+        _ = pc.jobs[0].enable_net
     with pytest.raises(AttributeError, match="ambiguous to get"):
-        pc.enable_net
+        _ = pc.enable_net
     with pytest.raises(AttributeError, match="ambiguous to set"):
         pc.jobs[0].enable_net = False
     with pytest.raises(AttributeError, match="ambiguous to set"):

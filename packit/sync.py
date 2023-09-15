@@ -35,10 +35,10 @@ def check_subpath(
     """
     try:
         subpath.resolve().relative_to(path.resolve())
-    except ValueError:
+    except ValueError as e:
         raise PackitException(
             f"Sync files: Illegal path! {subpath} is not in the subpath of {path}."
-        )
+        ) from e
     ret = str(subpath.resolve())
     if ensure_trailing_slash:
         ret += os.sep
@@ -144,13 +144,17 @@ class SyncFilesItem:
         command += [self.dest]
         return command
 
-    def resolve(self, src_base: Path = Path.cwd(), dest_base: Path = Path.cwd()):
+    def resolve(
+        self, src_base: Optional[Path] = None, dest_base: Optional[Path] = None
+    ):
         """Resolve all paths and check they are relative to src_base and dest_base
 
         Args:
             src_base: Base directory for all src items.
             dest_base: Base directory for dest.
         """
+        src_base = src_base or Path.cwd()
+        dest_base = dest_base or Path.cwd()
         self.src = [
             check_subpath(src_base / path, src_base, path.endswith(os.sep))
             for path in self.src
