@@ -47,6 +47,8 @@ def status(config, path_or_url, package_config):
     """
 
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
     api.status()

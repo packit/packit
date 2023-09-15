@@ -65,7 +65,7 @@ def query_response():
                                 "package_manager": "unspecified",
                                 "testing_repository": None,
                                 "composes": [],
-                            }
+                            },
                         ),
                         "comments": [
                             Munch(
@@ -87,9 +87,9 @@ def query_response():
                                             "avatar": None,
                                             "openid": "bodhi.id.fedoraproject.org",
                                             "groups": [],
-                                        }
+                                        },
                                     ),
-                                }
+                                },
                             ),
                             Munch(
                                 {
@@ -110,9 +110,9 @@ def query_response():
                                             "avatar": None,
                                             "openid": "bodhi.id.fedoraproject.org",
                                             "groups": [],
-                                        }
+                                        },
                                     ),
-                                }
+                                },
                             ),
                             Munch(
                                 {
@@ -133,9 +133,9 @@ def query_response():
                                             "avatar": None,
                                             "openid": "bodhi.id.fedoraproject.org",
                                             "groups": [],
-                                        }
+                                        },
                                     ),
-                                }
+                                },
                             ),
                             Munch(
                                 {
@@ -156,9 +156,9 @@ def query_response():
                                             "avatar": None,
                                             "openid": "bodhi.id.fedoraproject.org",
                                             "groups": [],
-                                        }
+                                        },
                                     ),
-                                }
+                                },
                             ),
                         ],
                         "builds": [
@@ -169,8 +169,8 @@ def query_response():
                                     "signed": True,
                                     "type": "rpm",
                                     "epoch": 0,
-                                }
-                            )
+                                },
+                            ),
                         ],
                         "compose": None,
                         "bugs": [],
@@ -185,18 +185,18 @@ def query_response():
                                     Munch({"name": "provenpackager"}),
                                     Munch({"name": "packager"}),
                                 ],
-                            }
+                            },
                         ),
                         "updateid": "FEDORA-2019-89c99f680c",
                         "karma": 0,
                         "content_type": "rpm",
                         "test_cases": [],
-                    }
-                )
+                    },
+                ),
             ],
             "page": 1,
             "pages": 1,
-        }
+        },
     )
 
 
@@ -258,7 +258,7 @@ def request_response():
                             "package_manager": "unspecified",
                             "testing_repository": None,
                             "composes": [],
-                        }
+                        },
                     ),
                     "comments": [
                         Munch(
@@ -280,9 +280,9 @@ def request_response():
                                         "avatar": None,
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -303,9 +303,9 @@ def request_response():
                                         "avatar": None,
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -326,9 +326,9 @@ def request_response():
                                         "avatar": None,
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                         Munch(
                             {
@@ -349,9 +349,9 @@ def request_response():
                                         "avatar": None,
                                         "openid": "bodhi.id.fedoraproject.org",
                                         "groups": [],
-                                    }
+                                    },
                                 ),
-                            }
+                            },
                         ),
                     ],
                     "builds": [
@@ -362,8 +362,8 @@ def request_response():
                                 "signed": True,
                                 "type": "rpm",
                                 "epoch": 0,
-                            }
-                        )
+                            },
+                        ),
                     ],
                     "compose": None,
                     "bugs": [],
@@ -378,20 +378,23 @@ def request_response():
                                 Munch({"name": "provenpackager"}),
                                 Munch({"name": "packager"}),
                             ],
-                        }
+                        },
                     ),
                     "updateid": "FEDORA-2019-89c99f680c",
                     "karma": 0,
                     "content_type": "rpm",
                     "test_cases": [],
-                }
-            )
-        }
+                },
+            ),
+        },
     )
 
 
 def test_push_updates(
-    cwd_upstream_or_distgit, api_instance, query_response, request_response
+    cwd_upstream_or_distgit,
+    api_instance,
+    query_response,
+    request_response,
 ):
     from bodhi.client.bindings import BodhiClient
 
@@ -400,7 +403,8 @@ def test_push_updates(
     flexmock(BodhiClient)
     BodhiClient.should_receive("query").and_return(query_response).once()
     BodhiClient.should_receive("request").with_args(
-        update="FEDORA-2019-89c99f680c", request="stable"
+        update="FEDORA-2019-89c99f680c",
+        request="stable",
     ).and_return(request_response).once()
 
     flexmock(

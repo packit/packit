@@ -104,11 +104,17 @@ class PackageConfig(MultiplePackages):
                     # propagate it to any monorepo sub-package
                     package[up_url_key] = raw_dict[up_url_key]
                 cls.set_defaults(
-                    package, repo_name, search_specfile, **specfile_search_args
+                    package,
+                    repo_name,
+                    search_specfile,
+                    **specfile_search_args,
                 )
         else:
             cls.set_defaults(
-                raw_dict, repo_name, search_specfile, **specfile_search_args
+                raw_dict,
+                repo_name,
+                search_specfile,
+                **specfile_search_args,
             )
 
         package_config = PackageConfigSchema().load(raw_dict)
@@ -126,7 +132,8 @@ class PackageConfig(MultiplePackages):
                 job for job in package_config.get_job_views() if name in job.packages
             ]
             package_config_views[name] = PackageConfigView(
-                packages={name: package}, jobs=jobs
+                packages={name: package},
+                jobs=jobs,
             )
         package_config.set_package_config_views(package_config_views)
 
@@ -149,7 +156,7 @@ class PackageConfig(MultiplePackages):
             logger.warning(
                 f"You have defined multiple copr projects to build in, we are going "
                 f"to pick the first one: {projects_list[0]}, reorder the job definitions"
-                f" if this is not the one you want."
+                f" if this is not the one you want.",
             )
         return projects_list[0]
 
@@ -211,7 +218,8 @@ class PackageConfig(MultiplePackages):
         self._package_config_views = value
 
     def get_package_config_for(
-        self, job_config: Union[JobConfigView, JobConfig]
+        self,
+        job_config: Union[JobConfigView, JobConfig],
     ) -> Union["PackageConfigView", "PackageConfig"]:
         """Select the PackageConfigView for the given JobConfig in
         a multiple packages config.
@@ -247,7 +255,7 @@ class PackageConfigView(PackageConfig):
     ):
         if len(packages) > 1:
             logger.error(
-                "The PackageConfigView class deals with just one single package"
+                "The PackageConfigView class deals with just one single package",
             )
         super().__init__(packages, jobs)
 
@@ -282,7 +290,7 @@ def find_packit_yaml(
 
     if try_local_dir_first and try_local_dir_last:
         logger.error(
-            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'."
+            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'.",
         )
 
     if try_local_dir_first:
@@ -305,7 +313,8 @@ def find_packit_yaml(
 
 
 def load_packit_yaml(
-    config_file_path: Optional[Path] = None, raw_text: str = ""
+    config_file_path: Optional[Path] = None,
+    raw_text: str = "",
 ) -> dict:
     """
     Use yaml.safe_load to parse provided text as yaml
@@ -413,7 +422,7 @@ def find_remote_package_config(
     except GithubAppNotInstalledError:
         logger.warning(
             "The Packit GitHub App is not installed"
-            f"for the {project.full_repo_name!r} repository."
+            f"for the {project.full_repo_name!r} repository.",
         )
         return None
     except APIException as ex:
@@ -428,14 +437,14 @@ def find_remote_package_config(
     except KeyError:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
-            f"of the {project.full_repo_name!r} repository."
+            f"of the {project.full_repo_name!r} repository.",
         )
         return None
 
     logger.debug(
         f"Found a config file {package_config_name!r} "
         f"on ref {ref!r} "
-        f"of the {project.full_repo_name!r} repository."
+        f"of the {project.full_repo_name!r} repository.",
     )
     return package_config_name
 
@@ -466,12 +475,13 @@ def get_package_config_from_repo(
 
     try:
         config_file_content = project.get_file_content(
-            path=package_config_path, ref=ref
+            path=package_config_path,
+            ref=ref,
         )
     except FileNotFoundError:
         logger.warning(
             f"No config file {package_config_path!r} found on ref {ref!r} "
-            f"of the {project.full_repo_name!r} repository."
+            f"of the {project.full_repo_name!r} repository.",
         )
         return None
     loaded_config = load_packit_yaml(raw_text=config_file_content)
@@ -496,7 +506,7 @@ def parse_loaded_config(
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(
-        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}"
+        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}",
     )
 
     try:

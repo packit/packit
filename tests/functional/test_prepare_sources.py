@@ -19,7 +19,7 @@ def test_prepare_sources_command_for_path(upstream_or_distgit_path, tmp_path):
                 "--result-dir",
                 Path.cwd(),
                 str(upstream_or_distgit_path),
-            ]
+            ],
         )
 
         tarball_path = list(Path.cwd().glob("*.tar.gz"))[0]

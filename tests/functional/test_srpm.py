@@ -60,11 +60,13 @@ def test_action_output(upstream_and_remote):
     # http://www.atlaspiv.cz/?page=detail&beer_id=4187
     the_line_we_want = "MadCat - Imperial Stout Rum Barrel Aged 20°"
     packit_yaml_dict["actions"] = {
-        "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"]
+        "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"],
     }
     packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
     out = call_real_packit(
-        parameters=["srpm"], cwd=upstream_repo_path, return_output=True
+        parameters=["srpm"],
+        cwd=upstream_repo_path,
+        return_output=True,
     )
 
     assert f"INFO   {the_line_we_want}\n" in out.decode()
@@ -139,12 +141,14 @@ def _test_srpm_symlinking(upstream_repo_path, path_prefix):
     desired_path = f"{path_prefix}/tmp/{sources_tarball}"
     packit_yaml_dict["actions"] = {
         "create-archive": [
-            f"bash -c 'mkdir tmp; touch {desired_path}; echo {desired_path}'"
-        ]
+            f"bash -c 'mkdir tmp; touch {desired_path}; echo {desired_path}'",
+        ],
     }
     packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
     out = call_real_packit(
-        parameters=["srpm"], cwd=upstream_repo_path, return_output=True
+        parameters=["srpm"],
+        cwd=upstream_repo_path,
+        return_output=True,
     )
     assert f"INFO   {desired_path}\n" in out.decode()
 

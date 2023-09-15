@@ -86,7 +86,8 @@ def update_source_git(
     """
     if force and not revision_range:
         raise click.BadOptionUsage(
-            "-f", "revision-range has to be specified when -f/--force is used"
+            "-f",
+            "revision-range has to be specified when -f/--force is used",
         )
 
     source_git_path = pathlib.Path(source_git).resolve()
@@ -96,10 +97,12 @@ def update_source_git(
         config=config,
         package_config=package_config,
         upstream_local_project=builder.build(
-            working_dir=source_git_path, git_repo=CALCULATE
+            working_dir=source_git_path,
+            git_repo=CALCULATE,
         ),
         downstream_local_project=builder.build(
-            working_dir=dist_git_path, git_repo=CALCULATE
+            working_dir=dist_git_path,
+            git_repo=CALCULATE,
         ),
     )
 

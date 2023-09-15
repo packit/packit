@@ -42,7 +42,7 @@ index e69de29..e892e75 100644
 +Some content in file B.
 --
 2.31.1
-"""
+""",
     )
     return patch_file
 
@@ -79,7 +79,7 @@ index e69de29..e892e75 100644
 +Some content in file B.
 --
 2.31.1
-"""
+""",
     )
     return patch_file
 
@@ -119,7 +119,7 @@ index e69de29..e892e75 100644
 +Some content in file B.
 --
 2.31.1
-"""
+""",
     )
     return patch_file
 
@@ -168,7 +168,7 @@ index e69de29..e892e75 100644
 +Some content in file B.
 --
 2.31.1
-"""
+""",
     )
     return patch_file
 
@@ -183,7 +183,7 @@ def commit_message_file(tmp_path):
 This is an explanation why the content was added.
 
 Signed-off-by: Everyday Programmer <eprog@redhat.com>
-"""
+""",
     )
     return file
 
@@ -262,7 +262,11 @@ Signed-off-by: Everyday Programmer <eprog@redhat.com>"""
     ],
 )
 def test_commit_message(
-    patch_file, strip_subject_prefix, strip_trailers, body, request
+    patch_file,
+    strip_subject_prefix,
+    strip_trailers,
+    body,
+    request,
 ):
     file = request.getfixturevalue(patch_file)
     subject = f"{'' if strip_subject_prefix else '[PATCH 1/2] '}Add some content"
@@ -305,7 +309,8 @@ def test_commit_message(
 def test_from_patch(patch_file, meta_fields, request):
     patch_path = request.getfixturevalue(patch_file)
     assert PatchMetadata.from_patch(str(patch_path)) == PatchMetadata(
-        path=patch_path, **meta_fields
+        path=patch_path,
+        **meta_fields,
     )
 
 
@@ -316,7 +321,7 @@ Add a test commit
 
 Patch-name: test.patch
 Signed-off-by: Everyday Programmer <eprog@redhat.com>
-"""
+""",
     )
     patch_meta = PatchMetadata.from_git_trailers(commit)
     assert patch_meta.name == "test.patch"

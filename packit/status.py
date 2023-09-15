@@ -64,7 +64,9 @@ class Status:
         for branch in branches:
             try:
                 self.dg.create_branch(
-                    branch, base=f"remotes/origin/{branch}", setup_tracking=False
+                    branch,
+                    base=f"remotes/origin/{branch}",
+                    setup_tracking=False,
                 )
                 self.dg.switch_branch(branch)
                 self.dg.specfile.reload()
@@ -105,7 +107,8 @@ class Status:
         # get just recent year to speed things up.
         since = datetime.now() - timedelta(days=365)
         builds = KojiHelper().get_nvrs(
-            self.dg.package_config.downstream_package_name, since
+            self.dg.package_config.downstream_package_name,
+            since,
         )
         logger.debug(f"Recent Koji builds fetched: {builds}")
         # Select latest build for each branch.
@@ -155,5 +158,5 @@ class Status:
 
     def get_copr_builds(self, number_of_builds: int = 5) -> list:
         return CoprHelper(upstream_local_project=self.up.local_project).get_copr_builds(
-            number_of_builds=number_of_builds
+            number_of_builds=number_of_builds,
         )

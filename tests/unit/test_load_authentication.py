@@ -22,7 +22,7 @@ authentication = {
     "authentication": {
         "github.com": {"token": "abcd"},
         "pagure": {"token": "abcd", "instance_url": "https://src.fedoraproject.org"},
-    }
+    },
 }
 
 

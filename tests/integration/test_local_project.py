@@ -13,7 +13,8 @@ from tests.spellbook import initiate_git_repo
 
 
 @pytest.mark.parametrize(
-    "merge, hops_file_content", ((True, "Cascade\n"), (False, None))
+    "merge, hops_file_content",
+    ((True, "Cascade\n"), (False, None)),
 )
 def test_pr_id_and_ref(tmp_path: Path, merge, hops_file_content):
     """p-s passes both ref and pr_id, we want to check out PR"""
@@ -53,7 +54,8 @@ def test_pr_id_and_ref(tmp_path: Path, merge, hops_file_content):
 
     assert (
         subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=upstream_git
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=upstream_git,
         )
         .strip()
         .decode()
@@ -109,7 +111,8 @@ def test_pr_id_and_ref_gitlab(tmp_path: Path):
 
     assert (
         subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=upstream_git
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=upstream_git,
         )
         .strip()
         .decode()

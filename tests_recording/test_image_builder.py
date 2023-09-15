@@ -32,7 +32,8 @@ class TestLocalProject(PackitTest):
         # when regenerating this, go to https://console.redhat.com/insights/image-builder
         # and find a successful build of an image
         response_json = ib.image_builder_request(
-            "GET", "composes/e31d475a-1d32-4cac-844e-a6a613f80439"
+            "GET",
+            "composes/e31d475a-1d32-4cac-844e-a6a613f80439",
         ).json()
         assert response_json["image_status"]["status"] == "success"
 

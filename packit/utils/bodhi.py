@@ -24,5 +24,5 @@ def get_bodhi_client() -> BodhiClient:
       `flexmock(aliases).should_receive("get_bodhi_client").and_return(bodhi_instance_mock)`
     """
     return BodhiClient(
-        oidc_storage_path=os.path.join(os.environ["HOME"], "bodhi-client.json")
+        oidc_storage_path=os.path.join(os.environ["HOME"], "bodhi-client.json"),
     )

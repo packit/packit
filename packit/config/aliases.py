@@ -109,7 +109,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
             {
                 f"{sys_and_version}-{architecture}"
                 for sys_and_version in get_versions(f"{sys_name}-{version}")
-            }
+            },
         )
     return {
         DEPRECATED_TARGET_MAP.get(target, target)
@@ -227,7 +227,8 @@ def get_aliases() -> dict[str, list[str]]:
     current_fedora_releases, pending_fedora_releases, epel_releases = [], [], []
 
     for release in filter(
-        lambda r: r.state in ["current", "pending", "frozen"], releases
+        lambda r: r.state in ["current", "pending", "frozen"],
+        releases,
     ):
         if release.id_prefix == "FEDORA" and release.name != "ELN":
             name = release.long_name.lower().replace(" ", "-")

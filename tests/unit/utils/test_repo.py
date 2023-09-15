@@ -116,7 +116,7 @@ def test_remote_to_https(inp, ok):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             textwrap.dedent(
                 """
@@ -140,7 +140,7 @@ def test_remote_to_https(inp, ok):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             id="remove-timestamps",
         ),
@@ -166,7 +166,7 @@ def test_remote_to_https(inp, ok):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             textwrap.dedent(
                 """
@@ -190,7 +190,7 @@ def test_remote_to_https(inp, ok):
                  #	stat-user		somebody
                     debug-level		0
                  #	reload-count		5
-            """
+            """,
             ),
             id="add-missing-diff",
         ),
@@ -207,7 +207,9 @@ def test_git_patch_ish(inp, outp):
         pytest.param("One sentence", None, id="one sentence"),
         pytest.param("One sentence\n", None, id="one sentence with end-line"),
         pytest.param(
-            "One sentence\n\n", None, id="one sentence with multiple end-lines"
+            "One sentence\n\n",
+            None,
+            id="one sentence with multiple end-lines",
         ),
         pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
         pytest.param("One sentence\nSecond sentence\n", None, id="two sentences"),
@@ -298,7 +300,9 @@ def test_get_commit_hunks_single_change():
     commit = "abcdefgh"
     git_api = flexmock()
     git_api.should_receive("show").with_args(
-        commit, format="", color="never"
+        commit,
+        format="",
+        color="never",
     ).and_return(
         """\
 diff --git a/test2 b/test2
@@ -308,7 +312,7 @@ index 1c7858b..0000000
 +++ /dev/null
 @@ -1 +0,0 @@
 -deleted
-        """
+        """,
     )
     repository = flexmock(git=git_api)
     hunks = get_commit_hunks(repository, commit)
@@ -321,7 +325,9 @@ def test_get_commit_hunks_multiple_changes():
     commit = "abcdefgh"
     git_api = flexmock()
     git_api.should_receive("show").with_args(
-        commit, format="", color="never"
+        commit,
+        format="",
+        color="never",
     ).and_return(
         """\
 diff --git a/a b/a
@@ -338,7 +344,7 @@ index 0000000..6178079
 +++ b/b.txt
 @@ -0,0 +1 @@
 +b
-        """
+        """,
     )
     repository = flexmock(git=git_api)
     hunks = get_commit_hunks(repository, commit)
@@ -384,7 +390,9 @@ index 0000000..6178079
 def test_get_commit_message_from_action_default(action_output):
     # This test case contains only outputs that produce defaults
     title, body = get_commit_message_from_action(
-        action_output, "default title", "default description"
+        action_output,
+        "default title",
+        "default description",
     )
 
     assert title == "default title"
@@ -434,7 +442,9 @@ def test_get_commit_message_from_action_default(action_output):
 )
 def test_get_commit_message_from_action(action_output, expected_title, expected_body):
     title, body = get_commit_message_from_action(
-        action_output, "default title", "default description"
+        action_output,
+        "default title",
+        "default description",
     )
 
     assert title == expected_title

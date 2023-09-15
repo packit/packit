@@ -54,7 +54,9 @@ class PackitCoprSettingsException(PackitException):
     """
 
     def __init__(
-        self, *args: object, fields_to_change: dict[str, tuple[Any, Any]]
+        self,
+        *args: object,
+        fields_to_change: dict[str, tuple[Any, Any]],
     ) -> None:
         self.fields_to_change = fields_to_change
         super().__init__(*args)

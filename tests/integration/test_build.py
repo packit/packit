@@ -11,7 +11,9 @@ from packit.utils import commands
 
 
 def test_basic_build(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
@@ -26,7 +28,9 @@ def test_basic_build(
 
 
 def test_build_from_upstream(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
 
@@ -46,7 +50,8 @@ def test_build_from_upstream(
         assert srpm_path.endswith(".src.rpm")
         assert cwd == api.up.local_project.working_dir
         return flexmock(
-            success=True, stdout="\n\nLink to koji build: https://koji...\n"
+            success=True,
+            stdout="\n\nLink to koji build: https://koji...\n",
         )
 
     flexmock(commands, run_command_remote=mocked_run_command)

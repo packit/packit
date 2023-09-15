@@ -193,7 +193,7 @@ class Config:
                 "        token: PAGURE_TOKEN\n"
                 '        instance_url: "https://src.fedoraproject.org"\n'
                 "See our documentation for more information "
-                "http://packit.dev/docs/configuration/#user-configuration-file. "
+                "http://packit.dev/docs/configuration/#user-configuration-file. ",
             )
             github_app_id = raw_dict.get("github_app_id")
             github_app_cert_path = raw_dict.get("github_app_cert_path")
@@ -203,11 +203,12 @@ class Config:
                     token=github_token,
                     github_app_id=github_app_id,
                     github_app_private_key_path=github_app_cert_path,
-                )
+                ),
             )
             pagure_user_token = raw_dict.get("pagure_user_token")
             pagure_instance_url = raw_dict.get(
-                "pagure_instance_url", "https://src.fedoraproject.org"
+                "pagure_instance_url",
+                "https://src.fedoraproject.org",
             )
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(
@@ -216,13 +217,19 @@ class Config:
                     stacklevel=2,
                 )
             services.add(
-                PagureService(token=pagure_user_token, instance_url=pagure_instance_url)
+                PagureService(
+                    token=pagure_user_token,
+                    instance_url=pagure_instance_url,
+                ),
             )
 
         return services
 
     def _get_project(
-        self, url: str, required: bool = True, get_project_kwargs: dict = None
+        self,
+        url: str,
+        required: bool = True,
+        get_project_kwargs: dict = None,
     ) -> Optional[GitProject]:
         """
         Gets a GitProject for the given URL.
@@ -243,7 +250,9 @@ class Config:
         get_project_kwargs = get_project_kwargs or {}
         try:
             project = get_project(
-                url=url, custom_instances=self.services, **get_project_kwargs
+                url=url,
+                custom_instances=self.services,
+                **get_project_kwargs,
             )
         except OgrException as ex:
             msg = f"Authentication for url {url!r} is missing in the config."
@@ -254,7 +263,10 @@ class Config:
         return project
 
     def get_project(
-        self, url: str, required: bool = True, get_project_kwargs: dict = None
+        self,
+        url: str,
+        required: bool = True,
+        get_project_kwargs: dict = None,
     ) -> Proxy:
         """
         Gets a proxy of GitProject for the given URL. On access, if the underlying

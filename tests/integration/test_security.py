@@ -19,10 +19,14 @@ def test_allowed_gpg_keys_none(api_instance_source_git: PackitAPI):
 
 @pytest.mark.parametrize("allowed_gpg_keys", [[], ["abcd", "efgh"]])
 def test_allowed_gpg_keys_not_allowed(
-    allowed_gpg_keys, api_instance_source_git: PackitAPI, gnupg_key_fingerprint: str
+    allowed_gpg_keys,
+    api_instance_source_git: PackitAPI,
+    gnupg_key_fingerprint: str,
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
-        message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
+        message="signed commit",
+        gpg_sign=gnupg_key_fingerprint,
+        allow_empty=True,
     )
 
     api_instance_source_git.up.allowed_gpg_keys = allowed_gpg_keys
@@ -32,10 +36,13 @@ def test_allowed_gpg_keys_not_allowed(
 
 
 def test_allowed_gpg_keys_allowed(
-    api_instance_source_git: PackitAPI, gnupg_key_fingerprint: str
+    api_instance_source_git: PackitAPI,
+    gnupg_key_fingerprint: str,
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
-        message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
+        message="signed commit",
+        gpg_sign=gnupg_key_fingerprint,
+        allow_empty=True,
     )
 
     api_instance_source_git.up.allowed_gpg_keys = [gnupg_key_fingerprint]
@@ -43,13 +50,18 @@ def test_allowed_gpg_keys_allowed(
 
 
 def test_allowed_gpg_keys_not_existing_key(
-    api_instance_source_git: PackitAPI, gnupg_instance: GPG, gnupg_key_fingerprint: str
+    api_instance_source_git: PackitAPI,
+    gnupg_instance: GPG,
+    gnupg_key_fingerprint: str,
 ):
     api_instance_source_git.up.local_project.git_repo.git.commit(
-        message="signed commit", gpg_sign=gnupg_key_fingerprint, allow_empty=True
+        message="signed commit",
+        gpg_sign=gnupg_key_fingerprint,
+        allow_empty=True,
     )
     remove_gpg_key_pair(
-        gpg_binary=gnupg_instance.gpgbinary, fingerprint=gnupg_key_fingerprint
+        gpg_binary=gnupg_instance.gpgbinary,
+        fingerprint=gnupg_key_fingerprint,
     )
     api_instance_source_git.up.allowed_gpg_keys = [gnupg_key_fingerprint]
     with pytest.raises(PackitException) as ex:

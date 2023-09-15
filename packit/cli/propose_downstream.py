@@ -67,7 +67,7 @@ def sync_release(
     branches_to_update = get_dg_branches(api, dist_git_branch)
 
     click.echo(
-        f"Proposing update of the following branches: {', '.join(branches_to_update)}"
+        f"Proposing update of the following branches: {', '.join(branches_to_update)}",
     )
 
     for branch in branches_to_update:

@@ -113,17 +113,17 @@ def test_koji_build(package_config_yaml, how_many_builds):
     package_config_dict = json.loads(package_config_yaml)
 
     flexmock(package_config).should_receive("find_packit_yaml").and_return(
-        flexmock(name=".packit.yaml", parent="/some/dir/teamcity-messages")
+        flexmock(name=".packit.yaml", parent="/some/dir/teamcity-messages"),
     )
     flexmock(package_config).should_receive("load_packit_yaml").and_return(
-        package_config_dict
+        package_config_dict,
     )
     flexmock(LocalProject).should_receive("git_repo").and_return(
         flexmock(
             remotes=[],
             active_branch=flexmock(name="an active branch"),
             head=flexmock(is_detached=False),
-        )
+        ),
     )
     # otherwise _dg and _local_project objects will be created
     # by debugger threads and you are not able to debug them

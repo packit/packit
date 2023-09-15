@@ -26,7 +26,8 @@ from tests.spellbook import (
 
 
 def get_git_repo_and_remote(
-    target_dir: Path, repo_template_path: Path
+    target_dir: Path,
+    repo_template_path: Path,
 ) -> tuple[Path, Path]:
     """
     :param target_dir: tmpdir from pytest - we'll work here
@@ -127,7 +128,10 @@ def ogr_distgit_and_remote(tmp_path) -> tuple[Path, Path]:
 
 @pytest.fixture(params=["upstream", "ogr-distgit"])
 def upstream_or_distgit_path(
-    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+    request,
+    upstream_and_remote,
+    distgit_and_remote,
+    ogr_distgit_and_remote,
 ):
     """
     Parametrize the test to upstream, downstream [currently skipped] and ogr distgit
@@ -140,7 +144,7 @@ def upstream_or_distgit_path(
 
 
 @pytest.fixture(
-    params=["upstream", "distgit", "ogr-distgit", "upstream-with-multiple-sources"]
+    params=["upstream", "distgit", "ogr-distgit", "upstream-with-multiple-sources"],
 )
 def cwd_upstream_or_distgit(
     request,

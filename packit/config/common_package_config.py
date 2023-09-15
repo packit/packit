@@ -204,10 +204,12 @@ class CommonPackageConfig:
         self.downstream_package_name: Optional[str] = downstream_package_name
         self._downstream_project_url: str = downstream_project_url
         self.dist_git_base_url: str = dist_git_base_url or getenv(
-            "DISTGIT_URL", PROD_DISTGIT_URL
+            "DISTGIT_URL",
+            PROD_DISTGIT_URL,
         )
         self.dist_git_namespace: str = dist_git_namespace or getenv(
-            "DISTGIT_NAMESPACE", DISTGIT_NAMESPACE
+            "DISTGIT_NAMESPACE",
+            DISTGIT_NAMESPACE,
         )
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
@@ -298,7 +300,7 @@ class CommonPackageConfig:
             logger.warning(
                 "You are setting both files_to_sync and synced_files."
                 " Packit will use files_to_sync. You should remove "
-                "synced_files since it is deprecated."
+                "synced_files since it is deprecated.",
             )
 
     @property
@@ -335,7 +337,7 @@ class CommonPackageConfig:
     def __eq__(self, other: object):
         if not isinstance(other, CommonPackageConfig):
             raise PackitConfigException(
-                "Provided object is not a CommonPackageConfig instance."
+                "Provided object is not a CommonPackageConfig instance.",
             )
         # required to avoid cyclical imports
         from packit.schema import CommonConfigSchema
@@ -380,7 +382,7 @@ class CommonPackageConfig:
         )
         return SyncFilesItem(
             src=[
-                downstream_specfile_path if from_downstream else upstream_specfile_path
+                downstream_specfile_path if from_downstream else upstream_specfile_path,
             ],
             dest=upstream_specfile_path
             if from_downstream
@@ -407,8 +409,9 @@ class CommonPackageConfig:
                 # this relative because of glob: "Non-relative patterns are unsupported"
                 files.append(
                     SyncFilesItem(
-                        src=[self.config_file_path], dest=self.config_file_path
-                    )
+                        src=[self.config_file_path],
+                        dest=self.config_file_path,
+                    ),
                 )
 
         return files
@@ -445,7 +448,7 @@ class MultiplePackages:
             return getattr(package, name)
         raise AttributeError(
             f"It is ambiguous to get {name}: "
-            "there is more than one package in the config."
+            "there is more than one package in the config.",
         )
 
     def __setattr__(self, name, value):
@@ -459,7 +462,7 @@ class MultiplePackages:
         else:
             raise AttributeError(
                 f"It is ambiguous to set {name}: "
-                "there is more than one package in the config."
+                "there is more than one package in the config.",
             )
 
     def get_package_names_as_env(self) -> dict[str, str]:

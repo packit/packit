@@ -59,7 +59,8 @@ def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
 
 @pytest.fixture()
 def mock_remote_functionality_downstream_autochangelog(
-    upstream_and_remote, distgit_with_autochangelog_and_remote
+    upstream_and_remote,
+    distgit_with_autochangelog_and_remote,
 ):
     u, _ = upstream_and_remote
     d, _ = distgit_with_autochangelog_and_remote
@@ -120,7 +121,10 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
     flexmock(
         GithubService,
         get_project=lambda repo, namespace: GithubProject(
-            "also-not", github_service, "set", github_repo=flexmock()
+            "also-not",
+            github_service,
+            "set",
+            github_repo=flexmock(),
         ),
     )
     flexmock(
@@ -186,7 +190,8 @@ def sourcegit_and_remote(tmp_path):
     shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
     initiate_git_repo(sourcegit_dir, tag=SOURCE_GIT_RELEASE_TAG)
     subprocess.check_call(
-        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path], cwd=sourcegit_remote
+        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path],
+        cwd=sourcegit_remote,
     )
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
@@ -269,7 +274,9 @@ def upstream_instance_with_two_commits(upstream_instance):
 
 @pytest.fixture()
 def distgit_instance(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+    upstream_and_remote,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
@@ -304,19 +311,22 @@ def api_instance(upstream_and_remote, distgit_and_remote):
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            working_dir=Path.cwd(), git_repo=CALCULATE
+            working_dir=Path.cwd(),
+            git_repo=CALCULATE,
         ),
     )
     return u, d, api
 
 
 def mock_api_for_source_git(
-    sourcegit: Path, distgit: Path, up_local_project: LocalProject
+    sourcegit: Path,
+    distgit: Path,
+    up_local_project: LocalProject,
 ):
     with cwd(sourcegit):
         c = get_test_config()
         pc = get_local_package_config(
-            package_config_path=sourcegit / ".distro" / "source-git.yaml"
+            package_config_path=sourcegit / ".distro" / "source-git.yaml",
         )
         pc.upstream_project_url = str(sourcegit)
         return PackitAPI(c, pc, up_local_project, dist_git_clone_path=str(distgit))
@@ -341,7 +351,7 @@ def add_source_git_commit_trailer(api: PackitAPI):
             (
                 FROM_SOURCE_GIT_TOKEN,
                 api.up.local_project.git_repo.head.commit.hexsha,
-            )
+            ),
         ],
     )
     return api
@@ -359,14 +369,19 @@ def api_instance_sync_push(sourcegit_and_remote, distgit_and_remote):
     distgit, _ = distgit_and_remote
 
     repo = flexmock(
-        default_branch="main", get_pulls=lambda state, sort, direction: [], fork="fork"
+        default_branch="main",
+        get_pulls=lambda state, sort, direction: [],
+        fork="fork",
     )
     service = flexmock(user=flexmock(get_username=lambda: "packit"))
     up_lp = LocalProjectBuilder().build(
         working_dir=sourcegit,
         git_repo=CALCULATE,
         git_project=GithubProject(
-            repo="beer", service=service, namespace="packit.dev", github_repo=repo
+            repo="beer",
+            service=service,
+            namespace="packit.dev",
+            github_repo=repo,
         ),
     )
     api = mock_api_for_source_git(sourcegit, distgit, up_lp)
@@ -431,7 +446,8 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
 
     if key_fingerprint in gnupg_instance.list_keys(secret=True).fingerprints:
         remove_gpg_key_pair(
-            gpg_binary=gnupg_instance.gpgbinary, fingerprint=key_fingerprint
+            gpg_binary=gnupg_instance.gpgbinary,
+            fingerprint=key_fingerprint,
         )
 
 

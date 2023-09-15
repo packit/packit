@@ -24,7 +24,9 @@ def build_rpms_from_specfile(api, upstream_ref, release_suffix, default_release_
     Build RPMs from the specfile definition and return the paths to the built RPMs.
     """
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     return api.create_rpms(
@@ -102,14 +104,19 @@ def local(
     it defaults to the current working directory
     """
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
 
     rpms = (
         build_rpms_from_srpm(api, config.srpm_path)
         if config.srpm_path is not None
         else build_rpms_from_specfile(
-            api, upstream_ref, release_suffix, default_release_suffix
+            api,
+            upstream_ref,
+            release_suffix,
+            default_release_suffix,
         )
     )
 

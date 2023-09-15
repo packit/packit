@@ -44,7 +44,9 @@ logger = logging.getLogger(__name__)
     default="fedora-rawhide-x86_64",
 )
 @click.option(
-    "--description", help="Description of the project to build in.", default=None
+    "--description",
+    help="Description of the project to build in.",
+    default=None,
 )
 @click.option(
     "--instructions",
@@ -151,10 +153,14 @@ def copr(
     it defaults to the current working directory.
     """
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     if not project:
@@ -168,7 +174,7 @@ def copr(
         else:
             logger.debug(
                 "Copr project not found in the job configuration. "
-                "Using the default one."
+                "Using the default one.",
             )
             sanitized_ref = sanitize_branch_name(path_or_url.ref)
             project = f"packit-cli-{path_or_url.repo_name}-{sanitized_ref}"
@@ -180,10 +186,11 @@ def copr(
         if target in DEPRECATED_TARGET_MAP:
             logger.warning(
                 f"Target '{target}' is deprecated. "
-                f"Please use '{DEPRECATED_TARGET_MAP[target]}' instead."
+                f"Please use '{DEPRECATED_TARGET_MAP[target]}' instead.",
             )
     targets_to_build = api.copr_helper.get_valid_build_targets(
-        *targets_list, default="fedora-rawhide-x86_64"
+        *targets_list,
+        default="fedora-rawhide-x86_64",
     )
 
     logger.info(f"Targets to build: {targets_to_build}.")

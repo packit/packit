@@ -35,9 +35,9 @@ def distgit_with_actions():
                             ActionName.pre_sync: "command --a",
                             ActionName.get_current_version: "command --b",
                         },
-                    )
-                }
-            )
+                    ),
+                },
+            ),
         ),
     )
 
@@ -53,10 +53,10 @@ def upstream_with_actions():
                         actions={
                             ActionName.pre_sync: "command --a",
                             ActionName.get_current_version: "command --b",
-                        }
-                    )
-                }
-            )
+                        },
+                    ),
+                },
+            ),
         ),
         local_project=flexmock(
             repo_name=flexmock(),
@@ -77,9 +77,9 @@ def packit_repository_base():
                     actions={
                         ActionName.pre_sync: "command --a",
                         ActionName.get_current_version: "command --b",
-                    }
-                )
-            }
+                    },
+                ),
+            },
         ),
     )
 
@@ -94,9 +94,9 @@ def packit_repository_base_more_actions():
                     actions={
                         ActionName.pre_sync: ["command --a", "command --a"],
                         ActionName.get_current_version: "command --b",
-                    }
-                )
-            }
+                    },
+                ),
+            },
         ),
     )
 
@@ -113,9 +113,9 @@ def packit_repository_base_with_sandcastle_object(tmp_path):
                     actions={
                         ActionName.pre_sync: "command -a",
                         ActionName.get_current_version: "command -b",
-                    }
-                )
-            }
+                    },
+                ),
+            },
         ),
     )
     b.local_project = LocalProjectBuilder().build(working_dir=tmp_path)
@@ -152,7 +152,9 @@ def test_with_action_defined(packit_repository_base):
 
 def test_with_action_working_dir(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env=None, print_live=True
+        command=["command", "--a"],
+        env=None,
+        print_live=True,
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -182,13 +184,19 @@ def test_run_action_not_defined(packit_repository_base):
         .action_function
     )
     packit_repository_base.run_action(
-        ActionName.create_patches, action_method, {}, "arg", kwarg="kwarg"
+        ActionName.create_patches,
+        action_method,
+        {},
+        "arg",
+        kwarg="kwarg",
     )
 
 
 def test_run_action_defined(packit_repository_base):
     flexmock(LocalCommandHandler).should_receive("run_command").with_args(
-        command=["command", "--a"], env={}, print_live=True
+        command=["command", "--a"],
+        env={},
+        print_live=True,
     ).and_return("command --a").once()
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
@@ -203,15 +211,21 @@ def test_run_action_defined(packit_repository_base):
     )
 
     packit_repository_base.run_action(
-        ActionName.pre_sync, action_method, {}, "arg", "kwarg"
+        ActionName.pre_sync,
+        action_method,
+        {},
+        "arg",
+        "kwarg",
     )
 
 
 @pytest.mark.skipif(
-    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+    not can_a_module_be_imported("sandcastle"),
+    reason="sandcastle is not installed",
 )
 def test_run_action_in_sandcastle(
-    packit_repository_base_with_sandcastle_object, caplog
+    packit_repository_base_with_sandcastle_object,
+    caplog,
 ):
     from sandcastle import Sandcastle
 
@@ -238,10 +252,16 @@ def test_run_action_in_sandcastle(
     flexmock(Sandcastle).should_receive("delete_pod").once().and_return(None)
     with caplog.at_level(logging.INFO, logger="packit"):
         packit_repository_base_with_sandcastle_object.run_action(
-            ActionName.pre_sync, None, "arg1", "kwarg1"
+            ActionName.pre_sync,
+            None,
+            "arg1",
+            "kwarg1",
         )
         packit_repository_base_with_sandcastle_object.run_action(
-            ActionName.get_current_version, None, "arg2", "kwarg2"
+            ActionName.get_current_version,
+            None,
+            "arg2",
+            "kwarg2",
         )
         # this is being called in PackitAPI.clean
         packit_repository_base_with_sandcastle_object.command_handler.clean()
@@ -254,7 +274,8 @@ def test_run_action_in_sandcastle(
 
 
 @pytest.mark.skipif(
-    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+    not can_a_module_be_imported("sandcastle"),
+    reason="sandcastle is not installed",
 )
 def test_command_handler_is_set(packit_repository_base_with_sandcastle_object):
     from sandcastle import Sandcastle
@@ -274,7 +295,7 @@ def test_run_action_more_actions(packit_repository_base_more_actions):
     flexmock(LocalCommandHandler).should_receive("run_command").times(2)
 
     packit_repository_base_more_actions.local_project = flexmock(
-        working_dir="my/working/dir"
+        working_dir="my/working/dir",
     )
 
     action_method = (
@@ -286,7 +307,10 @@ def test_run_action_more_actions(packit_repository_base_more_actions):
         .action_function
     )
     packit_repository_base_more_actions.run_action(
-        ActionName.pre_sync, action_method, "arg", kwarg="kwarg"
+        ActionName.pre_sync,
+        action_method,
+        "arg",
+        kwarg="kwarg",
     )
 
 
@@ -314,7 +338,7 @@ def test_get_output_from_action_not_defined(packit_repository_base):
                                 url="https://git.centos.org/sources/rsync/c8s/82e7829",
                             ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[],
             ),
@@ -332,7 +356,7 @@ def test_get_output_from_action_not_defined(packit_repository_base):
                                 url="https://git.centos.org/sources/rsync/c8s/82e7829",
                             ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[],
             ),
@@ -350,7 +374,7 @@ def test_get_output_from_action_not_defined(packit_repository_base):
                                 url="https://git.centos.org/sources/rsync/c8s/82e7829",
                             ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[],
             ),
@@ -379,7 +403,8 @@ def test_download_remote_sources(source, package_config, expected_url, tmp_path:
     def mocked_get(url, **_):
         assert url == expected_url
         return flexmock(
-            raise_for_status=lambda: None, iter_content=lambda **_: iter([b"1"])
+            raise_for_status=lambda: None,
+            iter_content=lambda **_: iter([b"1"]),
         )
 
     flexmock(requests).should_receive("get").replace_with(mocked_get)
@@ -388,8 +413,8 @@ def test_download_remote_sources(source, package_config, expected_url, tmp_path:
 
     flexmock(requests).should_receive("get").and_raise(
         Exception(
-            "This should not be called second time since the source is present already."
-        )
+            "This should not be called second time since the source is present already.",
+        ),
     )
     base_git.download_remote_sources()
 

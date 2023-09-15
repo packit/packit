@@ -23,7 +23,7 @@ def check_copytree_dirs_exists_support():
     """
     return bool(
         hasattr(shutil.copytree, "__defaults__")
-        and len(shutil.copytree.__defaults__) >= 5
+        and len(shutil.copytree.__defaults__) >= 5,
     )
 
 
@@ -76,7 +76,7 @@ def test_undo_identical(git_repo):
     # patch-ids to be different.
     # Is there any safe way to handle this?
     assert [item.a_path for item in git_repo.index.diff(None)] == [
-        "weird-identical.patch"
+        "weird-identical.patch",
     ]
 
 
@@ -121,7 +121,7 @@ def create_commits_to_squash(repo: git.Repo):
         Add a distro change
 
         patch_name: distro.patch
-        """
+        """,
     )
     repo.git.commit(f"-m{commit_message}")
 
@@ -132,7 +132,7 @@ def create_commits_to_squash(repo: git.Repo):
         Another distro change
 
         patch_name: distro.patch
-        """
+        """,
     )
     repo.git.commit(f"-m{commit_message}")
 
@@ -146,14 +146,17 @@ def test_squash_patches_by_name(source_git_repo: git.Repo, dist_git_repo: git.Re
     metadata defined are squashed.
     """
     local_project = flexmock(
-        git_repo=source_git_repo, ref="HEAD", working_dir=source_git_repo.working_dir
+        git_repo=source_git_repo,
+        ref="HEAD",
+        working_dir=source_git_repo.working_dir,
     )
 
     create_commits_to_squash(source_git_repo)
 
     patch_generator = PatchGenerator(local_project)
     patch_list = patch_generator.create_patches(
-        git_ref="0.1.0", destination=dist_git_repo.working_dir
+        git_ref="0.1.0",
+        destination=dist_git_repo.working_dir,
     )
     assert len(patch_list) == 3
     assert patch_list[1].path == Path(dist_git_repo.working_dir, "distro.patch")
@@ -180,7 +183,7 @@ def create_non_adjacent_commits_to_squash(repo: git.Repo):
         First commit
 
         patch_name: non_adjacent.patch
-        """
+        """,
     )
     repo.git.commit(f"-m{commit_message}")
 
@@ -198,14 +201,16 @@ def create_non_adjacent_commits_to_squash(repo: git.Repo):
         Third commit
 
         patch_name: non_adjacent.patch
-        """
+        """,
     )
     repo.git.commit(f"-m{commit_message}")
 
 
 def test_fail_if_not_adjacent(source_git_repo: git.Repo, dist_git_repo: git.Repo):
     local_project = flexmock(
-        git_repo=source_git_repo, ref="HEAD", working_dir=source_git_repo.working_dir
+        git_repo=source_git_repo,
+        ref="HEAD",
+        working_dir=source_git_repo.working_dir,
     )
 
     create_non_adjacent_commits_to_squash(source_git_repo)
@@ -213,6 +218,7 @@ def test_fail_if_not_adjacent(source_git_repo: git.Repo, dist_git_repo: git.Repo
     patch_generator = PatchGenerator(local_project)
     with pytest.raises(PackitException) as ex:
         patch_generator.create_patches(
-            git_ref="0.1.0", destination=dist_git_repo.working_dir
+            git_ref="0.1.0",
+            destination=dist_git_repo.working_dir,
         )
     assert "Non-adjacent patches" in str(ex)

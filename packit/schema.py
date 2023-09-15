@@ -220,7 +220,7 @@ class TargetsListOrDict(fields.Field):
                     ):
                         return True
                     raise ValidationError(
-                        f"Expected list[str], got {value!r} (type {type(value)!r})"
+                        f"Expected list[str], got {value!r} (type {type(value)!r})",
                     )
                 # chroot-specific configuration:
                 if key in CHROOT_SPECIFIC_COPR_CONFIGURATION:
@@ -228,7 +228,7 @@ class TargetsListOrDict(fields.Field):
                     if isinstance(value, expected_type):
                         return True
                     raise ValidationError(
-                        f"Expected {expected_type}, got {value!r} (type {type(value)!r})"
+                        f"Expected {expected_type}, got {value!r} (type {type(value)!r})",
                     )
                 raise ValidationError(f"Unknown key {key!r} in {attr!r}")
         return True
@@ -241,14 +241,14 @@ class TargetsListOrDict(fields.Field):
             targets_dict = value
         else:
             raise ValidationError(
-                f"Expected 'list[str]' or 'dict[str,dict]', got {value!r} (type {type(value)!r})."
+                f"Expected 'list[str]' or 'dict[str,dict]', got {value!r} (type {type(value)!r}).",
             )
 
         for target in targets_dict:
             if target in DEPRECATED_TARGET_MAP:
                 logger.warning(
                     f"Target '{target}' is deprecated. Please update your configuration "
-                    f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead."
+                    f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead.",
                 )
         return targets_dict
 
@@ -290,7 +290,7 @@ class JobMetadataSchema(Schema):
             if key in data:
                 logger.warning(
                     f"Job metadata key {key!r} has been renamed to 'dist_git_branches', "
-                    f"please update your configuration file."
+                    f"please update your configuration file.",
                 )
                 data["dist_git_branches"] = data.pop(key)
         for key in ("targets", "dist_git_branches"):
@@ -333,7 +333,8 @@ class CommonConfigSchema(Schema):
     dist_git_namespace = fields.String(missing=None)
     allowed_gpg_keys = fields.List(fields.String(), missing=None)
     spec_source_id = fields.Method(
-        deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
+        deserialize="spec_source_id_fm",
+        serialize="spec_source_id_serialize",
     )
     synced_files = fields.List(FilesToSyncField())
     files_to_sync = fields.List(FilesToSyncField())
@@ -343,7 +344,9 @@ class CommonConfigSchema(Schema):
     create_sync_note = fields.Bool(default=True)
     patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
     patch_generation_patch_id_digits = fields.Integer(
-        missing=4, default=4, validate=lambda x: x >= 0
+        missing=4,
+        default=4,
+        validate=lambda x: x >= 0,
     )
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
@@ -422,7 +425,10 @@ class CommonConfigSchema(Schema):
 
     @post_dump(pass_original=True)
     def adjust_files_to_sync(
-        self, data: dict, original: CommonPackageConfig, **kwargs
+        self,
+        data: dict,
+        original: CommonPackageConfig,
+        **kwargs,
     ) -> dict:
         """Fix the files_to_sync field in the serialized object
 
@@ -455,7 +461,8 @@ class JobConfigSchema(Schema):
     manual_trigger = fields.Boolean()
     labels = fields.List(fields.String(), missing=None)
     packages = fields.Dict(
-        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+        keys=fields.String(),
+        values=fields.Nested(CommonConfigSchema()),
     )
     package = fields.String(missing=None)
 
@@ -487,7 +494,7 @@ class JobConfigSchema(Schema):
         # loaded, this is why 'data["type"]' is already a JobType and not a string,
         # and the package configs below are PackageConfig objects, not dictionaries.
         if (data["type"] == JobType.tests and data.get("skip_build")) or data.get(
-            "specfile_path"
+            "specfile_path",
         ):
             return
 
@@ -498,7 +505,7 @@ class JobConfigSchema(Schema):
             if not config.specfile_path:
                 errors[package] = [
                     "'specfile_path' is not specified or "
-                    "no specfile was found in the repo"
+                    "no specfile was found in the repo",
                 ]
         if errors:
             raise ValidationError(errors)
@@ -529,7 +536,8 @@ class PackageConfigSchema(Schema):
 
     jobs = fields.Nested(JobConfigSchema, many=True)
     packages = fields.Dict(
-        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+        keys=fields.String(),
+        values=fields.Nested(CommonConfigSchema()),
     )
 
     # list of deprecated keys and their replacement (new,old)
@@ -559,7 +567,7 @@ class PackageConfigSchema(Schema):
                 package_name: {
                     "downstream_package_name": package_name,
                     "paths": paths,
-                }
+                },
             }
         data.setdefault("jobs", get_default_jobs())
         # By this point, we expect both 'packages' and 'jobs' to be present
@@ -584,7 +592,7 @@ class PackageConfigSchema(Schema):
             if old_key_value:
                 logger.warning(
                     f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
-                    f" please update your configuration file."
+                    f" please update your configuration file.",
                 )
                 new_key_value = data.get(new_key_name, None)
                 if not new_key_value:
@@ -645,7 +653,7 @@ class PackageConfigSchema(Schema):
             if metadata := job.pop("metadata", {}):
                 logger.warning(
                     "The 'metadata' key in jobs is deprecated and can be removed. "
-                    "Nest config options from 'metadata' directly under the job object."
+                    "Nest config options from 'metadata' directly under the job object.",
                 )
                 schema = JobMetadataSchema()
                 if errors := schema.validate(metadata):
@@ -654,7 +662,7 @@ class PackageConfigSchema(Schema):
                     raise ValidationError(
                         f"Keys: {not_nested_metadata_keys} are defined outside job metadata "
                         "dictionary. Mixing obsolete metadata dictionary and new job keys "
-                        "is not possible. Remove obsolete nested job metadata dictionary."
+                        "is not possible. Remove obsolete nested job metadata dictionary.",
                     )
                 job.update(metadata)
 
@@ -703,7 +711,7 @@ class PackageConfigSchema(Schema):
                 }
             else:
                 errors[f"'jobs[{i}].packages'"] = [
-                    f"Type is {type(selected_packages)} instead of 'list' or 'dict'."
+                    f"Type is {type(selected_packages)} instead of 'list' or 'dict'.",
                 ]
 
         if errors:

@@ -115,7 +115,7 @@ class LocalProject:
             f"pr_id: {pr_id}\n"
             f"cache: {cache}\n"
             f"merge_pr: {merge_pr}\n"
-            f"target_branch: {target_branch}\n"
+            f"target_branch: {target_branch}\n",
         )
 
         if refresh:
@@ -240,7 +240,7 @@ class LocalProject:
         """
         if self.working_dir and not self.git_repo:
             logger.debug(
-                "`working_dir` is set and `git_repo` is not: let's discover..."
+                "`working_dir` is set and `git_repo` is not: let's discover...",
             )
             if is_git_repo(directory=self.working_dir):
                 logger.debug("It's a git repo!")
@@ -249,10 +249,11 @@ class LocalProject:
 
             if self.git_url and not self.offline:
                 self._git_repo = self._get_repo(
-                    url=self.git_url, directory=self.working_dir
+                    url=self.git_url,
+                    directory=self.working_dir,
                 )
                 logger.debug(
-                    f"We just cloned git repo {self.git_url} to {self.working_dir}."
+                    f"We just cloned git repo {self.git_url} to {self.working_dir}.",
                 )
                 return True
         return False
@@ -268,7 +269,8 @@ class LocalProject:
             and not self.offline
         ):
             self.git_project = self.git_service.get_project(
-                repo=self.repo_name, namespace=self.namespace
+                repo=self.repo_name,
+                namespace=self.namespace,
             )
             logger.debug(f"Parsed project '{self.namespace}/{self.repo_name}'.")
             return True
@@ -278,7 +280,7 @@ class LocalProject:
         if not (self.git_project is None or self.git_service or self.offline):
             self.git_service = self.git_project.service
             logger.debug(
-                f"Parsed service {self.git_service} from the project {self.git_project}."
+                f"Parsed service {self.git_service} from the project {self.git_project}.",
             )
             return True
         return False
@@ -294,7 +296,7 @@ class LocalProject:
         if self.git_repo and not self.working_dir:
             self.working_dir = Path(self.git_repo.working_dir)
             logger.debug(
-                f"Parsed working directory {self.working_dir} from the repo {self.git_repo}."
+                f"Parsed working directory {self.working_dir} from the repo {self.git_repo}.",
             )
             return True
         return False
@@ -316,7 +318,7 @@ class LocalProject:
         if self.git_project and not self.git_url and not self.offline:
             self.git_url = self.git_project.get_git_urls()["git"]
             logger.debug(
-                f"Parsed remote url {self.git_url!r} from the project {self.git_project}."
+                f"Parsed remote url {self.git_url!r} from the project {self.git_project}.",
             )
             return True
         return False
@@ -326,10 +328,10 @@ class LocalProject:
             self.repo_name = self.git_project.repo
             if not self.repo_name:
                 raise PackitException(
-                    "Repo name should have been set but isn't, this is bug!"
+                    "Repo name should have been set but isn't, this is bug!",
                 )
             logger.debug(
-                f"Parsed repo name {self.repo_name!r} from the git project {self.git_project}."
+                f"Parsed repo name {self.repo_name!r} from the git project {self.git_project}.",
             )
             return True
         return False
@@ -338,7 +340,7 @@ class LocalProject:
         if self.git_project and not self.namespace:
             self.namespace = self.git_project.namespace
             logger.debug(
-                f"Parsed namespace {self.namespace!r} from the project {self.git_project}."
+                f"Parsed namespace {self.namespace!r} from the project {self.git_project}.",
             )
             return True
         return False
@@ -362,7 +364,7 @@ class LocalProject:
             # Repo has no remotes
             return False
         logger.debug(
-            f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}."
+            f"Parsed remote url {self.git_url!r} from the repo {self.git_repo}.",
         )
         return True
 
@@ -380,7 +382,7 @@ class LocalProject:
             )
             logger.debug(
                 f"Parsed namespace and repo name ({self.namespace}, {self.repo_name}) "
-                f"from url {self.git_url!r}."
+                f"from url {self.git_url!r}.",
             )
             return True
         return False
@@ -402,7 +404,10 @@ class LocalProject:
         logger.debug(f"Current commit is '{self.git_repo.commit()}'")
 
     def create_branch(
-        self, branch_name: str, base: str = "HEAD", setup_tracking: bool = False
+        self,
+        branch_name: str,
+        base: str = "HEAD",
+        setup_tracking: bool = False,
     ) -> git.Head:
         """
         Create a new git branch in git
@@ -416,7 +421,7 @@ class LocalProject:
         # it's not an error if the branch already exists
         if branch_name in self.git_repo.branches:
             logger.debug(
-                f"It seems that branch {branch_name!r} already exists, checking it out."
+                f"It seems that branch {branch_name!r} already exists, checking it out.",
             )
             head = self.git_repo.branches[branch_name]
         else:
@@ -428,7 +433,7 @@ class LocalProject:
                 remote_ref = origin.refs[branch_name]
             else:
                 raise PackitException(
-                    f"Remote origin doesn't have ref {branch_name!r}."
+                    f"Remote origin doesn't have ref {branch_name!r}.",
                 )
             # this is important to fedpkg: build can't find the tracking branch otherwise
             head.set_tracking_branch(remote_ref)
@@ -446,7 +451,10 @@ class LocalProject:
         branch.checkout()
 
     def _fetch_as_branch(
-        self, remote_ref: str, local_ref: str, local_branch: str
+        self,
+        remote_ref: str,
+        local_ref: str,
+        local_branch: str,
     ) -> None:
         """
         Fetches reference from the remote as the specified local reference and
@@ -474,7 +482,8 @@ class LocalProject:
             not self.git_service and get_service_class(self.git_url) == GitlabService
         )
         remote_ref = "+refs/{}/{}/head".format(
-            "merge-requests" if is_gitlab else "pull", pr_id
+            "merge-requests" if is_gitlab else "pull",
+            pr_id,
         )
         remote_name = self.remote or "origin"
         local_ref = f"refs/remotes/{remote_name}/{LP_TEMP_PR_CHECKOUT_NAME}/{pr_id}"
@@ -486,11 +495,13 @@ class LocalProject:
         head_commit = self.git_repo.branches[local_branch].commit
         logger.info(
             f"Checked out commit\n"
-            f"({shorten_commit_hash(head_commit.hexsha)})\t{head_commit.summary}"
+            f"({shorten_commit_hash(head_commit.hexsha)})\t{head_commit.summary}",
         )
 
     def merge_pr(
-        self, pr_id: Union[str, int], target_branch_name: Optional[str] = None
+        self,
+        pr_id: Union[str, int],
+        target_branch_name: Optional[str] = None,
     ) -> None:
         """
         Merge given PR into target branch. Fetches and switches to base branch
@@ -513,7 +524,7 @@ class LocalProject:
         )
         if not target_branch_name:
             raise PackitException(
-                f"Cannot get the target branch for merging PR {pr_id}."
+                f"Cannot get the target branch for merging PR {pr_id}.",
             )
 
         logger.debug(f"Target branch: {target_branch_name}")
@@ -529,7 +540,7 @@ class LocalProject:
         commit_sha = shorten_commit_hash(target_branch.commit.hexsha)
         logger.info(
             f"Merging ({target_branch}) with commit:\n"
-            f"({commit_sha})\t{target_branch.commit.summary}"
+            f"({commit_sha})\t{target_branch.commit.summary}",
         )
         try:
             self.git_repo.git.merge(f"{LP_TEMP_PR_CHECKOUT_NAME}/{pr_id}")
@@ -669,7 +680,9 @@ class LocalProjectBuilder:
         logger.debug(f"Transitive dependencies: {', '.join(dep_list)}")
 
     def _refresh_the_state(
-        self, state: LocalProjectCalculationState, to_calculate: set[str]
+        self,
+        state: LocalProjectCalculationState,
+        to_calculate: set[str],
     ) -> None:
         """Calculates the requested attributes while also considering transitive relations.
 
@@ -720,7 +733,8 @@ class LocalProjectBuilder:
                 change = change or part(state)
 
     def _parse_repo_name_full_name_and_namespace(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Calculates repo name, namespace or full name if they are missing
         based on the other attributes."""
@@ -737,12 +751,13 @@ class LocalProjectBuilder:
 
         if change:
             logger.debug(
-                f"Parsed full repo name '{state.namespace}/{state.repo_name}'."
+                f"Parsed full repo name '{state.namespace}/{state.repo_name}'.",
             )
         return change
 
     def _parse_git_repo_from_working_dir(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Prepares git.Repo instance based on working_dir.
 
@@ -750,7 +765,7 @@ class LocalProjectBuilder:
         """
         if state.working_dir and not state.git_repo:
             logger.debug(
-                "`working_dir` is set and `git_repo` is not: let's discover..."
+                "`working_dir` is set and `git_repo` is not: let's discover...",
             )
             if is_git_repo(directory=state.working_dir):
                 logger.debug("It's a git repo!")
@@ -759,10 +774,11 @@ class LocalProjectBuilder:
 
             if state.git_url and not self.offline:
                 state.git_repo = self._get_repo(
-                    url=state.git_url, directory=state.working_dir
+                    url=state.git_url,
+                    directory=state.working_dir,
                 )
                 logger.debug(
-                    f"We just cloned git repo {state.git_url} to {state.working_dir}."
+                    f"We just cloned git repo {state.git_url} to {state.working_dir}.",
                 )
                 return True
 
@@ -772,13 +788,15 @@ class LocalProjectBuilder:
         """Creates GitProject based on git_url and provided GitService instances."""
         if state.git_url and self._instances:
             state.git_project = get_project(
-                state.git_url, custom_instances=self._instances
+                state.git_url,
+                custom_instances=self._instances,
             )
             return True
         return False
 
     def _parse_git_project_from_repo_namespace_and_git_service(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Creates GitProject based on namespace, repo name and GitService."""
 
@@ -790,20 +808,22 @@ class LocalProjectBuilder:
             and not self.offline
         ):
             state.git_project = state.git_service.get_project(
-                repo=state.repo_name, namespace=state.namespace
+                repo=state.repo_name,
+                namespace=state.namespace,
             )
             logger.debug(f"Parsed project '{state.namespace}/{state.repo_name}'.")
             return True
         return False
 
     def _parse_git_service_from_git_project(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Creates GitService based on GitProject."""
         if not (state.git_project is None or state.git_service or self.offline):
             state.git_service = state.git_project.service
             logger.debug(
-                f"Parsed service {state.git_service} from the project {state.git_project}."
+                f"Parsed service {state.git_service} from the project {state.git_project}.",
             )
             return True
         return False
@@ -817,13 +837,14 @@ class LocalProjectBuilder:
         return False
 
     def _parse_working_dir_from_git_repo(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Obtains the working_dir from git.Repo instance."""
         if state.git_repo and not state.working_dir:
             state.working_dir = Path(state.git_repo.working_dir)
             logger.debug(
-                f"Parsed working directory {state.working_dir} from the repo {state.git_repo}."
+                f"Parsed working directory {state.working_dir} from the repo {state.git_repo}.",
             )
             return True
         return False
@@ -843,41 +864,44 @@ class LocalProjectBuilder:
         return False
 
     def _parse_git_url_from_git_project(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Obtains git URL from a GitProject."""
         if state.git_project and not state.git_url and not self.offline:
             state.git_url = state.git_project.get_git_urls()["git"]
             logger.debug(
-                f"Parsed remote url {state.git_url!r} from the project {state.git_project}."
+                f"Parsed remote url {state.git_url!r} from the project {state.git_project}.",
             )
             return True
         return False
 
     def _parse_repo_name_from_git_project(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Obtains git repo name from a GitProject."""
         if state.git_project and not state.repo_name:
             state.repo_name = state.git_project.repo
             if not state.repo_name:
                 raise PackitException(
-                    "Repo name should have been set but isn't, this is bug!"
+                    "Repo name should have been set but isn't, this is bug!",
                 )
             logger.debug(
-                f"Parsed repo name {state.repo_name!r} from the git project {state.git_project}."
+                f"Parsed repo name {state.repo_name!r} from the git project {state.git_project}.",
             )
             return True
         return False
 
     def _parse_namespace_from_git_project(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Obtains git repo namespace from a GitProject."""
         if state.git_project and not state.namespace:
             state.namespace = state.git_project.namespace
             logger.debug(
-                f"Parsed namespace {state.namespace!r} from the project {state.git_project}."
+                f"Parsed namespace {state.namespace!r} from the project {state.git_project}.",
             )
             return True
         return False
@@ -902,12 +926,13 @@ class LocalProjectBuilder:
             # Repo has no remotes
             return False
         logger.debug(
-            f"Parsed remote url {state.git_url!r} from the repo {state.git_repo}."
+            f"Parsed remote url {state.git_url!r} from the repo {state.git_repo}.",
         )
         return True
 
     def _parse_namespace_from_git_url(
-        self, state: LocalProjectCalculationState
+        self,
+        state: LocalProjectCalculationState,
     ) -> bool:
         """Obtains git repo namespace from a git URL."""
         if state.git_url and not (state.namespace and state.repo_name):
@@ -923,7 +948,7 @@ class LocalProjectBuilder:
             )
             logger.debug(
                 f"Parsed namespace and repo name ({state.namespace}, {state.repo_name}) "
-                f"from url {state.git_url!r}."
+                f"from url {state.git_url!r}.",
             )
             return True
         return False
@@ -998,7 +1023,9 @@ class LocalProjectBuilder:
         to_calculate: set[str] = set()
 
         def check_and_set(
-            calc_state: LocalProjectCalculationState, attr: str, value: Any
+            calc_state: LocalProjectCalculationState,
+            attr: str,
+            value: Any,
         ):
             if value is CALCULATE:
                 to_calculate.add(attr)

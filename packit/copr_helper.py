@@ -57,7 +57,10 @@ class CoprHelper:
         return f"{copr_url}/coprs/build/{build.id}/"
 
     def get_copr_settings_url(
-        self, owner: str, project: str, section: Optional[str] = None
+        self,
+        owner: str,
+        project: str,
+        section: Optional[str] = None,
     ):
         copr_url = self.copr_client.config.get("copr_url")
         section = section or "edit"
@@ -69,7 +72,9 @@ class CoprHelper:
         return f"{copr_url}/coprs/{owner}/{project}/{section}/"
 
     def get_valid_build_targets(
-        self, *name: str, default: Optional[str] = aliases.DEFAULT_VERSION
+        self,
+        *name: str,
+        default: Optional[str] = aliases.DEFAULT_VERSION,
     ) -> set:
         """
         For the provided iterable of names, expand them using get_build_targets() into valid
@@ -103,10 +108,10 @@ class CoprHelper:
                 chroot_names = get_build_targets(target)
                 for chroot_name in chroot_names:
                     if set(chroot_configuration.keys()).intersection(
-                        CHROOT_SPECIFIC_COPR_CONFIGURATION.keys()
+                        CHROOT_SPECIFIC_COPR_CONFIGURATION.keys(),
                     ):
                         logger.info(
-                            f"There is chroot-specific configuration for {chroot_name}"
+                            f"There is chroot-specific configuration for {chroot_name}",
                         )
                         # only update when needed
                         copr_chroot_configuration = (
@@ -119,12 +124,13 @@ class CoprHelper:
                         update_dict = {}
                         for c, default in CHROOT_SPECIFIC_COPR_CONFIGURATION.items():
                             if copr_chroot_configuration.get(
-                                c, default
+                                c,
+                                default,
                             ) != chroot_configuration.get(c, default):
                                 update_dict[c] = chroot_configuration.get(c, default)
                         if update_dict:
                             logger.info(
-                                f"Update {owner}/{project} {chroot_name}: {update_dict}"
+                                f"Update {owner}/{project} {chroot_name}: {update_dict}",
                             )
                             self.copr_client.project_chroot_proxy.edit(
                                 ownername=owner,
@@ -156,16 +162,17 @@ class CoprHelper:
         """
         logger.info(
             f"Trying to get {owner}/{project} Copr project. "
-            "The project will be created if it does not exist."
+            "The project will be created if it does not exist.",
         )
         try:
             copr_proj = self.copr_client.project_proxy.get(
-                ownername=owner, projectname=project
+                ownername=owner,
+                projectname=project,
             )
         except CoprNoResultException as ex:
             if owner != self.configured_owner:
                 raise PackitCoprProjectException(
-                    f"Copr project {owner}/{project} not found."
+                    f"Copr project {owner}/{project} not found.",
                 ) from ex
 
             logger.info(f"Copr project '{owner}/{project}' not found. Creating new.")
@@ -187,7 +194,7 @@ class CoprHelper:
         except CoprRequestException as ex:
             logger.debug(repr(ex))
             logger.error(
-                f"We were not able to get copr project {owner}/{project}: {ex}"
+                f"We were not able to get copr project {owner}/{project}: {ex}",
             )
             raise
 
@@ -196,7 +203,9 @@ class CoprHelper:
         )
 
         self._update_chroot_specific_configuration(
-            project, owner=owner, targets_dict=targets_dict
+            project,
+            owner=owner,
+            targets_dict=targets_dict,
         )
 
         fields_to_change = self.get_fields_to_change(
@@ -221,15 +230,18 @@ class CoprHelper:
                 }
                 logger.debug(f"Copr edit arguments: {kwargs}")
                 self.copr_client.project_proxy.edit(
-                    ownername=owner, projectname=project, **kwargs
+                    ownername=owner,
+                    projectname=project,
+                    **kwargs,
                 )
             except CoprAuthException as ex:
                 if "Only owners and admins may update their projects." in str(ex):
                     if request_admin_if_needed:
                         logger.info(
-                            f"Admin permissions are required "
-                            f"in order to be able to edit project settings. "
-                            f"Requesting the admin rights for the copr '{owner}/{project}' project."
+                            "Admin permissions are required "
+                            "in order to be able to edit project settings. "
+                            "Requesting the admin rights for the "
+                            f"copr '{owner}/{project}' project.",
                         )
                         self.copr_client.project_proxy.request_permissions(
                             ownername=owner,
@@ -241,7 +253,7 @@ class CoprHelper:
                             f"Admin permissions are required for copr '{owner}/{project}' project"
                             f"in order to be able to edit project settings. "
                             f"You can make a request by specifying --request-admin-if-needed "
-                            f"when using Packit CLI."
+                            f"when using Packit CLI.",
                         )
                 raise PackitCoprSettingsException(
                     f"Copr project update failed for '{owner}/{project}' project.",
@@ -280,7 +292,7 @@ class CoprHelper:
             if "instructions" not in copr_proj:
                 logger.debug(
                     "The `instructions` key was not received from Copr. "
-                    "We can't check that value to see if the update is needed."
+                    "We can't check that value to see if the update is needed.",
                 )
             elif copr_proj.instructions != instructions:
                 fields_to_change["instructions"] = (
@@ -292,7 +304,7 @@ class CoprHelper:
             if "unlisted_on_hp" not in copr_proj:
                 logger.debug(
                     "The `unlisted_on_hp` key was not received from Copr. "
-                    "We can't check that value to see if the update is needed."
+                    "We can't check that value to see if the update is needed.",
                 )
             elif copr_proj.unlisted_on_hp != (not list_on_homepage):
                 fields_to_change["unlisted_on_hp"] = (
@@ -304,7 +316,7 @@ class CoprHelper:
             if "delete_after_days" not in copr_proj:
                 logger.debug(
                     "The `delete_after_days` key was not received from Copr. "
-                    "We can't check that value to see if the update is needed."
+                    "We can't check that value to see if the update is needed.",
                 )
             elif copr_proj.delete_after_days != delete_after_days:
                 fields_to_change["delete_after_days"] = (
@@ -313,7 +325,7 @@ class CoprHelper:
                 )
 
         if additional_repos is not None and set(copr_proj.additional_repos) != set(
-            additional_repos
+            additional_repos,
         ):
             fields_to_change["additional_repos"] = (
                 copr_proj.additional_repos,
@@ -369,7 +381,9 @@ class CoprHelper:
             )
             # once created: update chroot-specific configuration if there is any
             self._update_chroot_specific_configuration(
-                project, owner=owner, targets_dict=targets_dict
+                project,
+                owner=owner,
+                targets_dict=targets_dict,
             )
         except CoprException as ex:
             # TODO: Remove once Copr doesn't throw for existing projects or new
@@ -388,7 +402,10 @@ class CoprHelper:
             raise PackitCoprProjectException(error) from ex
 
     def watch_copr_build(
-        self, build_id: int, timeout: int, report_func: Callable = None
+        self,
+        build_id: int,
+        timeout: int,
+        report_func: Callable = None,
     ) -> str:
         """returns copr build state"""
         watch_end = datetime.now() + timedelta(seconds=timeout)
@@ -432,14 +449,15 @@ class CoprHelper:
             project.name
             for project in reversed(client.project_proxy.get_list(ownername="packit"))
             if project.name.startswith(
-                f"{self.upstream_local_project.namespace}-{self.upstream_local_project.repo_name}-"
+                f"{self.upstream_local_project.namespace}-{self.upstream_local_project.repo_name}-",
             )
         ][:5]
 
         builds: list = []
         for project in projects:
             builds += client.build_proxy.get_list(
-                ownername="packit", projectname=project
+                ownername="packit",
+                projectname=project,
             )
 
         logger.debug("Copr builds fetched.")
@@ -462,7 +480,7 @@ class CoprHelper:
             filter(
                 lambda chroot: not chroot.startswith("_"),
                 client.mock_chroot_proxy.get_list().keys(),
-            )
+            ),
         )
 
     def get_build(self, build_id: int) -> dict:
@@ -479,13 +497,14 @@ class CoprHelper:
     def get_repo_download_url(self, owner: str, project: str, chroot: str) -> str:
         """Provide a link to yum repo for the particular chroot"""
         copr_proj = self.copr_client.project_proxy.get(
-            ownername=owner, projectname=project
+            ownername=owner,
+            projectname=project,
         )
         try:
             return copr_proj["chroot_repos"][chroot]
         except KeyError as e:
             raise PackitCoprProjectException(
-                f"There is no such target {chroot} in {owner}/{project}."
+                f"There is no such target {chroot} in {owner}/{project}.",
             ) from e
 
     def get_chroots(
@@ -509,6 +528,7 @@ class CoprHelper:
         """
         if not copr_project:
             copr_project = self.copr_client.project_proxy.get(
-                ownername=owner, projectname=project
+                ownername=owner,
+                projectname=project,
             )
         return set(copr_project.chroot_repos.keys())

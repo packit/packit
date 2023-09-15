@@ -90,7 +90,7 @@ def source_git_init(
     """
     logger.warning(
         "Generating source-git repositories is experimental, "
-        "please give us feedback if it does things differently than you expect."
+        "please give us feedback if it does things differently than you expect.",
     )
     api = PackitAPI(config=config, package_config=None)
     api.init_source_git(

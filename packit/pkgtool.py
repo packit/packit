@@ -112,7 +112,7 @@ class PkgTool:
             ):
                 logger.info(
                     f"'{self.tool} build' crashed. It is a known issue: "
-                    "the build is submitted in koji anyway."
+                    "the build is submitted in koji anyway.",
                 )
                 logger.debug(ex.stdout_output)
 

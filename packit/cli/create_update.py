@@ -34,7 +34,7 @@ class BugzillaIDs(click.ParamType):
             except ValueError as err:
                 raise click.BadParameter(
                     "cannot parse non-integer bugzilla ID. Please use following "
-                    "format: id[,id]"
+                    "format: id[,id]",
                 ) from err
 
         return ids
@@ -124,10 +124,11 @@ def create_update(
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
     branches_to_update = get_branches(
-        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
+        *dist_git_branch.split(","),
+        default_dg_branch=default_dg_branch,
     )
     click.echo(
-        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}"
+        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}",
     )
 
     if branches_to_update:

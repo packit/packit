@@ -186,7 +186,9 @@ def change_source_ext(upstream, extension):
 
 
 @pytest.mark.parametrize(
-    "extension", [".tar.gz", ".tar.bz2"], ids=[".tar.gz", ".tar.bz2"]
+    "extension",
+    [".tar.gz", ".tar.bz2"],
+    ids=[".tar.gz", ".tar.bz2"],
 )
 def test_create_archive(upstream_instance, extension):
     u, ups = upstream_instance
@@ -274,10 +276,12 @@ def test_fix_spec_persists(upstream_instance):
     """verify that changing specfile in fix_spec action persists"""
     _, upstream = upstream_instance
     upstream.package_config.actions = {
-        ActionName.fix_spec: "sed -i 's/^Version:.*$/Version: 1.0.0/' beer.spec"
+        ActionName.fix_spec: "sed -i 's/^Version:.*$/Version: 1.0.0/' beer.spec",
     }
     SRPMBuilder(upstream)._fix_specfile_to_use_local_archive(
-        "archive.tar.gz", update_release=False, release_suffix="1.%dist"
+        "archive.tar.gz",
+        update_release=False,
+        release_suffix="1.%dist",
     )
 
     assert upstream.specfile.version == "1.0.0"
@@ -290,16 +294,16 @@ def test_fix_spec_action_with_macros(upstream_instance):
         ActionName.fix_spec: (
             "sed -i 's/^Release:.*$/Release: "
             "${PACKIT_RPMSPEC_RELEASE}%{?dist}/' beer.spec"
-        )
+        ),
     }
 
     flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
-        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234")))
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: "1234"))),
     )
 
     flexmock(upstream.local_project).should_receive("commit_hexsha").and_return("4321")
     flexmock(upstream).should_receive("get_spec_release").with_args(
-        release_suffix=""
+        release_suffix="",
     ).and_return("1.1234.main.0.1221")
 
     flexmock(upstream).should_receive("with_action").with_args(
@@ -317,7 +321,9 @@ def test_fix_spec_action_with_macros(upstream_instance):
     )
 
     SRPMBuilder(upstream)._fix_specfile_to_use_local_archive(
-        "archive.tar.gz", update_release=True, release_suffix=""
+        "archive.tar.gz",
+        update_release=True,
+        release_suffix="",
     )
 
 
@@ -396,7 +402,8 @@ def test_create_srpm_git_desc_release(upstream_instance):
     assert srpm.exists()
     build_srpm(srpm)
     assert re.match(
-        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.(fc\d{2}|el\d).src.rpm$", str(srpm)
+        r".+beer-0.1.0-1\.\d{20}\.\w+\.\d\.g\w{7}\.(fc\d{2}|el\d).src.rpm$",
+        str(srpm),
     )
 
     with ups.specfile.sections() as sections:
@@ -415,15 +422,16 @@ def test_github_app(upstream_instance, tmp_path):
         f"authentication:\n"
         f"    github.com:\n"
         f"        github_app_private_key_path: {fake_cert_path}\n"
-        f"        github_app_id: qwe\n"
+        f"        github_app_id: qwe\n",
     )
     flexmock(os).should_receive("getenv").with_args("XDG_CONFIG_HOME").and_return(
-        str(tmp_path)
+        str(tmp_path),
     )
     ups.config = Config.get_user_config()
     assert (
         GithubService(
-            github_app_private_key_path=str(fake_cert_path), github_app_id="qwe"
+            github_app_private_key_path=str(fake_cert_path),
+            github_app_id="qwe",
         )
         in ups.config.services
     )
@@ -437,10 +445,14 @@ def create_git_tag(u, tag_name, time_to_set):
     Path(u, "tags").write_text(tag_name)
     subprocess.check_call(["git", "add", "tags"], cwd=u, env=env)
     subprocess.check_call(
-        ["git", "commit", "-m", f"Tag with {tag_name}"], cwd=u, env=env
+        ["git", "commit", "-m", f"Tag with {tag_name}"],
+        cwd=u,
+        env=env,
     )
     subprocess.check_call(
-        ["git", "tag", "-a", "-m", f"Tag with {tag_name}", tag_name], cwd=u, env=env
+        ["git", "tag", "-a", "-m", f"Tag with {tag_name}", tag_name],
+        cwd=u,
+        env=env,
     )
 
 
@@ -524,7 +536,9 @@ def test_get_last_tag_matching_config(
     [
         pytest.param("{upstream_pkg_name}-{version}", "beerware-0.1.0", id="default"),
         pytest.param(
-            "{version}-{upstream_pkg_name}", "0.1.0-beerware", id="ver-pkg_name"
+            "{version}-{upstream_pkg_name}",
+            "0.1.0-beerware",
+            id="ver-pkg_name",
         ),
     ],
 )

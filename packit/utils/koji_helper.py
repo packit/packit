@@ -82,11 +82,15 @@ class KojiHelper:
         """
         try:
             builds = self.session.listTagged(
-                package=package, tag=tag, inherit=True, latest=True, strict=True
+                package=package,
+                tag=tag,
+                inherit=True,
+                latest=True,
+                strict=True,
             )
         except Exception as e:
             logger.debug(
-                f"Failed to latest build of package {package} in tag {tag} from Koji: {e}"
+                f"Failed to latest build of package {package} in tag {tag} from Koji: {e}",
             )
             return None
         if not builds:
@@ -139,7 +143,9 @@ class KojiHelper:
         requested_headers = ["changelogtime", "changelogname", "changelogtext"]
         try:
             headers = self.session.getRPMHeaders(
-                rpmID=f"{nvr}.src", headers=requested_headers, strict=True
+                rpmID=f"{nvr}.src",
+                headers=requested_headers,
+                strict=True,
             )
         except Exception as e:
             logger.debug(f"Failed to get changelog of build {nvr} from Koji: {e}")
@@ -168,7 +174,7 @@ class KojiHelper:
                 break
             timestamp = date.fromtimestamp(time)
             lines.append(
-                str(ChangelogEntry.assemble(timestamp, name, text.splitlines()))
+                str(ChangelogEntry.assemble(timestamp, name, text.splitlines())),
             )
         return "\n".join(lines)
 

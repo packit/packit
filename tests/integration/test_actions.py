@@ -18,7 +18,11 @@ from packit.exceptions import PackitException
     ),
 )
 def test_with_action(
-    upstream_instance, action: ActionName, command, env_vars: dict, should_raise
+    upstream_instance,
+    action: ActionName,
+    command,
+    env_vars: dict,
+    should_raise,
 ):
     _, upstream = upstream_instance
     upstream.package_config.actions = {action: command}
