@@ -97,3 +97,12 @@ markers = [
 testpaths = [
     "tests",
 ]
+
+[tool.ruff]
+select = [
+    "E",   # pycodestyle Error
+    "F",   # Pyflakes
+    "W",   # pycodestyle Warning
+]
+line-length = 100
+target-version = "py39"
