@@ -8,10 +8,10 @@ import logging
 import click
 
 from packit.cli.builds.copr_build import copr
+from packit.cli.builds.in_image_builder import in_image_builder
 from packit.cli.builds.koji_build import koji
 from packit.cli.builds.local_build import local
 from packit.cli.builds.mock_build import mock
-from packit.cli.builds.in_image_builder import in_image_builder
 
 logger = logging.getLogger(__name__)
 

@@ -1,15 +1,16 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from contextlib import suppress as does_not_raise
 import pathlib
+from contextlib import suppress as does_not_raise
 
-from munch import Munch
 import pytest
 from flexmock import flexmock
+from munch import Munch
 
+from packit import api as packit_api
 from packit.api import PackitAPI
-from packit.config import PackageConfig, CommonPackageConfig
+from packit.config import CommonPackageConfig, PackageConfig
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -17,7 +18,6 @@ from packit.local_project import LocalProjectBuilder
 from packit.patches import PatchGenerator
 from packit.sync import SyncFilesItem
 from packit.utils.changelog_helper import ChangelogHelper
-from packit import api as packit_api
 
 
 def build_dict(copr_url, id):

@@ -4,7 +4,7 @@
 import pytest
 
 from packit.cli.prepare_sources import load_job_config
-from packit.config import CommonPackageConfig, JobConfig, JobType, JobConfigTriggerType
+from packit.config import CommonPackageConfig, JobConfig, JobConfigTriggerType, JobType
 
 
 @pytest.mark.parametrize(

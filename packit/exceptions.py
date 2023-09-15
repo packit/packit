@@ -1,7 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from typing import Union, Any
+from typing import Any, Union
 
 
 def ensure_str(inp: Union[bytes, str]) -> str:

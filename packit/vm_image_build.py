@@ -15,7 +15,7 @@ from typing import Optional, Union
 import requests
 from requests import HTTPError
 
-from packit.exceptions import PackitException, ImageBuilderError
+from packit.exceptions import ImageBuilderError, PackitException
 
 logger = logging.getLogger("packit")
 REDHAT_SSO_AUTH_URL = (

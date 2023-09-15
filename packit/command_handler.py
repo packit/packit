@@ -112,7 +112,7 @@ class SandcastleCommandHandler(CommandHandler):
         self.local_project = local_project
         self.config = config
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
-        from sandcastle.api import Sandcastle, MappedDir
+        from sandcastle.api import MappedDir, Sandcastle
 
         self._sandcastle: Optional[Sandcastle] = None
         self._mapped_dir: Optional[MappedDir] = None
@@ -122,7 +122,7 @@ class SandcastleCommandHandler(CommandHandler):
         """initialize Sandcastle lazily"""
         if self._sandcastle is None:
             # we import here so that packit does not depend on sandcastle (and thus python-kube)
-            from sandcastle.api import Sandcastle, MappedDir, VolumeSpec
+            from sandcastle.api import MappedDir, Sandcastle, VolumeSpec
 
             self._mapped_dir = MappedDir(
                 local_dir=self.local_project.working_dir,

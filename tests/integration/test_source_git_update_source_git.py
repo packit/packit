@@ -3,8 +3,8 @@
 
 import pytest
 
-from packit.exceptions import PackitException
 from packit.constants import DISTRO_DIR, FROM_DIST_GIT_TOKEN
+from packit.exceptions import PackitException
 
 
 def test_update_source_git_sources_changed(

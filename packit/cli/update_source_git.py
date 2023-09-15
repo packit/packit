@@ -10,10 +10,10 @@ import pathlib
 
 import click
 
+from packit.api import PackitAPI
 from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
 from packit.config import Config, PackageConfig, pass_config
-from packit.api import PackitAPI
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProjectBuilder
 
 
 @click.command("update-source-git")

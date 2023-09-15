@@ -3,44 +3,44 @@
 
 import copy
 import json
+from collections.abc import Mapping
 from logging import getLogger
 from typing import Any, Optional, Union
-from collections.abc import Mapping
 
 from marshmallow import (
     Schema,
+    ValidationError,
     fields,
+    post_dump,
     post_load,
     pre_load,
-    post_dump,
     validates_schema,
-    ValidationError,
 )
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
 from packit.config import (
-    PackageConfig,
-    Config,
     CommonPackageConfig,
+    Config,
     Deployment,
+    PackageConfig,
 )
+from packit.config.aliases import DEPRECATED_TARGET_MAP
 from packit.config.job_config import (
-    JobType,
     JobConfig,
-    JobConfigView,
     JobConfigTriggerType,
+    JobConfigView,
+    JobType,
     get_default_jobs,
 )
 from packit.config.notifications import (
-    NotificationsConfig,
     FailureCommentNotificationsConfig,
+    NotificationsConfig,
+    PullRequestNotificationsConfig,
 )
-from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.sync import SyncFilesItem
-from packit.config.aliases import DEPRECATED_TARGET_MAP
 
 logger = getLogger(__name__)
 

@@ -8,7 +8,7 @@ from typing import Optional
 import click
 import git
 
-from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.utils.repo import git_remote_url_to_https_url
 
 logger = logging.getLogger(__name__)

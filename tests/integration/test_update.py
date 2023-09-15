@@ -7,13 +7,13 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from specfile import Specfile
 
 from packit.actions import ActionName
 from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
-from specfile import Specfile
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
 

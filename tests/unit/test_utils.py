@@ -7,6 +7,7 @@ from importlib.metadata import PackageNotFoundError
 
 import pytest
 from flexmock import flexmock
+
 from packit.api import get_packit_version
 from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
 

@@ -6,8 +6,8 @@ from datetime import date, datetime
 from typing import Optional
 
 import koji
-
 from specfile.changelog import ChangelogEntry
+
 from packit.constants import KOJI_BASEURL
 
 logger = logging.getLogger(__name__)

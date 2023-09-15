@@ -4,9 +4,9 @@ import logging
 
 import pytest
 from flexmock import flexmock
-from requests import Session, HTTPError
+from requests import HTTPError, Session
 
-from packit.exceptions import PackitException, ImageBuilderError
+from packit.exceptions import ImageBuilderError, PackitException
 from packit.vm_image_build import ImageBuilder
 
 

@@ -5,7 +5,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.exceptions import PackitLookasideCacheException
-from packit.utils.lookaside import configparser, pyrpkg, get_lookaside_sources
+from packit.utils.lookaside import configparser, get_lookaside_sources, pyrpkg
 
 
 @pytest.mark.parametrize(

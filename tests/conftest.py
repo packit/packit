@@ -2,28 +2,27 @@
 # SPDX-License-Identifier: MIT
 
 import shutil
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 import pytest
+from deepdiff import DeepDiff
 from flexmock import flexmock
 
+from packit.config import JobConfig, PackageConfig
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 from tests.spellbook import (
-    initiate_git_repo,
-    UPSTREAM,
-    prepare_dist_git_repo,
+    DG_OGR,
     DISTGIT,
     DISTGIT_WITH_AUTOCHANGELOG,
-    DG_OGR,
+    UPSTREAM,
     UPSTREAM_SPEC_NOT_IN_ROOT,
-    UPSTREAM_WITH_MUTLIPLE_SOURCES,
     UPSTREAM_WEIRD_SOURCES,
+    UPSTREAM_WITH_MUTLIPLE_SOURCES,
+    initiate_git_repo,
+    prepare_dist_git_repo,
 )
-
-from packit.config import JobConfig, PackageConfig
-from deepdiff import DeepDiff
 
 
 def get_git_repo_and_remote(

@@ -1,9 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import pytest
 import koji
-from bodhi.client.bindings import BodhiClientException, BodhiClient
+import pytest
+from bodhi.client.bindings import BodhiClient, BodhiClientException
 from flexmock import flexmock
 from munch import Munch
 

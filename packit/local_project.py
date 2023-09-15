@@ -4,25 +4,24 @@
 import dataclasses
 import logging
 import shutil
-from pathlib import Path
-from typing import Optional, Union, Any, TypeVar
 from collections.abc import Iterable
 from functools import partial
+from pathlib import Path
+from typing import Any, Optional, TypeVar, Union
 
 import git
 from git.exc import GitCommandError
 from ogr import GitlabService
 from ogr.abstract import GitProject, GitService
-from ogr.factory import get_service_class
+from ogr.factory import get_project, get_service_class
 from ogr.parsing import parse_git_repo
-from ogr.factory import get_project
 
 from packit.constants import LP_TEMP_PR_CHECKOUT_NAME
 from packit.exceptions import PackitException, PackitMergeException
 from packit.utils.repo import (
     RepositoryCache,
-    is_git_repo,
     get_repo,
+    is_git_repo,
     shorten_commit_hash,
 )
 

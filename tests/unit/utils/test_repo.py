@@ -9,13 +9,13 @@ from flexmock import flexmock
 from packit.constants import COMMIT_ACTION_DIVIDER
 from packit.exceptions import PackitException
 from packit.utils.repo import (
-    get_namespace_and_repo_name,
-    git_remote_url_to_https_url,
-    git_patch_ish,
-    get_metadata_from_message,
-    get_message_from_metadata,
     get_commit_hunks,
     get_commit_message_from_action,
+    get_message_from_metadata,
+    get_metadata_from_message,
+    get_namespace_and_repo_name,
+    git_patch_ish,
+    git_remote_url_to_https_url,
 )
 
 

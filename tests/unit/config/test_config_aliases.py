@@ -9,12 +9,12 @@ from flexmock import flexmock
 import packit
 from packit.config import aliases
 from packit.config.aliases import (
-    get_versions,
-    get_build_targets,
-    get_branches,
-    get_koji_targets,
-    get_all_koji_targets,
     get_aliases,
+    get_all_koji_targets,
+    get_branches,
+    get_build_targets,
+    get_koji_targets,
+    get_versions,
 )
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException

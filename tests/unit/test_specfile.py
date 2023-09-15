@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 import pytest
 import rpm
-
 from specfile import Specfile
 
 spec = """

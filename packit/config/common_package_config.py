@@ -10,14 +10,14 @@ from enum import Enum
 from os import getenv
 from os.path import basename
 from re import split
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
 from packit.actions import ActionName
 from packit.config.notifications import (
     NotificationsConfig,
 )
 from packit.config.sources import SourcesItem
-from packit.constants import PROD_DISTGIT_URL, DISTGIT_NAMESPACE
+from packit.constants import DISTGIT_NAMESPACE, PROD_DISTGIT_URL
 from packit.exceptions import PackitConfigException
 from packit.sync import SyncFilesItem, iter_srcs
 

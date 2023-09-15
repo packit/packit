@@ -11,12 +11,12 @@ from pathlib import Path
 from typing import Optional
 
 from click.testing import CliRunner
-from packit.patches import PatchMetadata
-from packit.utils.repo import create_new_repo
 
 from packit.cli.packit_base import packit_base
 from packit.config import Config
+from packit.patches import PatchMetadata
 from packit.utils.commands import cwd, run_command
+from packit.utils.repo import create_new_repo
 
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"

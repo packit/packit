@@ -1,20 +1,20 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 import json
-import pytest
 from pathlib import PosixPath
-from flexmock import flexmock
-from click.testing import CliRunner
 
+import pytest
+from click.testing import CliRunner
+from flexmock import flexmock
+
+from packit.api import PackitAPI
+from packit.cli.builds import koji_build
+from packit.cli.packit_base import packit_base
 from packit.config import (
     package_config,
 )
-from packit.local_project import LocalProject
-from packit.api import PackitAPI
-from packit.cli.packit_base import packit_base
-from packit.cli.builds import koji_build
 from packit.distgit import DistGit
-
+from packit.local_project import LocalProject
 
 DEFAULT_CONFIG_YAML = """
     {

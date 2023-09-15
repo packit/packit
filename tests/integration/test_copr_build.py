@@ -5,9 +5,9 @@ import pytest
 from copr.v3 import (
     BuildProxy,
     Client,
+    CoprAuthException,
     CoprNoResultException,
     ProjectProxy,
-    CoprAuthException,
 )
 from flexmock import flexmock
 from munch import munchify

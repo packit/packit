@@ -2,15 +2,16 @@
 # SPDX-License-Identifier: MIT
 import os
 import shutil
-from subprocess import check_output, CalledProcessError
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
+from subprocess import CalledProcessError, check_output
+
 import packit.distgit
 import packit.upstream
 from packit.config import Config, get_package_config_from_repo
 from packit.exceptions import PackitException
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProjectBuilder
 
 
 def socket_guard(*args, **kwargs):

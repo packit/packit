@@ -13,7 +13,7 @@ from specfile.changelog import ChangelogEntry
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase, requests
 from packit.command_handler import LocalCommandHandler
-from packit.config import Config, CommonPackageConfig, RunCommandType, PackageConfig
+from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder

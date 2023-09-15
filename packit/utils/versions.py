@@ -1,7 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from packaging.version import parse, InvalidVersion
+from packaging.version import InvalidVersion, parse
 
 
 def compare_versions(a: str, b: str) -> int:

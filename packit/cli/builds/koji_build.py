@@ -7,17 +7,20 @@ from os import getcwd
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
+from packit.config import get_context_settings, pass_config
 from packit.config.aliases import get_branches, get_koji_targets
-from packit.exceptions import PackitCommandFailedError, ensure_str
-from packit.exceptions import PackitConfigException
-from packit.utils.changelog_helper import ChangelogHelper
 from packit.constants import (
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
+from packit.exceptions import (
+    PackitCommandFailedError,
+    PackitConfigException,
+    ensure_str,
+)
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,11 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Optional, Union
-from collections.abc import Iterable
 
 from packit.exceptions import PackitCommandFailedError
-
 from packit.utils import commands  # so we can mock utils
 from packit.utils.logging import logger
 

@@ -9,13 +9,13 @@ from marshmallow import ValidationError
 from ogr import GithubService, PagureService
 
 from packit.config import (
-    PackageConfig,
     CommonPackageConfig,
     Config,
     JobConfig,
+    JobConfigTriggerType,
     JobConfigView,
     JobType,
-    JobConfigTriggerType,
+    PackageConfig,
 )
 from packit.config.aliases import DEFAULT_VERSION
 from packit.schema import JobConfigSchema, JobMetadataSchema

@@ -1,16 +1,16 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import git
-import pytest
 import shutil
 import textwrap
-
-from flexmock import flexmock
 from pathlib import Path
-from packit.patches import PatchGenerator, PatchMetadata
-from packit.exceptions import PackitException
 
+import git
+import pytest
+from flexmock import flexmock
+
+from packit.exceptions import PackitException
+from packit.patches import PatchGenerator, PatchMetadata
 from tests.spellbook import DATA_DIR
 
 TESTS_DIR = str(Path(__file__).parent.parent)

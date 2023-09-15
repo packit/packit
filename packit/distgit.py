@@ -3,11 +3,11 @@
 
 import logging
 import os
-import tempfile
-from pathlib import Path
 import re
+import tempfile
+from collections.abc import Iterable, Sequence
+from pathlib import Path
 from typing import Optional, Union
-from collections.abc import Sequence, Iterable
 
 import cccolutils
 import git
@@ -16,6 +16,7 @@ from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
 from ogr.abstract import PullRequest
 from specfile.utils import NEVR
+
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
@@ -25,15 +26,15 @@ from packit.config import (
 )
 from packit.constants import EXISTING_BODHI_UPDATE_REGEX
 from packit.exceptions import (
-    PackitException,
-    PackitConfigException,
     PackitBodhiException,
+    PackitConfigException,
+    PackitException,
 )
-from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
-from packit.utils.koji_helper import KojiHelper
 from packit.utils.commands import cwd
+from packit.utils.koji_helper import KojiHelper
 
 logger = logging.getLogger(__name__)
 

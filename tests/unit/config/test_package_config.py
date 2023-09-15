@@ -1,47 +1,47 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
 from pathlib import Path, PosixPath
 from typing import Optional
 
-from github import GithubException
 import pytest
-import copy
 from flexmock import flexmock
+from github import GithubException
 from marshmallow import ValidationError
-
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import GithubAPIException
+
+import packit.config.package_config
 from packit.actions import ActionName
 from packit.config import (
     CommonPackageConfig,
-    JobType,
-    JobConfigTriggerType,
     JobConfig,
+    JobConfigTriggerType,
+    JobType,
     get_package_config_from_repo,
 )
 from packit.config.package_config import (
-    get_specfile_path_from_repo,
     PackageConfig,
-    get_local_specfile_path,
-    get_local_package_config,
     find_remote_package_config,
+    get_local_package_config,
+    get_local_specfile_path,
+    get_specfile_path_from_repo,
 )
-import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
-from tests.spellbook import UP_OSBUILD, SYNC_FILES
+from tests.spellbook import SYNC_FILES, UP_OSBUILD
 from tests.unit.config.test_config import (
+    get_default_job_config,
+    get_job_config_build_for_branch,
+    get_job_config_dict_build_for_branch,
     get_job_config_dict_full,
     get_job_config_dict_simple,
-    get_job_config_simple,
     get_job_config_full,
-    get_default_job_config,
-    get_job_config_dict_build_for_branch,
-    get_job_config_build_for_branch,
+    get_job_config_simple,
 )
 
 

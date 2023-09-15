@@ -1,6 +1,6 @@
 import functools
 import logging
-from typing import Union, Any, Callable
+from typing import Any, Callable, Union
 
 logger = logging.getLogger(__name__)
 

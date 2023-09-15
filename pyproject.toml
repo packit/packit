@@ -102,6 +102,7 @@ testpaths = [
 select = [
     "E",   # pycodestyle Error
     "F",   # Pyflakes
+    "I",   # isort
     "UP",  # pyupgrade
     "W",   # pycodestyle Warning
 ]

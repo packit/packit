@@ -10,9 +10,10 @@ import copy
 import logging
 import re
 import tempfile
+from collections.abc import Iterable, Sequence
 from datetime import datetime
 from distutils.dir_util import copy_tree
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import (
     Callable,
@@ -21,7 +22,6 @@ from typing import (
     Union,
     overload,
 )
-from collections.abc import Sequence, Iterable
 
 import click
 import git
@@ -36,44 +36,44 @@ from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
     COMMIT_ACTION_DIVIDER,
-    SYNCING_NOTE,
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
-    SYNC_RELEASE_PR_INSTRUCTIONS,
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
+    SYNC_RELEASE_PR_INSTRUCTIONS,
+    SYNCING_NOTE,
 )
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import (
     PackitCommandFailedError,
+    PackitCoprException,
     PackitException,
     PackitFailedToCreateRPMException,
-    PackitSRPMException,
-    PackitSRPMNotFoundException,
     PackitRPMException,
     PackitRPMNotFoundException,
-    PackitCoprException,
+    PackitSRPMException,
+    PackitSRPMNotFoundException,
 )
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
-from packit.sync import sync_files, SyncFilesItem
+from packit.sync import SyncFilesItem, sync_files
 from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
 from packit.utils.repo import (
-    shorten_commit_hash,
-    get_next_commit,
     commit_exists,
     get_commit_diff,
     get_commit_hunks,
-    is_the_repo_pristine,
     get_commit_message_from_action,
+    get_next_commit,
+    is_the_repo_pristine,
+    shorten_commit_hash,
 )
 from packit.utils.versions import compare_versions
 from packit.vm_image_build import ImageBuilder

@@ -11,6 +11,7 @@ from typing import Optional
 
 import git
 from gnupg import GPG, ListKeys
+
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)

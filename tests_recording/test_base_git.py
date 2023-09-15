@@ -3,11 +3,11 @@
 from pathlib import Path
 
 from flexmock import flexmock
-from specfile import Specfile
 from requre.cassette import DataTypes
 from requre.online_replacing import (
     record_requests_for_all_methods,
 )
+from specfile import Specfile
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import CommonPackageConfig, PackageConfig

@@ -1,9 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
-from typing import Union, Any
 import logging
+from pathlib import Path
+from typing import Any, Union
 
 from marshmallow import ValidationError
 
