@@ -616,18 +616,20 @@ class PackitRepositoryBase:
         return None
 
     def existing_pr(
-        self, title: str, description: str, target_branch: str, source_branch: str
+        self, title: str, target_branch: str, source_branch: str
     ) -> Optional[PullRequest]:
-        """Look for an already created PR with the same:
-        title, description and branch name
+        """
+        Look for an already created PR.
 
         Args:
-            title (str)
-            description (str)
-            branch (str)
+            title: Title of the pull request.
+            description: Description of the pull request.
+            target_branch: Branch to which the PR is being merged.
+            source_branch: Branch from which the changes are being pulled.
 
         Return:
-            PullRequest: if one is found otherwise None
+            The `PullRequest` object if some existing PR is found, `None`
+            otherwise.
         """
         pull_requests = self.local_project.git_project.get_pr_list()
         user = self.get_user()
@@ -635,7 +637,6 @@ class PackitRepositoryBase:
         for pr in pull_requests:
             if (
                 pr.title == title
-                and pr.description == description
                 and pr.target_branch == target_branch
                 and pr.source_branch == source_branch
                 and pr.author == user
