@@ -1175,9 +1175,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         except PackitException as exc:
             logger.error(f"Push to fork failed: {exc}")
             raise
-        pr = repo.existing_pr(
-            pr_title, pr_description.rstrip(), git_branch, repo.local_project.ref
-        )
+        pr = repo.existing_pr(pr_title, git_branch, repo.local_project.ref)
         if pr is None:
             pr = repo.create_pull(
                 pr_title,
