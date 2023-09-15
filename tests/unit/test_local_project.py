@@ -383,7 +383,7 @@ def test_offline_no_clone_no_temp_dir():
 def test_clone_using_empty_cache():
     cache_path_mock = flexmock(
         is_dir=lambda: True,
-        iterdir=lambda: [],
+        iterdir=list,
         joinpath=lambda x: "/reference/repo/package_name",
     )
     repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=False)
@@ -523,7 +523,7 @@ def test_clone_using_cache_not_present():
 def test_clone_and_add_to_cache():
     cache_path_mock = flexmock(
         is_dir=lambda: True,
-        iterdir=lambda: [],
+        iterdir=list,
         joinpath=lambda x: "/reference/repo/package_name",
     )
     repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=True)
@@ -834,7 +834,7 @@ def test_builder_offline_no_clone_no_temp_dir():
 def test_builder_clone_using_empty_cache():
     cache_path_mock = flexmock(
         is_dir=lambda: True,
-        iterdir=lambda: [],
+        iterdir=list,
         joinpath=lambda x: "/reference/repo/package_name",
     )
     repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=False)
@@ -986,7 +986,7 @@ def test_builder_clone_using_cache_not_present():
 def test_builder_clone_and_add_to_cache():
     cache_path_mock = flexmock(
         is_dir=lambda: True,
-        iterdir=lambda: [],
+        iterdir=list,
         joinpath=lambda x: "/reference/repo/package_name",
     )
     repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=True)
