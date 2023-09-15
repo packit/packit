@@ -136,10 +136,9 @@ class Config:
     @classmethod
     def get_user_config(cls) -> "Config":
         xdg_config_home = os.getenv("XDG_CONFIG_HOME")
-        if xdg_config_home:
-            directory = Path(xdg_config_home)
-        else:
-            directory = Path.home() / ".config"
+        directory = (
+            Path(xdg_config_home) if xdg_config_home else Path.home() / ".config"
+        )
 
         logger.debug(f"Loading user config from directory: {directory}")
 
@@ -149,10 +148,11 @@ class Config:
             logger.debug(f"Trying to load user config from: {config_file_name_full}")
             if config_file_name_full.is_file():
                 try:
-                    loaded_config = safe_load(open(config_file_name_full))
+                    with open(config_file_name_full) as file:
+                        loaded_config = safe_load(file)
                 except Exception as ex:
                     logger.error(f"Cannot load user config {config_file_name_full!r}.")
-                    raise PackitException(f"Cannot load user config: {ex!r}.")
+                    raise PackitException(f"Cannot load user config: {ex!r}.") from ex
                 break
         return Config.get_from_dict(raw_dict=loaded_config)
 

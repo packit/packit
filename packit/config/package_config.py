@@ -123,9 +123,7 @@ class PackageConfig(MultiplePackages):
         for name, package in package_config.packages.items():
             # filter out job data for the package
             jobs = [
-                job
-                for job in package_config.get_job_views()
-                if name in job.packages.keys()
+                job for job in package_config.get_job_views() if name in job.packages
             ]
             package_config_views[name] = PackageConfigView(
                 packages={name: package}, jobs=jobs

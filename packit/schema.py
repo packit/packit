@@ -205,7 +205,7 @@ class TargetsListOrDict(fields.Field):
     def __is_targets_dict(value) -> bool:
         if (
             not isinstance(value, dict)
-            or not all(isinstance(k, str) for k in value.keys())
+            or not all(isinstance(k, str) for k in value)
             or not all(isinstance(v, dict) for v in value.values())
         ):
             return False
@@ -223,7 +223,7 @@ class TargetsListOrDict(fields.Field):
                         f"Expected list[str], got {value!r} (type {type(value)!r})"
                     )
                 # chroot-specific configuration:
-                if key in CHROOT_SPECIFIC_COPR_CONFIGURATION.keys():
+                if key in CHROOT_SPECIFIC_COPR_CONFIGURATION:
                     expected_type = CHROOT_SPECIFIC_COPR_CONFIGURATION[key].__class__
                     if isinstance(value, expected_type):
                         return True
@@ -244,7 +244,7 @@ class TargetsListOrDict(fields.Field):
                 f"Expected 'list[str]' or 'dict[str,dict]', got {value!r} (type {type(value)!r})."
             )
 
-        for target in targets_dict.keys():
+        for target in targets_dict:
             if target in DEPRECATED_TARGET_MAP:
                 logger.warning(
                     f"Target '{target}' is deprecated. Please update your configuration "
