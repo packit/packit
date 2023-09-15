@@ -123,10 +123,7 @@ def koji(
         f"for package {package}"
     )
 
-    if koji_target is None:
-        targets_to_build = {None}
-    else:
-        targets_to_build = get_koji_targets(koji_target)
+    targets_to_build = {None} if koji_target is None else get_koji_targets(koji_target)
 
     if len(targets_to_build) > 1 and len(branches_to_build) > 1:
         raise PackitConfigException(

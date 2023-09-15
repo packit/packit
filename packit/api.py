@@ -5,7 +5,9 @@
 This is the official python interface for packit.
 """
 
+
 import asyncio
+import contextlib
 import copy
 import logging
 import re
@@ -461,10 +463,8 @@ class PackitAPI:
             for j, diff in enumerate(diffs[i]):
                 if diff.deleted_file:
                     path = distro_path / diff.a_path
-                    try:
+                    with contextlib.suppress(FileNotFoundError):
                         path.unlink()
-                    except FileNotFoundError:
-                        pass  # missing_ok argument to unlink was added in 3.8 which is not in EPEL
                 elif diff.renamed_file:
                     path = distro_path / diff.a_path
                     try:

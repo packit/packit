@@ -481,10 +481,10 @@ def test_srpm_merge_storm(
         )
     # make sure we are on the main branch
     assert (
-        "main"
-        == subprocess.check_output(["git", "branch", "--show-current"], cwd=sg_path)
+        subprocess.check_output(["git", "branch", "--show-current"], cwd=sg_path)
         .decode()
         .strip()
+        == "main"
     )
     assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-MERGE-COMMIT.patch",
@@ -499,9 +499,9 @@ def test_srpm_merge_storm_dirty(api_instance_source_git):
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, ref)
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     (sg_path / "malt").write_text("Mordor\n")
-    with pytest.raises(PackitException) as ex:
-        with cwd("/"):  # let's mimic p-s by having different cwd than the project
-            api_instance_source_git.create_srpm(upstream_ref=ref)
+    with pytest.raises(PackitException) as ex, cwd("/"):
+        # let's mimic p-s by having different cwd than the project
+        api_instance_source_git.create_srpm(upstream_ref=ref)
     assert "The source-git repo is dirty" in str(ex.value)
 
 
@@ -691,10 +691,9 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
     # an exc is thrown b/c that's not supported
     # to change order of patches (people should reorder the git history instead)
     patch_name = "nope.patch"
-    if starting_patch_id <= 1:
-        bad_patch_id = starting_patch_id + 1
-    else:
-        bad_patch_id = starting_patch_id - 1
+    bad_patch_id = (
+        starting_patch_id + 1 if starting_patch_id <= 1 else starting_patch_id - 1
+    )
     with pytest.raises(SourceNumberException):
         spec.add_patch(patch_name, bad_patch_id)
 
