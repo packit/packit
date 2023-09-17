@@ -190,6 +190,14 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
     "```\ngit fetch https://src.fedoraproject.org/forks/{user}/rpms/{package}.git "
     "refs/heads/*:refs/remotes/{user}/*\n"
     "git checkout {user}/{branch}\n```\n"
+    "\n---\n\n"
+    "Before pushing builds/updates, please remember to check the new\n"
+    "version against the "
+    "[packaging guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/).\n"
+    "For example, please:\n"
+    "- check that the new sources only contain permissible content\n"
+    "- check that the license of the new version has not changed\n"
+    "- check for any API/ABI and other changes that may break dependent packages\n"
 )
 
 COMMIT_ACTION_DIVIDER = "---%<--- snip ---%<--- here ---%<---\n"
