@@ -234,6 +234,10 @@ class PackitAPI:
         return SANDCASTLE_EXEC_DIR
 
     @property
+    def pkg_tool(self) -> str:
+        return self.package_config.pkg_tool or self.config.pkg_tool
+
+    @property
     def sync_release_env(self):
         if self.config.command_handler == RunCommandType.sandcastle:
             exec_dir = Path(self._get_sandcastle_exec_dir())
@@ -1820,7 +1824,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         if self._kerberos_initialized:
             return
 
-        if not self.config.pkg_tool.startswith("fedpkg"):
+        if not self.pkg_tool.startswith("fedpkg"):
             # centpkg doesn't use kerberos
             return
 

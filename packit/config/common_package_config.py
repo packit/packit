@@ -118,7 +118,7 @@ class CommonPackageConfig:
             payload of TF requests.
         module_hotfixes: if set, copr will generate repo files with module_hotfixes=1
         upload_sources: If Packit should upload sources to lookaside cache. True by default.
-
+        pkg_tool: Tool that is used for interaction with the lookaside cache.
     """
 
     def __init__(
@@ -190,6 +190,7 @@ class CommonPackageConfig:
         upstream_tag_include: str = "",
         upstream_tag_exclude: str = "",
         upload_sources: bool = True,
+        pkg_tool: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -303,6 +304,8 @@ class CommonPackageConfig:
 
         self.follow_fedora_branching = follow_fedora_branching
         self.upload_sources = upload_sources
+
+        self.pkg_tool = pkg_tool
 
     @property
     def targets_dict(self):

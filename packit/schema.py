@@ -394,6 +394,9 @@ class CommonConfigSchema(Schema):
     image_customizations = fields.Dict(missing=None)
     copr_chroot = fields.String(missing=None)
 
+    # Packaging tool used for interaction with lookaside cache
+    pkg_tool = fields.String(missing=None)
+
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id

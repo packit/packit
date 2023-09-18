@@ -173,6 +173,11 @@ class DistGit(PackitRepositoryBase):
                 return None
         return self._downstream_config
 
+    @property
+    def pkg_tool(self) -> str:
+        """Returns the packaging tool. Prefers the package-level override."""
+        return self.package_config.pkg_tool or self.config.pkg_tool
+
     def clone_package(
         self,
         target_path: Union[Path, str],
@@ -191,7 +196,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=target_path,
-            tool=self.config.pkg_tool,
+            tool=self.pkg_tool,
         )
         pkg_tool.clone(
             package_name=self.package_config.downstream_package_name,
@@ -353,7 +358,7 @@ class DistGit(PackitRepositoryBase):
         archives = []
         logger.info(f"Downloading archives: {self.upstream_archive_names}")
         with cwd(self.local_project.working_dir):
-            self.download_remote_sources(self.config.pkg_tool)
+            self.download_remote_sources(self.pkg_tool)
         for upstream_archive_name in self.upstream_archive_names:
             archive = self.absolute_source_dir / upstream_archive_name
             if not archive.exists():
@@ -378,7 +383,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            tool=pkg_tool or self.config.pkg_tool,
+            tool=pkg_tool or self.pkg_tool,
         )
         pkg_tool_.sources()
 
@@ -405,7 +410,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            tool=pkg_tool or self.config.pkg_tool,
+            tool=pkg_tool or self.pkg_tool,
         )
         try:
             pkg_tool_.new_sources(
@@ -461,7 +466,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
-            tool=self.config.pkg_tool,
+            tool=self.pkg_tool,
         )
         pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
