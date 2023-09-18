@@ -17,7 +17,7 @@ from packit.api import PackitAPI
 from packit.config import Config, JobType, get_local_package_config
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import PackageConfig
-from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES, DISTRO_DIR, SRC_GIT_CONFIG
+from packit.constants import DISTGIT_HOSTNAME_CANDIDATES, DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
@@ -323,7 +323,7 @@ def get_packit_api(
 
         if package_config.dist_git_base_url and (
             remote_hostname in package_config.dist_git_base_url
-            or remote_hostname in DIST_GIT_HOSTNAME_CANDIDATES
+            or remote_hostname in DISTGIT_HOSTNAME_CANDIDATES
         ):
             lp_downstream = local_project
             logger.debug("Input directory is a downstream repository.")

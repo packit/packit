@@ -18,7 +18,7 @@ from packit.config import PackageConfig, get_context_settings, pass_config
 from packit.config.aliases import get_branches
 from packit.config.job_config import JobType
 from packit.constants import (
-    CENTOS_STREAM_DISTGIT_URL,
+    DISTGIT_INSTANCES,
     PACKAGE_LONG_OPTION,
     PACKAGE_OPTION_HELP,
     PACKAGE_SHORT_OPTION,
@@ -74,7 +74,7 @@ def sync_release(
     if centos_stream_job:
         api_centos = copy.deepcopy(api)
         api_centos.config.pkg_tool = "centpkg"
-        api_centos.package_config.dist_git_base_url = CENTOS_STREAM_DISTGIT_URL
+        api_centos.package_config.dist_git_base_url = DISTGIT_INSTANCES["centpkg"].url
         new_job = get_centos_stream_job(api_centos)
         if new_job:
             for pkg_conf in new_job.packages.values():
