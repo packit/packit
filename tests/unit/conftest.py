@@ -63,6 +63,7 @@ def package_config_mock():
         patch_generation_ignore_paths=[],
         patch_generation_patch_id_digits=4,
         is_sub_package=False,
+        pkg_tool=None,
     )
     mock.should_receive("get_all_files_to_sync").and_return([])
     mock.should_receive("get_package_names_as_env").and_return({})
