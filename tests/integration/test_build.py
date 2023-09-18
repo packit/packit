@@ -36,8 +36,8 @@ def test_build_from_upstream(
 
     def mocked_run_command(
         cmd: Union[list[str], str],
-        error_message: str = None,
-        cwd: Union[str, Path] = None,
+        error_message: Optional[str] = None,
+        cwd: Optional[Union[str, Path]] = None,
         fail: bool = True,
         output: bool = False,
         env: Optional[dict] = None,

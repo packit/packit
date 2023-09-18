@@ -1095,7 +1095,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         no_pr: bool = False,
         fork: bool = True,
         remote_name: Optional[str] = None,
-        exclude_files: Iterable[str] = None,
+        exclude_files: Optional[Iterable[str]] = None,
         force: bool = False,
         sync_only_specfile: bool = False,
     ):
@@ -1312,7 +1312,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         dist_git_branch: str,
         update_type: str,
         update_notes: Optional[str] = None,
-        koji_builds: Sequence[str] = None,
+        koji_builds: Optional[Sequence[str]] = None,
         bugzilla_ids: Optional[list[int]] = None,
     ):
         """
@@ -1403,7 +1403,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         output_file: Optional[str] = None,
         upstream_ref: Optional[str] = None,
-        srpm_dir: Union[Path, str] = None,
+        srpm_dir: Optional[Union[Path, str]] = None,
         update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
     ) -> Path:
@@ -1445,7 +1445,7 @@ The first dist-git commit to be synced is '{short_hash}'.
     def create_rpms(
         self,
         upstream_ref: Optional[str] = None,
-        rpm_dir: str = None,
+        rpm_dir: Optional[str] = None,
         release_suffix: Optional[str] = None,
     ) -> list[Path]:
         """
@@ -1712,7 +1712,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         build_id: int,
         timeout: int,
-        report_func: Callable = None,
+        report_func: Optional[Callable] = None,
     ) -> str:
         """returns copr build state"""
         return self.copr_helper.watch_copr_build(

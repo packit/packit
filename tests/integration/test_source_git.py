@@ -438,7 +438,7 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref)
     create_merge_commit_in_source_git(sg_path)
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
     branches = subprocess.check_output(
@@ -473,7 +473,7 @@ def test_srpm_merge_storm(
 
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
     branches = subprocess.check_output(
@@ -541,7 +541,7 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -583,7 +583,7 @@ def test_srpm_git_no_prefix_patches(
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -616,7 +616,7 @@ def test_srpm_empty_patch(
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -661,7 +661,7 @@ def test_srpm_patch_non_conseq_indices(
     assert last_patch.number == 6
     assert last_patch.filename == "0004-Wei-bier-Summer-is-coming.patch"
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -741,7 +741,7 @@ def test_srpm_add_patch_with_ids(
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 

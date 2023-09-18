@@ -198,7 +198,7 @@ class Upstream(PackitRepositoryBase):
     def create_patches(
         self,
         upstream: Optional[str] = None,
-        destination: Union[str, Path] = None,
+        destination: Optional[Union[str, Path]] = None,
     ) -> list[PatchMetadata]:
         """
         Create patches from downstream commits.
@@ -308,7 +308,7 @@ class Upstream(PackitRepositoryBase):
 
     def create_archive(
         self,
-        version: str = None,
+        version: Optional[str] = None,
         create_symlink: Optional[bool] = True,
     ) -> str:
         return Archive(self, version).create(create_symlink=create_symlink)
@@ -339,7 +339,7 @@ class Upstream(PackitRepositoryBase):
 
         return tags
 
-    def get_last_tag(self, before: str = None) -> Optional[str]:
+    def get_last_tag(self, before: Optional[str] = None) -> Optional[str]:
         """
         Get last git-tag (matching the configuration) from the repo.
 
@@ -366,7 +366,7 @@ class Upstream(PackitRepositoryBase):
                 logger.debug(f"{before} not present in the obtained list of tags.")
                 return None
             index = tags.index(before)
-            tags = tags[(index + 1) :]  # noqa
+            tags = tags[(index + 1) :]
 
         matching_tags = self.filter_tags(tags)
         return matching_tags[0] if matching_tags else None

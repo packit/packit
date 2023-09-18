@@ -22,7 +22,7 @@ class CommitVerifier:
     Class used for verifying git commits. Uses python-gnupg for accessing the GPG binary.
     """
 
-    def __init__(self, key_server: str = None) -> None:
+    def __init__(self, key_server: Optional[str] = None) -> None:
         """
         :param key_server: GPG key server to be used
         """

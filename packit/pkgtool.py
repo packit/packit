@@ -46,7 +46,7 @@ class PkgTool:
 
         sources_ = [str(source) for source in sources] if sources else []
         return commands.run_command_remote(
-            cmd=[self.tool, "new-sources"] + sources_,
+            cmd=[self.tool, "new-sources", *sources_],
             cwd=self.directory,
             error_message="Adding new sources failed:",
             print_live=True,

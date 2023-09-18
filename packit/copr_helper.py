@@ -405,7 +405,7 @@ class CoprHelper:
         self,
         build_id: int,
         timeout: int,
-        report_func: Callable = None,
+        report_func: Optional[Callable] = None,
     ) -> str:
         """returns copr build state"""
         watch_end = datetime.now() + timedelta(seconds=timeout)

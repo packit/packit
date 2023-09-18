@@ -112,7 +112,7 @@ def is_git_repo(directory: Union[Path, str]) -> bool:
     return Path(directory, ".git").exists()
 
 
-def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
+def get_repo(url: str, directory: Optional[Union[Path, str]] = None) -> git.Repo:
     """
     Use directory as a git repo or clone repo to the tempdir.
     """
@@ -212,7 +212,7 @@ def get_current_version_command(
 
 
 def create_new_repo(cwd: Path, switches: list[str]):
-    subprocess.check_call(["git", "init"] + switches + [str(cwd)])
+    subprocess.check_call(["git", "init", *switches, str(cwd)])
     # TODO: Replace with -b / --initial-branch in `git init` when possible
     if "--bare" not in switches:
         subprocess.check_call(["git", "checkout", "-b", "main"], cwd=cwd)
@@ -463,7 +463,7 @@ def get_file_author(repo: git.Repo, filename: str) -> str:
 @contextmanager
 def commit_message_file(
     subject: str,
-    message: str = None,
+    message: Optional[str] = None,
     trailers: Optional[list[tuple[str, str]]] = None,
 ) -> Generator[str, None, None]:
     """Context manager to yield a commit message file

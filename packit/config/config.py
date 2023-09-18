@@ -47,7 +47,7 @@ class Config:
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
-        command_handler_pvc_volume_specs: list[dict[str, str]] = None,
+        command_handler_pvc_volume_specs: Optional[list[dict[str, str]]] = None,
         command_handler_storage_class: str = "",
         appcode: str = "",
         package_config_path=None,
@@ -229,7 +229,7 @@ class Config:
         self,
         url: str,
         required: bool = True,
-        get_project_kwargs: dict = None,
+        get_project_kwargs: Optional[dict] = None,
     ) -> Optional[GitProject]:
         """
         Gets a GitProject for the given URL.
@@ -266,7 +266,7 @@ class Config:
         self,
         url: str,
         required: bool = True,
-        get_project_kwargs: dict = None,
+        get_project_kwargs: Optional[dict] = None,
     ) -> Proxy:
         """
         Gets a proxy of GitProject for the given URL. On access, if the underlying

@@ -203,9 +203,9 @@ def iterate_packages_source_git(func):
             decorated_func_kwargs["config"] = copy.deepcopy(
                 config,
             )  # reset working variables like srpm_path
-            decorated_func_kwargs["package_config"] = list(
-                packages_config.get_package_config_views().values(),
-            )[0]
+            decorated_func_kwargs["package_config"] = next(
+                iter(packages_config.get_package_config_views().values()),
+            )
             func(*args, **decorated_func_kwargs)
             found_func = True
 
@@ -275,9 +275,9 @@ def get_packit_api(
         logger.debug(f"Final package (job) config: {package_config}")
     elif job_type is not None:
         try:
-            package_config = [
+            package_config = next(
                 job for job in package_config.jobs if job.type == job_type
-            ][0]
+            )
         except IndexError as e:
             raise PackitException(
                 f"No job with type {job_type} found in package config.",

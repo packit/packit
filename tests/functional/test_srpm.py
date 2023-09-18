@@ -16,7 +16,7 @@ from tests.spellbook import build_srpm
 def test_srpm_command_for_path(upstream_or_distgit_path, tmp_path):
     with cwd(tmp_path):
         call_real_packit(parameters=["--debug", "srpm", str(upstream_or_distgit_path)])
-        srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
+        srpm_path = next(Path.cwd().glob("*.src.rpm"))
         assert srpm_path.exists()
         build_srpm(srpm_path)
 
@@ -27,7 +27,7 @@ def test_srpm_command_for_path_with_multiple_sources(
     workdir, _ = upstream_and_remote_with_multiple_sources
     with cwd(workdir):
         call_real_packit(parameters=["--debug", "srpm", str(workdir)])
-        srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
+        srpm_path = next(Path.cwd().glob("*.src.rpm"))
         assert srpm_path.exists()
         assert (Path.cwd() / "python-ogr.spec").exists()
         build_srpm(srpm_path)
@@ -35,7 +35,7 @@ def test_srpm_command_for_path_with_multiple_sources(
 
 def test_srpm_command(cwd_upstream_or_distgit):
     call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
-    srpm_path = list(cwd_upstream_or_distgit.glob("*.src.rpm"))[0]
+    srpm_path = next(cwd_upstream_or_distgit.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -48,7 +48,7 @@ def test_srpm_command_no_tags(upstream_and_remote):
     subprocess.run(["xargs", "git", "tag", "-d"], cwd=upstream_cwd, input=tags.stdout)
 
     call_real_packit(parameters=["--debug", "srpm"], cwd=upstream_cwd)
-    srpm_path = list(upstream_cwd.glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_cwd.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -70,14 +70,14 @@ def test_action_output(upstream_and_remote):
     )
 
     assert f"INFO   {the_line_we_want}\n" in out.decode()
-    srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_repo_path.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
 
 def test_srpm_spec_not_in_root(upstream_spec_not_in_root):
     call_real_packit(parameters=["--debug", "srpm"], cwd=upstream_spec_not_in_root[0])
-    srpm_path = list(upstream_spec_not_in_root[0].glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_spec_not_in_root[0].glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -85,7 +85,7 @@ def test_srpm_spec_not_in_root(upstream_spec_not_in_root):
 def test_srpm_weird_sources(upstream_and_remote_weird_sources):
     repo = upstream_and_remote_weird_sources[0]
     call_real_packit(parameters=["--debug", "srpm"], cwd=repo)
-    srpm_path = list(repo.glob("*.src.rpm"))[0]
+    srpm_path = next(repo.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -152,7 +152,7 @@ def _test_srpm_symlinking(upstream_repo_path, path_prefix):
     )
     assert f"INFO   {desired_path}\n" in out.decode()
 
-    srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_repo_path.glob("*.src.rpm"))
     assert srpm_path.exists()
 
     tarball = Path(upstream_repo_path / sources_tarball)
