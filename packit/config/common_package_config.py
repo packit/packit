@@ -112,6 +112,7 @@ class CommonPackageConfig:
         tf_extra_params: Additional Testing Farm parameters to merge into the
             payload of TF requests.
         module_hotfixes: if set, copr will generate repo files with module_hotfixes=1
+        upload_sources: If Packit should upload sources to lookaside cache. True by default.
 
     """
 
@@ -183,6 +184,7 @@ class CommonPackageConfig:
         follow_fedora_branching: bool = False,
         upstream_tag_include: str = "",
         upstream_tag_exclude: str = "",
+        upload_sources: bool = True,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -281,6 +283,7 @@ class CommonPackageConfig:
         self.copr_chroot = copr_chroot
 
         self.follow_fedora_branching = follow_fedora_branching
+        self.upload_sources = upload_sources
 
     @property
     def targets_dict(self):

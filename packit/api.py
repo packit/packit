@@ -1251,7 +1251,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         # we would lose the unchanged ones from sources file,
         # because upload_to_lookaside_cache maintains the sources file in addition
         # to uploading, and it replaces it entirely, losing the previous content
-        self.dg.upload_to_lookaside_cache(archives=archives, pkg_tool=pkg_tool)
+        self.dg.upload_to_lookaside_cache(
+            archives=archives,
+            pkg_tool=pkg_tool,
+            offline=not self.package_config.upload_sources,
+        )
 
     def build(
         self,
