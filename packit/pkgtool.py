@@ -39,14 +39,22 @@ class PkgTool:
             f"tool='{self.tool}')"
         )
 
-    def new_sources(self, sources: Optional[Iterable[Path]] = None, fail: bool = True):
+    def new_sources(
+        self,
+        sources: Optional[Iterable[Path]] = None,
+        fail: bool = True,
+        offline: bool = False,
+    ):
         sources = sources or []
         if not self.directory.is_dir():
             raise Exception(f"Cannot access {self.tool} repository: {self.directory}")
 
+        cmd = [self.tool, "new-sources"]
+        if offline:
+            cmd.append("--offline")
         sources_ = [str(source) for source in sources] if sources else []
         return commands.run_command_remote(
-            cmd=[self.tool, "new-sources", *sources_],
+            cmd=cmd + sources_,
             cwd=self.directory,
             error_message="Adding new sources failed:",
             print_live=True,
