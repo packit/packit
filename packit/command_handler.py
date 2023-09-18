@@ -182,7 +182,7 @@ class SandcastleCommandHandler(CommandHandler):
         from sandcastle.exceptions import SandcastleCommandFailed
 
         cwd = cwd or Path(self.local_project.working_dir).relative_to(
-            self.config.command_handler_work_dir
+            self.config.command_handler_work_dir,
         )
         logger.info(f"Running command: {' '.join(command)} on dir {cwd}")
 

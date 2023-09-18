@@ -10,7 +10,7 @@ from munch import Munch
 
 from packit import api as packit_api
 from packit.api import PackitAPI
-from packit.config import CommonPackageConfig, PackageConfig
+from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -85,6 +85,7 @@ def api_mock(config_mock, package_config_mock, upstream_mock, distgit_mock):
     api._dg = distgit_mock
     api.should_receive("_prepare_files_to_sync").and_return([])
     api.should_receive("_handle_sources")
+    api.should_receive("_get_sandcastle_exec_dir").and_return("sandcastle-exec-dir")
     return api
 
 
@@ -197,6 +198,20 @@ def test_sync_release_create_sync_note(api_mock):
     api_mock.sync_release(version="1.1", dist_git_branch="_")
 
 
+def test_sync_release_env(api_mock):
+    env = api_mock.sync_release_env
+    assert env == {
+        "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/dist-git",
+        "PACKIT_UPSTREAM_REPO": "/mock_dir/sandcastle/local-project",
+    }
+    api_mock.config.command_handler = RunCommandType.sandcastle
+    env = api_mock.sync_release_env
+    assert env == {
+        "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/sandcastle-exec-dir/dist-git",
+        "PACKIT_UPSTREAM_REPO": "/mock_dir/sandcastle/sandcastle-exec-dir/local-project",
+    }
+
+
 @pytest.mark.parametrize(
     "path, downstream_package_name, expectation",
     [
@@ -259,8 +274,8 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     flexmock(packit_api).should_receive("sync_files").with_args(
         [
             SyncFilesItem(
-                src=["/mock_dir/src/a"],
-                dest="/mock_dir/dest",
+                src=["/mock_dir/sandcastle/local-project/src/a"],
+                dest="/mock_dir/sandcastle/dist-git/dest",
                 mkpath=True,
                 delete=True,
                 filters=["dummy filter"],

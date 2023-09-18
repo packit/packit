@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
 from pathlib import Path
 
 import pytest
@@ -64,6 +65,7 @@ def package_config_mock():
         is_sub_package=False,
     )
     mock.should_receive("get_all_files_to_sync").and_return([])
+    mock.should_receive("get_package_names_as_env").and_return({})
 
     # simulate ‹MultiplePackages›
     mock._first_package = "default"
@@ -78,6 +80,7 @@ def config_mock():
     conf._pagure_user_token = "test"
     conf._github_token = "test"
     conf.fas_user = "packit"
+    conf.command_handler_work_dir = "/mock_dir/sandcastle"
     return conf
 
 
@@ -101,7 +104,7 @@ def local_project_mock(git_project_mock, git_repo_mock):
     flexmock(Path).should_receive("write_text")
     return flexmock(
         git_project=git_project_mock,
-        working_dir=Path("/mock_dir"),
+        working_dir=Path("/mock_dir/sandcastle/local-project"),
         ref="mock_ref",
         git_repo=git_repo_mock,
         checkout_release=lambda *_: None,
@@ -129,10 +132,12 @@ def upstream_mock(local_project_mock, package_config_mock):
 
 @pytest.fixture
 def distgit_mock(local_project_mock, config_mock, package_config_mock):
+    local_project = copy.copy(local_project_mock)
+    local_project.working_dir = Path("/mock_dir/sandcastle/dist-git")
     distgit = DistGit(
         config=config_mock,
         package_config=package_config_mock,
-        local_project=local_project_mock,
+        local_project=local_project,
     )
     flexmock(distgit)
     distgit.should_receive("is_dirty").and_return(False)
