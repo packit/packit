@@ -360,6 +360,7 @@ class CommonConfigSchema(Schema):
     update_release = fields.Bool(default=True)
     upstream_tag_include = fields.String()
     upstream_tag_exclude = fields.String()
+    upload_sources = fields.Bool(default=True)
 
     # Former 'metadata' keys
     _targets = TargetsListOrDict(missing=None, data_key="targets")

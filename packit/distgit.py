@@ -386,6 +386,7 @@ class DistGit(PackitRepositoryBase):
         self,
         archives: Iterable[Path],
         pkg_tool: str = "",
+        offline: bool = False,
     ) -> None:
         """Upload files (archives) to the lookaside cache.
 
@@ -394,6 +395,8 @@ class DistGit(PackitRepositoryBase):
         Args:
             archive: Path to archive to upload to lookaside cache.
             pkg_tool: Optional, rpkg tool (fedpkg/centpkg) to use to upload.
+            offline: Whether to use offline mode of the tool
+                     (no actual upload, just local file updates).
 
         Raises:
             PackitException, if the upload fails.
@@ -405,7 +408,10 @@ class DistGit(PackitRepositoryBase):
             tool=pkg_tool or self.config.pkg_tool,
         )
         try:
-            pkg_tool_.new_sources(sources=archives)
+            pkg_tool_.new_sources(
+                sources=archives,
+                offline=offline,
+            )
         except Exception as ex:
             logger.error(
                 f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}",
