@@ -128,7 +128,7 @@ class CommonPackageConfig:
         downstream_project_url: Optional[str] = None,
         downstream_package_name: Optional[str] = None,
         dist_git_base_url: Optional[str] = None,
-        actions: dict[ActionName, Union[str, list[str]]] = None,
+        actions: Optional[dict[ActionName, Union[str, list[str]]]] = None,
         upstream_ref: Optional[str] = None,
         allowed_gpg_keys: Optional[list[str]] = None,
         create_pr: bool = True,
@@ -436,7 +436,7 @@ class MultiplePackages:
 
     def __init__(self, packages: dict[str, CommonPackageConfig]):
         super().__setattr__("packages", packages)
-        super().__setattr__("_first_package", list(packages)[0])
+        super().__setattr__("_first_package", next(iter(packages)))
 
     def __getattr__(self, name):
         if name in self.__dict__:

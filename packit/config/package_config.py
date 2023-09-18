@@ -347,7 +347,7 @@ def load_packit_yaml(
                 + str(ex.problem)  # type: ignore
             )  # type: ignore
             if ex.context is not None:  # type: ignore
-                msg += f" {str(ex.context)}"  # type: ignore
+                msg += f" {ex.context!s}"  # type: ignore
             logger.error(msg)
         else:
             logger.error(f"parser says: {ex!r}.")
@@ -522,7 +522,10 @@ def parse_loaded_config(
         raise PackitConfigException(f"Cannot parse package config. {ex!r}") from ex
 
 
-def get_local_specfile_path(dir: Path, exclude: list[str] = None) -> Optional[str]:
+def get_local_specfile_path(
+    dir: Path,
+    exclude: Optional[list[str]] = None,
+) -> Optional[str]:
     """
     Get the path to the local specfile if present. If specfile is not found in
     the directory itself, search for it recursively (rglob).
@@ -551,7 +554,10 @@ def get_local_specfile_path(dir: Path, exclude: list[str] = None) -> Optional[st
     return None
 
 
-def get_specfile_path_from_repo(project: GitProject, ref: str = None) -> Optional[str]:
+def get_specfile_path_from_repo(
+    project: GitProject,
+    ref: Optional[str] = None,
+) -> Optional[str]:
     """
     Get the path of the specfile in the given repo if present.
 

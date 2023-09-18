@@ -284,7 +284,7 @@ def test_sync_release_check_pr_instructions(api_mock):
             "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
             "If you need to do any change in this pull request, you need to locally fetch the "
             "source branch of it and push it (with a fix) to your fork "
-            "(as it is not possible to push to the branch created in the Packit’s fork):\n"
+            "(as it is not possible to push to the branch created in the Packit's fork):\n"
             "```\ngit fetch https://src.fedoraproject.org/forks/packit/rpms/package.git "
             "refs/heads/*:refs/remotes/packit/*\n"
             "git checkout packit/1.1-_-update\n```\n"

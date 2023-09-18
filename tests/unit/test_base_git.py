@@ -235,7 +235,7 @@ def test_run_action_in_sandcastle(
     def mocked_exec(
         command: list[str],
         env: Optional[dict] = None,
-        cwd: Union[str, Path] = None,
+        cwd: Optional[Union[str, Path]] = None,
     ):
         if command == ["command", "-b"]:
             return "1.2.3"

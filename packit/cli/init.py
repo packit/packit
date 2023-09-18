@@ -86,7 +86,7 @@ def get_existing_config(working_dir: Path) -> Optional[Path]:
 def generate_config(
     config_file: Path,
     write_to_file: bool = False,
-    template_data: dict = None,
+    template_data: Optional[dict] = None,
 ) -> str:
     """
     Generate config file from provided data

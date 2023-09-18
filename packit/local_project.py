@@ -7,7 +7,7 @@ import shutil
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import Any, Optional, TypeVar, Union
+from typing import Any, ClassVar, Optional, TypeVar, Union
 
 import git
 from git.exc import GitCommandError
@@ -628,7 +628,7 @@ CanCalculate = Union[T, _CalculateType]
 class LocalProjectBuilder:
     """Class for building instances of LocalProject dynamically."""
 
-    PREREQUISITES = {
+    PREREQUISITES: ClassVar = {
         "git_repo": ["working_dir", "git_url"],
         "git_project": ["git_url", "repo_name", "namespace", "git_service"],
         "git_service": ["git_project"],
@@ -643,7 +643,7 @@ class LocalProjectBuilder:
     def __init__(
         self,
         cache: Optional[RepositoryCache] = None,
-        instances: Iterable[GitService] = None,
+        instances: Optional[Iterable[GitService]] = None,
         offline: bool = False,
     ):
         """Creates a builder instance.

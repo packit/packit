@@ -129,7 +129,7 @@ class SourceGitGenerator:
                 "--define",
                 f"_packitpatch {_packitpatch}",
                 "--define",
-                f"_topdir {str(self.dist_git.working_dir)}",
+                f"_topdir {self.dist_git.working_dir!s}",
                 "-bp",
                 "--define",
                 f"_specdir {self.dist_git.working_dir}",

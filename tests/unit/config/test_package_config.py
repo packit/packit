@@ -1736,7 +1736,7 @@ def test_get_local_specfile_path():
 @pytest.mark.parametrize(
     "directory, local_first,local_last,config_file_name,res_pc_path",
     [
-        ([], False, True, None, Path.cwd() / list(CONFIG_FILE_NAMES)[0]),
+        ([], False, True, None, Path.cwd() / next(iter(CONFIG_FILE_NAMES))),
         ([], False, False, "different_conf.yaml", "different_conf.yaml"),
     ],
 )

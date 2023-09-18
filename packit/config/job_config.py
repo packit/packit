@@ -4,6 +4,7 @@
 from copy import deepcopy
 from enum import Enum
 from logging import getLogger
+from typing import Optional
 
 from packit.config.aliases import DEFAULT_VERSION
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
@@ -65,7 +66,7 @@ class JobConfig(MultiplePackages):
         packages: dict[str, CommonPackageConfig],
         skip_build: bool = False,
         manual_trigger: bool = False,
-        labels: list[str] = None,
+        labels: Optional[list[str]] = None,
     ):
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.

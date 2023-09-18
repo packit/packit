@@ -148,7 +148,7 @@ class PackitRepositoryBase:
             setup_tracking=setup_tracking,
         )
 
-    def switch_branch(self, branch: str = None) -> None:
+    def switch_branch(self, branch: Optional[str] = None) -> None:
         """
         Switch to a specified branch.
 
@@ -190,7 +190,7 @@ class PackitRepositoryBase:
     def run_action(
         self,
         actions: ActionName,
-        method: Callable = None,
+        method: Optional[Callable] = None,
         env: Optional[dict] = None,
         *args,
         **kwargs,
