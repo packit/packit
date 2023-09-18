@@ -2,34 +2,33 @@
 # SPDX-License-Identifier: MIT
 
 import shutil
-from pathlib import Path
-from typing import Tuple
 import subprocess
+from pathlib import Path
 
 import pytest
+from deepdiff import DeepDiff
 from flexmock import flexmock
 
+from packit.config import JobConfig, PackageConfig
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 from tests.spellbook import (
-    initiate_git_repo,
-    UPSTREAM,
-    prepare_dist_git_repo,
+    DG_OGR,
     DISTGIT,
     DISTGIT_WITH_AUTOCHANGELOG,
-    DG_OGR,
+    UPSTREAM,
     UPSTREAM_SPEC_NOT_IN_ROOT,
-    UPSTREAM_WITH_MUTLIPLE_SOURCES,
     UPSTREAM_WEIRD_SOURCES,
+    UPSTREAM_WITH_MUTLIPLE_SOURCES,
+    initiate_git_repo,
+    prepare_dist_git_repo,
 )
-
-from packit.config import JobConfig, PackageConfig
-from deepdiff import DeepDiff
 
 
 def get_git_repo_and_remote(
-    target_dir: Path, repo_template_path: Path
-) -> Tuple[Path, Path]:
+    target_dir: Path,
+    repo_template_path: Path,
+) -> tuple[Path, Path]:
     """
     :param target_dir: tmpdir from pytest - we'll work here
     :param repo_template_path: git repo template from tests/data/
@@ -46,27 +45,27 @@ def get_git_repo_and_remote(
 
 
 @pytest.fixture()
-def upstream_and_remote(tmp_path) -> Tuple[Path, Path]:
+def upstream_and_remote(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM)
 
 
 @pytest.fixture()
-def upstream_and_remote_with_multiple_sources(tmp_path) -> Tuple[Path, Path]:
+def upstream_and_remote_with_multiple_sources(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM_WITH_MUTLIPLE_SOURCES)
 
 
 @pytest.fixture()
-def upstream_and_remote_weird_sources(tmp_path) -> Tuple[Path, Path]:
+def upstream_and_remote_weird_sources(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM_WEIRD_SOURCES)
 
 
 @pytest.fixture()
-def upstream_spec_not_in_root(tmp_path) -> Tuple[Path, Path]:
+def upstream_spec_not_in_root(tmp_path) -> tuple[Path, Path]:
     return get_git_repo_and_remote(tmp_path, UPSTREAM_SPEC_NOT_IN_ROOT)
 
 
 @pytest.fixture()
-def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
+def distgit_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     create_new_repo(d_remote_path, ["--bare"])
@@ -87,7 +86,7 @@ def distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
 
 
 @pytest.fixture()
-def distgit_with_autochangelog_and_remote(tmp_path) -> Tuple[Path, Path]:
+def distgit_with_autochangelog_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "autochangelog_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     create_new_repo(d_remote_path, ["--bare"])
@@ -108,7 +107,7 @@ def distgit_with_autochangelog_and_remote(tmp_path) -> Tuple[Path, Path]:
 
 
 @pytest.fixture()
-def ogr_distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
+def ogr_distgit_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "ogr_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
     create_new_repo(d_remote_path, ["--bare"])
@@ -129,7 +128,10 @@ def ogr_distgit_and_remote(tmp_path) -> Tuple[Path, Path]:
 
 @pytest.fixture(params=["upstream", "ogr-distgit"])
 def upstream_or_distgit_path(
-    request, upstream_and_remote, distgit_and_remote, ogr_distgit_and_remote
+    request,
+    upstream_and_remote,
+    distgit_and_remote,
+    ogr_distgit_and_remote,
 ):
     """
     Parametrize the test to upstream, downstream [currently skipped] and ogr distgit
@@ -142,7 +144,7 @@ def upstream_or_distgit_path(
 
 
 @pytest.fixture(
-    params=["upstream", "distgit", "ogr-distgit", "upstream-with-multiple-sources"]
+    params=["upstream", "distgit", "ogr-distgit", "upstream-with-multiple-sources"],
 )
 def cwd_upstream_or_distgit(
     request,
@@ -221,7 +223,7 @@ def pytest_assertrepr_compare(op, left, right):
 
         schema = JobConfigSchema()
         return [str(DeepDiff(schema.dump(left), schema.dump(right)))]
-    elif (
+    if (
         isinstance(left, PackageConfig)
         and isinstance(right, PackageConfig)
         and op == "=="
@@ -230,5 +232,6 @@ def pytest_assertrepr_compare(op, left, right):
 
         schema = PackageConfigSchema()
         return [str(DeepDiff(schema.dump(left), schema.dump(right)))]
-    elif isinstance(left, dict) and isinstance(right, dict) and op == "==":
+    if isinstance(left, dict) and isinstance(right, dict) and op == "==":
         return [str(DeepDiff(left, right))]
+    return None

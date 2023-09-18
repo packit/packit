@@ -2,20 +2,22 @@
 # SPDX-License-Identifier: MIT
 
 from subprocess import check_output
+
 from requre.cassette import DataTypes
+from requre.helpers.files import StoreFiles
+from requre.helpers.simple_object import Simple
+from requre.modules_decorate_all_methods import (
+    record_git_module,
+    record_requests_module,
+    record_tempfile_module,
+)
 from requre.online_replacing import (
     apply_decorator_to_all_methods,
     replace_module_match,
 )
-from requre.helpers.simple_object import Simple
-from requre.helpers.files import StoreFiles
+
 from packit.api import PackitAPI
 from tests_recording.testbase import PackitTest
-from requre.modules_decorate_all_methods import (
-    record_requests_module,
-    record_tempfile_module,
-    record_git_module,
-)
 
 
 @record_tempfile_module
@@ -23,21 +25,23 @@ from requre.modules_decorate_all_methods import (
 @record_git_module
 @apply_decorator_to_all_methods(
     replace_module_match(
-        what="packit.utils.run_command_remote", decorate=Simple.decorator_plain()
-    )
+        what="packit.utils.run_command_remote",
+        decorate=Simple.decorator_plain(),
+    ),
 )
 @apply_decorator_to_all_methods(
     replace_module_match(
         what="packit.pkgtool.PkgTool.clone",
         decorate=StoreFiles.where_arg_references(
-            key_position_params_dict={"target_path": 2}
+            key_position_params_dict={"target_path": 2},
         ),
-    )
+    ),
 )
 @apply_decorator_to_all_methods(
     replace_module_match(
-        what="copr.v3.helpers.config_from_file", decorate=Simple.decorator_plain()
-    )
+        what="copr.v3.helpers.config_from_file",
+        decorate=Simple.decorator_plain(),
+    ),
 )
 class ProposeUpdate(PackitTest):
     def cassette_setup(self, cassette):

@@ -33,10 +33,10 @@ def nested_get(d: dict, *keys, default=None) -> Any:
     :return: value or None
     """
     response = d
-    for k in keys:
-        try:
+    try:
+        for k in keys:
             response = response[k]
-        except (KeyError, AttributeError, TypeError):
-            # logger.debug("can't obtain %s: %s", k, ex)
-            return default
+    except (KeyError, AttributeError, TypeError):
+        # logger.debug("can't obtain %s: %s", k, ex)
+        return default
     return response

@@ -3,10 +3,11 @@
 
 import logging
 import os
-import tempfile
-from pathlib import Path
 import re
-from typing import Optional, Sequence, List, Union, Iterable
+import tempfile
+from collections.abc import Iterable, Sequence
+from pathlib import Path
+from typing import Optional, Union
 
 import cccolutils
 import git
@@ -15,6 +16,7 @@ from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
 from ogr.abstract import PullRequest
 from specfile.utils import NEVR
+
 from packit.base_git import PackitRepositoryBase
 from packit.config import (
     Config,
@@ -24,15 +26,15 @@ from packit.config import (
 )
 from packit.constants import EXISTING_BODHI_UPDATE_REGEX
 from packit.exceptions import (
-    PackitException,
-    PackitConfigException,
     PackitBodhiException,
+    PackitConfigException,
+    PackitException,
 )
-from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
-from packit.utils.koji_helper import KojiHelper
 from packit.utils.commands import cwd
+from packit.utils.koji_helper import KojiHelper
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +114,8 @@ class DistGit(PackitRepositoryBase):
         dg = cls(config, package_config)
         dg.clone_package(target_path=path, branch=branch)
         dg._local_project = LocalProjectBuilder().build(
-            working_dir=path, git_repo=CALCULATE
+            working_dir=path,
+            git_repo=CALCULATE,
         )
         return dg
 
@@ -133,7 +136,7 @@ class DistGit(PackitRepositoryBase):
                 namespace=self.package_config.dist_git_namespace,
                 repo_name=self.package_config.downstream_package_name,
                 git_project=self.config.get_project(
-                    url=self.package_config.dist_git_package_url
+                    url=self.package_config.dist_git_package_url,
                 ),
                 cache=self.repository_cache,
             )
@@ -153,7 +156,7 @@ class DistGit(PackitRepositoryBase):
             # )
         elif not self._local_project.git_project:
             self._local_project.git_project = self.config.get_project(
-                url=self.package_config.dist_git_package_url
+                url=self.package_config.dist_git_package_url,
             )
 
         return self._local_project
@@ -202,7 +205,7 @@ class DistGit(PackitRepositoryBase):
         if not self.package_config.downstream_package_name:
             raise PackitException(
                 "Unable to find specfile in dist-git: "
-                "please set downstream_package_name in your .packit.yaml"
+                "please set downstream_package_name in your .packit.yaml",
             )
         return (
             self.local_project.working_dir
@@ -234,18 +237,21 @@ class DistGit(PackitRepositoryBase):
         origin.fetch()
         try:
             head = self.local_project.git_repo.heads[branch_name]
-        except IndexError:
-            raise PackitException(f"Branch {branch_name!r} does not exist.")
+        except IndexError as e:
+            raise PackitException(f"Branch {branch_name!r} does not exist.") from e
         try:
             remote_ref = origin.refs[branch_name]
-        except IndexError:
+        except IndexError as e:
             raise PackitException(
-                f"Branch {branch_name} does not exist in the origin remote."
-            )
+                f"Branch {branch_name} does not exist in the origin remote.",
+            ) from e
         head.set_commit(remote_ref)
 
     def push_to_fork(
-        self, branch_name: str, fork_remote_name: str = "fork", force: bool = False
+        self,
+        branch_name: str,
+        fork_remote_name: str = "fork",
+        force: bool = False,
     ):
         """
         push changes to a fork of the dist-git repo; they need to be committed!
@@ -256,7 +262,7 @@ class DistGit(PackitRepositoryBase):
         """
         logger.debug(
             f"About to {'force ' if force else ''}push changes to branch {branch_name!r} "
-            f"of a fork {fork_remote_name!r} of the dist-git repo."
+            f"of a fork {fork_remote_name!r} of the dist-git repo.",
         )
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
@@ -268,11 +274,12 @@ class DistGit(PackitRepositoryBase):
             if not fork:
                 raise PackitException(
                     "Unable to create a fork of repository "
-                    f"{self.local_project.git_project.full_repo_name}"
+                    f"{self.local_project.git_project.full_repo_name}",
                 )
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
-                name=fork_remote_name, url=fork_urls["ssh"]
+                name=fork_remote_name,
+                url=fork_urls["ssh"],
             )
 
         try:
@@ -282,17 +289,21 @@ class DistGit(PackitRepositoryBase):
                 f"Unable to push to remote fork {fork_remote_name!r} using branch {branch_name!r}, "
                 f"the error is:\n{ex}"
             )
-            raise PackitException(msg)
+            raise PackitException(msg) from ex
 
     def create_pull(
-        self, pr_title: str, pr_description: str, source_branch: str, target_branch: str
+        self,
+        pr_title: str,
+        pr_description: str,
+        source_branch: str,
+        target_branch: str,
     ) -> PullRequest:
         """
         Create dist-git pull request using the requested branches
         """
         logger.debug(
             "About to create dist-git pull request "
-            f"from {source_branch!r} to {target_branch!r}."
+            f"from {source_branch!r} to {target_branch!r}.",
         )
         project = self.local_project.git_project
 
@@ -316,7 +327,7 @@ class DistGit(PackitRepositoryBase):
         return dist_git_pr
 
     @property
-    def upstream_archive_names(self) -> List[str]:
+    def upstream_archive_names(self) -> list[str]:
         """
         Files that are considered upstream and should be uploaded to lookaside.
         Currently that's the source identified by spec_source_id (Source0 by default)
@@ -333,7 +344,7 @@ class DistGit(PackitRepositoryBase):
         logger.debug(f"Upstream archive names: {archive_names}")
         return archive_names
 
-    def download_upstream_archives(self) -> List[Path]:
+    def download_upstream_archives(self) -> list[Path]:
         """
         Fetch archives for the current upstream release defined in dist-git's spec
 
@@ -348,8 +359,8 @@ class DistGit(PackitRepositoryBase):
             if not archive.exists():
                 raise PackitException(
                     "Upstream archive was not downloaded. Check that {} exists in dist-git.".format(
-                        upstream_archive_name
-                    )
+                        upstream_archive_name,
+                    ),
                 )
             archives.append(archive)
         return archives
@@ -372,7 +383,9 @@ class DistGit(PackitRepositoryBase):
         pkg_tool_.sources()
 
     def upload_to_lookaside_cache(
-        self, archives: Iterable[Path], pkg_tool: str = ""
+        self,
+        archives: Iterable[Path],
+        pkg_tool: str = "",
     ) -> None:
         """Upload files (archives) to the lookaside cache.
 
@@ -395,9 +408,9 @@ class DistGit(PackitRepositoryBase):
             pkg_tool_.new_sources(sources=archives)
         except Exception as ex:
             logger.error(
-                f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}"
+                f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}",
             )
-            raise PackitException(ex)
+            raise PackitException(ex) from ex
 
     def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
         """
@@ -408,17 +421,17 @@ class DistGit(PackitRepositoryBase):
         try:
             res = requests.head(
                 f"{self.package_config.dist_git_base_url}lookaside/pkgs/"
-                f"{self.package_config.downstream_package_name}/{archive_name}/"
+                f"{self.package_config.downstream_package_name}/{archive_name}/",
             )
             if res.ok:
                 logger.info(
-                    f"Archive {archive_name!r} found in lookaside cache (skipping upload)."
+                    f"Archive {archive_name!r} found in lookaside cache (skipping upload).",
                 )
                 return True
             logger.debug(f"Archive {archive_name!r} not found in the lookaside cache.")
         except requests.exceptions.HTTPError:
             logger.warning(
-                f"Error trying to find {archive_name!r} in the lookaside cache."
+                f"Error trying to find {archive_name!r} in the lookaside cache.",
             )
         return False
 
@@ -463,7 +476,7 @@ class DistGit(PackitRepositoryBase):
         logger.debug(
             "Querying Koji for the latest build "
             f"of package {downstream_package_name!r} "
-            f"for dist-git-branch {dist_git_branch!r}"
+            f"for dist-git-branch {dist_git_branch!r}",
         )
 
         koji_helper = KojiHelper()
@@ -473,18 +486,19 @@ class DistGit(PackitRepositoryBase):
         if not build:
             raise PackitException(
                 f"There is no build for {downstream_package_name!r} "
-                f"and koji tag {tag}"
+                f"and koji tag {tag}",
             )
         logger.info(
             "Koji build for package "
             f"{downstream_package_name!r} and koji tag {tag}:"
-            f"\n{build}"
+            f"\n{build}",
         )
         return build
 
     @staticmethod
     def get_changelog_since_latest_stable_build(
-        package: str, nvr: str
+        package: str,
+        nvr: str,
     ) -> Optional[str]:
         """
         Retrieves changelog diff between the latest stable (tagged for a release)
@@ -524,7 +538,7 @@ class DistGit(PackitRepositoryBase):
         update_type: str,
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
-        bugzilla_ids: Optional[List[int]] = None,
+        bugzilla_ids: Optional[list[int]] = None,
     ):
         """
         Create bodhi update.
@@ -539,7 +553,7 @@ class DistGit(PackitRepositoryBase):
             bugzilla_ids: List of Bugzillas that are resolved with the update.
         """
         logger.debug(
-            f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}"
+            f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}",
         )
 
         bodhi_client = get_bodhi_client()
@@ -551,7 +565,7 @@ class DistGit(PackitRepositoryBase):
                 self.get_latest_build_for_branch(
                     self.package_config.downstream_package_name,
                     dist_git_branch=dist_git_branch,
-                )
+                ),
             ]
 
         # I was thinking of verifying that the build is valid for a new bodhi update
@@ -586,7 +600,7 @@ class DistGit(PackitRepositoryBase):
                 f"- {result['url']}\n"
                 f"- stable_karma: {result['stable_karma']}\n"
                 f"- unstable_karma: {result['unstable_karma']}\n"
-                f"- notes:\n{result['notes']}\n"
+                f"- notes:\n{result['notes']}\n",
             )
             if "caveats" in result:
                 for cav in result["caveats"]:
@@ -595,7 +609,7 @@ class DistGit(PackitRepositoryBase):
         except AuthError as ex:
             logger.error(ex)
             raise PackitException(
-                f"There is an authentication problem with Bodhi:\n{ex}"
+                f"There is an authentication problem with Bodhi:\n{ex}",
             ) from ex
         except BodhiClientException as ex:
             # don't logger.error here as it will end in sentry and it may just
@@ -607,10 +621,10 @@ class DistGit(PackitRepositoryBase):
                 return
 
             raise PackitBodhiException(
-                f"There is a problem with creating a bodhi update:\n{ex}"
+                f"There is a problem with creating a bodhi update:\n{ex}",
             ) from ex
 
-    def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[List[str]]:
+    def get_allowed_gpg_keys_from_downstream_config(self) -> Optional[list[str]]:
         if not self.downstream_config:
             return None
 
@@ -624,8 +638,4 @@ class DistGit(PackitRepositoryBase):
         ].allowed_gpg_keys
 
     def get_user(self) -> Optional[str]:
-        user = super().get_user()
-        if user:
-            return user
-        else:
-            return self.fas_user
+        return user if (user := super().get_user()) else self.fas_user

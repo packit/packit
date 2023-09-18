@@ -4,11 +4,11 @@
 import pytest
 from flexmock import flexmock
 from gnupg import GPG
-from packit.exceptions import PackitException
 
+from packit.exceptions import PackitException
 from packit.security import (
-    CommitSignatureStatus,
     VALID_SIGNATURE_STATUSES,
+    CommitSignatureStatus,
     CommitVerifier,
 )
 
@@ -41,7 +41,7 @@ def test_get_commit_signature_status(sign, status):
     repo_mock = flexmock(git=flexmock().should_receive("show").and_return(sign).mock())
 
     status_found = CommitVerifier.get_commit_signature_status(
-        commit=flexmock(hexsha="abcd", repo=repo_mock)
+        commit=flexmock(hexsha="abcd", repo=repo_mock),
     )
     assert status_found == status
 
@@ -75,14 +75,19 @@ def test_commit_signature_status_validity(status, valid):
     ],
 )
 def test_check_signature_of_commit(
-    key, sign, allowed_keys, local_keys, valid, download_times
+    key,
+    sign,
+    allowed_keys,
+    local_keys,
+    valid,
+    download_times,
 ):
     gpg_flexmock = flexmock(GPG)
     gpg_flexmock.should_receive("list_keys").and_return(
-        flexmock(fingerprints=local_keys)
+        flexmock(fingerprints=local_keys),
     )
     gpg_flexmock.should_receive("recv_keys").and_return(
-        flexmock(fingerprints=["fingerprint"])
+        flexmock(fingerprints=["fingerprint"]),
     ).times(download_times)
 
     repo_mock = flexmock(
@@ -91,7 +96,7 @@ def test_check_signature_of_commit(
         .and_return(sign)
         .and_return(key)
         .and_return(sign)
-        .mock()
+        .mock(),
     )
 
     verifier = CommitVerifier()
@@ -134,11 +139,11 @@ def test_check_signature_of_commit_not_present_key(
 ):
     gpg_flexmock = flexmock(GPG)
     gpg_flexmock.should_receive("list_keys").and_return(
-        flexmock(fingerprints=local_keys)
+        flexmock(fingerprints=local_keys),
     )
 
     gpg_flexmock.should_receive("recv_keys").and_return(
-        flexmock(fingerprints=["fingerprint"])
+        flexmock(fingerprints=["fingerprint"]),
     ).times(download_times)
 
     repo_mock = flexmock(
@@ -147,7 +152,7 @@ def test_check_signature_of_commit_not_present_key(
         .and_return(first_sign)
         .and_return(key)
         .and_return(second_sign)
-        .mock()
+        .mock(),
     )
 
     verifier = CommitVerifier()

@@ -7,11 +7,10 @@ import pathlib
 
 import click
 
-from packit.config import pass_config
-from packit.config import Config, PackageConfig
 from packit.api import PackitAPI
-from packit.local_project import LocalProjectBuilder, CALCULATE
 from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
+from packit.config import Config, PackageConfig, pass_config
+from packit.local_project import CALCULATE, LocalProjectBuilder
 
 
 @click.command("status")
@@ -21,7 +20,10 @@ from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
 @cover_packit_exception
 @iterate_packages_source_git
 def source_git_status(
-    config: Config, package_config: PackageConfig, source_git: str, dist_git: str
+    config: Config,
+    package_config: PackageConfig,
+    source_git: str,
+    dist_git: str,
 ):
     """Tell the synchronization status of a source-git and a dist-git repo.
 
@@ -40,10 +42,12 @@ def source_git_status(
         config=config,
         package_config=package_config,
         upstream_local_project=builder.build(
-            working_dir=source_git_path, git_repo=CALCULATE
+            working_dir=source_git_path,
+            git_repo=CALCULATE,
         ),
         downstream_local_project=builder.build(
-            working_dir=dist_git_path, git_repo=CALCULATE
+            working_dir=dist_git_path,
+            git_repo=CALCULATE,
         ),
     )
     click.echo(api.sync_status_string(source_git=source_git, dist_git=dist_git))

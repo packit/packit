@@ -5,8 +5,8 @@
 Functional tests for srpm command
 """
 import json
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit
@@ -16,7 +16,7 @@ from tests.spellbook import build_srpm
 def test_srpm_command_for_path(upstream_or_distgit_path, tmp_path):
     with cwd(tmp_path):
         call_real_packit(parameters=["--debug", "srpm", str(upstream_or_distgit_path)])
-        srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
+        srpm_path = next(Path.cwd().glob("*.src.rpm"))
         assert srpm_path.exists()
         build_srpm(srpm_path)
 
@@ -27,7 +27,7 @@ def test_srpm_command_for_path_with_multiple_sources(
     workdir, _ = upstream_and_remote_with_multiple_sources
     with cwd(workdir):
         call_real_packit(parameters=["--debug", "srpm", str(workdir)])
-        srpm_path = list(Path.cwd().glob("*.src.rpm"))[0]
+        srpm_path = next(Path.cwd().glob("*.src.rpm"))
         assert srpm_path.exists()
         assert (Path.cwd() / "python-ogr.spec").exists()
         build_srpm(srpm_path)
@@ -35,7 +35,7 @@ def test_srpm_command_for_path_with_multiple_sources(
 
 def test_srpm_command(cwd_upstream_or_distgit):
     call_real_packit(parameters=["--debug", "srpm"], cwd=cwd_upstream_or_distgit)
-    srpm_path = list(cwd_upstream_or_distgit.glob("*.src.rpm"))[0]
+    srpm_path = next(cwd_upstream_or_distgit.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -48,7 +48,7 @@ def test_srpm_command_no_tags(upstream_and_remote):
     subprocess.run(["xargs", "git", "tag", "-d"], cwd=upstream_cwd, input=tags.stdout)
 
     call_real_packit(parameters=["--debug", "srpm"], cwd=upstream_cwd)
-    srpm_path = list(upstream_cwd.glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_cwd.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -60,22 +60,24 @@ def test_action_output(upstream_and_remote):
     # http://www.atlaspiv.cz/?page=detail&beer_id=4187
     the_line_we_want = "MadCat - Imperial Stout Rum Barrel Aged 20°"
     packit_yaml_dict["actions"] = {
-        "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"]
+        "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"],
     }
     packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
     out = call_real_packit(
-        parameters=["srpm"], cwd=upstream_repo_path, return_output=True
+        parameters=["srpm"],
+        cwd=upstream_repo_path,
+        return_output=True,
     )
 
     assert f"INFO   {the_line_we_want}\n" in out.decode()
-    srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_repo_path.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
 
 def test_srpm_spec_not_in_root(upstream_spec_not_in_root):
     call_real_packit(parameters=["--debug", "srpm"], cwd=upstream_spec_not_in_root[0])
-    srpm_path = list(upstream_spec_not_in_root[0].glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_spec_not_in_root[0].glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -83,7 +85,7 @@ def test_srpm_spec_not_in_root(upstream_spec_not_in_root):
 def test_srpm_weird_sources(upstream_and_remote_weird_sources):
     repo = upstream_and_remote_weird_sources[0]
     call_real_packit(parameters=["--debug", "srpm"], cwd=repo)
-    srpm_path = list(repo.glob("*.src.rpm"))[0]
+    srpm_path = next(repo.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
 
@@ -139,16 +141,18 @@ def _test_srpm_symlinking(upstream_repo_path, path_prefix):
     desired_path = f"{path_prefix}/tmp/{sources_tarball}"
     packit_yaml_dict["actions"] = {
         "create-archive": [
-            f"bash -c 'mkdir tmp; touch {desired_path}; echo {desired_path}'"
-        ]
+            f"bash -c 'mkdir tmp; touch {desired_path}; echo {desired_path}'",
+        ],
     }
     packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
     out = call_real_packit(
-        parameters=["srpm"], cwd=upstream_repo_path, return_output=True
+        parameters=["srpm"],
+        cwd=upstream_repo_path,
+        return_output=True,
     )
     assert f"INFO   {desired_path}\n" in out.decode()
 
-    srpm_path = list(upstream_repo_path.glob("*.src.rpm"))[0]
+    srpm_path = next(upstream_repo_path.glob("*.src.rpm"))
     assert srpm_path.exists()
 
     tarball = Path(upstream_repo_path / sources_tarball)

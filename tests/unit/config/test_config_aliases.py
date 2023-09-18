@@ -9,12 +9,12 @@ from flexmock import flexmock
 import packit
 from packit.config import aliases
 from packit.config.aliases import (
-    get_versions,
-    get_build_targets,
-    get_branches,
-    get_koji_targets,
-    get_all_koji_targets,
     get_aliases,
+    get_all_koji_targets,
+    get_branches,
+    get_build_targets,
+    get_koji_targets,
+    get_versions,
 )
 from packit.copr_helper import CoprHelper
 from packit.exceptions import PackitException
@@ -172,7 +172,7 @@ class TestGetBranches:
     )
     def test_get_branches_from_multiple_values(self, names, versions):
         flexmock(packit.config.aliases).should_receive("get_versions").and_return(
-            versions
+            versions,
         )
         assert get_branches(*names) == versions
 
@@ -187,7 +187,7 @@ class TestGetKojiTargets:
 
     def test_preserve_all_koji_targets_together(self):
         assert set(ALL_KOJI_TARGETS_SNAPSHOT) == get_koji_targets(
-            *ALL_KOJI_TARGETS_SNAPSHOT
+            *ALL_KOJI_TARGETS_SNAPSHOT,
         )
 
     @pytest.mark.parametrize(
@@ -314,35 +314,35 @@ class TestGetAliases:
     def test_get_aliases(self, releases_list, expected_return, bodhi_client_response):
         bodhi_instance_mock = flexmock()
         bodhi_instance_mock.should_receive("get_releases").and_return(
-            bodhi_client_response(releases_list)
+            bodhi_client_response(releases_list),
         )
         flexmock(aliases).should_receive("get_bodhi_client").and_return(
-            bodhi_instance_mock
+            bodhi_instance_mock,
         ).once()
 
         get_aliases.cache_clear()
         aliases_result = get_aliases()
 
         assert Counter(aliases_result["fedora-stable"]) == Counter(
-            expected_return["fedora-stable"]
+            expected_return["fedora-stable"],
         )
         assert Counter(aliases_result["fedora-development"]) == Counter(
-            expected_return["fedora-development"]
+            expected_return["fedora-development"],
         )
         assert Counter(aliases_result["fedora-all"]) == Counter(
-            expected_return["fedora-all"]
+            expected_return["fedora-all"],
         )
         assert Counter(aliases_result["fedora-latest"]) == Counter(
-            expected_return["fedora-latest"]
+            expected_return["fedora-latest"],
         )
         assert Counter(aliases_result["fedora-latest-stable"]) == Counter(
-            expected_return["fedora-latest-stable"]
+            expected_return["fedora-latest-stable"],
         )
         assert Counter(aliases_result["fedora-branched"]) == Counter(
-            expected_return["fedora-branched"]
+            expected_return["fedora-branched"],
         )
         assert Counter(aliases_result["epel-all"]) == Counter(
-            expected_return["epel-all"]
+            expected_return["epel-all"],
         )
 
 
@@ -360,7 +360,7 @@ def test_get_valid_build_targets(targets, chroots, expected_result):
     copr_helper = CoprHelper(flexmock())
     flexmock(Client).should_receive("create_from_config_file")
     flexmock(packit.config.aliases).should_receive("get_build_targets").and_return(
-        targets
+        targets,
     )
     flexmock(CoprHelper).should_receive("get_available_chroots").and_return(chroots)
 
@@ -370,15 +370,16 @@ def test_get_valid_build_targets(targets, chroots, expected_result):
 @pytest.mark.parametrize(
     "name, default",
     [
-        pytest.param(["f1", "f2"], dict(default="test"), id="name_set-default_set"),
-        pytest.param(["f1", "f2"], dict(default="None"), id="name_set-default_None"),
-        pytest.param([], dict(default="test"), id="name_None-default_set"),
-        pytest.param([], dict(default=None), id="name_None-default_None"),
+        pytest.param(["f1", "f2"], {"default": "test"}, id="name_set-default_set"),
+        pytest.param(["f1", "f2"], {"default": "None"}, id="name_set-default_None"),
+        pytest.param([], {"default": "test"}, id="name_None-default_set"),
+        pytest.param([], {"default": None}, id="name_None-default_None"),
     ],
 )
 def test_get_valid_build_targets_get_aliases_call(name, default):
     flexmock(packit.config.aliases).should_receive("get_build_targets").with_args(
-        *name, **default
+        *name,
+        **default,
     ).and_return(set())
     flexmock(CoprHelper).should_receive("get_available_chroots").and_return(set())
     CoprHelper(flexmock()).get_valid_build_targets(*name, **default)

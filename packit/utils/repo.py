@@ -5,15 +5,16 @@ import logging
 import re
 import subprocess
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator, List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import git
 import yaml
 from git.exc import GitCommandError
-
 from ogr.parsing import RepoUrl, parse_git_repo
+
 from packit.constants import COMMIT_ACTION_DIVIDER
 from packit.exceptions import PackitException
 
@@ -36,13 +37,13 @@ class RepositoryCache:
         self.add_new = add_new
         logger.debug(
             f"Instantiation of the repository cache at {self.cache_path}. "
-            f"New projects will {'not ' if not self.add_new else ''}be added."
+            f"New projects will {'not ' if not self.add_new else ''}be added.",
         )
-        self.projects_added: List[str] = []
-        self.projects_cloned_using_cache: List[str] = []
+        self.projects_added: list[str] = []
+        self.projects_cloned_using_cache: list[str] = []
 
     @property
-    def cached_projects(self) -> List[str]:
+    def cached_projects(self) -> list[str]:
         """Project names we have in the cache."""
         if not self.cache_path.is_dir():
             self.cache_path.mkdir(parents=True)
@@ -74,12 +75,13 @@ class RepositoryCache:
             return git.repo.Repo(directory)
 
         logger.debug(
-            f"Cloning repo {url} -> {directory} using repository cache at {self.cache_path}"
+            f"Cloning repo {url} -> {directory} using repository cache at {self.cache_path}",
         )
         cached_projects = self.cached_projects
         cached_projects_str = "\n".join(f"- {project}" for project in cached_projects)
         logger.debug(
-            f"Repositories in the cache ({len(cached_projects)} project(s)):\n{cached_projects_str}"
+            f"Repositories in the cache ({len(cached_projects)} "
+            f"project(s)):\n{cached_projects_str}",
         )
 
         project_name = RepoUrl.parse(url).repo
@@ -93,7 +95,10 @@ class RepositoryCache:
             logger.debug(f"Using reference repo: {reference_repo}")
             self.projects_cloned_using_cache.append(project_name)
             return self._clone(
-                url=url, to_path=directory, tags=True, reference=str(reference_repo)
+                url=url,
+                to_path=directory,
+                tags=True,
+                reference=str(reference_repo),
             )
 
         return self._clone(url=url, to_path=directory, tags=True)
@@ -107,7 +112,7 @@ def is_git_repo(directory: Union[Path, str]) -> bool:
     return Path(directory, ".git").exists()
 
 
-def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
+def get_repo(url: str, directory: Optional[Union[Path, str]] = None) -> git.Repo:
     """
     Use directory as a git repo or clone repo to the tempdir.
     """
@@ -116,16 +121,15 @@ def get_repo(url: str, directory: Union[Path, str] = None) -> git.Repo:
     if is_git_repo(directory=directory):
         logger.debug(f"Repo already exists in {directory}.")
         return git.repo.Repo(directory)
-    else:
-        logger.info(f"Cloning repo {url} -> {directory}")
-        return git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
+    logger.info(f"Cloning repo {url} -> {directory}")
+    return git.repo.Repo.clone_from(url=url, to_path=directory, tags=True)
 
 
-def get_namespace_and_repo_name(url: str) -> Tuple[Optional[str], str]:
+def get_namespace_and_repo_name(url: str) -> tuple[Optional[str], str]:
     parsed_git_repo = parse_git_repo(url)
     if parsed_git_repo is None or not parsed_git_repo.repo:
         raise PackitException(
-            f"Invalid URL format, can't obtain namespace and repository name: {url}"
+            f"Invalid URL format, can't obtain namespace and repository name: {url}",
         )
     return parsed_git_repo.namespace, parsed_git_repo.repo
 
@@ -173,7 +177,10 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
     optional_suffix = ".git" if inp.endswith(".git") else ""
     url_str = "https://{}/{}/{}{}".format(
-        parsed_repo.hostname, parsed_repo.namespace, parsed_repo.repo, optional_suffix
+        parsed_repo.hostname,
+        parsed_repo.namespace,
+        parsed_repo.repo,
+        optional_suffix,
     )
 
     logger.debug(f"URL {inp!r} turned into HTTPS {url_str!r}")
@@ -181,8 +188,9 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
 
 def get_current_version_command(
-    glob_pattern: str, refs: Optional[str] = "tags"
-) -> List[str]:
+    glob_pattern: str,
+    refs: Optional[str] = "tags",
+) -> list[str]:
     """
     Returns command that find latest git reference matching given pattern.
 
@@ -203,14 +211,15 @@ def get_current_version_command(
     ]
 
 
-def create_new_repo(cwd: Path, switches: List[str]):
-    subprocess.check_call(["git", "init"] + switches + [str(cwd)])
+def create_new_repo(cwd: Path, switches: list[str]):
+    subprocess.check_call(["git", "init", *switches, str(cwd)])
     # TODO: Replace with -b / --initial-branch in `git init` when possible
     if "--bare" not in switches:
         subprocess.check_call(["git", "checkout", "-b", "main"], cwd=cwd)
     else:
         subprocess.check_call(
-            ["git", "symbolic-ref", "HEAD", "refs/heads/main"], cwd=cwd
+            ["git", "symbolic-ref", "HEAD", "refs/heads/main"],
+            cwd=cwd,
         )
 
 
@@ -246,7 +255,7 @@ def git_patch_ish(patch: str) -> str:
 def get_message_from_metadata(metadata: dict, header: Optional[str] = None) -> str:
     if not isinstance(metadata, dict):
         raise PackitException(
-            f"We can save only dictionaries to metadata. Not {metadata}"
+            f"We can save only dictionaries to metadata. Not {metadata}",
         )
 
     content = (
@@ -367,7 +376,7 @@ def commit_exists(repo: git.Repo, commit: str) -> bool:
         return True
 
 
-def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
+def get_commit_diff(commit: git.Commit) -> list[git.Diff]:
     """Get modified files of the given commit.
 
     Args:
@@ -379,15 +388,14 @@ def get_commit_diff(commit: git.Commit) -> List[git.Diff]:
     """
     if len(commit.parents) == 1:
         return commit.parents[0].diff(commit, create_patch=True)
-    elif len(commit.parents) == 0:
+    if len(commit.parents) == 0:
         # First commit in the repo
         return commit.diff(git.NULL_TREE, create_patch=True)
-    else:
-        # Probably a merge commit, we can't do much about it
-        return []
+    # Probably a merge commit, we can't do much about it
+    return []
 
 
-def get_commit_hunks(repo: git.Repo, commit: git.Commit) -> List[str]:
+def get_commit_hunks(repo: git.Repo, commit: git.Commit) -> list[str]:
     """Get a list of hunks of the given commit.
 
     Args:
@@ -454,7 +462,9 @@ def get_file_author(repo: git.Repo, filename: str) -> str:
 
 @contextmanager
 def commit_message_file(
-    subject: str, message: str = None, trailers: Optional[List[Tuple[str, str]]] = None
+    subject: str,
+    message: Optional[str] = None,
+    trailers: Optional[list[tuple[str, str]]] = None,
 ) -> Generator[str, None, None]:
     """Context manager to yield a commit message file
 
@@ -489,8 +499,10 @@ def commit_message_file(
 
 
 def get_commit_message_from_action(
-    output: Optional[List[str]], default_title: str, default_description: str
-) -> Tuple[str, str]:
+    output: Optional[list[str]],
+    default_title: str,
+    default_description: str,
+) -> tuple[str, str]:
     """
     Parse the output of the commit action and in case the action is not defined,
     no output has been produced or it couldn't be parsed, return the defaults.

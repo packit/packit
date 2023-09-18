@@ -4,23 +4,20 @@
 import copy
 import functools
 import logging
-import sys
 import pathlib
+import sys
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import click
 from github import GithubException
-
 from ogr.parsing import parse_git_repo
 
-from packit.config.package_config import PackageConfig
-from packit.config.common_package_config import MultiplePackages
-
 from packit.api import PackitAPI
-from packit.config import Config, get_local_package_config, JobType
-from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.config import Config, JobType, get_local_package_config
+from packit.config.common_package_config import MultiplePackages
+from packit.config.package_config import PackageConfig
+from packit.constants import DIST_GIT_HOSTNAME_CANDIDATES, DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
@@ -47,7 +44,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
         def covered_func(config=None, *args, **kwargs):
             try:
                 if config:
-                    func(config=config, *args, **kwargs)
+                    func(config=config, *args, **kwargs)  # noqa: B026
                 else:
                     func(*args, **kwargs)
             except KeyboardInterrupt:
@@ -67,7 +64,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                         "We've encountered an error while talking to GitHub API, please make sure"
                         " that you pass GitHub API token and it has correct permissions, \n"
                         f"precise error message: {exc} \n"
-                        "https://github.com/packit/packit/tree/master/docs\n"
+                        "https://github.com/packit/packit/tree/master/docs\n",
                     )
                 sys.exit(exit_code or 3)
             except Exception as exc:
@@ -85,10 +82,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
 
         return covered_func
 
-    if _func is None:
-        return decorator_cover
-    else:
-        return decorator_cover(_func)
+    return decorator_cover if _func is None else decorator_cover(_func)
 
 
 def iterate_packages(func):
@@ -121,20 +115,20 @@ def iterate_packages(func):
             package_config_path=config.package_config_path,
         )
         packages_config_views_names = set(
-            packages_config.get_package_config_views().keys()
+            packages_config.get_package_config_views().keys(),
         )
         if kwargs.get("package"):
             if not_defined_packages := set(kwargs["package"]).difference(
-                packages_config_views_names
+                packages_config_views_names,
             ):
                 logger.error(
                     "Packages %s are not defined in packit configuration.",
                     not_defined_packages,
                 )
-                return None
+                return
             for package in kwargs["package"]:
                 decorated_func_kwargs["config"] = copy.deepcopy(
-                    config
+                    config,
                 )  # reset working variables like srpm_path
                 decorated_func_kwargs[
                     "package_config"
@@ -143,7 +137,7 @@ def iterate_packages(func):
         elif hasattr(packages_config, "packages"):
             for package_config in packages_config.get_package_config_views().values():
                 decorated_func_kwargs["config"] = copy.deepcopy(
-                    config
+                    config,
                 )  # reset working variables like srpm_path
                 decorated_func_kwargs["package_config"] = package_config
                 func(*args, **decorated_func_kwargs)
@@ -187,14 +181,14 @@ def iterate_packages_source_git(func):
         dist_git_path = pathlib.Path(dist_git).resolve()
 
         packages_config = get_local_package_config(
-            package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG
+            package_config_path=source_git_path / DISTRO_DIR / SRC_GIT_CONFIG,
         )
 
         found_func = False
         for package in packages_config.get_package_config_views().values():
             if package.downstream_package_name == dist_git_path.name:
                 decorated_func_kwargs["config"] = copy.deepcopy(
-                    config
+                    config,
                 )  # reset working variables like srpm_path
                 decorated_func_kwargs["package_config"] = package
                 func(*args, **decorated_func_kwargs)
@@ -207,11 +201,11 @@ def iterate_packages_source_git(func):
             and not found_func
         ):
             decorated_func_kwargs["config"] = copy.deepcopy(
-                config
+                config,
             )  # reset working variables like srpm_path
-            decorated_func_kwargs["package_config"] = list(
-                packages_config.get_package_config_views().values()
-            )[0]
+            decorated_func_kwargs["package_config"] = next(
+                iter(packages_config.get_package_config_views().values()),
+            )
             func(*args, **decorated_func_kwargs)
             found_func = True
 
@@ -231,7 +225,7 @@ def iterate_packages_source_git(func):
                 for repo_dir in repo_dirs:
                     if package.downstream_package_name == repo_dir.name:
                         decorated_func_kwargs["config"] = copy.deepcopy(
-                            config
+                            config,
                         )  # reset working variables like srpm_path
                         decorated_func_kwargs["dist_git"] = str(repo_dir)
                         decorated_func_kwargs["package_config"] = package
@@ -246,7 +240,7 @@ def iterate_packages_source_git(func):
 
         if not found_func:
             logger.error(
-                f"No match found for source git {source_git} and dist git {dist_git}."
+                f"No match found for source git {source_git} and dist git {dist_git}.",
             )
 
     return covered_func
@@ -275,19 +269,19 @@ def get_packit_api(
     if job_config_index is not None and isinstance(package_config, PackageConfig):
         if job_config_index >= len(package_config.jobs):
             raise PackitException(
-                "job_config_index is bigger than number of jobs in package config!"
+                "job_config_index is bigger than number of jobs in package config!",
             )
         package_config = package_config.jobs[job_config_index]
         logger.debug(f"Final package (job) config: {package_config}")
     elif job_type is not None:
         try:
-            package_config = [
+            package_config = next(
                 job for job in package_config.jobs if job.type == job_type
-            ][0]
-        except IndexError:
-            raise PackitException(
-                f"No job with type {job_type} found in package config."
             )
+        except IndexError as e:
+            raise PackitException(
+                f"No job with type {job_type} found in package config.",
+            ) from e
         logger.debug(f"Final package (job) config: {package_config}")
 
     if dist_git_path and Path(dist_git_path) == local_project.working_dir:
@@ -301,10 +295,10 @@ def get_packit_api(
 
     if not local_project.git_repo:
         raise PackitNotAGitRepoException(
-            f"{local_project.working_dir!r} is not a git repository."
+            f"{local_project.working_dir!r} is not a git repository.",
         )
 
-    remote_urls: List[str] = []
+    remote_urls: list[str] = []
     for remote in local_project.git_repo.remotes:
         remote_urls += remote.urls
 

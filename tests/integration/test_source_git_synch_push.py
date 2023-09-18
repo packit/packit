@@ -1,8 +1,8 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from flexmock import flexmock
 import pytest
+from flexmock import flexmock
 
 from packit.exceptions import PackitException
 from packit.upstream import Upstream
@@ -67,7 +67,8 @@ def test_synch_push_one_commit(
     """Update upstream if dist-git has a new commit"""
 
     flexmock(Upstream).should_receive("push_to_fork").and_return(
-        "main", "packit.dev"
+        "main",
+        "packit.dev",
     ).once()
     flexmock(Upstream).should_receive("create_pull").and_return(None).once()
 
@@ -93,11 +94,13 @@ def test_synch_push_two_commits(
     """Update upstream if dist-git has a new commit"""
     api_instance_sync_push.dg.specfile.version = "3.4.5"
     api_instance_sync_push.dg.commit(
-        "Another dist-git commit to be synced back\n\nWith a multiline\ndescription", ""
+        "Another dist-git commit to be synced back\n\nWith a multiline\ndescription",
+        "",
     )
 
     flexmock(Upstream).should_receive("push_to_fork").and_return(
-        "main", "packit.dev"
+        "main",
+        "packit.dev",
     ).once()
     flexmock(Upstream).should_receive("create_pull").and_return(None).once()
 

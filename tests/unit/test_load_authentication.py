@@ -4,6 +4,7 @@
 import logging
 
 import pytest
+
 from packit.config.config import Config
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ authentication = {
     "authentication": {
         "github.com": {"token": "abcd"},
         "pagure": {"token": "abcd", "instance_url": "https://src.fedoraproject.org"},
-    }
+    },
 }
 
 

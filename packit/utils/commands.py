@@ -9,7 +9,7 @@ import sys
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from packit.exceptions import PackitCommandFailedError
 from packit.utils.logging import StreamLogger
@@ -34,12 +34,12 @@ class CommandResult:
 
 
 def run_command(
-    cmd: Union[List[str], str],
+    cmd: Union[list[str], str],
     error_message: Optional[str] = None,
     cwd: Union[str, Path, None] = None,
     fail: bool = True,
     output: bool = False,
-    env: Optional[Dict] = None,
+    env: Optional[dict] = None,
     print_live: bool = False,
 ) -> CommandResult:
     """
@@ -135,8 +135,8 @@ def run_command(
     if not output:
         return CommandResult(success=success)
 
-    command_output = map(
-        lambda out: out.get_output().decode(sys.getdefaultencoding()), (stdout, stderr)
+    command_output = (
+        out.get_output().decode(sys.getdefaultencoding()) for out in (stdout, stderr)
     )
 
     out, err = command_output
@@ -149,7 +149,7 @@ def run_command_remote(
     cwd=None,
     fail=True,
     output=False,
-    env: Optional[Dict] = None,
+    env: Optional[dict] = None,
     print_live: bool = False,
 ):
     """
@@ -162,7 +162,13 @@ def run_command_remote(
     call kinit to obtain a ticket.
     """
     return run_command(
-        cmd, error_message, cwd, fail, output, env, print_live=print_live
+        cmd,
+        error_message,
+        cwd,
+        fail,
+        output,
+        env,
+        print_live=print_live,
     )
 
 

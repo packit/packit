@@ -5,23 +5,21 @@
 This is the official python interface for packit.
 """
 
+
 import asyncio
+import contextlib
 import copy
 import logging
 import re
 import tempfile
+from collections.abc import Iterable, Sequence
 from datetime import datetime
 from distutils.dir_util import copy_tree
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import (
-    Sequence,
     Callable,
-    List,
     Literal,
-    Tuple,
-    Dict,
-    Iterable,
     Optional,
     Union,
     overload,
@@ -40,44 +38,44 @@ from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
     COMMIT_ACTION_DIVIDER,
-    SYNCING_NOTE,
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
-    SYNC_RELEASE_PR_INSTRUCTIONS,
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
+    SYNC_RELEASE_PR_INSTRUCTIONS,
+    SYNCING_NOTE,
 )
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import (
     PackitCommandFailedError,
+    PackitCoprException,
     PackitException,
     PackitFailedToCreateRPMException,
-    PackitSRPMException,
-    PackitSRPMNotFoundException,
     PackitRPMException,
     PackitRPMNotFoundException,
-    PackitCoprException,
+    PackitSRPMException,
+    PackitSRPMNotFoundException,
 )
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
-from packit.sync import sync_files, SyncFilesItem
+from packit.sync import SyncFilesItem, sync_files
 from packit.upstream import Upstream
 from packit.utils import commands
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
 from packit.utils.repo import (
-    shorten_commit_hash,
-    get_next_commit,
     commit_exists,
     get_commit_diff,
     get_commit_hunks,
-    is_the_repo_pristine,
     get_commit_message_from_action,
+    get_next_commit,
+    is_the_repo_pristine,
+    shorten_commit_hash,
 )
 from packit.utils.versions import compare_versions
 from packit.vm_image_build import ImageBuilder
@@ -105,7 +103,9 @@ class SynchronizationStatus:
     """
 
     def __init__(
-        self, source_git_range_start: Optional[str], dist_git_range_start: Optional[str]
+        self,
+        source_git_range_start: Optional[str],
+        dist_git_range_start: Optional[str],
     ):
         self.source_git_range_start = source_git_range_start
         self.dist_git_range_start = dist_git_range_start
@@ -134,7 +134,7 @@ def checkout_package_workdir(
     if hasattr(package_config, "paths") and package_config.paths and local_project:
         new_local_project = copy.deepcopy(local_project)
         new_local_project.working_dir = new_local_project.working_dir.joinpath(
-            package_config.paths[0]
+            package_config.paths[0],
         )
         return new_local_project
     return local_project
@@ -184,7 +184,8 @@ class PackitAPI:
                 config=self.config,
                 package_config=self.package_config,
                 local_project=checkout_package_workdir(
-                    self.package_config, self.upstream_local_project
+                    self.package_config,
+                    self.upstream_local_project,
                 ),
             )
         return self._up
@@ -204,13 +205,14 @@ class PackitAPI:
                 )
                 logger.info(
                     "Package name was not set, we've got it from dist-git's "
-                    f"directory name: {self.package_config.downstream_package_name}"
+                    f"directory name: {self.package_config.downstream_package_name}",
                 )
             self._dg = DistGit(
                 config=self.config,
                 package_config=self.package_config,
                 local_project=checkout_package_workdir(
-                    self.package_config, self.downstream_local_project
+                    self.package_config,
+                    self.downstream_local_project,
                 ),
                 clone_path=self._dist_git_clone_path,
             )
@@ -220,7 +222,7 @@ class PackitAPI:
     def copr_helper(self) -> CoprHelper:
         if self._copr_helper is None:
             self._copr_helper = CoprHelper(
-                upstream_local_project=self.upstream_local_project
+                upstream_local_project=self.upstream_local_project,
             )
         return self._copr_helper
 
@@ -285,12 +287,12 @@ class PackitAPI:
                 return
 
         if check_dist_git_pristine and not is_the_repo_pristine(
-            self.dg.local_project.git_repo
+            self.dg.local_project.git_repo,
         ):
             raise PackitException(
                 "Cannot update the dist-git repo "
                 f"{self.dg.local_project.git_repo.working_dir!r}, since it is not pristine."
-                f"{REPO_NOT_PRISTINE_HINT}"
+                f"{REPO_NOT_PRISTINE_HINT}",
             )
 
         if sync_default_files:
@@ -306,7 +308,8 @@ class PackitAPI:
             )
 
         if self.up.with_action(
-            action=ActionName.prepare_files, env=self.sync_release_env
+            action=ActionName.prepare_files,
+            env=self.sync_release_env,
         ):
             synced_files = self._prepare_files_to_sync(
                 synced_files=synced_files,
@@ -317,7 +320,8 @@ class PackitAPI:
         sync_files(synced_files)
 
         if upstream_ref and self.up.with_action(
-            action=ActionName.create_patches, env=self.sync_release_env
+            action=ActionName.create_patches,
+            env=self.sync_release_env,
         ):
             patches = self.up.create_patches(
                 upstream=upstream_ref,
@@ -327,7 +331,8 @@ class PackitAPI:
             # from the list, so that they are added to the spec-file.
             PatchGenerator.undo_identical(patches, self.dg.local_project.git_repo)
             self.dg.specfile_add_patches(
-                patches, self.package_config.patch_generation_patch_id_digits
+                patches,
+                self.package_config.patch_generation_patch_id_digits,
             )
 
         if add_new_sources or force_new_sources:
@@ -342,7 +347,7 @@ class PackitAPI:
                     (
                         FROM_SOURCE_GIT_TOKEN,
                         self.up.local_project.git_repo.head.commit.hexsha,
-                    )
+                    ),
                 ]
                 if mark_commit_origin
                 else None
@@ -355,7 +360,7 @@ class PackitAPI:
             )
 
     @staticmethod
-    def _transform_patch_to_source_git(patch: str, diffs: List[git.Diff]) -> str:
+    def _transform_patch_to_source_git(patch: str, diffs: list[git.Diff]) -> str:
         """Transforms a dist-git patch to source-git.
 
         It's necessary to insert .distro directory to paths in the patch.
@@ -363,16 +368,20 @@ class PackitAPI:
         for diff in diffs:
             if diff.a_path:
                 patch = patch.replace(
-                    f"a/{diff.a_path}", f"a/{DISTRO_DIR}/{diff.a_path}"
+                    f"a/{diff.a_path}",
+                    f"a/{DISTRO_DIR}/{diff.a_path}",
                 )
             if diff.b_path:
                 patch = patch.replace(
-                    f"b/{diff.b_path}", f"b/{DISTRO_DIR}/{diff.b_path}"
+                    f"b/{diff.b_path}",
+                    f"b/{DISTRO_DIR}/{diff.b_path}",
                 )
         return patch
 
     def update_source_git(
-        self, revision_range: Optional[str] = None, check_sync_status: bool = True
+        self,
+        revision_range: Optional[str] = None,
+        check_sync_status: bool = True,
     ):
         """Update a source-git repo from a dist-git repo.
 
@@ -392,7 +401,7 @@ class PackitAPI:
         """
         if not revision_range and not check_sync_status:
             raise PackitException(
-                "revision_range has to be specified if check_sync_status is False"
+                "revision_range has to be specified if check_sync_status is False",
             )
 
         if check_sync_status:
@@ -407,14 +416,14 @@ class PackitAPI:
             if not revision_range:
                 revision_range = f"{status.dist_git_range_start}~.."
                 logger.debug(
-                    f"revision_range not specified, setting to {revision_range}"
+                    f"revision_range not specified, setting to {revision_range}",
                 )
 
         if not is_the_repo_pristine(self.up.local_project.git_repo):
             raise PackitException(
                 "Cannot update the source-git repo "
                 f"{self.up.local_project.git_repo.working_dir!r}, since it is not pristine."
-                f"{REPO_NOT_PRISTINE_HINT}"
+                f"{REPO_NOT_PRISTINE_HINT}",
             )
 
         dg_release = self.dg.specfile.expanded_release
@@ -423,17 +432,18 @@ class PackitAPI:
             logger.info(
                 f"Release differs between dist-git and source-git ("
                 f"{dg_release} in dist-git and {up_release} in source-git). "
-                f"Trying to continue with the update."
+                f"Trying to continue with the update.",
             )
 
         # Do the checks beforehand but store commits and diffs to avoid recomputing.
         # Getting patch of a git commit is costly as per GitPython docs.
-        commits: List[git.Commit] = []
-        diffs: List[List[git.Diff]] = []
+        commits: list[git.Commit] = []
+        diffs: list[list[git.Diff]] = []
         patch_suffix = ".patch"
         distro_path = self.up.local_project.working_dir / DISTRO_DIR
         for commit in self.dg.local_project.git_repo.iter_commits(
-            revision_range, reverse=True
+            revision_range,
+            reverse=True,
         ):
             commits.append(commit)
             diffs.append(get_commit_diff(commit))
@@ -442,7 +452,7 @@ class PackitAPI:
                     raise PackitException(
                         f"The sources file was modified in commit "
                         f"{commit.hexsha} which is part of the provided range. "
-                        f"Such operation is not supported."
+                        f"Such operation is not supported.",
                     )
                 a_path = diff.a_path or ""
                 b_path = diff.b_path or ""
@@ -451,7 +461,7 @@ class PackitAPI:
                 if a_path.endswith(patch_suffix) or b_path.endswith(patch_suffix):
                     raise PackitException(
                         f"A patch was modified in commit {commit.hexsha} "
-                        f"which is not supported by this command."
+                        f"which is not supported by this command.",
                     )
 
         logger.info(f"Synchronizing {len(commits)} commits.")
@@ -465,17 +475,15 @@ class PackitAPI:
             for j, diff in enumerate(diffs[i]):
                 if diff.deleted_file:
                     path = distro_path / diff.a_path
-                    try:
+                    with contextlib.suppress(FileNotFoundError):
                         path.unlink()
-                    except FileNotFoundError:
-                        pass  # missing_ok argument to unlink was added in 3.8 which is not in EPEL
                 elif diff.renamed_file:
                     path = distro_path / diff.a_path
                     try:
                         path.rename(distro_path / Path(diff.b_path).name)
                     except FileNotFoundError as e:
                         raise PackitException(
-                            f"File {diff.a_path} to be renamed does not exist in source-git."
+                            f"File {diff.a_path} to be renamed does not exist in source-git.",
                         ) from e
                 else:
                     # The order of `hunks` should match the order of `diffs`, they are using the
@@ -491,11 +499,11 @@ class PackitAPI:
                             if diff.b_path == ".gitignore":
                                 logger.info(
                                     f"Commit {commit} contains an inapplicable .gitignore "
-                                    f"change, skipping this part of the commit."
+                                    f"change, skipping this part of the commit.",
                                 )
                                 continue
                             raise PackitException(
-                                f"Commit {commit} could not be applied to source-git."
+                                f"Commit {commit} could not be applied to source-git.",
                             ) from e
 
             title, _, message = commit.message.partition("\n")
@@ -512,10 +520,10 @@ class PackitAPI:
                 )
             else:
                 logger.info(
-                    f"Commit {commit} had no changes to be applied, skipping it."
+                    f"Commit {commit} had no changes to be applied, skipping it.",
                 )
 
-    def _get_latest_commit_update_pair(self) -> Tuple[str, str]:
+    def _get_latest_commit_update_pair(self) -> tuple[str, str]:
         """Finds the latest pair of commits which was created by updating
         source-git from dist-git (or vice versa) denoted by git trailers.
 
@@ -544,7 +552,8 @@ class PackitAPI:
                 ).group(1),
             )
             for c in self.up.local_project.git_repo.iter_commits(
-                max_count=1, grep=rf"^{re.escape(FROM_DIST_GIT_TOKEN)}: .\+$"
+                max_count=1,
+                grep=rf"^{re.escape(FROM_DIST_GIT_TOKEN)}: .\+$",
             )
         ]
         dg_update_commits = [
@@ -557,22 +566,25 @@ class PackitAPI:
                 c.hexsha,
             )
             for c in self.dg.local_project.git_repo.iter_commits(
-                max_count=1, grep=rf"^{re.escape(FROM_SOURCE_GIT_TOKEN)}: .\+$"
+                max_count=1,
+                grep=rf"^{re.escape(FROM_SOURCE_GIT_TOKEN)}: .\+$",
             )
         ]
         if sg_update_commits and not commit_exists(
-            self.dg.local_project.git_repo, sg_update_commits[0][1]
+            self.dg.local_project.git_repo,
+            sg_update_commits[0][1],
         ):
             raise PackitException(
                 f"Commit '{sg_update_commits[0][1]}' referenced in {FROM_DIST_GIT_TOKEN} "
-                f"git trailer does not exist in dist-git."
+                f"git trailer does not exist in dist-git.",
             )
         if dg_update_commits and not commit_exists(
-            self.up.local_project.git_repo, dg_update_commits[0][0]
+            self.up.local_project.git_repo,
+            dg_update_commits[0][0],
         ):
             raise PackitException(
                 f"Commit '{dg_update_commits[0][0]}' referenced in {FROM_SOURCE_GIT_TOKEN} "
-                f"git trailer does not exist in source-git."
+                f"git trailer does not exist in source-git.",
             )
         if sg_update_commits and dg_update_commits:
             # Check ancestor relationships, the situation is as follows:
@@ -587,19 +599,18 @@ class PackitAPI:
             #   git merge-base --is-ancestor
             # Ancestor is the older commit, we want to return the newer
             if self.up.local_project.git_repo.is_ancestor(
-                sg_update_commits[0][0], dg_update_commits[0][0]
+                sg_update_commits[0][0],
+                dg_update_commits[0][0],
             ):
                 return dg_update_commits[0]
-            else:
-                return sg_update_commits[0]
-        elif sg_update_commits:
             return sg_update_commits[0]
-        elif dg_update_commits:
+        if sg_update_commits:
+            return sg_update_commits[0]
+        if dg_update_commits:
             return dg_update_commits[0]
-        else:
-            raise PackitException(
-                "No git commits with trailers to mark synchronization points were found."
-            )
+        raise PackitException(
+            "No git commits with trailers to mark synchronization points were found.",
+        )
 
     def sync_status(self) -> SynchronizationStatus:
         """Checks the sync status of source-git and dist-git.
@@ -617,10 +628,12 @@ class PackitAPI:
         sg_sync_point, dg_sync_point = self._get_latest_commit_update_pair()
         return SynchronizationStatus(
             source_git_range_start=get_next_commit(
-                self.up.local_project.git_repo, sg_sync_point
+                self.up.local_project.git_repo,
+                sg_sync_point,
             ),
             dist_git_range_start=get_next_commit(
-                self.dg.local_project.git_repo, dg_sync_point
+                self.dg.local_project.git_repo,
+                dg_sync_point,
             ),
         )
 
@@ -648,26 +661,28 @@ The first dist-git commit to be synced is '{shorten_commit_hash(status.dist_git_
 Sync status needs to be reestablished manually, see
 https://packit.dev/source-git/work-with-source-git/fix-diverged-history
 """
-        elif status.source_git_range_start:
+        if status.source_git_range_start:
             number_of_commits = len(
                 list(
                     self.up.local_project.git_repo.iter_commits(
-                        f"{status.source_git_range_start}~..", ancestry_path=True
-                    )
-                )
+                        f"{status.source_git_range_start}~..",
+                        ancestry_path=True,
+                    ),
+                ),
             )
             return f"""'{source_git}' is ahead of '{dist_git}' by {number_of_commits} commits.
 Use "packit source-git update-dist-git {source_git} {dist_git}"
 to transform changes from '{source_git}' to '{dist_git}'.
 The first source-git commit to be synced is '{shorten_commit_hash(status.source_git_range_start)}'.
 """
-        elif status.dist_git_range_start:
+        if status.dist_git_range_start:
             number_of_commits = len(
                 list(
                     self.dg.local_project.git_repo.iter_commits(
-                        f"{status.dist_git_range_start}~..", ancestry_path=True
-                    )
-                )
+                        f"{status.dist_git_range_start}~..",
+                        ancestry_path=True,
+                    ),
+                ),
             )
             short_hash = shorten_commit_hash(status.dist_git_range_start)
             return f"""'{source_git}' is behind of '{dist_git}' by {number_of_commits} commits.
@@ -675,8 +690,7 @@ Use "packit source-git update-source-git {dist_git} {source_git}
 {short_hash}~..\" to transform changes from '{dist_git}' to '{source_git}'.
 The first dist-git commit to be synced is '{short_hash}'.
 """
-        else:
-            return f"'{source_git}' is up to date with '{dist_git}'."
+        return f"'{source_git}' is up to date with '{dist_git}'."
 
     @overload
     def sync_release(
@@ -789,14 +803,14 @@ The first dist-git commit to be synced is '{short_hash}'.
         # process version and tag parameters
         if version and tag:
             raise PackitException(
-                "Function parameters version and tag are mutually exclusive."
+                "Function parameters version and tag are mutually exclusive.",
             )
-        elif not tag:
+        if not tag:
             version = version or self.up.get_latest_released_version()
             if not version:
                 raise PackitException(
                     "Could not figure out version of latest upstream release. "
-                    "You can specify it as an argument."
+                    "You can specify it as an argument.",
                 )
             upstream_tag = self.up.convert_version_to_tag(version)
         else:
@@ -808,17 +822,17 @@ The first dist-git commit to be synced is '{short_hash}'.
         if self.dg.is_dirty():
             raise PackitException(
                 f"The distgit repository {self.dg.local_project.working_dir} is dirty."
-                f"This is not supported."
+                f"This is not supported.",
             )
         if not force and self.up.is_dirty() and not use_local_content:
             raise PackitException(
-                "The repository is dirty, will not discard the changes. Use --force to bypass."
+                "The repository is dirty, will not discard the changes. Use --force to bypass.",
             )
         # do not add anything between distgit clone and saving gpg keys!
         self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
 
         upstream_ref = self.up._expand_git_ref(
-            upstream_ref or self.package_config.upstream_ref
+            upstream_ref or self.package_config.upstream_ref,
         )
 
         current_up_branch = self.up.active_branch
@@ -828,12 +842,13 @@ The first dist-git commit to be synced is '{short_hash}'.
             if upstream_ref:
                 logger.info(
                     "We will not check out the upstream tag "
-                    "because this is a source-git repo."
+                    "because this is a source-git repo.",
                 )
             elif not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
             self.up.run_action(
-                actions=ActionName.post_upstream_clone, env=self.sync_release_env
+                actions=ActionName.post_upstream_clone,
+                env=self.sync_release_env,
             )
 
             if not use_downstream_specfile:
@@ -859,7 +874,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             if use_downstream_specfile:
                 logger.info(
-                    "Using the downstream specfile instead of the upstream one."
+                    "Using the downstream specfile instead of the upstream one.",
                 )
                 self.up.set_specfile(self.dg.specfile)
 
@@ -874,7 +889,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 readme_path = self.dg.local_project.working_dir / "README.packit"
                 logger.debug(f"README: {readme_path}")
                 readme_path.write_text(
-                    SYNCING_NOTE.format(packit_version=get_packit_version())
+                    SYNCING_NOTE.format(packit_version=get_packit_version()),
                 )
 
             # Preset the PR title and instructions
@@ -992,12 +1007,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         if self.up.is_dirty():
             raise PackitException(
                 f"The upstream repository {self.up.local_project.working_dir} is dirty."
-                f"This is not supported."
+                f"This is not supported.",
             )
         if not force and self.dg.is_dirty():
             raise PackitException(
                 f"The distgit repository {self.up.local_project.working_dir} is dirty,"
-                " will not discard the changes. Use --force to bypass."
+                " will not discard the changes. Use --force to bypass.",
             )
 
         dist_git_branch = (
@@ -1032,8 +1047,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         return pr
 
     def _prepare_files_to_sync(
-        self, synced_files: List[SyncFilesItem], full_version: str, upstream_tag: str
-    ) -> List[SyncFilesItem]:
+        self,
+        synced_files: list[SyncFilesItem],
+        full_version: str,
+        upstream_tag: str,
+    ) -> list[SyncFilesItem]:
         """
         Returns the list of files to sync to dist-git as is.
 
@@ -1055,7 +1073,8 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         # add entry to changelog
         ChangelogHelper(self.up, self.dg, self.package_config).update_dist_git(
-            full_version=full_version, upstream_tag=upstream_tag
+            full_version=full_version,
+            upstream_tag=upstream_tag,
         )
 
         # exclude spec, we have special plans for it
@@ -1066,7 +1085,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     x.drop_src(self.up.get_absolute_specfile_path())
                     for x in synced_files
                 ],
-            )
+            ),
         )
 
     def sync_from_downstream(
@@ -1076,7 +1095,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         no_pr: bool = False,
         fork: bool = True,
         remote_name: Optional[str] = None,
-        exclude_files: Iterable[str] = None,
+        exclude_files: Optional[Iterable[str]] = None,
         force: bool = False,
         sync_only_specfile: bool = False,
     ):
@@ -1103,7 +1122,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         if not force and self.up.is_dirty():
             raise PackitException(
-                "The repository is dirty, will not discard the changes. Use --force to bypass."
+                "The repository is dirty, will not discard the changes. Use --force to bypass.",
             )
         self.dg.update_branch(dist_git_branch)
         self.dg.switch_branch(dist_git_branch)
@@ -1211,7 +1230,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         # is already available in the dist-git spec-file.
         for upstream_archive_name in self.dg.upstream_archive_names:
             archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-                upstream_archive_name
+                upstream_archive_name,
             )
             archive_name_in_sources_file = (
                 sources_file.is_file()
@@ -1286,14 +1305,15 @@ The first dist-git commit to be synced is '{short_hash}'.
         self.dg.switch_branch(dist_git_branch)
 
         self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        return None
 
     def create_update(
         self,
         dist_git_branch: str,
         update_type: str,
         update_notes: Optional[str] = None,
-        koji_builds: Sequence[str] = None,
-        bugzilla_ids: Optional[List[int]] = None,
+        koji_builds: Optional[Sequence[str]] = None,
+        bugzilla_ids: Optional[list[int]] = None,
     ):
         """
         Create bodhi update.
@@ -1309,7 +1329,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         logger.debug(
             f"Create bodhi update, "
-            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}"
+            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}",
         )
         self.dg.create_bodhi_update(
             koji_builds=koji_builds,
@@ -1355,14 +1375,14 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
         except Exception as ex:
             raise PackitSRPMException(
-                f"Preparation of the repository for creation of an SRPM failed: {ex}"
+                f"Preparation of the repository for creation of an SRPM failed: {ex}",
             ) from ex
 
         if result_dir:
             self.copy_sources(result_dir)
 
         logger.info(
-            f"Directory with sources: {result_dir or self.up.absolute_specfile_dir}"
+            f"Directory with sources: {result_dir or self.up.absolute_specfile_dir}",
         )
 
     def copy_sources(self, result_dir) -> None:
@@ -1374,14 +1394,16 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         logger.debug(f"Copying {self.up.absolute_specfile_dir} -> {result_dir}")
         copy_tree(
-            str(self.up.absolute_specfile_dir), str(result_dir), preserve_symlinks=True
+            str(self.up.absolute_specfile_dir),
+            str(result_dir),
+            preserve_symlinks=True,
         )
 
     def create_srpm(
         self,
         output_file: Optional[str] = None,
         upstream_ref: Optional[str] = None,
-        srpm_dir: Union[Path, str] = None,
+        srpm_dir: Optional[Union[Path, str]] = None,
         update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
     ) -> Path:
@@ -1402,18 +1424,19 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.prepare_sources(upstream_ref, update_release, release_suffix)
             try:
                 srpm_path = self.up.create_srpm(
-                    srpm_path=output_file, srpm_dir=srpm_dir
+                    srpm_path=output_file,
+                    srpm_dir=srpm_dir,
                 )
             except PackitSRPMException:
                 raise
             except Exception as ex:
                 raise PackitSRPMException(
-                    f"An unexpected error occurred when creating the SRPM: {ex}"
+                    f"An unexpected error occurred when creating the SRPM: {ex}",
                 ) from ex
 
             if not srpm_path.exists():
                 raise PackitSRPMNotFoundException(
-                    f"SRPM was created successfully, but can't be found at {srpm_path}"
+                    f"SRPM was created successfully, but can't be found at {srpm_path}",
                 )
             return srpm_path
         finally:
@@ -1422,9 +1445,9 @@ The first dist-git commit to be synced is '{short_hash}'.
     def create_rpms(
         self,
         upstream_ref: Optional[str] = None,
-        rpm_dir: str = None,
+        rpm_dir: Optional[str] = None,
         release_suffix: Optional[str] = None,
-    ) -> List[Path]:
+    ) -> list[Path]:
         """
         Create RPMs from the upstream repository.
 
@@ -1443,11 +1466,12 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         try:
             self.up.prepare_upstream_for_srpm_creation(
-                upstream_ref=upstream_ref, release_suffix=release_suffix
+                upstream_ref=upstream_ref,
+                release_suffix=release_suffix,
             )
         except Exception as ex:
             raise PackitRPMException(
-                f"Preparing of the upstream to the RPM build failed: {ex}"
+                f"Preparing of the upstream to the RPM build failed: {ex}",
             ) from ex
 
         try:
@@ -1456,18 +1480,18 @@ The first dist-git commit to be synced is '{short_hash}'.
             raise
         except Exception as ex:
             raise PackitRPMException(
-                f"An unexpected error occurred when creating the RPMs: {ex}"
+                f"An unexpected error occurred when creating the RPMs: {ex}",
             ) from ex
 
         for rpm_path in rpm_paths:
             if not rpm_path.exists():
                 raise PackitRPMNotFoundException(
-                    f"RPM was created successfully, but can't be found at {rpm_path}"
+                    f"RPM was created successfully, but can't be found at {rpm_path}",
                 )
         return rpm_paths
 
     @staticmethod
-    async def status_get_downstream_prs(status) -> List[Tuple[int, str, str]]:
+    async def status_get_downstream_prs(status) -> list[tuple[int, str, str]]:
         try:
             await asyncio.sleep(0)
             return status.get_downstream_prs()
@@ -1477,7 +1501,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_get_dg_versions(status) -> Dict:
+    async def status_get_dg_versions(status) -> dict:
         try:
             await asyncio.sleep(0)
             return status.get_dg_versions()
@@ -1486,7 +1510,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return {}
 
     @staticmethod
-    async def status_get_up_releases(status) -> List:
+    async def status_get_up_releases(status) -> list:
         try:
             await asyncio.sleep(0)
             return status.get_up_releases()
@@ -1495,7 +1519,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_get_koji_builds(status) -> Dict:
+    async def status_get_koji_builds(status) -> dict:
         try:
             await asyncio.sleep(0)
             return status.get_koji_builds()
@@ -1504,7 +1528,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return {}
 
     @staticmethod
-    async def status_get_copr_builds(status) -> List:
+    async def status_get_copr_builds(status) -> list:
         try:
             await asyncio.sleep(0)
             return status.get_copr_builds()
@@ -1513,7 +1537,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_get_updates(status) -> List:
+    async def status_get_updates(status) -> list:
         try:
             await asyncio.sleep(0)
             return status.get_updates()
@@ -1522,13 +1546,13 @@ The first dist-git commit to be synced is '{short_hash}'.
             return []
 
     @staticmethod
-    async def status_main(status: Status) -> List:
+    async def status_main(status: Status) -> list:
         """
         Schedule repository data retrieval calls concurrently.
         :param status: status of the package
         :return: awaitable tasks
         """
-        res = await asyncio.gather(
+        return await asyncio.gather(
             PackitAPI.status_get_downstream_prs(status),
             PackitAPI.status_get_dg_versions(status),
             PackitAPI.status_get_up_releases(status),
@@ -1536,7 +1560,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             PackitAPI.status_get_copr_builds(status),
             PackitAPI.status_get_updates(status),
         )
-        return res
 
     def status(self) -> None:
         status = Status(self.config, self.package_config, self.up, self.dg)
@@ -1587,7 +1610,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         if copr_builds:
             click.echo("\nLatest Copr builds:")
             click.echo(
-                tabulate(copr_builds, headers=["Build ID", "Project name", "Status"])
+                tabulate(copr_builds, headers=["Build ID", "Project name", "Status"]),
             )
         else:
             click.echo("\nNo Copr builds found.")
@@ -1595,22 +1618,22 @@ The first dist-git commit to be synced is '{short_hash}'.
     def run_copr_build(
         self,
         project: str,
-        chroots: List[str],
+        chroots: list[str],
         owner: Optional[str] = None,
         description: Optional[str] = None,
         instructions: Optional[str] = None,
         upstream_ref: Optional[str] = None,
         list_on_homepage: bool = False,
         preserve_project: bool = False,
-        additional_packages: Optional[List[str]] = None,
-        additional_repos: Optional[List[str]] = None,
+        additional_packages: Optional[list[str]] = None,
+        additional_repos: Optional[list[str]] = None,
         request_admin_if_needed: bool = False,
         enable_net: bool = False,
         release_suffix: Optional[str] = None,
         srpm_path: Optional[Path] = None,
         module_hotfixes: bool = False,
         follow_fedora_branching: bool = False,
-    ) -> Tuple[int, str]:
+    ) -> tuple[int, str]:
         """
         Submit a build to copr build system using an SRPM using the current checkout.
 
@@ -1654,7 +1677,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         owner = owner or self.copr_helper.configured_owner
         if not owner:
             raise PackitCoprException(
-                "Copr owner not set. Use Copr config file or `--owner` when calling packit CLI."
+                "Copr owner not set. Use Copr config file or `--owner` when calling packit CLI.",
             )
         logger.info(f"We will operate with COPR owner {owner}.")
 
@@ -1674,7 +1697,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         )
         logger.debug(
             f"Submitting a build to copr build system,"
-            f"owner={owner}, project={project}, path={srpm_path}"
+            f"owner={owner}, project={project}, path={srpm_path}",
         )
 
         build = self.copr_helper.copr_client.build_proxy.create_from_file(
@@ -1686,11 +1709,16 @@ The first dist-git commit to be synced is '{short_hash}'.
         return build.id, self.copr_helper.copr_web_build_url(build)
 
     def watch_copr_build(
-        self, build_id: int, timeout: int, report_func: Callable = None
+        self,
+        build_id: int,
+        timeout: int,
+        report_func: Optional[Callable] = None,
     ) -> str:
         """returns copr build state"""
         return self.copr_helper.watch_copr_build(
-            build_id=build_id, timeout=timeout, report_func=report_func
+            build_id=build_id,
+            timeout=timeout,
+            report_func=report_func,
         )
 
     def push_bodhi_update(self, update_alias: str):
@@ -1708,12 +1736,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                 f"Bodhi update {response['alias']} ({response['title']}) pushed to stable:\n"
                 f"- {response['url']}\n"
                 f"- karma: {response['karma']}\n"
-                f"- notes:\n{response['notes']}\n"
+                f"- notes:\n{response['notes']}\n",
             )
         except UpdateNotFound:
             logger.error("Update was not found.")
 
-    def get_testing_updates(self, update_alias: Optional[str]) -> List:
+    def get_testing_updates(self, update_alias: Optional[str]) -> list:
         bodhi_client = get_bodhi_client()
         updates = []
         page = pages = 1
@@ -1735,7 +1763,8 @@ The first dist-git commit to be synced is '{short_hash}'.
     def days_in_testing(update) -> int:
         if update.get("date_testing"):
             date_testing = datetime.strptime(
-                update["date_testing"], "%Y-%m-%d %H:%M:%S"
+                update["date_testing"],
+                "%Y-%m-%d %H:%M:%S",
             )
             return (datetime.utcnow() - date_testing).days
         return 0
@@ -1866,7 +1895,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         srpm_path: Path,
         root: str = "default",
-    ) -> List[Path]:
+    ) -> list[Path]:
         """
         Performs a mock build with given SRPM and root.
 
@@ -1896,12 +1925,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                 f"stdout:\n"
                 f"{ex.stdout_output}\n"
                 f"stderr:\n"
-                f"{ex.stderr_output}"
+                f"{ex.stderr_output}",
             ) from ex
         except PackitException as ex:
             logger.error(f"The `mock` command failed: {ex!r}")
             raise PackitFailedToCreateRPMException(
-                f"The `mock` command failed:\n{ex}"
+                f"The `mock` command failed:\n{ex}",
             ) from ex
 
         rpms = Upstream._get_rpms_from_mock_output(cmd_result.stderr)
@@ -1911,8 +1940,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         image_distribution: str,
         image_name: str,
-        image_request: Dict,
-        image_customizations: Dict,
+        image_request: dict,
+        image_customizations: dict,
         copr_namespace: str,
         copr_project: str,
         copr_chroot: str,

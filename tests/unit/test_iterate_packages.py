@@ -1,20 +1,20 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 import json
-import pytest
 from pathlib import PosixPath
-from flexmock import flexmock
-from click.testing import CliRunner
 
+import pytest
+from click.testing import CliRunner
+from flexmock import flexmock
+
+from packit.api import PackitAPI
+from packit.cli.builds import koji_build
+from packit.cli.packit_base import packit_base
 from packit.config import (
     package_config,
 )
-from packit.local_project import LocalProject
-from packit.api import PackitAPI
-from packit.cli.packit_base import packit_base
-from packit.cli.builds import koji_build
 from packit.distgit import DistGit
-
+from packit.local_project import LocalProject
 
 DEFAULT_CONFIG_YAML = """
     {
@@ -200,17 +200,17 @@ def test_iterate_packages(package_config_yaml, mock_api_calls, how_many_times, o
     package_config_dict = json.loads(package_config_yaml)
 
     flexmock(package_config).should_receive("find_packit_yaml").and_return(
-        flexmock(name=".packit.yaml", parent="/some/dir/")
+        flexmock(name=".packit.yaml", parent="/some/dir/"),
     )
     flexmock(package_config).should_receive("load_packit_yaml").and_return(
-        package_config_dict
+        package_config_dict,
     )
     flexmock(LocalProject).should_receive("git_repo").and_return(
         flexmock(
             remotes=[],
             active_branch=flexmock(name="an active branch"),
             head=flexmock(is_detached=False),
-        )
+        ),
     )
     # otherwise _dg and _local_project objects will be created
     # by debugger threads and you are not able to debug them
@@ -220,7 +220,7 @@ def test_iterate_packages(package_config_yaml, mock_api_calls, how_many_times, o
     flexmock(PackitAPI).should_receive("init_kerberos_ticket").and_return()
     for call, result in mock_api_calls:
         flexmock(PackitAPI).should_receive(call).and_return(result).times(
-            how_many_times
+            how_many_times,
         )
 
     runner = CliRunner()
@@ -314,26 +314,26 @@ def test_iterate_packages_source_git(
     flexmock(PosixPath).should_receive("name").and_return(dist_git)
     flexmock(PosixPath).should_call("joinpath").with_args(str)
     flexmock(PosixPath).should_receive("joinpath").with_args(".git").and_return(
-        flexmock().should_receive("exists").and_return(dist_git_is_git_repo).mock()
+        flexmock().should_receive("exists").and_return(dist_git_is_git_repo).mock(),
     )
     flexmock(PosixPath).should_receive("glob").and_return(
         [
             flexmock(is_dir=lambda: True, name="copr-cli")
             .should_receive("joinpath")
             .and_return(flexmock().should_receive("exists").and_return(True).mock())
-            .mock()
-        ]
+            .mock(),
+        ],
     )
 
     flexmock(package_config).should_receive("load_packit_yaml").and_return(
-        package_config_dict
+        package_config_dict,
     )
     # otherwise _dg and _local_project objects will be created
     # by debugger threads and you are not able to debug them
     flexmock(PackitAPI).should_receive("__repr__").and_return("")
     for call, result in mock_api_calls:
         flexmock(PackitAPI).should_receive(call).and_return(result).times(
-            how_many_times
+            how_many_times,
         )
 
     runner = CliRunner()

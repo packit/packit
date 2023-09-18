@@ -1,7 +1,7 @@
+from bodhi.client.oidcclient import OIDCClient
 from flexmock import flexmock
 from requests import Session
 
-from bodhi.client.oidcclient import OIDCClient
 from packit.utils.bodhi import get_bodhi_client
 
 
@@ -16,7 +16,7 @@ def test_login_with_kerberos():
         flexmock(
             raise_for_status=lambda: None,
             text=f'<meta charset="UTF-8">\n<title>{the_code}</title>\n   ',
-        )
+        ),
     )
     flexmock(OIDCClient).should_receive("auth_callback").with_args(f"?{the_code}")
     bodhi.oidc.login_with_kerberos("foobar")

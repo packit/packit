@@ -1,6 +1,11 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+from packit.config.common_package_config import (
+    CommonPackageConfig,
+    Deployment,
+    MultiplePackages,
+)
 from packit.config.config import (
     Config,
     RunCommandType,
@@ -10,20 +15,15 @@ from packit.config.config import (
 )
 from packit.config.job_config import (
     JobConfig,
-    JobConfigView,
     JobConfigTriggerType,
+    JobConfigView,
     JobType,
 )
 from packit.config.package_config import (
     PackageConfig,
-    get_package_config_from_repo,
     get_local_package_config,
+    get_package_config_from_repo,
     parse_loaded_config,
-)
-from packit.config.common_package_config import (
-    CommonPackageConfig,
-    Deployment,
-    MultiplePackages,
 )
 
 __all__ = [

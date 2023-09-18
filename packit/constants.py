@@ -186,7 +186,7 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
     "\n---\n\n"
     "If you need to do any change in this pull request, you need to locally fetch the "
     "source branch of it and push it (with a fix) to your fork "
-    "(as it is not possible to push to the branch created in the Packit’s fork):\n"
+    "(as it is not possible to push to the branch created in the Packit's fork):\n"
     "```\ngit fetch https://src.fedoraproject.org/forks/{user}/rpms/{package}.git "
     "refs/heads/*:refs/remotes/{user}/*\n"
     "git checkout {user}/{branch}\n```\n"

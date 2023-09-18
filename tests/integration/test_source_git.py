@@ -16,14 +16,14 @@ from packit.utils.commands import cwd
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import (
     TARBALL_NAME,
-    git_add_and_commit,
     build_srpm,
-    create_merge_commit_in_source_git,
     create_git_am_style_history,
-    create_patch_mixed_history,
     create_history_with_empty_commit,
-    run_prep_for_srpm,
     create_history_with_patch_ids,
+    create_merge_commit_in_source_git,
+    create_patch_mixed_history,
+    git_add_and_commit,
+    run_prep_for_srpm,
 )
 
 
@@ -182,7 +182,8 @@ def test_basic_local_update_patch_content(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     assert "From-source-git-commit" not in git.Repo(distgit).head.commit.message
@@ -326,7 +327,8 @@ def test_basic_local_update_patch_content_with_metadata(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     patches = """
@@ -374,7 +376,8 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     patches = """
@@ -413,7 +416,8 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     )
 
     git_diff = subprocess.check_output(
-        ["git", "diff", "HEAD~", "HEAD"], cwd=distgit
+        ["git", "diff", "HEAD~", "HEAD"],
+        cwd=distgit,
     ).decode()
 
     patches = """
@@ -434,16 +438,17 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref)
     create_merge_commit_in_source_git(sg_path)
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
     branches = subprocess.check_output(
-        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"], cwd=sg_path
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"],
+        cwd=sg_path,
     ).split(b"\n")
     for b in branches:
         if b and b.startswith(b"packit-patches-"):
             raise AssertionError(
-                "packit-patches- branch was found - the history shouldn't have been linearized"
+                "packit-patches- branch was found - the history shouldn't have been linearized",
             )
     assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-switching-to-amarillo-hops.patch",
@@ -453,7 +458,9 @@ def test_srpm(mock_remote_functionality_sourcegit, api_instance_source_git, ref)
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_merge_storm(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -466,25 +473,26 @@ def test_srpm_merge_storm(
 
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
     branches = subprocess.check_output(
-        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"], cwd=sg_path
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/"],
+        cwd=sg_path,
     ).split(b"\n")
     for b in branches:
         if b and b.startswith(b"packit-patches-"):
             break
     else:
         raise AssertionError(
-            "packit-patches- branch was not found - this should trigger the linearization"
+            "packit-patches- branch was not found - this should trigger the linearization",
         )
     # make sure we are on the main branch
     assert (
-        "main"
-        == subprocess.check_output(["git", "branch", "--show-current"], cwd=sg_path)
+        subprocess.check_output(["git", "branch", "--show-current"], cwd=sg_path)
         .decode()
         .strip()
+        == "main"
     )
     assert {x.name for x in sg_path.joinpath(DISTRO_DIR).glob("*.patch")} == {
         "0001-MERGE-COMMIT.patch",
@@ -499,9 +507,9 @@ def test_srpm_merge_storm_dirty(api_instance_source_git):
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, ref)
     create_merge_commit_in_source_git(sg_path, go_nuts=True)
     (sg_path / "malt").write_text("Mordor\n")
-    with pytest.raises(PackitException) as ex:
-        with cwd("/"):  # let's mimic p-s by having different cwd than the project
-            api_instance_source_git.create_srpm(upstream_ref=ref)
+    with pytest.raises(PackitException) as ex, cwd("/"):
+        # let's mimic p-s by having different cwd than the project
+        api_instance_source_git.create_srpm(upstream_ref=ref)
     assert "The source-git repo is dirty" in str(ex.value)
 
 
@@ -533,7 +541,7 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -550,7 +558,9 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_git_no_prefix_patches(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -573,7 +583,7 @@ def test_srpm_git_no_prefix_patches(
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -586,7 +596,9 @@ def test_srpm_git_no_prefix_patches(
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_empty_patch(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -604,7 +616,7 @@ def test_srpm_empty_patch(
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -619,7 +631,9 @@ def test_srpm_empty_patch(
 
 @pytest.mark.parametrize("ref", ["0.1.0", "0.1*", "0.*"])
 def test_srpm_patch_non_conseq_indices(
-    mock_remote_functionality_sourcegit, api_instance_source_git, ref
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
+    ref,
 ):
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
     mock_spec_download_remote_s(sg_path, sg_path / DISTRO_DIR, "0.1.0")
@@ -647,7 +661,7 @@ def test_srpm_patch_non_conseq_indices(
     assert last_patch.number == 6
     assert last_patch.filename == "0004-Wei-bier-Summer-is-coming.patch"
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 
@@ -691,10 +705,9 @@ def test_add_patch_with_patch_id(api_instance_source_git, starting_patch_id):
     # an exc is thrown b/c that's not supported
     # to change order of patches (people should reorder the git history instead)
     patch_name = "nope.patch"
-    if starting_patch_id <= 1:
-        bad_patch_id = starting_patch_id + 1
-    else:
-        bad_patch_id = starting_patch_id - 1
+    bad_patch_id = (
+        starting_patch_id + 1 if starting_patch_id <= 1 else starting_patch_id - 1
+    )
     with pytest.raises(SourceNumberException):
         spec.add_patch(patch_name, bad_patch_id)
 
@@ -716,7 +729,8 @@ def test_add_patch_first_id_1(api_instance_source_git):
 
 
 def test_srpm_add_patch_with_ids(
-    mock_remote_functionality_sourcegit, api_instance_source_git
+    mock_remote_functionality_sourcegit,
+    api_instance_source_git,
 ):
     ref = "0.1.0"
     sg_path = Path(api_instance_source_git.upstream_local_project.working_dir)
@@ -727,7 +741,7 @@ def test_srpm_add_patch_with_ids(
     with cwd(sg_path):
         api_instance_source_git.create_srpm(upstream_ref=ref)
 
-    srpm_path = list(sg_path.glob("beer-0.1.0-2.*.src.rpm"))[0]
+    srpm_path = next(sg_path.glob("beer-0.1.0-2.*.src.rpm"))
     assert srpm_path.is_file()
     build_srpm(srpm_path)
 

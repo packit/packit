@@ -6,8 +6,9 @@ import io
 import shutil
 import subprocess
 import tarfile
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Optional
 
 import git
 import pytest
@@ -15,7 +16,7 @@ from flexmock import flexmock
 from gnupg import GPG
 from ogr.abstract import PRStatus
 from ogr.read_only import PullRequestReadOnly
-from ogr.services.github import GithubService, GithubProject
+from ogr.services.github import GithubProject, GithubService
 from ogr.services.pagure import PagureProject, PagureService, PagureUser
 
 from packit.api import PackitAPI
@@ -24,24 +25,23 @@ from packit.cli.utils import get_packit_api
 from packit.config import get_local_package_config
 from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
-from packit.upstream import Upstream
+from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.pkgtool import PkgTool
-from packit.local_project import LocalProject, LocalProjectBuilder, CALCULATE
+from packit.upstream import Upstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
-
 from tests.integration.utils import remove_gpg_key_pair
 from tests.spellbook import (
-    get_test_config,
-    SOURCEGIT_UPSTREAM,
-    SOURCEGIT_SOURCEGIT,
-    git_add_and_commit,
-    TARBALL_NAME,
-    UPSTREAM,
-    initiate_git_repo,
+    DATA_DIR,
     DISTGIT,
     NAME_VERSION,
-    DATA_DIR,
+    SOURCEGIT_SOURCEGIT,
+    SOURCEGIT_UPSTREAM,
+    TARBALL_NAME,
+    UPSTREAM,
+    get_test_config,
+    git_add_and_commit,
+    initiate_git_repo,
 )
 
 DOWNSTREAM_PROJECT_URL = "https://src.fedoraproject.org/not/set.git"
@@ -59,7 +59,8 @@ def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
 
 @pytest.fixture()
 def mock_remote_functionality_downstream_autochangelog(
-    upstream_and_remote, distgit_with_autochangelog_and_remote
+    upstream_and_remote,
+    distgit_with_autochangelog_and_remote,
 ):
     u, _ = upstream_and_remote
     d, _ = distgit_with_autochangelog_and_remote
@@ -120,7 +121,10 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
     flexmock(
         GithubService,
         get_project=lambda repo, namespace: GithubProject(
-            "also-not", github_service, "set", github_repo=flexmock()
+            "also-not",
+            github_service,
+            "set",
+            github_repo=flexmock(),
         ),
     )
     flexmock(
@@ -186,7 +190,8 @@ def sourcegit_and_remote(tmp_path):
     shutil.copytree(SOURCEGIT_UPSTREAM, sourcegit_dir)
     initiate_git_repo(sourcegit_dir, tag=SOURCE_GIT_RELEASE_TAG)
     subprocess.check_call(
-        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path], cwd=sourcegit_remote
+        ["cp", "-R", SOURCEGIT_SOURCEGIT, tmp_path],
+        cwd=sourcegit_remote,
     )
     git_add_and_commit(directory=sourcegit_dir, message="sourcegit content")
 
@@ -196,15 +201,13 @@ def sourcegit_and_remote(tmp_path):
 @pytest.fixture()
 def source_git_repo(sourcegit_and_remote):
     source_git_dir, _ = sourcegit_and_remote
-    source_git_repo = git.Repo(source_git_dir)
-    return source_git_repo
+    return git.Repo(source_git_dir)
 
 
 @pytest.fixture()
 def dist_git_repo(distgit_and_remote):
     dist_git_dir, _ = distgit_and_remote
-    dist_git_repo = git.Repo(dist_git_dir)
-    return dist_git_repo
+    return git.Repo(dist_git_dir)
 
 
 @pytest.fixture()
@@ -271,7 +274,9 @@ def upstream_instance_with_two_commits(upstream_instance):
 
 @pytest.fixture()
 def distgit_instance(
-    upstream_and_remote, distgit_and_remote, mock_remote_functionality_upstream
+    upstream_and_remote,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
 ):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
@@ -306,19 +311,22 @@ def api_instance(upstream_and_remote, distgit_and_remote):
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            working_dir=Path.cwd(), git_repo=CALCULATE
+            working_dir=Path.cwd(),
+            git_repo=CALCULATE,
         ),
     )
     return u, d, api
 
 
 def mock_api_for_source_git(
-    sourcegit: Path, distgit: Path, up_local_project: LocalProject
+    sourcegit: Path,
+    distgit: Path,
+    up_local_project: LocalProject,
 ):
     with cwd(sourcegit):
         c = get_test_config()
         pc = get_local_package_config(
-            package_config_path=sourcegit / ".distro" / "source-git.yaml"
+            package_config_path=sourcegit / ".distro" / "source-git.yaml",
         )
         pc.upstream_project_url = str(sourcegit)
         return PackitAPI(c, pc, up_local_project, dist_git_clone_path=str(distgit))
@@ -343,7 +351,7 @@ def add_source_git_commit_trailer(api: PackitAPI):
             (
                 FROM_SOURCE_GIT_TOKEN,
                 api.up.local_project.git_repo.head.commit.hexsha,
-            )
+            ),
         ],
     )
     return api
@@ -361,14 +369,19 @@ def api_instance_sync_push(sourcegit_and_remote, distgit_and_remote):
     distgit, _ = distgit_and_remote
 
     repo = flexmock(
-        default_branch="main", get_pulls=lambda state, sort, direction: [], fork="fork"
+        default_branch="main",
+        get_pulls=lambda state, sort, direction: [],
+        fork="fork",
     )
     service = flexmock(user=flexmock(get_username=lambda: "packit"))
     up_lp = LocalProjectBuilder().build(
         working_dir=sourcegit,
         git_repo=CALCULATE,
         git_project=GithubProject(
-            repo="beer", service=service, namespace="packit.dev", github_repo=repo
+            repo="beer",
+            service=service,
+            namespace="packit.dev",
+            github_repo=repo,
         ),
     )
     api = mock_api_for_source_git(sourcegit, distgit, up_lp)
@@ -433,7 +446,8 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
 
     if key_fingerprint in gnupg_instance.list_keys(secret=True).fingerprints:
         remove_gpg_key_pair(
-            gpg_binary=gnupg_instance.gpgbinary, fingerprint=key_fingerprint
+            gpg_binary=gnupg_instance.gpgbinary,
+            fingerprint=key_fingerprint,
         )
 
 

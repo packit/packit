@@ -6,12 +6,12 @@ import unittest
 from pathlib import Path
 
 from flexmock import flexmock
+from requre.modules_decorate_all_methods import (
+    record_git_module,
+    record_tempfile_module,
+)
 
 from packit.utils.repo import RepositoryCache
-from requre.modules_decorate_all_methods import (
-    record_tempfile_module,
-    record_git_module,
-)
 
 TEST_PROJECT_URL_TO_CLONE = "https://src.fedoraproject.org/rpms/python-requre.git"
 TEST_PROJECT_NAME = "python-requre"
@@ -70,7 +70,9 @@ class RepositoryCacheTest(unittest.TestCase):
         cache_path = self.tmp_path / "cache"
         clone_path = self.tmp_path / "clone1"
         flexmock(RepositoryCache).should_call("_clone").with_args(
-            url=TEST_PROJECT_URL_TO_CLONE, to_path=str(clone_path), tags=True
+            url=TEST_PROJECT_URL_TO_CLONE,
+            to_path=str(clone_path),
+            tags=True,
         )
 
         repo_cache = RepositoryCache(cache_path=cache_path, add_new=False)

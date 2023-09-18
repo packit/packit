@@ -3,8 +3,8 @@
 
 import pytest
 
-from packit.exceptions import PackitException
 from packit.constants import DISTRO_DIR, FROM_DIST_GIT_TOKEN
+from packit.exceptions import PackitException
 
 
 def test_update_source_git_sources_changed(
@@ -55,7 +55,7 @@ def test_update_source_git_gitignore_empty_commit(
             (
                 FROM_DIST_GIT_TOKEN,
                 api_instance_update_source_git.dg.local_project.git_repo.head.commit.hexsha,
-            )
+            ),
         ],
     )
 
@@ -88,7 +88,7 @@ def test_update_source_git_gitignore(
             (
                 FROM_DIST_GIT_TOKEN,
                 api_instance_update_source_git.dg.local_project.git_repo.head.commit.hexsha,
-            )
+            ),
         ],
     )
 

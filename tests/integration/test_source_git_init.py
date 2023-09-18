@@ -1,17 +1,16 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import pytest
-import yaml
-
-from flexmock import flexmock
 from pathlib import Path
 
-from packit.constants import SRC_GIT_CONFIG, DISTRO_DIR
-from packit.exceptions import PackitException
-from packit.source_git import SourceGitGenerator
-from packit.pkgtool import PkgTool
+import pytest
+import yaml
+from flexmock import flexmock
 
+from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.exceptions import PackitException
+from packit.pkgtool import PkgTool
+from packit.source_git import SourceGitGenerator
 from tests.integration.conftest import HELLO_RELEASE
 
 
@@ -118,7 +117,7 @@ def check_source_git_config(source_git_config):
                 f"exclude {SRC_GIT_CONFIG}",
                 "exclude .gitignore",
             ],
-        }
+        },
     ]
     assert source_git_config["sources"][0]["path"] == f"hello-{HELLO_RELEASE}.tar.gz"
 
@@ -144,7 +143,8 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
     hello_dist_git_repo.git.commit(message="Remove the patch")
 
     flexmock(
-        PkgTool, sources=download_sources(hello_source_git_repo, hello_dist_git_repo)
+        PkgTool,
+        sources=download_sources(hello_source_git_repo, hello_dist_git_repo),
     )
     sgg = SourceGitGenerator(
         config=flexmock(fas_user=None, pkg_tool="fedpkg"),
@@ -155,7 +155,7 @@ def test_create_from_upstream_no_patch(hello_source_git_repo, hello_dist_git_rep
     )
     sgg.create_from_upstream()
     source_git_config = yaml.safe_load(
-        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text()
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text(),
     )
     check_source_git_config(source_git_config)
     assert source_git_config["patch_generation_patch_id_digits"] == 1
@@ -175,7 +175,8 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     - A few downstream patches.
     """
     flexmock(
-        PkgTool, sources=download_sources(hello_source_git_repo, hello_dist_git_repo)
+        PkgTool,
+        sources=download_sources(hello_source_git_repo, hello_dist_git_repo),
     )
     sgg = SourceGitGenerator(
         config=flexmock(fas_user=None, pkg_tool="fedpkg"),
@@ -186,7 +187,7 @@ def test_create_from_upstream_with_patch(hello_source_git_repo, hello_dist_git_r
     )
     sgg.create_from_upstream()
     source_git_config = yaml.safe_load(
-        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text()
+        Path(hello_source_git_repo.working_dir, DISTRO_DIR, SRC_GIT_CONFIG).read_text(),
     )
     check_source_git_config(source_git_config)
     assert source_git_config["patch_generation_patch_id_digits"] == 4

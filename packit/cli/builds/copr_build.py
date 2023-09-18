@@ -3,25 +3,25 @@
 
 import logging
 import os
-from typing import Optional, List
+from typing import Optional
 
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
 from packit.config import (
-    pass_config,
-    get_context_settings,
     PackageConfig,
+    get_context_settings,
+    pass_config,
 )
 from packit.config.aliases import DEPRECATED_TARGET_MAP
-from packit.utils import sanitize_branch_name
-from packit.utils.changelog_helper import ChangelogHelper
 from packit.constants import (
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
+from packit.utils import sanitize_branch_name
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,9 @@ logger = logging.getLogger(__name__)
     default="fedora-rawhide-x86_64",
 )
 @click.option(
-    "--description", help="Description of the project to build in.", default=None
+    "--description",
+    help="Description of the project to build in.",
+    default=None,
 )
 @click.option(
     "--instructions",
@@ -151,10 +153,14 @@ def copr(
     it defaults to the current working directory.
     """
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     if not project:
@@ -168,7 +174,7 @@ def copr(
         else:
             logger.debug(
                 "Copr project not found in the job configuration. "
-                "Using the default one."
+                "Using the default one.",
             )
             sanitized_ref = sanitize_branch_name(path_or_url.ref)
             project = f"packit-cli-{path_or_url.repo_name}-{sanitized_ref}"
@@ -180,15 +186,16 @@ def copr(
         if target in DEPRECATED_TARGET_MAP:
             logger.warning(
                 f"Target '{target}' is deprecated. "
-                f"Please use '{DEPRECATED_TARGET_MAP[target]}' instead."
+                f"Please use '{DEPRECATED_TARGET_MAP[target]}' instead.",
             )
     targets_to_build = api.copr_helper.get_valid_build_targets(
-        *targets_list, default="fedora-rawhide-x86_64"
+        *targets_list,
+        default="fedora-rawhide-x86_64",
     )
 
     logger.info(f"Targets to build: {targets_to_build}.")
 
-    additional_repos_list: Optional[List[str]] = (
+    additional_repos_list: Optional[list[str]] = (
         additional_repos.split(",") if additional_repos else None
     )
 

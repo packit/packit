@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 import configparser
-
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Union
 
 import pyrpkg
 
@@ -15,7 +14,7 @@ def get_lookaside_sources(
     pkg_tool: str,
     package: str,
     basepath: Union[Path, str],
-) -> List[Dict[str, str]]:
+) -> list[dict[str, str]]:
     """
     Gets URLs to sources stored in lookaside cache.
 
@@ -37,7 +36,9 @@ def get_lookaside_sources(
         parser.read(f"/etc/rpkg/{pkg_tool}.conf")
         config = dict(parser.items(pkg_tool, raw=True))
         cache = pyrpkg.lookaside.CGILookasideCache(
-            config["lookasidehash"], config["lookaside"], config["lookaside_cgi"]
+            config["lookasidehash"],
+            config["lookaside"],
+            config["lookaside_cgi"],
         )
         if config.get("lookaside_namespaced", False):
             package = f"rpms/{package}"

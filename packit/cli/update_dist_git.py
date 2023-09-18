@@ -7,15 +7,14 @@ Update a dist-git repo from a source-git repo
 
 import pathlib
 from shutil import which
+from typing import Optional
 
 import click
 
-from typing import Optional
-
+from packit.api import PackitAPI
 from packit.cli.utils import cover_packit_exception, iterate_packages_source_git
 from packit.config import Config, PackageConfig, pass_config
-from packit.api import PackitAPI
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProjectBuilder
 
 
 @click.command("update-dist-git")
@@ -116,7 +115,8 @@ def update_dist_git(
         raise click.BadOptionUsage("-m", "Option -m cannot be combined with -F.")
     if pkg_tool and not which(pkg_tool):
         raise click.BadOptionUsage(
-            "--pkg-tool", f"{pkg_tool} is not executable or in any path"
+            "--pkg-tool",
+            f"{pkg_tool} is not executable or in any path",
         )
     if file:
         with click.open_file(file, "r") as fp:
@@ -129,10 +129,12 @@ def update_dist_git(
         config=config,
         package_config=package_config,
         upstream_local_project=builder.build(
-            working_dir=source_git_path, git_repo=CALCULATE
+            working_dir=source_git_path,
+            git_repo=CALCULATE,
         ),
         downstream_local_project=builder.build(
-            working_dir=dist_git_path, git_repo=CALCULATE
+            working_dir=dist_git_path,
+            git_repo=CALCULATE,
         ),
     )
 

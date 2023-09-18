@@ -7,10 +7,11 @@ This module contains code related to security, signing and verification.
 
 import logging
 from enum import Enum
-from typing import Optional, List
+from typing import Optional
 
 import git
 from gnupg import GPG, ListKeys
+
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ class CommitVerifier:
     Class used for verifying git commits. Uses python-gnupg for accessing the GPG binary.
     """
 
-    def __init__(self, key_server: str = None) -> None:
+    def __init__(self, key_server: Optional[str] = None) -> None:
         """
         :param key_server: GPG key server to be used
         """
@@ -55,7 +56,7 @@ class CommitVerifier:
         return self.gpg.list_keys()
 
     @property
-    def _gpg_fingerprints(self) -> List[str]:
+    def _gpg_fingerprints(self) -> list[str]:
         """List of fingerprints of the saved keys"""
         return self._gpg_keys.fingerprints
 
@@ -75,12 +76,16 @@ class CommitVerifier:
                 if result.fingerprints:
                     return result.fingerprints[0]
         except Exception as ex:
-            raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}", ex)
+            raise PackitException(
+                f"Cannot receive a gpg key: {key_fingerprint}",
+            ) from ex
 
         raise PackitException(f"Cannot receive a gpg key: {key_fingerprint}")
 
     def check_signature_of_commit(
-        self, commit: git.Commit, possible_key_fingerprints: List[str]
+        self,
+        commit: git.Commit,
+        possible_key_fingerprints: list[str],
     ) -> bool:
         """
         Check the validity of the commit signature
@@ -147,8 +152,8 @@ class CommitVerifier:
             return commit.repo.git.show(commit.hexsha, pretty=f"format:{pretty_format}")
         except git.GitCommandError as error:
             raise PackitException(
-                f"Cannot find commit {commit.hexsha!r} to check its signature.", error
-            )
+                f"Cannot find commit {commit.hexsha!r} to check its signature.",
+            ) from error
 
 
 class CommitSignatureStatus(Enum):

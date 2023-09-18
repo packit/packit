@@ -30,7 +30,7 @@ from packit.utils.commands import cwd
                 - job: copr_build
                   trigger: pull_request
                   targets: fedora-stable
-            """
+            """,
             ),
             True,
             "packit.yaml is valid and ready to be used",
@@ -47,7 +47,7 @@ from packit.utils.commands import cwd
                 notifications:
                     pull_request:
                         successful_build: 55
-            """
+            """,
             ),
             False,
             "**** field notifications has an incorrect value:\n"
@@ -72,7 +72,7 @@ from packit.utils.commands import cwd
                 - job: propose_downstream
                   trigger: release
                   dist_git_branches: fedora-latest
-            """
+            """,
             ),
             True,
             "packit.yaml is valid and ready to be used",
@@ -91,7 +91,7 @@ from packit.utils.commands import cwd
                   dest: a.md
                 - b.md
                 - c.txt
-            """
+            """,
             ),
             False,
             "Expected 'list[str]' or 'str', got <class 'int'>.",
@@ -110,7 +110,7 @@ from packit.utils.commands import cwd
                 - b.md
                 - src: c.txt
                   dest: True
-            """
+            """,
             ),
             False,
             "dest: Not a valid string.",
@@ -130,7 +130,7 @@ from packit.utils.commands import cwd
                   targets:
                   - fedora-stable
                   - centos-stream-9
-            """
+            """,
             ),
             True,
             "packit.yaml is valid and ready to be used",
@@ -144,7 +144,7 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
-            """
+            """,
             ),
             False,
             "downstream_package_name: Not a valid string.",
@@ -159,7 +159,7 @@ from packit.utils.commands import cwd
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
                 create_pr: ""
-            """
+            """,
             ),
             False,
             "create_pr: Not a valid boolean.",
@@ -179,7 +179,7 @@ from packit.utils.commands import cwd
                   dist_git_branches:
                   - f35
                   - f36
-            """
+            """,
             ),
             True,
             "packit.yaml is valid and ready to be used",
@@ -193,7 +193,7 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: gpg
                 dist_git_namespace: awesome
-            """
+            """,
             ),
             False,
             "allowed_gpg_keys: Not a valid list.",
@@ -207,7 +207,7 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit/upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
-            """
+            """,
             ),
             False,
             " Repository name must be a valid filename.",

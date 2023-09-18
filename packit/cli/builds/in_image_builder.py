@@ -8,12 +8,12 @@ from os import getcwd
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
-from packit.config import pass_config, JobType
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
+from packit.config import JobType, pass_config
 from packit.constants import (
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
 
 logger = logging.getLogger("packit")

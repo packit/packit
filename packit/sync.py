@@ -5,11 +5,12 @@
 Functions and classes dealing with syncing files between repositories
 """
 import copy
-import os
 import glob
 import logging
+import os
+from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import List, Optional, Union, Sequence, Iterator
+from typing import Optional, Union
 
 from packit.exceptions import PackitException
 from packit.utils import run_command
@@ -18,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 def check_subpath(
-    subpath: Path, path: Path, ensure_trailing_slash: bool = False
+    subpath: Path,
+    path: Path,
+    ensure_trailing_slash: bool = False,
 ) -> str:
     """Check if 'subpath' is a subpath of 'path'
 
@@ -34,10 +37,10 @@ def check_subpath(
     """
     try:
         subpath.resolve().relative_to(path.resolve())
-    except ValueError:
+    except ValueError as e:
         raise PackitException(
-            f"Sync files: Illegal path! {subpath} is not in the subpath of {path}."
-        )
+            f"Sync files: Illegal path! {subpath} is not in the subpath of {path}.",
+        ) from e
     ret = str(subpath.resolve())
     if ensure_trailing_slash:
         ret += os.sep
@@ -63,7 +66,7 @@ class SyncFilesItem:
         dest: Union[str, Path],
         mkpath: bool = False,
         delete: bool = False,
-        filters: Optional[List[str]] = None,
+        filters: Optional[list[str]] = None,
     ):
         # pathlib.Path has no support for trailing slashes, but
         # a trailing slash has a meaning for rsync.
@@ -111,7 +114,7 @@ class SyncFilesItem:
             other.filters,
         )
 
-    def command(self, fail_on_missing: bool = False) -> List[str]:
+    def command(self, fail_on_missing: bool = False) -> list[str]:
         """Provide to command to do the sync
 
         Args:
@@ -143,23 +146,33 @@ class SyncFilesItem:
         command += [self.dest]
         return command
 
-    def resolve(self, src_base: Path = Path.cwd(), dest_base: Path = Path.cwd()):
+    def resolve(
+        self,
+        src_base: Optional[Path] = None,
+        dest_base: Optional[Path] = None,
+    ):
         """Resolve all paths and check they are relative to src_base and dest_base
 
         Args:
             src_base: Base directory for all src items.
             dest_base: Base directory for dest.
         """
+        src_base = src_base or Path.cwd()
+        dest_base = dest_base or Path.cwd()
         self.src = [
             check_subpath(src_base / path, src_base, path.endswith(os.sep))
             for path in self.src
         ]
         self.dest = check_subpath(
-            dest_base / self.dest, dest_base, self.dest.endswith(os.sep)
+            dest_base / self.dest,
+            dest_base,
+            self.dest.endswith(os.sep),
         )
 
     def drop_src(
-        self, src: Union[str, Path], criteria=lambda x, y: x == str(y)
+        self,
+        src: Union[str, Path],
+        criteria=lambda x, y: x == str(y),
     ) -> Optional["SyncFilesItem"]:
         """Remove 'src' from the list of src-s
 
