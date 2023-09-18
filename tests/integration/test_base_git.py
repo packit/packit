@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 import pytest
+from flexmock import flexmock
 from git import PushInfo
 
-from flexmock import flexmock
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
-from packit.exceptions import PackitException
 from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject, LocalProjectBuilder
 from tests.spellbook import can_a_module_be_imported
 
@@ -28,10 +28,10 @@ def test_get_output_from_action_defined(echo_cmd, expected_output):
             PackageConfig(
                 packages={
                     "package": CommonPackageConfig(
-                        actions={ActionName.pre_sync: echo_cmd}
-                    )
-                }
-            )
+                        actions={ActionName.pre_sync: echo_cmd},
+                    ),
+                },
+            ),
         ),
     )
 
@@ -42,7 +42,8 @@ def test_get_output_from_action_defined(echo_cmd, expected_output):
 
 
 @pytest.mark.skipif(
-    not can_a_module_be_imported("sandcastle"), reason="sandcastle is not installed"
+    not can_a_module_be_imported("sandcastle"),
+    reason="sandcastle is not installed",
 )
 def test_get_output_from_action_defined_in_sandcastle():
     from sandcastle.api import Sandcastle
@@ -56,12 +57,12 @@ def test_get_output_from_action_defined_in_sandcastle():
         config=c,
         package_config=PackageConfig(
             packages={
-                "package": CommonPackageConfig(actions={ActionName.pre_sync: echo_cmd})
-            }
+                "package": CommonPackageConfig(actions={ActionName.pre_sync: echo_cmd}),
+            },
         ),
     )
     packit_repository_base.local_project = LocalProjectBuilder().build(
-        working_dir="/tmp"
+        working_dir="/tmp",
     )
 
     flexmock(Sandcastle).should_receive("run")
@@ -72,15 +73,17 @@ def test_get_output_from_action_defined_in_sandcastle():
 
 
 @pytest.mark.skip(
-    reason="Skipping since we don't have an OpenShift cluster by default."
+    reason="Skipping since we don't have an OpenShift cluster by default.",
 )
 def test_run_in_sandbox():
     packit_repository_base = PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(
             packages={
-                "package": CommonPackageConfig(actions={ActionName.pre_sync: "ls -lha"})
-            }
+                "package": CommonPackageConfig(
+                    actions={ActionName.pre_sync: "ls -lha"},
+                ),
+            },
         ),
     )
     packit_repository_base.config.actions_handler = "sandcastle"
@@ -98,7 +101,8 @@ def test_base_push_bad(distgit_and_remote):
         package_config=PackageConfig(packages={"package": CommonPackageConfig()}),
     )
     b.local_project = LocalProjectBuilder().build(
-        working_dir=distgit, git_url="https://github.com/packit/lol"
+        working_dir=distgit,
+        git_url="https://github.com/packit/lol",
     )
     flexmock(LocalProject).should_receive("git_repo").and_return(
         flexmock()
@@ -106,11 +110,11 @@ def test_base_push_bad(distgit_and_remote):
         .and_return(
             flexmock(
                 push=lambda *args, **kwargs: [
-                    PushInfo(PushInfo.REMOTE_REJECTED, None, None, None, None)
-                ]
-            )
+                    PushInfo(PushInfo.REMOTE_REJECTED, None, None, None, None),
+                ],
+            ),
         )
-        .mock()
+        .mock(),
     )
     with pytest.raises(PackitException) as e:
         b.push("master")
@@ -125,7 +129,8 @@ def test_base_push_good(distgit_and_remote):
         package_config=PackageConfig(packages={"package": CommonPackageConfig()}),
     )
     b.local_project = LocalProjectBuilder().build(
-        working_dir=distgit, git_url="https://github.com/packit/lol"
+        working_dir=distgit,
+        git_url="https://github.com/packit/lol",
     )
     flexmock(LocalProject).should_receive("git_repo").and_return(
         flexmock()
@@ -133,10 +138,10 @@ def test_base_push_good(distgit_and_remote):
         .and_return(
             flexmock(
                 push=lambda *args, **kwargs: [
-                    PushInfo(PushInfo.FAST_FORWARD, None, None, None, None)
-                ]
-            )
+                    PushInfo(PushInfo.FAST_FORWARD, None, None, None, None),
+                ],
+            ),
         )
-        .mock()
+        .mock(),
     )
     b.push("master")

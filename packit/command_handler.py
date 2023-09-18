@@ -4,7 +4,7 @@
 import logging
 from os import getenv
 from pathlib import Path
-from typing import Dict, List, Optional, Type, Union
+from typing import Optional, Union
 
 from packit.config import Config, RunCommandType
 from packit.local_project import LocalProject
@@ -12,10 +12,10 @@ from packit.utils import commands
 
 logger = logging.getLogger(__name__)
 
-RUN_COMMAND_HANDLER_MAPPING: Dict[RunCommandType, Type["CommandHandler"]] = {}
+RUN_COMMAND_HANDLER_MAPPING: dict[RunCommandType, type["CommandHandler"]] = {}
 
 
-def add_run_command(kls: Type["CommandHandler"]):
+def add_run_command(kls: type["CommandHandler"]):
     RUN_COMMAND_HANDLER_MAPPING[kls.name] = kls
     return kls
 
@@ -31,9 +31,9 @@ class CommandHandler:
 
     def run_command(
         self,
-        command: List[str],
+        command: list[str],
         return_output: bool = True,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:
@@ -80,9 +80,9 @@ class LocalCommandHandler(CommandHandler):
 
     def run_command(
         self,
-        command: List[str],
+        command: list[str],
         return_output: bool = True,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:
@@ -112,7 +112,7 @@ class SandcastleCommandHandler(CommandHandler):
         self.local_project = local_project
         self.config = config
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
-        from sandcastle.api import Sandcastle, MappedDir
+        from sandcastle.api import MappedDir, Sandcastle
 
         self._sandcastle: Optional[Sandcastle] = None
         self._mapped_dir: Optional[MappedDir] = None
@@ -122,7 +122,7 @@ class SandcastleCommandHandler(CommandHandler):
         """initialize Sandcastle lazily"""
         if self._sandcastle is None:
             # we import here so that packit does not depend on sandcastle (and thus python-kube)
-            from sandcastle.api import Sandcastle, MappedDir, VolumeSpec
+            from sandcastle.api import MappedDir, Sandcastle, VolumeSpec
 
             self._mapped_dir = MappedDir(
                 local_dir=self.local_project.working_dir,
@@ -173,9 +173,9 @@ class SandcastleCommandHandler(CommandHandler):
 
     def run_command(
         self,
-        command: List[str],
+        command: list[str],
         return_output: bool = True,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         cwd: Union[str, Path, None] = None,
         print_live: bool = False,
     ) -> commands.CommandResult:
@@ -196,7 +196,8 @@ class SandcastleCommandHandler(CommandHandler):
             raise  # reraise the error to halt the execution of the job
 
         return commands.CommandResult(
-            success=True, stdout=out if return_output else None
+            success=True,
+            stdout=out if return_output else None,
         )
 
     def clean(self) -> None:

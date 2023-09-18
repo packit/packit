@@ -9,21 +9,21 @@ from enum import Enum
 from functools import lru_cache, partial
 from pathlib import Path
 from shutil import which
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import click
 from lazy_object_proxy import Proxy
-from yaml import safe_load
-
-from ogr import GithubService, get_instances_from_dict, PagureService, get_project
+from ogr import GithubService, PagureService, get_instances_from_dict, get_project
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import OgrException
+from yaml import safe_load
+
 from packit.constants import (
     CONFIG_FILE_NAMES,
-    SANDCASTLE_WORK_DIR,
-    SANDCASTLE_PVC,
     SANDCASTLE_DEFAULT_PROJECT,
     SANDCASTLE_IMAGE,
+    SANDCASTLE_PVC,
+    SANDCASTLE_WORK_DIR,
 )
 from packit.exceptions import PackitConfigException, PackitException
 
@@ -47,7 +47,7 @@ class Config:
         command_handler_pvc_env_var: str = SANDCASTLE_PVC,
         command_handler_image_reference: str = SANDCASTLE_IMAGE,
         command_handler_k8s_namespace: str = SANDCASTLE_DEFAULT_PROJECT,
-        command_handler_pvc_volume_specs: List[Dict[str, str]] = None,
+        command_handler_pvc_volume_specs: Optional[list[dict[str, str]]] = None,
         command_handler_storage_class: str = "",
         appcode: str = "",
         package_config_path=None,
@@ -67,7 +67,7 @@ class Config:
         self.pkg_tool: str = pkg_tool
         self.upstream_git_remote = upstream_git_remote
 
-        self.services: Set[GitService] = set()
+        self.services: set[GitService] = set()
 
         # %%% ACTIONS HANDLER CONFIGURATION %%%
         # these values are specific to packit service when we run actions in a sandbox
@@ -90,7 +90,7 @@ class Config:
         # To be able to mount other volumes (like repository cache) to the sandcastle pod.
         # The keys are not checked by marshmallow to support any argument supported by Sandcastle.
         # e.g. you can set `path` and `pvc`/`pvc_from_env`
-        self.command_handler_pvc_volume_specs: List[Dict[str, str]] = (
+        self.command_handler_pvc_volume_specs: list[dict[str, str]] = (
             command_handler_pvc_volume_specs or []
         )
         # To specify PVCs' storage class (differes in auto-prod and MP+)
@@ -136,10 +136,9 @@ class Config:
     @classmethod
     def get_user_config(cls) -> "Config":
         xdg_config_home = os.getenv("XDG_CONFIG_HOME")
-        if xdg_config_home:
-            directory = Path(xdg_config_home)
-        else:
-            directory = Path.home() / ".config"
+        directory = (
+            Path(xdg_config_home) if xdg_config_home else Path.home() / ".config"
+        )
 
         logger.debug(f"Loading user config from directory: {directory}")
 
@@ -149,10 +148,11 @@ class Config:
             logger.debug(f"Trying to load user config from: {config_file_name_full}")
             if config_file_name_full.is_file():
                 try:
-                    loaded_config = safe_load(open(config_file_name_full))
+                    with open(config_file_name_full) as file:
+                        loaded_config = safe_load(file)
                 except Exception as ex:
                     logger.error(f"Cannot load user config {config_file_name_full!r}.")
-                    raise PackitException(f"Cannot load user config: {ex!r}.")
+                    raise PackitException(f"Cannot load user config: {ex!r}.") from ex
                 break
         return Config.get_from_dict(raw_dict=loaded_config)
 
@@ -193,7 +193,7 @@ class Config:
                 "        token: PAGURE_TOKEN\n"
                 '        instance_url: "https://src.fedoraproject.org"\n'
                 "See our documentation for more information "
-                "http://packit.dev/docs/configuration/#user-configuration-file. "
+                "http://packit.dev/docs/configuration/#user-configuration-file. ",
             )
             github_app_id = raw_dict.get("github_app_id")
             github_app_cert_path = raw_dict.get("github_app_cert_path")
@@ -203,25 +203,33 @@ class Config:
                     token=github_token,
                     github_app_id=github_app_id,
                     github_app_private_key_path=github_app_cert_path,
-                )
+                ),
             )
             pagure_user_token = raw_dict.get("pagure_user_token")
             pagure_instance_url = raw_dict.get(
-                "pagure_instance_url", "https://src.fedoraproject.org"
+                "pagure_instance_url",
+                "https://src.fedoraproject.org",
             )
             if raw_dict.get("pagure_fork_token"):
                 warnings.warn(
                     "packit no longer accepts 'pagure_fork_token'"
-                    " value (https://github.com/packit/packit/issues/495)"
+                    " value (https://github.com/packit/packit/issues/495)",
+                    stacklevel=2,
                 )
             services.add(
-                PagureService(token=pagure_user_token, instance_url=pagure_instance_url)
+                PagureService(
+                    token=pagure_user_token,
+                    instance_url=pagure_instance_url,
+                ),
             )
 
         return services
 
     def _get_project(
-        self, url: str, required: bool = True, get_project_kwargs: dict = None
+        self,
+        url: str,
+        required: bool = True,
+        get_project_kwargs: Optional[dict] = None,
     ) -> Optional[GitProject]:
         """
         Gets a GitProject for the given URL.
@@ -242,19 +250,23 @@ class Config:
         get_project_kwargs = get_project_kwargs or {}
         try:
             project = get_project(
-                url=url, custom_instances=self.services, **get_project_kwargs
+                url=url,
+                custom_instances=self.services,
+                **get_project_kwargs,
             )
         except OgrException as ex:
             msg = f"Authentication for url {url!r} is missing in the config."
             logger.warning(msg)
             if required:
-                raise PackitConfigException(msg, ex)
-            else:
-                return None
+                raise PackitConfigException(msg) from ex
+            return None
         return project
 
     def get_project(
-        self, url: str, required: bool = True, get_project_kwargs: dict = None
+        self,
+        url: str,
+        required: bool = True,
+        get_project_kwargs: Optional[dict] = None,
     ) -> Proxy:
         """
         Gets a proxy of GitProject for the given URL. On access, if the underlying
@@ -283,13 +295,13 @@ def get_default_map_from_file() -> Optional[dict]:
     return None
 
 
-@lru_cache()
+@lru_cache
 def get_context_settings() -> dict:
-    return dict(
-        help_option_names=["-h", "--help"],
-        auto_envvar_prefix="PACKIT",
-        default_map=get_default_map_from_file(),
-    )
+    return {
+        "help_option_names": ["-h", "--help"],
+        "auto_envvar_prefix": "PACKIT",
+        "default_map": get_default_map_from_file(),
+    }
 
 
 class RunCommandType(Enum):

@@ -10,14 +10,14 @@ from enum import Enum
 from os import getenv
 from os.path import basename
 from re import split
-from typing import Dict, List, Optional, Union, Any, Set
+from typing import Any, Optional, Union
 
 from packit.actions import ActionName
 from packit.config.notifications import (
     NotificationsConfig,
 )
 from packit.config.sources import SourcesItem
-from packit.constants import PROD_DISTGIT_URL, DISTGIT_NAMESPACE
+from packit.constants import DISTGIT_NAMESPACE, PROD_DISTGIT_URL
 from packit.exceptions import PackitConfigException
 from packit.sync import SyncFilesItem, iter_srcs
 
@@ -119,66 +119,66 @@ class CommonPackageConfig:
         self,
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
-        synced_files: Optional[List[SyncFilesItem]] = None,
-        files_to_sync: Optional[List[SyncFilesItem]] = None,
+        synced_files: Optional[list[SyncFilesItem]] = None,
+        files_to_sync: Optional[list[SyncFilesItem]] = None,
         dist_git_namespace: Optional[str] = None,
         upstream_project_url: Optional[str] = None,  # can be URL or path
         upstream_package_name: Optional[str] = None,
-        paths: Optional[List[str]] = None,
+        paths: Optional[list[str]] = None,
         downstream_project_url: Optional[str] = None,
         downstream_package_name: Optional[str] = None,
         dist_git_base_url: Optional[str] = None,
-        actions: Dict[ActionName, Union[str, List[str]]] = None,
+        actions: Optional[dict[ActionName, Union[str, list[str]]]] = None,
         upstream_ref: Optional[str] = None,
-        allowed_gpg_keys: Optional[List[str]] = None,
+        allowed_gpg_keys: Optional[list[str]] = None,
         create_pr: bool = True,
         sync_changelog: bool = False,
         create_sync_note: bool = True,
         spec_source_id: str = "Source0",
         upstream_tag_template: str = "{version}",
         archive_root_dir_template: str = "{upstream_pkg_name}-{version}",
-        patch_generation_ignore_paths: Optional[List[str]] = None,
+        patch_generation_ignore_paths: Optional[list[str]] = None,
         patch_generation_patch_id_digits: int = 4,
         notifications: Optional[NotificationsConfig] = None,
         copy_upstream_release_description: bool = False,
-        sources: Optional[List[SourcesItem]] = None,
+        sources: Optional[list[SourcesItem]] = None,
         merge_pr_in_ci: bool = True,
-        srpm_build_deps: Optional[List[str]] = None,
+        srpm_build_deps: Optional[list[str]] = None,
         identifier: Optional[str] = None,
-        packit_instances: Optional[List[Deployment]] = None,
+        packit_instances: Optional[list[Deployment]] = None,
         issue_repository: Optional[str] = None,
         release_suffix: Optional[str] = None,
         update_release: bool = True,
         # Former JobMetadataConfig attributes
-        _targets: Union[List[str], Dict[str, Dict[str, Any]], None] = None,
+        _targets: Union[list[str], dict[str, dict[str, Any]], None] = None,
         timeout: int = 7200,
         owner: Optional[str] = None,
         project: Optional[str] = None,
-        dist_git_branches: Optional[List[str]] = None,
+        dist_git_branches: Optional[list[str]] = None,
         branch: Optional[str] = None,
         scratch: bool = False,
         list_on_homepage: bool = False,
         preserve_project: bool = False,
-        additional_packages: Optional[List[str]] = None,
-        additional_repos: Optional[List[str]] = None,
+        additional_packages: Optional[list[str]] = None,
+        additional_repos: Optional[list[str]] = None,
         fmf_url: Optional[str] = None,
         fmf_ref: Optional[str] = None,
         fmf_path: Optional[str] = None,
         use_internal_tf: bool = False,
         skip_build: bool = False,
-        env: Optional[Dict[str, Any]] = None,
+        env: Optional[dict[str, Any]] = None,
         enable_net: bool = False,
-        allowed_pr_authors: Optional[List[str]] = None,
-        allowed_committers: Optional[List[str]] = None,
+        allowed_pr_authors: Optional[list[str]] = None,
+        allowed_committers: Optional[list[str]] = None,
         tmt_plan: Optional[str] = None,
         tf_post_install_script: Optional[str] = None,
-        tf_extra_params: Optional[Dict[Any, Any]] = None,
+        tf_extra_params: Optional[dict[Any, Any]] = None,
         module_hotfixes: bool = False,
         # # vm-image-build
         # example: "rhel-86"
         image_distribution: Optional[str] = None,
-        image_request: Optional[Dict] = None,
-        image_customizations: Optional[Dict] = None,
+        image_request: Optional[dict] = None,
+        image_customizations: Optional[dict] = None,
         copr_chroot: Optional[str] = None,
         follow_fedora_branching: bool = False,
         upstream_tag_include: str = "",
@@ -187,9 +187,9 @@ class CommonPackageConfig:
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
 
-        self._files_to_sync: List[SyncFilesItem] = files_to_sync or []  # new option
+        self._files_to_sync: list[SyncFilesItem] = files_to_sync or []  # new option
         self._files_to_sync_used: bool = files_to_sync is not None
-        self.synced_files: List[SyncFilesItem] = (
+        self.synced_files: list[SyncFilesItem] = (
             synced_files or []
         )  # old deprecated option
         if synced_files is not None:
@@ -204,10 +204,12 @@ class CommonPackageConfig:
         self.downstream_package_name: Optional[str] = downstream_package_name
         self._downstream_project_url: str = downstream_project_url
         self.dist_git_base_url: str = dist_git_base_url or getenv(
-            "DISTGIT_URL", PROD_DISTGIT_URL
+            "DISTGIT_URL",
+            PROD_DISTGIT_URL,
         )
         self.dist_git_namespace: str = dist_git_namespace or getenv(
-            "DISTGIT_NAMESPACE", DISTGIT_NAMESPACE
+            "DISTGIT_NAMESPACE",
+            DISTGIT_NAMESPACE,
         )
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
@@ -240,7 +242,7 @@ class CommonPackageConfig:
         self.upstream_tag_exclude = upstream_tag_exclude
 
         # from deprecated JobMetadataConfig
-        self._targets: Dict[str, Dict[str, Any]]
+        self._targets: dict[str, dict[str, Any]]
         if isinstance(_targets, list):
             self._targets = {key: {} for key in _targets}
         else:
@@ -248,21 +250,21 @@ class CommonPackageConfig:
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
-        self.dist_git_branches: Set[str] = (
+        self.dist_git_branches: set[str] = (
             set(dist_git_branches) if dist_git_branches else set()
         )
         self.branch: str = branch
         self.scratch: bool = scratch
         self.list_on_homepage: bool = list_on_homepage
         self.preserve_project: bool = preserve_project
-        self.additional_packages: List[str] = additional_packages or []
-        self.additional_repos: List[str] = additional_repos or []
+        self.additional_packages: list[str] = additional_packages or []
+        self.additional_repos: list[str] = additional_repos or []
         self.fmf_url: str = fmf_url
         self.fmf_ref: str = fmf_ref
         self.fmf_path: str = fmf_path
         self.use_internal_tf: bool = use_internal_tf
         self.skip_build: bool = skip_build
-        self.env: Dict[str, Any] = env or {}
+        self.env: dict[str, Any] = env or {}
         self.enable_net = enable_net
         self.allowed_pr_authors = (
             allowed_pr_authors if allowed_pr_authors is not None else ["packit"]
@@ -293,16 +295,16 @@ class CommonPackageConfig:
         logger = logging.getLogger(__name__)
         msg = "synced_files option is deprecated. Use files_to_sync option instead."
         logger.warning(msg)
-        warnings.warn(msg, DeprecationWarning)
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
         if self._files_to_sync_used:
             logger.warning(
                 "You are setting both files_to_sync and synced_files."
                 " Packit will use files_to_sync. You should remove "
-                "synced_files since it is deprecated."
+                "synced_files since it is deprecated.",
             )
 
     @property
-    def files_to_sync(self) -> List[SyncFilesItem]:
+    def files_to_sync(self) -> list[SyncFilesItem]:
         """
         synced_files is the old option we want to deprecate.
         Spec file and configuration file can be automatically added to
@@ -319,10 +321,9 @@ class CommonPackageConfig:
 
         if self._files_to_sync_used:
             return self._files_to_sync
-        elif self.synced_files:
+        if self.synced_files:
             return self.synced_files
-        else:
-            return []
+        return []
 
     def __repr__(self):
         # required to avoid cyclical imports
@@ -336,7 +337,7 @@ class CommonPackageConfig:
     def __eq__(self, other: object):
         if not isinstance(other, CommonPackageConfig):
             raise PackitConfigException(
-                "Provided object is not a CommonPackageConfig instance."
+                "Provided object is not a CommonPackageConfig instance.",
             )
         # required to avoid cyclical imports
         from packit.schema import CommonConfigSchema
@@ -358,6 +359,7 @@ class CommonPackageConfig:
                 f"{self.dist_git_base_url}{self.dist_git_namespace}/"
                 f"{self.downstream_package_name}.git"
             )
+        return None
 
     @property
     def spec_source_id_number(self) -> int:
@@ -380,7 +382,7 @@ class CommonPackageConfig:
         )
         return SyncFilesItem(
             src=[
-                downstream_specfile_path if from_downstream else upstream_specfile_path
+                downstream_specfile_path if from_downstream else upstream_specfile_path,
             ],
             dest=upstream_specfile_path
             if from_downstream
@@ -407,8 +409,9 @@ class CommonPackageConfig:
                 # this relative because of glob: "Non-relative patterns are unsupported"
                 files.append(
                     SyncFilesItem(
-                        src=[self.config_file_path], dest=self.config_file_path
-                    )
+                        src=[self.config_file_path],
+                        dest=self.config_file_path,
+                    ),
                 )
 
         return files
@@ -431,23 +434,22 @@ class MultiplePackages:
            case. Using 'self.__getattribute__("attribute")' solves this issue.
     """
 
-    def __init__(self, packages: Dict[str, CommonPackageConfig]):
+    def __init__(self, packages: dict[str, CommonPackageConfig]):
         super().__setattr__("packages", packages)
-        super().__setattr__("_first_package", list(packages)[0])
+        super().__setattr__("_first_package", next(iter(packages)))
 
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
-        elif len(self.__getattribute__("packages")) == 1:
+        if len(self.__getattribute__("packages")) == 1:
             package = self.__getattribute__("packages")[
                 self.__getattribute__("_first_package")
             ]
             return getattr(package, name)
-        else:
-            raise AttributeError(
-                f"It is ambiguous to get {name}: "
-                "there is more than one package in the config."
-            )
+        raise AttributeError(
+            f"It is ambiguous to get {name}: "
+            "there is more than one package in the config.",
+        )
 
     def __setattr__(self, name, value):
         if name in self.__dict__ or "packages" not in self.__dict__:
@@ -460,7 +462,7 @@ class MultiplePackages:
         else:
             raise AttributeError(
                 f"It is ambiguous to set {name}: "
-                "there is more than one package in the config."
+                "there is more than one package in the config.",
             )
 
     def get_package_names_as_env(self) -> dict[str, str]:
@@ -482,5 +484,4 @@ class MultiplePackages:
                 )
                 return env
             raise PackitConfigException("No packages in config")
-        else:
-            raise PackitConfigException("Multiple packages in config")
+        raise PackitConfigException("Multiple packages in config")

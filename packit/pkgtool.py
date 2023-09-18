@@ -1,11 +1,11 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Optional, Union, Iterable
+from typing import Optional, Union
 
 from packit.exceptions import PackitCommandFailedError
-
 from packit.utils import commands  # so we can mock utils
 from packit.utils.logging import logger
 
@@ -46,7 +46,7 @@ class PkgTool:
 
         sources_ = [str(source) for source in sources] if sources else []
         return commands.run_command_remote(
-            cmd=[self.tool, "new-sources"] + sources_,
+            cmd=[self.tool, "new-sources", *sources_],
             cwd=self.directory,
             error_message="Adding new sources failed:",
             print_live=True,
@@ -112,7 +112,7 @@ class PkgTool:
             ):
                 logger.info(
                     f"'{self.tool} build' crashed. It is a known issue: "
-                    "the build is submitted in koji anyway."
+                    "the build is submitted in koji anyway.",
                 )
                 logger.debug(ex.stdout_output)
 

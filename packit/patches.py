@@ -11,7 +11,7 @@ import re
 import tempfile
 from itertools import islice
 from pathlib import Path
-from typing import List, Optional, Dict, Tuple
+from typing import Optional
 
 import git
 import yaml
@@ -20,7 +20,7 @@ from packit.constants import DATETIME_FORMAT, PATCH_META_TRAILER_TOKENS
 from packit.exceptions import PackitException, PackitGitException
 from packit.local_project import LocalProject
 from packit.utils.commands import run_command
-from packit.utils.repo import is_a_git_ref, git_patch_ish, get_metadata_from_message
+from packit.utils.repo import get_metadata_from_message, git_patch_ish, is_a_git_ref
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def git_format_patch(
     working_dir: Path,
     destination: str,
-    files_to_ignore: List[str],
+    files_to_ignore: list[str],
     ref_or_range: str,
     no_prefix: bool = False,
 ):
@@ -88,7 +88,10 @@ def remove_prefixes(patch: Path):
     logger.debug(f"Remove prefixes from {patch}.")
     content = patch.read_text()
     content = re.sub(
-        r"^(diff .+) a/(.+) b/(.+)$", r"\1 \2 \3", content, flags=re.MULTILINE
+        r"^(diff .+) a/(.+) b/(.+)$",
+        r"\1 \2 \3",
+        content,
+        flags=re.MULTILINE,
     )
     content = re.sub(r"^(---) a/(.+)$", r"\1 \2", content, flags=re.MULTILINE)
     content = re.sub(r"^(\+\+\+) b/(.+)$", r"\1 \2", content, flags=re.MULTILINE)
@@ -130,7 +133,9 @@ def commit_message(
     if strip_subject_prefix:
         # Strip [<subject_prefix>] or [<subject_prefix> n/m]
         subject = re.sub(
-            r"^\[" + strip_subject_prefix + r"( \d+/\d+)?\] (.+)$", r"\2", subject
+            r"^\[" + strip_subject_prefix + r"( \d+/\d+)?\] (.+)$",
+            r"\2",
+            subject,
         )
 
     if strip_trailers:
@@ -242,7 +247,8 @@ class PatchMetadata:
 
     @staticmethod
     def from_commit(
-        commit: git.Commit, patch_path: Optional[Path] = None
+        commit: git.Commit,
+        patch_path: Optional[Path] = None,
     ) -> "PatchMetadata":
         """
         Load PatchMetadata from an existing git.Commit
@@ -256,7 +262,7 @@ class PatchMetadata:
         if metadata:
             logger.debug(
                 f"Commit {commit.hexsha:.8} metadata:\n"
-                f"{yaml.dump(metadata, indent=4, default_flow_style=False)}"
+                f"{yaml.dump(metadata, indent=4, default_flow_style=False)}",
             )
             metadata_defined = True
         else:
@@ -320,7 +326,9 @@ class PatchMetadata:
 
         patch_path = Path(patch)
         description = metadata.get("Patch-status") or commit_message(
-            patch_path, strip_subject_prefix="PATCH", strip_trailers=trailers
+            patch_path,
+            strip_subject_prefix="PATCH",
+            strip_trailers=trailers,
         )
         return PatchMetadata(
             name=metadata.get("Patch-name") or patch_path.name,
@@ -384,7 +392,9 @@ class PatchGenerator:
                  within the set of git_ref children commits
         """
         commits = self.get_commits_since_ref(
-            git_ref, add_upstream_head_commit=True, no_merge_commits=False
+            git_ref,
+            add_upstream_head_commit=True,
+            no_merge_commits=False,
         )
         for commit in islice(commits, 1, None):  # 0 = upstream, don't check that one
             for parent_commit in commit.parents:
@@ -416,13 +426,13 @@ class PatchGenerator:
             "When git history is too complex with merge commits having parents \n"
             "across a wide range, git is known to produce patches which cannot be applied. \n"
             "Therefore we are going to make the history linear on a dedicated branch \n"
-            "to make sure the patches will be able to be applied."
+            "to make sure the patches will be able to be applied.",
         )
         if self.lp.git_repo.is_dirty():
             raise PackitGitException(
                 "The source-git repo is dirty which means we won't be able to do a linear history. "
                 "Please commit the changes to resolve the issue. If you are changing the content "
-                "of the repository in an action, you can commit those as well."
+                "of the repository in an action, you can commit those as well.",
             )
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         initial_branch = self.lp.ref
@@ -465,11 +475,11 @@ class PatchGenerator:
 
     def process_patches(
         self,
-        patches: Dict[str, bytes],
-        commits: List[git.Commit],
+        patches: dict[str, bytes],
+        commits: list[git.Commit],
         destination: str,
-        files_to_ignore: Optional[List[str]] = None,
-    ) -> List[PatchMetadata]:
+        files_to_ignore: Optional[list[str]] = None,
+    ) -> list[PatchMetadata]:
         """
         Pair commits (in a source-git repo) with a list patches generated with git-format-patch.
 
@@ -483,7 +493,7 @@ class PatchGenerator:
         :param destination: place the patch files here
         :param files_to_ignore: list of files to ignore when creating patches
         """
-        patch_list: List[PatchMetadata] = []
+        patch_list: list[PatchMetadata] = []
         for commit in commits:
             # commit.size doesn't work since even an empty commit is size > 0 (287)
             if not commit.stats.files:
@@ -498,7 +508,7 @@ class PatchGenerator:
                     raise PackitException(
                         f"Empty commit {commit} is referencing a patch which is present in spec"
                         " file but the name is not defined in the commit metadata"
-                        " - please define it."
+                        " - please define it.",
                     )
                 patch_list.append(patch)
 
@@ -512,12 +522,13 @@ class PatchGenerator:
                 if commit.hexsha.encode() in patch_content:
                     path = Path(patch_name)
                     patch_metadata = PatchMetadata.from_commit(
-                        commit=commit, patch_path=path
+                        commit=commit,
+                        patch_path=path,
                     )
 
                     if patch_metadata.ignore:
                         logger.debug(
-                            f"[IGNORED: {patch_metadata.name}] {commit.summary}"
+                            f"[IGNORED: {patch_metadata.name}] {commit.summary}",
                         )
                     else:
                         logger.debug(f"[{patch_metadata.name}] {commit.summary}")
@@ -537,8 +548,9 @@ class PatchGenerator:
                             )
                             patch_list.append(
                                 PatchMetadata.from_commit(
-                                    commit=commit, patch_path=Path(git_f_p_out)
-                                )
+                                    commit=commit,
+                                    patch_path=Path(git_f_p_out),
+                                ),
                             )
                         else:
                             patch_list.append(patch_metadata)
@@ -546,8 +558,9 @@ class PatchGenerator:
         return patch_list
 
     def process_patches_with_trailers(
-        self, patches: List[str]
-    ) -> Tuple[List[PatchMetadata], bool]:
+        self,
+        patches: list[str],
+    ) -> tuple[list[PatchMetadata], bool]:
         """Collect and return patch metadata stored in Git trailers.
 
         Args:
@@ -558,7 +571,7 @@ class PatchGenerator:
             A list of PatchMetadata objects and a flag to indicate whether any metadata
             stored in Git trailers was found or not.
         """
-        patch_list: List[PatchMetadata] = [
+        patch_list: list[PatchMetadata] = [
             PatchMetadata.from_patch(patch) for patch in patches
         ]
         used_git_trailers = any(patch.metadata_defined for patch in patch_list)
@@ -569,8 +582,8 @@ class PatchGenerator:
 
     @staticmethod
     def squash_by_squash_commits(
-        patch_list: List[PatchMetadata],
-    ) -> List[PatchMetadata]:
+        patch_list: list[PatchMetadata],
+    ) -> list[PatchMetadata]:
         """Append commits to a single patch until 'squash_commits==True'
         is found.
 
@@ -589,10 +602,10 @@ class PatchGenerator:
             "Squashing commits by 'squash_commits' metadata. "
             "This mechanism is deprecated. Please, use an "
             "identical 'patch_name' to merge multiple adjacent "
-            "commits in a single patch file, instead."
+            "commits in a single patch file, instead.",
         )
 
-        new_patch_list: List[PatchMetadata] = []
+        new_patch_list: list[PatchMetadata] = []
 
         prepend_patches = ""
         # this iterator is being reused in both cycles below
@@ -626,7 +639,7 @@ class PatchGenerator:
             else:
                 logger.debug(f"Appending commit {patch} to {top_patch}.")
                 top_patch.path.write_text(
-                    patch.path.read_text() + top_patch.path.read_text()
+                    patch.path.read_text() + top_patch.path.read_text(),
                 )
                 patch.path.unlink()
             # we are draining rest of the iterator here
@@ -640,7 +653,7 @@ class PatchGenerator:
         return new_patch_list
 
     @staticmethod
-    def squash_by_patch_name(patch_list: List[PatchMetadata]) -> List[PatchMetadata]:
+    def squash_by_patch_name(patch_list: list[PatchMetadata]) -> list[PatchMetadata]:
         """Squash adjacent patches if they have identical names.
 
         Squashing is done by appending the content of a patch to the previous patch
@@ -661,21 +674,21 @@ class PatchGenerator:
             PackitException if non-adjacent patches have the same name.
         """
         logger.debug("Squashing commits by 'patch_name'.")
-        squashed_patch_list: List[PatchMetadata] = []
+        squashed_patch_list: list[PatchMetadata] = []
         seen_patch_names = set()
         for patch in patch_list:
             if squashed_patch_list and squashed_patch_list[-1].name == patch.name:
                 logger.debug(
-                    f"Appending patch {patch!r} to {squashed_patch_list[-1]!r}."
+                    f"Appending patch {patch!r} to {squashed_patch_list[-1]!r}.",
                 )
                 squashed_patch_list[-1].path.write_text(
-                    squashed_patch_list[-1].path.read_text() + patch.path.read_text()
+                    squashed_patch_list[-1].path.read_text() + patch.path.read_text(),
                 )
                 patch.path.unlink()
             else:
                 if patch.name in seen_patch_names:
                     raise PackitException(
-                        f"Non-adjacent patches cannot have the same name: {patch.name}."
+                        f"Non-adjacent patches cannot have the same name: {patch.name}.",
                     )
                 seen_patch_names.add(patch.name)
                 squashed_patch_list.append(patch)
@@ -683,8 +696,8 @@ class PatchGenerator:
 
     @staticmethod
     def squash_patches(
-        patch_list: List[PatchMetadata],
-    ) -> List[PatchMetadata]:
+        patch_list: list[PatchMetadata],
+    ) -> list[PatchMetadata]:
         """
         When using `%autosetup -S git_am`, there is a case
         where a single patch file contains multiple commits.
@@ -706,11 +719,10 @@ class PatchGenerator:
         """
         if any(commit.squash_commits for commit in patch_list):
             return PatchGenerator.squash_by_squash_commits(patch_list)
-        else:
-            return PatchGenerator.squash_by_patch_name(patch_list)
+        return PatchGenerator.squash_by_patch_name(patch_list)
 
     @staticmethod
-    def rename_patches(patch_list: List[PatchMetadata]):
+    def rename_patches(patch_list: list[PatchMetadata]):
         """Ensure that patch file names match 'patch_name', if defined.
 
         Args:
@@ -725,16 +737,16 @@ class PatchGenerator:
                 new_path = patch.path.parent / patch.name
                 logger.debug(
                     f"Renaming the patch: {patch.path} -> {new_path}"
-                    f"{' (already exists)' if new_path.exists() else ''}"
+                    f"{' (already exists)' if new_path.exists() else ''}",
                 )
                 patch.path.rename(new_path)
                 patch.path = new_path
 
     @staticmethod
     def undo_identical(
-        patch_list: List[PatchMetadata],
+        patch_list: list[PatchMetadata],
         repo: git.Repo,
-    ) -> List[PatchMetadata]:
+    ) -> list[PatchMetadata]:
         """
         Remove from patch_list and undo changes of patch files which
         have the same patch-id as their previous version, and so they
@@ -744,7 +756,7 @@ class PatchGenerator:
         :param repo: Git repo to work in.
         :return: A filtered list of patches, with identical patches removed.
         """
-        ret: List[PatchMetadata] = []
+        ret: list[PatchMetadata] = []
         for patch in patch_list:
             relative_patch_path = patch.path.relative_to(repo.working_dir)
             logger.debug(f"Processing {relative_patch_path} ...")
@@ -781,8 +793,8 @@ class PatchGenerator:
         self,
         git_ref: str,
         destination: str,
-        files_to_ignore: Optional[List[str]] = None,
-    ) -> List[PatchMetadata]:
+        files_to_ignore: Optional[list[str]] = None,
+    ) -> list[PatchMetadata]:
         """
         Create patches from git commits.
 
@@ -792,7 +804,7 @@ class PatchGenerator:
         :return: [PatchMetadata, ...] list of patches
         """
         files_to_ignore = files_to_ignore or []
-        patch_list: List[PatchMetadata] = []
+        patch_list: list[PatchMetadata] = []
         contained = self.are_child_commits_contained(git_ref)
         patches_revision_range = f"{git_ref}..HEAD"
         if not contained:
@@ -802,22 +814,28 @@ class PatchGenerator:
 
         # this is a string, separated by new-lines, with the names of patch files
         git_format_patch_out = git_format_patch(
-            self.lp.working_dir, destination, files_to_ignore, patches_revision_range
+            self.lp.working_dir,
+            destination,
+            files_to_ignore,
+            patches_revision_range,
         )
 
         if git_format_patch_out:
-            patches: Dict[str, bytes] = {
+            patches: dict[str, bytes] = {
                 # we need to read bytes since we cannot decode whatever is inside patches
                 patch_name: Path(patch_name).read_bytes()
                 for patch_name in git_format_patch_out.split("\n")
             }
             commits = self.get_commits_in_range(patches_revision_range)
             patch_list, used_git_trailers = self.process_patches_with_trailers(
-                list(patches)
+                list(patches),
             )
             if not used_git_trailers:
                 patch_list = self.process_patches(
-                    patches, commits, destination, files_to_ignore
+                    patches,
+                    commits,
+                    destination,
+                    files_to_ignore,
                 )
             patch_list = self.squash_patches(patch_list)
             self.rename_patches(patch_list)
@@ -831,7 +849,7 @@ class PatchGenerator:
         git_ref: str,
         add_upstream_head_commit: bool = True,
         no_merge_commits: bool = True,
-    ) -> List[git.Commit]:
+    ) -> list[git.Commit]:
         """
         Return a list of different commits between HEAD and selected git_ref
 
@@ -846,7 +864,7 @@ class PatchGenerator:
             upstream_ref = f"origin/{git_ref}"
             if upstream_ref not in self.lp.git_repo.refs:
                 raise PackitException(
-                    f"Couldn't not find upstream branch {upstream_ref!r} and tag {git_ref!r}."
+                    f"Couldn't not find upstream branch {upstream_ref!r} and tag {git_ref!r}.",
                 )
         commits = self.get_commits_in_range(
             revision_range=f"{git_ref}..{self.lp.ref}",
@@ -859,8 +877,10 @@ class PatchGenerator:
         return commits
 
     def get_commits_in_range(
-        self, revision_range: str, no_merge_commits: bool = True
-    ) -> List[git.Commit]:
+        self,
+        revision_range: str,
+        no_merge_commits: bool = True,
+    ) -> list[git.Commit]:
         """
         provide a list of git.Commit objects in a given git range
 
@@ -873,5 +893,5 @@ class PatchGenerator:
                 rev=revision_range,
                 reverse=True,
                 no_merges=no_merge_commits,  # do not include merge commits in the list
-            )
+            ),
         )

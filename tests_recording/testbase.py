@@ -2,15 +2,16 @@
 # SPDX-License-Identifier: MIT
 import os
 import shutil
-from subprocess import check_output, CalledProcessError
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
+from subprocess import CalledProcessError, check_output
+
 import packit.distgit
 import packit.upstream
 from packit.config import Config, get_package_config_from_repo
 from packit.exceptions import PackitException
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.local_project import CALCULATE, LocalProjectBuilder
 
 
 def socket_guard(*args, **kwargs):
@@ -93,7 +94,9 @@ class PackitTest(unittest.TestCase):
     def upstream(self):
         if not self._upstream:
             self._upstream = packit.upstream.Upstream(
-                self.config, self.pc, local_project=self.lp
+                self.config,
+                self.pc,
+                local_project=self.lp,
             )
         return self._upstream
 
@@ -107,7 +110,7 @@ class PackitTest(unittest.TestCase):
             check_output(["git", "config", "--global", "-l"])
         except CalledProcessError:
             check_output(
-                ["git", "config", "--global", "user.email", "test@example.com"]
+                ["git", "config", "--global", "user.email", "test@example.com"],
             )
             check_output(["git", "config", "--global", "user.name", "Tester"])
             check_output(["git", "config", "--global", "safe.directory", "*"])

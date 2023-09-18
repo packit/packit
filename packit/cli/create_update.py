@@ -7,16 +7,16 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
-from packit.config import pass_config, get_context_settings
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
+from packit.config import get_context_settings, pass_config
 from packit.config.aliases import get_branches
-from packit.constants import DEFAULT_BODHI_NOTE
-from packit.exceptions import PackitException
 from packit.constants import (
+    DEFAULT_BODHI_NOTE,
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
+from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
 
@@ -25,19 +25,14 @@ class BugzillaIDs(click.ParamType):
     name = "bugzilla_ids"
 
     def convert(self, value, param, ctx):
-        ids = []
-
         str_ids = value.split(",")
-        for bugzilla_id in str_ids:
-            try:
-                ids.append(int(bugzilla_id))
-            except ValueError:
-                raise click.BadParameter(
-                    "cannot parse non-integer bugzilla ID. Please use following "
-                    "format: id[,id]"
-                )
-
-        return ids
+        try:
+            return [int(bugzilla_id) for bugzilla_id in str_ids]
+        except ValueError as err:
+            raise click.BadParameter(
+                "cannot parse non-integer bugzilla ID. Please use following "
+                "format: id[,id]",
+            ) from err
 
 
 @click.command("create-update", context_settings=get_context_settings())
@@ -124,10 +119,11 @@ def create_update(
     default_dg_branch = api.dg.local_project.git_project.default_branch
     dist_git_branch = dist_git_branch or default_dg_branch
     branches_to_update = get_branches(
-        *dist_git_branch.split(","), default_dg_branch=default_dg_branch
+        *dist_git_branch.split(","),
+        default_dg_branch=default_dg_branch,
     )
     click.echo(
-        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}"
+        f"Creating Bodhi update for the following branches: {', '.join(branches_to_update)}",
     )
 
     if branches_to_update:
@@ -142,7 +138,7 @@ def create_update(
                 update_type=update_type,
                 bugzilla_ids=resolve_bugzillas,
             )
-        except PackitException as ex:
+        except PackitException as ex:  # noqa: PERF203
             click.echo(
                 f"There was a problem while creating an update for {branch}:\n{ex}\n\n"
                 "Please try again later if this looks like a transient issue.\n"

@@ -10,7 +10,7 @@ from pathlib import Path
 def test_srpm(cwd_upstream_or_distgit, api_instance):
     u, d, api = api_instance
     api.create_srpm()
-    assert list(Path.cwd().glob("*.src.rpm"))[0].exists()
+    assert next(Path.cwd().glob("*.src.rpm")).exists()
 
 
 def test_srpm_custom_path(cwd_upstream_or_distgit, api_instance):

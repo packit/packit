@@ -7,13 +7,14 @@ from importlib.metadata import PackageNotFoundError
 
 import pytest
 from flexmock import flexmock
+
 from packit.api import get_packit_version
 from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
 
 
 def test_get_packit_version_not_installed():
     flexmock(sys.modules["packit.api"]).should_receive("version").and_raise(
-        PackageNotFoundError
+        PackageNotFoundError,
     )
     assert get_packit_version() == "NOT_INSTALLED"
 
@@ -24,7 +25,8 @@ def test_get_packit_version():
 
 
 @pytest.mark.parametrize(
-    "to,from_,exp", (("/", "/", "."), ("/a", "/a/b", ".."), ("/a", "/c", "../a"))
+    "to,from_,exp",
+    (("/", "/", "."), ("/a", "/a/b", ".."), ("/a", "/c", "../a")),
 )
 def test_relative_to(to, from_, exp):
     assert os.path.relpath(to, from_) == exp

@@ -1,9 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import pytest
 import koji
-from bodhi.client.bindings import BodhiClientException, BodhiClient
+import pytest
+from bodhi.client.bindings import BodhiClient, BodhiClientException
 from flexmock import flexmock
 from munch import Munch
 
@@ -65,7 +65,7 @@ def bodhi_response():
                     "state": "pending",
                     "composed_by_bodhi": True,
                     "composes": [],
-                }
+                },
             ),
             "comments": [
                 Munch(
@@ -90,9 +90,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -116,9 +116,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -143,9 +143,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -169,9 +169,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
                 Munch(
                     {
@@ -195,9 +195,9 @@ def bodhi_response():
                                 "img/icons/bodhi-24.png",
                                 "openid": "bodhi.id.fedoraproject.org",
                                 "groups": [],
-                            }
+                            },
                         ),
-                    }
+                    },
                 ),
             ],
             "builds": [
@@ -209,8 +209,8 @@ def bodhi_response():
                         "ci_url": None,
                         "type": "rpm",
                         "epoch": 0,
-                    }
-                )
+                    },
+                ),
             ],
             "compose": None,
             "bugs": [],
@@ -228,14 +228,14 @@ def bodhi_response():
                         Munch({"name": "provenpackager"}),
                         Munch({"name": "packager"}),
                     ],
-                }
+                },
             ),
             "updateid": "FEDORA-2019-0c53f2476d",
             "submitter": "ttomecek",
             "karma": 0,
             "content_type": "rpm",
             "test_cases": [],
-        }
+        },
     )
 
 
@@ -278,7 +278,7 @@ def test_basic_bodhi_update(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
-        lambda tag, package, inherit, latest, strict: latest_builds_from_koji
+        lambda tag, package, inherit, latest, strict: latest_builds_from_koji,
     )
 
     flexmock(
@@ -329,7 +329,7 @@ def test_bodhi_update_with_bugs(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
     flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
-        lambda tag, package, inherit, latest, strict: latest_builds_from_koji
+        lambda tag, package, inherit, latest, strict: latest_builds_from_koji,
     )
 
     flexmock(

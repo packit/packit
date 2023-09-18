@@ -26,7 +26,7 @@ from packit.local_project import LocalProjectBuilder
                     source_branch="f31-update",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
                     author="packit",
-                )
+                ),
             ],
             True,
         ),
@@ -41,7 +41,7 @@ from packit.local_project import LocalProjectBuilder
                     source_branch="f31-update",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
                     author="packit",
-                )
+                ),
             ],
             False,
         ),
@@ -56,7 +56,7 @@ from packit.local_project import LocalProjectBuilder
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
                     author="packit-stg",
                     source_branch="f31-update",
-                )
+                ),
             ],
             False,
         ),
@@ -71,7 +71,7 @@ from packit.local_project import LocalProjectBuilder
                     source_branch="f31-update",
                     description="Upstream tag: 0.4.0\nUpstream commit: 6957453b",
                     author="packit",
-                )
+                ),
             ],
             False,
         ),
@@ -86,7 +86,7 @@ def test_existing_pr(title, target_branch, source_branch, prs, exists):
     distgit = DistGit(
         config=flexmock(Config()),
         package_config=flexmock(
-            PackageConfig(packages={"package": CommonPackageConfig()})
+            PackageConfig(packages={"package": CommonPackageConfig()}),
         ),
         local_project=local_project,
     )
@@ -110,7 +110,7 @@ def test_monorepo_regression():
         {
             "a": package_a,
             "b": package_b,
-        }
+        },
     )
 
     dg = DistGit(config, package_config)

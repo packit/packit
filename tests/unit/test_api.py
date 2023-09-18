@@ -1,15 +1,16 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from contextlib import suppress as does_not_raise
 import pathlib
+from contextlib import suppress as does_not_raise
 
-from munch import Munch
 import pytest
 from flexmock import flexmock
+from munch import Munch
 
+from packit import api as packit_api
 from packit.api import PackitAPI
-from packit.config import PackageConfig, CommonPackageConfig
+from packit.config import CommonPackageConfig, PackageConfig
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -17,7 +18,6 @@ from packit.local_project import LocalProjectBuilder
 from packit.patches import PatchGenerator
 from packit.sync import SyncFilesItem
 from packit.utils.changelog_helper import ChangelogHelper
-from packit import api as packit_api
 
 
 def build_dict(copr_url, id):
@@ -47,7 +47,7 @@ def build_dict(copr_url, id):
             "state": "succeeded",
             "submitted_on": 1566377764,
             "submitter": "packit",
-        }
+        },
     )
 
 
@@ -152,17 +152,19 @@ def test_sync_release_version_tag_processing(
 ):
     api_mock.up.package_config.upstream_tag_template = "v{version}"
     api_mock.up.should_receive("get_latest_released_version").and_return(
-        get_latest_released_return
+        get_latest_released_return,
     )
     api_mock.up.should_receive("get_specfile_version").and_return(
-        get_specfile_version_return
+        get_specfile_version_return,
     )
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("_prepare_files_to_sync").with_args(
-        synced_files=[], full_version=version, upstream_tag=tag
+        synced_files=[],
+        full_version=version,
+        upstream_tag=tag,
     )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     flexmock(PatchGenerator).should_receive("undo_identical")
@@ -175,7 +177,7 @@ def test_sync_release_do_not_create_sync_note(api_mock):
     flexmock(pathlib.Path).should_receive("write_text").never()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.up.package_config.create_sync_note = False
@@ -188,7 +190,7 @@ def test_sync_release_create_sync_note(api_mock):
     flexmock(pathlib.Path).should_receive("write_text").once()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
@@ -205,7 +207,10 @@ def test_sync_release_create_sync_note(api_mock):
     ],
 )
 def test_dg_downstream_package_name_is_set(
-    api_mock, path, downstream_package_name, expectation
+    api_mock,
+    path,
+    downstream_package_name,
+    expectation,
 ):
     api_mock._dg = None
     api_mock.package_config.downstream_package_name = downstream_package_name
@@ -225,14 +230,14 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
                         filters=["dummy filter"],
                         mkpath=True,
                         delete=True,
-                    )
+                    ),
                 ],
                 upstream_package_name="test_package_name",
                 downstream_package_name="test_package_name",
                 upstream_tag_template="_",
                 upstream_project_url="_",
                 upstream_ref="_",
-            )
+            ),
         },
     )
     upstream_mock.package_config = pc
@@ -246,7 +251,7 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     flexmock(pathlib.Path).should_receive("write_text").once()
     api.up.should_receive("get_specfile_version").and_return("0")
     api.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api.should_receive("push_and_create_pr").and_return(flexmock())
     flexmock(ChangelogHelper).should_receive("update_dist_git")
@@ -259,8 +264,8 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
                 mkpath=True,
                 delete=True,
                 filters=["dummy filter"],
-            )
-        ]
+            ),
+        ],
     )
 
     api.sync_release(version="1.1", dist_git_branch="_")
@@ -270,7 +275,7 @@ def test_sync_release_check_pr_instructions(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock()
+        flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("push_and_create_pr").with_args(
@@ -279,7 +284,7 @@ def test_sync_release_check_pr_instructions(api_mock):
             "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
             "If you need to do any change in this pull request, you need to locally fetch the "
             "source branch of it and push it (with a fix) to your fork "
-            "(as it is not possible to push to the branch created in the Packit’s fork):\n"
+            "(as it is not possible to push to the branch created in the Packit's fork):\n"
             "```\ngit fetch https://src.fedoraproject.org/forks/packit/rpms/package.git "
             "refs/heads/*:refs/remotes/packit/*\n"
             "git checkout packit/1.1-_-update\n```\n"

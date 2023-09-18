@@ -7,14 +7,14 @@ import os
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
-from packit.config import pass_config, get_context_settings
-from packit.utils.changelog_helper import ChangelogHelper
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
+from packit.config import get_context_settings, pass_config
 from packit.constants import (
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger("packit")
 
@@ -82,10 +82,14 @@ def mock(
     it defaults to the current working directory.
     """
     api = get_packit_api(
-        config=config, package_config=package_config, local_project=path_or_url
+        config=config,
+        package_config=package_config,
+        local_project=path_or_url,
     )
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     if not config.srpm_path:

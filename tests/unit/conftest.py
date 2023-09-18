@@ -12,7 +12,7 @@ from packit.config import Config
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
 from packit.upstream import Upstream
-from tests.spellbook import get_test_config, CRONIE, initiate_git_repo
+from tests.spellbook import CRONIE, get_test_config, initiate_git_repo
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def mock_get_aliases():
             "fedora-stable": ["fedora-31", "fedora-32"],
             "fedora-development": ["fedora-33", "fedora-rawhide"],
             "epel-all": ["epel-6", "epel-7", "epel-8"],
-        }
+        },
     )
 
 

@@ -1,47 +1,47 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import copy
 from pathlib import Path, PosixPath
 from typing import Optional
 
-from github import GithubException
 import pytest
-import copy
 from flexmock import flexmock
+from github import GithubException
 from marshmallow import ValidationError
-
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import GithubAPIException
+
+import packit.config.package_config
 from packit.actions import ActionName
 from packit.config import (
     CommonPackageConfig,
-    JobType,
-    JobConfigTriggerType,
     JobConfig,
+    JobConfigTriggerType,
+    JobType,
     get_package_config_from_repo,
 )
 from packit.config.package_config import (
-    get_specfile_path_from_repo,
     PackageConfig,
-    get_local_specfile_path,
-    get_local_package_config,
     find_remote_package_config,
+    get_local_package_config,
+    get_local_specfile_path,
+    get_specfile_path_from_repo,
 )
-import packit.config.package_config
 from packit.config.sources import SourcesItem
 from packit.constants import CONFIG_FILE_NAMES
 from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
-from tests.spellbook import UP_OSBUILD, SYNC_FILES
+from tests.spellbook import SYNC_FILES, UP_OSBUILD
 from tests.unit.config.test_config import (
+    get_default_job_config,
+    get_job_config_build_for_branch,
+    get_job_config_dict_build_for_branch,
     get_job_config_dict_full,
     get_job_config_dict_simple,
-    get_job_config_simple,
     get_job_config_full,
-    get_default_job_config,
-    get_job_config_dict_build_for_branch,
-    get_job_config_build_for_branch,
+    get_job_config_simple,
 )
 
 
@@ -70,7 +70,7 @@ def test_get_specfile_path_from_repo(files, expected):
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -79,9 +79,9 @@ def test_get_specfile_path_from_repo(files, expected):
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             None,
@@ -91,7 +91,7 @@ def test_get_specfile_path_from_repo(files, expected):
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -101,9 +101,9 @@ def test_get_specfile_path_from_repo(files, expected):
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 project="example",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             "example",
@@ -113,7 +113,7 @@ def test_get_specfile_path_from_repo(files, expected):
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -123,7 +123,7 @@ def test_get_specfile_path_from_repo(files, expected):
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 project="example1",
-                            )
+                            ),
                         },
                     ),
                     JobConfig(
@@ -133,7 +133,7 @@ def test_get_specfile_path_from_repo(files, expected):
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
                                 project="example2",
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -155,7 +155,7 @@ def test_project_from_copr_build_job(package_config, project):
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -167,9 +167,9 @@ def test_project_from_copr_build_job(package_config, project):
                                 dist_git_branches=[
                                     "example",
                                 ],
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             {
@@ -181,7 +181,7 @@ def test_project_from_copr_build_job(package_config, project):
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -194,7 +194,7 @@ def test_project_from_copr_build_job(package_config, project):
                                     "example1",
                                     "example2",
                                 ],
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -206,7 +206,7 @@ def test_project_from_copr_build_job(package_config, project):
                 packages={
                     "package": CommonPackageConfig(
                         specfile_path="xxx",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -215,9 +215,9 @@ def test_project_from_copr_build_job(package_config, project):
                         packages={
                             "package": CommonPackageConfig(
                                 specfile_path="xxx",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             set(),
@@ -237,7 +237,7 @@ def test_package_config_equal(job_config_simple):
                 synced_files=[SyncFilesItem(src=["packit.yaml"], dest="packit.yaml")],
                 downstream_package_name="package",
                 create_pr=True,
-            )
+            ),
         },
         jobs=[job_config_simple],
     ) == PackageConfig(
@@ -247,7 +247,7 @@ def test_package_config_equal(job_config_simple):
                 synced_files=[SyncFilesItem(src=["packit.yaml"], dest="packit.yaml")],
                 downstream_package_name="package",
                 create_pr=True,
-            )
+            ),
         },
         jobs=[job_config_simple],
     )
@@ -264,7 +264,7 @@ def test_package_config_equal(job_config_simple):
                         SyncFilesItem(src=["a"], dest="a"),
                         SyncFilesItem(src=["b"], dest="b"),
                     ],
-                )
+                ),
             },
             jobs=[get_job_config_simple()],
         ),
@@ -273,7 +273,7 @@ def test_package_config_equal(job_config_simple):
                 "package": CommonPackageConfig(
                     specfile_path="fedora/package.spec",
                     synced_files=[SyncFilesItem(src=["c"], dest="c")],
-                )
+                ),
             },
             jobs=[get_job_config_simple()],
         ),
@@ -285,7 +285,7 @@ def test_package_config_equal(job_config_simple):
                         SyncFilesItem(src=["a"], dest="a"),
                         SyncFilesItem(src=["b"], dest="b"),
                     ],
-                )
+                ),
             },
             jobs=[get_job_config_full()],
         ),
@@ -298,7 +298,7 @@ def test_package_config_equal(job_config_simple):
                         SyncFilesItem(src=["d"], dest="d"),
                     ],
                     create_pr=False,
-                )
+                ),
             },
             jobs=[get_job_config_full()],
         ),
@@ -314,7 +314,7 @@ def test_package_config_not_equal(not_equal_package_config):
                     SyncFilesItem(src=["d"], dest="d"),
                 ],
                 create_pr=True,
-            )
+            ),
         },
         jobs=[get_job_config_full()],
     )
@@ -360,7 +360,7 @@ def test_package_config_not_equal(not_equal_package_config):
                         "dist_git_branches": [
                             "fedora-all",
                         ],
-                    }
+                    },
                 ],
             },
             True,
@@ -374,7 +374,7 @@ def test_package_config_not_equal(not_equal_package_config):
                         "job": "propose_downstream",
                         "trigger": "release",
                         "dist_git_branches": ["fedora-all", "epel-8"],
-                    }
+                    },
                 ],
             },
             True,
@@ -390,7 +390,7 @@ def test_package_config_not_equal(not_equal_package_config):
                         "targets": [
                             "fedora-stable",
                         ],
-                    }
+                    },
                 ],
             },
             True,
@@ -404,7 +404,7 @@ def test_package_config_not_equal(not_equal_package_config):
                         "job": "copr_build",
                         "trigger": "release",
                         "targets": ["fedora-stable", "fedora-development"],
-                    }
+                    },
                 ],
             },
             True,
@@ -421,7 +421,7 @@ def test_package_config_not_equal(not_equal_package_config):
                         "timeout": 123,
                         "owner": "santa",
                         "project": "gifts",
-                    }
+                    },
                 ],
             },
             True,
@@ -441,7 +441,7 @@ def test_package_config_not_equal(not_equal_package_config):
                             "MYVAR1": 5,
                             "MYVAR2": "foo",
                         },
-                    }
+                    },
                 ],
             },
             True,
@@ -558,7 +558,7 @@ def test_package_config_not_equal(not_equal_package_config):
                             "fedora-stable",
                         ],
                         "module_hotfixes": True,
-                    }
+                    },
                 ],
             },
             True,
@@ -585,7 +585,7 @@ def test_package_config_validate(raw, is_valid):
                         "job": "propose_downstream",
                         "trigger": "release",
                         "unknown": "key",
-                    }
+                    },
                 ],
             },
             False,
@@ -599,7 +599,7 @@ def test_package_config_validate(raw, is_valid):
                         "job": "propose_downstream",
                         "trigger": "release",
                         "unknown": "key",
-                    }
+                    },
                 ],
             },
             False,
@@ -621,7 +621,7 @@ def test_package_config_validate_unknown_key(raw, is_valid):
         {
             "specfile_path": "test/spec/file/path",
             "jobs": [{"trigger": "release", "release_to": ["f28"]}],
-        }
+        },
     ],
 )
 def test_package_config_parse_error(raw):
@@ -648,10 +648,11 @@ def test_package_config_parse_error(raw):
                         create_pr=False,
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
-                            )
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
+                            ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_full(
@@ -662,9 +663,9 @@ def test_package_config_parse_error(raw):
                             SyncFilesItem(
                                 src=["fedora/package.spec"],
                                 dest="fedora/package.spec",
-                            )
+                            ),
                         ],
-                    )
+                    ),
                 ],
             ),
             id="specfile_path+synced_files+job_config_full+downstream_package_name+create_pr",
@@ -688,15 +689,17 @@ def test_package_config_parse_error(raw):
                         specfile_path="fedora/package.spec",
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
                             ),
                             SyncFilesItem(src=["somefile"], dest="somefile"),
                             SyncFilesItem(src=["other"], dest="other"),
                             SyncFilesItem(
-                                src=["directory/files"], dest="directory/files"
+                                src=["directory/files"],
+                                dest="directory/files",
                             ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_simple(
@@ -710,10 +713,11 @@ def test_package_config_parse_error(raw):
                             SyncFilesItem(src=["somefile"], dest="somefile"),
                             SyncFilesItem(src=["other"], dest="other"),
                             SyncFilesItem(
-                                src=["directory/files"], dest="directory/files"
+                                src=["directory/files"],
+                                dest="directory/files",
                             ),
                         ],
-                    )
+                    ),
                 ],
             ),
             id="specfile_path+synced_files+job_config_dict_simple+downstream_package_name",
@@ -732,10 +736,11 @@ def test_package_config_parse_error(raw):
                         specfile_path="fedora/package.spec",
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
-                            )
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
+                            ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_full(
@@ -745,9 +750,9 @@ def test_package_config_parse_error(raw):
                             SyncFilesItem(
                                 src=["fedora/package.spec"],
                                 dest="fedora/package.spec",
-                            )
+                            ),
                         ],
-                    )
+                    ),
                 ],
             ),
             id="specfile_path+synced_files(spec_only)+job_config_full+downstream_package_name",
@@ -766,11 +771,12 @@ def test_package_config_parse_error(raw):
                         specfile_path="fedora/package.spec",
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
                             ),
                             SyncFilesItem(src=["somefile"], dest="somefile"),
                         ],
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_full(
@@ -783,7 +789,7 @@ def test_package_config_parse_error(raw):
                             ),
                             SyncFilesItem(src=["somefile"], dest="somefile"),
                         ],
-                    )
+                    ),
                 ],
             ),
             id="specfile_path+synced_files+job_config_full+downstream_package_name",
@@ -808,10 +814,11 @@ def test_package_config_parse_error(raw):
                         dist_git_base_url="https://something.wicked",
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
-                            )
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
+                            ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_full(
@@ -824,9 +831,9 @@ def test_package_config_parse_error(raw):
                             SyncFilesItem(
                                 src=["fedora/package.spec"],
                                 dest="fedora/package.spec",
-                            )
+                            ),
                         ],
-                    )
+                    ),
                 ],
             ),
             id="specfile_path+synced_files+job_config_dict_full+upstream_project_url"
@@ -857,7 +864,7 @@ def test_package_config_parse_error(raw):
                         upstream_package_name="qwe",
                         dist_git_base_url="https://something.wicked",
                         downstream_package_name="package",
-                    )
+                    ),
                 },
                 jobs=[],
             ),
@@ -877,18 +884,20 @@ def test_package_config_parse_error(raw):
                         specfile_path="fedora/package.spec",
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
-                            )
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
+                            ),
                         ],
-                    )
+                    ),
                 },
                 jobs=get_default_job_config(
                     downstream_package_name="package",
                     specfile_path="fedora/package.spec",
                     synced_files=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
                 ),
             ),
@@ -907,14 +916,14 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         spec_source_id="Source3",
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_build_for_branch(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         spec_source_id="Source3",
-                    )
+                    ),
                 ],
             ),
             id="specfile_path+get_job_config_dict_build_for_branch",
@@ -932,14 +941,14 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=True,
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_simple(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=True,
-                    )
+                    ),
                 ],
             ),
             id="sync_changelog_true",
@@ -956,14 +965,14 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=False,
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_simple(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=False,
-                    )
+                    ),
                 ],
             ),
             id="sync_changelog_false_by_default",
@@ -981,14 +990,14 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         create_sync_note=False,
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_simple(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         create_sync_note=False,
-                    )
+                    ),
                 ],
             ),
             id="create_sync_note_false",
@@ -1005,14 +1014,14 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         create_sync_note=True,
-                    )
+                    ),
                 },
                 jobs=[
                     get_job_config_simple(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         create_sync_note=True,
-                    )
+                    ),
                 ],
             ),
             id="create_sync_note_true_by_default",
@@ -1025,7 +1034,7 @@ def test_package_config_parse_error(raw):
                     {
                         "path": "rsync-3.1.3.tar.gz",
                         "url": "https://git.centos.org/sources/rsync/c8s/82e7829",
-                    }
+                    },
                 ],
                 "jobs": [],
             },
@@ -1040,7 +1049,7 @@ def test_package_config_parse_error(raw):
                                 url="https://git.centos.org/sources/rsync/c8s/82e7829",
                             ),
                         ],
-                    )
+                    ),
                 },
                 jobs=[],
             ),
@@ -1066,7 +1075,7 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=False,
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -1080,7 +1089,7 @@ def test_package_config_parse_error(raw):
                                 fmf_url="https://example.com",
                                 fmf_ref="test_ref",
                                 fmf_path="test/path",
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -1106,7 +1115,7 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=False,
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -1119,7 +1128,7 @@ def test_package_config_parse_error(raw):
                                 sync_changelog=False,
                                 tmt_plan="^packit!",
                                 tf_post_install_script="echo 'hi packit!'",
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -1141,9 +1150,9 @@ def test_package_config_parse_error(raw):
                                     "tmt": {
                                         "context": {
                                             "how": "full",
-                                        }
+                                        },
                                     },
-                                }
+                                },
                             ],
                             "test": {"fmf": {"name": "foo"}},
                         },
@@ -1156,7 +1165,7 @@ def test_package_config_parse_error(raw):
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
                         sync_changelog=False,
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -1172,11 +1181,11 @@ def test_package_config_parse_error(raw):
                                         {
                                             "pool": "new-pool",
                                             "tmt": {"context": {"how": "full"}},
-                                        }
+                                        },
                                     ],
                                     "test": {"fmf": {"name": "foo"}},
                                 },
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -1203,7 +1212,7 @@ def test_package_config_parse_error(raw):
                         "image_customizations": {
                             "packages": ["peddle", "board"],
                         },
-                    }
+                    },
                 ],
             },
             PackageConfig(
@@ -1212,7 +1221,7 @@ def test_package_config_parse_error(raw):
                     "package": CommonPackageConfig(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -1228,7 +1237,7 @@ def test_package_config_parse_error(raw):
                                     "image_type": "aws",
                                     "upload_request": {
                                         "options": {
-                                            "share_with_accounts": ["123456789012"]
+                                            "share_with_accounts": ["123456789012"],
                                         },
                                         "type": "aws",
                                     },
@@ -1236,7 +1245,7 @@ def test_package_config_parse_error(raw):
                                 image_customizations={
                                     "packages": ["peddle", "board"],
                                 },
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -1267,7 +1276,7 @@ def test_package_config_parse(raw, expected):
                         "job": "copr_build",
                         "trigger": "release",
                         "specfile_path": "somewhere/package.spec",
-                    }
+                    },
                 ],
             },
             PackageConfig(
@@ -1275,7 +1284,7 @@ def test_package_config_parse(raw, expected):
                     "package": CommonPackageConfig(
                         downstream_package_name="package",
                         specfile_path="fedora/package.spec",
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -1285,9 +1294,9 @@ def test_package_config_parse(raw, expected):
                             "package": CommonPackageConfig(
                                 downstream_package_name="package",
                                 specfile_path="somewhere/package.spec",
-                            )
+                            ),
                         },
-                    )
+                    ),
                 ],
             ),
             id="override-specfile_path",
@@ -1308,7 +1317,7 @@ def test_package_config_parse(raw, expected):
                         "files_to_sync": ["a", "b", "c"],
                         "actions": {"create-archive": "ls"},
                         "spec_source_id": "Source1",
-                    }
+                    },
                 ],
             },
             PackageConfig(
@@ -1319,7 +1328,7 @@ def test_package_config_parse(raw, expected):
                         files_to_sync=[SyncFilesItem([x], x) for x in ("x", "y")],
                         actions={ActionName.post_upstream_clone: "ls"},
                         _targets=["fedora-36"],
-                    )
+                    ),
                 },
                 jobs=[
                     JobConfig(
@@ -1335,7 +1344,7 @@ def test_package_config_parse(raw, expected):
                                 actions={ActionName.create_archive: "ls"},
                                 _targets=["fedora-36"],
                                 spec_source_id="Source1",
-                            )
+                            ),
                         },
                     ),
                 ],
@@ -1393,15 +1402,16 @@ def test_package_config_overrides_bad(raw, err_message):
                         specfile_path="fedora/package.spec",
                         synced_files=[
                             SyncFilesItem(
-                                src=["fedora/package.spec"], dest="fedora/package.spec"
-                            )
+                                src=["fedora/package.spec"],
+                                dest="fedora/package.spec",
+                            ),
                         ],
                         downstream_package_name="package",
                         upstream_package_name="package",
-                    )
+                    ),
                 },
             ),
-        )
+        ),
     ],
 )
 def test_package_config_upstream_and_downstream_package_names(raw, expected):
@@ -1427,18 +1437,21 @@ def test_dist_git_package_url():
                 downstream_package_name="packit",
                 dist_git_namespace="awesome",
                 synced_files=[
-                    SyncFilesItem(src=["fedora/foobar.spec"], dest="fedora/foobar.spec")
+                    SyncFilesItem(
+                        src=["fedora/foobar.spec"],
+                        dest="fedora/foobar.spec",
+                    ),
                 ],
                 specfile_path="fedora/package.spec",
                 create_pr=False,
-            )
+            ),
         },
         jobs=get_default_job_config(
             dist_git_base_url="https://packit.dev/",
             downstream_package_name="packit",
             dist_git_namespace="awesome",
             synced_files=[
-                SyncFilesItem(src=["fedora/foobar.spec"], dest="fedora/foobar.spec")
+                SyncFilesItem(src=["fedora/foobar.spec"], dest="fedora/foobar.spec"),
             ],
             specfile_path="fedora/package.spec",
             create_pr=False,
@@ -1494,11 +1507,12 @@ def test_get_package_config_from_repo(
     if config_name:
         project.should_receive("get_files").and_return([spec_path]).once()
         project.should_receive("get_file_content").with_args(
-            path=config_name, ref=None
+            path=config_name,
+            ref=None,
         ).and_return(content.format(config_name=config_name)).once()
     project.should_receive("full_repo_name").and_return("a/b")
     project.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
-        files
+        files,
     )
     config = get_package_config_from_repo(project=project)
     if config_name:
@@ -1519,7 +1533,8 @@ def test_get_package_config_from_repo_explicit_path():
     config_name = ".distro/source-git.yaml"
 
     project.should_receive("get_file_content").with_args(
-        path=config_name, ref=None
+        path=config_name,
+        ref=None,
     ).and_return(
         """\
 upstream_project_url: https://github.com/packit/packit
@@ -1534,11 +1549,12 @@ files_to_sync:
   - "protect sources"
   - "exclude source-git.yaml"
   - "exclude .gitignore"
-"""
+""",
     ).once()
     project.should_receive("full_repo_name").and_return("packit/packit")
     config = get_package_config_from_repo(
-        project=project, package_config_path=config_name
+        project=project,
+        package_config_path=config_name,
     )
     assert config is not None
     assert config.downstream_package_name == "packit"
@@ -1552,7 +1568,7 @@ def test_get_package_config_from_repo_empty_no_spec():
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return("# this is a comment")
     gp.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
-        ["packit.yaml", "tox.ini"]
+        ["packit.yaml", "tox.ini"],
     )
     git_project = GitProject(repo="packit", service=GitService(), namespace="")
     with pytest.raises(
@@ -1583,7 +1599,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_pa
     gp.should_receive("full_repo_name").and_return("a/b")
     gp.should_receive("get_file_content").and_return(content)
     gp.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
-        ["packit.yaml", "tox.ini"]
+        ["packit.yaml", "tox.ini"],
     )
     git_project = GitProject(repo="packit", service=GitService(), namespace="")
     config = get_package_config_from_repo(project=git_project)
@@ -1606,9 +1622,9 @@ def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_pa
                         config_file_path="packit.yaml",
                         specfile_path="file.spec",
                         synced_files=[
-                            SyncFilesItem(src=["file.spec"], dest="file.spec")
+                            SyncFilesItem(src=["file.spec"], dest="file.spec"),
                         ],
-                    )
+                    ),
                 },
             ),
             [
@@ -1624,9 +1640,9 @@ def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_pa
                         specfile_path="file.spec",
                         downstream_package_name="package",
                         synced_files=[
-                            SyncFilesItem(src=["file.spec"], dest="package.spec")
+                            SyncFilesItem(src=["file.spec"], dest="package.spec"),
                         ],
-                    )
+                    ),
                 },
             ),
             [
@@ -1642,7 +1658,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_pa
                         specfile_path="file.spec",
                         downstream_package_name="package",
                         synced_files=[SyncFilesItem(src=["file.txt"], dest="file.txt")],
-                    )
+                    ),
                 },
             ),
             [
@@ -1659,7 +1675,7 @@ def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_pa
                         specfile_path="file.spec",
                         synced_files=[],
                         downstream_package_name="package",
-                    )
+                    ),
                 },
             ),
             [
@@ -1675,9 +1691,9 @@ def test_get_package_config_from_repo_spec_file_not_defined(content, specfile_pa
                         specfile_path="file.spec",
                         synced_files=[SyncFilesItem(src=["file.txt"], dest="file.txt")],
                         files_to_sync=[
-                            SyncFilesItem(src=["file.spec"], dest="file.spec")
+                            SyncFilesItem(src=["file.spec"], dest="file.spec"),
                         ],
-                    )
+                    ),
                 },
             ),
             [
@@ -1692,7 +1708,8 @@ def test_get_all_files_to_sync(package_config, all_synced_files):
 
 def test_notifications_section():
     pc = PackageConfig.get_from_dict(
-        {"specfile_path": "package.spec"}, repo_name="package"
+        {"specfile_path": "package.spec"},
+        repo_name="package",
     )
     assert not pc.notifications.pull_request.successful_build
     assert pc.notifications.failure_comment.message is None
@@ -1719,12 +1736,16 @@ def test_get_local_specfile_path():
 @pytest.mark.parametrize(
     "directory, local_first,local_last,config_file_name,res_pc_path",
     [
-        ([], False, True, None, Path.cwd() / list(CONFIG_FILE_NAMES)[0]),
+        ([], False, True, None, Path.cwd() / next(iter(CONFIG_FILE_NAMES))),
         ([], False, False, "different_conf.yaml", "different_conf.yaml"),
     ],
 )
 def test_get_local_package_config_path(
-    directory, local_first, local_last, config_file_name, res_pc_path
+    directory,
+    local_first,
+    local_last,
+    config_file_name,
+    res_pc_path,
 ):
     flexmock(PosixPath).should_receive("is_file").and_return(True)
 
@@ -1742,7 +1763,8 @@ def test_get_local_package_config_path(
     )
 
     get_local_package_config(
-        try_local_dir_last=local_last, package_config_path=config_file_name
+        try_local_dir_last=local_last,
+        package_config_path=config_file_name,
     )
 
 
@@ -1758,10 +1780,11 @@ def test_specfile_path_from_downstream_package_name():
     )
     assert (
         get_local_package_config(
-            package_config_path=".packit.yaml", repo_name="cockpit"
+            package_config_path=".packit.yaml",
+            repo_name="cockpit",
         ).specfile_path
         == PackageConfig(
-            packages={"cockpit": CommonPackageConfig(specfile_path="cockpit.spec")}
+            packages={"cockpit": CommonPackageConfig(specfile_path="cockpit.spec")},
         ).specfile_path
     )
 
@@ -1777,10 +1800,11 @@ def test_specfile_path_from_downstream_package_name():
                     upstream_package_name="package",
                     synced_files=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
-                )
+                ),
             },
         ),
         PackageConfig(
@@ -1791,15 +1815,17 @@ def test_specfile_path_from_downstream_package_name():
                     upstream_package_name="package",
                     synced_files=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
                     files_to_sync=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
-                )
+                ),
             },
         ),
         PackageConfig(
@@ -1809,14 +1835,15 @@ def test_specfile_path_from_downstream_package_name():
                     downstream_package_name="package",
                     upstream_package_name="package",
                     synced_files=[
-                        SyncFilesItem(src=["fedora/p.spec"], dest="fedora/p.spec")
+                        SyncFilesItem(src=["fedora/p.spec"], dest="fedora/p.spec"),
                     ],
                     files_to_sync=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
-                )
+                ),
             },
         ),
         PackageConfig(
@@ -1827,10 +1854,11 @@ def test_specfile_path_from_downstream_package_name():
                     upstream_package_name="package",
                     files_to_sync=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
-                )
+                ),
             },
         ),
         PackageConfig(
@@ -1840,10 +1868,11 @@ def test_specfile_path_from_downstream_package_name():
                     downstream_package_name="package",
                     synced_files=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
-                )
+                ),
             },
             jobs=[
                 get_job_config_full(
@@ -1851,10 +1880,11 @@ def test_specfile_path_from_downstream_package_name():
                     downstream_package_name="package",
                     synced_files=[
                         SyncFilesItem(
-                            src=["fedora/package.spec"], dest="fedora/package.spec"
-                        )
+                            src=["fedora/package.spec"],
+                            dest="fedora/package.spec",
+                        ),
                     ],
-                )
+                ),
             ],
         ),
         PackageConfig(
@@ -1870,7 +1900,7 @@ def test_specfile_path_from_downstream_package_name():
                     dist_git_base_url="https://something.wicked",
                     downstream_package_name="package",
                     spec_source_id="Source1",
-                )
+                ),
             },
             jobs=[],
         ),
@@ -1893,7 +1923,7 @@ def test_specfile_path_from_downstream_package_name():
                             url="https://git.centos.org/sources/rsync/c8s/82e7829",
                         ),
                     ],
-                )
+                ),
             },
             jobs=[],
         ),
@@ -1908,7 +1938,7 @@ def test_specfile_path_from_downstream_package_name():
                     upstream_project_url="https://github.com/asd/qwe",
                     upstream_package_name="qwe",
                     srpm_build_deps=["make", "tar", "findutils"],
-                )
+                ),
             },
             jobs=[],
         ),
@@ -1931,7 +1961,7 @@ def test_serialize_and_deserialize(package_config):
                     config_file_path=".packit.yaml",
                     downstream_package_name="package",
                     upstream_package_name="package",
-                )
+                ),
             },
         ),
     ],
@@ -1950,34 +1980,38 @@ def test_get_specfile_sync_files_item():
             "ogr": CommonPackageConfig(
                 specfile_path="fedora/python-ogr.spec",
                 downstream_package_name="python-ogr",
-            )
+            ),
         },
     )
     upstream_specfile_path = "fedora/python-ogr.spec"
     downstream_specfile_path = "python-ogr.spec"
 
     assert pc.get_specfile_sync_files_item() == SyncFilesItem(
-        src=[upstream_specfile_path], dest=downstream_specfile_path
+        src=[upstream_specfile_path],
+        dest=downstream_specfile_path,
     )
     assert pc.get_specfile_sync_files_item(from_downstream=True) == SyncFilesItem(
-        src=[downstream_specfile_path], dest=upstream_specfile_path
+        src=[downstream_specfile_path],
+        dest=upstream_specfile_path,
     )
 
 
 def test_get_specfile_sync_files_nodownstreamname_item():
     pc = PackageConfig(
         packages={
-            "package": CommonPackageConfig(specfile_path="fedora/python-ogr.spec")
-        }
+            "package": CommonPackageConfig(specfile_path="fedora/python-ogr.spec"),
+        },
     )
     upstream_specfile_path = "fedora/python-ogr.spec"
     downstream_specfile_path = "python-ogr.spec"
 
     assert pc.get_specfile_sync_files_item() == SyncFilesItem(
-        src=[upstream_specfile_path], dest=downstream_specfile_path
+        src=[upstream_specfile_path],
+        dest=downstream_specfile_path,
     )
     assert pc.get_specfile_sync_files_item(from_downstream=True) == SyncFilesItem(
-        src=[downstream_specfile_path], dest=upstream_specfile_path
+        src=[downstream_specfile_path],
+        dest=upstream_specfile_path,
     )
 
 
@@ -1991,7 +2025,7 @@ def test_get_specfile_sync_files_nodownstreamname_item():
                     "job": "copr_build",
                     "trigger": "release",
                     "targets": ["fedora-stable", "fedora-development"],
-                }
+                },
             ],
         },
         {
@@ -2001,7 +2035,7 @@ def test_get_specfile_sync_files_nodownstreamname_item():
                     "job": "tests",
                     "trigger": "release",
                     "targets": ["fedora-stable", "fedora-development"],
-                }
+                },
             ],
         },
     ],
@@ -2022,7 +2056,7 @@ def test_package_config_specfile_not_present_raise(raw):
                     "targets": ["fedora-stable", "fedora-development"],
                     "skip_build": True,
                     "manual_trigger": True,
-                }
+                },
             ],
         },
         {
@@ -2057,7 +2091,8 @@ def test_specfile_path_not_defined_in_test_only_jobs(raw):
 
 
 @pytest.mark.parametrize(
-    "package_name,result", ((None, None), ("baz", "http://foo/bar/baz.git"))
+    "package_name,result",
+    ((None, None), ("baz", "http://foo/bar/baz.git")),
 )
 def test_pc_dist_git_package_url_has_no_None(package_name, result):
     assert (
@@ -2067,7 +2102,7 @@ def test_pc_dist_git_package_url_has_no_None(package_name, result):
                     downstream_package_name=package_name,
                     dist_git_base_url="http://foo/",
                     dist_git_namespace="bar",
-                )
+                ),
             },
         ).dist_git_package_url
         == result
@@ -2104,7 +2139,7 @@ def test_handle_metadata():
                 "metadata": {
                     "dist-git-branch": "shrek",
                 },
-            }
+            },
         ],
     }
     pc = PackageConfigSchema().load(data)
@@ -2140,8 +2175,8 @@ def test_deprecated_keys_renamed(config):
                     "package": {
                         "specfile_path": "package.spec",
                         "upstream_project_name": "upstream_package",
-                    }
-                }
+                    },
+                },
             },
             id="in_packages",
         ),
@@ -2155,7 +2190,7 @@ def test_deprecated_keys_renamed(config):
                         "job": "copr_build",
                         "trigger": "pull_request",
                         "upstream_project_name": "upstream_package",
-                    }
+                    },
                 ],
             },
             id="in_job",
@@ -2171,9 +2206,9 @@ def test_deprecated_keys_renamed(config):
                         "packages": {
                             "package": {
                                 "upstream_project_name": "upstream_package",
-                            }
+                            },
                         },
-                    }
+                    },
                 ],
             },
             id="in_job_packages",
@@ -2229,16 +2264,14 @@ def test_loading_packageless_config():
     top_level_config["actions"] = {
         ActionName(k): v for k, v in top_level_config["actions"].items()
     }
-    job_config = []
-    for job in config_data["jobs"]:
-        job_config.append(
-            {
-                f"_{k}" if k == "targets" else k: v
-                for k, v in job.items()
-                if k not in {"job", "trigger"}
-            }
-        )
-
+    job_config = [
+        {
+            f"_{k}" if k == "targets" else k: v
+            for k, v in job.items()
+            if k not in {"job", "trigger"}
+        }
+        for job in config_data["jobs"]
+    ]
     expected_config = PackageConfig(
         packages={"foo": CommonPackageConfig(paths=["./"], **top_level_config)},
         jobs=[
@@ -2247,8 +2280,9 @@ def test_loading_packageless_config():
                 trigger=JobConfigTriggerType.pull_request,
                 packages={
                     "foo": CommonPackageConfig(
-                        paths=["./"], **(top_level_config | job_config[0])
-                    )
+                        paths=["./"],
+                        **(top_level_config | job_config[0]),
+                    ),
                 },
             ),
             JobConfig(
@@ -2256,8 +2290,9 @@ def test_loading_packageless_config():
                 trigger=JobConfigTriggerType.commit,
                 packages={
                     "foo": CommonPackageConfig(
-                        paths=["./"], **(top_level_config | job_config[1])
-                    )
+                        paths=["./"],
+                        **(top_level_config | job_config[1]),
+                    ),
                 },
             ),
         ],
@@ -2272,16 +2307,16 @@ def test_package_naming():
         {
             "downstream_package_name": "baar",
             "specfile_path": "fedora/baar.spec",
-        }
+        },
     )
     config2 = PackageConfigSchema().load(
         {
             "packages": {
                 "baar": {
                     "specfile_path": "fedora/baar.spec",
-                }
-            }
-        }
+                },
+            },
+        },
     )
     assert config1 == config2
     assert config1.downstream_package_name == config2.downstream_package_name == "baar"
@@ -2307,7 +2342,7 @@ def test_multiple_packages():
                 "specfile_path": "jeee/jeee.spec",
                 "paths": ["jeee"],
             },
-        }
+        },
     }
     pc = PackageConfigSchema().load(config)
     assert pc.packages.keys() == pc.jobs[0].packages.keys() == config["packages"].keys()
@@ -2318,9 +2353,9 @@ def test_multiple_packages():
     pc.jobs[0].trigger = pc.jobs[0].trigger
     # Accessing package related attributes without 'packages' raises an error
     with pytest.raises(AttributeError, match="ambiguous to get"):
-        pc.jobs[0].enable_net
+        _ = pc.jobs[0].enable_net
     with pytest.raises(AttributeError, match="ambiguous to get"):
-        pc.enable_net
+        _ = pc.enable_net
     with pytest.raises(AttributeError, match="ambiguous to set"):
         pc.jobs[0].enable_net = False
     with pytest.raises(AttributeError, match="ambiguous to set"):
@@ -2382,8 +2417,9 @@ def test_selecting_packages_in_jobs(data):
     expected_config = PackageConfig(
         packages={
             "apple": CommonPackageConfig(
-                downstream_package_name="apple", specfile_path="apple.spec"
-            )
+                downstream_package_name="apple",
+                specfile_path="apple.spec",
+            ),
         },
         jobs=[
             JobConfig(
@@ -2391,8 +2427,9 @@ def test_selecting_packages_in_jobs(data):
                 trigger=JobConfigTriggerType.pull_request,
                 packages={
                     "apple": CommonPackageConfig(
-                        downstream_package_name="apple", specfile_path="apple.spec"
-                    )
+                        downstream_package_name="apple",
+                        specfile_path="apple.spec",
+                    ),
                 },
             ),
             JobConfig(
@@ -2400,8 +2437,9 @@ def test_selecting_packages_in_jobs(data):
                 trigger=JobConfigTriggerType.pull_request,
                 packages={
                     "apple": CommonPackageConfig(
-                        downstream_package_name="apple", specfile_path="apple.spec"
-                    )
+                        downstream_package_name="apple",
+                        specfile_path="apple.spec",
+                    ),
                 },
             ),
         ],
@@ -2506,10 +2544,14 @@ def test_package_error_in_job(data, error):
 def test_multiple_packages_in_jobs(data):
     """Check that it's possible to select one or more packages in jobs."""
     apple_config = CommonPackageConfig(
-        downstream_package_name="apple", specfile_path="apple.spec", paths=["apple"]
+        downstream_package_name="apple",
+        specfile_path="apple.spec",
+        paths=["apple"],
     )
     pear_config = CommonPackageConfig(
-        downstream_package_name="pear", specfile_path="pear.spec", paths=["pear"]
+        downstream_package_name="pear",
+        specfile_path="pear.spec",
+        paths=["pear"],
     )
     expected_config = PackageConfig(
         packages={
@@ -2552,7 +2594,7 @@ def test_multiple_packages_in_jobs(data):
                         "job": "copr_build",
                         "trigger": "pull_request",
                         "specfile_path": "copr/foo.spec",
-                    }
+                    },
                 ],
             },
             id="override_in_job",
@@ -2568,9 +2610,9 @@ def test_multiple_packages_in_jobs(data):
                         "packages": {
                             "foo": {
                                 "specfile_path": "copr/foo.spec",
-                            }
+                            },
                         },
-                    }
+                    },
                 ],
             },
             id="override_in_job",
@@ -2580,10 +2622,12 @@ def test_multiple_packages_in_jobs(data):
 def test_configuring_packages_in_jobs(data):
     """Configuration of individual or all packages can be overwritten in jobs"""
     package_foo_config = CommonPackageConfig(
-        downstream_package_name="foo", specfile_path="fedora/foo.spec"
+        downstream_package_name="foo",
+        specfile_path="fedora/foo.spec",
     )
     job_foo_config = CommonPackageConfig(
-        downstream_package_name="foo", specfile_path="copr/foo.spec"
+        downstream_package_name="foo",
+        specfile_path="copr/foo.spec",
     )
     expected_config = PackageConfig(
         packages={"foo": package_foo_config},
@@ -2592,7 +2636,7 @@ def test_configuring_packages_in_jobs(data):
                 type=JobType.copr_build,
                 trigger=JobConfigTriggerType.pull_request,
                 packages={"foo": job_foo_config},
-            )
+            ),
         ],
     )
     loaded_config = PackageConfigSchema().load(data)

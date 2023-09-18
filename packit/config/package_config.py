@@ -4,14 +4,14 @@
 import json
 import logging
 from pathlib import Path
-from typing import Callable, Optional, List, Dict, Union, Set
+from typing import Callable, Optional, Union
 
 from ogr.abstract import GitProject
 from ogr.exceptions import (
-    GithubAppNotInstalledError,
     APIException,
+    GithubAppNotInstalledError,
 )
-from yaml import safe_load, YAMLError
+from yaml import YAMLError, safe_load
 
 from packit.config.common_package_config import CommonPackageConfig, MultiplePackages
 from packit.config.job_config import (
@@ -36,11 +36,11 @@ class PackageConfig(MultiplePackages):
 
     def __init__(
         self,
-        packages: Dict[str, CommonPackageConfig],
-        jobs: Optional[List[JobConfig]] = None,
+        packages: dict[str, CommonPackageConfig],
+        jobs: Optional[list[JobConfig]] = None,
     ):
-        self._job_views: List[Union[JobConfig, JobConfigView]] = []
-        self._package_config_views: Dict[str, "PackageConfigView"] = {}
+        self._job_views: list[Union[JobConfig, JobConfigView]] = []
+        self._package_config_views: dict[str, "PackageConfigView"] = {}
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
         # It is done here to avoid triggering __setattr__ and
@@ -104,11 +104,17 @@ class PackageConfig(MultiplePackages):
                     # propagate it to any monorepo sub-package
                     package[up_url_key] = raw_dict[up_url_key]
                 cls.set_defaults(
-                    package, repo_name, search_specfile, **specfile_search_args
+                    package,
+                    repo_name,
+                    search_specfile,
+                    **specfile_search_args,
                 )
         else:
             cls.set_defaults(
-                raw_dict, repo_name, search_specfile, **specfile_search_args
+                raw_dict,
+                repo_name,
+                search_specfile,
+                **specfile_search_args,
             )
 
         package_config = PackageConfigSchema().load(raw_dict)
@@ -119,16 +125,15 @@ class PackageConfig(MultiplePackages):
         if not package_config:
             return None
 
-        package_config_views: Dict[str, "PackageConfigView"] = {}
+        package_config_views: dict[str, "PackageConfigView"] = {}
         for name, package in package_config.packages.items():
             # filter out job data for the package
             jobs = [
-                job
-                for job in package_config.get_job_views()
-                if name in job.packages.keys()
+                job for job in package_config.get_job_views() if name in job.packages
             ]
             package_config_views[name] = PackageConfigView(
-                packages={name: package}, jobs=jobs
+                packages={name: package},
+                jobs=jobs,
             )
         package_config.set_package_config_views(package_config_views)
 
@@ -151,11 +156,11 @@ class PackageConfig(MultiplePackages):
             logger.warning(
                 f"You have defined multiple copr projects to build in, we are going "
                 f"to pick the first one: {projects_list[0]}, reorder the job definitions"
-                f" if this is not the one you want."
+                f" if this is not the one you want.",
             )
         return projects_list[0]
 
-    def get_propose_downstream_dg_branches_value(self) -> Optional[Set]:
+    def get_propose_downstream_dg_branches_value(self) -> Optional[set]:
         for job in self.jobs:
             if job.type == JobType.propose_downstream:
                 return job.dist_git_branches
@@ -175,7 +180,7 @@ class PackageConfig(MultiplePackages):
         logger.debug(f"the other configuration:\n{serialized_other}")
         return serialized_self == serialized_other
 
-    def get_job_views(self) -> List[Union[JobConfig, JobConfigView]]:
+    def get_job_views(self) -> list[Union[JobConfig, JobConfigView]]:
         """Get jobs views on a single package.
         If a JobConfig reference more than a package, then
         split it in many JobConfigView(s) one for any package
@@ -192,7 +197,7 @@ class PackageConfig(MultiplePackages):
                 self._job_views.append(job)
         return self._job_views
 
-    def get_package_config_views(self) -> Dict[str, "PackageConfigView"]:
+    def get_package_config_views(self) -> dict[str, "PackageConfigView"]:
         """Return a dictionary of package name -> PackageConfigView
         every PackageConfigView holds just one package (the named one)
         and its associated jobs.
@@ -202,7 +207,7 @@ class PackageConfig(MultiplePackages):
         """
         return self._package_config_views
 
-    def set_package_config_views(self, value: Dict[str, "PackageConfigView"]):
+    def set_package_config_views(self, value: dict[str, "PackageConfigView"]):
         """Set a dictionary of package name -> PackageConfigView
         every PackageConfigView holds just one package (the named one)
         and its associated jobs.
@@ -213,7 +218,8 @@ class PackageConfig(MultiplePackages):
         self._package_config_views = value
 
     def get_package_config_for(
-        self, job_config: Union[JobConfigView, JobConfig]
+        self,
+        job_config: Union[JobConfigView, JobConfig],
     ) -> Union["PackageConfigView", "PackageConfig"]:
         """Select the PackageConfigView for the given JobConfig in
         a multiple packages config.
@@ -244,12 +250,12 @@ class PackageConfigView(PackageConfig):
 
     def __init__(
         self,
-        packages: Dict[str, CommonPackageConfig],
-        jobs: Optional[List[JobConfig]] = None,
+        packages: dict[str, CommonPackageConfig],
+        jobs: Optional[list[JobConfig]] = None,
     ):
         if len(packages) > 1:
             logger.error(
-                "The PackageConfigView class deals with just one single package"
+                "The PackageConfigView class deals with just one single package",
             )
         super().__init__(packages, jobs)
 
@@ -284,7 +290,7 @@ def find_packit_yaml(
 
     if try_local_dir_first and try_local_dir_last:
         logger.error(
-            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'."
+            "Ambiguous usage of 'try_local_dir_first' and 'try_local_dir_last'.",
         )
 
     if try_local_dir_first:
@@ -307,8 +313,9 @@ def find_packit_yaml(
 
 
 def load_packit_yaml(
-    config_file_path: Optional[Path] = None, raw_text: str = ""
-) -> Dict:
+    config_file_path: Optional[Path] = None,
+    raw_text: str = "",
+) -> dict:
     """
     Use yaml.safe_load to parse provided text as yaml
 
@@ -340,11 +347,11 @@ def load_packit_yaml(
                 + str(ex.problem)  # type: ignore
             )  # type: ignore
             if ex.context is not None:  # type: ignore
-                msg += f" {str(ex.context)}"  # type: ignore
+                msg += f" {ex.context!s}"  # type: ignore
             logger.error(msg)
         else:
             logger.error(f"parser says: {ex!r}.")
-        raise PackitConfigException("Please correct data and retry.")
+        raise PackitConfigException("Please correct data and retry.") from ex
 
 
 def get_local_package_config(
@@ -415,7 +422,7 @@ def find_remote_package_config(
     except GithubAppNotInstalledError:
         logger.warning(
             "The Packit GitHub App is not installed"
-            f"for the {project.full_repo_name!r} repository."
+            f"for the {project.full_repo_name!r} repository.",
         )
         return None
     except APIException as ex:
@@ -430,14 +437,14 @@ def find_remote_package_config(
     except KeyError:
         logger.warning(
             f"No config file ({CONFIG_FILE_NAMES}) found on ref {ref!r} "
-            f"of the {project.full_repo_name!r} repository."
+            f"of the {project.full_repo_name!r} repository.",
         )
         return None
 
     logger.debug(
         f"Found a config file {package_config_name!r} "
         f"on ref {ref!r} "
-        f"of the {project.full_repo_name!r} repository."
+        f"of the {project.full_repo_name!r} repository.",
     )
     return package_config_name
 
@@ -468,12 +475,13 @@ def get_package_config_from_repo(
 
     try:
         config_file_content = project.get_file_content(
-            path=package_config_path, ref=ref
+            path=package_config_path,
+            ref=ref,
         )
     except FileNotFoundError:
         logger.warning(
             f"No config file {package_config_path!r} found on ref {ref!r} "
-            f"of the {project.full_repo_name!r} repository."
+            f"of the {project.full_repo_name!r} repository.",
         )
         return None
     loaded_config = load_packit_yaml(raw_text=config_file_content)
@@ -498,7 +506,7 @@ def parse_loaded_config(
 ) -> PackageConfig:
     """Tries to parse the config to PackageConfig."""
     logger.debug(
-        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}"
+        f"Package config before loading:\n{json.dumps(loaded_config, indent=4)}",
     )
 
     try:
@@ -511,10 +519,13 @@ def parse_loaded_config(
         )
     except Exception as ex:
         logger.error(f"Cannot parse package config. {ex}.")
-        raise PackitConfigException(f"Cannot parse package config: {ex!r}.")
+        raise PackitConfigException(f"Cannot parse package config. {ex!r}") from ex
 
 
-def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[str]:
+def get_local_specfile_path(
+    dir: Path,
+    exclude: Optional[list[str]] = None,
+) -> Optional[str]:
     """
     Get the path to the local specfile if present. If specfile is not found in
     the directory itself, search for it recursively (rglob).
@@ -543,7 +554,10 @@ def get_local_specfile_path(dir: Path, exclude: List[str] = None) -> Optional[st
     return None
 
 
-def get_specfile_path_from_repo(project: GitProject, ref: str = None) -> Optional[str]:
+def get_specfile_path_from_repo(
+    project: GitProject,
+    ref: Optional[str] = None,
+) -> Optional[str]:
     """
     Get the path of the specfile in the given repo if present.
 

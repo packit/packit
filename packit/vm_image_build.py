@@ -10,12 +10,12 @@ Guides and more info about Image Builder:
     https://github.com/packit/research/tree/main/image-builder
 """
 import logging
-from typing import Optional, Dict, List, Union
+from typing import Optional, Union
 
 import requests
 from requests import HTTPError
 
-from packit.exceptions import PackitException, ImageBuilderError
+from packit.exceptions import ImageBuilderError, PackitException
 
 logger = logging.getLogger("packit")
 REDHAT_SSO_AUTH_URL = (
@@ -54,13 +54,13 @@ class ImageBuilder:
         self._access_token = self._get_access_token()
         if not self._access_token:
             raise PackitException(
-                "Unable to obtain access token. You may need to regenerate the refresh token."
+                "Unable to obtain access token. You may need to regenerate the refresh token.",
             )
         self.session.headers.update(
             {
                 "Authorization": f"Bearer {self._access_token}",
                 "Accept": "application/json",
-            }
+            },
         )
 
     def request(self, method: str, url: str, payload: Optional[dict] = None):
@@ -91,7 +91,10 @@ class ImageBuilder:
             return response
 
     def image_builder_request(
-        self, method: str, path: str, payload: Optional[dict] = None
+        self,
+        method: str,
+        path: str,
+        payload: Optional[dict] = None,
     ):
         """
         Request to the Image Builder API.
@@ -105,7 +108,9 @@ class ImageBuilder:
             requests.Response object.
         """
         return self.request(
-            method, url=f"{IMAGE_BUILDER_API_URL}/{path}", payload=payload
+            method,
+            url=f"{IMAGE_BUILDER_API_URL}/{path}",
+            payload=payload,
         )
 
     def launch_request(self, method: str, path: str, payload: Optional[dict] = None):
@@ -147,7 +152,7 @@ class ImageBuilder:
             return response_json["access_token"]
         except KeyError:
             logger.info(
-                f"Failed to get access token ({response.status_code}): {response_json}"
+                f"Failed to get access token ({response.status_code}): {response_json}",
             )
             return None
 
@@ -163,15 +168,14 @@ class ImageBuilder:
             REDHAT_API_GET_USER_URL,
             headers={"Authorization": f"Bearer {self._access_token}"},
         )
-        json_output = response.json()
-        return json_output
+        return response.json()
 
     def create_image(
         self,
         image_distribution: str,
         image_name: str,
-        image_request: Dict,
-        image_customizations: Dict,
+        image_request: dict,
+        image_customizations: dict,
         repo_url: str,
     ):
         """
@@ -217,11 +221,11 @@ class ImageBuilder:
         image_customizations.setdefault("payload_repositories", [])
         # variable assignment is done for sake of mypy:
         #   https://stackoverflow.com/a/54788883/909579
-        payload_repositories: List[Dict[str, Union[str, bool]]] = image_customizations[
+        payload_repositories: list[dict[str, Union[str, bool]]] = image_customizations[
             "payload_repositories"
         ]
         logger.debug(
-            f"image_customizations -> payload_repositories {payload_repositories}"
+            f"image_customizations -> payload_repositories {payload_repositories}",
         )
         payload = {
             "image_name": image_name,
@@ -237,18 +241,18 @@ class ImageBuilder:
                 # https://issues.redhat.com/browse/HMSIB-14
                 # "gpgkey": "https://download.copr.../@cockpit/cockpit-preview/pubkey.gpg",
                 "check_gpg": False,
-            }
+            },
         )
         response = self.image_builder_request("POST", "compose", payload=payload)
 
         response_json = response.json()
         try:
             return response_json["id"]
-        except KeyError:
+        except KeyError as e:
             logger.error(
-                f"Failed to create image ({response.status_code}): {response_json}"
+                f"Failed to create image ({response.status_code}): {response_json}",
             )
-            raise PackitException(f"Failed to create image: {response_json}")
+            raise PackitException(f"Failed to create image: {response_json}") from e
 
     def get_image_status(self, build_id: str):
         """
@@ -275,7 +279,7 @@ class ImageBuilder:
         logger.debug(f"Image build metadata: {response_json}")
         return response_json["image_status"]["status"]
 
-    def clone(self, build_id: str, region: str, share_with_accounts: List[str]):
+    def clone(self, build_id: str, region: str, share_with_accounts: list[str]):
         """
         Clone existing image into a new AWS region.
 

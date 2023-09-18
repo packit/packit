@@ -7,15 +7,15 @@ from pathlib import Path
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
-from packit.config import pass_config, get_context_settings
-from packit.schema import JobConfigSchema
-from packit.utils.changelog_helper import ChangelogHelper
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
+from packit.config import get_context_settings, pass_config
 from packit.constants import (
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
+from packit.schema import JobConfigSchema
+from packit.utils.changelog_helper import ChangelogHelper
 
 logger = logging.getLogger("packit")
 
@@ -174,12 +174,14 @@ def prepare_sources(
     if bump is not None:
         if update_release is not None:
             raise click.UsageError(
-                "--[no-]bump and --[no-]update-release are mutually exclusive"
+                "--[no-]bump and --[no-]update-release are mutually exclusive",
             )
         logger.warning("--[no-]bump is deprecated. Use --[no-]update-release instead.")
         update_release = bump
     release_suffix = ChangelogHelper.resolve_release_suffix(
-        api.package_config, release_suffix, default_release_suffix
+        api.package_config,
+        release_suffix,
+        default_release_suffix,
     )
 
     api.prepare_sources(

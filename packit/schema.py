@@ -3,43 +3,44 @@
 
 import copy
 import json
+from collections.abc import Mapping
 from logging import getLogger
-from typing import Dict, Any, Optional, Mapping, Union, List
+from typing import Any, Optional, Union
 
 from marshmallow import (
     Schema,
+    ValidationError,
     fields,
+    post_dump,
     post_load,
     pre_load,
-    post_dump,
     validates_schema,
-    ValidationError,
 )
 from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
 from packit.config import (
-    PackageConfig,
-    Config,
     CommonPackageConfig,
+    Config,
     Deployment,
+    PackageConfig,
 )
+from packit.config.aliases import DEPRECATED_TARGET_MAP
 from packit.config.job_config import (
-    JobType,
     JobConfig,
-    JobConfigView,
     JobConfigTriggerType,
+    JobConfigView,
+    JobType,
     get_default_jobs,
 )
 from packit.config.notifications import (
-    NotificationsConfig,
     FailureCommentNotificationsConfig,
+    NotificationsConfig,
+    PullRequestNotificationsConfig,
 )
-from packit.config.notifications import PullRequestNotificationsConfig
 from packit.config.sources import SourcesItem
 from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.sync import SyncFilesItem
-from packit.config.aliases import DEPRECATED_TARGET_MAP
 
 logger = getLogger(__name__)
 
@@ -47,18 +48,15 @@ logger = getLogger(__name__)
 class StringOrListOfStringsField(fields.Field):
     """Field type expecting a string or a list"""
 
-    def _serialize(self, value, attr, obj, **kwargs) -> List[str]:
+    def _serialize(self, value, attr, obj, **kwargs) -> list[str]:
         return [str(item) for item in value]
 
-    def _deserialize(self, value, attr, data, **kwargs) -> List[str]:
+    def _deserialize(self, value, attr, data, **kwargs) -> list[str]:
         if isinstance(value, list) and all(isinstance(v, str) for v in value):
             return value
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return [value]
-        else:
-            raise ValidationError(
-                f"Expected 'list[str]' or 'str', got {type(value)!r}."
-            )
+        raise ValidationError(f"Expected 'list[str]' or 'str', got {type(value)!r}.")
 
 
 class SyncFilesItemSchema(Schema):
@@ -79,7 +77,7 @@ class FilesToSyncField(fields.Field):
     of a dict matching SyncFilesItemSchema.
     """
 
-    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs) -> List[dict]:
+    def _serialize(self, value: Any, attr: str, obj: Any, **kwargs) -> list[dict]:
         return SyncFilesItemSchema().dump(value)
 
     def _deserialize(
@@ -91,10 +89,9 @@ class FilesToSyncField(fields.Field):
     ) -> SyncFilesItem:
         if isinstance(value, dict):
             return SyncFilesItem(**SyncFilesItemSchema().load(value))
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return SyncFilesItem(src=[value], dest=value)
-        else:
-            raise ValidationError(f"Expected 'dict' or 'str', got {type(value)!r}.")
+        raise ValidationError(f"Expected 'dict' or 'str', got {type(value)!r}.")
 
 
 class ActionField(fields.Field):
@@ -111,7 +108,7 @@ class ActionField(fields.Field):
         attr: Optional[str],
         data: Optional[Mapping[str, Any]],
         **kwargs,
-    ) -> Dict:
+    ) -> dict:
         if not isinstance(value, dict):
             raise ValidationError(f"'dict' required, got {type(value)!r}.")
 
@@ -208,7 +205,7 @@ class TargetsListOrDict(fields.Field):
     def __is_targets_dict(value) -> bool:
         if (
             not isinstance(value, dict)
-            or not all(isinstance(k, str) for k in value.keys())
+            or not all(isinstance(k, str) for k in value)
             or not all(isinstance(v, dict) for v in value.values())
         ):
             return False
@@ -223,35 +220,35 @@ class TargetsListOrDict(fields.Field):
                     ):
                         return True
                     raise ValidationError(
-                        f"Expected list[str], got {value!r} (type {type(value)!r})"
+                        f"Expected list[str], got {value!r} (type {type(value)!r})",
                     )
                 # chroot-specific configuration:
-                if key in CHROOT_SPECIFIC_COPR_CONFIGURATION.keys():
+                if key in CHROOT_SPECIFIC_COPR_CONFIGURATION:
                     expected_type = CHROOT_SPECIFIC_COPR_CONFIGURATION[key].__class__
                     if isinstance(value, expected_type):
                         return True
                     raise ValidationError(
-                        f"Expected {expected_type}, got {value!r} (type {type(value)!r})"
+                        f"Expected {expected_type}, got {value!r} (type {type(value)!r})",
                     )
                 raise ValidationError(f"Unknown key {key!r} in {attr!r}")
         return True
 
-    def _deserialize(self, value, attr, data, **kwargs) -> Dict[str, Dict[str, Any]]:
-        targets_dict: Dict[str, Dict[str, Any]]
+    def _deserialize(self, value, attr, data, **kwargs) -> dict[str, dict[str, Any]]:
+        targets_dict: dict[str, dict[str, Any]]
         if isinstance(value, list) and all(isinstance(v, str) for v in value):
             targets_dict = {key: {} for key in value}
         elif self.__is_targets_dict(value):
             targets_dict = value
         else:
             raise ValidationError(
-                f"Expected 'list[str]' or 'dict[str,dict]', got {value!r} (type {type(value)!r})."
+                f"Expected 'list[str]' or 'dict[str,dict]', got {value!r} (type {type(value)!r}).",
             )
 
-        for target in targets_dict.keys():
+        for target in targets_dict:
             if target in DEPRECATED_TARGET_MAP:
                 logger.warning(
                     f"Target '{target}' is deprecated. Please update your configuration "
-                    f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead."
+                    f"file and use '{DEPRECATED_TARGET_MAP[target]}' instead.",
                 )
         return targets_dict
 
@@ -293,7 +290,7 @@ class JobMetadataSchema(Schema):
             if key in data:
                 logger.warning(
                     f"Job metadata key {key!r} has been renamed to 'dist_git_branches', "
-                    f"please update your configuration file."
+                    f"please update your configuration file.",
                 )
                 data["dist_git_branches"] = data.pop(key)
         for key in ("targets", "dist_git_branches"):
@@ -336,7 +333,8 @@ class CommonConfigSchema(Schema):
     dist_git_namespace = fields.String(missing=None)
     allowed_gpg_keys = fields.List(fields.String(), missing=None)
     spec_source_id = fields.Method(
-        deserialize="spec_source_id_fm", serialize="spec_source_id_serialize"
+        deserialize="spec_source_id_fm",
+        serialize="spec_source_id_serialize",
     )
     synced_files = fields.List(FilesToSyncField())
     files_to_sync = fields.List(FilesToSyncField())
@@ -346,7 +344,9 @@ class CommonConfigSchema(Schema):
     create_sync_note = fields.Bool(default=True)
     patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
     patch_generation_patch_id_digits = fields.Integer(
-        missing=4, default=4, validate=lambda x: x >= 0
+        missing=4,
+        default=4,
+        validate=lambda x: x >= 0,
     )
     notifications = fields.Nested(NotificationsSchema)
     copy_upstream_release_description = fields.Bool(default=False)
@@ -425,7 +425,10 @@ class CommonConfigSchema(Schema):
 
     @post_dump(pass_original=True)
     def adjust_files_to_sync(
-        self, data: dict, original: CommonPackageConfig, **kwargs
+        self,
+        data: dict,
+        original: CommonPackageConfig,
+        **kwargs,
     ) -> dict:
         """Fix the files_to_sync field in the serialized object
 
@@ -458,7 +461,8 @@ class JobConfigSchema(Schema):
     manual_trigger = fields.Boolean()
     labels = fields.List(fields.String(), missing=None)
     packages = fields.Dict(
-        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+        keys=fields.String(),
+        values=fields.Nested(CommonConfigSchema()),
     )
     package = fields.String(missing=None)
 
@@ -490,7 +494,7 @@ class JobConfigSchema(Schema):
         # loaded, this is why 'data["type"]' is already a JobType and not a string,
         # and the package configs below are PackageConfig objects, not dictionaries.
         if (data["type"] == JobType.tests and data.get("skip_build")) or data.get(
-            "specfile_path"
+            "specfile_path",
         ):
             return
 
@@ -501,7 +505,7 @@ class JobConfigSchema(Schema):
             if not config.specfile_path:
                 errors[package] = [
                     "'specfile_path' is not specified or "
-                    "no specfile was found in the repo"
+                    "no specfile was found in the repo",
                 ]
         if errors:
             raise ValidationError(errors)
@@ -510,10 +514,7 @@ class JobConfigSchema(Schema):
     def make_instance(self, data, **_):
         package = data.pop("package")
         job_config = JobConfig(**data)
-        if package:
-            return JobConfigView(job_config, package)
-        else:
-            return job_config
+        return JobConfigView(job_config, package) if package else job_config
 
 
 class PackageConfigSchema(Schema):
@@ -535,7 +536,8 @@ class PackageConfigSchema(Schema):
 
     jobs = fields.Nested(JobConfigSchema, many=True)
     packages = fields.Dict(
-        keys=fields.String(), values=fields.Nested(CommonConfigSchema())
+        keys=fields.String(),
+        values=fields.Nested(CommonConfigSchema()),
     )
 
     # list of deprecated keys and their replacement (new,old)
@@ -565,7 +567,7 @@ class PackageConfigSchema(Schema):
                 package_name: {
                     "downstream_package_name": package_name,
                     "paths": paths,
-                }
+                },
             }
         data.setdefault("jobs", get_default_jobs())
         # By this point, we expect both 'packages' and 'jobs' to be present
@@ -590,7 +592,7 @@ class PackageConfigSchema(Schema):
             if old_key_value:
                 logger.warning(
                     f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
-                    f" please update your configuration file."
+                    f" please update your configuration file.",
                 )
                 new_key_value = data.get(new_key_name, None)
                 if not new_key_value:
@@ -627,8 +629,7 @@ class PackageConfigSchema(Schema):
             v.setdefault("downstream_package_name", k)
             # Inherit default values from the top-level.
             v.update(data | v)
-        data = {"packages": packages, "jobs": jobs}
-        return data
+        return {"packages": packages, "jobs": jobs}
 
     @staticmethod
     def rearrange_jobs(data: dict) -> dict:
@@ -652,7 +653,7 @@ class PackageConfigSchema(Schema):
             if metadata := job.pop("metadata", {}):
                 logger.warning(
                     "The 'metadata' key in jobs is deprecated and can be removed. "
-                    "Nest config options from 'metadata' directly under the job object."
+                    "Nest config options from 'metadata' directly under the job object.",
                 )
                 schema = JobMetadataSchema()
                 if errors := schema.validate(metadata):
@@ -661,7 +662,7 @@ class PackageConfigSchema(Schema):
                     raise ValidationError(
                         f"Keys: {not_nested_metadata_keys} are defined outside job metadata "
                         "dictionary. Mixing obsolete metadata dictionary and new job keys "
-                        "is not possible. Remove obsolete nested job metadata dictionary."
+                        "is not possible. Remove obsolete nested job metadata dictionary.",
                     )
                 job.update(metadata)
 
@@ -710,7 +711,7 @@ class PackageConfigSchema(Schema):
                 }
             else:
                 errors[f"'jobs[{i}].packages'"] = [
-                    f"Type is {type(selected_packages)} instead of 'list' or 'dict'."
+                    f"Type is {type(selected_packages)} instead of 'list' or 'dict'.",
                 ]
 
         if errors:

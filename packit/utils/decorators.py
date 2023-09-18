@@ -1,13 +1,13 @@
 import functools
 import logging
-from typing import Union, Tuple, Type, Any, Callable
+from typing import Any, Callable, Union
 
 logger = logging.getLogger(__name__)
 
 
 def fallback_return_value(
     fallback_value: Any,
-    exceptions: Union[Type[Exception], Tuple[Type[Exception]]] = Exception,
+    exceptions: Union[type[Exception], tuple[type[Exception]]] = Exception,
 ) -> Any:
     """
     The function of this decorator is to return some fallback value in case an exception was raised
@@ -28,7 +28,7 @@ def fallback_return_value(
                 logger.warning(
                     f"Fallback return value used while calling {func.__name__} because of "
                     f"{type(e).__name__}"
-                    f"{': ' + str(e) if str(e) else ''} "
+                    f"{': ' + str(e) if str(e) else ''} ",
                 )
                 return fallback_value
 

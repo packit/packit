@@ -11,7 +11,8 @@ from tests.spellbook import git_set_user_email
 
 
 @pytest.mark.skipif(
-    condition=True, reason="Don't interact with a real pagure instance by default"
+    condition=True,
+    reason="Don't interact with a real pagure instance by default",
 )
 def test_basic_distgit_workflow(tmp_path):
     pagure_token = os.getenv("PAGURE_TOKEN")
@@ -43,7 +44,8 @@ def test_basic_distgit_workflow(tmp_path):
     subprocess.check_call(["git", "add", "README"], cwd=repo)
     subprocess.check_call(["git", "commit", "-m", "test commit"], cwd=repo)
     subprocess.check_call(
-        ["git", "push", "origin", f"{branch_name}:{branch_name}"], cwd=repo
+        ["git", "push", "origin", f"{branch_name}:{branch_name}"],
+        cwd=repo,
     )
 
     pr = fork.create_pr("testing PR", "serious description", "master", branch_name)

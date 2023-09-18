@@ -1,13 +1,13 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from packit.utils.commands import run_command, run_command_remote, cwd
+from packit.utils.commands import cwd, run_command, run_command_remote
 from packit.utils.extensions import assert_existence, nested_get
 from packit.utils.logging import (
-    StreamLogger,
     PackitFormatter,
-    set_logging,
+    StreamLogger,
     commits_to_nice_str,
+    set_logging,
 )
 from packit.utils.repo import (
     commit_message_file,
@@ -19,7 +19,6 @@ from packit.utils.repo import (
     is_a_git_ref,
     is_git_repo,
 )
-
 
 __all__ = [
     assert_existence.__name__,

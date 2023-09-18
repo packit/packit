@@ -3,10 +3,6 @@
 # pre-commit install -t pre-commit -t pre-push
 
 repos:
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
-    hooks:
-      - id: pyupgrade
   - repo: https://github.com/psf/black
     rev: 23.9.1
     hooks:
@@ -36,13 +32,11 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
         exclude: ^(tests/data/patches|tests/.+\.patch)
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.290
     hooks:
-      - id: flake8
-        args:
-          - --max-line-length=100
-          - --per-file-ignores=files/packit.wsgi:F401,E402
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.5.1
     hooks:

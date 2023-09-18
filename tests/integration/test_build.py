@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Union, List, Optional, Dict
+from typing import Optional, Union
 
 from flexmock import flexmock
 
@@ -11,7 +11,9 @@ from packit.utils import commands
 
 
 def test_basic_build(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
@@ -26,17 +28,19 @@ def test_basic_build(
 
 
 def test_build_from_upstream(
-    cwd_upstream_or_distgit, api_instance, mock_remote_functionality_upstream
+    cwd_upstream_or_distgit,
+    api_instance,
+    mock_remote_functionality_upstream,
 ):
     u, d, api = api_instance
 
     def mocked_run_command(
-        cmd: Union[List[str], str],
-        error_message: str = None,
-        cwd: Union[str, Path] = None,
+        cmd: Union[list[str], str],
+        error_message: Optional[str] = None,
+        cwd: Optional[Union[str, Path]] = None,
         fail: bool = True,
         output: bool = False,
-        env: Optional[Dict] = None,
+        env: Optional[dict] = None,
         decode=True,
         print_live=False,
     ):
@@ -46,7 +50,8 @@ def test_build_from_upstream(
         assert srpm_path.endswith(".src.rpm")
         assert cwd == api.up.local_project.working_dir
         return flexmock(
-            success=True, stdout="\n\nLink to koji build: https://koji...\n"
+            success=True,
+            stdout="\n\nLink to koji build: https://koji...\n",
         )
 
     flexmock(commands, run_command_remote=mocked_run_command)

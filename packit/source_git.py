@@ -17,20 +17,20 @@ from specfile import Specfile
 
 from packit.config import Config
 from packit.constants import (
-    RPM_MACROS_FOR_PREP,
     DISTRO_DIR,
-    SRC_GIT_CONFIG,
     FROM_DIST_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
+    RPM_MACROS_FOR_PREP,
+    SRC_GIT_CONFIG,
 )
 from packit.exceptions import PackitException
 from packit.patches import PatchMetadata
 from packit.pkgtool import PkgTool
 from packit.utils import (
     commit_message_file,
-    run_command,
     get_default_branch,
     get_file_author,
+    run_command,
 )
 from packit.utils.lookaside import get_lookaside_sources
 from packit.utils.repo import is_git_repo, is_the_repo_pristine
@@ -83,7 +83,7 @@ class SourceGitGenerator:
         self.upstream_ref = upstream_ref
         try:
             self.upstream_url = upstream_url or next(
-                self.source_git.remote(upstream_remote or "origin").urls
+                self.source_git.remote(upstream_remote or "origin").urls,
             )
         except ValueError as exc:
             logger.debug(f"Failed when getting upstream URL: {exc}")
@@ -91,7 +91,7 @@ class SourceGitGenerator:
                 "Unable to tell the URL of the upstream repository because there is no remote "
                 f"called '{upstream_remote or 'origin'}' in {self.source_git.working_dir}. "
                 "Please specify the correct upstream remote using '--upstream-remote' or the "
-                "upstream URL, using '--upstream-url'."
+                "upstream URL, using '--upstream-url'.",
             ) from exc
         self.pkg_tool = pkg_tool
         self.pkg_name = pkg_name or Path(self.dist_git.working_dir).name
@@ -106,7 +106,9 @@ class SourceGitGenerator:
         if not self._dist_git_specfile:
             path = str(Path(self.dist_git.working_dir, f"{self.pkg_name}.spec"))
             self._dist_git_specfile = Specfile(
-                path, sourcedir=self.dist_git.working_dir, autosave=True
+                path,
+                sourcedir=self.dist_git.working_dir,
+                autosave=True,
             )
         return self._dist_git_specfile
 
@@ -117,7 +119,7 @@ class SourceGitGenerator:
         """
         files = importlib.resources.files("packit.data")
         with importlib.resources.as_file(
-            files.joinpath("_packitpatch")
+            files.joinpath("_packitpatch"),
         ) as _packitpatch:
             logger.info(f"expanding %prep section in {self.dist_git.working_dir}")
 
@@ -127,7 +129,7 @@ class SourceGitGenerator:
                 "--define",
                 f"_packitpatch {_packitpatch}",
                 "--define",
-                f"_topdir {str(self.dist_git.working_dir)}",
+                f"_topdir {self.dist_git.working_dir!s}",
                 "-bp",
                 "--define",
                 f"_specdir {self.dist_git.working_dir}",
@@ -156,7 +158,7 @@ class SourceGitGenerator:
         ]
         if len(build_dirs) > 1:
             raise RuntimeError(
-                f"More than one matching directory found in {path / 'BUILD'}"
+                f"More than one matching directory found in {path / 'BUILD'}",
             )
         if not build_dirs:
             raise RuntimeError(f"No subdirectory found in {path / 'BUILD'}")
@@ -169,7 +171,7 @@ class SourceGitGenerator:
         if not is_git_repo(BUILD_dir):
             raise RuntimeError(
                 "Running %prep section wasn't successful. "
-                "Make sure the package uses %autosetup."
+                "Make sure the package uses %autosetup.",
             )
         prep_repo = git.Repo(BUILD_dir)
         from_branch = get_default_branch(prep_repo)
@@ -213,10 +215,14 @@ class SourceGitGenerator:
             logger.debug(f"author={author}")
 
             with commit_message_file(
-                commit.message, trailers=trailers
+                commit.message,
+                trailers=trailers,
             ) as commit_message:
                 self.source_git.git.commit(
-                    file=commit_message, author=author, amend=True, allow_empty=True
+                    file=commit_message,
+                    author=author,
+                    amend=True,
+                    allow_empty=True,
                 )
 
         self.source_git.git.branch("-D", to_branch)
@@ -233,7 +239,7 @@ class SourceGitGenerator:
                 "Cannot initialize a source-git repo. "
                 "The corresponding dist-git repository at "
                 f"{self.dist_git.working_dir!r} is not pristine. "
-                f"{REPO_NOT_PRISTINE_HINT}"
+                f"{REPO_NOT_PRISTINE_HINT}",
             )
 
         command = ["rsync", "--archive", "--delete"]
@@ -253,7 +259,7 @@ class SourceGitGenerator:
             """\
             # Reset gitignore rules
             !*
-            """
+            """,
         )
         Path(self.distro_dir, ".gitignore").write_text(reset_rules)
 
@@ -286,7 +292,7 @@ class SourceGitGenerator:
                         f"exclude {SRC_GIT_CONFIG}",
                         "exclude .gitignore",
                     ],
-                }
+                },
             ],
         }
         if lookaside_sources := get_lookaside_sources(
@@ -302,7 +308,7 @@ class SourceGitGenerator:
                 Dumper=SafeDumperWithoutAliases,
                 default_flow_style=False,
                 sort_keys=False,
-            )
+            ),
         )
 
     def create_from_upstream(self):
@@ -313,13 +319,13 @@ class SourceGitGenerator:
         if upstream_ref_sha != self.source_git.head.commit.hexsha:
             raise PackitException(
                 f"{self.upstream_ref!r} is not pointing to the current HEAD "
-                f"in {self.source_git.working_dir!r}."
+                f"in {self.source_git.working_dir!r}.",
             )
         with self.dist_git_specfile.prep() as prep:
             if "%autosetup" not in prep:
                 raise PackitException(
                     "Initializing source-git repos for packages "
-                    "not using %autosetup is not supported."
+                    "not using %autosetup is not supported.",
                 )
 
         self._populate_distro_dir()

@@ -5,9 +5,9 @@ import distro
 import pytest
 from requre.cassette import DataTypes
 from requre.modules_decorate_all_methods import (
-    record_tempfile_module,
     # record_git_module,
     record_requests_module,
+    record_tempfile_module,
 )
 
 from packit.local_project import LocalProject

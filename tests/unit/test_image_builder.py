@@ -4,9 +4,9 @@ import logging
 
 import pytest
 from flexmock import flexmock
-from requests import Session, HTTPError
+from requests import HTTPError, Session
 
-from packit.exceptions import PackitException, ImageBuilderError
+from packit.exceptions import ImageBuilderError, PackitException
 from packit.vm_image_build import ImageBuilder
 
 
@@ -26,7 +26,7 @@ def test_create_image():
                     "options": {"share_with_accounts": ["123456789012"]},
                     "type": "aws",
                 },
-            }
+            },
         ],
         "customizations": {
             "payload_repositories": [
@@ -41,7 +41,9 @@ def test_create_image():
     }
     request_response = {"id": "foo-baz-bar"}
     flexmock(ib).should_receive("image_builder_request").with_args(
-        "POST", "compose", payload=payload
+        "POST",
+        "compose",
+        payload=payload,
     ).and_return(flexmock(json=lambda: request_response))
     response = ib.create_image(
         "rhel-90",
@@ -86,9 +88,9 @@ def test_bad_request(caplog):
                 "detail": (
                     "request body has an error: doesn't match schema... "
                     'value "fedora-rawhide" is not one of the allowed values'
-                )
-            }
-        ]
+                ),
+            },
+        ],
     }
 
     r = flexmock(

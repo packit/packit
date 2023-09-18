@@ -8,8 +8,8 @@ from packit.api import PackitAPI
 from packit.cli import utils
 from packit.cli.utils import get_packit_api
 from packit.config import CommonPackageConfig, JobConfig
-from packit.config.job_config import JobType, JobConfigTriggerType
-from packit.local_project import LocalProjectBuilder, CALCULATE
+from packit.config.job_config import JobConfigTriggerType, JobType
+from packit.local_project import CALCULATE, LocalProjectBuilder
 from tests.spellbook import get_test_config, initiate_git_repo
 
 
@@ -19,7 +19,8 @@ def test_is_upstream(upstream_and_remote):
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            working_dir=upstream, git_repo=CALCULATE
+            working_dir=upstream,
+            git_repo=CALCULATE,
         ),
     )
     assert api.upstream_local_project
@@ -33,7 +34,8 @@ def test_is_downstream(distgit_and_remote):
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            working_dir=downstream, git_repo=CALCULATE
+            working_dir=downstream,
+            git_repo=CALCULATE,
         ),
     )
     assert api.downstream_local_project
@@ -46,7 +48,8 @@ def test_url_is_downstream():
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            git_url="https://src.fedoraproject.org/rpms/packit", git_repo=CALCULATE
+            git_url="https://src.fedoraproject.org/rpms/packit",
+            git_repo=CALCULATE,
         ),
     )
     assert api.downstream_local_project
@@ -58,7 +61,8 @@ def test_url_is_upstream():
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            git_url="https://github.com/packit/ogr", git_repo=CALCULATE
+            git_url="https://github.com/packit/ogr",
+            git_repo=CALCULATE,
         ),
     )
     assert api.upstream_local_project
@@ -71,7 +75,9 @@ def test_url_is_upstream():
         (
             [],
             flexmock(
-                upstream_project_url=None, dist_git_base_url=None, synced_files=None
+                upstream_project_url=None,
+                dist_git_base_url=None,
+                synced_files=None,
             ),
             True,
         ),
@@ -183,7 +189,7 @@ def test_url_is_upstream():
                 packages={
                     "package": CommonPackageConfig(
                         upstream_project_url="https://github.com/packit/ogr",
-                    )
+                    ),
                 },
             ),
             True,
@@ -196,14 +202,15 @@ def test_get_api(tmp_path, remotes, package_config, is_upstream):
     initiate_git_repo(repo, remotes=remotes)
 
     flexmock(utils).should_receive("get_local_package_config").and_return(
-        package_config
+        package_config,
     )
 
     c = get_test_config()
     api = get_packit_api(
         config=c,
         local_project=LocalProjectBuilder().build(
-            working_dir=str(repo), git_repo=CALCULATE
+            working_dir=str(repo),
+            git_repo=CALCULATE,
         ),
     )
 

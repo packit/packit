@@ -1,9 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
-from typing import Dict, Union, List, Any
 import logging
+from pathlib import Path
+from typing import Any, Union
 
 from marshmallow import ValidationError
 
@@ -24,7 +24,10 @@ class PackageConfigValidator:
     """
 
     def __init__(
-        self, config_file_path: Path, config_content: Dict, project_path: Path
+        self,
+        config_file_path: Path,
+        config_content: dict,
+        project_path: Path,
     ):
         self.config_file_path = config_file_path
         self.content = config_content
@@ -39,7 +42,7 @@ class PackageConfigValidator:
         Raises:
             PackitConfigException: when the config is not valid
         """
-        schema_errors: Union[List[Any], Dict[Any, Any]] = None
+        schema_errors: Union[list[Any], dict[Any, Any]] = None
         config = None
         try:
             config = PackageConfig.get_from_dict(
@@ -61,7 +64,7 @@ class PackageConfigValidator:
                 f"running `packit srpm` to create an SRPM "
                 f"from the current checkout. If it's not being generated, "
                 f"please make sure the path is correct and "
-                f"the file is present."
+                f"the file is present.",
             )
 
         synced_files_errors = []
@@ -103,8 +106,7 @@ class PackageConfigValidator:
 
         if schema_errors or synced_files_errors:
             raise PackitConfigException(output)
-        else:
-            return f"{self.config_file_path.name} is valid and ready to be used"
+        return f"{self.config_file_path.name} is valid and ready to be used"
 
     def validate_get_field_output(
         self,
@@ -118,7 +120,10 @@ class PackageConfigValidator:
         return self.validate_get_field_item_output(errors, field_name, level)
 
     def validate_get_field_item_output(
-        self, errors: dict, field_name: str, level: int
+        self,
+        errors: dict,
+        field_name: str,
+        level: int,
     ) -> str:
         index_output = f"{level * '*'} field {field_name} has an incorrect value:\n"
         level += 1

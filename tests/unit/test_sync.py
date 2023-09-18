@@ -1,15 +1,15 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
 from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
-# from flexmock import flexmock
-
-from packit.sync import check_subpath, SyncFilesItem
 from packit.exceptions import PackitException
+
+# from flexmock import flexmock
+from packit.sync import SyncFilesItem, check_subpath
 
 
 @contextmanager
@@ -64,11 +64,19 @@ def test_check_subpath(subpath, path, trailing_slash, result):
         ),
         (
             SyncFilesItem(
-                ["src/a"], "dest", filters=["dummy filter"], mkpath=True, delete=True
+                ["src/a"],
+                "dest",
+                filters=["dummy filter"],
+                mkpath=True,
+                delete=True,
             ),
             {"src": "c"},
             SyncFilesItem(
-                ["src/a"], "dest", filters=["dummy filter"], mkpath=True, delete=True
+                ["src/a"],
+                "dest",
+                filters=["dummy filter"],
+                mkpath=True,
+                delete=True,
             ),
         ),
     ],
@@ -94,7 +102,7 @@ def test_drop_src(item, drop, result):
                 SyncFilesItem(
                     [Path(Path.cwd() / "a"), Path(Path.cwd() / "b")],
                     Path(Path.cwd() / "dest"),
-                )
+                ),
             ),
         ),
         (
@@ -104,7 +112,7 @@ def test_drop_src(item, drop, result):
                 SyncFilesItem(
                     [Path(Path.cwd() / "src" / "a"), Path(Path.cwd() / "src" / "b")],
                     Path(Path.cwd() / "dest" / "dest"),
-                )
+                ),
             ),
         ),
         (

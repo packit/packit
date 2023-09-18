@@ -69,7 +69,7 @@ class ChangelogHelper:
         if not messages:
             return None
 
-        return "\n".join(map(lambda line: line.rstrip(), messages))
+        return "\n".join(line.rstrip() for line in messages)
 
     @staticmethod
     def sanitize_entry(entry: str) -> str:
@@ -98,7 +98,8 @@ class ChangelogHelper:
         """
         comment = self.get_entry_from_action(version=full_version) or (
             self.up.local_project.git_project.get_release(
-                tag_name=upstream_tag, name=full_version
+                tag_name=upstream_tag,
+                name=full_version,
             ).body
             if self.package_config.copy_upstream_release_description
             # in pull_from_upstream workflow, upstream git_project can be None
@@ -119,7 +120,7 @@ class ChangelogHelper:
             # no downstream spec file: this is either a mistake or
             # there is no spec file in dist-git yet, hence warning
             logger.warning(
-                f"Unable to find a spec file in downstream: {ex}, copying the one from upstream."
+                f"Unable to find a spec file in downstream: {ex}, copying the one from upstream.",
             )
             shutil.copy2(
                 self.up.absolute_specfile_path,
@@ -127,7 +128,10 @@ class ChangelogHelper:
             )
 
     def _get_release_for_source_git(
-        self, current_commit: str, update_release: bool, release_suffix: Optional[str]
+        self,
+        current_commit: str,
+        update_release: bool,
+        release_suffix: Optional[str],
     ) -> Optional[str]:
         old_release = self.up.specfile.expanded_release
         if release_suffix:
@@ -145,14 +149,18 @@ class ChangelogHelper:
         return f"{new_release}.g{current_commit}"
 
     def prepare_upstream_using_source_git(
-        self, update_release: bool, release_suffix: Optional[str]
+        self,
+        update_release: bool,
+        release_suffix: Optional[str],
     ) -> None:
         """
         Updates changelog when creating SRPM within source-git repository.
         """
         current_commit = self.up.local_project.commit_hexsha
         release_to_update = self._get_release_for_source_git(
-            current_commit, update_release, release_suffix
+            current_commit,
+            update_release,
+            release_suffix,
         )
 
         msg = self.get_entry_from_action()

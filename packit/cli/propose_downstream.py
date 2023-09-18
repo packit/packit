@@ -5,20 +5,20 @@
 Update selected component from upstream in Fedora
 """
 
-import logging
 import functools
+import logging
 import os
 
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, iterate_packages, get_packit_api
-from packit.config import pass_config, get_context_settings, PackageConfig
+from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
+from packit.config import PackageConfig, get_context_settings, pass_config
 from packit.config.aliases import get_branches
 from packit.constants import (
     PACKAGE_LONG_OPTION,
-    PACKAGE_SHORT_OPTION,
     PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
 )
 
 logger = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ def sync_release(
     branches_to_update = get_dg_branches(api, dist_git_branch)
 
     click.echo(
-        f"Proposing update of the following branches: {', '.join(branches_to_update)}"
+        f"Proposing update of the following branches: {', '.join(branches_to_update)}",
     )
 
     for branch in branches_to_update:
