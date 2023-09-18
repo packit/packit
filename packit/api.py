@@ -226,32 +226,32 @@ class PackitAPI:
             )
         return self._copr_helper
 
+    def _get_sandcastle_exec_dir(self):
+        # import sandcastle here, we don't want to depend upon
+        # sandcastle and python-kube if not in service
+        from sandcastle.constants import SANDCASTLE_EXEC_DIR
+
+        return SANDCASTLE_EXEC_DIR
+
     @property
     def sync_release_env(self):
         if self.config.command_handler == RunCommandType.sandcastle:
-            # import this here, we don't want to depend upon
-            # sandcastle and python-kube if not in service
-            from sandcastle.constants import SANDCASTLE_EXEC_DIR
-
+            exec_dir = Path(self._get_sandcastle_exec_dir())
             # working dirs should be placed under
             # self.config.command_handler_working_dir
             # when running this code as a service
             downstream_suffix = Path(self.dg.local_project.working_dir).relative_to(
-                self.config.command_handler_work_dir
+                self.config.command_handler_work_dir,
             )
             upstream_suffix = Path(self.up.local_project.working_dir).relative_to(
-                self.config.command_handler_work_dir
+                self.config.command_handler_work_dir,
             )
             env = {
                 "PACKIT_DOWNSTREAM_REPO": str(
-                    self.config.command_handler_work_dir
-                    / SANDCASTLE_EXEC_DIR
-                    / downstream_suffix
+                    self.config.command_handler_work_dir / exec_dir / downstream_suffix,
                 ),
                 "PACKIT_UPSTREAM_REPO": str(
-                    self.config.command_handler_work_dir
-                    / SANDCASTLE_EXEC_DIR
-                    / upstream_suffix
+                    self.config.command_handler_work_dir / exec_dir / upstream_suffix,
                 ),
             }
         else:

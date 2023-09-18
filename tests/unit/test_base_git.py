@@ -118,7 +118,7 @@ def packit_repository_base_with_sandcastle_object(tmp_path):
             },
         ),
     )
-    b.local_project = LocalProjectBuilder().build(working_dir=tmp_path)
+    b.local_project = LocalProjectBuilder().build(working_dir=Path("/sandcastle"))
     return b
 
 
@@ -267,7 +267,7 @@ def test_run_action_in_sandcastle(
         packit_repository_base_with_sandcastle_object.command_handler.clean()
         # leading space means that we have the output actually printed
         # and it's not a single line with the whole output
-        assert " Running command: command -a\n" in caplog.text
+        assert " Running command: command -a on dir .\n" in caplog.text
         assert " make po-pull\n" in caplog.text
         assert " anaconda-localization-XXXXXXXXXX)\n" in caplog.text
         assert " 1.2.3\n" in caplog.text
