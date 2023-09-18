@@ -518,7 +518,10 @@ class PackitRepositoryBase:
             except AttributeError:
                 sections.append(Section("changelog", previous_changelog))
         if version is not None:
-            self.specfile.version = version
+            self.specfile.update_tag("Version", version)
+        # update_tag() is unable to update macro values when there is no delimiter
+        # between modifiable entities, and Release (unless it's %autorelease) is always
+        # suffixed with %{?dist} with no delimiter; no point in using it here
         self.specfile.raw_release = new_release
         if comment is not None:
             self.specfile.add_changelog_entry(comment.splitlines())
