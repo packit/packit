@@ -652,3 +652,109 @@ def test_set_spec_content_no_changelog(tmp_path, changelog_section):
     dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
     with dist_git.specfile.sections() as sections:
         assert sections.changelog == [new_log.header, new_log.content[0]]
+
+
+@pytest.mark.parametrize(
+    "header, raw_version, macro_definitions",
+    [
+        pytest.param(
+            "",
+            "1.1",
+            {},
+        ),
+        pytest.param(
+            ("%global package_version 1.0\n"),
+            "%{package_version}",
+            {
+                "package_version": "1.1",
+            },
+        ),
+        pytest.param(
+            (
+                "%global majorver 1\n"
+                "%global minorver 0\n"
+                "%global package_version %{majorver}.%{minorver}\n"
+            ),
+            "%{package_version}",
+            {
+                "majorver": "1",
+                "minorver": "1",
+                "package_version": "%{majorver}.%{minorver}",
+            },
+        ),
+        pytest.param(
+            (
+                "%global majorver 1\n"
+                "%global minorver 0\n"
+                "%global patchver 0\n"
+                "%global package_version %{majorver}.%{minorver}.%{patchver}\n"
+            ),
+            "%{package_version}",
+            {
+                "majorver": "1",
+                "minorver": "0",
+                "patchver": "0",
+                "package_version": "1.1",
+            },
+        ),
+    ],
+)
+def test_set_spec_content_version_macros(
+    tmp_path,
+    header,
+    raw_version,
+    macro_definitions,
+):
+    distgit_spec_contents = header + (
+        "Name: bring-me-to-the-life\n"
+        "Version: %{package_version}\n"
+        "Release: 1\n"
+        "Source0: foo.bar\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    distgit_spec_path = tmp_path / "life.spec"
+    distgit_spec_path.write_text(distgit_spec_contents)
+
+    upstream_spec_contents = header + (
+        "Name: bring-me-to-the-life\n"
+        "Version: %{package_version}\n"
+        "Release: 1\n"
+        "Source0: foo.bor\n"
+        "License: MIT\n"
+        "Summary: evanescence, I was brought to life\n"
+        "%description\n-\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    upstream_spec_path = tmp_path / "e-life.spec"
+    upstream_spec_path.write_text(upstream_spec_contents)
+    upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
+
+    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git._specfile_path = distgit_spec_path
+
+    new_log = ChangelogEntry(
+        "* Wed Jun 02 2021 John Fou <john-fou@example.com> - 1.1-1",
+        ["- 1.1 upstream release"],
+    )
+    flexmock(ChangelogEntry).should_receive("assemble").and_return(new_log)
+    dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
+    with dist_git.specfile.sections() as sections:
+        assert [
+            new_log.header,
+            new_log.content[0],
+            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+            "- Initial package.",
+        ] == sections.changelog
+    assert dist_git.specfile.expanded_version == "1.1"
+    assert dist_git.specfile.version == raw_version
+    with dist_git.specfile.macro_definitions() as mds:
+        for md in mds:
+            assert macro_definitions.pop(md.name) == md.body
+    assert not macro_definitions
