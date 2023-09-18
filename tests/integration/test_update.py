@@ -12,6 +12,7 @@ from specfile import Specfile
 from packit.actions import ActionName
 from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
+from packit.distgit import DistGit
 from packit.local_project import LocalProject
 from packit.upstream import Upstream
 from tests.integration.conftest import mock_spec_download_remote_s
@@ -51,6 +52,36 @@ def test_basic_local_update(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     flexmock(Specfile).should_call("reload").once()
 
+    api.sync_release(dist_git_branch="main", version="0.1.0")
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
+def test_basic_local_update_no_upload_to_lookaside(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+):
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(Specfile).should_call("reload").once()
+    flexmock(DistGit).should_call("upload_to_lookaside_cache").with_args(
+        archives=[d / "beerware-0.1.0.tar.gz"],
+        pkg_tool="",
+        offline=True,
+    ).once()
+
+    api.package_config.upload_sources = False
     api.sync_release(dist_git_branch="main", version="0.1.0")
 
     assert (d / TARBALL_NAME).is_file()
@@ -142,6 +173,7 @@ def test_basic_local_update_with_multiple_sources(
     flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
         archives=[dist_git_first_source, dist_git_second_source],
         pkg_tool="",
+        offline=False,
     )
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
@@ -190,6 +222,7 @@ def test_basic_local_update_with_adding_second_source(
     flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
         archives=[dist_git_first_source, dist_git_second_source],
         pkg_tool="",
+        offline=False,
     )
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
@@ -237,6 +270,7 @@ def test_basic_local_update_with_removing_second_source(
     flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
         archives=[dist_git_first_source],
         pkg_tool="",
+        offline=False,
     )
 
     api.sync_release(dist_git_branch="main", version="0.1.0")
