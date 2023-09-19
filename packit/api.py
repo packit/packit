@@ -32,7 +32,7 @@ from ogr.abstract import PullRequest
 from tabulate import tabulate
 
 from packit.actions import ActionName
-from packit.config import Config, PackageConfig
+from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -226,12 +226,40 @@ class PackitAPI:
             )
         return self._copr_helper
 
+    def _get_sandcastle_exec_dir(self):
+        # import sandcastle here, we don't want to depend upon
+        # sandcastle and python-kube if not in service
+        from sandcastle.constants import SANDCASTLE_EXEC_DIR
+
+        return SANDCASTLE_EXEC_DIR
+
     @property
     def sync_release_env(self):
-        return {
-            "PACKIT_DOWNSTREAM_REPO": str(self.dg.local_project.working_dir),
-            "PACKIT_UPSTREAM_REPO": str(self.up.local_project.working_dir),
-        } | self.up.package_config.get_package_names_as_env()
+        if self.config.command_handler == RunCommandType.sandcastle:
+            exec_dir = Path(self._get_sandcastle_exec_dir())
+            # working dirs should be placed under
+            # self.config.command_handler_working_dir
+            # when running this code as a service
+            downstream_suffix = Path(self.dg.local_project.working_dir).relative_to(
+                self.config.command_handler_work_dir,
+            )
+            upstream_suffix = Path(self.up.local_project.working_dir).relative_to(
+                self.config.command_handler_work_dir,
+            )
+            env = {
+                "PACKIT_DOWNSTREAM_REPO": str(
+                    self.config.command_handler_work_dir / exec_dir / downstream_suffix,
+                ),
+                "PACKIT_UPSTREAM_REPO": str(
+                    self.config.command_handler_work_dir / exec_dir / upstream_suffix,
+                ),
+            }
+        else:
+            env = {
+                "PACKIT_DOWNSTREAM_REPO": str(self.dg.local_project.working_dir),
+                "PACKIT_UPSTREAM_REPO": str(self.up.local_project.working_dir),
+            }
+        return env | self.up.package_config.get_package_names_as_env()
 
     def update_dist_git(
         self,
