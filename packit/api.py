@@ -10,6 +10,7 @@ import asyncio
 import contextlib
 import copy
 import logging
+import os
 import re
 import tempfile
 from collections.abc import Iterable, Sequence
@@ -1257,27 +1258,37 @@ The first dist-git commit to be synced is '{short_hash}'.
         archives_to_upload = False
         sources_file = self.dg.local_project.working_dir / "sources"
 
+        # We need to download the sources beforehand! Previous solution was relying
+        # on the HTTP index of the uploaded archives in the lookaside cache which
+        # appears to be Fedora-only. Making the check distro-agnostic requires us
+        # to use the `pyrpkg` which needs hash of the archive when doing the lookup,
+        # therefore it needs the archive itself beforehand.
+        archives = self.dg.download_upstream_archives()
+
         # Here, dist-git spec-file has already been updated from the upstream spec-file.
         # => Any update done to the Source tags in upstream
         # is already available in the dist-git spec-file.
-        for upstream_archive_name in self.dg.upstream_archive_names:
+        for archive in archives:
+            archive_name = os.path.basename(archive)
+
             archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-                upstream_archive_name,
+                archive,
             )
             archive_name_in_sources_file = (
-                sources_file.is_file()
-                and upstream_archive_name in sources_file.read_text()
+                sources_file.is_file() and archive_name in sources_file.read_text()
             )
 
             if not archive_name_in_cache or not archive_name_in_sources_file:
                 archives_to_upload = True
+                # found one that needs uploading, no need to continue
+                break
+
         if not archives_to_upload and not force_new_sources:
             return
 
         # There is at least one archive to upload,
         # because it is missing from lookaside, sources file, or both,
         # or because force_new_sources is set.
-        archives = self.dg.download_upstream_archives()
         self.init_kerberos_ticket()
         # Upload all of archives. If we uploaded only those that need uploading,
         # we would lose the unchanged ones from sources file,
