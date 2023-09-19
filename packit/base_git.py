@@ -26,7 +26,7 @@ from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
 from packit.security import CommitVerifier
 from packit.utils.commands import cwd
-from packit.utils.lookaside import get_lookaside_sources
+from packit.utils.lookaside import LookasideCache
 from packit.utils.repo import RepositoryCache, commit_message_file
 
 logger = getLogger(__name__)
@@ -585,10 +585,9 @@ class PackitRepositoryBase:
         sourcelist = [(s.url, s.path, False) for s in self.package_config.sources]
         if pkg_tool:
             # Fetch sources defined in "sources" file from lookaside cache
-            lookaside_sources = get_lookaside_sources(
-                pkg_tool,
-                self.specfile.expanded_name,
-                self.specfile.path.parent,
+            lookaside_sources = LookasideCache(pkg_tool).get_sources(
+                basepath=self.specfile.path.parent,
+                package=self.specfile.expanded_name,
             )
             sourcelist.extend((ls["url"], ls["path"], True) for ls in lookaside_sources)
         # Fetch all remote sources defined in the spec file

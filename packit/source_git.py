@@ -32,7 +32,7 @@ from packit.utils import (
     get_file_author,
     run_command,
 )
-from packit.utils.lookaside import get_lookaside_sources
+from packit.utils.lookaside import LookasideCache
 from packit.utils.repo import is_git_repo, is_the_repo_pristine
 
 logger = logging.getLogger(__name__)
@@ -295,10 +295,11 @@ class SourceGitGenerator:
                 },
             ],
         }
-        if lookaside_sources := get_lookaside_sources(
+        if lookaside_sources := LookasideCache(
             self.pkg_tool or self.config.pkg_tool,
-            self.pkg_name,
-            self.dist_git.working_dir,
+        ).get_sources(
+            basepath=self.dist_git.working_dir,
+            package=self.pkg_name,
         ):
             package_config["sources"] = lookaside_sources
 
