@@ -1,6 +1,10 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import itertools
+from dataclasses import dataclass
+from typing import Optional
+
 DG_PR_COMMENT_KEY_SG_PR = "Source-git pull request ID"
 DG_PR_COMMENT_KEY_SG_COMMIT = "Source-git commit"
 
@@ -29,20 +33,41 @@ EXISTING_BODHI_UPDATE_REGEX = r".*Update for \S+ already exists.*"
 
 FEDORA_DOMAIN = "fedoraproject.org"
 
-PROD_DISTGIT_HOSTNAME = f"src.{FEDORA_DOMAIN}"
-PROD_DISTGIT_URL = f"https://{PROD_DISTGIT_HOSTNAME}/"
 
-DISTGIT_NAMESPACE = "rpms"
+@dataclass
+class DistGitInstance:
+    hostname: str
+    alternative_hostname: Optional[str]
+    namespace: str
 
-ALTERNATIVE_PROD_DG_HOSTNAME = f"pkgs.{FEDORA_DOMAIN}"
-STG_DISTGIT_HOSTNAME = f"src.stg.{FEDORA_DOMAIN}"
-ALTERNATIVE_STG_DG_HOSTNAME = f"pkgs.stg.{FEDORA_DOMAIN}"
+    @property
+    def url(self) -> str:
+        return f"https://{self.hostname}/"
 
-DIST_GIT_HOSTNAME_CANDIDATES = (
-    PROD_DISTGIT_HOSTNAME,
-    ALTERNATIVE_PROD_DG_HOSTNAME,
-    STG_DISTGIT_HOSTNAME,
-    ALTERNATIVE_STG_DG_HOSTNAME,
+
+DISTGIT_INSTANCES = {
+    "fedpkg": DistGitInstance(
+        hostname=f"src.{FEDORA_DOMAIN}",
+        alternative_hostname=f"pkgs.{FEDORA_DOMAIN}",
+        namespace="rpms",
+    ),
+    "fedpkg-stage": DistGitInstance(
+        hostname=f"src.stg.{FEDORA_DOMAIN}",
+        alternative_hostname=f"pkgs.stg.{FEDORA_DOMAIN}",
+        namespace="rpms",
+    ),
+    "centpkg": DistGitInstance(
+        hostname="gitlab.com",
+        alternative_hostname=None,
+        namespace="redhat/centos-stream/rpms",
+    ),
+}
+
+DISTGIT_HOSTNAME_CANDIDATES = set(
+    itertools.chain(
+        (distgit.hostname, distgit.alternative_hostname)
+        for distgit in DISTGIT_INSTANCES.values()
+    ),
 )
 
 COPR2GITHUB_STATE = {
