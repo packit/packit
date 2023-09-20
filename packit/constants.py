@@ -59,7 +59,7 @@ DISTGIT_INSTANCES = {
     "centpkg": DistGitInstance(
         hostname="gitlab.com",
         alternative_hostname=None,
-        namespace="redhat/centos-stream",
+        namespace="redhat/centos-stream/rpms",
     ),
 }
 
