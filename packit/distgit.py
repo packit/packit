@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import logging
-import os
 import re
 import tempfile
 from collections.abc import Iterable, Sequence
@@ -11,7 +10,6 @@ from typing import Optional, Union
 
 import cccolutils
 import git
-import requests
 from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
 from ogr.abstract import PullRequest
@@ -35,6 +33,7 @@ from packit.pkgtool import PkgTool
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import cwd
 from packit.utils.koji_helper import KojiHelper
+from packit.utils.lookaside import LookasideCache
 
 logger = logging.getLogger(__name__)
 
@@ -173,6 +172,11 @@ class DistGit(PackitRepositoryBase):
                 return None
         return self._downstream_config
 
+    @property
+    def pkg_tool(self) -> str:
+        """Returns the packaging tool. Prefers the package-level override."""
+        return self.package_config.pkg_tool or self.config.pkg_tool
+
     def clone_package(
         self,
         target_path: Union[Path, str],
@@ -191,7 +195,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=target_path,
-            tool=self.config.pkg_tool,
+            tool=self.pkg_tool,
         )
         pkg_tool.clone(
             package_name=self.package_config.downstream_package_name,
@@ -353,7 +357,7 @@ class DistGit(PackitRepositoryBase):
         archives = []
         logger.info(f"Downloading archives: {self.upstream_archive_names}")
         with cwd(self.local_project.working_dir):
-            self.download_remote_sources(self.config.pkg_tool)
+            self.download_remote_sources(self.pkg_tool)
         for upstream_archive_name in self.upstream_archive_names:
             archive = self.absolute_source_dir / upstream_archive_name
             if not archive.exists():
@@ -378,7 +382,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            tool=pkg_tool or self.config.pkg_tool,
+            tool=pkg_tool or self.pkg_tool,
         )
         pkg_tool_.sources()
 
@@ -405,7 +409,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            tool=pkg_tool or self.config.pkg_tool,
+            tool=pkg_tool or self.pkg_tool,
         )
         try:
             pkg_tool_.new_sources(
@@ -418,28 +422,21 @@ class DistGit(PackitRepositoryBase):
             )
             raise PackitException(ex) from ex
 
-    def is_archive_in_lookaside_cache(self, archive_path: str) -> bool:
+    def is_archive_in_lookaside_cache(self, archive_path: Union[Path, str]) -> bool:
         """
-        We are using a name to check the presence in the lookaside cache.
-        (This is the same approach fedpkg itself uses.)
+        Check whether the archive is already uploaded to the lookaside cache.
+
+        Args:
+            archive_path: Path to the archive.
+
+        Returns:
+            `True`, if archive is present in the lookaside cache, `False`
+            otherwise.
         """
-        archive_name = os.path.basename(archive_path)
-        try:
-            res = requests.head(
-                f"{self.package_config.dist_git_base_url}lookaside/pkgs/"
-                f"{self.package_config.downstream_package_name}/{archive_name}/",
-            )
-            if res.ok:
-                logger.info(
-                    f"Archive {archive_name!r} found in lookaside cache (skipping upload).",
-                )
-                return True
-            logger.debug(f"Archive {archive_name!r} not found in the lookaside cache.")
-        except requests.exceptions.HTTPError:
-            logger.warning(
-                f"Error trying to find {archive_name!r} in the lookaside cache.",
-            )
-        return False
+        return LookasideCache(self.pkg_tool).is_archive_uploaded(
+            self.package_config.downstream_package_name,
+            archive_path,
+        )
 
     def purge_unused_git_branches(self):
         # TODO: remove branches from merged PRs
@@ -461,7 +458,7 @@ class DistGit(PackitRepositoryBase):
         pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
-            tool=self.config.pkg_tool,
+            tool=self.pkg_tool,
         )
         pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 

@@ -5,7 +5,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.exceptions import PackitLookasideCacheException
-from packit.utils.lookaside import configparser, get_lookaside_sources, pyrpkg
+from packit.utils.lookaside import LookasideCache, configparser, pyrpkg
 
 
 @pytest.mark.parametrize(
@@ -125,6 +125,6 @@ def test_get_lookaside_sources(config, sources, package, result):
     )
     if "lookaside" not in config:
         with pytest.raises(PackitLookasideCacheException):
-            get_lookaside_sources("", package, "")
+            LookasideCache("").get_sources("", package)
     else:
-        assert get_lookaside_sources("", package, "") == result
+        assert LookasideCache("").get_sources("", package) == result
