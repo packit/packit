@@ -236,6 +236,7 @@ class PackitAPI:
 
     @property
     def pkg_tool(self) -> str:
+        """Returns the packaging tool. Prefers the package-level override."""
         return self.package_config.pkg_tool or self.config.pkg_tool
 
     @property
