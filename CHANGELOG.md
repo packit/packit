@@ -1,3 +1,11 @@
+# 0.81.0
+
+- Packit now supports the `pkg_tool` option in the config (at the top-level or with specific packages when using the monorepo syntax). This option can be used for switching between `fedpkg` or `centpkg`. (#2085)
+- When updating the `Version` tag during `propose_downstream` or `pull_from_upstream`, Packit now tries to update referenced macros (if any) rather than overwriting the references. (#2087)
+- If you have concerns about Packit uploading new archives to lookaside cache before creating a pull request, you can newly set `upload_sources` to False to disable this. (#2086)
+- We have fixed a bug that could cause duplicit PRs to be created when using the `commit-message` action. (#2080)
+- Packit now supports `commit-message` action that can be used to override the default commit message produced by Packit during `propose-downstream` or `pull-from-upstream`. Please pay attention to our [documentation](https://packit.dev/docs/configuration/actions#commit-message) with regards to the usage of this action. (#2070)
+
 # 0.80.0
 
 - Packit CLI now provides a new command `pull-from-upstream`, offering the same functionality as `propose-downstream` but suited for usage from the dist-git repository with Packit configuration placed there. This was primarily added to help reproduce the behaviour of the service's [pull_from_upstream job](https://packit.dev/docs/configuration/downstream/pull_from_upstream). (#2063)
