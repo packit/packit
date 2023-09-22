@@ -53,18 +53,27 @@ class ChangelogHelper:
             release_suffix = package_config.release_suffix
         return release_suffix
 
-    def get_entry_from_action(self, version: Optional[str] = None) -> Optional[str]:
+    def get_entry_from_action(
+        self,
+        version: Optional[str] = None,
+        resolved_bugs: Optional[list[str]] = None,
+    ) -> Optional[str]:
         """
         Runs changelog-entry action if present and returns string that can be
         used as a changelog entry.
 
         Args:
             version: version to be set in specfile
+            resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
 
         Returns:
             Changelog entry or `None` if action is not present.
         """
-        env = {"PACKIT_PROJECT_VERSION": version}
+        resolved_bugs_str = " ".join(resolved_bugs) if resolved_bugs else ""
+        env = {
+            "PACKIT_PROJECT_VERSION": version,
+            "PACKIT_RESOLVED_BUGS": resolved_bugs_str,
+        }
         messages = self.up.get_output_from_action(ActionName.changelog_entry, env=env)
         if not messages:
             return None
@@ -80,7 +89,12 @@ class ChangelogHelper:
         # not to break identification of entry boundaries
         return re.sub(r"^[*]", " *", entry, flags=re.MULTILINE)
 
-    def update_dist_git(self, full_version: str, upstream_tag: str) -> None:
+    def update_dist_git(
+        self,
+        full_version: str,
+        upstream_tag: str,
+        resolved_bugs: Optional[list[str]] = None,
+    ) -> None:
         """
         Update the spec-file in dist-git:
         * Sync content from upstream spec-file.
@@ -95,8 +109,13 @@ class ChangelogHelper:
             full_version: Version to be set in the spec-file.
             upstream_tag: The commit messages after last tag and before this tag are used
                 to update the changelog in the spec-file.
+            resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
         """
-        comment = self.get_entry_from_action(version=full_version) or (
+        action_output = self.get_entry_from_action(
+            version=full_version,
+            resolved_bugs=resolved_bugs,
+        )
+        comment = action_output or (
             self.up.local_project.git_project.get_release(
                 tag_name=upstream_tag,
                 name=full_version,
@@ -109,6 +128,11 @@ class ChangelogHelper:
                 before=upstream_tag,
             )
         )
+        if not action_output and resolved_bugs:
+            comment += "\n"
+            for bug in resolved_bugs:
+                comment += f"- Resolves {bug}\n"
+
         comment = self.sanitize_entry(comment)
         try:
             self.dg.set_specfile_content(
