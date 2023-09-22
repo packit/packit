@@ -281,6 +281,7 @@ class PackitAPI:
         mark_commit_origin: bool = False,
         check_sync_status: bool = False,
         check_dist_git_pristine: bool = True,
+        resolved_bugs: Optional[list[str]] = None,
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
@@ -308,6 +309,7 @@ class PackitAPI:
             check_sync_status: Check the synchronization status of the source-git
                 and dist-git repos prior to performing the update.
             check_dist_git_pristine: Check whether the dist-git is pristine.
+            resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
         """
         if check_sync_status:
             status = self.sync_status()
@@ -349,6 +351,7 @@ class PackitAPI:
                 synced_files=synced_files,
                 full_version=version,
                 upstream_tag=upstream_tag,
+                resolved_bugs=resolved_bugs,
             )
 
         sync_files(synced_files)
@@ -746,6 +749,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
+        resolved_bugs: Optional[list[str]] = None,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -769,6 +773,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
+        resolved_bugs: Optional[list[str]] = None,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -791,6 +796,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
+        resolved_bugs: Optional[list[str]] = None,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -821,6 +827,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 of getting the upstream one (used by packit-service in pull_from_upstream)
             add_pr_instructions: Whether to add instructions on how to change the content
                 of the created PR (used by packit-service)
+            resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -948,6 +955,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
                     "PACKIT_UPSTREAM_COMMIT": self.up.local_project.commit_hexsha,
                     "PACKIT_DEBUG_DIVIDER": COMMIT_ACTION_DIVIDER.strip(),
+                    "PACKIT_RESOLVED_BUGS": " ".join(resolved_bugs)
+                    if resolved_bugs
+                    else "",
                 }
                 | self.sync_release_env,
             )
@@ -956,10 +966,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 output=commit_msg_action_output,
                 default_title=title or f"[packit] {version} upstream release",
                 default_description=description
-                or SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION.format(
-                    upstream_tag=upstream_tag,
-                    upstream_commit=self.up.local_project.commit_hexsha,
-                ),
+                or self.get_default_commit_description(upstream_tag, resolved_bugs),
             )
 
             self.update_dist_git(
@@ -973,6 +980,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 sync_default_files=sync_default_files,
                 mark_commit_origin=mark_commit_origin,
                 check_dist_git_pristine=False,
+                resolved_bugs=resolved_bugs,
             )
 
             pr = None
@@ -992,6 +1000,26 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
         return pr
+
+    def get_default_commit_description(
+        self,
+        upstream_tag: str,
+        resolved_bugs: Optional[list[str]],
+    ) -> str:
+        """
+        Get the default commit description.
+        In case the autochangelog is used, the bugs should be referenced in the commits.
+        """
+        resolved_bugs_msg = ""
+        if resolved_bugs and self.dg.specfile.has_autochangelog:
+            for bug in resolved_bugs:
+                resolved_bugs_msg += f"Resolves {bug}\n"
+
+        return SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION.format(
+            upstream_tag=upstream_tag,
+            upstream_commit=self.up.local_project.commit_hexsha,
+            resolved_bugs=resolved_bugs_msg,
+        )
 
     def get_pr_default_title_and_description(self):
         """Create a default title and description to be used
@@ -1085,6 +1113,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         synced_files: list[SyncFilesItem],
         full_version: str,
         upstream_tag: str,
+        resolved_bugs: Optional[list[str]] = None,
     ) -> list[SyncFilesItem]:
         """
         Returns the list of files to sync to dist-git as is.
@@ -1098,6 +1127,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             full_version: Version to be set in the spec-file.
             upstream_tag: The commit message of this commit is going to be used
                 to update the changelog in the spec-file.
+            resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
 
         Returns:
             The list of synced files with the spec-file removed if it was updated.
@@ -1109,6 +1139,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         ChangelogHelper(self.up, self.dg, self.package_config).update_dist_git(
             full_version=full_version,
             upstream_tag=upstream_tag,
+            resolved_bugs=resolved_bugs,
         )
 
         # exclude spec, we have special plans for it
