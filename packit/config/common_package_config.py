@@ -217,7 +217,7 @@ class CommonPackageConfig:
         self.dist_git_namespace: str = (
             dist_git_namespace
             or (pkg_tool and DISTGIT_INSTANCES[pkg_tool].namespace)
-            or getenv("DISTGIT_URL", DISTGIT_INSTANCES["fedpkg"].namespace)
+            or getenv("DISTGIT_NAMESPACE", DISTGIT_INSTANCES["fedpkg"].namespace)
         )
 
         self.actions = actions or {}
