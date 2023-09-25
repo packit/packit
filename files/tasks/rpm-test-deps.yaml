@@ -6,6 +6,7 @@
       - python3-setuptools_scm
       - python3-distro
       - rpmautospec-rpm-macros
+      - python3-flexmock
     state: present
   become: true
 
@@ -14,20 +15,17 @@
     name:
       - python3-pytest-cov
       - python3-pytest-timeout
-      - python3-flexmock
       - python3-deepdiff
     state: present
   when: ansible_facts['distribution'] == 'Fedora'
   become: true
 
 # packages not in epel, install from PyPI
-# flexmock: https://bugzilla.redhat.com/show_bug.cgi?id=2120251
 - name: (EPEL) Install dependencies from PyPI
   ansible.builtin.pip:
     name:
       - pytest-cov
       - pytest-timeout
-      - flexmock
       - deepdiff
     state: latest
   when: ansible_facts['distribution'] != 'Fedora'
