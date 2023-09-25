@@ -54,6 +54,7 @@ def sync_release(
     force,
     use_downstream_specfile,
     package_config,
+    resolved_bugs,
 ):
     api = get_packit_api(
         config=config,
@@ -80,6 +81,7 @@ def sync_release(
             create_pr=pr,
             force=force,
             use_downstream_specfile=use_downstream_specfile,
+            resolved_bugs=resolved_bugs,
         )
 
 
@@ -114,6 +116,14 @@ def sync_release_common_options(func):
         default=False,
         is_flag=True,
         help="Don't discard changes in the git repo by default, unless this is set.",
+    )
+    @click.option(
+        "-b",
+        "--resolve-bug",
+        help="Bug(s) that are resolved with the update, e.g. rhbz#123 (multiple can be specified)",
+        required=False,
+        default=None,
+        multiple=True,
     )
     @click.option(
         PACKAGE_SHORT_OPTION,
@@ -164,6 +174,7 @@ def propose_downstream(
     local_content,
     upstream_ref,
     force,
+    resolve_bug,
     package_config,
 ):
     """
@@ -188,6 +199,7 @@ def propose_downstream(
         upstream_ref=upstream_ref,
         use_downstream_specfile=False,
         package_config=package_config,
+        resolved_bugs=resolve_bug,
     )
 
 
@@ -205,6 +217,7 @@ def pull_from_upstream(
     path_or_url,
     version,
     force,
+    resolve_bug,
     package_config,
 ):
     """
@@ -229,4 +242,5 @@ def pull_from_upstream(
         upstream_ref=None,
         use_downstream_specfile=True,
         package_config=package_config,
+        resolved_bugs=resolve_bug,
     )

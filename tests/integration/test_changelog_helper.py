@@ -107,10 +107,12 @@ def test_update_distgit_when_copy_upstream_release_description(
     ChangelogHelper(upstream, downstream, package_config).update_dist_git(
         upstream_tag="0.1.0",
         full_version="0.1.0",
+        resolved_bugs=["rhbz#123"],
     )
 
     with downstream._specfile.sections() as sections:
         assert "Some release 0.1.0" in sections.changelog
+        assert "- Resolves rhbz#123" in sections.changelog
 
 
 @pytest.mark.skipif(
@@ -170,6 +172,7 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
     )
     expected_env = {
         "PACKIT_PROJECT_VERSION": "0.1.0",
+        "PACKIT_RESOLVED_BUGS": "rhbz#123 rhbz#124",
     }
     flexmock(upstream).should_receive("get_output_from_action").with_args(
         ActionName.changelog_entry,
@@ -179,4 +182,5 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
     ChangelogHelper(upstream, downstream, package_config).update_dist_git(
         upstream_tag="0.1.0",
         full_version="0.1.0",
+        resolved_bugs=["rhbz#123", "rhbz#124"],
     )
