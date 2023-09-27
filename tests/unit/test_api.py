@@ -334,12 +334,6 @@ def test_sync_release_check_pr_instructions(api_mock):
     ],
 )
 def test_get_default_commit_description(api_mock, resolved_bugs, result):
-    class Specfile:
-        def __init__(self, has_autochangelog: bool):
-            self.has_autochangelog = has_autochangelog
-
-    spec = Specfile(has_autochangelog=True)
-    api_mock.dg.should_receive("specfile").and_return(spec)
     assert (
         api_mock.get_default_commit_description("1.0.0", resolved_bugs=resolved_bugs)
         == result
