@@ -1011,7 +1011,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         In case the autochangelog is used, the bugs should be referenced in the commits.
         """
         resolved_bugs_msg = ""
-        if resolved_bugs and self.dg.specfile.has_autochangelog:
+        if resolved_bugs:
             for bug in resolved_bugs:
                 resolved_bugs_msg += f"Resolves {bug}\n"
 
