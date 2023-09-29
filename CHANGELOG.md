@@ -1,3 +1,7 @@
+# 0.82.0
+
+- You can now specify bugs resolved by an update by `-b` or `--resolve-bug` option for `propose-downstream` and `pull-from-upstream` commands. The values will be added by default to the changelog and commit message and provided in `commit-message` and `changelog-entry` actions as `PACKIT_RESOLVED_BUGS` env variable. (#2094)
+
 # 0.81.0
 
 - Packit now supports the `pkg_tool` option in the config (at the top-level or with specific packages when using the monorepo syntax). This option can be used for switching between `fedpkg` or `centpkg`. (#2085)
