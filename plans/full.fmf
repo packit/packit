@@ -10,9 +10,9 @@ prepare:
     script: dnf -y config-manager --save --setopt="*:packit:packit-dev.priority=5"
 adjust:
   - when: "distro == rhel-9 or distro == centos-9 or distro == centos-stream-9"
-    because: "deepdiff is not in EPEL 9"
+    because: "build and deepdiff are not in EPEL 9"
     prepare:
       - how: install
         package: python3-pip
       - how: shell
-        script: pip3 install deepdiff
+        script: pip3 install build deepdiff

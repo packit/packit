@@ -2,7 +2,12 @@
 - name: Install test rpm dependencies
   ansible.builtin.dnf:
     name:
-      - python3-setuptools_scm
+      - hatch
+      - python3-hatch-vcs
+      - pyproject-rpm-macros
+      - python3-deprecated
+      - python3-gitlab
+      - python3-pygithub
       - python3-distro
       - rpmautospec-rpm-macros
       - python3-flexmock
@@ -12,6 +17,7 @@
 - name: (Fedora) Install dependencies as RPMs
   ansible.builtin.dnf:
     name:
+      - python3-build
       - python3-pytest-cov
       - python3-pytest-timeout
       - python3-deepdiff
@@ -23,6 +29,7 @@
 - name: (EPEL) Install dependencies from PyPI
   ansible.builtin.pip:
     name:
+      - build
       - pytest-cov
       - pytest-timeout
       - deepdiff

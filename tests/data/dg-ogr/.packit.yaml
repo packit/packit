@@ -1,33 +1,43 @@
 ---
 specfile_path: fedora/python-ogr.spec
-synced_files:
-  - fedora/changelog
 # https://packit.dev/docs/configuration/#top-level-keys
 downstream_package_name: python-ogr
+upstream_project_url: https://github.com/packit/ogr
+issue_repository: https://github.com/packit/ogr
 upstream_package_name: ogr
-upstream_project_url: https://github.com/packit-service/ogr
+copy_upstream_release_description: true
 actions:
   # we need this b/c `git archive` doesn't put all the metadata in the tarball:
   #   LookupError: setuptools-scm was unable to detect version for '/builddir/build/BUILD/ogr-0.11.1'.
   #   Make sure you're either building from a fully intact git repository or PyPI tarballs.
   create-archive:
-    - python3 setup.py sdist --dist-dir ./fedora/
+    - python3 -m build --sdist --outdir ./fedora/
     - bash -c "ls -1t ./fedora/*.tar.gz | head -n 1"
-  get-current-version: python3 setup.py --version
+  get-current-version:
+    - hatch version
+
+srpm_build_deps:
+  - python3-build
+  - hatch
+  - python3-hatch-vcs
+
 jobs:
   - job: sync_from_downstream
     trigger: commit
+
   - job: propose_downstream
     trigger: release
-    metadata:
-      dist_git_branches: fedora-all
+    dist_git_branches:
+      - fedora-all
+      - epel-9
+
   - job: copr_build
     trigger: pull_request
-    metadata:
-      targets:
-        - fedora-all
+    targets:
+      - fedora-all
+      - epel-9
   - job: tests
     trigger: pull_request
-    metadata:
-      targets:
-        - fedora-all
+    targets:
+      - fedora-all
+      - epel-9
