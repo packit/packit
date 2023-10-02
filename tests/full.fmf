@@ -2,7 +2,13 @@ require:
   - python3-flexmock
   - python3-pytest
   - python3-deepdiff
-  - python3-setuptools_scm
+  - python3-build
+  - hatch
+  - python3-hatch-vcs
+  - pyproject-rpm-macros
+  - python3-deprecated
+  - python3-gitlab
+  - python3-pygithub
   - python3-distro
   - python3-devel
   - packit
@@ -19,8 +25,9 @@ require:
   #- rpmautospec-rpm-macros
 adjust:
   - when: "distro == rhel-9 or distro == centos-9 or distro == centos-stream-9"
-    because: "deepdiff is not in EPEL 9: https://bugzilla.redhat.com/show_bug.cgi?id=2120251"
+    because: "build and deepdiff are not in EPEL 9: https://bugzilla.redhat.com/show_bug.cgi?id=2120251"
     require-:
+      - python3-build
       - python3-deepdiff
 component:
   - packit
