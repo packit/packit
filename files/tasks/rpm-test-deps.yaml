@@ -2,7 +2,6 @@
 - name: Install test rpm dependencies
   ansible.builtin.dnf:
     name:
-      - python3-setuptools_scm_git_archive
       - python3-setuptools_scm
       - python3-distro
       - rpmautospec-rpm-macros
