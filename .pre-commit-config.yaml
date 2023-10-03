@@ -52,6 +52,10 @@ repos:
             types-PyYAML,
             types-cachetools,
           ]
+  - repo: https://github.com/teemtee/tmt.git
+    rev: 1.27.0
+    hooks:
+      - id: tmt-lint
   - repo: https://github.com/packit/pre-commit-hooks
     rev: v1.2.0
     hooks:
