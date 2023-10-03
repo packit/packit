@@ -517,7 +517,10 @@ class Upstream(PackitRepositoryBase):
         self._fix_spec_source(archive)
         self._fix_spec_prep(archive)
 
-        ChangelogHelper(self).prepare_upstream_locally(
+        ChangelogHelper(
+            self,
+            package_config=self.package_config,
+        ).prepare_upstream_locally(
             version,
             commit,
             update_release,
@@ -1073,7 +1076,10 @@ class SRPMBuilder:
         self.upstream.fetch_upstream_archive()
         self.upstream.create_patches_and_update_specfile(self.upstream_ref)
 
-        ChangelogHelper(self.upstream).prepare_upstream_using_source_git(
+        ChangelogHelper(
+            self.upstream,
+            package_config=self.upstream.package_config,
+        ).prepare_upstream_using_source_git(
             update_release,
             release_suffix,
         )
