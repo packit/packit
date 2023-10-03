@@ -303,7 +303,7 @@ def test_sync_release_check_pr_instructions(api_mock):
             "```\ngit fetch https://src.fedoraproject.org/forks/packit/rpms/package.git "
             "refs/heads/*:refs/remotes/packit/*\n"
             "git checkout packit/1.1-_-update\n```\n"
-            "If you have the `koji_build `job configured as well, make sure to configure"
+            "If you have the `koji_build` job configured as well, make sure to configure "
             "the `allowed_pr_authors` and/or `allowed_committers` (see [the docs]"
             "(https://packit.dev/docs/configuration/downstream/koji_build#optional-parameters)) "
             "since by default, Packit reacts only to its own PRs.\n"
