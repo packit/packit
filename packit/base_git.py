@@ -601,6 +601,7 @@ class PackitRepositoryBase:
                 for spec_source in sources + patches
                 if spec_source.remote
             )
+        logger.debug(f"List of sources to download (url, path, optional): {sourcelist}")
         # Download all sources
         for url, filename, optional in sourcelist:
             source_path = self.specfile.sourcedir.joinpath(filename)
