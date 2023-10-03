@@ -130,3 +130,6 @@ ignore = [
 
 line-length = 100
 target-version = "py39"
+
+[tool.mypy]
+python_version = "3.9"
