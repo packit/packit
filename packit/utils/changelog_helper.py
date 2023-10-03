@@ -70,7 +70,7 @@ class ChangelogHelper:
             Changelog entry or `None` if action is not present.
         """
         resolved_bugs_str = " ".join(resolved_bugs) if resolved_bugs else ""
-        env = {
+        env = self.package_config.get_package_names_as_env() | {
             "PACKIT_PROJECT_VERSION": version,
             "PACKIT_RESOLVED_BUGS": resolved_bugs_str,
         }

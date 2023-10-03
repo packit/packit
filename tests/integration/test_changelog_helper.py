@@ -171,6 +171,9 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
         .mock()
     )
     expected_env = {
+        "PACKIT_CONFIG_PACKAGE_NAME": "beer",
+        "PACKIT_UPSTREAM_PACKAGE_NAME": "beerware",
+        "PACKIT_DOWNSTREAM_PACKAGE_NAME": "beer",
         "PACKIT_PROJECT_VERSION": "0.1.0",
         "PACKIT_RESOLVED_BUGS": "rhbz#123 rhbz#124",
     }
