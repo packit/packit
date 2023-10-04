@@ -571,6 +571,8 @@ class DistGit(PackitRepositoryBase):
                 ),
             ]
 
+        bugzilla_ids_from_changelog = []
+
         # I was thinking of verifying that the build is valid for a new bodhi update
         # but in the end it's likely a waste of resources since bodhi will tell us
         if update_notes is not None:
@@ -586,6 +588,9 @@ class DistGit(PackitRepositoryBase):
                         f"\n\n##### **Changelog for {package}**\n\n```\n"
                         f"{changelog}\n```"
                     )
+            bugzilla_ids_from_changelog = self.get_bugzilla_ids_from_changelog(
+                rendered_note,
+            )
         try:
             save_kwargs = {
                 "builds": koji_builds,
@@ -593,8 +598,16 @@ class DistGit(PackitRepositoryBase):
                 "type": update_type,
             }
 
+            bugs = []
+
             if bugzilla_ids:
-                save_kwargs["bugs"] = list(map(str, bugzilla_ids))
+                bugs = list(map(str, bugzilla_ids))
+            if bugzilla_ids_from_changelog:
+                bugs += bugzilla_ids_from_changelog
+
+            if bugs:
+                save_kwargs["bugs"] = bugs
+
             result = bodhi_client.save(**save_kwargs)
 
             logger.debug(f"Bodhi response:\n{result}")
@@ -642,3 +655,18 @@ class DistGit(PackitRepositoryBase):
 
     def get_user(self) -> Optional[str]:
         return user if (user := super().get_user()) else self.fas_user
+
+    @staticmethod
+    def get_bugzilla_ids_from_changelog(changelog: str) -> list[str]:
+        """
+        Find bugzilla IDs referenced in the changelog.
+        """
+        # https://github.com/fedora-infra/bodhi/blob/373fe7f449e66a07ab0649c369bb68b11ec6d86f/bodhi-server/bodhi/server/config.py#L317
+        bz_regex = (
+            r"(?:fix(?:es)?|close(?:s)?|resolve(?:s)?)(?:\:)?\s"
+            r"(?:fedora|epel|rh(?:bz)?)#(\d{5,})"
+        )
+
+        bugs = [bug.group(1) for bug in re.finditer(bz_regex, changelog, re.IGNORECASE)]
+        logger.debug(f"Bug IDs found in the changelog: {bugs}")
+        return bugs

@@ -148,3 +148,28 @@ def test_monorepo_regression():
 )
 def test_bodhi_regex(exception_message, matches):
     assert bool(re.match(EXISTING_BODHI_UPDATE_REGEX, exception_message)) == matches
+
+
+@pytest.mark.parametrize(
+    "changelog, bugs",
+    [
+        (
+            "* Fri Sep 29 2023 Packit <hello@packit.dev> - 0.82.0-1"
+            "- Resolves rhbz#2240355",
+            ["2240355"],
+        ),
+        (
+            "* Fri Sep 29 2023 Packit <hello@packit.dev> - 0.82.0-1"
+            "- Resolves rhbz#2240355"
+            "- Resolves rhbz#2340355",
+            ["2240355", "2340355"],
+        ),
+        (
+            "* Fri Sep 29 2023 Packit <hello@packit.dev> - 0.82.0-1"
+            "- Update without associated bugs",
+            [],
+        ),
+    ],
+)
+def test_get_bugzilla_ids_from_changelog(changelog, bugs):
+    assert DistGit.get_bugzilla_ids_from_changelog(changelog) == bugs
