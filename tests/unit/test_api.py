@@ -11,6 +11,7 @@ from munch import Munch
 from packit import api as packit_api
 from packit.api import PackitAPI
 from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
+from packit.config.config import Config
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -342,3 +343,26 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
         api_mock.get_default_commit_description("1.0.0", resolved_bugs=resolved_bugs)
         == result
     )
+
+
+@pytest.mark.parametrize(
+    "package_config, config, expected_pkg_tool",
+    (
+        pytest.param(
+            flexmock(pkg_tool=None),
+            Config(),
+            "fedpkg",
+            id="default from config",
+        ),
+        pytest.param(
+            flexmock(pkg_tool="rhpkg"),
+            Config(),
+            "rhpkg",
+            id="package-level override",
+        ),
+        # regression in automated allowlisting
+        pytest.param(None, Config(), "fedpkg", id="no package_config given"),
+    ),
+)
+def test_pkg_tool_property(package_config, config, expected_pkg_tool):
+    assert PackitAPI(config, package_config).pkg_tool == expected_pkg_tool
