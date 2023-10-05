@@ -1,3 +1,6 @@
+summary:
+  Full test suite of the Packit
+
 require:
   - python3-flexmock
   - python3-pytest
@@ -23,16 +26,21 @@ require:
   - git
   - make
   #- rpmautospec-rpm-macros
+
 adjust:
   - when: "distro == rhel-9 or distro == centos-9 or distro == centos-stream-9"
     because: "build and deepdiff are not in EPEL 9: https://bugzilla.redhat.com/show_bug.cgi?id=2120251"
     require-:
       - python3-build
       - python3-deepdiff
+
 component:
   - packit
 tier: 1
 tag:
   - basic
-test: pytest-3 -v .
+
+test: pytest-3 -v $TEST_TARGET
 duration: 30m
+environment:
+  TEST_TARGET: .
