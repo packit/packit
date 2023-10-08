@@ -64,9 +64,12 @@ DISTGIT_INSTANCES = {
 }
 
 DISTGIT_HOSTNAME_CANDIDATES = set(
-    itertools.chain(
-        (distgit.hostname, distgit.alternative_hostname)
-        for distgit in DISTGIT_INSTANCES.values()
+    filter(
+        lambda hostname: hostname is not None,
+        itertools.chain.from_iterable(
+            (distgit.hostname, distgit.alternative_hostname)
+            for distgit in DISTGIT_INSTANCES.values()
+        ),
     ),
 )
 
