@@ -7,7 +7,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.config import CommonPackageConfig, Config, PackageConfig
-from packit.constants import EXISTING_BODHI_UPDATE_REGEX
+from packit.constants import DISTGIT_HOSTNAME_CANDIDATES, EXISTING_BODHI_UPDATE_REGEX
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
 
@@ -173,3 +173,14 @@ def test_bodhi_regex(exception_message, matches):
 )
 def test_get_bugzilla_ids_from_changelog(changelog, bugs):
     assert DistGit.get_bugzilla_ids_from_changelog(changelog) == bugs
+
+
+# Regression test for constructing the hostname candidates from the possible dist-git instances
+def test_hostname_candidates():
+    assert {
+        "src.stg.fedoraproject.org",
+        "gitlab.com",
+        "src.fedoraproject.org",
+        "pkgs.fedoraproject.org",
+        "pkgs.stg.fedoraproject.org",
+    } == DISTGIT_HOSTNAME_CANDIDATES
