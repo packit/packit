@@ -33,7 +33,7 @@ repos:
       - id: trailing-whitespace
         exclude: ^(tests/data/patches|tests/.+\.patch)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.290
+    rev: v0.0.292
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
