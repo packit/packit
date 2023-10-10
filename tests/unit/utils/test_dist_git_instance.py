@@ -44,3 +44,30 @@ CENTOS_DG = DistGitInstance(
 )
 def test_has_repository(dg: DistGitInstance, url: str, expected: bool):
     assert dg.has_repository(url) == expected
+
+
+@pytest.mark.parametrize(
+    "url, namespace, expected",
+    (
+        pytest.param(
+            "https://src.fedoraproject.org/",
+            "rpms",
+            FEDORA_DG,
+            id="packit-prod / fedora-source-git-prod",
+        ),
+        pytest.param(
+            "https://gitlab.com/",
+            "redhat/centos-stream/rpms",
+            CENTOS_DG,
+            id="stream-prod",
+        ),
+    ),
+)
+def test_from_url_and_namespace(url: str, namespace: str, expected: DistGitInstance):
+    parsed_dg_instance = DistGitInstance.from_url_and_namespace(url, namespace)
+
+    assert parsed_dg_instance and parsed_dg_instance.hostname in (
+        expected.hostname,
+        expected.alternative_hostname,
+    )
+    assert parsed_dg_instance.namespace == expected.namespace

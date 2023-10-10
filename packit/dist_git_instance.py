@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from ogr.parsing import parse_git_repo
+from ogr.parsing import RepoUrl, parse_git_repo
 
 
 @dataclass
@@ -16,6 +16,28 @@ class DistGitInstance:
     @property
     def url(self) -> str:
         return f"https://{self.hostname}/"
+
+    @staticmethod
+    def from_url_and_namespace(url: str, namespace: str) -> "DistGitInstance":
+        """Create an instance from the url and namespace.
+
+        Args:
+            url: Base URL of the dist-git.
+            namespace: Namespace in the dist-git.
+
+        Returns:
+            DistGitInstance object.
+        """
+        parsed_url = RepoUrl._prepare_url(url)
+        if parsed_url is None:
+            # parsing has failed
+            raise ValueError("Parsing of the dist-git URL has failed")
+
+        return DistGitInstance(
+            hostname=parsed_url.hostname,
+            alternative_hostname=None,
+            namespace=namespace,
+        )
 
     def has_repository(self, remote_url: str) -> bool:
         """
