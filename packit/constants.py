@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 import itertools
-from dataclasses import dataclass
-from typing import Optional
+
+from packit.dist_git_instance import DistGitInstance
 
 DG_PR_COMMENT_KEY_SG_PR = "Source-git pull request ID"
 DG_PR_COMMENT_KEY_SG_COMMIT = "Source-git commit"
@@ -32,18 +32,6 @@ DEFAULT_BODHI_NOTE = "New upstream release: {version}"
 EXISTING_BODHI_UPDATE_REGEX = r".*Update for \S+ already exists.*"
 
 FEDORA_DOMAIN = "fedoraproject.org"
-
-
-@dataclass
-class DistGitInstance:
-    hostname: str
-    alternative_hostname: Optional[str]
-    namespace: str
-
-    @property
-    def url(self) -> str:
-        return f"https://{self.hostname}/"
-
 
 DISTGIT_INSTANCES = {
     "fedpkg": DistGitInstance(

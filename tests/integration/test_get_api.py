@@ -9,6 +9,7 @@ from packit.cli import utils
 from packit.cli.utils import get_packit_api
 from packit.config import CommonPackageConfig, JobConfig
 from packit.config.job_config import JobConfigTriggerType, JobType
+from packit.constants import DISTGIT_INSTANCES
 from packit.local_project import CALCULATE, LocalProjectBuilder
 from tests.spellbook import get_test_config, initiate_git_repo
 
@@ -76,7 +77,7 @@ def test_url_is_upstream():
             [],
             flexmock(
                 upstream_project_url=None,
-                dist_git_base_url=None,
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -85,7 +86,7 @@ def test_url_is_upstream():
             [],
             flexmock(
                 upstream_project_url="some-url",
-                dist_git_base_url=None,
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -94,7 +95,7 @@ def test_url_is_upstream():
             [("origin", "https://github.com/packit/ogr.git")],
             flexmock(
                 upstream_project_url="some-url",
-                dist_git_base_url=None,
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -103,7 +104,7 @@ def test_url_is_upstream():
             [("origin", "https://github.com/packit/ogr.git")],
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url=None,
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -112,7 +113,7 @@ def test_url_is_upstream():
             [("upstream", "https://github.com/packit/ogr.git")],
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url=None,
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -121,7 +122,7 @@ def test_url_is_upstream():
             [("origin", "https://src.fedoraproject.org/rpms/ogr.git")],
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="https://src.fedoraproject.org",
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
                 downstream_package_name=None,
             ),
@@ -131,7 +132,7 @@ def test_url_is_upstream():
             [("origin", "https://src.fedoraproject.org/rpms/python-ogr.git")],
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="src.fedoraproject.org",
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
                 downstream_package_name=None,
             ),
@@ -141,7 +142,7 @@ def test_url_is_upstream():
             [("origin", "https://src.fedoraproject.org/rpms/python-ogr.git")],
             flexmock(
                 upstream_project_url=None,
-                dist_git_base_url="https://src.fedoraproject.org",
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
                 downstream_package_name=None,
             ),
@@ -151,7 +152,7 @@ def test_url_is_upstream():
             [("origin", "https://src.fedoraproject.org/fork/user/rpms/python-ogr.git")],
             flexmock(
                 upstream_project_url=None,
-                dist_git_base_url="https://src.fedoraproject.org",
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
                 downstream_package_name=None,
             ),
@@ -161,7 +162,7 @@ def test_url_is_upstream():
             [("origin", "git@github.com:user/ogr.git")],
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="https://src.fedoraproject.org",
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -173,7 +174,7 @@ def test_url_is_upstream():
             ],
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
-                dist_git_base_url="https://src.fedoraproject.org",
+                dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
                 synced_files=None,
             ),
             True,
@@ -189,6 +190,8 @@ def test_url_is_upstream():
                 packages={
                     "package": CommonPackageConfig(
                         upstream_project_url="https://github.com/packit/ogr",
+                        dist_git_base_url=DISTGIT_INSTANCES["fedpkg"].url,
+                        dist_git_namespace=DISTGIT_INSTANCES["fedpkg"].namespace,
                     ),
                 },
             ),

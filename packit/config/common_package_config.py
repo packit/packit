@@ -18,6 +18,7 @@ from packit.config.notifications import (
 )
 from packit.config.sources import SourcesItem
 from packit.constants import DISTGIT_INSTANCES
+from packit.dist_git_instance import DistGitInstance
 from packit.exceptions import PackitConfigException
 from packit.sync import SyncFilesItem, iter_srcs
 
@@ -26,6 +27,39 @@ class Deployment(Enum):
     dev = "dev"
     stg = "stg"
     prod = "prod"
+
+
+def _construct_dist_git_instance(
+    base_url: Optional[str],
+    namespace: Optional[str],
+    pkg_tool: Optional[str],
+) -> DistGitInstance:
+    """Construct a dist-git instance information from provided configuration.
+
+    Args:
+        base_url: Base URL of the dist-git provided from the config.
+        namespace: Namespace in the dist-git provided from the config.
+        pkg_tool: Packaging tool to be used provided from the config.
+
+    Returns:
+        Dist-git instance information that is used in config.
+    """
+
+    # explicitly specified values in config override everything
+    if base_url is not None:
+        return DistGitInstance.from_url_and_namespace(base_url, namespace)
+
+    # explicitly specified packaging tool overrides too
+    if pkg_tool:
+        return DISTGIT_INSTANCES[pkg_tool]
+
+    # we try the environment variables
+    base_url, namespace = getenv("DISTGIT_URL"), getenv("DISTGIT_NAMESPACE")
+    if base_url is not None:
+        return DistGitInstance.from_url_and_namespace(base_url, namespace)
+
+    # if nothing has been provided, default to the Fedora
+    return DISTGIT_INSTANCES["fedpkg"]
 
 
 class CommonPackageConfig:
@@ -207,17 +241,11 @@ class CommonPackageConfig:
         self.downstream_package_name: Optional[str] = downstream_package_name
         self._downstream_project_url: str = downstream_project_url
 
-        # Set up the dist-git instance parameters
-        # XXX: Try to think about something more reasonable… UGH
-        self.dist_git_base_url: str = (
-            dist_git_base_url
-            or (pkg_tool and DISTGIT_INSTANCES[pkg_tool].url)
-            or getenv("DISTGIT_URL", DISTGIT_INSTANCES["fedpkg"].url)
-        )
-        self.dist_git_namespace: str = (
-            dist_git_namespace
-            or (pkg_tool and DISTGIT_INSTANCES[pkg_tool].namespace)
-            or getenv("DISTGIT_NAMESPACE", DISTGIT_INSTANCES["fedpkg"].namespace)
+        # Set up the dist-git instance
+        self.dist_git_instance = _construct_dist_git_instance(
+            base_url=dist_git_base_url,
+            namespace=dist_git_namespace,
+            pkg_tool=pkg_tool,
         )
 
         self.actions = actions or {}
@@ -293,6 +321,14 @@ class CommonPackageConfig:
         self.upload_sources = upload_sources
 
         self.pkg_tool = pkg_tool
+
+    @property
+    def dist_git_base_url(self) -> str:
+        return self.dist_git_instance.url
+
+    @property
+    def dist_git_namespace(self) -> Optional[str]:
+        return self.dist_git_instance.namespace
 
     @property
     def targets_dict(self):

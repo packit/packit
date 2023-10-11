@@ -2092,7 +2092,7 @@ def test_specfile_path_not_defined_in_test_only_jobs(raw):
 
 @pytest.mark.parametrize(
     "package_name,result",
-    ((None, None), ("baz", "http://foo/bar/baz.git")),
+    ((None, None), ("baz", "https://foo/bar/baz.git")),
 )
 def test_pc_dist_git_package_url_has_no_None(package_name, result):
     assert (
@@ -2100,7 +2100,7 @@ def test_pc_dist_git_package_url_has_no_None(package_name, result):
             packages={
                 "package": CommonPackageConfig(
                     downstream_package_name=package_name,
-                    dist_git_base_url="http://foo/",
+                    dist_git_base_url="https://foo/",
                     dist_git_namespace="bar",
                 ),
             },
