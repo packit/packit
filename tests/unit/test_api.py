@@ -303,6 +303,7 @@ def test_sync_release_check_pr_instructions(api_mock):
             "to this repository):\n"
             "```\n"
             "git clone ssh://$YOUR_USER@pkgs.fedoraproject.org/forks/packit/rpms/package.git\n"
+            "cd package\n"
             "git checkout 1.1-_-update\n"
             "```\n"
             "\n---\n\n"
