@@ -12,7 +12,7 @@ import cccolutils
 import git
 from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
-from ogr.abstract import PullRequest
+from ogr.abstract import AccessLevel, GitProject, PullRequest
 from specfile.utils import NEVR
 
 from packit.base_git import PackitRepositoryBase
@@ -251,6 +251,34 @@ class DistGit(PackitRepositoryBase):
             ) from e
         head.set_commit(remote_ref)
 
+    @staticmethod
+    def sync_acls(project: GitProject, fork: GitProject) -> None:
+        """
+        Synchronizes ACLs between dist-git project and its fork.
+
+        Users and groups with commit or higher access to the original project will gain
+        commit access to the fork. Users and groups without commit or higher access
+        to the original project will be removed from the fork.
+
+        Args:
+            project: Original dist-git project.
+            fork: Fork of the original project.
+        """
+        committers = project.who_can_merge_pr()
+        fork_committers = fork.who_can_merge_pr()
+        # do not mess with fork owners
+        fork_owners = set(fork.get_owners())
+        for user in fork_committers - committers - fork_owners:
+            fork.remove_user(user)
+        for user in committers - fork_committers - fork_owners:
+            fork.add_user(user, AccessLevel.push)
+        commit_groups = project.which_groups_can_merge_pr()
+        fork_commit_groups = fork.which_groups_can_merge_pr()
+        for group in fork_commit_groups - commit_groups:
+            fork.remove_group(group)
+        for group in commit_groups - fork_commit_groups:
+            fork.add_group(group, AccessLevel.push)
+
     def push_to_fork(
         self,
         branch_name: str,
@@ -280,6 +308,8 @@ class DistGit(PackitRepositoryBase):
                     "Unable to create a fork of repository "
                     f"{self.local_project.git_project.full_repo_name}",
                 )
+            # synchronize ACLs between original repo and fork
+            self.sync_acls(self.local_project.git_project, fork)
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name,
