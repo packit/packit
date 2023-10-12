@@ -205,6 +205,7 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
     "to this repository):\n"
     "```\n"
     "git clone ssh://$YOUR_USER@pkgs.fedoraproject.org/forks/{user}/rpms/{package}.git\n"
+    "cd {package}\n"
     "git checkout {branch}\n"
     "```\n"
     "\n---\n\n"
