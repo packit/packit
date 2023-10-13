@@ -4,9 +4,10 @@
 """
 Functional tests for srpm command
 """
-import json
 import subprocess
 from pathlib import Path
+
+import yaml
 
 from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit
@@ -55,14 +56,14 @@ def test_srpm_command_no_tags(upstream_and_remote):
 
 def test_action_output(upstream_and_remote):
     upstream_repo_path = upstream_and_remote[0]
-    packit_yaml_path = upstream_repo_path / ".packit.json"
-    packit_yaml_dict = json.loads(packit_yaml_path.read_text())
+    packit_yaml_path = upstream_repo_path / ".packit.yaml"
+    packit_yaml_dict = yaml.safe_load(packit_yaml_path.read_text())
     # http://www.atlaspiv.cz/?page=detail&beer_id=4187
     the_line_we_want = "MadCat - Imperial Stout Rum Barrel Aged 20°"
     packit_yaml_dict["actions"] = {
         "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"],
     }
-    packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
+    packit_yaml_path.write_text(yaml.dump(packit_yaml_dict))
     out = call_real_packit(
         parameters=["srpm"],
         cwd=upstream_repo_path,
@@ -134,8 +135,8 @@ def test_srpm_twice(cwd_upstream_or_distgit):
 
 
 def _test_srpm_symlinking(upstream_repo_path, path_prefix):
-    packit_yaml_path = upstream_repo_path / ".packit.json"
-    packit_yaml_dict = json.loads(packit_yaml_path.read_text())
+    packit_yaml_path = upstream_repo_path / ".packit.yaml"
+    packit_yaml_dict = yaml.safe_load(packit_yaml_path.read_text())
 
     sources_tarball = "random_sources.tar.gz"
     desired_path = f"{path_prefix}/tmp/{sources_tarball}"
@@ -144,7 +145,7 @@ def _test_srpm_symlinking(upstream_repo_path, path_prefix):
             f"bash -c 'mkdir tmp; touch {desired_path}; echo {desired_path}'",
         ],
     }
-    packit_yaml_path.write_text(json.dumps(packit_yaml_dict))
+    packit_yaml_path.write_text(yaml.dump(packit_yaml_dict))
     out = call_real_packit(
         parameters=["srpm"],
         cwd=upstream_repo_path,

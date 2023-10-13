@@ -13,7 +13,7 @@ repos:
       - id: prettier
         exclude: tests_recording/test_data/
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-added-large-files
         exclude: tests_recording/test_data/test_api/
@@ -38,7 +38,7 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
+    rev: v1.6.0
     hooks:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
@@ -53,7 +53,7 @@ repos:
             types-cachetools,
           ]
   - repo: https://github.com/teemtee/tmt.git
-    rev: 1.27.0
+    rev: 1.28.2
     hooks:
       - id: tmt-lint
   - repo: https://github.com/packit/pre-commit-hooks
