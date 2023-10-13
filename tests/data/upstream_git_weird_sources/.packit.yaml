@@ -1,0 +1,3 @@
+specfile_path: beer.spec
+upstream_package_name: beerware
+downstream_package_name: beer
