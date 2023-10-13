@@ -14,10 +14,8 @@ SRC_GIT_CONFIG = "source-git.yaml"
 CONFIG_FILE_NAMES = {
     ".packit.yaml",
     ".packit.yml",
-    ".packit.json",
     "packit.yaml",
     "packit.yml",
-    "packit.json",
 }
 
 # local branch name when checking out a PR before we merge it with the target branch
