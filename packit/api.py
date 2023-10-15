@@ -1002,6 +1002,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.local_project.git_repo.git.checkout(current_up_branch, "-f")
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
+            self.dg.local_project.git_repo.git.clean("-xdf")
+
         return pr
 
     def get_default_commit_description(
