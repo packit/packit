@@ -194,7 +194,8 @@ PACKAGE_OPTION_HELP = (
 )
 
 SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION = (
-    "Upstream tag: {upstream_tag}\nUpstream commit: {upstream_commit}\n{resolved_bugs}"
+    "{resolved_bugs}Upstream tag: {upstream_tag}\n"
+    "Upstream commit: {upstream_commit}\n"
 )
 SYNC_RELEASE_PR_INSTRUCTIONS = (
     "\n---\n\n"
