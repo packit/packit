@@ -3,7 +3,7 @@
 - We have adjusted how we include the resolved bugzillas in the commit messages created when syncing the release downstream so that the resolved bugzillas are included in changelog when using %autochangelog. (#2126)
 - Packit now properly cleans up the branch after syncing the release which should prevent unwanted files (e.g.tarballs) being committed in dist-git. (#2125)
 - Packit no longer accepts `packit.json` or `.packit.json` as a configuration file name. (#2123)
-- Packit now updates ACL of its own dist-git forks to allow users and groups with commit rights to the original dist-git repo to push directly to a fork. (#2112)
+- Packit now updates ACL of a dist-git fork when creating dist-git PRs to allow users and groups with commit rights to the original dist-git repo to push directly to a source branch. (#2112)
 - We have fixed an issue that prevented you from running the jobs on the GitLab.com due to failing resolution of the upstream/downstream relationship for the cloned project. (#2120)
 - We have fixed an issue that you could encounter when running the Packit from the CLI that caused misinterpretation of the repository to be an upstream repo instead of a downstream. (#2117)
 
