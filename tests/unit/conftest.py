@@ -93,7 +93,11 @@ def git_project_mock():
 @pytest.fixture
 def git_repo_mock():
     return flexmock(
-        git=flexmock(checkout=lambda *_: None, reset=lambda *_: None),
+        git=flexmock(
+            checkout=lambda *_: None,
+            reset=lambda *_: None,
+            clean=lambda *_: None,
+        ),
         remote=lambda *_: flexmock(refs={"_": "_"}),
         branches=[],
         create_head=lambda *_, **__: None,
