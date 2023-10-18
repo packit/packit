@@ -3,6 +3,7 @@
 
 import pytest
 
+from packit.constants import DISTGIT_INSTANCES
 from packit.dist_git_instance import DistGitInstance
 
 FEDORA_DG = DistGitInstance(
@@ -71,3 +72,15 @@ def test_from_url_and_namespace(url: str, namespace: str, expected: DistGitInsta
         expected.alternative_hostname,
     )
     assert parsed_dg_instance.namespace == expected.namespace
+
+
+@pytest.mark.parametrize(
+    "pkg_tool, package, expected_url",
+    (
+        ("fedpkg", "packit", "https://src.fedoraproject.org/rpms/packit"),
+        ("centpkg", "nispor", "https://gitlab.com/redhat/centos-stream/rpms/nispor"),
+        ("fedpkg-stage", "packit", "https://src.stg.fedoraproject.org/rpms/packit"),
+    ),
+)
+def test_distgit_project_url_from_dg_constant(pkg_tool, package, expected_url):
+    assert DISTGIT_INSTANCES[pkg_tool].distgit_project_url(package) == expected_url

@@ -17,6 +17,9 @@ class DistGitInstance:
     def url(self) -> str:
         return f"https://{self.hostname}/"
 
+    def distgit_project_url(self, package: str) -> str:
+        return f"{self.url}{self.namespace}/{package}"
+
     @staticmethod
     def from_url_and_namespace(url: str, namespace: str) -> "DistGitInstance":
         """Create an instance from the url and namespace.
