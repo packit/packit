@@ -339,11 +339,11 @@ def test_sync_release_check_pr_instructions(api_mock):
     [
         pytest.param(
             ["rhbz#123"],
-            "- Resolves rhbz#123\nUpstream tag: 1.0.0\nUpstream commit: _\n",
+            "- Resolves rhbz#123\n\nUpstream tag: 1.0.0\nUpstream commit: _\n",
         ),
         pytest.param(
             ["rhbz#123", "rhbz#222"],
-            "- Resolves rhbz#123\n- Resolves rhbz#222\nUpstream tag: 1.0.0\nUpstream commit: _\n",
+            "- Resolves rhbz#123\n- Resolves rhbz#222\n\nUpstream tag: 1.0.0\nUpstream commit: _\n",
         ),
         pytest.param(None, "Upstream tag: 1.0.0\nUpstream commit: _\n"),
     ],
