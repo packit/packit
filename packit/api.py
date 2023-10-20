@@ -1023,6 +1023,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         if resolved_bugs:
             for bug in resolved_bugs:
                 resolved_bugs_msg += f"- Resolves {bug}\n"
+            # add one more newline so that the text after is not included in autochangelog
+            resolved_bugs_msg += "\n"
 
         return SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION.format(
             upstream_tag=upstream_tag,
