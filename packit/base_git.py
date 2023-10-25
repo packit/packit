@@ -600,6 +600,7 @@ class PackitRepositoryBase:
                 )
                 for spec_source in sources + patches
                 if spec_source.remote
+                and spec_source.valid  # skip invalid (excluded using conditions) sources
             )
         logger.debug(f"List of sources to download (url, path, optional): {sourcelist}")
         # Download all sources
