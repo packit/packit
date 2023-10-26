@@ -93,10 +93,8 @@ class LookasideCache:
         archive_name = os.path.basename(archive_path)
         archive_hash = self.cache.hash_file(archive_path)
 
-        return self.cache.remote_file_exists_head(
+        return self.cache.remote_file_exists(
             name=self._get_package(package),
             filename=archive_name,
             hash=archive_hash,
-            # `hashtype` is a required argument, yet it doesn't have a default…
-            hashtype=None,
         )

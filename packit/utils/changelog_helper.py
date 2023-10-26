@@ -115,19 +115,25 @@ class ChangelogHelper:
             version=full_version,
             resolved_bugs=resolved_bugs,
         )
-        comment = action_output or (
-            self.up.local_project.git_project.get_release(
+        default_comment = f"Packit automatic update to version {full_version}"
+        if (
+            not action_output
+            and self.package_config.copy_upstream_release_description
+            and self.up.local_project.git_project
+        ):
+            # in pull_from_upstream workflow, upstream git_project can be None
+            default_comment = self.up.local_project.git_project.get_release(
                 tag_name=upstream_tag,
                 name=full_version,
             ).body
-            if self.package_config.copy_upstream_release_description
-            # in pull_from_upstream workflow, upstream git_project can be None
-            and self.up.local_project.git_project
-            else self.up.get_commit_messages(
+        elif not action_output and self.up.local_project.git_repo:
+            # in pull_from_upstream workflow, upstream git_repo can be None
+            comment = self.up.get_commit_messages(
                 after=self.up.get_last_tag(before=upstream_tag),
                 before=upstream_tag,
             )
-        )
+        else:
+            comment = action_output or default_comment
         if not action_output and resolved_bugs:
             comment += "\n"
             for bug in resolved_bugs:

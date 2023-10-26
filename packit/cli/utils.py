@@ -17,7 +17,7 @@ from packit.api import PackitAPI
 from packit.config import Config, JobType, get_local_package_config
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import PackageConfig
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.constants import DISTGIT_HOSTNAME_CANDIDATES, DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
@@ -312,29 +312,26 @@ def get_packit_api(
     lp_downstream = None
 
     for url in remote_urls:
-        parsed_url = parse_git_repo(url)
-        if not parsed_url.hostname:
+        remote_hostname = get_hostname_or_none(url=url)
+        if not remote_hostname:
             continue
 
-        if package_config.dist_git_instance.has_repository(url):
-            lp_downstream = local_project
-            logger.debug(
-                "Input directory is a downstream repository. Deduced from package config.",
-            )
+        if upstream_hostname and remote_hostname == upstream_hostname:
+            lp_upstream = local_project
+            logger.debug("Input directory is an upstream repository.")
             break
 
-        if upstream_hostname and parsed_url.hostname == upstream_hostname:
-            lp_upstream = local_project
-            logger.debug(
-                "Input directory is an upstream repository. Upstream hostname matches.",
-            )
+        if package_config.dist_git_base_url and (
+            remote_hostname in package_config.dist_git_base_url
+            or remote_hostname in DISTGIT_HOSTNAME_CANDIDATES
+        ):
+            lp_downstream = local_project
+            logger.debug("Input directory is a downstream repository.")
             break
     else:
         lp_upstream = local_project
         # fallback, this is the past behavior
-        logger.debug(
-            "Input directory is an upstream repository. No suitable remote found.",
-        )
+        logger.debug("Input directory is an upstream repository.")
 
     return PackitAPI(
         config=config,

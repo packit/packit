@@ -77,6 +77,7 @@ class Upstream(PackitRepositoryBase):
                 repo_name=self.package_config.upstream_package_name,
                 cache=self.repository_cache,
                 merge_pr=self.package_config.merge_pr_in_ci,
+                specfile=self.specfile,
             )
             # TODO: Turn this on once p-s mocks are updated
             # builder = LocalProjectBuilder(cache=self.repository_cache)

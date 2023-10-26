@@ -165,18 +165,18 @@ class PackitAPI:
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
 
-    def __repr__(self):
-        return (
-            "PackitAPI("
-            f"config='{self.config}', "
-            f"package_config='{self.package_config}', "
-            f"upstream_local_project='{self.upstream_local_project}', "
-            f"downstream_local_project='{self.downstream_local_project}', "
-            f"up='{self.up}', "
-            f"dg='{self.dg}', "
-            f"copr_helper='{self.copr_helper}', "
-            f"stage='{self.stage}')"
-        )
+    # def __repr__(self):
+    #    return (
+    #        "PackitAPI("
+    #        f"config='{self.config}', "
+    #        f"package_config='{self.package_config}', "
+    #        f"upstream_local_project='{self.upstream_local_project}', "
+    #        f"downstream_local_project='{self.downstream_local_project}', "
+    #        f"up='{self.up}', "
+    #        f"dg='{self.dg}', "
+    #        f"copr_helper='{self.copr_helper}', "
+    #        f"stage='{self.stage}')"
+    #    )
 
     @property
     def up(self) -> Upstream:
@@ -841,6 +841,13 @@ The first dist-git commit to be synced is '{short_hash}'.
             PackitException, if the version of the latest upstream release cannot be told.
             PackitException, if the upstream repo or dist-git is dirty.
         """
+
+        if use_downstream_specfile:
+            logger.info(
+                "Using the downstream specfile instead of the upstream one.",
+            )
+            self.up.set_specfile(self.dg.specfile)
+
         dist_git_branch = (
             dist_git_branch or self.dg.local_project.git_project.default_branch
         )
@@ -861,14 +868,27 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_tag = tag
             version = self.up.get_version_from_tag(tag)
 
-        assert_existence(self.up.local_project, "Upstream local project")
         assert_existence(self.dg.local_project, "Dist-git local project")
+        assert_existence(self.up.local_project, "Upstream local project")
+
+        up_is_git_repo = True
+        if use_downstream_specfile and self.up.local_project.git_repo is None:
+            # this is a pull-from-upstream and we don't strictly need
+            # an upstream git repo
+            logger.debug("No upstream git repo, taking sources from specfile")
+            up_is_git_repo = False
+
         if self.dg.is_dirty():
             raise PackitException(
                 f"The distgit repository {self.dg.local_project.working_dir} is dirty."
                 f"This is not supported.",
             )
-        if not force and self.up.is_dirty() and not use_local_content:
+        if (
+            up_is_git_repo
+            and not force
+            and self.up.is_dirty()
+            and not use_local_content
+        ):
             raise PackitException(
                 "The repository is dirty, will not discard the changes. Use --force to bypass.",
             )
@@ -879,7 +899,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_ref or self.package_config.upstream_ref,
         )
 
-        current_up_branch = self.up.active_branch
+        if up_is_git_repo:
+            current_up_branch = self.up.active_branch
         try:
             # we want to check out the tag only when local_content is not set
             # and it's an actual upstream repo and not source-git
@@ -888,7 +909,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "We will not check out the upstream tag "
                     "because this is a source-git repo.",
                 )
-            elif not use_local_content:
+            elif (
+                not use_local_content and up_is_git_repo
+            ):  # use local content for tarballs?
                 self.up.local_project.checkout_release(upstream_tag)
             self.up.run_action(
                 actions=ActionName.post_upstream_clone,
@@ -915,12 +938,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             logger.info(f"Using {dist_git_branch!r} dist-git branch.")
             self.dg.update_branch(dist_git_branch)
             self.dg.switch_branch(dist_git_branch)
-
-            if use_downstream_specfile:
-                logger.info(
-                    "Using the downstream specfile instead of the upstream one.",
-                )
-                self.up.set_specfile(self.dg.specfile)
 
             if create_pr:
                 local_pr_branch = (
@@ -950,13 +967,14 @@ The first dist-git commit to be synced is '{short_hash}'.
                 else ""
             )
 
+            commit_sha = self.up.local_project.commit_hexsha if up_is_git_repo else ""
             # Evaluate the commit title and message
             commit_msg_action_output = self.up.get_output_from_action(
                 ActionName.commit_message,
                 env={
                     "PACKIT_PROJECT_VERSION": version,
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
-                    "PACKIT_UPSTREAM_COMMIT": self.up.local_project.commit_hexsha,
+                    "PACKIT_UPSTREAM_COMMIT": commit_sha,
                     "PACKIT_DEBUG_DIVIDER": COMMIT_ACTION_DIVIDER.strip(),
                     "PACKIT_RESOLVED_BUGS": " ".join(resolved_bugs)
                     if resolved_bugs
@@ -965,11 +983,15 @@ The first dist-git commit to be synced is '{short_hash}'.
                 | self.sync_release_env,
             )
 
-            commit_title, commit_description = get_commit_message_from_action(
+            commit_description = (
+                self.get_default_commit_description(upstream_tag, resolved_bugs)
+                if up_is_git_repo
+                else ""  # @todo see if we can take it from the hotness event
+            )
+            title, description = get_commit_message_from_action(
                 output=commit_msg_action_output,
                 default_title=title or f"[packit] {version} upstream release",
-                default_description=description
-                or self.get_default_commit_description(upstream_tag, resolved_bugs),
+                default_description=description or commit_description,
             )
 
             self.update_dist_git(
@@ -978,8 +1000,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 add_new_sources=add_new_sources,
                 force_new_sources=force_new_sources,
                 upstream_tag=upstream_tag,
-                commit_title=commit_title,
-                commit_msg=commit_description,
+                commit_title=title,
+                commit_msg=description,
                 sync_default_files=sync_default_files,
                 mark_commit_origin=mark_commit_origin,
                 check_dist_git_pristine=False,
@@ -997,7 +1019,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
-            if not use_local_content and not upstream_ref:
+            if not use_local_content and not upstream_ref and up_is_git_repo:
                 logger.info(f"Checking out the original branch {current_up_branch}.")
                 self.up.local_project.git_repo.git.checkout(current_up_branch, "-f")
             self.dg.refresh_specfile()
