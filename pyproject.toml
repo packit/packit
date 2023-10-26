@@ -71,7 +71,6 @@ testing = [
     "distro",
     "setuptools", # Required for test_upstream.py/test_get_version_macro
     "setuptools-scm", # Required for tests using python-ogr.spec
-    "setuptools-scm-git-archive", # Required for tests using python-ogr.spec
 ]
 dev = [
     "packitos[testing]",
