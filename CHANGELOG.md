@@ -1,3 +1,7 @@
+# 0.85.0
+
+- Packit no longer downloads sources excluded using spec file conditions. (#2132)
+
 # 0.84.0
 
 - We have adjusted how we include the resolved bugzillas in the commit messages created when syncing the release downstream so that the resolved bugzillas are included in changelog when using %autochangelog. (#2126)
