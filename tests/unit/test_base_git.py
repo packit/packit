@@ -324,7 +324,7 @@ def test_get_output_from_action_not_defined(packit_repository_base):
 
 
 @pytest.mark.parametrize(
-    "source, package_config, expected_url",
+    "source, package_config, expected_urls, extra_source",
     [
         pytest.param(
             "https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz",
@@ -342,7 +342,8 @@ def test_get_output_from_action_not_defined(packit_repository_base):
                 },
                 jobs=[],
             ),
-            "https://git.centos.org/sources/rsync/c8s/82e7829",
+            ["https://git.centos.org/sources/rsync/c8s/82e7829"],
+            False,
         ),
         pytest.param(
             "https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz",
@@ -360,7 +361,11 @@ def test_get_output_from_action_not_defined(packit_repository_base):
                 },
                 jobs=[],
             ),
-            "https://git.centos.org/sources/rsync/c8s/82e7829",
+            [
+                "https://git.centos.org/sources/rsync/c8s/82e7829",
+                "https://example.com/extra-source.tar.xz",
+            ],
+            True,
         ),
         pytest.param(
             "rsync-3.1.3.tar.gz",
@@ -378,30 +383,46 @@ def test_get_output_from_action_not_defined(packit_repository_base):
                 },
                 jobs=[],
             ),
-            "https://git.centos.org/sources/rsync/c8s/82e7829",
+            ["https://git.centos.org/sources/rsync/c8s/82e7829"],
+            False,
         ),
     ],
 )
-def test_download_remote_sources(source, package_config, expected_url, tmp_path: Path):
+def test_download_remote_sources(
+    source,
+    package_config,
+    expected_urls,
+    extra_source,
+    tmp_path: Path,
+):
     specfile_content = (
         "Name: rsync\n"
         "Version: 3.1.3\n"
         "Release: 1\n"
         f"Source0: {source}\n"
+        "%if 0%{?extra_source}\n"
+        "Source1: https://example.com/extra-source.tar.xz\n"
+        "%endif\n"
         "License: GPLv3+\n"
         "Summary: rsync\n"
         "%description\nrsync\n"
     )
     spec_path = tmp_path / "rsync.spec"
     spec_path.write_text(specfile_content)
-    specfile = Specfile(spec_path, sourcedir=tmp_path, autosave=True)
+    specfile = Specfile(
+        spec_path,
+        sourcedir=tmp_path,
+        autosave=True,
+        macros=[("extra_source", "1")] if extra_source else None,
+    )
     base_git = PackitRepositoryBase(config=flexmock(), package_config=package_config)
     flexmock(base_git).should_receive("specfile").and_return(specfile)
 
+    expected_urls = iter(expected_urls)
     expected_path = tmp_path / "rsync-3.1.3.tar.gz"
 
     def mocked_get(url, **_):
-        assert url == expected_url
+        assert url == next(expected_urls)
         return flexmock(
             raise_for_status=lambda: None,
             iter_content=lambda **_: iter([b"1"]),
