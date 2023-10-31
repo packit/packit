@@ -493,31 +493,63 @@ def test_get_spec_release(
 
 
 @pytest.mark.parametrize(
-    "update_release,release_suffix,expected_release_suffix",
+    "update_release,had_disttag,release_suffix,expected_release_suffix",
     (
         # current_git_tag_version="4.5"
         # original_release_number_from_spec = "2"
+        # original_dist_from_spec = "%{?dist}" if had_disttag else ""
         pytest.param(
             True,
+            False,
             "",
             # update-release from command line wins over release_suffix on packit.yaml
-            "2.1234.mock_ref.",
+            "2.1234.mock_ref.%{?dist}",
             id="Bump release, release_suffix is empty",
         ),
         pytest.param(
             True,
+            False,
             None,
-            "2.1234.mock_ref.",
+            "2.1234.mock_ref.%{?dist}",
             id="Bump release, release_suffix is None",
         ),
-        pytest.param(True, "7", "2.7", id="Bump release, release_suffix value is 7"),
         pytest.param(
             True,
+            False,
+            "7",
+            "2.7%{?dist}",
+            id="Bump release, release_suffix value is 7",
+        ),
+        pytest.param(
+            True,
+            False,
             "{PACKIT_RPMSPEC_RELEASE}",
-            "2.1234.mock_ref.",
+            "2.1234.mock_ref.%{?dist}",
             id="Bump release, release_suffix value is a macro {PACKIT_RPMSPEC_RELEASE}",
         ),
         pytest.param(
+            True,
+            True,
+            "",
+            "2.1234.mock_ref.",
+            id="Bump release, release_suffix is empty, make sure %{?dist} tag is not duplicated",
+        ),
+        pytest.param(
+            True,
+            True,
+            "{PACKIT_RPMSPEC_RELEASE}",
+            "2.1234.mock_ref.",
+            id="Bump release, release_suffix is a macro, make sure %{?dist} tag is not duplicated",
+        ),
+        pytest.param(
+            True,
+            False,
+            "{PACKIT_RPMSPEC_RELEASE}%{{?dist}}",
+            "2.1234.mock_ref.%{?dist}",
+            id="Bump release, make sure %{?dist} tag is not duplicated",
+        ),
+        pytest.param(
+            False,
             False,
             "",
             "2.1234.mock_ref.",
@@ -525,17 +557,20 @@ def test_get_spec_release(
         ),
         pytest.param(
             False,
+            False,
             None,
             "2.1234.mock_ref.",
             id="Do not modify release, release_suffix is None",
         ),
         pytest.param(
             False,
+            False,
             "7",
             "2.7",
             id="Do not modify release, release_suffix value is 7",
         ),
         pytest.param(
+            False,
             False,
             "{PACKIT_RPMSPEC_RELEASE}",
             "2.1234.mock_ref.",
@@ -546,6 +581,7 @@ def test_get_spec_release(
 def test_fix_spec(
     upstream_mock,
     update_release,
+    had_disttag,
     release_suffix,
     expected_release_suffix,
 ):
@@ -570,8 +606,10 @@ def test_fix_spec(
     )
     flexmock(upstream_mock).should_receive("_fix_spec_prep").with_args(archive=archive)
 
+    disttag = "%{?dist}" if had_disttag else ""
     upstream_mock._specfile = flexmock(
         expanded_release=original_release_number_from_spec,
+        raw_release=f"{original_release_number_from_spec}{disttag}",
     )
     upstream_mock._specfile.should_receive("reload").once()
 

@@ -222,6 +222,14 @@ class ChangelogHelper:
         # instead of changing version, we change Release field
         # upstream projects should take care of versions
         if update_release:
+            # Make sure the new release has a dist tag if it is not already included explicitly
+            # (in release) or implicitly (in up.specfile.raw_release)
+            if (
+                release
+                and not release.endswith("%{?dist}")
+                and not self.up.specfile.raw_release.endswith("%{?dist}")
+            ):
+                release = f"{release}%{{?dist}}"
             logger.debug(f"Setting Release in spec to {release!r}.")
             self.up.specfile.release = release
         if msg is not None:
