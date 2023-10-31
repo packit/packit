@@ -1,9 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import logging
 from typing import Optional
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 def get_upstream_version(package_name: str) -> Optional[str]:
@@ -19,10 +22,14 @@ def get_upstream_version(package_name: str) -> Optional[str]:
     """
 
     def query(endpoint, **kwargs):
-        response = requests.get(
-            f"https://release-monitoring.org/api/{endpoint}",
-            params=kwargs,
-        )
+        try:
+            response = requests.get(
+                f"https://release-monitoring.org/api/{endpoint}",
+                params=kwargs,
+            )
+        except requests.exceptions.RequestException as e:
+            logger.debug(f"release-monitoring.org query failed: {e!s}")
+            return {}
         if not response.ok:
             return {}
         return response.json()
