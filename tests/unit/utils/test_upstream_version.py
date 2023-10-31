@@ -8,20 +8,23 @@ from packit.utils.upstream_version import get_upstream_version, requests
 
 
 @pytest.mark.parametrize(
-    "package, version",
+    "package, version, exception",
     [
-        ("libtiff", "4.4.0"),
-        ("tiff", "4.4.0"),
-        ("python-specfile", "0.5.0"),
-        ("specfile", "0.5.0"),
-        ("python3-specfile", None),
-        ("mock", "3.1-1"),
-        ("packitos", "0.56.0"),
-        ("packit", None),
+        ("libtiff", "4.4.0", None),
+        ("tiff", "4.4.0", None),
+        ("python-specfile", "0.5.0", None),
+        ("specfile", "0.5.0", None),
+        ("python3-specfile", None, None),
+        ("mock", "3.1-1", None),
+        ("packitos", "0.56.0", None),
+        ("packitos", "0.56.0", requests.exceptions.SSLError),
+        ("packit", None, None),
     ],
 )
-def test_get_upstream_version(package, version):
+def test_get_upstream_version(package, version, exception):
     def mocked_get(url, params):
+        if exception is not None:
+            raise exception()
         packages = {
             "libtiff": "tiff",
             "python-specfile": "specfile",
@@ -53,4 +56,7 @@ def test_get_upstream_version(package, version):
 
     flexmock(requests).should_receive("get").replace_with(mocked_get)
 
-    assert get_upstream_version(package) == version
+    if exception is None:
+        assert get_upstream_version(package) == version
+    else:
+        assert get_upstream_version(package) is None
