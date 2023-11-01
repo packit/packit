@@ -484,13 +484,16 @@ class DistGit(PackitRepositoryBase):
         :param scratch: should the build be a scratch build?
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
+
+        Returns:
+            The 'stdout' of the build command.
         """
         pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
             tool=self.pkg_tool,
         )
-        pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        return pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     @staticmethod
     def get_latest_build_for_branch(downstream_package_name, dist_git_branch):
