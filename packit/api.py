@@ -1368,6 +1368,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             srpm_path: Specifies the path to the SRPM. If given, it is used for
                 the Koji build instead of the dist-git sources or upstream (if
                 `from_upstream` is set).
+
+        Returns:
+            The 'stdout' of the build command.
         """
         logger.info(f"Using {dist_git_branch!r} dist-git branch")
         self.init_kerberos_ticket()
@@ -1394,8 +1397,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self.dg.update_branch(dist_git_branch)
         self.dg.switch_branch(dist_git_branch)
 
-        self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
-        return None
+        return self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
 
     def create_update(
         self,
