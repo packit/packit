@@ -22,7 +22,7 @@ def test_basic_build(
         cwd=api.dg.local_project.working_dir,
         error_message="Submission of build to koji failed.",
         fail=True,
-    ).once()
+    ).once().and_return(flexmock(stdout=""))
 
     api.build("main", scratch=True, nowait=True, koji_target="asdqwe")
 
