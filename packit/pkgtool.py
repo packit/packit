@@ -85,14 +85,18 @@ class PkgTool:
         nowait: bool = False,
         koji_target: Optional[str] = None,
         srpm_path: Optional[Path] = None,
-    ):
+    ) -> Optional[str]:
         """
-        build in koji
+        Run build in Koji.
 
-        :param scratch: scratch (temporary) build or not?
-        :param nowait: False == wait for the build to finish
-        :param koji_target: koji target to build in (`koji list-targets`)
-        :param srpm_path: use selected SRPM for build, not dist-git repo & ref
+        Args:
+            scratch: scratch (temporary) build or not?
+            nowait: False == wait for the build to finish
+            koji_target: koji target to build in (`koji list-targets`)
+            srpm_path: use selected SRPM for build, not dist-git repo & ref
+
+        Returns:
+            The 'stdout' of the build command.
         """
         cmd = [self.tool, "build"]
         if scratch:
@@ -105,12 +109,12 @@ class PkgTool:
             cmd += ["--srpm", str(srpm_path)]
 
         try:
-            commands.run_command_remote(
+            return commands.run_command_remote(
                 cmd=cmd,
                 cwd=self.directory,
                 error_message="Submission of build to koji failed.",
                 fail=True,
-            )
+            ).stdout
 
         except PackitCommandFailedError as ex:
             # fail on the fedpkg side, the build is triggered
@@ -123,9 +127,9 @@ class PkgTool:
                     "the build is submitted in koji anyway.",
                 )
                 logger.debug(ex.stdout_output)
+                return ""
 
-            else:
-                raise
+            raise
 
     def clone(
         self,
