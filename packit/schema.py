@@ -360,6 +360,8 @@ class CommonConfigSchema(Schema):
     update_release = fields.Bool(default=True)
     upstream_tag_include = fields.String()
     upstream_tag_exclude = fields.String()
+    prerelease_suffix_pattern = fields.String()
+    prerelease_suffix_macro = fields.String(missing=None)
     upload_sources = fields.Bool(default=True)
 
     # Former 'metadata' keys
