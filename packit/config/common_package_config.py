@@ -221,6 +221,8 @@ class CommonPackageConfig:
         follow_fedora_branching: bool = False,
         upstream_tag_include: str = "",
         upstream_tag_exclude: str = "",
+        prerelease_suffix_pattern: str = r"([.\-_~^]?)(alpha|beta|rc|pre(view)?)([.\-_]?\d+)?",
+        prerelease_suffix_macro: Optional[str] = None,
         upload_sources: bool = True,
         pkg_tool: Optional[str] = None,
         version_update_mask: Optional[str] = None,
@@ -282,6 +284,8 @@ class CommonPackageConfig:
         self.upstream_tag_include = upstream_tag_include
         self.upstream_tag_exclude = upstream_tag_exclude
         self.version_update_mask = version_update_mask
+        self.prerelease_suffix_pattern = prerelease_suffix_pattern
+        self.prerelease_suffix_macro = prerelease_suffix_macro
 
         # from deprecated JobMetadataConfig
         self._targets: dict[str, dict[str, Any]]
