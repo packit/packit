@@ -114,6 +114,8 @@ class PkgTool:
                 cwd=self.directory,
                 error_message="Submission of build to koji failed.",
                 fail=True,
+                output=True,
+                print_live=True,
             ).stdout
 
         except PackitCommandFailedError as ex:
