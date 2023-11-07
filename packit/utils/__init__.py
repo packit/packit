@@ -39,6 +39,7 @@ __all__ = [
     set_logging.__name__,
     StreamLogger.__name__,
 ]
+OFFENDERS = "!@#$%&*()={[}]|\\'\":;<,>/?`"
 
 
 def sanitize_branch_name(branch_name: str) -> str:
@@ -49,18 +50,25 @@ def sanitize_branch_name(branch_name: str) -> str:
         Name must contain only letters, digits, underscores, dashes and dots.
     """
     # https://stackoverflow.com/questions/3411771/best-way-to-replace-multiple-characters-in-a-string
-    offenders = "!@#$%^&*()+={[}]|\\'\":;<,>/?~`"
+    offenders = OFFENDERS + "^~+"
     for o in offenders:
         branch_name = branch_name.replace(o, "-")
     return branch_name
 
 
-def sanitize_branch_name_for_rpm(branch_name: str) -> str:
-    """
+def sanitize_version(version: str) -> str:
+    """Sanitize given string to be usable as a version.
+
     rpm is picky about release: hates "/" - it's an error
     also prints a warning for "-"
+
+    Follows rules in
+    https://github.com/rpm-software-management/rpm/blob/master/docs/manual/spec.md#version
+
+    The version string consists of alphanumeric characters,
+    which can optionally be segmented with the separators
+    ., _ and +, plus ~ and ^
     """
-    offenders = "!@#$%^&*()={[}]|\\'\":;<,>/?~`"
-    for o in offenders:
-        branch_name = branch_name.replace(o, "")
-    return branch_name.replace("-", ".")
+    for o in OFFENDERS:
+        version = version.replace(o, "")
+    return version.replace("-", ".")
