@@ -9,7 +9,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.api import get_packit_version
-from packit.utils import sanitize_branch_name, sanitize_branch_name_for_rpm
+from packit.utils import sanitize_branch_name, sanitize_version
 
 
 def test_get_packit_version_not_installed():
@@ -33,9 +33,17 @@ def test_relative_to(to, from_, exp):
 
 
 @pytest.mark.parametrize(
-    "inp,exp,exp_rpm",
-    (("pr/123", "pr-123", "pr123"), ("🌈🌈🌈", "🌈🌈🌈", "🌈🌈🌈"), ("@#$#$%", "------", "")),
+    "inp,exp,ver",
+    (
+        ("pr/123", "pr-123", "pr123"),
+        ("🌈🌈🌈", "🌈🌈🌈", "🌈🌈🌈"),
+        ("@#$#$%", "------", ""),
+        ("pr+1", "pr-1", "pr+1"),
+        ("pr^1", "pr-1", "pr^1"),
+        ("pr~1", "pr-1", "pr~1"),
+        ("pr-1", "pr-1", "pr.1"),
+    ),
 )
-def test_sanitize_branch(inp, exp, exp_rpm):
+def test_sanitize_branch(inp, exp, ver):
     assert sanitize_branch_name(inp) == exp
-    assert sanitize_branch_name_for_rpm(inp) == exp_rpm
+    assert sanitize_version(inp) == ver

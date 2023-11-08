@@ -30,7 +30,7 @@ from packit.exceptions import (
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator, PatchMetadata
 from packit.sync import iter_srcs
-from packit.utils import commands, sanitize_branch_name_for_rpm
+from packit.utils import commands, sanitize_version
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.commands import run_command
 from packit.utils.repo import get_current_version_command, git_remote_url_to_https_url
@@ -301,7 +301,7 @@ class Upstream(PackitRepositoryBase):
             version = self.specfile.expanded_version
 
         logger.debug(f"Version: {version}")
-        version = sanitize_branch_name_for_rpm(version)
+        version = sanitize_version(version)
         logger.debug(f"Sanitized version: {version}")
 
         return version
@@ -487,7 +487,7 @@ class Upstream(PackitRepositoryBase):
             # the leading dot is put here b/c git_desc_suffix can be empty
             # and we could have two subsequent dots - rpm errors out in such a case
         current_branch = self.local_project.ref
-        sanitized_current_branch = sanitize_branch_name_for_rpm(current_branch)
+        sanitized_current_branch = sanitize_version(current_branch)
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         return (
             f"{original_release_number}.{current_time}."
@@ -1110,7 +1110,7 @@ class SRPMBuilder:
             "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(release_suffix),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
-            "PACKIT_PROJECT_BRANCH": sanitize_branch_name_for_rpm(
+            "PACKIT_PROJECT_BRANCH": sanitize_version(
                 self.upstream.local_project.ref,
             ),
         }
