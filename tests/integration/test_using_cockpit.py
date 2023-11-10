@@ -71,6 +71,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         working_dir=dist_git_path,
         git_repo=CALCULATE,
     )
+    flexmock(api.up, get_specfile_version=lambda: "178")
 
     with cwd(upstream_path):
         api.sync_release(
@@ -112,6 +113,7 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
         working_dir=dist_git_path,
         git_repo=CALCULATE,
     )
+    flexmock(api.up, get_specfile_version=lambda: "178")
 
     with cwd(upstream_path):
         assert pr == api.sync_release(

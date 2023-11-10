@@ -148,6 +148,9 @@ class CommonPackageConfig:
         module_hotfixes: if set, copr will generate repo files with module_hotfixes=1
         upload_sources: If Packit should upload sources to lookaside cache. True by default.
         pkg_tool: Tool that is used for interaction with the lookaside cache.
+        version_update_mask: String containing a reg exp. The old version contained in the
+            specfile and the newly released version have both to match this reg exp
+            otherwise Packit shall not sync the release downstream.
     """
 
     def __init__(
@@ -220,6 +223,7 @@ class CommonPackageConfig:
         upstream_tag_exclude: str = "",
         upload_sources: bool = True,
         pkg_tool: Optional[str] = None,
+        version_update_mask: str = "",
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -277,6 +281,7 @@ class CommonPackageConfig:
         self.update_release = update_release
         self.upstream_tag_include = upstream_tag_include
         self.upstream_tag_exclude = upstream_tag_exclude
+        self.version_update_mask = version_update_mask
 
         # from deprecated JobMetadataConfig
         self._targets: dict[str, dict[str, Any]]
