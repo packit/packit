@@ -165,8 +165,7 @@ def test_basic_local_update_with_multiple_sources(
             ["git", "commit", "-m", "Added new source to specfile"],
             cwd=git_path,
         )
-    api.up.specfile.reload()
-    api.dg.specfile.reload()
+    subprocess.check_call(["git", "tag", "0.1.0", "-f"], cwd=u)
 
     dist_git_first_source = d / TARBALL_NAME
     dist_git_second_source = d / "the_source.tar.gz"
@@ -215,7 +214,7 @@ def test_basic_local_update_with_adding_second_source(
         ["git", "commit", "-m", "Added new source to specfile"],
         cwd=u,
     )
-    api.up.specfile.reload()
+    subprocess.check_call(["git", "tag", "0.1.0", "-f"], cwd=u)
 
     dist_git_first_source = d / TARBALL_NAME
     dist_git_second_source = d / "the_source.tar.gz"

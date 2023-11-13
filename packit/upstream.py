@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import git
+import rpm
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
@@ -245,7 +246,10 @@ class Upstream(PackitRepositoryBase):
 
     def get_specfile_version(self) -> str:
         """provide version from specfile"""
-        version = self.specfile.expanded_version
+        # we need to get the version from rpm spec header
+        # (as the version tag might not be present directly in the specfile,
+        # but e.g. imported)
+        version = self.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_VERSION]
         logger.info(f"Version in spec file is {version!r}.")
         return version
 

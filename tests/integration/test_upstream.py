@@ -26,6 +26,7 @@ from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 from tests.spellbook import (
     EMPTY_CHANGELOG,
+    NO_VERSION_TAG_IN_SPECFILE,
     UPSTREAM_MACRO_IN_SOURCE,
     build_srpm,
     get_test_config,
@@ -101,6 +102,28 @@ def test_get_version_macro(upstream_instance):
         f.write(data)
 
     assert ups.get_specfile_version() == "1"
+
+
+def test_get_version_no_version_tag(tmp_path):
+    u_remote_path = tmp_path / "upstream_remote"
+    u_remote_path.mkdir(parents=True, exist_ok=True)
+
+    create_new_repo(u_remote_path, ["--bare"])
+
+    u = tmp_path / "upstream_git"
+    shutil.copytree(NO_VERSION_TAG_IN_SPECFILE, u)
+    initiate_git_repo(u, tag="0.1.0")
+
+    with cwd(tmp_path):
+        c = get_test_config()
+
+        pc = get_local_package_config(str(u))
+        pc.upstream_project_url = str(u)
+        lp = LocalProjectBuilder().build(working_dir=u)
+
+        ups = Upstream(c, pc, lp)
+
+    assert ups.get_specfile_version() == "2.1.1"
 
 
 def test_set_spec_ver(upstream_instance):
