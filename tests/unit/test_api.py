@@ -382,12 +382,13 @@ def test_pkg_tool_property(package_config, config, expected_pkg_tool):
 
 
 @pytest.mark.parametrize(
-    "current_version, proposed_version, target_branch, exp",
+    "current_version, proposed_version, target_branch, version_update_mask, exp",
     (
         pytest.param(
             "3.10.0",
             "4.0.0",
             "rawhide",
+            None,
             does_not_raise(),
             id="skip version distance check for rawhide",
         ),
@@ -395,6 +396,7 @@ def test_pkg_tool_property(package_config, config, expected_pkg_tool):
             "3.10.0",
             "4.0.0",
             "f38",
+            r"\d+\.\d+\.",
             pytest.raises(PackitException),
             id="proposed version far too distant for f38",
         ),
@@ -402,19 +404,24 @@ def test_pkg_tool_property(package_config, config, expected_pkg_tool):
             "3.10.0",
             "3.10.1",
             "f38",
+            r"\d+\.\d+\.",
             does_not_raise(),
             id="proposed version ok for f38",
         ),
     ),
 )
-def test_check_version_distance(current_version, proposed_version, target_branch, exp):
+def test_check_version_distance(
+    current_version,
+    proposed_version,
+    target_branch,
+    version_update_mask,
+    exp,
+):
     package_config = flexmock(
-        version_update_mask=r"\d+\.\d+\.",
+        version_update_mask=version_update_mask,
     )
     config = Config()
-    from packit import api
 
-    flexmock(api, get_branches=lambda _: ["f38"])
     with exp:
         PackitAPI(config, package_config).check_version_distance(
             current_version,

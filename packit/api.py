@@ -745,24 +745,25 @@ The first dist-git commit to be synced is '{short_hash}'.
         proposed: str, release we are preparing for package
         target_branch: str, Fedora branch where release the package
         """
-        masked_current = re.match(self.package_config.version_update_mask, current)
-        masked_proposed = re.match(
-            self.package_config.version_update_mask,
-            proposed,
-        )
-        if (
-            masked_current
-            and masked_proposed
-            and masked_current.group(0) != masked_proposed.group(0)
-        ):
-            raise ReleaseSkippedPackitException(
-                f"The upstream released version {current} does not match "
-                f"specfile version {proposed} at branch {target_branch} "
-                f"using the version_update_mask "
-                f'"{self.package_config.version_update_mask}".'
-                "\nYou can change the version_update_mask with an empty string "
-                "to skip this check.",
+        if self.package_config.version_update_mask is not None:
+            masked_current = re.match(self.package_config.version_update_mask, current)
+            masked_proposed = re.match(
+                self.package_config.version_update_mask,
+                proposed,
             )
+            if (
+                masked_current
+                and masked_proposed
+                and masked_current.group(0) != masked_proposed.group(0)
+            ):
+                raise ReleaseSkippedPackitException(
+                    f"The upstream released version {current} does not match "
+                    f"specfile version {proposed} at branch {target_branch} "
+                    f"using the version_update_mask "
+                    f'"{self.package_config.version_update_mask}".'
+                    "\nYou can change the version_update_mask with an empty string "
+                    "to skip this check.",
+                )
 
     @overload
     def sync_release(

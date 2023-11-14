@@ -223,7 +223,7 @@ class CommonPackageConfig:
         upstream_tag_exclude: str = "",
         upload_sources: bool = True,
         pkg_tool: Optional[str] = None,
-        version_update_mask: str = "",
+        version_update_mask: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
