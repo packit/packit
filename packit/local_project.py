@@ -4,20 +4,28 @@
 import dataclasses
 import logging
 import shutil
+import tarfile
+import tempfile
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
 from typing import Any, ClassVar, Optional, TypeVar, Union
 
 import git
+import requests
 from git.exc import GitCommandError
 from ogr import GitlabService
 from ogr.abstract import GitProject, GitService
 from ogr.factory import get_project, get_service_class
 from ogr.parsing import parse_git_repo
+from specfile import Specfile
 
 from packit.constants import LP_TEMP_PR_CHECKOUT_NAME
-from packit.exceptions import PackitException, PackitMergeException
+from packit.exceptions import (
+    PackitDownloadFailedException,
+    PackitException,
+    PackitMergeException,
+)
 from packit.utils.repo import (
     RepositoryCache,
     get_repo,
@@ -67,6 +75,7 @@ class LocalProject:
         merge_pr: bool = True,
         target_branch: str = "",
         working_dir_temporary: bool = False,
+        specfile: Specfile = None,
     ) -> None:
         """
 
@@ -83,6 +92,7 @@ class LocalProject:
         :param refresh: bool (calculate the missing attributes, defaults to True)
         :param remote: name of the git remote to use
         :param pr_id: ID of the pull request to fetch and check out
+        :param specfile: Specfile where to look for sources, if given
         """
         self.working_dir_temporary = working_dir_temporary
         self._git_repo: git.Repo = git_repo
@@ -97,6 +107,7 @@ class LocalProject:
         self.offline = offline
         self.remote = remote
         self.cache = cache
+        self.specfile = specfile
 
         logger.debug(
             "Arguments received in the init method of the LocalProject class: \n"
@@ -116,6 +127,7 @@ class LocalProject:
             f"cache: {cache}\n"
             f"merge_pr: {merge_pr}\n"
             f"target_branch: {target_branch}\n",
+            f"specfile: {specfile}\n",
         )
 
         if refresh:
@@ -216,6 +228,7 @@ class LocalProject:
                 or self._parse_namespace_from_git_project()
                 or self._parse_git_url_from_git_repo()
                 or self._parse_namespace_from_git_url()
+                or self._populate_working_dir_with_specfile_sources()
             )
 
     def _parse_repo_name_full_name_and_namespace(self):
@@ -300,6 +313,75 @@ class LocalProject:
             )
             return True
         return False
+
+    # this is a copy and paste!!! get rid of the copy...
+    def download_remote_sources(self) -> list[Path]:
+        """
+        Download the sources from the URL in the configuration (if the path in
+        the configuration match to the URL basename from SourceX) or from the one
+        from SourceX in specfile.
+
+        Args:
+            pkg_tool: Packaging tool associated with a lookaside cache instance
+              to be used for downloading sources.
+
+        Raises:
+            PackitDownloadFailedException if download fails for any reason.
+        """
+        user_agent = "packit/xxx (hello+cli@packit.dev)"
+        sourcelist: list[tuple[str, str, bool]] = []
+        # Fetch all remote sources defined in the spec file
+        with self.specfile.sources() as sources, self.specfile.patches() as patches:
+            sourcelist.extend(
+                (
+                    spec_source.expanded_location,
+                    spec_source.expanded_filename,
+                    False,
+                )
+                for spec_source in sources + patches
+                if spec_source.remote
+            )
+        logger.debug(f"List of sources to download (url, path, optional): {sourcelist}")
+        # Download all sources
+        sources = []
+        for url, filename, optional in sourcelist:
+            source_path = Path(self.working_dir).joinpath(filename)
+            sources.append(source_path)
+            if source_path.is_file():
+                continue
+            try:
+                with requests.get(
+                    url,
+                    headers={"User-Agent": user_agent},
+                    stream=True,
+                ) as response:
+                    response.raise_for_status()
+                    with open(source_path, "wb") as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError,
+            ) as e:
+                msg = f"Failed to download source from {url}"
+                if optional:
+                    logger.warning(f"{msg}: {e!r}")
+                    continue
+                logger.error(f"{msg}: {e!r}")
+                raise PackitDownloadFailedException(f"{msg}:\n{e}") from e
+
+        return sources
+
+    def explode_sources_archives(self, sources: list[Path]):
+        for source in sources:
+            if tarfile.is_tarfile(f"{source}"):
+                logger.debug(f"Source archive {source} is tar.")
+                tar = tarfile.open(f"{source}")
+                tar.extractall(Path(self.working_dir), filter="data")
+                tar.close()
+                source.unlink()
+            else:
+                logger.warning(f"Source archive {source} is not tar.")
 
     def _parse_git_repo_from_git_url(self):
         if (
@@ -386,6 +468,15 @@ class LocalProject:
             )
             return True
         return False
+
+    def _populate_working_dir_with_specfile_sources(self):
+        if self.specfile:
+            # Use specfile to retrieve sources
+            self.working_dir_temporary = True
+            self.working_dir = Path(tempfile.mkdtemp())
+            sources = self.download_remote_sources()
+            self.explode_sources_archives(sources)
+        return False  # otherwise change is True and will loop forever
 
     def _get_ref_from_git_repo(self) -> str:
         if self.git_repo.head.is_detached:
