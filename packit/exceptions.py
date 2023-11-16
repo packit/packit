@@ -119,3 +119,7 @@ class ImageBuilderError(PackitException):
 
     def __init__(self, errors):
         self.errors = errors
+
+
+class ReleaseSkippedPackitException(PackitException):
+    """The release of the new version has been skipped due to a failing check"""
