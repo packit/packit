@@ -34,6 +34,7 @@ from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig, RunCommandType
+from packit.config.aliases import get_branches
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -58,6 +59,7 @@ from packit.exceptions import (
     PackitRPMNotFoundException,
     PackitSRPMException,
     PackitSRPMNotFoundException,
+    ReleaseSkippedPackitException,
 )
 from packit.local_project import LocalProject
 from packit.patches import PatchGenerator
@@ -732,6 +734,44 @@ The first dist-git commit to be synced is '{short_hash}'.
 """
         return f"'{source_git}' is up to date with '{dist_git}'."
 
+    def check_version_distance(
+        self,
+        current,
+        proposed,
+        target_branch,
+    ) -> None:
+        """Following this guidelines:
+        https://docs.fedoraproject.org/en-US/fesco/Updates_Policy/#philosophy
+        we want to avoid major updates of packages within a **stable** release.
+
+        current: str, already released version for package
+        proposed: str, release we are preparing for package
+        target_branch: str, Fedora branch where release the package
+        """
+        branches_to_check = get_branches("fedora-branched")
+        if (
+            self.package_config.version_update_mask
+            and target_branch in branches_to_check
+        ):
+            masked_current = re.match(self.package_config.version_update_mask, current)
+            masked_proposed = re.match(
+                self.package_config.version_update_mask,
+                proposed,
+            )
+            if (
+                masked_current
+                and masked_proposed
+                and masked_current.group(0) != masked_proposed.group(0)
+            ):
+                raise ReleaseSkippedPackitException(
+                    f"The upstream released version {current} does not match "
+                    f"specfile version {proposed} at branch {target_branch} "
+                    f"using the version_update_mask "
+                    f'"{self.package_config.version_update_mask}".'
+                    "\nYou can change the version_update_mask with an empty string "
+                    "to skip this check.",
+                )
+
     @overload
     def sync_release(
         self,
@@ -872,9 +912,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             raise PackitException(
                 "The repository is dirty, will not discard the changes. Use --force to bypass.",
             )
-        # do not add anything between distgit clone and saving gpg keys!
-        self.up.allowed_gpg_keys = self.dg.get_allowed_gpg_keys_from_downstream_config()
-
         upstream_ref = self.up._expand_git_ref(
             upstream_ref or self.package_config.upstream_ref,
         )
@@ -890,37 +927,46 @@ The first dist-git commit to be synced is '{short_hash}'.
                 )
             elif not use_local_content:
                 self.up.local_project.checkout_release(upstream_tag)
-            self.up.run_action(
-                actions=ActionName.post_upstream_clone,
-                env=self.sync_release_env,
-            )
 
-            if not use_downstream_specfile:
-                spec_ver = self.up.get_specfile_version()
-                if compare_versions(version, spec_ver) > 0:
-                    logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
-
-            self.dg.check_last_commit()
-
-            self.up.run_action(actions=ActionName.pre_sync, env=self.sync_release_env)
-            if not use_downstream_specfile:
-                self.up.specfile.reload()
             self.dg.create_branch(
                 dist_git_branch,
                 base=f"remotes/origin/{dist_git_branch}",
                 setup_tracking=True,
             )
-
             # fetch and reset --hard upstream/$branch?
             logger.info(f"Using {dist_git_branch!r} dist-git branch.")
             self.dg.update_branch(dist_git_branch)
             self.dg.switch_branch(dist_git_branch)
+
+            # do not add anything between distgit clone/checkout and saving gpg keys!
+            self.up.allowed_gpg_keys = (
+                self.dg.get_allowed_gpg_keys_from_downstream_config()
+            )
 
             if use_downstream_specfile:
                 logger.info(
                     "Using the downstream specfile instead of the upstream one.",
                 )
                 self.up.set_specfile(self.dg.specfile)
+
+            self.up.run_action(
+                actions=ActionName.post_upstream_clone,
+                env=self.sync_release_env,
+            )
+
+            # compare versions here because users can mangle with specfile in
+            # post_upstream_clone action
+            spec_ver = self.up.get_specfile_version()
+            if compare_versions(version, spec_ver) > 0:
+                logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
+
+            self.check_version_distance(version, spec_ver, dist_git_branch)
+
+            self.dg.check_last_commit()
+
+            self.up.run_action(actions=ActionName.pre_sync, env=self.sync_release_env)
+            if not use_downstream_specfile:
+                self.up.specfile.reload()
 
             if create_pr:
                 local_pr_branch = (
