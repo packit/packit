@@ -34,6 +34,7 @@ from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig, RunCommandType
+from packit.config.aliases import get_branches
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -739,13 +740,19 @@ The first dist-git commit to be synced is '{short_hash}'.
         proposed,
         target_branch,
     ) -> None:
-        """Check 'distance' between new and old release
+        """Following this guidelines:
+        https://docs.fedoraproject.org/en-US/fesco/Updates_Policy/#philosophy
+        we want to avoid major updates of packages within a **stable** release.
 
         current: str, already released version for package
         proposed: str, release we are preparing for package
         target_branch: str, Fedora branch where release the package
         """
-        if self.package_config.version_update_mask is not None:
+        branches_to_check = get_branches("fedora-branched")
+        if (
+            self.package_config.version_update_mask
+            and target_branch in branches_to_check
+        ):
             masked_current = re.match(self.package_config.version_update_mask, current)
             masked_proposed = re.match(
                 self.package_config.version_update_mask,
