@@ -20,6 +20,11 @@ jobs:
           fetch-tags: true
       - uses: actions/setup-python@v4
 
+      - name: Get history and tags for SCM versioning to work
+        run: |
+          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
       - name: Build a source tarball and a binary wheel
         # https://pypa-build.readthedocs.io
         run: |
