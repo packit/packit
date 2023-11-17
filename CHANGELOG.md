@@ -1,3 +1,10 @@
+# 0.86.0
+
+- Packit can now check, using the `update_version_mask`, that the proposed version release and the actual package release for the target dist-git branch are compatible. (#2156)
+- Packit is now able to get the version from specfile even if the `Version` tag is not present in the specfile directly, but e.g. imported from another file. (#2157)
+- Packit now allows `~^+` (special characters) in a tag (used for building the version string). (#2154)
+- Enforce dist tag `%{?dist}` when updating release (#2106)
+
 # 0.85.0
 
 - Packit no longer downloads sources excluded using spec file conditions. (#2132)
