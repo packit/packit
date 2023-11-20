@@ -1,3 +1,7 @@
+# 0.86.2
+
+- Packit _0.86.1_ was not released on PyPI due to an internal bug, it should be fixed in this release.
+
 # 0.86.1
 
 - Packit _0.86.0_ was not released on PyPI due to an internal bug, it should be fixed in this release.
