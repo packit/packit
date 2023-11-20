@@ -474,7 +474,13 @@ def test_set_spec_content(tmp_path):
     upstream_spec_path.write_text(upstream_spec_contents)
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
-    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(
+            prerelease_suffix_macro=None,
+            prerelease_suffix_pattern=None,
+        ),
+    )
     dist_git._specfile_path = distgit_spec_path
 
     dist_git.set_specfile_content(upstream_specfile, None, None)
@@ -622,7 +628,13 @@ def test_set_spec_content_reset_release(
     upstream_spec_path.write_text(upstream_spec_contents)
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
-    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(
+            prerelease_suffix_macro=None,
+            prerelease_suffix_pattern=None,
+        ),
+    )
     dist_git._specfile_path = distgit_spec_path
 
     dist_git.set_specfile_content(upstream_specfile, "1.1", "1.1 upstream release")
@@ -662,7 +674,13 @@ def test_set_spec_content_no_changelog(tmp_path, changelog_section):
     upstream_spec_path.write_text(upstream_spec_contents)
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
-    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(
+            prerelease_suffix_macro=None,
+            prerelease_suffix_pattern=None,
+        ),
+    )
     dist_git._specfile_path = distgit_spec_path
 
     new_log = ChangelogEntry(
@@ -757,7 +775,13 @@ def test_set_spec_content_version_macros(
     upstream_spec_path.write_text(upstream_spec_contents)
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
-    dist_git = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(
+            prerelease_suffix_macro=None,
+            prerelease_suffix_pattern=None,
+        ),
+    )
     dist_git._specfile_path = distgit_spec_path
 
     new_log = ChangelogEntry(
@@ -779,3 +803,235 @@ def test_set_spec_content_version_macros(
         for md in mds:
             assert macro_definitions.pop(md.name) == md.body
     assert not macro_definitions
+
+
+@pytest.mark.parametrize(
+    "header, version, source_url, prerelease_suffix_pattern, prerelease_suffix_macro, "
+    "upstream_version, spec_version, is_prerelease",
+    [
+        pytest.param(
+            "%define uversion %{version_no_tilde %{quote:%nil}}\n",
+            "1.2.3~a4",
+            "https://example.com/files/v%{uversion}/%{name}-%{uversion}.tar.gz",
+            r"()a\d+",
+            None,
+            "1.2.3",
+            "1.2.3",
+            False,
+        ),
+        pytest.param(
+            "%define uversion %{version_no_tilde %{quote:%nil}}\n",
+            "1.2.3",
+            "https://example.com/files/v%{uversion}/%{name}-%{uversion}.tar.gz",
+            r"()a\d+",
+            None,
+            "1.2.4a1",
+            "1.2.4~a1",
+            True,
+        ),
+        pytest.param(
+            "",
+            "1.2.3~b4",
+            "https://example.com/files/%{name}-%{version_no_tilde}.tar.gz",
+            r"(-)b\d+",
+            None,
+            "1.2.3",
+            "1.2.3",
+            False,
+        ),
+        pytest.param(
+            "",
+            "1.2.3",
+            "https://example.com/files/%{name}-%{version_no_tilde}.tar.gz",
+            r"(-)b\d+",
+            None,
+            "1.2.4-b1",
+            "1.2.4~b1",
+            True,
+        ),
+        pytest.param(
+            (
+                "%global base_version 1.2.3\n"
+                "%global prerelease rc4\n"
+                "%global package_version %{base_version}%{?prerelease:~%{prerelease}}\n"
+                "%global tarball_version %{base_version}%{?prerelease}\n"
+            ),
+            "%{package_version}",
+            "https://example.com/files/v%{base_version}/%{name}-%{tarball_version}.tar.gz",
+            r"()rc\d+",
+            "prerelease",
+            "1.2.3",
+            "1.2.3",
+            False,
+        ),
+        pytest.param(
+            (
+                "%global base_version 1.2.3\n"
+                "#global prerelease rc4\n"
+                "%global package_version %{base_version}%{?prerelease:~%{prerelease}}\n"
+                "%global tarball_version %{base_version}%{?prerelease}\n"
+            ),
+            "%{package_version}",
+            "https://example.com/files/v%{base_version}/%{name}-%{tarball_version}.tar.gz",
+            r"()rc\d+",
+            "prerelease",
+            "1.2.4rc1",
+            "1.2.4~rc1",
+            True,
+        ),
+        pytest.param(
+            (
+                "%global majorver 1\n"
+                "%global minorver 2\n"
+                "%global patchver 3\n"
+                "%global prerel beta\n"
+                "%global package_version "
+                "%{majorver}.%{minorver}.%{patchver}%{?prerelease:~%{prerelease}}\n"
+                "%global tarball_version "
+                "%{majorver}.%{minorver}.%{patchver}%{?prerelease:-%{prerelease}}\n"
+            ),
+            "%{package_version}",
+            "https://example.com/files/v%{majorver}.%{minorver}/%{name}-%{tarball_version}.tar.gz",
+            r"(-)beta\d*",
+            "prerel",
+            "1.2.3",
+            "1.2.3",
+            False,
+        ),
+        pytest.param(
+            (
+                "%global majorver 1\n"
+                "%global minorver 2\n"
+                "%global patchver 3\n"
+                "%global prerel beta\n"
+                "%global package_version %{majorver}.%{minorver}.%{patchver}%{?prerel:~%{prerel}}\n"
+                "%global tarball_version %{majorver}.%{minorver}.%{patchver}%{?prerel:-%{prerel}}\n"
+            ),
+            "%{package_version}",
+            "https://example.com/files/v%{majorver}.%{minorver}/%{name}-%{tarball_version}.tar.gz",
+            r"(-)beta\d*",
+            "prerel",
+            "1.2.4-beta",
+            "1.2.4~beta",
+            True,
+        ),
+        pytest.param(
+            (
+                "%global basever 1.2.3\n"
+                "%global prerel alpha_4\n"
+                "%if 0%{?prerel:1}\n"
+                "%global package_version %{basever}~%{prerel}\n"
+                "%global tarball_version %{basever}.%{prerel}\n"
+                "%else\n"
+                "%global package_version %{basever}\n"
+                "%global tarball_version %{basever}\n"
+                "%endif\n"
+            ),
+            "%{package_version}",
+            "https://example.com/files/%{name}-%{tarball_version}.tar.gz",
+            r"(\.)alpha_\d+",
+            "prerel",
+            "1.2.3",
+            "1.2.3",
+            False,
+        ),
+        pytest.param(
+            (
+                "%global basever 1.2.3\n"
+                "%global prerel alpha_4\n"
+                "%if 0%{?prerel:1}\n"
+                "%global package_version %{basever}~%{prerel}\n"
+                "%global tarball_version %{basever}.%{prerel}\n"
+                "%else\n"
+                "%global package_version %{basever}\n"
+                "%global tarball_version %{basever}\n"
+                "%endif\n"
+            ),
+            "%{package_version}",
+            "https://example.com/files/%{name}-%{tarball_version}.tar.gz",
+            r"(\.)alpha_\d+",
+            "prerel",
+            "1.2.4.alpha_1",
+            "1.2.4~alpha_1",
+            True,
+        ),
+    ],
+)
+def test_set_spec_content_prerelease(
+    tmp_path,
+    header,
+    version,
+    source_url,
+    prerelease_suffix_pattern,
+    prerelease_suffix_macro,
+    upstream_version,
+    spec_version,
+    is_prerelease,
+):
+    distgit_spec_contents = header + (
+        "Name: bring-me-to-the-life\n"
+        f"Version: {version}\n"
+        "Release: 1\n"
+        f"Source0: {source_url}\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    distgit_spec_path = tmp_path / "life.spec"
+    distgit_spec_path.write_text(distgit_spec_contents)
+
+    upstream_spec_contents = header + (
+        "Name: bring-me-to-the-life\n"
+        f"Version: {version}\n"
+        "Release: 1\n"
+        f"Source0: {source_url}\n"
+        "License: MIT\n"
+        "Summary: evanescence, I was brought to life\n"
+        "%description\n-\n"
+        "%changelog\n"
+        "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1\n"
+        "- Initial package.\n"
+    )
+    upstream_spec_path = tmp_path / "e-life.spec"
+    upstream_spec_path.write_text(upstream_spec_contents)
+    upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
+
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(
+            prerelease_suffix_macro=prerelease_suffix_macro,
+            prerelease_suffix_pattern=prerelease_suffix_pattern,
+        ),
+    )
+    dist_git._specfile_path = distgit_spec_path
+
+    new_log = ChangelogEntry(
+        f"* Wed Jun 02 2021 John Fou <john-fou@example.com> - {spec_version}-1",
+        [f"- {upstream_version} upstream release"],
+    )
+    flexmock(ChangelogEntry).should_receive("assemble").and_return(new_log)
+    dist_git.set_specfile_content(
+        upstream_specfile,
+        upstream_version,
+        f"{upstream_version} upstream release",
+    )
+    with dist_git.specfile.sections() as sections:
+        assert [
+            new_log.header,
+            new_log.content[0],
+            "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
+            "- Initial package.",
+        ] == sections.changelog
+    assert dist_git.specfile.expanded_version == spec_version
+    with dist_git.specfile.sources() as sources:
+        assert sources[0].location == source_url
+        assert (
+            sources[0].expanded_filename
+            == f"bring-me-to-the-life-{upstream_version}.tar.gz"
+        )
+    if prerelease_suffix_macro:
+        with dist_git.specfile.macro_definitions() as mds:
+            assert mds.get(prerelease_suffix_macro).commented_out == (not is_prerelease)
