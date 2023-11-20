@@ -4,6 +4,7 @@
 name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
+  workflow_dispatch:
   release:
     types: [released]
 
@@ -15,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-tags: true
       - uses: actions/setup-python@v4
 
       - name: Build a source tarball and a binary wheel
