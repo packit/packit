@@ -1,3 +1,6 @@
+# 0.86.1
+
+
 # 0.86.0
 
 - Packit can now check, using the `update_version_mask`, that the proposed version release and the actual package release for the target dist-git branch are compatible. (#2156)
