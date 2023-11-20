@@ -1,5 +1,7 @@
 # 0.86.1
 
+- Packit _0.86.0_ was not released on PyPI due to an internal bug, it should be fixed in this release.
+
 # 0.86.0
 
 - Packit can now check, using the `update_version_mask`, that the proposed version release and the actual package release for the target dist-git branch are compatible. (#2156)
