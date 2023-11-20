@@ -14,7 +14,12 @@ import requests
 from git import GitCommandError, PushInfo
 from ogr.abstract import PullRequest
 from specfile import Specfile
-from specfile.exceptions import DuplicateSourceException, SourceNumberException
+from specfile.exceptions import (
+    DuplicateSourceException,
+    SourceNumberException,
+    SpecfileException,
+)
+from specfile.macro_definitions import CommentOutStyle
 from specfile.sections import Section
 
 from packit.actions import ActionName
@@ -518,7 +523,20 @@ class PackitRepositoryBase:
             except AttributeError:
                 sections.append(Section("changelog", previous_changelog))
         if version is not None:
-            self.specfile.update_tag("Version", version)
+            try:
+                self.specfile.update_version(
+                    version,
+                    self.package_config.prerelease_suffix_pattern,
+                    self.package_config.prerelease_suffix_macro,
+                    CommentOutStyle.HASH,
+                )
+            except SpecfileException:
+                logger.error(
+                    "Invalid pre-release suffix pattern: "
+                    + self.package_config.prerelease_suffix_pattern,
+                )
+                # ignore the invalid pattern and fall back to standard behavior
+                self.specfile.update_version(version)
         # update_tag() is unable to update macro values when there is no delimiter
         # between modifiable entities, and Release (unless it's %autorelease) is always
         # suffixed with %{?dist} with no delimiter; no point in using it here
