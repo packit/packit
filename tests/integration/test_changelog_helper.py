@@ -1,6 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
-
+import subprocess
 from logging import getLogger
 
 import pytest
@@ -187,3 +187,33 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
         full_version="0.1.0",
         resolved_bugs=["rhbz#123", "rhbz#124"],
     )
+
+
+def test_update_distgit_no_distgit_specfile(
+    upstream,
+    distgit_instance,
+):
+    d, downstream = distgit_instance
+    # remove the downstream specfile
+    d.joinpath("beer.spec").unlink()
+    subprocess.check_call(
+        ["git", "commit", "-m", "remove spec", "-a"],
+        cwd=str(d),
+    )
+    package_config = upstream.package_config
+    package_config.copy_upstream_release_description = True
+    upstream.local_project.git_project = (
+        flexmock()
+        .should_receive("get_release")
+        .with_args(tag_name="0.1.0", name="0.1.0")
+        .and_return(flexmock(body="Some release 0.1.0"))
+        .mock()
+    )
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
+    )
+
+    with downstream._specfile.sections() as sections:
+        assert "Some release 0.1.0" in sections.changelog

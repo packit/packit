@@ -150,6 +150,12 @@ class ChangelogHelper:
                 self.up.absolute_specfile_path,
                 self.dg.get_absolute_specfile_path(),
             )
+            # set the specfile content now that the downstream spec file is present
+            self.dg.set_specfile_content(
+                self.up.specfile,
+                full_version,
+                comment=None if self.dg.specfile.has_autochangelog else comment,
+            )
 
     def _get_release_for_source_git(
         self,
