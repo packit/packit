@@ -5,6 +5,7 @@ import re
 
 import pytest
 from flexmock import flexmock
+from specfile import Specfile
 
 from packit.config import CommonPackageConfig, Config, PackageConfig
 from packit.constants import DISTGIT_HOSTNAME_CANDIDATES, EXISTING_BODHI_UPDATE_REGEX
@@ -184,3 +185,53 @@ def test_hostname_candidates():
         "pkgs.fedoraproject.org",
         "pkgs.stg.fedoraproject.org",
     } == DISTGIT_HOSTNAME_CANDIDATES
+
+
+@pytest.mark.parametrize(
+    "spec_source_id, with_coffee, archive_names",
+    [
+        ("Source0", "0", ["source0.tar.gz", "source2.tar.gz"]),
+        ("Source1", "0", ["source0.tar.gz", "source1.tar.gz", "source2.tar.gz"]),
+        ("Source2", "0", ["source0.tar.gz", "source2.tar.gz"]),
+        ("Source2", "1", ["source0.tar.gz", "source2-with-coffee.tar.gz"]),
+    ],
+)
+def test_upstream_archive_names(spec_source_id, with_coffee, archive_names, tmp_path):
+    specfile_content = (
+        "Name: test\n"
+        "Version: 1.2.3\n"
+        "Release: 1\n"
+        "Source0: https://example.com/source0.tar.gz\n"
+        "Source1: source1.tar.gz\n"
+        "%if 0%{?with_coffee}\n"
+        "Source2: https://example.com/source2-with-coffee.tar.gz\n"
+        "%else\n"
+        "Source2: https://example.com/source2.tar.gz\n"
+        "%endif\n"
+        "License: MIT\n"
+        "Summary: test\n"
+        "%description\ntest\n"
+    )
+    spec_path = tmp_path / "test.spec"
+    spec_path.write_text(specfile_content)
+    specfile = Specfile(
+        spec_path,
+        sourcedir=tmp_path,
+        autosave=True,
+        macros=[("with_coffee", with_coffee)],
+    )
+    dg = DistGit(
+        config=flexmock(Config()),
+        package_config=flexmock(
+            PackageConfig(
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="test.spec",
+                        spec_source_id=spec_source_id,
+                    ),
+                },
+            ),
+        ),
+    )
+    flexmock(dg).should_receive("specfile").and_return(specfile)
+    assert dg.upstream_archive_names == archive_names
