@@ -373,7 +373,8 @@ class DistGit(PackitRepositoryBase):
             archive_names = [
                 s.expanded_filename
                 for s in sources
-                if s.remote or s.number == self.package_config.spec_source_id_number
+                if (s.remote or s.number == self.package_config.spec_source_id_number)
+                and s.valid
             ]
         logger.debug(f"Upstream archive names: {archive_names}")
         return archive_names
