@@ -1,3 +1,8 @@
+# 0.87.0
+
+- Packit now correctly sets the specfile content (e.g. changelog entry) even if it syncs the specfile from upstream the first time. (#2170)
+- Packit now supports pre-release version in `propose_downstream` and `pull_from_upstream`. A spec file update might be required, see the documentation for more details. (#2149)
+
 # 0.86.2
 
 - Packit _0.86.1_ was not released on PyPI due to an internal bug, it should be fixed in this release.
