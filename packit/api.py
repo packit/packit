@@ -936,7 +936,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             # fetch and reset --hard upstream/$branch?
             logger.info(f"Using {dist_git_branch!r} dist-git branch.")
             self.dg.update_branch(dist_git_branch)
-            self.dg.switch_branch(dist_git_branch)
+            self.dg.switch_branch(dist_git_branch, force=True)
 
             # do not add anything between distgit clone/checkout and saving gpg keys!
             self.up.allowed_gpg_keys = (

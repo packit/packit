@@ -153,17 +153,26 @@ class PackitRepositoryBase:
             setup_tracking=setup_tracking,
         )
 
-    def switch_branch(self, branch: Optional[str] = None) -> None:
+    def switch_branch(
+        self,
+        branch: Optional[str] = None,
+        force: Optional[bool] = False,
+    ) -> None:
         """
         Switch to a specified branch.
 
         Args:
             branch: branch to switch to, defaults to repo's default branch
+            force: whether to use force switch
         """
         branch = branch or self.local_project.git_project.default_branch
-        logger.debug(f"Switching to branch {branch!r}")
+        logger.debug(f"Switching {'(force)' if force else ''} to branch {branch!r}")
+        switch_args = [branch]
+        if force:
+            switch_args.append("-f")
+
         try:
-            self.local_project.git_repo.git.switch(branch)
+            self.local_project.git_repo.git.switch(*switch_args)
         except GitCommandError as exc:
             raise PackitException(f"Failed to switch branch to {branch!r}") from exc
 
