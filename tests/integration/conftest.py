@@ -22,7 +22,7 @@ from ogr.services.pagure import PagureProject, PagureService, PagureUser
 from packit.api import PackitAPI
 from packit.base_git import PackitRepositoryBase
 from packit.cli.utils import get_packit_api
-from packit.config import get_local_package_config
+from packit.config import config, get_local_package_config
 from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
 from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
@@ -116,6 +116,12 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
             created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
         )
 
+    release = flexmock(body="Some description of the upstream release", url="some-url")
+    flexmock(config).should_receive("get_project").and_return(
+        flexmock(
+            get_release=lambda name, tag_name: release,
+        ),
+    )
     flexmock(GithubService)
     github_service = GithubService()
     flexmock(
@@ -139,6 +145,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         GithubProject,
         get_git_urls=lambda: {"git": UPSTREAM_PROJECT_URL},
         fork_create=lambda: None,
+        get_release=lambda: flexmock(url="url"),
     )
     flexmock(PagureUser, get_username=lambda: "packito")
 
@@ -338,6 +345,13 @@ def api_instance_source_git(sourcegit_and_remote, distgit_and_remote):
     distgit, _ = distgit_and_remote
     builder = LocalProjectBuilder()
     up_lp = builder.build(working_dir=sourcegit, git_repo=CALCULATE)
+    up_lp.git_project = (
+        flexmock()
+        .should_receive("get_release")
+        .with_args(tag_name="0.1.0", name="0.1.0")
+        .and_return(flexmock(url="some-url"))
+        .mock()
+    )
     return mock_api_for_source_git(sourcegit, distgit, up_lp)
 
 

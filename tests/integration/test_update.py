@@ -355,7 +355,7 @@ def test_basic_local_update_copy_upstream_release_description(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    release = flexmock(body="Some description of the upstream release")
+    release = flexmock(body="Some description of the upstream release", url="some-url")
     api.up.local_project.git_project = flexmock(
         get_release=lambda name, tag_name: release,
     )

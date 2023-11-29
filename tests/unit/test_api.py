@@ -8,6 +8,7 @@ import pytest
 from flexmock import flexmock
 from munch import Munch
 
+from packit import api
 from packit import api as packit_api
 from packit.api import PackitAPI
 from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
@@ -297,7 +298,7 @@ def test_sync_release_check_pr_instructions(api_mock):
     api_mock.should_receive("push_and_create_pr").with_args(
         pr_title=str,
         pr_description=(
-            "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+            "Upstream tag: _ ([release details](url))\nUpstream commit: _\n\n---\n\n"
             "If you need to do any change in this pull request, you can clone Packit's fork "
             "and push directly to the source branch of this PR (provided you have commit access "
             "to this repository):\n"
@@ -356,6 +357,50 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
         api_mock.get_default_commit_description("1.0.0", resolved_bugs=resolved_bugs)
         == result
     )
+
+
+@pytest.mark.parametrize(
+    "tag_link, commit_link, release_link, result",
+    [
+        pytest.param(
+            "",
+            "",
+            "",
+            "Upstream tag: 1.0.0\nUpstream commit: _\n",
+        ),
+        pytest.param(
+            "tag-link",
+            "",
+            "",
+            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: _\n",
+        ),
+        pytest.param(
+            "tag-link",
+            "commit-link",
+            "",
+            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: [_](commit-link)\n",
+        ),
+        pytest.param(
+            "tag-link",
+            "",
+            "release-link",
+            "Upstream tag: [1.0.0](tag-link) ([release details](release-link))\n"
+            "Upstream commit: _\n",
+        ),
+        pytest.param(
+            "tag-link",
+            "commit-link",
+            "release-link",
+            "Upstream tag: [1.0.0](tag-link) ([release details](release-link))\n"
+            "Upstream commit: [_](commit-link)\n",
+        ),
+    ],
+)
+def test_get_pr_description(api_mock, tag_link, commit_link, release_link, result):
+    flexmock(api).should_receive("get_tag_link").and_return(tag_link)
+    flexmock(api).should_receive("get_commit_link").and_return(commit_link)
+    flexmock(api_mock).should_receive("get_release_link").and_return(release_link)
+    assert api_mock.get_pr_description("1.0.0", version="1.0.0") == result
 
 
 @pytest.mark.parametrize(

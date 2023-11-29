@@ -197,6 +197,12 @@ SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION = (
     "{resolved_bugs}Upstream tag: {upstream_tag}\n"
     "Upstream commit: {upstream_commit}\n"
 )
+
+SYNC_RELEASE_PR_DESCRIPTION = (
+    "Upstream tag: {upstream_tag_info}{release_info}\n"
+    "Upstream commit: {upstream_commit_info}\n"
+)
+
 SYNC_RELEASE_PR_INSTRUCTIONS = (
     "\n---\n\n"
     "If you need to do any change in this pull request, you can clone Packit's fork "

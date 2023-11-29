@@ -3,6 +3,8 @@
 
 from subprocess import check_output
 
+from flexmock import flexmock
+from ogr.services.github.project import GithubProject
 from requre.cassette import DataTypes
 from requre.helpers.files import StoreFiles
 from requre.helpers.simple_object import Simple
@@ -121,6 +123,10 @@ class ProposeUpdate(PackitTest):
         )
         changed_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()
         assert original_upstream_spec_content != changed_upstream_spec_content
+        # mock the release as there is no real release 0
+        flexmock(GithubProject).should_receive("get_release").and_return(
+            flexmock(url="url"),
+        )
         self.api.package_config.sync_changelog = True
         self.api.sync_release(version="0", use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()

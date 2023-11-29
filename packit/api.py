@@ -45,6 +45,7 @@ from packit.constants import (
     FROM_SOURCE_GIT_TOKEN,
     REPO_NOT_PRISTINE_HINT,
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
+    SYNC_RELEASE_PR_DESCRIPTION,
     SYNC_RELEASE_PR_INSTRUCTIONS,
     SYNCING_NOTE,
 )
@@ -75,8 +76,11 @@ from packit.utils.repo import (
     commit_exists,
     get_commit_diff,
     get_commit_hunks,
+    get_commit_link,
     get_commit_message_from_action,
     get_next_commit,
+    get_tag_link,
+    git_remote_url_to_https_url,
     is_the_repo_pristine,
     shorten_commit_hash,
 )
@@ -1034,9 +1038,13 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             pr = None
             if create_pr:
+                pr_description = self.get_pr_description(
+                    upstream_tag=upstream_tag,
+                    version=version,
+                )
                 pr = self.push_and_create_pr(
                     pr_title=pr_title,
-                    pr_description=f"{commit_description}{pr_instructions}",
+                    pr_description=f"{pr_description}{pr_instructions}",
                     git_branch=dist_git_branch,
                     repo=self.dg,
                 )
@@ -1076,6 +1084,43 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_tag=upstream_tag,
             upstream_commit=self.up.local_project.commit_hexsha,
             resolved_bugs=resolved_bugs_msg,
+        )
+
+    def get_release_link(self, upstream_tag: str, version: str) -> str:
+        """
+        Get link to the release via API if the GitProject is initialised.
+        """
+        if not self.up.local_project.git_project:
+            return ""
+
+        release = self.up.local_project.git_project.get_release(
+            tag_name=upstream_tag,
+            name=version,
+        )
+        return release.url if release else ""
+
+    def get_pr_description(self, upstream_tag: str, version: str) -> str:
+        """
+        Get the description used in pull requests for syncing release.
+        """
+        commit = self.up.local_project.commit_hexsha
+        git_url = git_remote_url_to_https_url(
+            self.up.local_project.git_url,
+            with_dot_git_suffix=False,
+        )
+
+        tag_link = get_tag_link(git_url, upstream_tag)
+        commit_link = get_commit_link(git_url, commit)
+        release_link = self.get_release_link(upstream_tag, version)
+
+        commit_info = f"[{commit}]({commit_link})" if commit_link else commit
+        tag_info = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
+        release_info = f" ([release details]({release_link}))" if release_link else ""
+
+        return SYNC_RELEASE_PR_DESCRIPTION.format(
+            upstream_tag_info=tag_info,
+            upstream_commit_info=commit_info,
+            release_info=release_info,
         )
 
     def get_pr_default_title_and_description(self):
