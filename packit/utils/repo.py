@@ -160,7 +160,10 @@ def get_default_branch(repository: git.Repo) -> str:
     return config.get_value("init", "defaultBranch", "master")
 
 
-def git_remote_url_to_https_url(inp: str) -> str:
+def git_remote_url_to_https_url(
+    inp: str,
+    with_dot_git_suffix: Optional[bool] = True,
+) -> str:
     """
     turn provided git remote URL to https URL:
     returns empty string if the input can't be processed
@@ -173,9 +176,12 @@ def git_remote_url_to_https_url(inp: str) -> str:
 
     if inp.startswith(("http", "https")):
         logger.debug(f"Provided input {inp!r} is an url.")
+        if inp.endswith(".git"):
+            return inp if with_dot_git_suffix else inp[:-4]
+
         return inp
 
-    optional_suffix = ".git" if inp.endswith(".git") else ""
+    optional_suffix = ".git" if inp.endswith(".git") and with_dot_git_suffix else ""
     url_str = "https://{}/{}/{}{}".format(
         parsed_repo.hostname,
         parsed_repo.namespace,
