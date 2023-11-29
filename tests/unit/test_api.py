@@ -360,30 +360,34 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
 
 
 @pytest.mark.parametrize(
-    "tag_link, commit_link, release_link, result",
+    "tag_link, commit_link, release_link, project_id, result",
     [
         pytest.param(
             "",
             "",
             "",
+            None,
             "Upstream tag: 1.0.0\nUpstream commit: _\n",
         ),
         pytest.param(
             "tag-link",
             "",
             "",
+            None,
             "Upstream tag: [1.0.0](tag-link)\nUpstream commit: _\n",
         ),
         pytest.param(
             "tag-link",
             "commit-link",
             "",
+            None,
             "Upstream tag: [1.0.0](tag-link)\nUpstream commit: [_](commit-link)\n",
         ),
         pytest.param(
             "tag-link",
             "",
             "release-link",
+            None,
             "Upstream tag: [1.0.0](tag-link) ([release details](release-link))\n"
             "Upstream commit: _\n",
         ),
@@ -391,16 +395,40 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "tag-link",
             "commit-link",
             "release-link",
+            None,
             "Upstream tag: [1.0.0](tag-link) ([release details](release-link))\n"
             "Upstream commit: [_](commit-link)\n",
         ),
+        pytest.param(
+            "tag-link",
+            "commit-link",
+            "release-link",
+            12345,
+            "Upstream tag: [1.0.0](tag-link) ([release details](release-link))\n"
+            "Upstream commit: [_](commit-link)\n"
+            "Release monitoring project: [12345](https://release-monitoring.org/project/12345",
+        ),
     ],
 )
-def test_get_pr_description(api_mock, tag_link, commit_link, release_link, result):
+def test_get_pr_description(
+    api_mock,
+    tag_link,
+    commit_link,
+    release_link,
+    project_id,
+    result,
+):
     flexmock(api).should_receive("get_tag_link").and_return(tag_link)
     flexmock(api).should_receive("get_commit_link").and_return(commit_link)
     flexmock(api_mock).should_receive("get_release_link").and_return(release_link)
-    assert api_mock.get_pr_description("1.0.0", version="1.0.0") == result
+    assert (
+        api_mock.get_pr_description(
+            "1.0.0",
+            version="1.0.0",
+            release_monitoring_project_id=project_id,
+        )
+        == result
+    )
 
 
 @pytest.mark.parametrize(

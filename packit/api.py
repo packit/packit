@@ -43,6 +43,7 @@ from packit.constants import (
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
+    RELEASE_MONITORING_PROJECT_URL,
     REPO_NOT_PRISTINE_HINT,
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
     SYNC_RELEASE_PR_DESCRIPTION,
@@ -797,6 +798,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -821,6 +823,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -844,6 +847,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -1041,6 +1045,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 pr_description = self.get_pr_description(
                     upstream_tag=upstream_tag,
                     version=version,
+                    release_monitoring_project_id=release_monitoring_project_id,
                 )
                 pr = self.push_and_create_pr(
                     pr_title=pr_title,
@@ -1099,7 +1104,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         )
         return release.url if release else ""
 
-    def get_pr_description(self, upstream_tag: str, version: str) -> str:
+    def get_pr_description(
+        self,
+        upstream_tag: str,
+        version: str,
+        release_monitoring_project_id: Optional[int] = None,
+    ) -> str:
         """
         Get the description used in pull requests for syncing release.
         """
@@ -1116,11 +1126,21 @@ The first dist-git commit to be synced is '{short_hash}'.
         commit_info = f"[{commit}]({commit_link})" if commit_link else commit
         tag_info = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
         release_info = f" ([release details]({release_link}))" if release_link else ""
+        release_monitoring_info = (
+            (
+                f"Release monitoring project: "
+                f"[{release_monitoring_project_id}]"
+                f"({RELEASE_MONITORING_PROJECT_URL.format(project_id=release_monitoring_project_id)}"
+            )
+            if release_monitoring_project_id
+            else ""
+        )
 
         return SYNC_RELEASE_PR_DESCRIPTION.format(
             upstream_tag_info=tag_info,
             upstream_commit_info=commit_info,
-            release_info=release_info,
+            upstream_release_info=release_info,
+            release_monitoring_info=release_monitoring_info,
         )
 
     def get_pr_default_title_and_description(self):
