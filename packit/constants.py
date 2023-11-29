@@ -199,8 +199,9 @@ SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION = (
 )
 
 SYNC_RELEASE_PR_DESCRIPTION = (
-    "Upstream tag: {upstream_tag_info}{release_info}\n"
+    "Upstream tag: {upstream_tag_info}{upstream_release_info}\n"
     "Upstream commit: {upstream_commit_info}\n"
+    "{release_monitoring_info}"
 )
 
 SYNC_RELEASE_PR_INSTRUCTIONS = (
@@ -240,3 +241,4 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
 )
 
 COMMIT_ACTION_DIVIDER = "---%<--- snip ---%<--- here ---%<---\n"
+RELEASE_MONITORING_PROJECT_URL = "https://release-monitoring.org/project/{project_id}"
