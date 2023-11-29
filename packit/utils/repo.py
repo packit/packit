@@ -548,3 +548,49 @@ def get_commit_message_from_action(
     # it is later reconstructed in a generic way for both defaults and override,
     # so we don't care about the whitespace at the beginning and the end
     return title.strip(), description.strip()
+
+
+def get_tag_link(git_url: str, upstream_tag: str) -> str:
+    """
+    Get link to the tag of a Git repo.
+    """
+    link = ""
+    git_repo = parse_git_repo(git_url)
+    if not git_repo:
+        return ""
+
+    forge = git_repo.hostname
+    if not forge:
+        return ""
+
+    if forge == "github.com":
+        link = f"{git_url}/releases/tag/{upstream_tag}"
+    # GitLab or GitLab instances (e.g. gitlab.gnome.org)
+    elif "gitlab" in forge:
+        link = f"{git_url}/-/tags/{upstream_tag}"
+
+    return link
+
+
+def get_commit_link(git_url: str, upstream_commit: str) -> str:
+    """
+    Get link to the commit of a Git repo.
+    """
+    link = ""
+    git_repo = parse_git_repo(git_url)
+    if not git_repo:
+        return ""
+
+    forge = git_repo.hostname
+    if not forge:
+        return ""
+
+    if forge == "github.com":
+        link = f"{git_url}/commit/{upstream_commit}"
+    # GitLab or GitLab instances (e.g. gitlab.gnome.org)
+    elif "gitlab" in forge:
+        link = f"{git_url}/-/commit/{upstream_commit}"
+    elif forge == "pagure.io":
+        link = f"{git_url}/c/{upstream_commit}"
+
+    return link

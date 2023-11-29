@@ -10,10 +10,12 @@ from packit.constants import COMMIT_ACTION_DIVIDER
 from packit.exceptions import PackitException
 from packit.utils.repo import (
     get_commit_hunks,
+    get_commit_link,
     get_commit_message_from_action,
     get_message_from_metadata,
     get_metadata_from_message,
     get_namespace_and_repo_name,
+    get_tag_link,
     git_patch_ish,
     git_remote_url_to_https_url,
 )
@@ -61,24 +63,36 @@ def test_remote_to_https_unchanged(inp):
 
 
 @pytest.mark.parametrize(
-    "inp,ok",
+    "inp,with_suffix,result",
     [
-        ("git@github.com:packit/ogr", "https://github.com/packit/ogr"),
+        ("git@github.com:packit/ogr", True, "https://github.com/packit/ogr"),
         (
             "ssh://ttomecek@pkgs.fedoraproject.org/rpms/alot.git",
+            True,
             "https://pkgs.fedoraproject.org/rpms/alot.git",
         ),
-        ("www.github.com/packit/packit", "https://www.github.com/packit/packit"),
-        ("github.com/packit/packit", "https://github.com/packit/packit"),
-        ("git://github.com/packit/packit", "https://github.com/packit/packit"),
+        ("www.github.com/packit/packit", True, "https://www.github.com/packit/packit"),
+        ("github.com/packit/packit", True, "https://github.com/packit/packit"),
+        ("git://github.com/packit/packit", True, "https://github.com/packit/packit"),
         (
             "git+https://github.com/packit/packit.git",
+            True,
             "https://github.com/packit/packit.git",
+        ),
+        (
+            "git+https://github.com/packit/packit.git",
+            False,
+            "https://github.com/packit/packit",
+        ),
+        (
+            "https://github.com/packit/packit.git",
+            False,
+            "https://github.com/packit/packit",
         ),
     ],
 )
-def test_remote_to_https(inp, ok):
-    assert git_remote_url_to_https_url(inp) == ok
+def test_remote_to_https(inp, with_suffix, result):
+    assert git_remote_url_to_https_url(inp, with_suffix) == result
 
 
 @pytest.mark.parametrize(
@@ -449,3 +463,57 @@ def test_get_commit_message_from_action(action_output, expected_title, expected_
 
     assert title == expected_title
     assert body == expected_body
+
+
+@pytest.mark.parametrize(
+    "git_url, commit, result",
+    [
+        pytest.param(
+            "https://github.com/packit/packit-service",
+            "abcdefg",
+            "https://github.com/packit/packit-service/commit/abcdefg",
+        ),
+        pytest.param(
+            "https://gitlab.com/packit/packit-service",
+            "abcdefg",
+            "https://gitlab.com/packit/packit-service/-/commit/abcdefg",
+        ),
+        pytest.param(
+            "https://gitlab.gnome.org/packit/packit-service",
+            "abcdefg",
+            "https://gitlab.gnome.org/packit/packit-service/-/commit/abcdefg",
+        ),
+        pytest.param(
+            "https://pagure.io/packit/packit-service",
+            "abcdefg",
+            "https://pagure.io/packit/packit-service/c/abcdefg",
+        ),
+    ],
+)
+def test_get_commit_link(git_url, commit, result):
+    assert get_commit_link(git_url, commit) == result
+
+
+@pytest.mark.parametrize(
+    "git_url, tag, result",
+    [
+        pytest.param(
+            "https://github.com/packit/packit-service",
+            "1.0.0",
+            "https://github.com/packit/packit-service/releases/tag/1.0.0",
+        ),
+        pytest.param(
+            "https://gitlab.com/packit/packit-service",
+            "1.0.0",
+            "https://gitlab.com/packit/packit-service/-/tags/1.0.0",
+        ),
+        pytest.param(
+            "https://gitlab.gnome.org/packit/packit-service",
+            "1.0.0",
+            "https://gitlab.gnome.org/packit/packit-service/-/tags/1.0.0",
+        ),
+        pytest.param("https://pagure.io/packit/packit-service", "1.0.0", ""),
+    ],
+)
+def test_get_tag_link(git_url, tag, result):
+    assert get_tag_link(git_url, tag) == result
