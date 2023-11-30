@@ -39,6 +39,7 @@ from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
+    BUGZILLA_URL,
     COMMIT_ACTION_DIVIDER,
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
@@ -879,6 +880,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             add_pr_instructions: Whether to add instructions on how to change the content
                 of the created PR (used by packit-service)
             resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
+            release_monitoring_project_id: ID of the project in release monitoring if the syncing
+                happens as reaction to that.
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -1109,10 +1112,23 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_tag: str,
         version: str,
         release_monitoring_project_id: Optional[int] = None,
+        resolved_bugs: Optional[list[str]] = None,
     ) -> str:
         """
         Get the description used in pull requests for syncing release.
         """
+        resolved_bugzillas_info = ""
+        if resolved_bugs:
+            for bug in resolved_bugs:
+                match = re.search(r"#(\d+)", bug)
+                if match:
+                    bug_id = match.group(1)
+                    resolved_bugzillas_info += (
+                        f"Resolves [{bug}]({BUGZILLA_URL.format(bug_id=bug_id)})\n"
+                    )
+                else:
+                    resolved_bugzillas_info += f"Resolves {bug}\n"
+
         commit = self.up.local_project.commit_hexsha
         git_url = git_remote_url_to_https_url(
             self.up.local_project.git_url,
@@ -1130,7 +1146,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             (
                 f"Release monitoring project: "
                 f"[{release_monitoring_project_id}]"
-                f"({RELEASE_MONITORING_PROJECT_URL.format(project_id=release_monitoring_project_id)}"
+                f"({RELEASE_MONITORING_PROJECT_URL.format(project_id=release_monitoring_project_id)})\n"
             )
             if release_monitoring_project_id
             else ""
@@ -1141,6 +1157,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_commit_info=commit_info,
             upstream_release_info=release_info,
             release_monitoring_info=release_monitoring_info,
+            resolved_bugzillas_info=resolved_bugzillas_info,
         )
 
     def get_pr_default_title_and_description(self):
