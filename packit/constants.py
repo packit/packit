@@ -197,6 +197,14 @@ SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION = (
     "{resolved_bugs}Upstream tag: {upstream_tag}\n"
     "Upstream commit: {upstream_commit}\n"
 )
+
+SYNC_RELEASE_PR_DESCRIPTION = (
+    "Upstream tag: {upstream_tag_info}{upstream_release_info}\n"
+    "Upstream commit: {upstream_commit_info}\n"
+    "{release_monitoring_info}"
+    "{resolved_bugzillas_info}"
+)
+
 SYNC_RELEASE_PR_INSTRUCTIONS = (
     "\n---\n\n"
     "If you need to do any change in this pull request, you can clone Packit's fork "
@@ -234,3 +242,5 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
 )
 
 COMMIT_ACTION_DIVIDER = "---%<--- snip ---%<--- here ---%<---\n"
+RELEASE_MONITORING_PROJECT_URL = "https://release-monitoring.org/project/{project_id}"
+BUGZILLA_URL = "https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}"
