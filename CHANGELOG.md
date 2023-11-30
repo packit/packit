@@ -1,3 +1,7 @@
+# 0.87.1
+
+- Packit now links the information related to upstream in PRs opened when syncing a release. (#2173)
+
 # 0.87.0
 
 - Packit now correctly sets the specfile content (e.g. changelog entry) even if it syncs the specfile from upstream the first time. (#2170)
