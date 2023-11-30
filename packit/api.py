@@ -39,12 +39,15 @@ from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
+    BUGZILLA_URL,
     COMMIT_ACTION_DIVIDER,
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
+    RELEASE_MONITORING_PROJECT_URL,
     REPO_NOT_PRISTINE_HINT,
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
+    SYNC_RELEASE_PR_DESCRIPTION,
     SYNC_RELEASE_PR_INSTRUCTIONS,
     SYNCING_NOTE,
 )
@@ -75,8 +78,11 @@ from packit.utils.repo import (
     commit_exists,
     get_commit_diff,
     get_commit_hunks,
+    get_commit_link,
     get_commit_message_from_action,
     get_next_commit,
+    get_tag_link,
+    git_remote_url_to_https_url,
     is_the_repo_pristine,
     shorten_commit_hash,
 )
@@ -793,6 +799,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -817,6 +824,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -840,6 +848,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         use_downstream_specfile: bool = False,
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -871,6 +880,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             add_pr_instructions: Whether to add instructions on how to change the content
                 of the created PR (used by packit-service)
             resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
+            release_monitoring_project_id: ID of the project in release monitoring if the syncing
+                happens as reaction to that.
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -1034,9 +1045,14 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             pr = None
             if create_pr:
+                pr_description = self.get_pr_description(
+                    upstream_tag=upstream_tag,
+                    version=version,
+                    release_monitoring_project_id=release_monitoring_project_id,
+                )
                 pr = self.push_and_create_pr(
                     pr_title=pr_title,
-                    pr_description=f"{commit_description}{pr_instructions}",
+                    pr_description=f"{pr_description}{pr_instructions}",
                     git_branch=dist_git_branch,
                     repo=self.dg,
                 )
@@ -1076,6 +1092,72 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_tag=upstream_tag,
             upstream_commit=self.up.local_project.commit_hexsha,
             resolved_bugs=resolved_bugs_msg,
+        )
+
+    def get_release_link(self, upstream_tag: str, version: str) -> str:
+        """
+        Get link to the release via API if the GitProject is initialised.
+        """
+        if not self.up.local_project.git_project:
+            return ""
+
+        release = self.up.local_project.git_project.get_release(
+            tag_name=upstream_tag,
+            name=version,
+        )
+        return release.url if release else ""
+
+    def get_pr_description(
+        self,
+        upstream_tag: str,
+        version: str,
+        release_monitoring_project_id: Optional[int] = None,
+        resolved_bugs: Optional[list[str]] = None,
+    ) -> str:
+        """
+        Get the description used in pull requests for syncing release.
+        """
+        resolved_bugzillas_info = ""
+        if resolved_bugs:
+            for bug in resolved_bugs:
+                match = re.search(r"#(\d+)", bug)
+                if match:
+                    bug_id = match.group(1)
+                    resolved_bugzillas_info += (
+                        f"Resolves [{bug}]({BUGZILLA_URL.format(bug_id=bug_id)})\n"
+                    )
+                else:
+                    resolved_bugzillas_info += f"Resolves {bug}\n"
+
+        commit = self.up.local_project.commit_hexsha
+        git_url = git_remote_url_to_https_url(
+            self.up.local_project.git_url,
+            with_dot_git_suffix=False,
+        )
+
+        tag_link = get_tag_link(git_url, upstream_tag)
+        commit_link = get_commit_link(git_url, commit)
+        release_link = self.get_release_link(upstream_tag, version)
+
+        commit_info = f"[{commit}]({commit_link})" if commit_link else commit
+        tag_info = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
+        release_info = f" ([release details]({release_link}))" if release_link else ""
+        release_monitoring_info = (
+            (
+                f"Release monitoring project: "
+                f"[{release_monitoring_project_id}]"
+                f"({RELEASE_MONITORING_PROJECT_URL.format(project_id=release_monitoring_project_id)})\n"
+            )
+            if release_monitoring_project_id
+            else ""
+        )
+
+        return SYNC_RELEASE_PR_DESCRIPTION.format(
+            upstream_tag_info=tag_info,
+            upstream_commit_info=commit_info,
+            upstream_release_info=release_info,
+            release_monitoring_info=release_monitoring_info,
+            resolved_bugzillas_info=resolved_bugzillas_info,
         )
 
     def get_pr_default_title_and_description(self):

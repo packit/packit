@@ -88,7 +88,12 @@ def config_mock():
 
 @pytest.fixture
 def git_project_mock():
-    return flexmock(upstream_project_url="dummy_url")
+    return (
+        flexmock(upstream_project_url="dummy_url")
+        .should_receive("get_release")
+        .and_return(flexmock(url="url"))
+        .mock()
+    )
 
 
 @pytest.fixture
@@ -116,6 +121,7 @@ def local_project_mock(git_project_mock, git_repo_mock):
         checkout_release=lambda *_: None,
         commit_hexsha="_",
         repo_name="package",
+        git_url="some-url",
     )
 
 
@@ -124,7 +130,10 @@ def upstream_mock(local_project_mock, package_config_mock):
     upstream = Upstream(
         config=get_test_config(),
         package_config=package_config_mock,
-        local_project=LocalProjectBuilder().build(working_dir="test"),
+        local_project=LocalProjectBuilder().build(
+            working_dir="test",
+            git_url="my-git-url",
+        ),
     )
     flexmock(upstream)
     upstream.should_receive("local_project").and_return(local_project_mock)
