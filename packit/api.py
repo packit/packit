@@ -1049,6 +1049,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     upstream_tag=upstream_tag,
                     version=version,
                     release_monitoring_project_id=release_monitoring_project_id,
+                    resolved_bugs=resolved_bugs,
                 )
                 pr = self.push_and_create_pr(
                     pr_title=pr_title,
