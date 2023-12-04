@@ -1047,8 +1047,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             if create_pr:
                 pr_description = self.get_pr_description(
                     upstream_tag=upstream_tag,
-                    version=version,
                     release_monitoring_project_id=release_monitoring_project_id,
+                    resolved_bugs=resolved_bugs,
                 )
                 pr = self.push_and_create_pr(
                     pr_title=pr_title,
@@ -1094,23 +1094,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             resolved_bugs=resolved_bugs_msg,
         )
 
-    def get_release_link(self, upstream_tag: str, version: str) -> str:
-        """
-        Get link to the release via API if the GitProject is initialised.
-        """
-        if not self.up.local_project.git_project:
-            return ""
-
-        release = self.up.local_project.git_project.get_release(
-            tag_name=upstream_tag,
-            name=version,
-        )
-        return release.url if release else ""
-
     def get_pr_description(
         self,
         upstream_tag: str,
-        version: str,
         release_monitoring_project_id: Optional[int] = None,
         resolved_bugs: Optional[list[str]] = None,
     ) -> str:
@@ -1137,11 +1123,9 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         tag_link = get_tag_link(git_url, upstream_tag)
         commit_link = get_commit_link(git_url, commit)
-        release_link = self.get_release_link(upstream_tag, version)
 
         commit_info = f"[{commit}]({commit_link})" if commit_link else commit
         tag_info = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
-        release_info = f" ([release details]({release_link}))" if release_link else ""
         release_monitoring_info = (
             (
                 f"Release monitoring project: "
@@ -1155,7 +1139,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         return SYNC_RELEASE_PR_DESCRIPTION.format(
             upstream_tag_info=tag_info,
             upstream_commit_info=commit_info,
-            upstream_release_info=release_info,
             release_monitoring_info=release_monitoring_info,
             resolved_bugzillas_info=resolved_bugzillas_info,
         )
