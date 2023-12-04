@@ -199,7 +199,7 @@ SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION = (
 )
 
 SYNC_RELEASE_PR_DESCRIPTION = (
-    "Upstream tag: {upstream_tag_info}{upstream_release_info}\n"
+    "Upstream tag: {upstream_tag_info}\n"
     "Upstream commit: {upstream_commit_info}\n"
     "{release_monitoring_info}"
     "{resolved_bugzillas_info}"
