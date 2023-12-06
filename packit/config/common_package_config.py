@@ -13,6 +13,7 @@ from re import split
 from typing import Any, Optional, Union
 
 from packit.actions import ActionName
+from packit.config.commands import TestCommandConfig
 from packit.config.notifications import (
     NotificationsConfig,
 )
@@ -226,6 +227,7 @@ class CommonPackageConfig:
         upload_sources: bool = True,
         pkg_tool: Optional[str] = None,
         version_update_mask: Optional[str] = None,
+        test_command: Optional[TestCommandConfig] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -286,6 +288,7 @@ class CommonPackageConfig:
         self.version_update_mask = version_update_mask
         self.prerelease_suffix_pattern = prerelease_suffix_pattern
         self.prerelease_suffix_macro = prerelease_suffix_macro
+        self.test_command = test_command or TestCommandConfig()
 
         # from deprecated JobMetadataConfig
         self._targets: dict[str, dict[str, Any]]

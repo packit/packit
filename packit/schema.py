@@ -26,6 +26,7 @@ from packit.config import (
     PackageConfig,
 )
 from packit.config.aliases import DEPRECATED_TARGET_MAP
+from packit.config.commands import TestCommandConfig
 from packit.config.job_config import (
     JobConfig,
     JobConfigTriggerType,
@@ -193,6 +194,17 @@ class NotificationsSchema(Schema):
     @post_load
     def make_instance(self, data, **kwargs):
         return NotificationsConfig(**data)
+
+
+class TestCommandSchema(Schema):
+    """Configuration of test command."""
+
+    default_labels = fields.List(fields.String, missing=None)
+    default_identifier = fields.String(missing=None)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return TestCommandConfig(**data)
 
 
 class TargetsListOrDict(fields.Field):
@@ -363,6 +375,7 @@ class CommonConfigSchema(Schema):
     prerelease_suffix_pattern = fields.String()
     prerelease_suffix_macro = fields.String(missing=None)
     upload_sources = fields.Bool(default=True)
+    test_command = fields.Nested(TestCommandSchema)
 
     # Former 'metadata' keys
     _targets = TargetsListOrDict(missing=None, data_key="targets")

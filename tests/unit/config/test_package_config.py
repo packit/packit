@@ -1728,6 +1728,32 @@ def test_notifications_section_failure_comment_message():
     assert pc.notifications.failure_comment.message == message
 
 
+def test_test_command_labels():
+    labels = ["label1", "label2"]
+    pc = PackageConfig.get_from_dict(
+        {
+            "specfile_path": "package.spec",
+            "test_command": {"default_labels": labels},
+        },
+        repo_name="package",
+    )
+    assert pc.test_command.default_labels == labels
+    assert not pc.test_command.default_identifier
+
+
+def test_test_command_identifiers():
+    identifier = "id1"
+    pc = PackageConfig.get_from_dict(
+        {
+            "specfile_path": "package.spec",
+            "test_command": {"default_identifier": identifier},
+        },
+        repo_name="package",
+    )
+    assert not pc.test_command.default_labels
+    assert pc.test_command.default_identifier == identifier
+
+
 def test_get_local_specfile_path():
     assert str(get_local_specfile_path(UP_OSBUILD)) == "osbuild.spec"
     assert not get_local_specfile_path(SYNC_FILES)
