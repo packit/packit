@@ -115,18 +115,22 @@ class ChangelogHelper:
             version=full_version,
             resolved_bugs=resolved_bugs,
         )
-        comment = action_output or (
-            self.up.local_project.git_project.get_release(
-                tag_name=upstream_tag,
-                name=full_version,
-            ).body
-            if self.package_config.copy_upstream_release_description
-            # in pull_from_upstream workflow, upstream git_project can be None
-            and self.up.local_project.git_project
-            else self.up.get_commit_messages(
-                after=self.up.get_last_tag(before=upstream_tag),
-                before=upstream_tag,
+        comment = (
+            action_output
+            or (
+                self.up.local_project.git_project.get_release(
+                    tag_name=upstream_tag,
+                    name=full_version,
+                ).body
+                if self.package_config.copy_upstream_release_description
+                # in pull_from_upstream workflow, upstream git_project can be None
+                and self.up.local_project.git_project
+                else self.up.get_commit_messages(
+                    after=self.up.get_last_tag(before=upstream_tag),
+                    before=upstream_tag,
+                )
             )
+            or f"- Update to upstream release {full_version}"
         )
         if not action_output and resolved_bugs:
             comment += "\n"
