@@ -156,6 +156,30 @@ def test_update_distgit_unsafe_commit_messages(upstream, distgit_instance):
     assert len(downstream.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_CHANGELOGTEXT]) == 2
 
 
+def test_update_distgit_when_copy_upstream_release_description_none(
+    upstream,
+    distgit_instance,
+):
+    _, downstream = distgit_instance
+    package_config = upstream.package_config
+    package_config.copy_upstream_release_description = True
+    upstream.local_project.git_project = (
+        flexmock()
+        .should_receive("get_release")
+        .with_args(tag_name="0.1.0", name="0.1.0")
+        .and_return(flexmock(body=None))
+        .mock()
+    )
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
+    )
+
+    with downstream._specfile.sections() as sections:
+        assert "- Update to upstream release 0.1.0" in sections.changelog
+
+
 def test_update_distgit_changelog_entry_action_pass_env_vars(
     upstream,
     distgit_instance,
