@@ -22,7 +22,7 @@ from packit.utils.upstream_version import get_upstream_version, requests
     ],
 )
 def test_get_upstream_version(package, version, exception):
-    def mocked_get(url, params):
+    def mocked_get(url, params, *_, **__):
         if exception is not None:
             raise exception()
         packages = {

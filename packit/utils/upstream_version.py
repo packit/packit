@@ -6,6 +6,8 @@ from typing import Optional
 
 import requests
 
+from packit.constants import HTTP_REQUEST_TIMEOUT
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +28,7 @@ def get_upstream_version(package_name: str) -> Optional[str]:
             response = requests.get(
                 f"https://release-monitoring.org/api/{endpoint}",
                 params=kwargs,
+                timeout=HTTP_REQUEST_TIMEOUT,
             )
         except requests.exceptions.RequestException as e:
             logger.debug(f"release-monitoring.org query failed: {e!s}")
