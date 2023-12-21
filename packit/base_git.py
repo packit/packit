@@ -26,6 +26,7 @@ from packit.actions import ActionName
 from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config, RunCommandType
 from packit.config.common_package_config import MultiplePackages
+from packit.constants import HTTP_REQUEST_TIMEOUT
 from packit.exceptions import PackitDownloadFailedException, PackitException
 from packit.local_project import LocalProject
 from packit.patches import PatchMetadata
@@ -639,16 +640,14 @@ class PackitRepositoryBase:
                 with requests.get(
                     url,
                     headers={"User-Agent": user_agent},
+                    timeout=HTTP_REQUEST_TIMEOUT,
                     stream=True,
                 ) as response:
                     response.raise_for_status()
                     with open(source_path, "wb") as f:
                         for chunk in response.iter_content(chunk_size=8192):
                             f.write(chunk)
-            except (
-                requests.exceptions.ConnectionError,
-                requests.exceptions.HTTPError,
-            ) as e:
+            except requests.exceptions.RequestException as e:
                 msg = f"Failed to download source from {url}"
                 if optional:
                     logger.warning(f"{msg}: {e!r}")
