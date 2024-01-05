@@ -800,6 +800,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
         release_monitoring_project_id: Optional[int] = None,
+        pr_description_footer: Optional[str] = None,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -825,6 +826,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
         release_monitoring_project_id: Optional[int] = None,
+        pr_description_footer: Optional[str] = None,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -849,6 +851,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         add_pr_instructions: bool = False,
         resolved_bugs: Optional[list[str]] = None,
         release_monitoring_project_id: Optional[int] = None,
+        pr_description_footer: Optional[str] = None,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -882,6 +885,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
             release_monitoring_project_id: ID of the project in release monitoring if the syncing
                 happens as reaction to that.
+            pr_description_footer: Footer for the PR description (used by packit-service)
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -1050,9 +1054,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                     release_monitoring_project_id=release_monitoring_project_id,
                     resolved_bugs=resolved_bugs,
                 )
+                footer = (
+                    f"\n---\n\n{pr_description_footer}" if pr_description_footer else ""
+                )
                 pr = self.push_and_create_pr(
                     pr_title=pr_title,
-                    pr_description=f"{pr_description}{pr_instructions}",
+                    pr_description=f"{pr_description}{pr_instructions}{footer}",
                     git_branch=dist_git_branch,
                     repo=self.dg,
                 )
