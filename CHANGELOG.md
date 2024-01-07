@@ -1,3 +1,7 @@
+# 0.88.0
+
+- We have fixed a bug preventing the release from being synced downstream if the changelog to be set is empty. (#2183)
+
 # 0.87.1
 
 - Packit now links the information related to upstream in PRs opened when syncing a release. (#2173)
