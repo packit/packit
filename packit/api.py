@@ -1524,7 +1524,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
         bugzilla_ids: Optional[list[int]] = None,
-    ):
+    ) -> Optional[tuple[str, str]]:
         """
         Create bodhi update.
 
@@ -1536,12 +1536,15 @@ The first dist-git commit to be synced is '{short_hash}'.
               will be generated.
             koji_builds: List of Koji builds or `None` (picks latest).
             bugzilla_ids: List of Bugzillas that are resolved with the update.
+
+        Returns:
+            Alias and URL of the update or None if the update was already created.
         """
         logger.debug(
             f"Create bodhi update, "
             f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}",
         )
-        self.dg.create_bodhi_update(
+        return self.dg.create_bodhi_update(
             koji_builds=koji_builds,
             dist_git_branch=dist_git_branch,
             update_notes=update_notes,

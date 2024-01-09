@@ -576,7 +576,7 @@ class DistGit(PackitRepositoryBase):
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
         bugzilla_ids: Optional[list[int]] = None,
-    ):
+    ) -> Optional[tuple[str, str]]:
         """
         Create bodhi update.
 
@@ -588,6 +588,9 @@ class DistGit(PackitRepositoryBase):
               will be generated.
             koji_builds: List of Koji builds or `None` (picks latest).
             bugzilla_ids: List of Bugzillas that are resolved with the update.
+
+        Returns:
+            Alias and URL of the update or None if the update was already created.
         """
         logger.debug(
             f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}",
@@ -656,6 +659,8 @@ class DistGit(PackitRepositoryBase):
                 for cav in result["caveats"]:
                     logger.info(f"- {cav['name']}: {cav['description']}\n")
 
+            return result["alias"], result["url"]
+
         except AuthError as ex:
             logger.error(ex)
             raise PackitException(
@@ -668,7 +673,7 @@ class DistGit(PackitRepositoryBase):
 
             # early return in case update already exists
             if re.match(EXISTING_BODHI_UPDATE_REGEX, str(ex)):
-                return
+                return None
 
             raise PackitBodhiException(
                 f"There is a problem with creating a bodhi update:\n{ex}",
