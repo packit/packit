@@ -460,23 +460,43 @@ def test_github_app(upstream_instance, tmp_path):
     )
 
 
-def create_git_tag(u, tag_name, time_to_set):
+def create_git_tag(u, tag_name, time_to_set, branch=None):
     timestamp = time_to_set.strftime("%Y-%m-%dT%H:%M:%S")
     # Set the environment variable to ensure the tag's timestamp
     env = {"GIT_COMMITTER_DATE": timestamp}
 
-    Path(u, "tags").write_text(tag_name)
-    subprocess.check_call(["git", "add", "tags"], cwd=u, env=env)
-    subprocess.check_call(
-        ["git", "commit", "-m", f"Tag with {tag_name}"],
-        cwd=u,
-        env=env,
-    )
-    subprocess.check_call(
-        ["git", "tag", "-a", "-m", f"Tag with {tag_name}", tag_name],
-        cwd=u,
-        env=env,
-    )
+    if branch is not None:
+        original_branch = (
+            subprocess.check_output(["git", "branch", "--show-current"], cwd=u, env=env)
+            .strip()
+            .decode()
+        )
+
+    try:
+        if branch is not None:
+            try:
+                subprocess.check_call(["git", "checkout", branch], cwd=u, env=env)
+            except subprocess.CalledProcessError:
+                subprocess.check_call(
+                    ["git", "checkout", "--orphan", branch],
+                    cwd=u,
+                    env=env,
+                )
+        Path(u, "tags").write_text(tag_name)
+        subprocess.check_call(["git", "add", "tags"], cwd=u, env=env)
+        subprocess.check_call(
+            ["git", "commit", "-m", f"Tag with {tag_name}"],
+            cwd=u,
+            env=env,
+        )
+        subprocess.check_call(
+            ["git", "tag", "-a", "-m", f"Tag with {tag_name}", tag_name],
+            cwd=u,
+            env=env,
+        )
+    finally:
+        if branch is not None:
+            subprocess.check_call(["git", "checkout", original_branch], cwd=u, env=env)
 
 
 @pytest.mark.parametrize(
@@ -496,6 +516,87 @@ def test_get_last_tag(upstream_instance, tags, before, last_tag):
     for i, tag in enumerate(tags):
         create_git_tag(u, tag, now_time + timedelta(minutes=i + 1))
 
+    assert ups.get_last_tag(before=before) == last_tag
+
+
+@pytest.mark.parametrize(
+    "tags, tags_branch1, tags_branch2, merged_ref, before, last_tag",
+    [
+        (["0.2.0"], [], [], None, None, "0.2.0"),
+        (["0.2.0"], [], [], "branch1", None, None),
+        (["0.2.0"], ["b1-1.0"], [], "branch1", None, "b1-1.0"),
+        (["0.2.0"], ["b1-1.0"], ["b2-1.0.0"], "branch2", None, "b2-1.0.0"),
+        (
+            ["0.2.0", "0.3.0"],
+            ["b1-1.0", "b1-2.1"],
+            ["b2-1.0.0", "b2-1.2.3"],
+            None,
+            None,
+            "b2-1.2.3",
+        ),
+        (
+            ["0.2.0", "0.3.0"],
+            ["b1-1.0", "b1-2.1"],
+            ["b2-1.0.0", "b2-1.2.3"],
+            "branch1",
+            None,
+            "b1-2.1",
+        ),
+        (
+            ["0.2.0", "0.3.0"],
+            ["b1-1.0", "b1-2.1"],
+            ["b2-1.0.0", "b2-1.2.3"],
+            "branch2",
+            None,
+            "b2-1.2.3",
+        ),
+        (
+            ["0.2.0", "0.3.0"],
+            ["b1-1.0", "b1-2.1"],
+            ["b2-1.0.0", "b2-1.2.3"],
+            None,
+            "0.3.0",
+            "0.2.0",
+        ),
+        (
+            ["0.2.0", "0.3.0"],
+            ["b1-1.0", "b1-2.1"],
+            ["b2-1.0.0", "b2-1.2.3"],
+            None,
+            "b1-2.1",
+            "b1-1.0",
+        ),
+        (
+            ["0.2.0", "0.3.0"],
+            ["b1-1.0", "b1-2.1"],
+            ["b2-1.0.0", "b2-1.2.3"],
+            None,
+            "b2-1.2.3",
+            "b2-1.0.0",
+        ),
+    ],
+)
+def test_get_last_tag_multiple_branches(
+    upstream_instance,
+    tags,
+    tags_branch1,
+    tags_branch2,
+    merged_ref,
+    before,
+    last_tag,
+):
+    u, ups = upstream_instance
+    now_time = datetime.now()
+
+    # Tag more commits in the history
+    for i, tag in enumerate(tags):
+        create_git_tag(u, tag, now_time + timedelta(minutes=i + 1))
+    for i, tag in enumerate(tags_branch1):
+        create_git_tag(u, tag, now_time + timedelta(minutes=i - 60 + 1), "branch1")
+    for i, tag in enumerate(tags_branch2):
+        create_git_tag(u, tag, now_time + timedelta(minutes=i + 60 + 1), "branch2")
+
+    ups._merged_ref = merged_ref
     assert ups.get_last_tag(before=before) == last_tag
 
 
