@@ -1559,6 +1559,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_suffix: Optional[str] = None,
         result_dir: Optional[Union[Path, str]] = None,
         create_symlinks: Optional[bool] = True,
+        merged_ref: Optional[str] = None,
     ) -> None:
         """
         Prepare sources for an SRPM build.
@@ -1571,6 +1572,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             create_symlinks: whether symlinks should be created instead of copying the files
                 (currently when the archive is created outside the specfile dir, or in the future
                  if we will create symlinks in some other places)
+            merged_ref: git ref in the upstream repo used to identify correct most recent tag
         """
         self.up.run_action(
             actions=ActionName.post_upstream_clone,
@@ -1585,6 +1587,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 update_release=update_release,
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
+                merged_ref=merged_ref,
             )
         except Exception as ex:
             raise PackitSRPMException(
@@ -1619,6 +1622,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         srpm_dir: Optional[Union[Path, str]] = None,
         update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
+        merged_ref: Optional[str] = None,
     ) -> Path:
         """
         Create srpm from the upstream repo
@@ -1629,12 +1633,18 @@ The first dist-git commit to be synced is '{short_hash}'.
             srpm_dir: path to the directory where the srpm is meant to be placed
             release_suffix: specifies local release suffix. `None` represents default suffix.
             update_release: whether to change Release in the spec-file
+            merged_ref: git ref in the upstream repo used to identify correct most recent tag
 
         Returns:
             a path to the srpm
         """
         try:
-            self.prepare_sources(upstream_ref, update_release, release_suffix)
+            self.prepare_sources(
+                upstream_ref,
+                update_release,
+                release_suffix,
+                merged_ref=merged_ref,
+            )
             try:
                 srpm_path = self.up.create_srpm(
                     srpm_path=output_file,
@@ -1660,6 +1670,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_ref: Optional[str] = None,
         rpm_dir: Optional[str] = None,
         release_suffix: Optional[str] = None,
+        merged_ref: Optional[str] = None,
     ) -> list[Path]:
         """
         Create RPMs from the upstream repository.
@@ -1668,6 +1679,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_ref: Git reference to the upstream commit.
             rpm_dir: Path to the directory where the RPMs are meant to be placed.
             release_suffix: Release suffix that is used during modification of specfile.
+            merged_ref: git ref in the upstream repo used to identify correct most recent tag
 
         Returns:
             List of paths to the built RPMs.
@@ -1681,6 +1693,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.up.prepare_upstream_for_srpm_creation(
                 upstream_ref=upstream_ref,
                 release_suffix=release_suffix,
+                merged_ref=merged_ref,
             )
         except Exception as ex:
             raise PackitRPMException(
