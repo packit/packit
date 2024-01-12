@@ -60,6 +60,7 @@ class Upstream(PackitRepositoryBase):
         self.config = config
         self.package_config = package_config
         self._project_required = True
+        self._merged_ref: Optional[str] = None
 
     def __repr__(self):
         return (
@@ -317,9 +318,12 @@ class Upstream(PackitRepositoryBase):
     ) -> str:
         return Archive(self, version).create(create_symlink=create_symlink)
 
-    def list_tags(self) -> list[str]:
+    def list_tags(self, merged_ref: Optional[str] = None) -> list[str]:
         """
         List tags in the repository sorted by created date from the most recent.
+
+        Args:
+            merged_ref: List only tags reachable from this git ref.
 
         Returns:
             List of tags.
@@ -331,6 +335,8 @@ class Upstream(PackitRepositoryBase):
                 "--list",
                 "--sort=-creatordate",
             ]
+            if merged_ref is not None:
+                cmd.append(f"--merged={merged_ref}")
             tags = run_command(
                 cmd,
                 output=True,
@@ -359,7 +365,7 @@ class Upstream(PackitRepositoryBase):
             f"the upstream repository {self.local_project.working_dir}.",
         )
 
-        tags = self.list_tags()
+        tags = self.list_tags(before if before is not None else self._merged_ref)
 
         if not tags:
             logger.info("No tags found in the repository.")
@@ -600,6 +606,7 @@ class Upstream(PackitRepositoryBase):
         update_release: bool = True,
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
+        merged_ref: Optional[str] = None,
     ):
         """
         1. determine version
@@ -613,12 +620,17 @@ class Upstream(PackitRepositoryBase):
             release_suffix: suffix %release part of NVR with this
             create_symlinks: whether symlinks should be created instead of copying the files
                 (e.g. when the archive is created outside the specfile dir)
+            merged_ref: git ref in the upstream repo used to identify correct most recent tag
         """
-        SRPMBuilder(upstream=self, ref=upstream_ref).prepare(
-            update_release=update_release,
-            release_suffix=release_suffix,
-            create_symlinks=create_symlinks,
-        )
+        try:
+            self._merged_ref = merged_ref
+            SRPMBuilder(upstream=self, ref=upstream_ref).prepare(
+                update_release=update_release,
+                release_suffix=release_suffix,
+                create_symlinks=create_symlinks,
+            )
+        finally:
+            self._merged_ref = None
 
     def create_patches_and_update_specfile(self, upstream_ref) -> None:
         """
