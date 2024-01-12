@@ -102,42 +102,44 @@ class CoprHelper:
         """
         Using the provided targets_dict, update chroot specific configuration
         """
-        if targets_dict:
-            # let's update chroot specific configuration
-            for target, chroot_configuration in targets_dict.items():
-                chroot_names = get_build_targets(target)
-                for chroot_name in chroot_names:
-                    if set(chroot_configuration.keys()).intersection(
-                        CHROOT_SPECIFIC_COPR_CONFIGURATION.keys(),
-                    ):
+        if not targets_dict:
+            return
+
+        # let's update chroot specific configuration
+        for target, chroot_configuration in targets_dict.items():
+            chroot_names = get_build_targets(target)
+            for chroot_name in chroot_names:
+                if set(chroot_configuration.keys()).intersection(
+                    CHROOT_SPECIFIC_COPR_CONFIGURATION.keys(),
+                ):
+                    logger.info(
+                        f"There is chroot-specific configuration for {chroot_name}",
+                    )
+                    # only update when needed
+                    copr_chroot_configuration = (
+                        self.copr_client.project_chroot_proxy.get(
+                            ownername=owner,
+                            projectname=project,
+                            chrootname=chroot_name,
+                        )
+                    )
+                    update_dict = {}
+                    for c, default in CHROOT_SPECIFIC_COPR_CONFIGURATION.items():
+                        if copr_chroot_configuration.get(
+                            c,
+                            default,
+                        ) != chroot_configuration.get(c, default):
+                            update_dict[c] = chroot_configuration.get(c, default)
+                    if update_dict:
                         logger.info(
-                            f"There is chroot-specific configuration for {chroot_name}",
+                            f"Update {owner}/{project} {chroot_name}: {update_dict}",
                         )
-                        # only update when needed
-                        copr_chroot_configuration = (
-                            self.copr_client.project_chroot_proxy.get(
-                                ownername=owner,
-                                projectname=project,
-                                chrootname=chroot_name,
-                            )
+                        self.copr_client.project_chroot_proxy.edit(
+                            ownername=owner,
+                            projectname=project,
+                            chrootname=chroot_name,
+                            **update_dict,
                         )
-                        update_dict = {}
-                        for c, default in CHROOT_SPECIFIC_COPR_CONFIGURATION.items():
-                            if copr_chroot_configuration.get(
-                                c,
-                                default,
-                            ) != chroot_configuration.get(c, default):
-                                update_dict[c] = chroot_configuration.get(c, default)
-                        if update_dict:
-                            logger.info(
-                                f"Update {owner}/{project} {chroot_name}: {update_dict}",
-                            )
-                            self.copr_client.project_chroot_proxy.edit(
-                                ownername=owner,
-                                projectname=project,
-                                chrootname=chroot_name,
-                                **update_dict,
-                            )
 
     def create_copr_project_if_not_exists(
         self,
@@ -202,12 +204,6 @@ class CoprHelper:
             None if preserve_project is None else -1 if preserve_project else 60
         )
 
-        self._update_chroot_specific_configuration(
-            project,
-            owner=owner,
-            targets_dict=targets_dict,
-        )
-
         fields_to_change = self.get_fields_to_change(
             copr_proj=copr_proj,
             additional_repos=additional_repos,
@@ -218,47 +214,61 @@ class CoprHelper:
             delete_after_days=delete_after_days,
             module_hotfixes=module_hotfixes,
         )
-
-        if fields_to_change:
-            logger.info(f"Updating copr project '{owner}/{project}'")
-            for field, (old, new) in fields_to_change.items():
-                logger.debug(f"{field}: {old} -> {new}")
-
-            try:
-                kwargs: dict[str, Any] = {
-                    arg_name: new for arg_name, (old, new) in fields_to_change.items()
-                }
-                logger.debug(f"Copr edit arguments: {kwargs}")
-                self.copr_client.project_proxy.edit(
-                    ownername=owner,
-                    projectname=project,
-                    **kwargs,
+        try:
+            if fields_to_change:
+                failure_message = (
+                    f"Copr project update failed for '{owner}/{project}' project."
                 )
-            except CoprAuthException as ex:
-                if "Only owners and admins may update their projects." in str(ex):
-                    if request_admin_if_needed:
-                        logger.info(
-                            "Admin permissions are required "
-                            "in order to be able to edit project settings. "
-                            "Requesting the admin rights for the "
-                            f"copr '{owner}/{project}' project.",
-                        )
-                        self.copr_client.project_proxy.request_permissions(
-                            ownername=owner,
-                            projectname=project,
-                            permissions={"admin": True},
-                        )
-                    else:
-                        logger.warning(
-                            f"Admin permissions are required for copr '{owner}/{project}' project"
-                            f"in order to be able to edit project settings. "
-                            f"You can make a request by specifying --request-admin-if-needed "
-                            f"when using Packit CLI.",
-                        )
-                raise PackitCoprSettingsException(
-                    f"Copr project update failed for '{owner}/{project}' project.",
-                    fields_to_change=fields_to_change,
-                ) from ex
+                logger.info(f"Updating copr project '{owner}/{project}'")
+                for field, (old, new) in fields_to_change.items():
+                    logger.debug(f"{field}: {old} -> {new}")
+                    kwargs: dict[str, Any] = {
+                        arg_name: new
+                        for arg_name, (old, new) in fields_to_change.items()
+                    }
+                    logger.debug(f"Copr edit arguments: {kwargs}")
+                    self.copr_client.project_proxy.edit(
+                        ownername=owner,
+                        projectname=project,
+                        **kwargs,
+                    )
+
+            fields_to_change = None
+            failure_message = (
+                f"Copr project chroot configuration update failed "
+                f"for '{owner}/{project}' project."
+            )
+            self._update_chroot_specific_configuration(
+                project,
+                owner=owner,
+                targets_dict=targets_dict,
+            )
+
+        except CoprAuthException as ex:
+            if "Only owners and admins may update their projects." in str(ex):
+                if request_admin_if_needed:
+                    logger.info(
+                        "Admin permissions are required "
+                        "in order to be able to edit project settings. "
+                        "Requesting the admin rights for the "
+                        f"copr '{owner}/{project}' project.",
+                    )
+                    self.copr_client.project_proxy.request_permissions(
+                        ownername=owner,
+                        projectname=project,
+                        permissions={"admin": True},
+                    )
+                else:
+                    logger.warning(
+                        f"Admin permissions are required for copr '{owner}/{project}' project"
+                        f"in order to be able to edit project settings. "
+                        f"You can make a request by specifying --request-admin-if-needed "
+                        f"when using Packit CLI.",
+                    )
+            raise PackitCoprSettingsException(
+                failure_message,
+                fields_to_change=fields_to_change,
+            ) from ex
 
     def get_fields_to_change(
         self,
