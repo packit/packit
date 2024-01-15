@@ -93,19 +93,20 @@ class CoprHelper:
         logger.info(f"Result set: {set(build_targets) & set(copr_chroots)}")
         return set(build_targets) & set(copr_chroots)
 
-    def _update_chroot_specific_configuration(
+    def _get_chroot_specific_configuration_to_update(
         self,
         project: str,
         owner: Optional[str] = None,
         targets_dict: Optional[dict] = None,  # chroot specific configuration
-    ):
+    ) -> dict[str, dict[str, tuple]]:
         """
         Using the provided targets_dict, update chroot specific configuration
         """
         if not targets_dict:
-            return
+            return {}
 
-        # let's update chroot specific configuration
+        update_dict = {}
+        # let's get the chroot specific configuration to update
         for target, chroot_configuration in targets_dict.items():
             chroot_names = get_build_targets(target)
             for chroot_name in chroot_names:
@@ -116,30 +117,58 @@ class CoprHelper:
                         f"There is chroot-specific configuration for {chroot_name}",
                     )
                     # only update when needed
-                    copr_chroot_configuration = (
-                        self.copr_client.project_chroot_proxy.get(
-                            ownername=owner,
-                            projectname=project,
-                            chrootname=chroot_name,
+                    try:
+                        copr_chroot_configuration = (
+                            self.copr_client.project_chroot_proxy.get(
+                                ownername=owner,
+                                projectname=project,
+                                chrootname=chroot_name,
+                            )
                         )
-                    )
-                    update_dict = {}
+                    except CoprNoResultException:
+                        logger.debug(
+                            "It was not possible to get chroot configuration for "
+                            f"{chroot_name}",
+                        )
+                        continue
+
+                    update_dict_chroot = {}
                     for c, default in CHROOT_SPECIFIC_COPR_CONFIGURATION.items():
-                        if copr_chroot_configuration.get(
-                            c,
-                            default,
-                        ) != chroot_configuration.get(c, default):
-                            update_dict[c] = chroot_configuration.get(c, default)
-                    if update_dict:
-                        logger.info(
-                            f"Update {owner}/{project} {chroot_name}: {update_dict}",
-                        )
-                        self.copr_client.project_chroot_proxy.edit(
-                            ownername=owner,
-                            projectname=project,
-                            chrootname=chroot_name,
-                            **update_dict,
-                        )
+                        if (
+                            old_value := copr_chroot_configuration.get(
+                                c,
+                                default,
+                            )
+                        ) != (new_value := chroot_configuration.get(c, default)):
+                            update_dict_chroot[c] = (old_value, new_value)
+                    if update_dict_chroot:
+                        update_dict[chroot_name] = update_dict_chroot
+        return update_dict
+
+    def _update_chroot_specific_configuration(
+        self,
+        owner: str,
+        project: str,
+        update_dict: dict[str, dict[str, tuple]],
+    ):
+        for chroot, update_dict_chroot in update_dict.items():
+            diff_string = [
+                f"{field}: {old} -> {new}"
+                for field, (old, new) in update_dict_chroot.items()
+            ]
+            logger.info(
+                f"Update {owner}/{project} {chroot}: {diff_string}",
+            )
+            update_args = {
+                field: new_value
+                for field, (old_value, new_value) in update_dict_chroot.items()
+            }
+            self.copr_client.project_chroot_proxy.edit(
+                ownername=owner,
+                projectname=project,
+                chrootname=chroot,
+                **update_args,
+            )
 
     def create_copr_project_if_not_exists(
         self,
@@ -219,29 +248,31 @@ class CoprHelper:
                 failure_message = (
                     f"Copr project update failed for '{owner}/{project}' project."
                 )
-                logger.info(f"Updating copr project '{owner}/{project}'")
-                for field, (old, new) in fields_to_change.items():
-                    logger.debug(f"{field}: {old} -> {new}")
-                    kwargs: dict[str, Any] = {
-                        arg_name: new
-                        for arg_name, (old, new) in fields_to_change.items()
-                    }
-                    logger.debug(f"Copr edit arguments: {kwargs}")
-                    self.copr_client.project_proxy.edit(
-                        ownername=owner,
-                        projectname=project,
-                        **kwargs,
-                    )
+                self.update_copr_project(owner, project, fields_to_change)
 
-            fields_to_change = None
             failure_message = (
                 f"Copr project chroot configuration update failed "
                 f"for '{owner}/{project}' project."
             )
+            chroot_specific_config_to_update = (
+                self._get_chroot_specific_configuration_to_update(
+                    project,
+                    owner,
+                    targets_dict,
+                )
+            )
+
+            # transform the dict for the user message purposes
+            fields_to_change = {
+                f"{chroot}: {field}": values
+                for chroot, chroot_config in chroot_specific_config_to_update.items()
+                for field, values in chroot_config.items()
+            }
+
             self._update_chroot_specific_configuration(
-                project,
+                project=project,
                 owner=owner,
-                targets_dict=targets_dict,
+                update_dict=chroot_specific_config_to_update,
             )
 
         except CoprAuthException as ex:
@@ -269,6 +300,25 @@ class CoprHelper:
                 failure_message,
                 fields_to_change=fields_to_change,
             ) from ex
+
+    def update_copr_project(
+        self,
+        owner: str,
+        project: str,
+        fields_to_change: dict[str, tuple],
+    ):
+        logger.info(f"Updating copr project '{owner}/{project}'")
+        for field, (old, new) in fields_to_change.items():
+            logger.debug(f"{field}: {old} -> {new}")
+            kwargs: dict[str, Any] = {
+                arg_name: new for arg_name, (old, new) in fields_to_change.items()
+            }
+            logger.debug(f"Copr edit arguments: {kwargs}")
+            self.copr_client.project_proxy.edit(
+                ownername=owner,
+                projectname=project,
+                **kwargs,
+            )
 
     def get_fields_to_change(
         self,
@@ -390,10 +440,15 @@ class CoprHelper:
                 follow_fedora_branching=follow_fedora_branching,
             )
             # once created: update chroot-specific configuration if there is any
-            self._update_chroot_specific_configuration(
+            chroot_specific_config = self._get_chroot_specific_configuration_to_update(
                 project,
+                owner,
+                targets_dict,
+            )
+            self._update_chroot_specific_configuration(
+                project=project,
                 owner=owner,
-                targets_dict=targets_dict,
+                update_dict=chroot_specific_config,
             )
         except CoprException as ex:
             # TODO: Remove once Copr doesn't throw for existing projects or new
