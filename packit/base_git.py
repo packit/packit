@@ -204,6 +204,48 @@ class PackitRepositoryBase:
         except GitCommandError as exc:
             raise PackitException(f"Failed to switch branch to {branch!r}") from exc
 
+    def search_branch(self, name: str) -> bool:
+        """
+        Does branch exist remotely?
+
+        Args:
+            name: branch name to search
+
+        Returns:
+            True if the remote branch already exist.
+        """
+        try:
+            self.local_project.git_repo.git.fetch()
+            for ref in self.local_project.git_repo.remote().refs:
+                if ref.remote_head == name:
+                    return True
+        except GitCommandError as exc:
+            raise PackitException(
+                f"Failed to list refs for repo {self.local_project.git_repo!r}",
+            ) from exc
+        return False
+
+    def checkout_branch(
+        self,
+        name: str,
+    ) -> None:
+        """
+        Checkout remote, already existing, branch "name"
+
+        Args:
+            name: str
+        """
+        if self.search_branch(name):
+            try:
+                self.local_project.git_repo.git.checkout(name)
+            except GitCommandError as exc:
+                raise PackitException(
+                    f"Failed checking out remote branch {name}",
+                ) from exc
+        else:
+            self.create_branch(name)
+            self.switch_branch(name)
+
     def commit(
         self,
         title: str,
@@ -550,6 +592,7 @@ class PackitRepositoryBase:
         title: str,
         target_branch: str,
         source_branch: str,
+        exact_match=True,
     ) -> Optional[PullRequest]:
         """
         Look for an already created PR.
@@ -559,6 +602,7 @@ class PackitRepositoryBase:
             description: Description of the pull request.
             target_branch: Branch to which the PR is being merged.
             source_branch: Branch from which the changes are being pulled.
+            exact_match: Search for a title exact match?
 
         Return:
             The `PullRequest` object if some existing PR is found, `None`
@@ -569,7 +613,7 @@ class PackitRepositoryBase:
 
         for pr in pull_requests:
             if (
-                pr.title == title
+                (pr.title == title if exact_match else title in pr.title)
                 and pr.target_branch == target_branch
                 and pr.source_branch == source_branch
                 and pr.author == user

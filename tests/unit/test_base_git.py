@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 import logging
+import subprocess
 from pathlib import Path
 from typing import Optional, Union
 
@@ -16,10 +17,11 @@ from packit.command_handler import LocalCommandHandler
 from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
-from packit.local_project import LocalProjectBuilder
+from packit.local_project import LocalProject, LocalProjectBuilder
 from packit.upstream import Upstream
 from packit.utils import commands
-from tests.spellbook import can_a_module_be_imported
+from packit.utils.repo import create_new_repo
+from tests.spellbook import can_a_module_be_imported, initiate_git_repo
 
 
 @pytest.fixture()
@@ -1052,3 +1054,73 @@ def test_set_spec_content_prerelease(
     if prerelease_suffix_macro:
         with dist_git.specfile.macro_definitions() as mds:
             assert mds.get(prerelease_suffix_macro).commented_out == (not is_prerelease)
+
+
+@pytest.mark.parametrize(
+    "remote_branches,branch_found",
+    [
+        pytest.param([], False, id="No remote branches already opened"),
+        pytest.param(
+            ["one", "two", "three"],
+            False,
+            id="Remote branches not from packit",
+        ),
+        pytest.param(
+            ["rawhide-pull_from_upstream"],
+            True,
+            id="New packit remote branch matching",
+        ),
+    ],
+)
+def test_search_branch(tmp_path, remote_branches, branch_found):
+    remote = tmp_path / "remote_repo"
+    remote.mkdir()
+    create_new_repo(remote, [])
+
+    for branch in remote_branches:
+        subprocess.check_call(["git", "checkout", "-b", branch], cwd=remote)
+        subprocess.check_call(["touch", branch], cwd=remote)
+        subprocess.check_call(["git", "add", branch], cwd=remote)
+        subprocess.check_call(["git", "commit", "-m", branch], cwd=remote)
+
+    local = tmp_path / "local_repo"
+    initiate_git_repo(local, remotes=[("origin", remote / ".git")])
+
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(),
+    )
+    dist_git.local_project = LocalProject(working_dir=local)
+    assert dist_git.search_branch("rawhide-pull_from_upstream") == branch_found
+
+
+@pytest.mark.parametrize(
+    "remote_branches",
+    [
+        pytest.param([], id="No remote branches already opened"),
+        pytest.param(
+            ["rawhide-pull_from_upstream"],
+            id="Packit remote branch already exist",
+        ),
+    ],
+)
+def test_checkout_branch(tmp_path, remote_branches):
+    remote = tmp_path / "remote_repo"
+    remote.mkdir()
+    create_new_repo(remote, [])
+
+    for branch in remote_branches:
+        subprocess.check_call(["git", "checkout", "-b", branch], cwd=remote)
+        subprocess.check_call(["touch", branch], cwd=remote)
+        subprocess.check_call(["git", "add", branch], cwd=remote)
+        subprocess.check_call(["git", "commit", "-m", branch], cwd=remote)
+
+    local = tmp_path / "local_repo"
+    initiate_git_repo(local, remotes=[("origin", remote / ".git")])
+
+    dist_git = PackitRepositoryBase(
+        config=flexmock(),
+        package_config=flexmock(),
+    )
+    dist_git.local_project = LocalProject(working_dir=local)
+    dist_git.checkout_branch("rawhide-pull_from_upstream")
