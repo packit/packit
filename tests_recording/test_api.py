@@ -6,6 +6,8 @@ from subprocess import check_output
 from bugzilla import Bugzilla
 from flexmock import flexmock
 from ogr.services.github.project import GithubProject
+
+from packit.api import PackitAPI
 from requre.cassette import DataTypes
 from requre.helpers.files import StoreFiles
 from requre.helpers.simple_object import Simple
@@ -18,8 +20,6 @@ from requre.online_replacing import (
     apply_decorator_to_all_methods,
     replace_module_match,
 )
-
-from packit.api import PackitAPI
 from tests_recording.testbase import PackitTest
 
 
