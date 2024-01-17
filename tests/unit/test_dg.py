@@ -78,10 +78,11 @@ from packit.local_project import LocalProjectBuilder
         ),
     ],
 )
-def test_existing_pr(title, target_branch, source_branch, prs, exists):
+def test_existing_pr(git_repo_mock, title, target_branch, source_branch, prs, exists):
     user_mock = flexmock().should_receive("get_username").and_return("packit").mock()
     local_project = LocalProjectBuilder().build(
         git_project=flexmock(service="something", get_pr_list=lambda: prs),
+        git_repo=git_repo_mock,
         git_service=flexmock(user=user_mock),
     )
     distgit = DistGit(

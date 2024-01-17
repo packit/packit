@@ -1,11 +1,11 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 import pytest
-from requre.cassette import DataTypes
-from requre.modules_decorate_all_methods import record_requests_module
 
 from packit.exceptions import ImageBuilderError
 from packit.vm_image_build import ImageBuilder
+from requre.cassette import DataTypes
+from requre.modules_decorate_all_methods import record_requests_module
 from tests_recording.testbase import PackitTest
 
 

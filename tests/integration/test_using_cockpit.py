@@ -57,9 +57,10 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         download_upstream_archives=lambda: ["the-archive"],
     )
     flexmock(DistGit).should_receive("existing_pr").and_return(None)
+    # below noqa: E501 because of black issue https://github.com/psf/black/issues/809
     flexmock(
         PackitAPI,
-        push_and_create_pr=lambda pr_title, pr_description, git_branch, repo, sync_acls: None,
+        push_and_create_pr=lambda pr_title, pr_description, git_branch, repo, sync_acls, pr_title_suffix: None,  # noqa: E501
     )
 
     pc = get_local_package_config(str(upstream_path))
@@ -102,6 +103,7 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
         download_upstream_archives=lambda: ["the-archive"],
     )
     pr = flexmock(url="https://example.com/pull/1")
+    pr.should_receive("update_info").and_return()
     flexmock(DistGit).should_receive("existing_pr").and_return(pr)
 
     pc = get_local_package_config(str(upstream_path))

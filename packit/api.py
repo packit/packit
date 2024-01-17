@@ -31,6 +31,7 @@ import click
 import git
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
+from ogr.exceptions import PagureAPIException
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -1104,11 +1105,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.specfile.reload()
 
             if create_pr:
-                local_pr_branch = (
-                    f"{version}-{dist_git_branch}-{local_pr_branch_suffix}"
-                )
-                self.dg.create_branch(local_pr_branch)
-                self.dg.switch_branch(local_pr_branch)
+                local_pr_branch = f"{dist_git_branch}-{local_pr_branch_suffix}"
+                self.dg.checkout_branch(local_pr_branch)
 
             if create_sync_note and self.package_config.create_sync_note:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
@@ -1182,6 +1180,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     git_branch=dist_git_branch,
                     repo=self.dg,
                     sync_acls=sync_acls,
+                    pr_title_suffix=version,
                 )
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
@@ -1507,6 +1506,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         git_branch: str,
         repo: Union[Upstream, DistGit],
         sync_acls: bool = False,
+        pr_title_suffix: Optional[str] = "",
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
         try:
@@ -1514,7 +1514,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         except PackitException as exc:
             logger.error(f"Push to fork failed: {exc}")
             raise
-        pr = repo.existing_pr(pr_title, git_branch, repo.local_project.ref)
+        pr = repo.existing_pr(
+            pr_title.rstrip(f" {pr_title_suffix}"),
+            git_branch,
+            repo.local_project.ref,
+            exact_match=False,
+        )
         if pr is None:
             pr = repo.create_pull(
                 pr_title,
@@ -1523,7 +1528,15 @@ The first dist-git commit to be synced is '{short_hash}'.
                 target_branch=git_branch,
             )
         else:
-            logger.debug(f"PR already exists: {pr.url}")
+            logger.debug(
+                f"PR already exists: {pr.url} updating title"
+                f' "{pr_title}" and description "{pr_description}"',
+            )
+            try:
+                pr.update_info(pr_title, pr_description)
+            except PagureAPIException as exc:
+                logger.error(f"Update of existing PR {pr.url} failed: {exc}")
+                raise PackitException(f"Update of existing PR {pr.url} failed") from exc
         return pr
 
     def _handle_sources(

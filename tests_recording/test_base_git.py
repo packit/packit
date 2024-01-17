@@ -3,15 +3,15 @@
 from pathlib import Path
 
 from flexmock import flexmock
-from requre.cassette import DataTypes
-from requre.online_replacing import (
-    record_requests_for_all_methods,
-)
 from specfile import Specfile
 
 from packit.base_git import PackitRepositoryBase
 from packit.config import CommonPackageConfig, PackageConfig
 from packit.config.sources import SourcesItem
+from requre.cassette import DataTypes
+from requre.online_replacing import (
+    record_requests_for_all_methods,
+)
 from tests_recording.testbase import PackitTest
 
 

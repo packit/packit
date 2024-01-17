@@ -1,5 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+from packit.status import Status
 from requre.cassette import DataTypes
 from requre.helpers.files import StoreFiles
 from requre.helpers.simple_object import Simple
@@ -12,8 +13,6 @@ from requre.online_replacing import (
     apply_decorator_to_all_methods,
     replace_module_match,
 )
-
-from packit.status import Status
 from tests_recording.testbase import PackitTest
 
 
