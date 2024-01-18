@@ -55,36 +55,21 @@ class TestCoprHelper:
         )
 
     @pytest.mark.parametrize(
-        "targets_dict,expect_call_args",
+        "update_dict,expect_call_args",
         [
             (
-                {"fedora-rawhide": {}},
+                {},
                 None,
             ),
             (
-                {"fedora-rawhide": {"distros": ["y"]}},
-                None,
-            ),
-            (
-                {"fedora-rawhide": {"additional_repos": ["y"]}},
+                {"fedora-rawhide-x86_64": {"additional_repos": ([], ["y"])}},
                 {
                     "additional_repos": ["y"],
                 },
             ),
-            (
-                {
-                    "fedora-rawhide": {
-                        "additional_modules": "httpd:2.4,nodejs:12",
-                        "distros": ["z"],
-                    },
-                },
-                {
-                    "additional_modules": "httpd:2.4,nodejs:12",
-                },
-            ),
         ],
     )
-    def test_update_chroot_specific_configuration(self, targets_dict, expect_call_args):
+    def test_update_chroot_specific_configuration(self, update_dict, expect_call_args):
         project_proxy_mock = flexmock()
         copr_client_mock = flexmock(
             config={"copr_url": "https://fedoracloud.org"},
@@ -96,6 +81,62 @@ class TestCoprHelper:
         ).and_return(copr_client_mock)
 
         if expect_call_args:
+            project_proxy_mock.should_receive("edit").with_args(
+                projectname="project",
+                ownername="owner",
+                chrootname="fedora-rawhide-x86_64",
+                **expect_call_args,
+            ).once()
+
+        copr_helper = CoprHelper("_upstream_local_project")
+        copr_helper._update_chroot_specific_configuration(
+            project="project",
+            owner="owner",
+            update_dict=update_dict,
+        )
+
+    @pytest.mark.parametrize(
+        "targets_dict,result_dict",
+        [
+            ({"fedora-rawhide": {}}, {}),
+            ({"fedora-rawhide": {"distros": ["y"]}}, {}),
+            (
+                {"fedora-rawhide": {"additional_repos": ["y"]}},
+                {
+                    "fedora-rawhide-x86_64": {"additional_repos": ([], ["y"])},
+                },
+            ),
+            (
+                {
+                    "fedora-rawhide": {
+                        "additional_modules": "httpd:2.4,nodejs:12",
+                        "distros": ["z"],
+                    },
+                },
+                {
+                    "fedora-rawhide-x86_64": {
+                        "additional_modules": ("", "httpd:2.4,nodejs:12"),
+                    },
+                },
+            ),
+        ],
+    )
+    def test_get_chroot_specific_configuration_to_update(
+        self,
+        targets_dict,
+        result_dict,
+    ):
+        project_proxy_mock = flexmock()
+        copr_client_mock = flexmock(
+            config={"copr_url": "https://fedoracloud.org"},
+            project_chroot_proxy=project_proxy_mock,
+        )
+
+        flexmock(packit.copr_helper.CoprClient).should_receive(
+            "create_from_config_file",
+        ).and_return(copr_client_mock)
+
+        if result_dict:
             project_proxy_mock.should_receive("get").and_return(
                 {
                     "additional_modules": "",
@@ -111,16 +152,13 @@ class TestCoprHelper:
                     "without_opts": [],
                 },
             )
-            project_proxy_mock.should_receive("edit").with_args(
-                ownername="owner",
-                projectname="project",
-                chrootname="fedora-rawhide-x86_64",
-                **expect_call_args,
-            )
 
         copr_helper = CoprHelper("_upstream_local_project")
-        copr_helper._update_chroot_specific_configuration(
-            "project",
-            "owner",
-            targets_dict=targets_dict,
+        assert (
+            copr_helper._get_chroot_specific_configuration_to_update(
+                "project",
+                "owner",
+                targets_dict=targets_dict,
+            )
+            == result_dict
         )
