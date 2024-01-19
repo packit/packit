@@ -1,3 +1,7 @@
+# 0.89.0
+
+- We have fixed a bug in handling chroot-specific configuration once the chroots themselves are updated. (#2194)
+
 # 0.88.0
 
 - We have fixed a bug preventing the release from being synced downstream if the changelog to be set is empty. (#2183)
