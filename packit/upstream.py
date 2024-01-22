@@ -365,7 +365,7 @@ class Upstream(PackitRepositoryBase):
             f"the upstream repository {self.local_project.working_dir}.",
         )
 
-        tags = self.list_tags(before if before is not None else self._merged_ref)
+        tags = self.list_tags(self._merged_ref)
 
         if not tags:
             logger.info("No tags found in the repository.")
