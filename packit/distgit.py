@@ -264,20 +264,33 @@ class DistGit(PackitRepositoryBase):
             project: Original dist-git project.
             fork: Fork of the original project.
         """
+        logger.info("Syncing ACLs between dist-git project and fork.")
+
         committers = project.who_can_merge_pr()
         fork_committers = fork.who_can_merge_pr()
         # do not mess with fork owners
         fork_owners = set(fork.get_owners())
         for user in fork_committers - committers - fork_owners:
+            logger.debug(f"Removing user {user}")
             fork.remove_user(user)
         for user in committers - fork_committers - fork_owners:
-            fork.add_user(user, AccessLevel.push)
+            logger.debug(f"Adding user {user}")
+            try:
+                fork.add_user(user, AccessLevel.push)
+            except Exception as ex:
+                logger.debug(f"It was not possible to add user {user}: {ex}")
+
         commit_groups = project.which_groups_can_merge_pr()
         fork_commit_groups = fork.which_groups_can_merge_pr()
         for group in fork_commit_groups - commit_groups:
+            logger.debug(f"Removing group {group}")
             fork.remove_group(group)
         for group in commit_groups - fork_commit_groups:
-            fork.add_group(group, AccessLevel.push)
+            logger.debug(f"Adding group {group}")
+            try:
+                fork.add_group(group, AccessLevel.push)
+            except Exception as ex:
+                logger.debug(f"It was not possible to add group {group}: {ex}")
 
     def push_to_fork(
         self,
