@@ -113,16 +113,22 @@ class Upstream(PackitRepositoryBase):
         force: bool = False,
         fork: bool = True,
         remote_name: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
     ) -> tuple[str, Optional[str]]:
         """
         push current branch to fork if fork=True, else to origin
 
-        :param branch_name: the branch where we push
-        :param force: push forcefully?
-        :param fork: push to fork?
-        :param remote_name: name of remote where we should push
+        Args:
+            branch_name: the branch where we push
+            force: push forcefully?
+            fork: push to fork?
+            remote_name: name of remote where we should push
                if None, try to find a ssh_url
-        :return: name of the branch where we pushed
+            sync_acls: whether to sync the ACLs of the original repo and the fork
+
+        Returns:
+            name of the branch where we pushed
+
         """
         logger.debug(
             f"About to {'force ' if force else ''}push changes to branch {branch_name!r}.",
@@ -136,6 +142,11 @@ class Upstream(PackitRepositoryBase):
                 else:
                     # ogr is awesome! if you want to fork your own repo, you'll get it!
                     project = self.local_project.git_project.get_fork(create=True)
+
+                if sync_acls:
+                    # synchronize ACLs between original repo and fork
+                    self.sync_acls(self.local_project.git_project, project)
+
                 fork_username = project.namespace
                 fork_urls = project.get_git_urls()
 
