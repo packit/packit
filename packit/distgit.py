@@ -12,7 +12,7 @@ import cccolutils
 import git
 from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
-from ogr.abstract import AccessLevel, GitProject, PullRequest
+from ogr.abstract import PullRequest
 from specfile.utils import NEVR
 
 from packit.base_git import PackitRepositoryBase
@@ -251,59 +251,22 @@ class DistGit(PackitRepositoryBase):
             ) from e
         head.set_commit(remote_ref)
 
-    @staticmethod
-    def sync_acls(project: GitProject, fork: GitProject) -> None:
-        """
-        Synchronizes ACLs between dist-git project and its fork.
-
-        Users and groups with commit or higher access to the original project will gain
-        commit access to the fork. Users and groups without commit or higher access
-        to the original project will be removed from the fork.
-
-        Args:
-            project: Original dist-git project.
-            fork: Fork of the original project.
-        """
-        logger.info("Syncing ACLs between dist-git project and fork.")
-
-        committers = project.who_can_merge_pr()
-        fork_committers = fork.who_can_merge_pr()
-        # do not mess with fork owners
-        fork_owners = set(fork.get_owners())
-        for user in fork_committers - committers - fork_owners:
-            logger.debug(f"Removing user {user}")
-            fork.remove_user(user)
-        for user in committers - fork_committers - fork_owners:
-            logger.debug(f"Adding user {user}")
-            try:
-                fork.add_user(user, AccessLevel.push)
-            except Exception as ex:
-                logger.debug(f"It was not possible to add user {user}: {ex}")
-
-        commit_groups = project.which_groups_can_merge_pr()
-        fork_commit_groups = fork.which_groups_can_merge_pr()
-        for group in fork_commit_groups - commit_groups:
-            logger.debug(f"Removing group {group}")
-            fork.remove_group(group)
-        for group in commit_groups - fork_commit_groups:
-            logger.debug(f"Adding group {group}")
-            try:
-                fork.add_group(group, AccessLevel.push)
-            except Exception as ex:
-                logger.debug(f"It was not possible to add group {group}: {ex}")
-
     def push_to_fork(
         self,
         branch_name: str,
         fork_remote_name: str = "fork",
         force: bool = False,
+        sync_acls: bool = False,
     ):
         """
         push changes to a fork of the dist-git repo; they need to be committed!
 
-        :param branch_name: the branch where we push
-        :param fork_remote_name: local name of the remote where we push to
-        :param force: push forcefully?
+        Args:
+            branch_name: the branch where we push
+            fork_remote_name: local name of the remote where we push to
+            force: push forcefully?
+            sync_acls: whether to sync the ACLs of the original repo and the fork
+
         """
         logger.debug(
             f"About to {'force ' if force else ''}push changes to branch {branch_name!r} "
@@ -321,8 +284,9 @@ class DistGit(PackitRepositoryBase):
                     "Unable to create a fork of repository "
                     f"{self.local_project.git_project.full_repo_name}",
                 )
-            # synchronize ACLs between original repo and fork
-            self.sync_acls(self.local_project.git_project, fork)
+            if sync_acls:
+                # synchronize ACLs between original repo and fork
+                self.sync_acls(self.local_project.git_project, fork)
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
                 name=fork_remote_name,
