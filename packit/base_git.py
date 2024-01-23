@@ -12,7 +12,7 @@ from typing import Callable, Optional
 import git
 import requests
 from git import GitCommandError, PushInfo
-from ogr.abstract import PullRequest
+from ogr.abstract import AccessLevel, GitProject, PullRequest
 from specfile import Specfile
 from specfile.exceptions import (
     DuplicateSourceException,
@@ -691,3 +691,44 @@ class PackitRepositoryBase:
             ):
                 return pr
         return None
+
+    @staticmethod
+    def sync_acls(project: GitProject, fork: GitProject) -> None:
+        """
+        Synchronizes ACLs between dist-git project and its fork.
+
+        Users and groups with commit or higher access to the original project will gain
+        commit access to the fork. Users and groups without commit or higher access
+        to the original project will be removed from the fork.
+
+        Args:
+            project: Original dist-git project.
+            fork: Fork of the original project.
+        """
+        logger.info("Syncing ACLs between dist-git project and fork.")
+
+        committers = project.who_can_merge_pr()
+        fork_committers = fork.who_can_merge_pr()
+        # do not mess with fork owners
+        fork_owners = set(fork.get_owners())
+        for user in fork_committers - committers - fork_owners:
+            logger.debug(f"Removing user {user}")
+            fork.remove_user(user)
+        for user in committers - fork_committers - fork_owners:
+            logger.debug(f"Adding user {user}")
+            try:
+                fork.add_user(user, AccessLevel.push)
+            except Exception as ex:
+                logger.debug(f"It was not possible to add user {user}: {ex}")
+
+        commit_groups = project.which_groups_can_merge_pr()
+        fork_commit_groups = fork.which_groups_can_merge_pr()
+        for group in fork_commit_groups - commit_groups:
+            logger.debug(f"Removing group {group}")
+            fork.remove_group(group)
+        for group in commit_groups - fork_commit_groups:
+            logger.debug(f"Adding group {group}")
+            try:
+                fork.add_group(group, AccessLevel.push)
+            except Exception as ex:
+                logger.debug(f"It was not possible to add group {group}: {ex}")
