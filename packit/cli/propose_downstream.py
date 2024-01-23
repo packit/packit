@@ -55,6 +55,7 @@ def sync_release(
     use_downstream_specfile,
     package_config,
     resolved_bugs,
+    sync_acls,
 ):
     api = get_packit_api(
         config=config,
@@ -82,6 +83,7 @@ def sync_release(
             force=force,
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolved_bugs,
+            sync_acls=sync_acls,
         )
 
 
@@ -124,6 +126,12 @@ def sync_release_common_options(func):
         required=False,
         default=None,
         multiple=True,
+    )
+    @click.option(
+        "--sync-acls",
+        default=False,
+        is_flag=True,
+        help="Sync ACLs between dist-git repo and the fork, is considered only with --pr option.",
     )
     @click.option(
         PACKAGE_SHORT_OPTION,
@@ -174,6 +182,7 @@ def propose_downstream(
     local_content,
     upstream_ref,
     force,
+    sync_acls,
     resolve_bug,
     package_config,
 ):
@@ -200,6 +209,7 @@ def propose_downstream(
         use_downstream_specfile=False,
         package_config=package_config,
         resolved_bugs=resolve_bug,
+        sync_acls=sync_acls,
     )
 
 
@@ -217,6 +227,7 @@ def pull_from_upstream(
     path_or_url,
     version,
     force,
+    sync_acls,
     resolve_bug,
     package_config,
 ):
@@ -243,4 +254,5 @@ def pull_from_upstream(
         use_downstream_specfile=True,
         package_config=package_config,
         resolved_bugs=resolve_bug,
+        sync_acls=sync_acls,
     )

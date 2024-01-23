@@ -801,6 +801,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         resolved_bugs: Optional[list[str]] = None,
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -827,6 +828,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         resolved_bugs: Optional[list[str]] = None,
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -852,6 +854,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         resolved_bugs: Optional[list[str]] = None,
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -886,6 +889,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             release_monitoring_project_id: ID of the project in release monitoring if the syncing
                 happens as reaction to that.
             pr_description_footer: Footer for the PR description (used by packit-service)
+            sync_acls: Whether to sync the ACLs of original repo and
+                fork when creating a PR from fork.
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -1062,6 +1067,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     pr_description=f"{pr_description}{pr_instructions}{footer}",
                     git_branch=dist_git_branch,
                     repo=self.dg,
+                    sync_acls=sync_acls,
                 )
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
@@ -1381,10 +1387,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description: str,
         git_branch: str,
         repo: Union[Upstream, DistGit],
+        sync_acls: bool = False,
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
         try:
-            repo.push_to_fork(repo.local_project.ref, force=True)
+            repo.push_to_fork(repo.local_project.ref, force=True, sync_acls=sync_acls)
         except PackitException as exc:
             logger.error(f"Push to fork failed: {exc}")
             raise
