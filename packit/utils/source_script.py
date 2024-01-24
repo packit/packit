@@ -13,6 +13,7 @@ def create_source_script(
     update_release: bool = True,
     release_suffix: Optional[str] = None,
     package: Optional[str] = None,
+    merged_ref: Optional[str] = None,
 ):
     options = []
     if ref:
@@ -27,6 +28,8 @@ def create_source_script(
         options += ["--no-update-release"]
     if release_suffix:
         options += ["--release-suffix", f"'{release_suffix}'"]
+    if merged_ref:
+        options += ["--merged-ref", f"'{merged_ref}'"]
 
     # do not create symlinks in Copr environment
     options += ["--no-create-symlinks"]
