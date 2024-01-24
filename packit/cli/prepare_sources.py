@@ -44,6 +44,11 @@ def load_job_config(job_config):
     "(this option implies the repository is source-git).",
 )
 @click.option(
+    "--merged-ref",
+    default=None,
+    help="Git ref used to identify correct most recent tag.",
+)
+@click.option(
     "--update-release/--no-update-release",
     default=None,
     help=(
@@ -134,6 +139,7 @@ def prepare_sources(
     path_or_url,
     job_config_index,
     upstream_ref,
+    merged_ref,
     update_release,
     bump,
     release_suffix,
@@ -186,6 +192,7 @@ def prepare_sources(
 
     api.prepare_sources(
         upstream_ref=upstream_ref,
+        merged_ref=merged_ref,
         update_release=update_release,
         release_suffix=release_suffix,
         result_dir=result_dir,
