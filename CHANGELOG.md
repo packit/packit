@@ -1,3 +1,8 @@
+# 0.90.0
+
+- `pull-from-upstream` and `propose-downstream` commands now have the `--sync-acls` option that enables syncing the ACLs between dits-git repo and fork. The default behaviour was, however, changed to not sync the ACLs. (#2214)
+- Packit now properly handles exceptions when syncing ACLs during release syncing. (#2213)
+
 # 0.89.0
 
 - We have fixed a bug in handling chroot-specific configuration once the chroots themselves are updated. (#2194)
