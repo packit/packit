@@ -12,12 +12,12 @@ from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
 
 ALIASES: dict[str, list[str]] = {
-    "fedora-all": ["fedora-37", "fedora-38", "fedora-39", "fedora-rawhide"],
-    "fedora-stable": ["fedora-37", "fedora-38"],
-    "fedora-development": ["fedora-rawhide", "fedora-39"],
+    "fedora-all": ["fedora-38", "fedora-39", "fedora-rawhide"],
+    "fedora-stable": ["fedora-38", "fedora-39"],
+    "fedora-development": ["fedora-rawhide"],
     "fedora-latest": ["fedora-39"],
-    "fedora-latest-stable": ["fedora-38"],
-    "fedora-branched": ["fedora-37", "fedora-38", "fedora-39"],
+    "fedora-latest-stable": ["fedora-39"],
+    "fedora-branched": ["fedora-38", "fedora-39"],
     "epel-all": ["epel-7", "epel-8", "epel-9"],
     "opensuse-leap-all": (
         leap_all := ["opensuse-leap-15.5", "opensuse-leap-15.4", "opensuse-leap-15.3"]
