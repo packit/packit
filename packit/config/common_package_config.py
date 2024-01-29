@@ -152,6 +152,9 @@ class CommonPackageConfig:
         version_update_mask: String containing a reg exp. The old version contained in the
             specfile and the newly released version have both to match this reg exp
             otherwise Packit shall not sync the release downstream.
+        parse_time_macros: Dict with macros to (un)define before parsing specfile.
+            Keys are macro names and values are macro values. A value of None will undefine
+            the corresponding macro.
     """
 
     def __init__(
@@ -228,6 +231,7 @@ class CommonPackageConfig:
         pkg_tool: Optional[str] = None,
         version_update_mask: Optional[str] = None,
         test_command: Optional[TestCommandConfig] = None,
+        parse_time_macros: Optional[dict[str, str]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -333,6 +337,8 @@ class CommonPackageConfig:
         self.upload_sources = upload_sources
 
         self.pkg_tool = pkg_tool
+
+        self.parse_time_macros = parse_time_macros or {}
 
     @property
     def dist_git_base_url(self) -> str:

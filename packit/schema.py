@@ -413,6 +413,8 @@ class CommonConfigSchema(Schema):
     pkg_tool = fields.String(missing=None)
     version_update_mask = fields.String(missing=None)
 
+    parse_time_macros = fields.Dict(missing=None)
+
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id
