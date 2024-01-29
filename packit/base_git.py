@@ -120,6 +120,12 @@ class PackitRepositoryBase:
             self._specfile = Specfile(
                 self.absolute_specfile_path,
                 sourcedir=self.absolute_source_dir,
+                macros=[
+                    # both keys (though unlikely) and values could have been interpreted
+                    # as numbers by the YAML parser, convert them (back) to strings
+                    (str(k), v if v is None else str(v))
+                    for k, v in self.package_config.parse_time_macros.items()
+                ],
                 autosave=True,
             )
         return self._specfile
