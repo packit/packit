@@ -479,6 +479,7 @@ def test_set_spec_content(tmp_path):
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
+            parse_time_macros={},
         ),
     )
     dist_git._specfile_path = distgit_spec_path
@@ -633,6 +634,7 @@ def test_set_spec_content_reset_release(
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
+            parse_time_macros={},
         ),
     )
     dist_git._specfile_path = distgit_spec_path
@@ -679,6 +681,7 @@ def test_set_spec_content_no_changelog(tmp_path, changelog_section):
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
+            parse_time_macros={},
         ),
     )
     dist_git._specfile_path = distgit_spec_path
@@ -780,6 +783,7 @@ def test_set_spec_content_version_macros(
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
+            parse_time_macros={},
         ),
     )
     dist_git._specfile_path = distgit_spec_path
@@ -1004,6 +1008,7 @@ def test_set_spec_content_prerelease(
         package_config=flexmock(
             prerelease_suffix_macro=prerelease_suffix_macro,
             prerelease_suffix_pattern=prerelease_suffix_pattern,
+            parse_time_macros={},
         ),
     )
     dist_git._specfile_path = distgit_spec_path
