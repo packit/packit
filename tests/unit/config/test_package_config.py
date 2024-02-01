@@ -1741,6 +1741,67 @@ def test_test_command_labels():
     assert not pc.test_command.default_identifier
 
 
+@pytest.mark.parametrize(
+    "package_config_dict, present, absent",
+    [
+        (
+            {
+                "specfile_path": "package.spec",
+            },
+            [],
+            [],
+        ),
+        (
+            {"specfile_path": "package.spec", "require": {}},
+            [],
+            [],
+        ),
+        (
+            {"specfile_path": "package.spec", "require": {"label": {}}},
+            [],
+            [],
+        ),
+        (
+            {
+                "specfile_path": "package.spec",
+                "require": {
+                    "label": {"present": ["label-1"]},
+                },
+            },
+            ["label-1"],
+            [],
+        ),
+        (
+            {
+                "specfile_path": "package.spec",
+                "require": {
+                    "label": {"absent": ["label-1"]},
+                },
+            },
+            [],
+            ["label-1"],
+        ),
+        (
+            {
+                "specfile_path": "package.spec",
+                "require": {
+                    "label": {"present": ["label-1"], "absent": ["label-2", "label-3"]},
+                },
+            },
+            ["label-1"],
+            ["label-2", "label-3"],
+        ),
+    ],
+)
+def test_require(package_config_dict, present, absent):
+    pc = PackageConfig.get_from_dict(
+        package_config_dict,
+        repo_name="package",
+    )
+    assert pc.require.label.present == present
+    assert pc.require.label.absent == absent
+
+
 def test_test_command_identifiers():
     identifier = "id1"
     pc = PackageConfig.get_from_dict(
