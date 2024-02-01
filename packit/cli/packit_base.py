@@ -8,6 +8,7 @@ import click
 
 from packit.cli.build import build
 from packit.cli.create_update import create_update
+from packit.cli.dist_git import dist_git
 from packit.cli.init import init
 from packit.cli.prepare_sources import prepare_sources
 from packit.cli.propose_downstream import propose_downstream, pull_from_upstream
@@ -91,6 +92,6 @@ packit_base.add_command(init)
 packit_base.add_command(validate_config)
 packit_base.add_command(source_git)
 packit_base.add_command(prepare_sources)
-
+packit_base.add_command(dist_git)
 if __name__ == "__main__":
     packit_base()
