@@ -244,6 +244,10 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
 COMMIT_ACTION_DIVIDER = "---%<--- snip ---%<--- here ---%<---\n"
 RELEASE_MONITORING_PROJECT_URL = "https://release-monitoring.org/project/{project_id}"
 BUGZILLA_URL = "https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}"
+ANITYA_MONITORING_CHECK_URL = (
+    "https://src.fedoraproject.org/_dg/anitya/rpms/{package_name}"
+)
+RELEASE_MONITORING_PACKAGE_CHECK_URL = "https://release-monitoring.org//api/v2/packages/?name={package_name}&distribution=Fedora"
 
 # connection timeout and read timeout in seconds
 # with connection timeout, the actual value will usually be a multiple of what is configured,
