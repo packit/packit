@@ -90,6 +90,11 @@ class LocalProjectParameter(click.ParamType):
                 )
             elif git_remote_url_to_https_url(value):
                 logger.debug(f"Input is a URL to a git repo: {value}")
+                working_dir = (
+                    clone_path
+                    if (clone_path := self.get_param("clone_path", ctx))
+                    else CALCULATE
+                )
                 local_project = builder.build(
                     git_url=value,
                     ref=ref,
@@ -98,7 +103,7 @@ class LocalProjectParameter(click.ParamType):
                     merge_pr=merge_pr,
                     target_branch=target_branch,
                     git_repo=CALCULATE,
-                    working_dir=CALCULATE,
+                    working_dir=working_dir,
                     git_project=CALCULATE,
                     git_service=CALCULATE,
                     full_name=CALCULATE,
