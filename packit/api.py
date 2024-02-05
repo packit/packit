@@ -2065,7 +2065,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.up.local_project.free_resources()
 
     @staticmethod
-    def validate_package_config(working_dir: Path) -> str:
+    def validate_package_config(working_dir: Path, offline: bool = False) -> str:
         """Validate package config.
 
         Args:
@@ -2083,7 +2083,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             try_local_dir_last=True,
         )
         config_content = load_packit_yaml(config_path)
-        v = PackageConfigValidator(config_path, config_content, working_dir)
+        v = PackageConfigValidator(config_path, config_content, working_dir, offline)
         return v.validate()
 
     def init_source_git(

@@ -5,9 +5,15 @@ import logging
 from pathlib import Path
 from typing import Any, Union
 
+import requests
 from marshmallow import ValidationError
 
+from packit.config import JobType
 from packit.config.package_config import PackageConfig, get_local_specfile_path
+from packit.constants import (
+    ANITYA_MONITORING_CHECK_URL,
+    RELEASE_MONITORING_PACKAGE_CHECK_URL,
+)
 from packit.exceptions import PackitConfigException
 from packit.sync import iter_srcs
 
@@ -28,10 +34,12 @@ class PackageConfigValidator:
         config_file_path: Path,
         config_content: dict,
         project_path: Path,
+        offline: bool = False,
     ):
         self.config_file_path = config_file_path
         self.content = config_content
         self.project_path = project_path
+        self.offline = offline
 
     def validate(self) -> str:
         """Validate PackageConfig.
@@ -78,6 +86,17 @@ class PackageConfigValidator:
                         or any(self.project_path.glob(f))
                     )
                 ]  # right now we use just the first path in a monorepo package
+
+                if (
+                    any(
+                        job.type == JobType.pull_from_upstream
+                        for job in package_config.get_job_views()
+                    )
+                    and not self.offline
+                ):
+                    package_name = package_config.downstream_package_name
+                    self.check_upstream_release_monitoring_mapping_exists(package_name)
+                    self.check_anitya_monitoring_enabled(package_name)
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
 
@@ -136,3 +155,53 @@ class PackageConfigValidator:
             )
             index_output += index_type_error
         return index_output
+
+    @staticmethod
+    def check_upstream_release_monitoring_mapping_exists(package_name: str):
+        """
+        Check whether there is mapping for the particular package in Upstream
+        Release Monitoring and warn in case not.
+        """
+        try:
+            response = requests.get(
+                RELEASE_MONITORING_PACKAGE_CHECK_URL.format(package_name=package_name),
+            )
+            result = response.json()
+            items = result.get("items")
+
+            if not items:
+                logger.warning(
+                    f"No mapping for package {package_name!r} found in Upstream "
+                    f"Release Monitoring. Please visit https://release-monitoring.org/ "
+                    f"and create one, otherwise `pull_from_upstream` job won't be triggered.",
+                )
+
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                f"Error while checking Upstream Release Monitoring "
+                f"mapping for package {package_name!r}: {e}",
+            )
+
+    @staticmethod
+    def check_anitya_monitoring_enabled(package_name: str):
+        """
+        Check whether the monitoring for the particular package is enabled
+        and warn in case not.
+        """
+        try:
+            response = requests.get(
+                ANITYA_MONITORING_CHECK_URL.format(package_name=package_name),
+            )
+            result = response.json()
+            if result.get("monitoring") == "no-monitoring":
+                logger.warning(
+                    f"Monitoring for package {package_name!r} is disabled. Please, visit "
+                    f"https://src.fedoraproject.org/rpms/{package_name} and "
+                    f"enable it on the left side (Monitoring status), "
+                    f"otherwise `pull_from_upstream` job won't be triggered.",
+                )
+
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                f"Error while checking monitoring for package {package_name!r}: {e}",
+            )
