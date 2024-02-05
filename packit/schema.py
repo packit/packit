@@ -39,6 +39,7 @@ from packit.config.notifications import (
     NotificationsConfig,
     PullRequestNotificationsConfig,
 )
+from packit.config.requirements import LabelRequirementsConfig, RequirementsConfig
 from packit.config.sources import SourcesItem
 from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
 from packit.sync import SyncFilesItem
@@ -205,6 +206,25 @@ class TestCommandSchema(Schema):
     @post_load
     def make_instance(self, data, **kwargs):
         return TestCommandConfig(**data)
+
+
+class LabelRequirementsSchema(Schema):
+    present = fields.List(fields.String)
+    absent = fields.List(fields.String)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return LabelRequirementsConfig(**data)
+
+
+class RequirementsSchema(Schema):
+    """Configuration of test command."""
+
+    label = fields.Nested(LabelRequirementsSchema, missing=None)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return RequirementsConfig(**data)
 
 
 class TargetsListOrDict(fields.Field):
@@ -376,6 +396,7 @@ class CommonConfigSchema(Schema):
     prerelease_suffix_macro = fields.String(missing=None)
     upload_sources = fields.Bool(default=True)
     test_command = fields.Nested(TestCommandSchema)
+    require = fields.Nested(RequirementsSchema)
 
     # Former 'metadata' keys
     _targets = TargetsListOrDict(missing=None, data_key="targets")

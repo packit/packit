@@ -17,6 +17,7 @@ from packit.config.commands import TestCommandConfig
 from packit.config.notifications import (
     NotificationsConfig,
 )
+from packit.config.requirements import RequirementsConfig
 from packit.config.sources import SourcesItem
 from packit.constants import DISTGIT_INSTANCES
 from packit.dist_git_instance import DistGitInstance
@@ -232,6 +233,7 @@ class CommonPackageConfig:
         version_update_mask: Optional[str] = None,
         test_command: Optional[TestCommandConfig] = None,
         parse_time_macros: Optional[dict[str, str]] = None,
+        require: Optional[RequirementsConfig] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -293,6 +295,7 @@ class CommonPackageConfig:
         self.prerelease_suffix_pattern = prerelease_suffix_pattern
         self.prerelease_suffix_macro = prerelease_suffix_macro
         self.test_command = test_command or TestCommandConfig()
+        self.require = require or RequirementsConfig()
 
         # from deprecated JobMetadataConfig
         self._targets: dict[str, dict[str, Any]]
