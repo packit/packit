@@ -17,7 +17,7 @@ from packit.api import PackitAPI
 from packit.config import Config, JobType, get_local_package_config
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import PackageConfig
-from packit.constants import DISTRO_DIR, SRC_GIT_CONFIG
+from packit.constants import CONFIG_FILE_NAMES, DISTRO_DIR, SRC_GIT_CONFIG
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
@@ -349,4 +349,13 @@ def get_hostname_or_none(url: str) -> Optional[str]:
     parsed_url = parse_git_repo(potential_url=url)
     if parsed_url:
         return parsed_url.hostname
+    return None
+
+
+def get_existing_config(working_dir: Path) -> Optional[Path]:
+    # find name of config file if already exists
+    for config_file_name in CONFIG_FILE_NAMES:
+        config_file_path = working_dir / config_file_name
+        if config_file_path.is_file():
+            return config_file_path
     return None

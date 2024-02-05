@@ -13,11 +13,11 @@ from typing import Optional
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception
+from packit.cli.utils import cover_packit_exception, get_existing_config
 from packit.config import get_context_settings
 from packit.config.config import pass_config
 from packit.config.package_config import get_local_specfile_path
-from packit.constants import CONFIG_FILE_NAMES, PACKIT_CONFIG_TEMPLATE
+from packit.constants import PACKIT_CONFIG_TEMPLATE
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -72,15 +72,6 @@ def init(
         write_to_file=True,
         template_data=template_data,
     )
-
-
-def get_existing_config(working_dir: Path) -> Optional[Path]:
-    # find name of config file if already exists
-    for config_file_name in CONFIG_FILE_NAMES:
-        config_file_path = working_dir / config_file_name
-        if config_file_path.is_file():
-            return config_file_path
-    return None
 
 
 def generate_config(
