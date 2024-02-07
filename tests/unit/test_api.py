@@ -5,6 +5,7 @@ import pathlib
 from contextlib import suppress as does_not_raise
 
 import pytest
+from bugzilla import Bugzilla
 from flexmock import flexmock
 from munch import Munch
 
@@ -520,3 +521,43 @@ def test_check_version_distance(
             proposed_version,
             target_branch,
         )
+
+
+@pytest.mark.parametrize(
+    "package_name, version, response, result",
+    (
+        pytest.param(
+            "python-ogr",
+            "1.0.0",
+            [
+                flexmock(id=1, summary="python-ogr-1.1.1 is available"),
+                flexmock(id=2, summary="python-ogr-1.0.0 is available"),
+            ],
+            "rhbz#2",
+        ),
+        pytest.param(
+            "python-ogr",
+            "2.0.0",
+            [
+                flexmock(id=1, summary="python-ogr-1.1.1 is available"),
+                flexmock(id=2, summary="python-ogr-1.0.0 is available"),
+            ],
+            None,
+        ),
+        pytest.param(
+            "python-ogr",
+            "2.0.0",
+            [
+                flexmock(id=1, summary="python-ogr-1.1.1 is available"),
+                flexmock(id=2, summary="python-ogr-1.0.0 is available"),
+                flexmock(id=2, summary="python-ogr-2.0 is available"),
+            ],
+            None,
+        ),
+    ),
+)
+def test_get_upstream_release_monitoring_bug(package_name, version, response, result):
+    flexmock(Bugzilla).should_receive("query").and_return(response)
+    assert (
+        PackitAPI.get_upstream_release_monitoring_bug(package_name, version) == result
+    )
