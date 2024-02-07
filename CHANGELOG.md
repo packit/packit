@@ -1,3 +1,9 @@
+# 0.91.0
+
+- We have introduced new CLI command `packit dist-git init` that initializes Packit configuration for release automation in dist-git repository. (#2225)
+- `packit validate-config` now checks whether the Upstream Release Monitoring for the package is correctly configured if `pull_from_upstream` job is present in the configuration. (#2226)
+- There is a new global configuration option `parse_time_macros` that allows to configure macros to be explicitly defined or undefined at spec file parse time. (#2222)
+
 # 0.90.0
 
 - `pull-from-upstream` and `propose-downstream` commands now have the `--sync-acls` option that enables syncing the ACLs between dits-git repo and fork. The default behaviour was, however, changed to not sync the ACLs. (#2214)
