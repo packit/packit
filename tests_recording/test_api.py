@@ -3,6 +3,7 @@
 
 from subprocess import check_output
 
+from bugzilla import Bugzilla
 from flexmock import flexmock
 from ogr.services.github.project import GithubProject
 from requre.cassette import DataTypes
@@ -127,6 +128,10 @@ class ProposeUpdate(PackitTest):
         flexmock(GithubProject).should_receive("get_release").and_return(
             flexmock(url="url"),
         )
+        # not able to record the bugzilla connection, therefore mocking
+        flexmock(Bugzilla).should_receive("__init__")
+        flexmock(Bugzilla).should_receive("query").and_return([])
+
         self.api.package_config.sync_changelog = True
         self.api.sync_release(version="0", use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
