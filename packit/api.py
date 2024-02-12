@@ -26,6 +26,7 @@ from typing import (
     overload,
 )
 
+import bugzilla
 import click
 import git
 from git.exc import GitCommandError
@@ -39,6 +40,7 @@ from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
+    BUGZILLA_HOSTNAME,
     BUGZILLA_URL,
     COMMIT_ACTION_DIVIDER,
     DISTRO_DIR,
@@ -778,6 +780,44 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "to skip this check.",
                 )
 
+    @staticmethod
+    def get_upstream_release_monitoring_bug(
+        package_name: str,
+        version: str,
+    ) -> Optional[str]:
+        """
+        Obtain the bug created by Upstream Release Monitoring
+        about the new upstream release matching the package_name
+        and the version via Bugzilla API.
+
+        Returns bugzilla if found in format 'rhbz#{id}'
+        """
+        bzapi = bugzilla.Bugzilla(BUGZILLA_HOSTNAME)
+        # https://bugzilla.readthedocs.io/en/latest/api/core/v1/bug.html#search-bugs
+        query = {
+            "product": ["Fedora"],
+            "component": [package_name],
+            "bug_status": "NEW",
+            # e.g. python-ogr-50.1 is available
+            "summary": "is available",
+            "creator": "Upstream Release Monitoring",
+        }
+        try:
+            bugs = bzapi.query(query)
+        except Exception as ex:
+            logger.error(f"There was an error when calling Bugzilla API: {ex!r}")
+            return None
+
+        logger.debug(f"Bugzilla IDs found via Bugzilla API: {[bug.id for bug in bugs]}")
+
+        for bug in bugs:
+            match = re.search(f"{package_name}-(.*?) is available", bug.summary)
+            if match and match.group(1) == version:
+                logger.debug(f"Found matching bug with ID {bug.id}")
+                return f"rhbz#{bug.id}"
+
+        return None
+
     @overload
     def sync_release(
         self,
@@ -935,6 +975,16 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_ref = self.up._expand_git_ref(
             upstream_ref or self.package_config.upstream_ref,
         )
+        if not resolved_bugs:
+            upstream_release_monitoring_bug = self.get_upstream_release_monitoring_bug(
+                package_name=self.dg.local_project.repo_name,
+                version=version,
+            )
+            resolved_bugs = (
+                [upstream_release_monitoring_bug]
+                if upstream_release_monitoring_bug
+                else []
+            )
 
         current_up_branch = self.up.active_branch
         try:
