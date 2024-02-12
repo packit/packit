@@ -244,6 +244,7 @@ SYNC_RELEASE_PR_INSTRUCTIONS = (
 COMMIT_ACTION_DIVIDER = "---%<--- snip ---%<--- here ---%<---\n"
 RELEASE_MONITORING_PROJECT_URL = "https://release-monitoring.org/project/{project_id}"
 BUGZILLA_URL = "https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}"
+BUGZILLA_HOSTNAME = "bugzilla.redhat.com"
 ANITYA_MONITORING_CHECK_URL = (
     "https://src.fedoraproject.org/_dg/anitya/rpms/{package_name}"
 )
