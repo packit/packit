@@ -584,6 +584,33 @@ def test_serialize_and_deserialize_job_config(config):
             },
             False,
         ),
+        (
+            {
+                "job": "tests",
+                "trigger": "ignore",
+                "labels": ["regression", "long"],
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    },
+                },
+            },
+            {
+                "job": "tests",
+                "trigger": "ignore",
+                "labels": ["regression", "long"],
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    },
+                },
+            },
+            False,
+        ),
     ],
 )
 def test_deserialize_and_serialize_job_config(config_in, config_out, validation_error):
