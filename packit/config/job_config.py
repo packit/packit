@@ -48,6 +48,7 @@ class JobConfigTriggerType(Enum):
     release = "release"
     pull_request = "pull_request"
     commit = "commit"
+    ignore = "ignore"
 
 
 class JobConfig(MultiplePackages):
