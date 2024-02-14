@@ -21,6 +21,8 @@ packages:
       - src: .fmf/
         dest: .fmf/
 
+version_update_mask: '\d+\.'
+
 copy_upstream_release_description: true
 issue_repository: https://github.com/packit/packit
 
