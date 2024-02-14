@@ -197,8 +197,16 @@ class PackageConfigValidator:
                 logger.warning(
                     f"Monitoring for package {package_name!r} is disabled. Please, visit "
                     f"https://src.fedoraproject.org/rpms/{package_name} and "
-                    f"enable it on the left side (Monitoring status), "
+                    f"set `Monitoring status` on the left side to `Monitoring`, "
                     f"otherwise `pull_from_upstream` job won't be triggered.",
+                )
+            if result.get("monitoring") == "monitoring-with-scratch":
+                logger.warning(
+                    f"Monitoring for package {package_name!r} is set to "
+                    f"`Monitoring and scratch builds`. Please, visit "
+                    f"https://src.fedoraproject.org/rpms/{package_name} and "
+                    f"set it to `Monitoring` on the left side (Monitoring status) "
+                    f"to avoid duplicated scratch builds for new releases.",
                 )
 
         except requests.exceptions.RequestException as e:
