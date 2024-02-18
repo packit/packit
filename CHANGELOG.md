@@ -1,3 +1,8 @@
+# 0.92.0
+
+- Packit now supports `trigger: ignore` which can be used for templating by using the YAML. (#2234)
+- Packit now searches for bugzilla about new release created by Upstream Release Monitoring to reference each time it syncs the release downstream. (#2229)
+
 # 0.91.0
 
 - We have introduced new CLI command `packit dist-git init` that initializes Packit configuration for release automation in dist-git repository. (#2225)
