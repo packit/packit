@@ -7,11 +7,10 @@ on:
       - edited
       - synchronize
 
-check_release_notes:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Check
-      uses: packit/.github/workflows/check-release-notes.yml@main
-      with:
-        description: ${{ github.event.pull_request.body }}
-        placeholder: "Packit now supports automatic ordering of ☕ after all checks pass."
+jobs:
+  check_release_notes:
+    name: Notes are either written, or there are none
+    uses: packit/.github/.github/workflows/check-release-notes.yml@main
+    with:
+      description: ${{ github.event.pull_request.body }}
+      placeholder: "Packit now supports automatic ordering of ☕ after all checks pass."
