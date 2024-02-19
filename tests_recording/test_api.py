@@ -133,6 +133,6 @@ class ProposeUpdate(PackitTest):
         flexmock(Bugzilla).should_receive("query").and_return([])
 
         self.api.package_config.sync_changelog = True
-        self.api.sync_release(version="0", use_local_content=True)
+        self.api.sync_release(version="1.0.0", use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
