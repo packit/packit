@@ -11,6 +11,7 @@ from typing import Callable, Optional
 
 import git
 import requests
+import rpm
 from git import GitCommandError, PushInfo
 from ogr.abstract import AccessLevel, GitProject, PullRequest
 from specfile import Specfile
@@ -137,6 +138,15 @@ class PackitRepositoryBase:
         from spec files can be found
         """
         return self.absolute_specfile_dir
+
+    def get_specfile_version(self) -> str:
+        """provide version from specfile"""
+        # we need to get the version from rpm spec header
+        # (as the version tag might not be present directly in the specfile,
+        # but e.g. imported)
+        version = self.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_VERSION]
+        logger.info(f"Version in spec file is {version!r}.")
+        return version
 
     def create_branch(
         self,

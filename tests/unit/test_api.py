@@ -16,7 +16,7 @@ from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
 from packit.config.config import Config
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
-from packit.exceptions import PackitException
+from packit.exceptions import PackitException, ReleaseSkippedPackitException
 from packit.local_project import LocalProjectBuilder
 from packit.patches import PatchGenerator
 from packit.sync import SyncFilesItem
@@ -338,6 +338,22 @@ def test_sync_release_check_pr_instructions(api_mock):
         sync_acls=False,
     ).and_return(flexmock())
     api_mock.sync_release(version="1.1", dist_git_branch="_", add_pr_instructions=True)
+
+
+def test_sync_release_downgrade(api_mock):
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.dg.should_receive("get_specfile_version").and_return("1.1")
+    with pytest.raises(ReleaseSkippedPackitException):
+        api_mock.sync_release(
+            version="1.0",
+            dist_git_branch="_",
+            add_pr_instructions=True,
+        )
 
 
 @pytest.mark.parametrize(
