@@ -366,9 +366,7 @@ class PackitAPI:
                 upstream_tag=upstream_tag,
                 resolved_bugs=resolved_bugs,
             )
-
         sync_files(synced_files)
-
         if upstream_ref and self.up.with_action(
             action=ActionName.create_patches,
             env=self.sync_release_env,
@@ -1012,6 +1010,21 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.up.allowed_gpg_keys = (
                 self.dg.get_allowed_gpg_keys_from_downstream_config()
             )
+
+            try:
+                downstream_spec_ver = self.dg.get_specfile_version()
+                if compare_versions(version, downstream_spec_ver) < 0:
+                    msg = (
+                        f"Downstream specfile version {downstream_spec_ver} is lower "
+                        f"than the version to propose ({version}). Skipping the update."
+                    )
+                    logger.debug(msg)
+                    raise ReleaseSkippedPackitException(msg)
+                self.dg.refresh_specfile()
+
+            except FileNotFoundError:
+                # no downstream spec file
+                pass
 
             if use_downstream_specfile:
                 logger.info(
