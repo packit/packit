@@ -1,3 +1,6 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
 from bodhi.client.oidcclient import OIDCClient
 from flexmock import flexmock
 from requests import Session
