@@ -1,3 +1,6 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
 import pytest
 
 from packit.cli.dist_git_init import DistGitInitializer
