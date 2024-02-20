@@ -13,4 +13,3 @@ jobs:
     uses: packit/.github/.github/workflows/check-release-notes.yml@main
     with:
       description: ${{ github.event.pull_request.body }}
-      placeholder: "Packit now supports automatic ordering of ☕ after all checks pass."
