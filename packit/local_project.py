@@ -555,7 +555,10 @@ class LocalProject:
         try:
             self.git_repo.git.checkout(tag)
         except Exception as ex:
-            raise PackitException("Cannot checkout release tag.") from ex
+            raise PackitException(
+                "Cannot checkout release tag. Please, check whether the "
+                "'upstream_tag_template' needs to be configured.",
+            ) from ex
 
     def fetch(self, remote: str, refspec: Optional[str] = None, force: bool = False):
         """
