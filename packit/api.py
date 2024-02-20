@@ -1135,6 +1135,11 @@ The first dist-git commit to be synced is '{short_hash}'.
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
+            # version should hold the plain version string
+            if version.startswith("v"):
+                logger.warning(
+                    "Please, check whether the `upstream_tag_template` needs to be configured.",
+                )
             if not use_local_content and not upstream_ref:
                 logger.info(f"Checking out the original branch {current_up_branch}.")
                 self.up.local_project.git_repo.git.checkout(current_up_branch, "-f")
