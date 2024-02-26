@@ -1,3 +1,7 @@
+# 0.93.0
+
+- Packit now checks the version to propose against the version in specfile and doesn't create downgrade PRs. (#2239)
+
 # 0.92.0
 
 - Packit now supports `trigger: ignore` which can be used for templating by using the YAML. (#2234)
