@@ -397,6 +397,7 @@ class CommonConfigSchema(Schema):
     upload_sources = fields.Bool(default=True)
     test_command = fields.Nested(TestCommandSchema)
     require = fields.Nested(RequirementsSchema)
+    status_name_template = fields.String(missing=None)
 
     # Former 'metadata' keys
     _targets = TargetsListOrDict(missing=None, data_key="targets")

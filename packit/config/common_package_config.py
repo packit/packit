@@ -156,6 +156,7 @@ class CommonPackageConfig:
         parse_time_macros: Dict with macros to (un)define before parsing specfile.
             Keys are macro names and values are macro values. A value of None will undefine
             the corresponding macro.
+        status_name_template: Template for configurable names for status checks.
     """
 
     def __init__(
@@ -234,6 +235,7 @@ class CommonPackageConfig:
         test_command: Optional[TestCommandConfig] = None,
         parse_time_macros: Optional[dict[str, str]] = None,
         require: Optional[RequirementsConfig] = None,
+        status_name_template: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -296,6 +298,7 @@ class CommonPackageConfig:
         self.prerelease_suffix_macro = prerelease_suffix_macro
         self.test_command = test_command or TestCommandConfig()
         self.require = require or RequirementsConfig()
+        self.status_name_template = status_name_template
 
         # from deprecated JobMetadataConfig
         self._targets: dict[str, dict[str, Any]]
