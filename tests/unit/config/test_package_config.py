@@ -563,6 +563,24 @@ def test_package_config_not_equal(not_equal_package_config):
             },
             True,
         ),
+        (
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "copr_build",
+                        "trigger": "release",
+                        "targets": [
+                            "fedora-stable",
+                        ],
+                        "module_hotfixes": True,
+                        "status_name_template": "packit-copr-build-release",
+                    },
+                ],
+            },
+            True,
+        ),
     ],
 )
 def test_package_config_validate(raw, is_valid):
@@ -2025,6 +2043,18 @@ def test_specfile_path_from_downstream_package_name():
                     upstream_project_url="https://github.com/asd/qwe",
                     upstream_package_name="qwe",
                     srpm_build_deps=["make", "tar", "findutils"],
+                ),
+            },
+            jobs=[],
+        ),
+        PackageConfig(
+            packages={
+                "main": CommonPackageConfig(
+                    specfile_path="fedora/package.spec",
+                    upstream_project_url="https://github.com/asd/qwe",
+                    upstream_package_name="qwe",
+                    srpm_build_deps=[],
+                    status_name_template="packit-job",
                 ),
             },
             jobs=[],
