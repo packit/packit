@@ -143,6 +143,8 @@ class CommonPackageConfig:
             will run koji builds.
         allowed_committers: List of Fedora accounts for which distgit pushes we
             will run koji builds.
+        allowed_builders: List of Fedora accounts whose Koji builds will trigger
+            Bodhi updates.
         tmt_plan: Test to run in Testing Farm.
         tf_post_install_script: post install script to run before the tf tests
         tf_extra_params: Additional Testing Farm parameters to merge into the
@@ -214,6 +216,7 @@ class CommonPackageConfig:
         enable_net: bool = False,
         allowed_pr_authors: Optional[list[str]] = None,
         allowed_committers: Optional[list[str]] = None,
+        allowed_builders: Optional[list[str]] = None,
         tmt_plan: Optional[str] = None,
         tf_post_install_script: Optional[str] = None,
         tf_extra_params: Optional[dict[Any, Any]] = None,
@@ -329,6 +332,9 @@ class CommonPackageConfig:
             allowed_pr_authors if allowed_pr_authors is not None else ["packit"]
         )
         self.allowed_committers = allowed_committers or []
+        self.allowed_builders = (
+            allowed_builders if allowed_builders is not None else ["packit"]
+        )
         self.tmt_plan = tmt_plan
         self.tf_extra_params = tf_extra_params or {}
         self.tf_post_install_script = tf_post_install_script
