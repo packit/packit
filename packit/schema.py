@@ -419,6 +419,7 @@ class CommonConfigSchema(Schema):
     enable_net = fields.Boolean(missing=False)
     allowed_pr_authors = fields.List(fields.String(), missing=None)
     allowed_committers = fields.List(fields.String(), missing=None)
+    allowed_builders = fields.List(fields.String(), missing=None)
     tmt_plan = fields.String(missing=None)
     tf_post_install_script = fields.String(missing=None)
     tf_extra_params = fields.Dict(missing=None)
