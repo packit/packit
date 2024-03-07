@@ -301,6 +301,62 @@ def test_koji_build_allowlist(raw, expected, allowed_pr_authors, allowed_committ
 
 
 @pytest.mark.parametrize(
+    "raw,expected,allowed_builders",
+    [
+        pytest.param(
+            {
+                "job": "bodhi_update",
+                "trigger": "commit",
+                "packages": {
+                    "package": {
+                        "specfile_path": "package.spec",
+                    },
+                },
+            },
+            JobConfig(
+                type=JobType.bodhi_update,
+                trigger=JobConfigTriggerType.commit,
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="package.spec",
+                        allowed_builders=["packit"],
+                    ),
+                },
+            ),
+            ["packit"],
+        ),
+        pytest.param(
+            {
+                "job": "bodhi_update",
+                "trigger": "commit",
+                "packages": {
+                    "package": {
+                        "specfile_path": "package.spec",
+                        "allowed_builders": ["me"],
+                    },
+                },
+            },
+            JobConfig(
+                type=JobType.bodhi_update,
+                trigger=JobConfigTriggerType.commit,
+                packages={
+                    "package": CommonPackageConfig(
+                        specfile_path="package.spec",
+                        allowed_builders=["me"],
+                    ),
+                },
+            ),
+            ["me"],
+        ),
+    ],
+)
+def test_bodhi_updates_allowed(raw, expected, allowed_builders):
+    job_config = JobConfig.get_from_dict(raw_dict=raw)
+    assert job_config == expected
+    assert job_config.allowed_builders == allowed_builders
+
+
+@pytest.mark.parametrize(
     "raw,expected_packages_keys,identifiers",
     [
         pytest.param(
