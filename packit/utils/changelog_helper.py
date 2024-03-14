@@ -57,6 +57,7 @@ class ChangelogHelper:
         self,
         version: Optional[str] = None,
         resolved_bugs: Optional[list[str]] = None,
+        upstream_tag: Optional[str] = None,
     ) -> Optional[str]:
         """
         Runs changelog-entry action if present and returns string that can be
@@ -73,6 +74,7 @@ class ChangelogHelper:
         env = self.package_config.get_package_names_as_env() | {
             "PACKIT_PROJECT_VERSION": version,
             "PACKIT_RESOLVED_BUGS": resolved_bugs_str,
+            "PACKIT_PROJECT_UPSTREAM_TAG": upstream_tag or "",
         }
         messages = self.up.get_output_from_action(ActionName.changelog_entry, env=env)
         if not messages:
@@ -88,6 +90,50 @@ class ChangelogHelper:
         # prepend asterisk at the start of a line with a space in order
         # not to break identification of entry boundaries
         return re.sub(r"^[*]", " *", entry, flags=re.MULTILINE)
+
+    def get_changelog_entry(
+        self,
+        default_changelog_entry: str,
+        full_version: str,
+        upstream_tag: str,
+        resolved_bugs: Optional[list[str]],
+    ):
+        """
+        Get the sanitized changelog entry to be added to the changelog.
+
+        Args:
+            default_changelog_entry: entry that will be used if there is nothing else configured
+            full_version: version that is being proposed
+            upstream_tag: new tag in upstream
+            resolved_bugs: list of bugs that should be referenced
+        """
+
+
+        action_output = self.get_entry_from_action(
+            version=full_version,
+            resolved_bugs=resolved_bugs,
+            upstream_tag=upstream_tag,
+        )
+
+        comment = action_output or default_changelog_entry
+        if (
+            self.package_config.copy_upstream_release_description
+            # in pull_from_upstream workflow, upstream git_project can be None
+            and self.up.local_project.git_project
+        ):
+            release_description = self.up.local_project.git_project.get_release(
+                tag_name=upstream_tag,
+                name=full_version,
+            ).body
+            if release_description:
+                comment = release_description
+
+        if not action_output and resolved_bugs:
+            comment += "\n"
+            for bug in resolved_bugs:
+                comment += f"- Resolves: {bug}\n"
+
+        return self.sanitize_entry(comment)
 
     def update_dist_git(
         self,
@@ -111,38 +157,22 @@ class ChangelogHelper:
                 to update the changelog in the spec-file.
             resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
         """
-        action_output = self.get_entry_from_action(
-            version=full_version,
-            resolved_bugs=resolved_bugs,
-        )
-        comment = (
-            action_output
-            or (
-                self.up.local_project.git_project.get_release(
-                    tag_name=upstream_tag,
-                    name=full_version,
-                ).body
-                if self.package_config.copy_upstream_release_description
-                # in pull_from_upstream workflow, upstream git_project can be None
-                and self.up.local_project.git_project
-                else self.up.get_commit_messages(
-                    after=self.up.get_last_tag(before=upstream_tag),
-                    before=upstream_tag,
-                )
-            )
-            or f"- Update to upstream release {full_version}"
-        )
-        if not action_output and resolved_bugs:
-            comment += "\n"
-            for bug in resolved_bugs:
-                comment += f"- Resolves: {bug}\n"
-
-        comment = self.sanitize_entry(comment)
+        default_changelog_entry = f"- Update to version {full_version}"
         try:
+            comment = (
+                self.get_changelog_entry(
+                    default_changelog_entry,
+                    full_version,
+                    upstream_tag,
+                    resolved_bugs,
+                )
+                if not self.dg.specfile.has_autochangelog
+                else None
+            )
             self.dg.set_specfile_content(
                 self.up.specfile,
                 full_version,
-                comment=None if self.dg.specfile.has_autochangelog else comment,
+                comment=comment,
             )
         except FileNotFoundError as ex:
             # no downstream spec file: this is either a mistake or
@@ -154,11 +184,17 @@ class ChangelogHelper:
                 self.up.absolute_specfile_path,
                 self.dg.get_absolute_specfile_path(),
             )
+            comment = self.get_changelog_entry(
+                default_changelog_entry,
+                full_version,
+                upstream_tag,
+                resolved_bugs,
+            )
             # set the specfile content now that the downstream spec file is present
             self.dg.set_specfile_content(
                 self.up.specfile,
                 full_version,
-                comment=None if self.dg.specfile.has_autochangelog else comment,
+                comment=comment,
             )
 
     def _get_release_for_source_git(
