@@ -177,7 +177,7 @@ def test_update_distgit_when_copy_upstream_release_description_none(
     )
 
     with downstream._specfile.sections() as sections:
-        assert "- Update to upstream release 0.1.0" in sections.changelog
+        assert "- Update to version 0.1.0" in sections.changelog
 
 
 def test_update_distgit_changelog_entry_action_pass_env_vars(
@@ -200,6 +200,7 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
         "PACKIT_DOWNSTREAM_PACKAGE_NAME": "beer",
         "PACKIT_PROJECT_VERSION": "0.1.0",
         "PACKIT_RESOLVED_BUGS": "rhbz#123 rhbz#124",
+        "PACKIT_PROJECT_UPSTREAM_TAG": "0.1.0",
     }
     flexmock(upstream).should_receive("get_output_from_action").with_args(
         ActionName.changelog_entry,
