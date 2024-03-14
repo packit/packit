@@ -58,6 +58,7 @@ class ChangelogHelper:
         version: Optional[str] = None,
         resolved_bugs: Optional[list[str]] = None,
         upstream_tag: Optional[str] = None,
+        previous_version: Optional[str] = None,
     ) -> Optional[str]:
         """
         Runs changelog-entry action if present and returns string that can be
@@ -75,6 +76,7 @@ class ChangelogHelper:
             "PACKIT_PROJECT_VERSION": version,
             "PACKIT_RESOLVED_BUGS": resolved_bugs_str,
             "PACKIT_PROJECT_UPSTREAM_TAG": upstream_tag or "",
+            "PACKIT_PROJECT_PREVIOUS_VERSION": previous_version or "",
         }
         messages = self.up.get_output_from_action(ActionName.changelog_entry, env=env)
         if not messages:
@@ -108,11 +110,19 @@ class ChangelogHelper:
             resolved_bugs: list of bugs that should be referenced
         """
 
+        previous_specfile_version = None
+        try:
+            previous_specfile_version = self.dg.specfile.version
+        except Exception:
+            logger.debug(
+                "We were not able to get the previous version from specfile in dist-git",
+            )
 
         action_output = self.get_entry_from_action(
             version=full_version,
             resolved_bugs=resolved_bugs,
             upstream_tag=upstream_tag,
+            previous_version=previous_specfile_version,
         )
 
         comment = action_output or default_changelog_entry

@@ -201,6 +201,7 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
         "PACKIT_PROJECT_VERSION": "0.1.0",
         "PACKIT_RESOLVED_BUGS": "rhbz#123 rhbz#124",
         "PACKIT_PROJECT_UPSTREAM_TAG": "0.1.0",
+        "PACKIT_PROJECT_PREVIOUS_VERSION": "0.0.0",
     }
     flexmock(upstream).should_receive("get_output_from_action").with_args(
         ActionName.changelog_entry,
