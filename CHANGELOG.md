@@ -1,3 +1,7 @@
+# 0.94.0
+
+- Added new configuration options `status_name_template` and `allowed_builders`.
+
 # 0.93.0
 
 - Packit now checks the version to propose against the version in specfile and doesn't create downgrade PRs. (#2239)
