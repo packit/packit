@@ -118,6 +118,7 @@ jobs:
   - job: bodhi_update
     trigger: commit
     packit_instances: ["stg"]
+    allowed_builders: ["packit-stg", "packit"]
     dist_git_branches:
       - fedora-branched
       - epel-9
