@@ -1165,7 +1165,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         # should be included needs to be prefixed with dash
         if resolved_bugs:
             for bug in resolved_bugs:
-                resolved_bugs_msg += f"- Resolves {bug}\n"
+                resolved_bugs_msg += f"- Resolves: {bug}\n"
             # add one more newline so that the text after is not included in autochangelog
             resolved_bugs_msg += "\n"
 
@@ -1191,10 +1191,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                 if match:
                     bug_id = match.group(1)
                     resolved_bugzillas_info += (
-                        f"Resolves [{bug}]({BUGZILLA_URL.format(bug_id=bug_id)})\n"
+                        f"Resolves: [{bug}]({BUGZILLA_URL.format(bug_id=bug_id)})\n"
                     )
                 else:
-                    resolved_bugzillas_info += f"Resolves {bug}\n"
+                    resolved_bugzillas_info += f"Resolves: {bug}\n"
 
         commit = self.up.local_project.commit_hexsha
         git_url = git_remote_url_to_https_url(
