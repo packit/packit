@@ -361,11 +361,14 @@ def test_sync_release_downgrade(api_mock):
     [
         pytest.param(
             ["rhbz#123"],
-            "- Resolves rhbz#123\n\nUpstream tag: 1.0.0\nUpstream commit: _\n",
+            "- Resolves: rhbz#123\n\nUpstream tag: 1.0.0\nUpstream commit: _\n",
         ),
         pytest.param(
             ["rhbz#123", "rhbz#222"],
-            "- Resolves rhbz#123\n- Resolves rhbz#222\n\nUpstream tag: 1.0.0\nUpstream commit: _\n",
+            (
+                "- Resolves: rhbz#123\n- Resolves: rhbz#222\n\n"
+                "Upstream tag: 1.0.0\nUpstream commit: _\n"
+            ),
         ),
         pytest.param(None, "Upstream tag: 1.0.0\nUpstream commit: _\n"),
     ],
@@ -432,7 +435,7 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream tag: [1.0.0](tag-link)\n"
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
-            "Resolves [rhbz#1234](https://bugzilla.redhat.com/show_bug.cgi?id=1234)\n",
+            "Resolves: [rhbz#1234](https://bugzilla.redhat.com/show_bug.cgi?id=1234)\n",
         ),
         pytest.param(
             "tag-link",
@@ -442,7 +445,7 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream tag: [1.0.0](tag-link)\n"
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
-            "Resolves rhbz#not-a-number\n",
+            "Resolves: rhbz#not-a-number\n",
         ),
     ],
 )

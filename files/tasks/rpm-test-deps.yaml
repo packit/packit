@@ -10,7 +10,6 @@
       - python3-pygithub
       - python3-distro
       - rpmautospec-rpm-macros
-      - python3-flexmock
     state: present
   become: true
 
@@ -21,6 +20,7 @@
       - python3-pytest-cov
       - python3-pytest-timeout
       - python3-deepdiff
+      - python3-flexmock
     state: present
   when: ansible_facts['distribution'] == 'Fedora'
   become: true
@@ -33,6 +33,7 @@
       - pytest-cov
       - pytest-timeout
       - deepdiff
+      - flexmock
     state: latest
   when: ansible_facts['distribution'] != 'Fedora'
   become: true
