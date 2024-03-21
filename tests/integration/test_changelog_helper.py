@@ -112,7 +112,7 @@ def test_update_distgit_when_copy_upstream_release_description(
 
     with downstream._specfile.sections() as sections:
         assert "Some release 0.1.0" in sections.changelog
-        assert "- Resolves rhbz#123" in sections.changelog
+        assert "- Resolves: rhbz#123" in sections.changelog
 
 
 @pytest.mark.skipif(
