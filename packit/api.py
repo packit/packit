@@ -1096,7 +1096,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             commit_title, commit_description = get_commit_message_from_action(
                 output=commit_msg_action_output,
-                default_title=title or f"[packit] {version} upstream release",
+                default_title=title or f"Update to {version} upstream release",
                 default_description=description
                 or self.get_default_commit_description(upstream_tag, resolved_bugs),
             )
