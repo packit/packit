@@ -135,7 +135,7 @@ class ChangelogHelper:
         if not action_output and resolved_bugs:
             comment += "\n"
             for bug in resolved_bugs:
-                comment += f"- Resolves {bug}\n"
+                comment += f"- Resolves: {bug}\n"
 
         comment = self.sanitize_entry(comment)
         try:
