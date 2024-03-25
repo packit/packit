@@ -12,7 +12,7 @@ from packit.utils.logging import logger
 
 class PkgTool:
     """
-    Wrapper around fedpkg/centpkg.
+    Wrapper around fedpkg/centpkg/cbs.
     """
 
     def __init__(
@@ -25,7 +25,7 @@ class PkgTool:
         Args:
             fas_username: FAS username (used for cloning)
             directory: operate in this dist-git repository
-            tool: pkgtool to use (fedpkg, centpkg)
+            tool: pkgtool to use (fedpkg, centpkg, cbs)
         """
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
