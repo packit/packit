@@ -1,6 +1,7 @@
 # 0.94.1
 
 - `packit validate-config` now checks whether `upstream_project_url` is set if `pull_from_upstream` job is configured. (#2254)
+- `Resolves` is changed to `Resolves:` for the dist-git commit since that's the correct format for CentOS Stream 9. (#2260)
 
 # 0.94.0
 
