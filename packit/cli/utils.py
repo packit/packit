@@ -130,9 +130,9 @@ def iterate_packages(func):
                 decorated_func_kwargs["config"] = copy.deepcopy(
                     config,
                 )  # reset working variables like srpm_path
-                decorated_func_kwargs[
-                    "package_config"
-                ] = packages_config.get_package_config_views()[package]
+                decorated_func_kwargs["package_config"] = (
+                    packages_config.get_package_config_views()[package]
+                )
                 func(*args, **decorated_func_kwargs)
         elif hasattr(packages_config, "packages"):
             for package_config in packages_config.get_package_config_views().values():

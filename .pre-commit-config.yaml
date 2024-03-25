@@ -4,11 +4,11 @@
 
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 24.3.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         exclude: tests_recording/test_data/
@@ -33,12 +33,12 @@ repos:
       - id: trailing-whitespace
         exclude: ^(tests/data/patches|tests/.+\.patch)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.3.4
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.9.0
     hooks:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
@@ -53,7 +53,7 @@ repos:
             types-cachetools,
           ]
   - repo: https://github.com/teemtee/tmt.git
-    rev: 1.29.0
+    rev: 1.31.0
     hooks:
       - id: tmt-lint
   - repo: https://github.com/packit/pre-commit-hooks

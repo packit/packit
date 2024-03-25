@@ -462,9 +462,9 @@ class CommonPackageConfig:
             src=[
                 downstream_specfile_path if from_downstream else upstream_specfile_path,
             ],
-            dest=upstream_specfile_path
-            if from_downstream
-            else downstream_specfile_path,
+            dest=(
+                upstream_specfile_path if from_downstream else downstream_specfile_path
+            ),
         )
 
     def get_all_files_to_sync(self):

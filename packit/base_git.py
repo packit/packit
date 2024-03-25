@@ -538,7 +538,10 @@ class PackitRepositoryBase:
             specfile,
             version,
         )
-        with self.specfile.sections() as sections, specfile.sections() as other_sections:
+        with (
+            self.specfile.sections() as sections,
+            specfile.sections() as other_sections,
+        ):
             try:
                 previous_changelog = sections.changelog[:]
             except AttributeError:
