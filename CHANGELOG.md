@@ -1,3 +1,7 @@
+# 0.94.1
+
+- `packit validate-config` now checks whether `upstream_project_url` is set if `pull_from_upstream` job is configured. (#2254)
+
 # 0.94.0
 
 - Added new configuration options `status_name_template` and `allowed_builders`.
