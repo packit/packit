@@ -1,0 +1,6 @@
+---
+- name: Install centos-packager
+  ansible.builtin.dnf:
+    name:
+      - centos-packager
+  become: true
