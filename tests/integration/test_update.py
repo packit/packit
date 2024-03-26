@@ -145,7 +145,7 @@ def test_basic_local_update_use_downstream_specfile(
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
 
-    assert changelog.count("0.1.0") == 1
+    assert changelog.count("0.1.0-1") == 1
 
 
 def test_basic_local_update_with_multiple_sources(
