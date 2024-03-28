@@ -1015,7 +1015,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 downstream_spec_ver = self.dg.get_specfile_version()
                 if compare_versions(version, downstream_spec_ver) < 0:
                     msg = (
-                        f"Downstream specfile version {downstream_spec_ver} is lower "
+                        f"Downstream specfile version {downstream_spec_ver} is higher "
                         f"than the version to propose ({version}). Skipping the update."
                     )
                     logger.debug(msg)
