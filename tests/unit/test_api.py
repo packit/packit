@@ -361,16 +361,22 @@ def test_sync_release_downgrade(api_mock):
     [
         pytest.param(
             ["rhbz#123"],
-            "- Resolves: rhbz#123\n\nUpstream tag: 1.0.0\nUpstream commit: _\n",
+            "- Resolves: rhbz#123\n\nUpstream tag: 1.0.0\nUpstream commit: _\n"
+            "\nCommit authored by Packit automation (https://packit.dev/)\n",
         ),
         pytest.param(
             ["rhbz#123", "rhbz#222"],
             (
                 "- Resolves: rhbz#123\n- Resolves: rhbz#222\n\n"
                 "Upstream tag: 1.0.0\nUpstream commit: _\n"
+                "\nCommit authored by Packit automation (https://packit.dev/)\n"
             ),
         ),
-        pytest.param(None, "Upstream tag: 1.0.0\nUpstream commit: _\n"),
+        pytest.param(
+            None,
+            "Upstream tag: 1.0.0\nUpstream commit: _\n"
+            "\nCommit authored by Packit automation (https://packit.dev/)\n",
+        ),
     ],
 )
 def test_get_default_commit_description(api_mock, resolved_bugs, result):
