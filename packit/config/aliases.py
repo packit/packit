@@ -10,6 +10,7 @@ from packit.exceptions import PackitException
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import run_command
 from packit.utils.decorators import fallback_return_value
+from packit.utils.monitoring import Pushgateway
 
 ALIASES: dict[str, list[str]] = {
     "fedora-all": ["fedora-38", "fedora-39", "fedora-rawhide"],
@@ -44,6 +45,9 @@ DEPRECATED_TARGET_MAP = {
 DEFAULT_VERSION = "fedora-stable"
 
 logger = logging.getLogger(__name__)
+
+
+pushgateway = Pushgateway()
 
 
 def get_versions(*name: str, default=DEFAULT_VERSION) -> set[str]:
@@ -210,8 +214,14 @@ def get_all_koji_targets() -> list[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).stdout.split()
 
 
+def update_metrics():
+    if hasattr(pushgateway, "aliases_fallback_used"):
+        pushgateway.aliases_fallback_used.inc()
+    pushgateway.push()
+
+
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
-@fallback_return_value(ALIASES)
+@fallback_return_value(ALIASES, callback=update_metrics)
 def get_aliases() -> dict[str, list[str]]:
     """
     Function to automatically determine fedora-* and epel-* aliases.
