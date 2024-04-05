@@ -6,7 +6,6 @@ from copr.v3 import (
     BuildProxy,
     Client,
     CoprAuthException,
-    CoprNoResultException,
     ProjectProxy,
 )
 from flexmock import flexmock
@@ -28,7 +27,7 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
     instructions = "the instructions"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         flexmock(
             chroot_repos=flexmock(keys=lambda: chroots),
             description=description,
@@ -77,7 +76,7 @@ def test_copr_build_existing_project_change_settings(
     instructions = "the instructions"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         flexmock(
             chroot_repos=flexmock(keys=lambda: chroots),
             description=description,
@@ -148,7 +147,7 @@ def test_copr_build_existing_project_munch_no_settings_change(
     project = "project-name"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         munchify(
             {
                 "additional_repos": [],
@@ -207,7 +206,7 @@ def test_copr_build_existing_project_munch_additional_repos_change(
     project = "project-name"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         munchify(
             {
                 "additional_repos": [],
@@ -270,7 +269,7 @@ def test_copr_build_existing_project_munch_list_on_homepage_change(
     project = "project-name"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         munchify(
             {
                 "additional_repos": [],
@@ -330,7 +329,7 @@ def test_copr_build_existing_project_munch_do_not_update_booleans_by_default(
     project = "project-name"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         munchify(
             {
                 "additional_repos": [],
@@ -407,7 +406,7 @@ def test_copr_build_existing_project_munch_chroot_updates(
     u, d, api = api_instance
     project = "project-name"
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         munchify(
             {
                 "additional_repos": [],
@@ -479,7 +478,7 @@ def test_copr_build_existing_project_error_on_change_settings(
     instructions = "the instructions"
     chroots = ["fedora-rawhide-x86_64"]
 
-    flexmock(ProjectProxy).should_receive("get").and_return(
+    flexmock(ProjectProxy).should_receive("add").and_return(
         flexmock(
             chroot_repos=flexmock(keys=lambda: chroots),
             description=description,
@@ -525,38 +524,6 @@ def test_copr_build_existing_project_error_on_change_settings(
     assert e_info.value.fields_to_change == {
         "description": ("some description", "different description"),
     }
-
-
-def test_copr_build_non_existing_project(cwd_upstream_or_distgit, api_instance):
-    u, d, api = api_instance
-    owner = "the-owner"
-    project = "project-name"
-
-    flexmock(ProjectProxy).should_receive("get").and_raise(
-        CoprNoResultException,
-        "project not found",
-    )
-    flexmock(ProjectProxy).should_receive("edit").and_return(None).times(0)
-    flexmock(ProjectProxy).should_receive("add").and_return(None)
-
-    flexmock(CoprHelper).should_receive("get_copr_client").and_return(
-        Client(
-            config={"copr_url": "https://copr.fedorainfracloud.org", "username": owner},
-        ),
-    )
-
-    build = flexmock(id="1", ownername=owner, projectname=project)
-    flexmock(BuildProxy).should_receive("create_from_file").and_return(build)
-    build_id, url = api.run_copr_build(
-        project=project,
-        chroots="fedora-rawhide-x86_64",
-        owner=owner,
-        description="some description",
-        instructions="the instructions",
-    )
-
-    assert build_id == "1"
-    assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
 
 
 def test_copr_build_no_owner(cwd_upstream_or_distgit, api_instance):
@@ -663,15 +630,30 @@ def test_copr_build_cli_project_set_from_config(upstream_and_remote, copr_client
     run_packit(["build", "in-copr", "--no-wait"], working_dir=upstream)
 
 
-def test_create_copr_project(copr_client_mock):
+def test_create_or_update_copr_project(copr_client_mock):
     copr_helper = CoprHelper(flexmock(git_url="https://gitlab.com/"))
     flexmock(packit.copr_helper.CoprClient).should_receive(
         "create_from_config_file",
     ).and_return(copr_client_mock)
 
+    options = {
+        "chroots": ["centos-stream-8-x86_64"],
+        "description": "my fabulous test",
+        "instructions": None,
+        "owner": "me",
+        "project": "already-present",
+        "targets_dict": {"centos-stream-8": {"additional_packages": ["foo"]}},
+        "module_hotfixes": None,
+    }
+
     copr_client_mock.project_proxy = flexmock()
     copr_client_mock.project_chroot_proxy = flexmock()
-    flexmock(copr_client_mock.project_proxy).should_receive("add").and_return({})
+    flexmock(copr_client_mock.project_proxy).should_receive("add").and_return(
+        flexmock(
+            chroot_repos={"centos-stream-8-x86_64": "https://repo.url"},
+            **options,
+        ),
+    )
     flexmock(copr_client_mock.project_chroot_proxy).should_receive("get").and_return(
         {"additional_packages": []},
     )
@@ -682,11 +664,4 @@ def test_create_copr_project(copr_client_mock):
         additional_packages=["foo"],
     ).and_return({})
 
-    copr_helper.create_copr_project(
-        chroots=["centos-stream-8-x86_64"],
-        description="my fabulous test",
-        instructions=None,
-        owner="me",
-        project="already-present",
-        targets_dict={"centos-stream-8": {"additional_packages": ["foo"]}},
-    )
+    copr_helper.create_or_update_copr_project(**options)
