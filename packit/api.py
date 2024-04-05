@@ -1982,7 +1982,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
         logger.info(f"We will operate with COPR owner {owner}.")
 
-        self.copr_helper.create_copr_project_if_not_exists(
+        self.copr_helper.create_or_update_copr_project(
             project=project,
             chroots=chroots,
             owner=owner,

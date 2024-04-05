@@ -170,7 +170,7 @@ class CoprHelper:
                 **update_args,
             )
 
-    def create_copr_project_if_not_exists(
+    def create_or_update_copr_project(
         self,
         project: str,
         chroots: list[str],
@@ -187,51 +187,56 @@ class CoprHelper:
         follow_fedora_branching: bool = False,
     ) -> None:
         """
-        Create a project in copr if it does not exists.
+        Create or update a project in copr.
 
         Raises PackitCoprException on any problems.
         """
-        logger.info(
-            f"Trying to get {owner}/{project} Copr project. "
-            "The project will be created if it does not exist.",
+        default_description = (
+            "Continuous builds initiated by Packit service.\n"
+            "For more info check out https://packit.dev/"
         )
-        try:
-            copr_proj = self.copr_client.project_proxy.get(
-                ownername=owner,
-                projectname=project,
-            )
-        except CoprNoResultException as ex:
-            if owner != self.configured_owner:
-                raise PackitCoprProjectException(
-                    f"Copr project {owner}/{project} not found.",
-                ) from ex
 
-            logger.info(f"Copr project '{owner}/{project}' not found. Creating new.")
-            self.create_copr_project(
-                chroots=chroots,
-                description=description,
-                instructions=instructions,
-                owner=owner,
-                project=project,
-                list_on_homepage=list_on_homepage,
-                preserve_project=preserve_project,
-                additional_packages=additional_packages,
-                additional_repos=additional_repos,
-                targets_dict=targets_dict,
-                module_hotfixes=module_hotfixes,
-                follow_fedora_branching=follow_fedora_branching,
+        default_instructions = (
+            (
+                "You can check out the upstream project "
+                f"{self.upstream_local_project.git_url} to find out how to consume these builds. "
+                f"This copr project is created and handled by the Packit project "
+                "(https://packit.dev/)."
             )
-            return
-        except CoprRequestException as ex:
-            logger.debug(repr(ex))
-            logger.error(
-                f"We were not able to get copr project {owner}/{project}: {ex}",
-            )
-            raise
+            if self.upstream_local_project
+            else None
+        )
 
         delete_after_days: Optional[int] = (
             None if preserve_project is None else -1 if preserve_project else 60
         )
+
+        logger.info(f"Creating {owner}/{project} Copr project.")
+        try:
+            copr_proj = self.copr_client.project_proxy.add(
+                ownername=owner,
+                projectname=project,
+                chroots=chroots,
+                description=description or default_description,
+                contact="https://github.com/packit/packit/issues",
+                # don't show project on Copr homepage by default
+                unlisted_on_hp=not list_on_homepage,
+                # delete project after the specified period of time
+                delete_after_days=delete_after_days,
+                additional_repos=additional_repos,
+                instructions=instructions or default_instructions,
+                module_hotfixes=module_hotfixes,
+                follow_fedora_branching=follow_fedora_branching,
+                exist_ok=True,
+            )
+        except (CoprException, CoprRequestException) as ex:
+            error = (
+                f"Cannot create a new Copr project "
+                f"(owner={owner} project={project} chroots={chroots}): {ex}"
+            )
+            logger.error(error)
+            logger.error(ex.result)
+            raise PackitCoprProjectException(error) from ex
 
         fields_to_change = self.get_fields_to_change(
             copr_proj=copr_proj,
@@ -399,72 +404,6 @@ class CoprHelper:
             )
 
         return fields_to_change
-
-    def create_copr_project(
-        self,
-        chroots: list[str],
-        description: str,
-        instructions: str,
-        owner: str,
-        project: str,
-        list_on_homepage: bool = False,
-        preserve_project: bool = False,
-        additional_packages: Optional[list[str]] = None,
-        additional_repos: Optional[list[str]] = None,
-        targets_dict: Optional[dict] = None,  # chroot specific configuration
-        module_hotfixes: bool = False,
-        follow_fedora_branching: bool = False,
-    ) -> None:
-        try:
-            self.copr_client.project_proxy.add(
-                ownername=owner,
-                projectname=project,
-                chroots=chroots,
-                description=(
-                    description
-                    or "Continuous builds initiated by packit service.\n"
-                    "For more info check out https://packit.dev/"
-                ),
-                contact="https://github.com/packit/packit/issues",
-                # don't show project on Copr homepage by default
-                unlisted_on_hp=not list_on_homepage,
-                # delete project after the specified period of time
-                delete_after_days=60 if not preserve_project else None,
-                additional_repos=additional_repos,
-                instructions=instructions
-                or "You can check out the upstream project "
-                f"{self.upstream_local_project.git_url} to find out how to consume these builds. "
-                f"This copr project is created and handled by the packit project "
-                "(https://packit.dev/).",
-                module_hotfixes=module_hotfixes,
-                follow_fedora_branching=follow_fedora_branching,
-            )
-            # once created: update chroot-specific configuration if there is any
-            chroot_specific_config = self._get_chroot_specific_configuration_to_update(
-                project,
-                owner,
-                targets_dict,
-            )
-            self._update_chroot_specific_configuration(
-                project=project,
-                owner=owner,
-                update_dict=chroot_specific_config,
-            )
-        except CoprException as ex:
-            # TODO: Remove once Copr doesn't throw for existing projects or new
-            # API endpoint is established.
-            if "You already have a project named" in ex.result.error:
-                # race condition between workers
-                logger.debug(f"Copr project ({owner}/{project}) is already present.")
-                return
-
-            error = (
-                f"Cannot create a new Copr project "
-                f"(owner={owner} project={project} chroots={chroots}): {ex}"
-            )
-            logger.error(error)
-            logger.error(ex.result)
-            raise PackitCoprProjectException(error) from ex
 
     def watch_copr_build(
         self,
