@@ -1,3 +1,8 @@
+# 0.94.2
+
+- Packit previously put the "[packit]" string as a prefix in the subject of pull-from-upstream commits. Now the prefix is no longer there - this is made unnecessary noise in autochangelog. This affects the default. Custom action can still override this behavior. (#2263)
+- We have fixed a race condition that could occur when multiple `copr_build` jobs sharing a Copr project but having different targets were running at the same time. (#2274)
+
 # 0.94.1
 
 - `packit validate-config` now checks whether `upstream_project_url` is set if `pull_from_upstream` job is configured. (#2254)
