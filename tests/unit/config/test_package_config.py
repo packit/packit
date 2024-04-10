@@ -1833,6 +1833,22 @@ def test_test_command_identifiers():
     assert pc.test_command.default_identifier == identifier
 
 
+def test_get_raw_dict_with_defaults():
+    pc = PackageConfig.get_from_dict(
+        {
+            "specfile_path": "package.spec",
+        },
+        repo_name="package",
+        config_file_path="path",
+    )
+    assert pc.get_raw_dict_with_defaults() == {
+        "specfile_path": "package.spec",
+        "config_file_path": "path",
+        "upstream_package_name": "package",
+        "downstream_package_name": "package",
+    }
+
+
 def test_get_local_specfile_path():
     assert str(get_local_specfile_path(UP_OSBUILD)) == "osbuild.spec"
     assert not get_local_specfile_path(SYNC_FILES)
