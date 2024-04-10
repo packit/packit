@@ -41,6 +41,7 @@ class PackageConfig(MultiplePackages):
     ):
         self._job_views: list[Union[JobConfig, JobConfigView]] = []
         self._package_config_views: dict[str, "PackageConfigView"] = {}
+        self._raw_dict_with_defaults: Optional[dict] = None
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
         # It is done here to avoid triggering __setattr__ and
@@ -92,7 +93,6 @@ class PackageConfig(MultiplePackages):
         **specfile_search_args,
     ) -> "PackageConfig":
         # required to avoid cyclical imports
-        from packit.schema import PackageConfigSchema
 
         # we need to process defaults first so they get propagated to JobConfigs
         raw_dict.setdefault("config_file_path", config_file_path)
@@ -117,8 +117,22 @@ class PackageConfig(MultiplePackages):
                 **specfile_search_args,
             )
 
+        return cls.get_from_dict_without_setting_defaults(raw_dict)
+
+    @classmethod
+    def get_from_dict_without_setting_defaults(
+        cls,
+        raw_dict: dict,
+    ) -> "PackageConfig":
+        # required to avoid cyclical imports
+        from packit.schema import PackageConfigSchema
+
         package_config = PackageConfigSchema().load(raw_dict)
+        package_config._raw_dict_with_defaults = raw_dict
         return cls.post_load(package_config)
+
+    def get_raw_dict_with_defaults(self):
+        return self._raw_dict_with_defaults
 
     @classmethod
     def post_load(cls, package_config: "PackageConfig") -> "PackageConfig":
