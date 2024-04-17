@@ -973,7 +973,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_ref = self.up._expand_git_ref(
             upstream_ref or self.package_config.upstream_ref,
         )
-        if not resolved_bugs:
+        # don't reference Upstream Release Monitoring bug for CentOS
+        if not resolved_bugs and self.package_config.pkg_tool in (None, "fedpkg"):
             upstream_release_monitoring_bug = self.get_upstream_release_monitoring_bug(
                 package_name=self.dg.local_project.repo_name,
                 version=version,
