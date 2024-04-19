@@ -17,7 +17,7 @@ from yaml import safe_load
 from packit.api import PackitAPI
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_existing_config
-from packit.config import PackageConfig, get_context_settings
+from packit.config import PackageConfig
 from packit.config.config import Config, pass_config
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
@@ -39,7 +39,7 @@ For more details, see https://packit.dev/docs/configuration/ or contact
 """
 
 
-@click.command("init", context_settings=get_context_settings())
+@click.command("init", context_settings={"ignore_unknown_options": True})
 @click.option(
     "--upstream-git-url",
     help="URL to the upstream GIT repository",
@@ -56,6 +56,10 @@ For more details, see https://packit.dev/docs/configuration/ or contact
 @click.option(
     "--upstream-tag-exclude",
     help="Python regex used for filtering upstream tags to exclude. ",
+)
+@click.option(
+    "--version-update-mask",
+    help="Python regex used for comparison of the old and the new version. ",
 )
 @click.option(
     "--issue-repository",
@@ -129,6 +133,7 @@ For more details, see https://packit.dev/docs/configuration/ or contact
     help="Commit message used when creating a PR (also for the title) or pushing to dist-git. "
     f"Default: {COMMIT_MESSAGE!r}",
 )
+@click.argument("other_args", nargs=-1, type=click.UNPROCESSED)
 @click.argument(
     "path_or_url",
     type=LocalProjectParameter(),
@@ -142,6 +147,7 @@ def init(
     upstream_tag_template,
     upstream_tag_include,
     upstream_tag_exclude,
+    version_update_mask,
     issue_repository,
     no_pull,
     no_koji_build,
@@ -156,6 +162,7 @@ def init(
     clone_path,
     commit_msg,
     path_or_url,
+    other_args,
 ):
     """
     Create the initial Packit dist-git configuration for Fedora release syncing based on
@@ -194,7 +201,17 @@ def init(
         $ packit dist-git init --upstream-git-url https://github.com/packit/packit --clone-path
         `<my-package>` https://src.fedoraproject.org/rpms/packit
 
+    Using arbitrary configuration options that are not provided as the command options
+    (the working dir needs to be specified in this case):
+
+    \b
+        $ packit dist-git init --upstream-git-url https://github.com/packit/packit
+        --my-option option-value .
+
     """
+    kwargs = {
+        other_args[i][2:]: other_args[i + 1] for i in range(0, len(other_args), 2)
+    }
     if no_pull and no_koji_build:
         logger.warning("At least one job needs to be defined!")
         return
@@ -204,6 +221,7 @@ def init(
         upstream_tag_template=upstream_tag_template,
         upstream_tag_include=upstream_tag_include,
         upstream_tag_exclude=upstream_tag_exclude,
+        version_update_mask=version_update_mask,
         issue_repository=issue_repository,
         no_pull=no_pull,
         no_koji_build=no_koji_build,
@@ -218,6 +236,7 @@ def init(
         config=config,
         path_or_url=path_or_url,
         commit_msg=commit_msg,
+        kwargs=kwargs,
     ).initialize_dist_git()
 
 
@@ -242,6 +261,7 @@ class DistGitInitializer:
         upstream_tag_template: Optional[str] = None,
         upstream_tag_include: Optional[str] = None,
         upstream_tag_exclude: Optional[str] = None,
+        version_update_mask: Optional[str] = None,
         issue_repository: Optional[str] = None,
         no_pull: bool = False,
         no_koji_build: bool = False,
@@ -254,12 +274,14 @@ class DistGitInitializer:
         create_pr: bool = False,
         force: bool = False,
         commit_msg: Optional[str] = None,
+        kwargs: Optional[dict] = None,
     ):
         self.config = config
         self.upstream_git_url = upstream_git_url
         self.upstream_tag_template = upstream_tag_template
         self.upstream_tag_include = upstream_tag_include
         self.upstream_tag_exclude = upstream_tag_exclude
+        self.version_update_mask = version_update_mask
         self.issue_repository = issue_repository
         self.no_pull = no_pull
         self.no_koji_build = no_koji_build
@@ -279,6 +301,7 @@ class DistGitInitializer:
         self.path_or_url = path_or_url
         self.force = force
         self.commit_msg = commit_msg or COMMIT_MESSAGE
+        self.kwargs = kwargs or {}
 
     @property
     def working_dir(self):
@@ -355,6 +378,7 @@ class DistGitInitializer:
             "upstream_tag_template",
             "upstream_tag_include",
             "upstream_tag_exclude",
+            "version_update_mask",
             "issue_repository",
             "allowed_committers",
             "allowed_pr_authors",
@@ -365,6 +389,8 @@ class DistGitInitializer:
             value = getattr(self, key, None)
             if value:
                 config[key] = value
+
+        config.update(self.kwargs)
 
         config["jobs"] = []
         if not self.no_pull:
