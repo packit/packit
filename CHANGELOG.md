@@ -1,3 +1,8 @@
+# 0.95.0
+
+- `packit dist-git init` now allows specifying `--version-update-mask` option and also any arbitrary top-level configuration options. (#2288)
+- We have fixed Packit auto-referencing Upstream Release Monitoring bug for release syncing to CentOS Stream. (#2284)
+
 # 0.94.2
 
 - Packit previously put the "[packit]" string as a prefix in the subject of pull-from-upstream commits. Now the prefix is no longer there - this is made unnecessary noise in autochangelog. This affects the default. Custom action can still override this behavior. (#2263)
