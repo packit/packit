@@ -102,6 +102,76 @@ def test_get_build_changelog(error):
 
 
 @pytest.mark.parametrize(
+    "error",
+    [False, True],
+)
+def test_get_tag_info(error):
+    info = {"name": "f39-build-side-12345", "id": 12345}
+
+    def getBuildConfig(*_, **__):
+        if error:
+            raise Exception
+        return info
+
+    session = flexmock(getBuildConfig=getBuildConfig)
+    result = KojiHelper(session).get_tag_info("f39-build-side-12345")
+    if error:
+        assert result is None
+    else:
+        assert result == info
+
+
+@pytest.mark.parametrize(
+    "error",
+    [False, True],
+)
+def test_create_sidetag(error):
+    info = {"name": "f39-build-side-12345", "id": 12345}
+
+    def createSideTag(*_, **__):
+        if error:
+            raise Exception
+        return info
+
+    session = flexmock(
+        logged_in=True,
+        getBuildTarget=lambda _: {"build_tag_name": "f39-build"},
+        createSideTag=createSideTag,
+    )
+    result = KojiHelper(session).create_sidetag("f39")
+    if error:
+        assert result is None
+    else:
+        assert result == info
+
+
+@pytest.mark.parametrize(
+    "logged_in",
+    [False, True],
+)
+def test_remove_sidetag(logged_in):
+    session = flexmock(logged_in=logged_in)
+    session.should_receive("gssapi_login").and_return().times(
+        0 if logged_in else 1,
+    ).mock()
+    session.should_receive("removeSideTag").once()
+    KojiHelper(session).remove_sidetag("f39-build-side-12345")
+
+
+@pytest.mark.parametrize(
+    "branch, target",
+    [
+        ("f39", "f39-candidate"),
+        ("epel9", "epel9-candidate"),
+        ("rawhide", "rawhide"),
+        ("main", "rawhide"),
+    ],
+)
+def test_get_build_target(branch, target):
+    assert KojiHelper.get_build_target(branch) == target
+
+
+@pytest.mark.parametrize(
     "since, formatted_changelog",
     [
         (
