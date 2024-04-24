@@ -159,6 +159,7 @@ class CommonPackageConfig:
             Keys are macro names and values are macro values. A value of None will undefine
             the corresponding macro.
         status_name_template: Template for configurable names for status checks.
+        sidetag_group: Sidetag group identifier for downstream Koji builds and Bodhi updates.
     """
 
     def __init__(
@@ -239,6 +240,7 @@ class CommonPackageConfig:
         parse_time_macros: Optional[dict[str, str]] = None,
         require: Optional[RequirementsConfig] = None,
         status_name_template: Optional[str] = None,
+        sidetag_group: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -351,6 +353,8 @@ class CommonPackageConfig:
         self.pkg_tool = pkg_tool
 
         self.parse_time_macros = parse_time_macros or {}
+
+        self.sidetag_group = sidetag_group
 
     @property
     def dist_git_base_url(self) -> str:
