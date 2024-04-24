@@ -90,7 +90,7 @@ class KojiHelper:
             )
         except Exception as e:
             logger.debug(
-                f"Failed to latest build of package {package} in tag {tag} from Koji: {e}",
+                f"Failed to get latest build of package {package} in tag {tag} from Koji: {e}",
             )
             return None
         if not builds:
@@ -154,6 +154,95 @@ class KojiHelper:
             if not isinstance(v, list):
                 headers[k] = [v]
         return list(zip(*[headers[h] for h in requested_headers]))
+
+    def get_tag_info(self, tag: str) -> Optional[dict]:
+        """
+        Gets tag information.
+
+        Args:
+            tag: Koji tag.
+
+        Returns:
+            Tag information or None if there is no such tag.
+        """
+        try:
+            info = self.session.getBuildConfig(tag)
+        except Exception as e:
+            logger.debug(f"Failed to get tag info of {tag} from Koji: {e}")
+            return None
+        return info
+
+    def create_sidetag(self, dist_git_branch: str) -> Optional[dict]:
+        """
+        Creates a new sidetag for the specified dist-git branch.
+
+        Attempts to log in if the underlying session is not authenticated.
+
+        Args:
+            dist_git_branch: dist-git branch name.
+
+        Returns:
+            New tag information or None if creation failed.
+        """
+        target_name = self.get_build_target(dist_git_branch)
+        try:
+            target = self.session.getBuildTarget(target_name)
+        except Exception as e:
+            logger.debug(f"Failed to get build target {target_name} from Koji: {e}")
+            return None
+        if not target:
+            logger.debug(f"Failed to get build target {target_name} from Koji")
+            return None
+        if not (build_tag := target.get("build_tag_name")):
+            logger.debug(f"Failed to get build tag from build target {target_name}")
+            return None
+        if not self.session.logged_in:
+            try:
+                self.session.gssapi_login()
+            except Exception as e:
+                logger.debug(f"Authentication failed: {e}")
+                return None
+        try:
+            info = self.session.createSideTag(build_tag)
+        except Exception as e:
+            logger.debug(f"Failed to create sidetag for {build_tag} in Koji: {e}")
+            return None
+        return info
+
+    def remove_sidetag(self, sidetag: str) -> None:
+        """
+        Removes the specified sidetag.
+
+        Attempts to log in if the underlying session is not authenticated.
+
+        Args:
+            sidetag: Sidetag name.
+        """
+        if not self.session.logged_in:
+            try:
+                self.session.gssapi_login()
+            except Exception as e:
+                logger.debug(f"Authentication failed: {e}")
+                return
+        try:
+            self.session.removeSideTag(sidetag)
+        except Exception as e:
+            logger.debug(f"Failed to remove sidetag {sidetag} in Koji: {e}")
+
+    @staticmethod
+    def get_build_target(dist_git_branch: str) -> str:
+        """
+        Gets a build target from a dist-git branch name.
+
+        Args:
+            dist_git_branch: dist-git branch name.
+
+        Returns:
+            Name of matching build target.
+        """
+        if dist_git_branch in ["rawhide", "main"]:
+            return "rawhide"
+        return f"{dist_git_branch}-candidate"
 
     @staticmethod
     def format_changelog(changelog: list[tuple[int, str, str]], since: int = 0) -> str:
