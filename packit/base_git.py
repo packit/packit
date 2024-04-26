@@ -14,6 +14,7 @@ import requests
 import rpm
 from git import GitCommandError, PushInfo
 from ogr.abstract import AccessLevel, GitProject, PullRequest
+from ogr.services.pagure import PagureProject
 from specfile import Specfile
 from specfile.exceptions import (
     DuplicateSourceException,
@@ -736,6 +737,12 @@ class PackitRepositoryBase:
                 fork.add_user(user, AccessLevel.push)
             except Exception as ex:
                 logger.debug(f"It was not possible to add user {user}: {ex}")
+
+        if not isinstance(project, PagureProject):
+            logger.debug(
+                "Syncing of group ACLs is skipped for forges other than Pagure.",
+            )
+            return
 
         commit_groups = project.which_groups_can_merge_pr()
         fork_commit_groups = fork.which_groups_can_merge_pr()
