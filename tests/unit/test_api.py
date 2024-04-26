@@ -202,13 +202,13 @@ def test_sync_release_create_sync_note(api_mock):
 
 
 def test_sync_release_env(api_mock):
-    env = api_mock.sync_release_env
+    env = api_mock.sync_release_env()
     assert env == {
         "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/dist-git",
         "PACKIT_UPSTREAM_REPO": "/mock_dir/sandcastle/local-project",
     }
     api_mock.config.command_handler = RunCommandType.sandcastle
-    env = api_mock.sync_release_env
+    env = api_mock.sync_release_env()
     assert env == {
         "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/sandcastle-exec-dir/dist-git",
         "PACKIT_UPSTREAM_REPO": "/mock_dir/sandcastle/sandcastle-exec-dir/local-project",
