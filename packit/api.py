@@ -1503,36 +1503,21 @@ The first dist-git commit to be synced is '{short_hash}'.
                 you want to upload archive with the same name but different hash.
             pkg_tool: Tool to upload sources.
         """
-
-        archives_to_upload = False
-        sources_file = self.dg.local_project.working_dir / "sources"
-
         # We need to download the sources beforehand! Previous solution was relying
         # on the HTTP index of the uploaded archives in the lookaside cache which
         # appears to be Fedora-only. Making the check distro-agnostic requires us
         # to use the `pyrpkg` which needs hash of the archive when doing the lookup,
         # therefore it needs the archive itself beforehand.
-        archives = self.dg.download_upstream_archives()
+        upstream_archives = self.dg.download_upstream_archives()
+        # Check for existing local archives and upload those as well
+        local_archives = self.get_local_archives_to_upload()
 
-        # Here, dist-git spec-file has already been updated from the upstream spec-file.
-        # => Any update done to the Source tags in upstream
-        # is already available in the dist-git spec-file.
-        for archive in archives:
-            archive_name = os.path.basename(archive)
+        archives = upstream_archives + local_archives
 
-            archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-                archive,
-            )
-            archive_name_in_sources_file = (
-                sources_file.is_file() and archive_name in sources_file.read_text()
-            )
-
-            if not archive_name_in_cache or not archive_name_in_sources_file:
-                archives_to_upload = True
-                # found one that needs uploading, no need to continue
-                break
-
-        if not archives_to_upload and not force_new_sources:
+        if (
+            not self.should_archives_be_uploaded_to_lookaside(archives)
+            and not force_new_sources
+        ):
             return
 
         # There is at least one archive to upload,
@@ -1548,6 +1533,39 @@ The first dist-git commit to be synced is '{short_hash}'.
             pkg_tool=pkg_tool,
             offline=not self.package_config.upload_sources,
         )
+
+    def should_archives_be_uploaded_to_lookaside(self, archives: list[Path]) -> bool:
+        # Here, dist-git spec-file has already been updated from the upstream spec-file.
+        # => Any update done to the Source tags in upstream
+        # is already available in the dist-git spec-file.
+        sources_file = self.dg.local_project.working_dir / "sources"
+        for archive in archives:
+            archive_name = os.path.basename(archive)
+            archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
+                archive,
+            )
+            archive_name_in_sources_file = (
+                sources_file.is_file() and archive_name in sources_file.read_text()
+            )
+
+            if not archive_name_in_cache or not archive_name_in_sources_file:
+                return True
+
+        return False
+
+    def get_local_archives_to_upload(self) -> list[Path]:
+        local_archives = self.dg.local_archive_names
+        local_archives_to_upload = []
+        for local_archive in local_archives:
+            archive_path = self.dg.absolute_source_dir / local_archive
+            if not archive_path.exists():
+                logger.debug(
+                    f"Local archive {archive_path} doesn't exist. Skipping the handling of it.",
+                )
+                continue
+            local_archives_to_upload.append(archive_path)
+
+        return local_archives_to_upload
 
     def build(
         self,

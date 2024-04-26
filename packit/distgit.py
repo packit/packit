@@ -340,11 +340,12 @@ class DistGit(PackitRepositoryBase):
     @property
     def upstream_archive_names(self) -> list[str]:
         """
-        Files that are considered upstream and should be uploaded to lookaside.
+        Sources that are considered upstream and should be uploaded to lookaside.
         Currently that's the source identified by spec_source_id (Source0 by default)
         and all other sources specified as URLs in the spec file.
 
-        :return: names of the archives, e.g. ['sen-0.6.1.tar.gz']
+        Returns:
+             names of the archives, e.g. ['sen-0.6.1.tar.gz']
         """
         with self.specfile.sources() as sources:
             archive_names = [
@@ -353,7 +354,35 @@ class DistGit(PackitRepositoryBase):
                 if (s.remote or s.number == self.package_config.spec_source_id_number)
                 and s.valid
             ]
-        logger.debug(f"Upstream archive names: {archive_names}")
+        logger.debug(
+            f"Remote sources or sources specified by spec_source_id (Source0 by default): "
+            f"{archive_names}",
+        )
+        return archive_names
+
+    @property
+    def local_archive_names(self) -> list[str]:
+        """
+        Sources that are considered local (are not specified by URL).
+        Source specified by spec_source_id is excluded as it is
+        handled as upstream archive in upstream_archive_names.
+
+        Returns:
+             names of the archives, e.g. ['sen-0.6.1.tar.gz']
+        """
+        with self.specfile.sources() as sources:
+            archive_names = [
+                s.expanded_filename
+                for s in sources
+                if (
+                    not s.remote
+                    and s.number != self.package_config.spec_source_id_number
+                )
+                and s.valid
+            ]
+        logger.debug(
+            f"Local sources (source specified by spec_source_id excluded): {archive_names}",
+        )
         return archive_names
 
     def download_upstream_archives(self) -> list[Path]:
