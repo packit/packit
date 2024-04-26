@@ -800,13 +800,21 @@ The first dist-git commit to be synced is '{short_hash}'.
             "summary": "is available",
             "creator": "Upstream Release Monitoring",
         }
+        logger.debug(
+            f"About to search for Bugzilla bugs with these parameters: {query}",
+        )
         try:
             bugs = bzapi.query(query)
         except Exception as ex:
             logger.error(f"There was an error when calling Bugzilla API: {ex!r}")
             return None
 
-        logger.debug(f"Bugzilla IDs found via Bugzilla API: {[bug.id for bug in bugs]}")
+        logger.debug(
+            f"Bugzilla IDs found via Bugzilla API: {[bug.id for bug in bugs]}",
+        )
+
+        if bugs:
+            logger.debug(f"About to find the bug matching version {version}")
 
         for bug in bugs:
             match = re.search(f"{package_name}-(.*?) is available", bug.summary)
