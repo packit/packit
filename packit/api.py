@@ -358,7 +358,7 @@ class PackitAPI:
                 dest_base=self.dg.local_project.working_dir,
             )
 
-        if self.up.with_action(
+        if self.up.actions_handler.with_action(
             action=ActionName.prepare_files,
             env=self.sync_release_env(version=version),
         ):
@@ -369,7 +369,7 @@ class PackitAPI:
                 resolved_bugs=resolved_bugs,
             )
         sync_files(synced_files)
-        if upstream_ref and self.up.with_action(
+        if upstream_ref and self.up.actions_handler.with_action(
             action=ActionName.create_patches,
             env=self.sync_release_env(version=version),
         ):
@@ -1043,7 +1043,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 )
                 self.up.set_specfile(self.dg.specfile)
 
-            self.up.run_action(
+            self.up.actions_handler.run_action(
                 actions=ActionName.post_upstream_clone,
                 env=self.sync_release_env(version=version),
             )
@@ -1058,7 +1058,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             self.dg.check_last_commit()
 
-            self.up.run_action(
+            self.up.actions_handler.run_action(
                 actions=ActionName.pre_sync,
                 env=self.sync_release_env(version=version),
             )
@@ -1094,7 +1094,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
 
             # Evaluate the commit title and message
-            commit_msg_action_output = self.up.get_output_from_action(
+            commit_msg_action_output = self.up.actions_handler.get_output_from_action(
                 ActionName.commit_message,
                 env={
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
@@ -1680,7 +1680,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                  if we will create symlinks in some other places)
             merged_ref: git ref in the upstream repo used to identify correct most recent tag
         """
-        self.up.run_action(
+        self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
             env=self.up.package_config.get_package_names_as_env(),
         )
@@ -1790,7 +1790,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             List of paths to the built RPMs.
         """
-        self.up.run_action(
+        self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
             env=self.up.package_config.get_package_names_as_env(),
         )
