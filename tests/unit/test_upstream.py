@@ -9,6 +9,7 @@ from flexmock import flexmock
 
 import packit
 from packit.actions import ActionName
+from packit.actions_handler import ActionsHandler
 from packit.exceptions import PackitException
 from packit.upstream import Archive, SRPMBuilder, Upstream
 
@@ -97,7 +98,11 @@ def test_get_commands_for_actions(action_config, result):
         config=flexmock(),
         local_project=flexmock(),
     )
-    assert ups.get_commands_for_actions(action=ActionName.create_archive) == result
+    ups._command_handler = flexmock()
+    assert (
+        ups.actions_handler.get_commands_for_actions(action=ActionName.create_archive)
+        == result
+    )
 
 
 @pytest.mark.parametrize(
@@ -115,7 +120,9 @@ def test_get_commands_for_actions(action_config, result):
 )
 def test_get_current_version(action_output, version, expected_result, upstream_mock):
     flexmock(packit.upstream.os).should_receive("listdir").and_return("mocked")
-    upstream_mock.should_receive("get_output_from_action").and_return(action_output)
+    flexmock(ActionsHandler).should_receive("get_output_from_action").and_return(
+        action_output,
+    )
     upstream_mock.should_receive("get_last_tag").and_return("_mocked")
     upstream_mock.should_receive("get_version_from_tag").and_return(version)
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(

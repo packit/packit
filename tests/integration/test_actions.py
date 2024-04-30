@@ -27,7 +27,7 @@ def test_with_action(
     _, upstream = upstream_instance
     upstream.package_config.actions = {action: command}
     try:
-        upstream.with_action(action, env=env_vars)
+        upstream.actions_handler.with_action(action, env=env_vars)
     except PackitException as ex:
         if should_raise:
             assert "Command " in str(ex)
@@ -56,7 +56,7 @@ def test_get_output_from_action(
     _, upstream = upstream_instance
     upstream.package_config.actions = {action: command}
     try:
-        out = upstream.get_output_from_action(action, env=env_vars)
+        out = upstream.actions_handler.get_output_from_action(action, env=env_vars)
     except PackitException as ex:
         if should_raise:
             assert "Command " in str(ex)

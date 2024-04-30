@@ -69,7 +69,7 @@ def upstream_with_actions():
 
 @pytest.fixture()
 def packit_repository_base():
-    return PackitRepositoryBase(
+    repo_base = PackitRepositoryBase(
         config=Config(),
         package_config=PackageConfig(
             packages={
@@ -82,6 +82,8 @@ def packit_repository_base():
             },
         ),
     )
+    repo_base.local_project = flexmock()
+    return repo_base
 
 
 @pytest.fixture()
@@ -123,17 +125,23 @@ def packit_repository_base_with_sandcastle_object(tmp_path):
 
 
 def test_has_action_upstream(upstream_with_actions):
-    assert upstream_with_actions.has_action(ActionName.pre_sync)
-    assert not upstream_with_actions.has_action(ActionName.create_patches)
+    assert upstream_with_actions.actions_handler.has_action(ActionName.pre_sync)
+    assert not upstream_with_actions.actions_handler.has_action(
+        ActionName.create_patches,
+    )
 
 
 def test_has_action_distgit(distgit_with_actions):
-    assert distgit_with_actions.has_action(ActionName.pre_sync)
-    assert not distgit_with_actions.has_action(ActionName.create_patches)
+    assert distgit_with_actions.actions_handler.has_action(ActionName.pre_sync)
+    assert not distgit_with_actions.actions_handler.has_action(
+        ActionName.create_patches,
+    )
 
 
 def test_with_action_non_defined(packit_repository_base):
-    if packit_repository_base.with_action(action=ActionName.create_patches):
+    if packit_repository_base.actions_handler.with_action(
+        action=ActionName.create_patches,
+    ):
         # this is the style we are using that function
         return
 
@@ -145,7 +153,7 @@ def test_with_action_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    if packit_repository_base.with_action(action=ActionName.pre_sync):
+    if packit_repository_base.actions_handler.with_action(action=ActionName.pre_sync):
         # this is the style we are using that function
         raise AssertionError()
 
@@ -159,7 +167,9 @@ def test_with_action_working_dir(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    assert not packit_repository_base.with_action(action=ActionName.pre_sync)
+    assert not packit_repository_base.actions_handler.with_action(
+        action=ActionName.pre_sync,
+    )
 
 
 def test_run_action_hook_not_defined(packit_repository_base):
@@ -167,7 +177,7 @@ def test_run_action_hook_not_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    packit_repository_base.run_action(actions=ActionName.create_patches)
+    packit_repository_base.actions_handler.run_action(actions=ActionName.create_patches)
 
 
 def test_run_action_not_defined(packit_repository_base):
@@ -183,7 +193,7 @@ def test_run_action_not_defined(packit_repository_base):
         .mock()
         .action_function
     )
-    packit_repository_base.run_action(
+    packit_repository_base.actions_handler.run_action(
         ActionName.create_patches,
         action_method,
         {},
@@ -210,7 +220,7 @@ def test_run_action_defined(packit_repository_base):
         .action_function
     )
 
-    packit_repository_base.run_action(
+    packit_repository_base.actions_handler.run_action(
         ActionName.pre_sync,
         action_method,
         {},
@@ -251,13 +261,13 @@ def test_run_action_in_sandcastle(
     flexmock(Sandcastle, exec=mocked_exec)
     flexmock(Sandcastle).should_receive("delete_pod").once().and_return(None)
     with caplog.at_level(logging.INFO, logger="packit"):
-        packit_repository_base_with_sandcastle_object.run_action(
+        packit_repository_base_with_sandcastle_object.actions_handler.run_action(
             ActionName.pre_sync,
             None,
             "arg1",
             "kwarg1",
         )
-        packit_repository_base_with_sandcastle_object.run_action(
+        packit_repository_base_with_sandcastle_object.actions_handler.run_action(
             ActionName.get_current_version,
             None,
             "arg2",
@@ -306,7 +316,7 @@ def test_run_action_more_actions(packit_repository_base_more_actions):
         .mock()
         .action_function
     )
-    packit_repository_base_more_actions.run_action(
+    packit_repository_base_more_actions.actions_handler.run_action(
         ActionName.pre_sync,
         action_method,
         "arg",
@@ -319,7 +329,9 @@ def test_get_output_from_action_not_defined(packit_repository_base):
 
     packit_repository_base.local_project = flexmock(working_dir="my/working/dir")
 
-    result = packit_repository_base.get_output_from_action(ActionName.create_patches)
+    result = packit_repository_base.actions_handler.get_output_from_action(
+        ActionName.create_patches,
+    )
     assert result is None
 
 
