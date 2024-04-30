@@ -8,14 +8,16 @@ import re
 import shlex
 import shutil
 import tarfile
-from functools import reduce
+from functools import partial, reduce
 from pathlib import Path
 from typing import Optional, Union
 
 import git
+from lazy_object_proxy import Proxy
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
+from packit.command_handler import CommandHandler
 from packit.config import Config
 from packit.config.common_package_config import MultiplePackages
 from packit.constants import DATETIME_FORMAT, DEFAULT_ARCHIVE_EXT
@@ -101,6 +103,16 @@ class Upstream(PackitRepositoryBase):
                 required=self._project_required,
             )
         return self._local_project
+
+    @property
+    def command_handler(self) -> CommandHandler:
+        if self._command_handler is None:
+            self._command_handler = self.handler_kls(
+                # so that the local_project is evaluated only when needed
+                local_project=Proxy(partial(Upstream.local_project.__get__, self)),  # type: ignore
+                config=self.config,
+            )
+        return self._command_handler
 
     @property
     def active_branch(self) -> str:
@@ -257,7 +269,7 @@ class Upstream(PackitRepositoryBase):
 
     def get_version_from_action(self) -> str:
         """provide version from action"""
-        action_output = self.get_output_from_action(
+        action_output = self.actions_handler.get_output_from_action(
             action=ActionName.get_current_version,
             env=self.package_config.get_package_names_as_env(),
         )
@@ -640,7 +652,7 @@ class Upstream(PackitRepositoryBase):
         :param upstream_ref: the base git ref for the source git
         """
         env = self.package_config.get_package_names_as_env()
-        if self.with_action(action=ActionName.create_patches, env=env):
+        if self.actions_handler.with_action(action=ActionName.create_patches, env=env):
             patches = self.create_patches(
                 upstream=upstream_ref,
                 destination=str(self.absolute_specfile_dir),
@@ -1150,7 +1162,10 @@ class SRPMBuilder:
             new_release = self.upstream.get_spec_release(release_suffix)
         env = env | self.upstream.package_config.get_package_names_as_env()
 
-        if self.upstream.with_action(action=ActionName.fix_spec, env=env):
+        if self.upstream.actions_handler.with_action(
+            action=ActionName.fix_spec,
+            env=env,
+        ):
             self.upstream.fix_spec(
                 archive=archive,
                 version=self.current_version,
@@ -1241,8 +1256,8 @@ class Archive:
             "PACKIT_PROJECT_NAME_VERSION": dir_name,
         }
         env = env | self.upstream.package_config.get_package_names_as_env()
-        if self.upstream.has_action(action=ActionName.create_archive):
-            outputs = self.upstream.get_output_from_action(
+        if self.upstream.actions_handler.has_action(action=ActionName.create_archive):
+            outputs = self.upstream.actions_handler.get_output_from_action(
                 action=ActionName.create_archive,
                 env=env,
             )
