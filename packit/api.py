@@ -252,8 +252,7 @@ class PackitAPI:
 
         return self.config.pkg_tool
 
-    @property
-    def sync_release_env(self):
+    def sync_release_env(self, version: Optional[str] = None):
         if self.config.command_handler == RunCommandType.sandcastle:
             exec_dir = Path(self._get_sandcastle_exec_dir())
             # working dirs should be placed under
@@ -278,6 +277,9 @@ class PackitAPI:
                 "PACKIT_DOWNSTREAM_REPO": str(self.dg.local_project.working_dir),
                 "PACKIT_UPSTREAM_REPO": str(self.up.local_project.working_dir),
             }
+        if version:
+            env["PACKIT_PROJECT_VERSION"] = version
+
         return env | self.up.package_config.get_package_names_as_env()
 
     def update_dist_git(
@@ -358,7 +360,7 @@ class PackitAPI:
 
         if self.up.with_action(
             action=ActionName.prepare_files,
-            env=self.sync_release_env,
+            env=self.sync_release_env(version=version),
         ):
             synced_files = self._prepare_files_to_sync(
                 synced_files=synced_files,
@@ -369,7 +371,7 @@ class PackitAPI:
         sync_files(synced_files)
         if upstream_ref and self.up.with_action(
             action=ActionName.create_patches,
-            env=self.sync_release_env,
+            env=self.sync_release_env(version=version),
         ):
             patches = self.up.create_patches(
                 upstream=upstream_ref,
@@ -1043,7 +1045,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             self.up.run_action(
                 actions=ActionName.post_upstream_clone,
-                env=self.sync_release_env,
+                env=self.sync_release_env(version=version),
             )
 
             # compare versions here because users can mangle with specfile in
@@ -1056,7 +1058,10 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             self.dg.check_last_commit()
 
-            self.up.run_action(actions=ActionName.pre_sync, env=self.sync_release_env)
+            self.up.run_action(
+                actions=ActionName.pre_sync,
+                env=self.sync_release_env(version=version),
+            )
             if not use_downstream_specfile:
                 self.up.specfile.reload()
 
@@ -1092,7 +1097,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             commit_msg_action_output = self.up.get_output_from_action(
                 ActionName.commit_message,
                 env={
-                    "PACKIT_PROJECT_VERSION": version,
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
                     "PACKIT_UPSTREAM_COMMIT": self.up.local_project.commit_hexsha,
                     "PACKIT_DEBUG_DIVIDER": COMMIT_ACTION_DIVIDER.strip(),
@@ -1100,7 +1104,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     if resolved_bugs
                     else "",
                 }
-                | self.sync_release_env,
+                | self.sync_release_env(version),
             )
 
             commit_title, commit_description = get_commit_message_from_action(
@@ -1499,36 +1503,21 @@ The first dist-git commit to be synced is '{short_hash}'.
                 you want to upload archive with the same name but different hash.
             pkg_tool: Tool to upload sources.
         """
-
-        archives_to_upload = False
-        sources_file = self.dg.local_project.working_dir / "sources"
-
         # We need to download the sources beforehand! Previous solution was relying
         # on the HTTP index of the uploaded archives in the lookaside cache which
         # appears to be Fedora-only. Making the check distro-agnostic requires us
         # to use the `pyrpkg` which needs hash of the archive when doing the lookup,
         # therefore it needs the archive itself beforehand.
-        archives = self.dg.download_upstream_archives()
+        upstream_archives = self.dg.download_upstream_archives()
+        # Check for existing local archives and upload those as well
+        local_archives = self.get_local_archives_to_upload()
 
-        # Here, dist-git spec-file has already been updated from the upstream spec-file.
-        # => Any update done to the Source tags in upstream
-        # is already available in the dist-git spec-file.
-        for archive in archives:
-            archive_name = os.path.basename(archive)
+        archives = upstream_archives + local_archives
 
-            archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
-                archive,
-            )
-            archive_name_in_sources_file = (
-                sources_file.is_file() and archive_name in sources_file.read_text()
-            )
-
-            if not archive_name_in_cache or not archive_name_in_sources_file:
-                archives_to_upload = True
-                # found one that needs uploading, no need to continue
-                break
-
-        if not archives_to_upload and not force_new_sources:
+        if (
+            not self.should_archives_be_uploaded_to_lookaside(archives)
+            and not force_new_sources
+        ):
             return
 
         # There is at least one archive to upload,
@@ -1544,6 +1533,39 @@ The first dist-git commit to be synced is '{short_hash}'.
             pkg_tool=pkg_tool,
             offline=not self.package_config.upload_sources,
         )
+
+    def should_archives_be_uploaded_to_lookaside(self, archives: list[Path]) -> bool:
+        # Here, dist-git spec-file has already been updated from the upstream spec-file.
+        # => Any update done to the Source tags in upstream
+        # is already available in the dist-git spec-file.
+        sources_file = self.dg.local_project.working_dir / "sources"
+        for archive in archives:
+            archive_name = os.path.basename(archive)
+            archive_name_in_cache = self.dg.is_archive_in_lookaside_cache(
+                archive,
+            )
+            archive_name_in_sources_file = (
+                sources_file.is_file() and archive_name in sources_file.read_text()
+            )
+
+            if not archive_name_in_cache or not archive_name_in_sources_file:
+                return True
+
+        return False
+
+    def get_local_archives_to_upload(self) -> list[Path]:
+        local_archives = self.dg.local_archive_names
+        local_archives_to_upload = []
+        for local_archive in local_archives:
+            archive_path = self.dg.absolute_source_dir / local_archive
+            if not archive_path.exists():
+                logger.debug(
+                    f"Local archive {archive_path} doesn't exist. Skipping the handling of it.",
+                )
+                continue
+            local_archives_to_upload.append(archive_path)
+
+        return local_archives_to_upload
 
     def build(
         self,
