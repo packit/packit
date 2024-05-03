@@ -1,3 +1,8 @@
+# 0.96.0
+
+- Packit will now upload to lookaside cache sources that are not specified by URLs and are present in the dist-git repo during release sync. Additionally, all the actions ran during syncing release will provide the PACKIT_PROJECT_VERSION env var. (#2297)
+- We have fixed the syncing of ACLs during CentOS Stream release syncing. (#2298)
+
 # 0.95.0
 
 - `packit dist-git init` now allows specifying `--version-update-mask` option and also any arbitrary top-level configuration options. (#2288)
