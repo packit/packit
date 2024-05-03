@@ -5,6 +5,7 @@ import logging
 import re
 import tempfile
 from collections.abc import Iterable, Sequence
+from functools import partial
 from pathlib import Path
 from typing import Optional, Union
 
@@ -12,10 +13,12 @@ import cccolutils
 import git
 from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
+from lazy_object_proxy import Proxy
 from ogr.abstract import PullRequest
 from specfile.utils import NEVR
 
 from packit.base_git import PackitRepositoryBase
+from packit.command_handler import CommandHandler
 from packit.config import (
     Config,
     MultiplePackages,
@@ -159,6 +162,16 @@ class DistGit(PackitRepositoryBase):
             )
 
         return self._local_project
+
+    @property
+    def command_handler(self) -> CommandHandler:
+        if self._command_handler is None:
+            self._command_handler = self.handler_kls(
+                # so that the local_project is evaluated only when needed
+                local_project=Proxy(partial(DistGit.local_project.__get__, self)),  # type: ignore
+                config=self.config,
+            )
+        return self._command_handler
 
     @property
     def downstream_config(self) -> Optional[PackageConfig]:
