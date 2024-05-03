@@ -329,7 +329,7 @@ def test_fix_spec_action_with_macros(upstream_instance):
         release_suffix="",
     ).and_return("1.1234.main.0.1221")
 
-    flexmock(upstream).should_receive("with_action").with_args(
+    flexmock(upstream.actions_handler).should_receive("with_action").with_args(
         action=ActionName.fix_spec,
         env={
             "PACKIT_PROJECT_VERSION": "0.1.0",

@@ -78,7 +78,10 @@ class ChangelogHelper:
             "PACKIT_PROJECT_UPSTREAM_TAG": upstream_tag or "",
             "PACKIT_PROJECT_PREVIOUS_VERSION": previous_version or "",
         }
-        messages = self.up.get_output_from_action(ActionName.changelog_entry, env=env)
+        messages = self.up.actions_handler.get_output_from_action(
+            ActionName.changelog_entry,
+            env=env,
+        )
         if not messages:
             return None
 

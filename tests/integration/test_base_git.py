@@ -37,7 +37,9 @@ def test_get_output_from_action_defined(echo_cmd, expected_output):
 
     packit_repository_base.local_project = flexmock(working_dir=".")
 
-    result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
+    result = packit_repository_base.actions_handler.get_output_from_action(
+        ActionName.pre_sync,
+    )
     assert result == expected_output
 
 
@@ -68,7 +70,9 @@ def test_get_output_from_action_defined_in_sandcastle():
     flexmock(Sandcastle).should_receive("run")
     flexmock(Sandcastle).should_receive("exec").and_return(echo_cmd)
     flexmock(Sandcastle).should_receive("delete_pod").and_return(None)
-    result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
+    result = packit_repository_base.actions_handler.get_output_from_action(
+        ActionName.pre_sync,
+    )
     assert result[-1] == echo_cmd
 
 
@@ -88,7 +92,9 @@ def test_run_in_sandbox():
     )
     packit_repository_base.config.actions_handler = "sandcastle"
 
-    result = packit_repository_base.get_output_from_action(ActionName.pre_sync)
+    result = packit_repository_base.actions_handler.get_output_from_action(
+        ActionName.pre_sync,
+    )
     assert "total 4.0K" in result
     assert "drwxr-xr-x. 1 root root" in result
 
