@@ -36,6 +36,8 @@ Requires:       rpmdevtools
 # Copying files between repositories
 Requires:       rsync
 
+Recommends:       osh-cli
+
 %description -n python3-packit
 Python library for Packit,
 check out packit package for the executable.

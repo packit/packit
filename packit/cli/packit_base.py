@@ -13,6 +13,7 @@ from packit.cli.init import init
 from packit.cli.prepare_sources import prepare_sources
 from packit.cli.propose_downstream import propose_downstream, pull_from_upstream
 from packit.cli.push_updates import push_updates
+from packit.cli.scan_in_osh import scan_in_osh
 from packit.cli.source_git import source_git
 from packit.cli.srpm import srpm
 from packit.cli.status import status
@@ -93,5 +94,7 @@ packit_base.add_command(validate_config)
 packit_base.add_command(source_git)
 packit_base.add_command(prepare_sources)
 packit_base.add_command(dist_git)
+packit_base.add_command(scan_in_osh)
+
 if __name__ == "__main__":
     packit_base()
