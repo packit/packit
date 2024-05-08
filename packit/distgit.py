@@ -456,6 +456,7 @@ class DistGit(PackitRepositoryBase):
             PackitException, if the upload fails.
         """
         logger.info("About to upload to lookaside cache.")
+        logger.debug(f"Archives to upload: {archives}")
         pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
