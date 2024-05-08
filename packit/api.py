@@ -1558,9 +1558,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         local_archives_to_upload = []
         for local_archive in local_archives:
             archive_path = self.dg.absolute_source_dir / local_archive
-            if not archive_path.exists():
+            if not archive_path.exists() or local_archive in [
+                path for path, _ in self.dg.local_project.git_repo.index.entries
+            ]:
                 logger.debug(
-                    f"Local archive {archive_path} doesn't exist. Skipping the handling of it.",
+                    f"Local archive {archive_path} doesn't exist or is tracked by git. "
+                    f"Skipping the handling of it.",
                 )
                 continue
             local_archives_to_upload.append(archive_path)
