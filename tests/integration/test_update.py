@@ -291,6 +291,48 @@ def test_basic_local_update_with_adding_second_local_source(
     assert "0.1.0" in changelog
 
 
+def test_basic_local_update_with_adding_second_local_source_tracked_by_git(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+):
+    """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d, files_to_create=["the_source.tar.gz"])
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    with Specfile(u / "beer.spec", autosave=True).sources() as sources:
+        sources.append("README")
+    subprocess.check_call(["git", "add", "beer.spec"], cwd=u)
+    subprocess.check_call(
+        ["git", "commit", "-m", "Added new source to specfile"],
+        cwd=u,
+    )
+    subprocess.check_call(["git", "tag", "0.1.0", "-f"], cwd=u)
+
+    dist_git_first_source = d / TARBALL_NAME
+    dist_git_second_source = d / "README"
+
+    flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
+        archives=[dist_git_first_source],
+        pkg_tool="",
+        offline=False,
+    )
+
+    api.sync_release(dist_git_branch="main", version="0.1.0")
+
+    assert dist_git_first_source.is_file()
+    assert dist_git_second_source.is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert spec.sources()
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
 def test_basic_local_update_with_removing_second_source(
     cwd_upstream,
     api_instance,
