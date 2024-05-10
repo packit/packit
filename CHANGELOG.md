@@ -1,3 +1,8 @@
+# 0.97.0
+
+- Add a `scan-in-osh` subcommand in the CLI to perform a scan through OpenScanHub. By default, it performs a full scan of the packages and a differential scan can be performed through `--base-srpm` option. (#2301)
+- When running `dist-git init` command from CLI, you can pass a command to specify a git URL of the project. (#2308)
+
 # 0.96.0
 
 - Packit will now upload to lookaside cache sources that are not specified by URLs and are present in the dist-git repo during release sync. Additionally, all the actions ran during syncing release will provide the PACKIT_PROJECT_VERSION env var. (#2297)
