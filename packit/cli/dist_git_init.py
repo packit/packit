@@ -21,6 +21,7 @@ from packit.config import PackageConfig
 from packit.config.config import Config, pass_config
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
+from packit.utils import commands
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,10 @@ For more details, see https://packit.dev/docs/configuration/ or contact
 @click.option(
     "--upstream-git-url",
     help="URL to the upstream GIT repository",
-    required=True,
+)
+@click.option(
+    "--upstream-git-url-command",
+    help="Command to get the URL of the upstream git repository",
 )
 @click.option(
     "--upstream-tag-template",
@@ -144,6 +148,7 @@ For more details, see https://packit.dev/docs/configuration/ or contact
 def init(
     config,
     upstream_git_url,
+    upstream_git_url_command,
     upstream_tag_template,
     upstream_tag_include,
     upstream_tag_exclude,
@@ -215,6 +220,31 @@ def init(
     if no_pull and no_koji_build:
         logger.warning("At least one job needs to be defined!")
         return
+
+    if upstream_git_url and upstream_git_url_command:
+        click.echo(
+            "Only one of --upstream-git-url or --upstream-git-url-command can be specified.",
+            err=True,
+        )
+        return
+
+    if not (upstream_git_url or upstream_git_url_command):
+        click.echo(
+            "One of --upstream-git-url or --upstream-git-url-command needs to be specified.",
+            err=True,
+        )
+        return
+
+    click.echo(
+        f"Running the following command to find upstream git URL: {upstream_git_url_command}",
+    )
+    result = commands.run_command(
+        upstream_git_url_command,
+        output=True,
+        cwd=path_or_url.working_dir,
+    )
+    upstream_git_url = result.stdout.strip()
+    click.echo(f"Found the following URL: {upstream_git_url}")
 
     DistGitInitializer(
         upstream_git_url=upstream_git_url,
