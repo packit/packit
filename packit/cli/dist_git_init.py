@@ -47,7 +47,7 @@ For more details, see https://packit.dev/docs/configuration/ or contact
 )
 @click.option(
     "--upstream-git-url-command",
-    help="Command to get a URL of the upstream GIT repository",
+    help="Command to get the URL of the upstream git repository",
 )
 @click.option(
     "--upstream-tag-template",
@@ -244,7 +244,7 @@ def init(
         cwd=path_or_url.working_dir,
     )
     upstream_git_url = result.stdout.strip()
-    click.echo(f"Found a following URL: {upstream_git_url}")
+    click.echo(f"Found the following URL: {upstream_git_url}")
 
     DistGitInitializer(
         upstream_git_url=upstream_git_url,
