@@ -105,6 +105,33 @@ def test_get_build_changelog(error):
     "error",
     [False, True],
 )
+def test_get_builds_in_tag(error):
+    builds = [
+        {
+            "package_name": "python-specfile",
+            "name": "python3-specfile",
+            "version": "0.28.0",
+            "release": "1.fc39",
+        },
+    ]
+
+    def listTagged(*_, **__):
+        if error:
+            raise Exception
+        return builds
+
+    session = flexmock(listTagged=listTagged)
+    result = KojiHelper(session).get_builds_in_tag("f39-build-side-12345")
+    if error:
+        assert result == []
+    else:
+        assert result == builds
+
+
+@pytest.mark.parametrize(
+    "error",
+    [False, True],
+)
 def test_get_tag_info(error):
     info = {"name": "f39-build-side-12345", "id": 12345}
 

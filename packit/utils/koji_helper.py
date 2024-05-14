@@ -155,6 +155,28 @@ class KojiHelper:
                 headers[k] = [v]
         return list(zip(*[headers[h] for h in requested_headers]))
 
+    def get_builds_in_tag(self, tag: str) -> list[dict]:
+        """
+        Gets list of builds tagged into the specified tag.
+
+        Args:
+            tag: Tag name.
+
+        Returns:
+            List of builds.
+        """
+        try:
+            builds = self.session.listTagged(
+                tag=tag,
+                inherit=False,
+                latest=False,
+                strict=True,
+            )
+        except Exception as e:
+            logger.debug(f"Failed to get builds tagged into {tag} from Koji: {e}")
+            return []
+        return builds
+
     def get_tag_info(self, tag: str) -> Optional[dict]:
         """
         Gets tag information.
