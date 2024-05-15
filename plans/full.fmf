@@ -10,7 +10,7 @@ adjust:
         copr: packit/packit-dev
       # make sure the Copr repo has higher priority than TF Tag Repository
       - how: shell
-        script: dnf -y config-manager --save --setopt="*:packit:packit-dev.priority=5"
+        script: sed -i -n '/^priority=/!p;$apriority=5' /etc/yum.repos.d/*:packit:packit-dev.repo
       # upgrade ogr and specfile in case they are already installed
       - how: shell
         script: dnf -y upgrade python3-ogr python3-specfile
