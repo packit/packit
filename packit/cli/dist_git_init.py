@@ -235,16 +235,17 @@ def init(
         )
         return
 
-    click.echo(
-        f"Running the following command to find upstream git URL: {upstream_git_url_command}",
-    )
-    result = commands.run_command(
-        upstream_git_url_command,
-        output=True,
-        cwd=path_or_url.working_dir,
-    )
-    upstream_git_url = result.stdout.strip()
-    click.echo(f"Found the following URL: {upstream_git_url}")
+    if upstream_git_url_command:
+        click.echo(
+            f"Running the following command to find upstream git URL: {upstream_git_url_command}",
+        )
+        result = commands.run_command(
+            upstream_git_url_command,
+            output=True,
+            cwd=path_or_url.working_dir,
+        )
+        upstream_git_url = result.stdout.strip()
+        click.echo(f"Found the following URL: {upstream_git_url}")
 
     DistGitInitializer(
         upstream_git_url=upstream_git_url,
