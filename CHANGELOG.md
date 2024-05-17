@@ -1,3 +1,7 @@
+# 0.97.1
+
+- We have fixed the behaviour for `dist-git init` command when `upstream-git-url` argument is specified.
+
 # 0.97.0
 
 - Add a `scan-in-osh` subcommand in the CLI to perform a scan through OpenScanHub. By default, it performs a full scan of the packages and a differential scan can be performed through `--base-srpm` option. (#2301)
