@@ -15,6 +15,7 @@ from bodhi.client.bindings import BodhiClientException
 from fedora.client import AuthError
 from lazy_object_proxy import Proxy
 from ogr.abstract import PullRequest
+from ogr.services.pagure import PagureProject
 from specfile.utils import NEVR
 
 from packit.base_git import PackitRepositoryBase
@@ -297,8 +298,8 @@ class DistGit(PackitRepositoryBase):
                     "Unable to create a fork of repository "
                     f"{self.local_project.git_project.full_repo_name}",
                 )
-            if sync_acls:
-                # synchronize ACLs between original repo and fork
+            if sync_acls and isinstance(self.local_project.git_project, PagureProject):
+                # synchronize ACLs between original repo and fork for Pagure
                 self.sync_acls(self.local_project.git_project, fork)
             fork_urls = fork.get_git_urls()
             self.local_project.git_repo.create_remote(
