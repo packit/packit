@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 )
 @click.option(
     "--base-srpm",
-    help="Base SRPM to perform a differential build",
+    help="Base SRPM to perform a differential build against",
     default=None,
 )
 @click.option(
@@ -59,7 +59,7 @@ def scan_in_osh(
 ):
     """
     Perform a scan through OpenScanHub.
-    You need a valid kerberos ticket and set `dns_canonicalize_hostname=false`
+    You need a valid Kerberos ticket and set `dns_canonicalize_hostname=false`
     in Kerberos configurations.
     Documentation can be found at https://fedoraproject.org/wiki/OpenScanHub.
     """
