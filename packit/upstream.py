@@ -14,6 +14,7 @@ from typing import Optional, Union
 
 import git
 from lazy_object_proxy import Proxy
+from ogr.services.pagure import PagureProject
 
 from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
@@ -154,8 +155,11 @@ class Upstream(PackitRepositoryBase):
                     # ogr is awesome! if you want to fork your own repo, you'll get it!
                     project = self.local_project.git_project.get_fork(create=True)
 
-                if sync_acls:
-                    # synchronize ACLs between original repo and fork
+                if sync_acls and isinstance(
+                    self.local_project.git_project,
+                    PagureProject,
+                ):
+                    # synchronize ACLs between original repo and fork for Pagure
                     self.sync_acls(self.local_project.git_project, project)
 
                 fork_username = project.namespace
