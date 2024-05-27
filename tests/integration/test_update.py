@@ -52,7 +52,7 @@ def test_basic_local_update(
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     flexmock(Specfile).should_call("reload").once()
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"])
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -82,7 +82,7 @@ def test_basic_local_update_no_upload_to_lookaside(
     ).once()
 
     api.package_config.upload_sources = False
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"])
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -114,7 +114,7 @@ def test_basic_local_update_use_downstream_specfile(
 
     api.sync_release(
         dist_git_branch="main",
-        version="0.1.0",
+        versions=["0.1.0"],
         use_downstream_specfile=True,
     )
 
@@ -131,7 +131,7 @@ def test_basic_local_update_use_downstream_specfile(
     # do this second time to see whether the specfile is updated correctly
     api.sync_release(
         dist_git_branch="main",
-        version="0.1.0",
+        versions=["0.1.0"],
         use_downstream_specfile=True,
     )
 
@@ -175,7 +175,10 @@ def test_basic_local_update_with_multiple_sources(
         offline=False,
     )
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert dist_git_first_source.is_file()
     assert dist_git_second_source.is_file()
@@ -224,7 +227,10 @@ def test_basic_local_update_with_adding_second_source(
         offline=False,
     )
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert dist_git_first_source.is_file()
     assert dist_git_second_source.is_file()
@@ -272,7 +278,10 @@ def test_basic_local_update_with_adding_second_local_source(
         offline=False,
     )
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert dist_git_first_source.is_file()
     assert dist_git_second_source.is_file()
@@ -318,7 +327,10 @@ def test_basic_local_update_with_adding_second_local_source_tracked_by_git(
         offline=False,
     )
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert dist_git_first_source.is_file()
     assert dist_git_second_source.is_file()
@@ -359,7 +371,10 @@ def test_basic_local_update_with_removing_second_source(
         offline=False,
     )
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert dist_git_first_source.is_file()
     assert not dist_git_second_source.is_file()
@@ -447,7 +462,10 @@ def test_basic_local_update_copy_upstream_release_description(
         get_release=lambda name, tag_name: release,
     )
     api.package_config.copy_upstream_release_description = True
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -477,7 +495,10 @@ def test_basic_local_update_using_distgit(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
 
-    api.sync_release(dist_git_branch="main", version="0.1.0")
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
@@ -511,7 +532,7 @@ def test_basic_local_update_direct_push(
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)
 
-    api.sync_release(dist_git_branch="main", version="0.1.0", create_pr=False)
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"], create_pr=False)
 
     remote_dir_clone = Path(f"{distgit_remote}-clone")
     subprocess.check_call(
@@ -538,7 +559,7 @@ def test_update_downstream_changelog_even_if_has_autochangelog(
     api.package_config.sync_changelog = True
     api.sync_release(
         dist_git_branch="main",
-        version="0.1.0",
+        versions=["0.1.0"],
         create_pr=False,
         add_new_sources=False,
     )
@@ -566,7 +587,7 @@ def test_basic_local_update_direct_push_no_dg_spec(
     _, distgit_remote = distgit_and_remote
     mock_spec_download_remote_s(d)
 
-    api.sync_release(dist_git_branch="main", version="0.1.0", create_pr=False)
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"], create_pr=False)
 
     remote_dir_clone = Path(f"{distgit_remote}-clone")
     subprocess.check_call(
