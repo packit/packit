@@ -89,7 +89,7 @@ class ProposeUpdate(PackitTest):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release(version="0.8.1", force=True)
+        self.api.sync_release(versions=["0.8.1"], force=True)
 
     # We don't run this test because we haven't been able to regenerate the data for it
     # and we're not sure what it's supposed to actually test.
@@ -107,7 +107,7 @@ class ProposeUpdate(PackitTest):
             f"git tag -a {version_increase} -m 'my version {version_increase}'",
             shell=True,
         )
-        self.api.sync_release(version="0.8.1")
+        self.api.sync_release(versions=["0.8.1"])
 
     def test_changelog_sync(self):
         """
@@ -133,6 +133,6 @@ class ProposeUpdate(PackitTest):
         flexmock(Bugzilla).should_receive("query").and_return([])
 
         self.api.package_config.sync_changelog = True
-        self.api.sync_release(version="1.0.0", use_local_content=True)
+        self.api.sync_release(versions=["1.0.0"], use_local_content=True)
         new_downstream_spec_content = self.api.dg.absolute_specfile_path.read_text()
         assert changed_upstream_spec_content == new_downstream_spec_content
