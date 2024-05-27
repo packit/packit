@@ -172,8 +172,9 @@ def test_sync_release_version_tag_processing(
     )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     flexmock(PatchGenerator).should_receive("undo_identical")
+    versions = [version] if version else []
     with expectation:
-        api_mock.sync_release(version=version, tag=tag, dist_git_branch="_")
+        api_mock.sync_release(versions=versions, tag=tag, dist_git_branch="_")
 
 
 def test_sync_release_do_not_create_sync_note(api_mock):
@@ -186,7 +187,7 @@ def test_sync_release_do_not_create_sync_note(api_mock):
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.up.package_config.create_sync_note = False
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
-    api_mock.sync_release(version="1.1", dist_git_branch="_")
+    api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
 
 def test_sync_release_create_sync_note(api_mock):
@@ -198,7 +199,7 @@ def test_sync_release_create_sync_note(api_mock):
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
-    api_mock.sync_release(version="1.1", dist_git_branch="_")
+    api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
 
 def test_sync_release_env(api_mock):
@@ -286,7 +287,7 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
         ],
     )
 
-    api.sync_release(version="1.1", dist_git_branch="_")
+    api.sync_release(versions=["1.1"], dist_git_branch="_")
 
 
 def test_sync_release_check_pr_instructions(api_mock):
@@ -337,7 +338,11 @@ def test_sync_release_check_pr_instructions(api_mock):
         repo=DistGit,
         sync_acls=False,
     ).and_return(flexmock())
-    api_mock.sync_release(version="1.1", dist_git_branch="_", add_pr_instructions=True)
+    api_mock.sync_release(
+        versions=["1.1"],
+        dist_git_branch="_",
+        add_pr_instructions=True,
+    )
 
 
 def test_sync_release_downgrade(api_mock):
@@ -350,7 +355,7 @@ def test_sync_release_downgrade(api_mock):
     api_mock.dg.should_receive("get_specfile_version").and_return("1.1")
     with pytest.raises(ReleaseSkippedPackitException):
         api_mock.sync_release(
-            version="1.0",
+            versions=["1.0"],
             dist_git_branch="_",
             add_pr_instructions=True,
         )
@@ -506,7 +511,7 @@ def test_pkg_tool_property(package_config, config, expected_pkg_tool):
             "4.0.0",
             "rawhide",
             None,
-            does_not_raise(),
+            True,
             id="skip version distance check for rawhide",
         ),
         pytest.param(
@@ -514,7 +519,7 @@ def test_pkg_tool_property(package_config, config, expected_pkg_tool):
             "4.0.0",
             "f38",
             r"\d+\.\d+\.",
-            pytest.raises(PackitException),
+            False,
             id="proposed version far too distant for f38",
         ),
         pytest.param(
@@ -522,7 +527,7 @@ def test_pkg_tool_property(package_config, config, expected_pkg_tool):
             "3.10.1",
             "f38",
             r"\d+\.\d+\.",
-            does_not_raise(),
+            True,
             id="proposed version ok for f38",
         ),
     ),
@@ -540,12 +545,14 @@ def test_check_version_distance(
     )
     config = Config()
 
-    with exp:
+    assert (
         PackitAPI(config, package_config).check_version_distance(
             current_version,
             proposed_version,
             target_branch,
         )
+        == exp
+    )
 
 
 @pytest.mark.parametrize(

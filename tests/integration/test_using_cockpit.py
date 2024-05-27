@@ -77,7 +77,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         api.sync_release(
             dist_git_branch="main",
             use_local_content=False,
-            version="179",
+            versions=["179"],
             force_new_sources=False,
             create_pr=True,
         )
@@ -119,7 +119,7 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
         assert pr == api.sync_release(
             dist_git_branch="main",
             use_local_content=False,
-            version="179",
+            versions=["179"],
             force_new_sources=False,
             create_pr=True,
         )
