@@ -24,7 +24,7 @@ def check_ready_api_dg_first(
     mock_spec_download_remote_s(distgit)
     api_instance_update_source_git.sync_release(
         dist_git_branch="main",
-        version="0.1.0",
+        versions=["0.1.0"],
         upstream_ref="0.1.0",
         mark_commit_origin=True,
     )
@@ -52,7 +52,7 @@ def check_ready_api_sg_first(
     mock_spec_download_remote_s(distgit)
     api_instance_update_source_git.sync_release(
         dist_git_branch="main",
-        version="0.1.0",
+        versions=["0.1.0"],
         upstream_ref="0.1.0",
         mark_commit_origin=True,
     )
