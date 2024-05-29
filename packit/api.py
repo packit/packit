@@ -747,7 +747,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         current,
         proposed,
         target_branch,
-    ) -> None:
+    ) -> bool:
         """Following this guidelines:
         https://docs.fedoraproject.org/en-US/fesco/Updates_Policy/#philosophy
         we want to avoid major updates of packages within a **stable** release.
@@ -771,14 +771,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                 and masked_proposed
                 and masked_current.group(0) != masked_proposed.group(0)
             ):
-                raise ReleaseSkippedPackitException(
-                    f"The upstream released version {current} does not match "
-                    f"specfile version {proposed} at branch {target_branch} "
-                    f"using the version_update_mask "
-                    f'"{self.package_config.version_update_mask}".'
-                    "\nYou can change the version_update_mask with an empty string "
-                    "to skip this check.",
+                logger.debug(
+                    f"Masked {current} and {proposed} ({masked_current} and {masked_proposed}) "
+                    f"do not match.",
                 )
+                return False
+        return True
 
     @staticmethod
     def get_upstream_release_monitoring_bug(
@@ -830,7 +828,7 @@ The first dist-git commit to be synced is '{short_hash}'.
     def sync_release(
         self,
         dist_git_branch: Optional[str] = None,
-        version: Optional[str] = None,
+        versions: Optional[list[str]] = None,
         tag: Optional[str] = None,
         use_local_content=False,
         add_new_sources=True,
@@ -857,7 +855,7 @@ The first dist-git commit to be synced is '{short_hash}'.
     def sync_release(
         self,
         dist_git_branch: Optional[str] = None,
-        version: Optional[str] = None,
+        versions: Optional[list[str]] = None,
         tag: Optional[str] = None,
         use_local_content=False,
         add_new_sources=True,
@@ -883,7 +881,7 @@ The first dist-git commit to be synced is '{short_hash}'.
     def sync_release(
         self,
         dist_git_branch: Optional[str] = None,
-        version: Optional[str] = None,
+        versions: Optional[list[str]] = None,
         tag: Optional[str] = None,
         use_local_content=False,
         add_new_sources=True,
@@ -910,7 +908,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             dist_git_branch: Branch in dist-git, defaults to repo's default branch.
             use_local_content: Don't check out anything.
-            version: Upstream version to update in dist-git.
+            versions: List of new upstream versions.
             tag: Upstream git tag.
             add_new_sources: Download and upload source archives.
             force_new_sources: Download/upload the archive even if it's
@@ -952,13 +950,15 @@ The first dist-git commit to be synced is '{short_hash}'.
         dist_git_branch = (
             dist_git_branch or self.dg.local_project.git_project.default_branch
         )
-        # process version and tag parameters
-        if version and tag:
+        version = None
+        # process versions and tag parameters
+        if versions and tag:
             raise PackitException(
-                "Function parameters version and tag are mutually exclusive.",
+                "Function parameters versions and tag are mutually exclusive.",
             )
         if not tag:
-            version = version or self.up.get_latest_released_version()
+            # [FIXME] for now let's just pick the first one
+            version = versions[0] if versions else self.up.get_latest_released_version()
             if not version:
                 raise PackitException(
                     "Could not figure out version of latest upstream release. "
@@ -1054,7 +1054,15 @@ The first dist-git commit to be synced is '{short_hash}'.
             if compare_versions(version, spec_ver) > 0:
                 logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
 
-            self.check_version_distance(version, spec_ver, dist_git_branch)
+            if not self.check_version_distance(version, spec_ver, dist_git_branch):
+                raise ReleaseSkippedPackitException(
+                    f"The upstream released version {version} does not match "
+                    f"specfile version {spec_ver} at branch {dist_git_branch} "
+                    f"using the version_update_mask "
+                    f'"{self.package_config.version_update_mask}".'
+                    "\nYou can change the version_update_mask with an empty string "
+                    "to skip this check.",
+                )
 
             self.dg.check_last_commit()
 
