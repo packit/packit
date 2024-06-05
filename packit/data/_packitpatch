@@ -13,6 +13,11 @@ set -eu
 # correct repo is /path/BUILD/<TOP-LEVEL-DIR-IN-ARCHIVE>
 top_level_git_path=$(git rev-parse --show-toplevel)
 second_to_last_dir=$(basename $(dirname ${top_level_git_path}))
+# since rpm 4.20 the actual top level dir is one level deeper
+# /path/BUILD/$NAME-$VERSION-build/<TOP-LEVEL-DIR-IN-ARCHIVE>
+case $second_to_last_dir in *-build)
+    second_to_last_dir=$(basename $(dirname $(dirname ${top_level_git_path})))
+esac
 # we cannot override %__scm_setup_patch b/c it is called from %autosetup
 # and some specs have %setup + %autopatch, so we need to make sure
 # the git repo exists here

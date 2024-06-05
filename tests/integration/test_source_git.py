@@ -551,7 +551,10 @@ def test_srpm_git_am(mock_remote_functionality_sourcegit, api_instance_source_gi
         "malt.patch",
     }
     run_prep_for_srpm(srpm_path)
-    prep_root = sg_path.joinpath("beerware-0.1.0")
+    if (sg_path / "beer-0.1.0-build").is_dir():
+        prep_root = sg_path / "beer-0.1.0-build" / "beerware-0.1.0"
+    else:
+        prep_root = sg_path / "beerware-0.1.0"
     assert prep_root.joinpath("malt").read_text() == "Munich\n"
     assert prep_root.joinpath("hops").read_text() == "Saaz\n"
 
@@ -573,9 +576,9 @@ def test_srpm_git_no_prefix_patches(
         )
         sections.prep[0:2] = [
             "%setup -n %{upstream_name}-%{version}",
-            "%patch1 -p1",
-            "%patch2 -p0",
-            "%patch8 -p1",
+            "%patch -P1 -p1",
+            "%patch -P2 -p0",
+            "%patch -P8 -p1",
         ]
 
     create_patch_mixed_history(sg_path)
