@@ -162,7 +162,24 @@ class SourceGitGenerator:
             )
         if not build_dirs:
             raise RuntimeError(f"No subdirectory found in {path / 'BUILD'}")
-        return build_dirs[0]
+        build_dir = build_dirs[0]
+        # since rpm 4.20 the actual build dir is one level deeper
+        if build_dir.name.endswith("-build"):
+            build_dirs = [
+                d
+                for d in (path / "BUILD" / build_dir).iterdir()
+                if d.is_dir() and d.name != "SPECPARTS"
+            ]
+            if len(build_dirs) > 1:
+                raise RuntimeError(
+                    f"More than one matching directory found in {path / 'BUILD' / build_dir}",
+                )
+            if not build_dirs:
+                raise RuntimeError(
+                    f"No subdirectory found in {path / 'BUILD' / build_dir}",
+                )
+            build_dir = build_dirs[0]
+        return build_dir
 
     def _rebase_patches(self):
         """Rebase current branch against the from_branch."""
