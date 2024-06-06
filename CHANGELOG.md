@@ -1,3 +1,7 @@
+# 0.98.0
+
+- We have fixed the syncing of ACLs for `propose-downtream` for CentOS Stream. (#2318)
+
 # 0.97.1
 
 - We have fixed the behaviour for `dist-git init` command when `upstream-git-url` argument is specified.
