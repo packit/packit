@@ -252,6 +252,7 @@ class PackitAPI:
 
         return self.config.pkg_tool
 
+    # [TODO] Rename to something more reasonable
     def sync_release_env(self, version: Optional[str] = None):
         if self.config.command_handler == RunCommandType.sandcastle:
             exec_dir = Path(self._get_sandcastle_exec_dir())
@@ -274,8 +275,12 @@ class PackitAPI:
             }
         else:
             env = {
-                "PACKIT_DOWNSTREAM_REPO": str(self.dg.local_project.working_dir),
-                "PACKIT_UPSTREAM_REPO": str(self.up.local_project.working_dir),
+                variable_name: str(repo.local_project.working_dir)
+                for variable_name, repo in (
+                    ("PACKIT_DOWNSTREAM_REPO", self.dg),
+                    ("PACKIT_UPSTREAM_REPO", self.up),
+                )
+                if repo._local_project is not None
             }
         if version:
             env["PACKIT_PROJECT_VERSION"] = version
