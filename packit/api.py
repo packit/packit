@@ -252,8 +252,35 @@ class PackitAPI:
 
         return self.config.pkg_tool
 
-    # [TODO] Rename to something more reasonable
-    def sync_release_env(self, version: Optional[str] = None):
+    def common_action_env(self, version: Optional[str] = None) -> dict[str, str]:
+        """
+        Constructs an environment with vairables that are shared across multiple
+        different actions.
+
+        Exposed environment variables:
+        * `PACKIT_UPSTREAM_REPO` — path to the upstream repository, if has been
+          cloned already
+        * `PACKIT_DOWNSTREAM_REPO` — path to the downstream repository, if has
+          been cloned already
+        * `PACKIT_PROJECT_VERSION` — version for `sync-release` environments, if
+          has been provided (see docs/usage for details)
+        * `PACKIT_CONFIG_PACKAGE_NAME` — name of the package in the Packit
+          config
+        * `PACKIT_UPSTREAM_PACKAGE_NAME` — name of the upstream package
+        * `PACKIT_DOWNSTREAM_PACKAGE_NAME` — name of the downstream package
+
+        Args:
+            version: Optional version to be passed to the environment. Defaults
+                to `None` which means that no `PACKIT_PROJECT_VERSION` is
+                exposed to the environment.
+
+        Returns:
+            Dictionary with environment variables that are exposed to the
+            action.
+        """
+        env = {}
+
+        # Add paths to the repositories
         if self.config.command_handler == RunCommandType.sandcastle:
             exec_dir = Path(self._get_sandcastle_exec_dir())
             # working dirs should be placed under
@@ -282,10 +309,15 @@ class PackitAPI:
                 )
                 if repo._local_project is not None
             }
+
+        # Add version, if provided
         if version:
             env["PACKIT_PROJECT_VERSION"] = version
 
-        return env | self.up.package_config.get_package_names_as_env()
+        # Add package names
+        env |= self.up.package_config.get_package_names_as_env()
+
+        return env
 
     def update_dist_git(
         self,
@@ -365,7 +397,7 @@ class PackitAPI:
 
         if self.up.actions_handler.with_action(
             action=ActionName.prepare_files,
-            env=self.sync_release_env(version=version),
+            env=self.common_action_env(version=version),
         ):
             synced_files = self._prepare_files_to_sync(
                 synced_files=synced_files,
@@ -376,7 +408,7 @@ class PackitAPI:
         sync_files(synced_files)
         if upstream_ref and self.up.actions_handler.with_action(
             action=ActionName.create_patches,
-            env=self.sync_release_env(version=version),
+            env=self.common_action_env(version=version),
         ):
             patches = self.up.create_patches(
                 upstream=upstream_ref,
@@ -1050,7 +1082,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             self.up.actions_handler.run_action(
                 actions=ActionName.post_upstream_clone,
-                env=self.sync_release_env(version=version),
+                env=self.common_action_env(version=version),
             )
 
             # compare versions here because users can mangle with specfile in
@@ -1073,7 +1105,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             self.up.actions_handler.run_action(
                 actions=ActionName.pre_sync,
-                env=self.sync_release_env(version=version),
+                env=self.common_action_env(version=version),
             )
             if not use_downstream_specfile:
                 self.up.specfile.reload()
@@ -1117,7 +1149,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     if resolved_bugs
                     else "",
                 }
-                | self.sync_release_env(version),
+                | self.common_action_env(version),
             )
 
             commit_title, commit_description = get_commit_message_from_action(
@@ -1698,7 +1730,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
-            env=self.sync_release_env(),
+            env=self.common_action_env(),
         )
 
         if update_release is None:
@@ -1808,7 +1840,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
-            env=self.sync_release_env(),
+            env=self.common_action_env(),
         )
 
         try:
