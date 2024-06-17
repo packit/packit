@@ -42,6 +42,7 @@ logger = getLogger(__name__)
 class PackitRepositoryBase:
     # mypy complains when this is a property
     local_project: LocalProject
+    _local_project: Optional[LocalProject]
 
     def __init__(
         self,

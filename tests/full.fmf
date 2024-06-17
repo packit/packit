@@ -38,9 +38,37 @@ component:
   - packit
 tier: 1
 tag:
-  - basic
+  - full
 
 test: pytest-3 -v $TEST_TARGET
 duration: 30m
-environment:
-  TEST_TARGET: .
+
+/custom-target:
+  summary: Custom tests
+  description: |
+    Custom tests that are useful for debugging as it is much easier to override
+    the ‹TEST_TARGET› environment variable, disabled in CI as it is split into
+    the separate test suites.
+  tag: manual
+  adjust:
+    - when: initiator != human
+      enabled: false
+      because: "This test suite is for manually specifying the target and to be run locally"
+
+/unit:
+  summary: Unit tests
+  order: 1
+  environment+:
+    TEST_TARGET: unit/
+
+/integration:
+  summary: Integration tests
+  order: 2
+  environment+:
+    TEST_TARGET: integration/
+
+/functional:
+  summary: Functional tests
+  order: 3
+  environment+:
+    TEST_TARGET: functional/

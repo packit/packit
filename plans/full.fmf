@@ -1,6 +1,6 @@
 summary: Unit, integration & functional tests.
 discover+:
-  filter: tier:1
+  filter: tag:full
 adjust:
   - when: "initiator == packit"
     because: "have the latest builds of ogr and specfile available for upstream test jobs"
