@@ -278,37 +278,30 @@ class PackitAPI:
             Dictionary with environment variables that are exposed to the
             action.
         """
-        env = {}
-
         # Add paths to the repositories
+        env = {
+            variable_name: str(repo.local_project.working_dir)
+            for variable_name, repo in (
+                ("PACKIT_DOWNSTREAM_REPO", self.dg),
+                ("PACKIT_UPSTREAM_REPO", self.up),
+            )
+            if repo._local_project is not None
+        }
+
+        # Adjust paths for the sandcastle
         if self.config.command_handler == RunCommandType.sandcastle:
-            exec_dir = Path(self._get_sandcastle_exec_dir())
             # working dirs should be placed under
             # self.config.command_handler_working_dir
             # when running this code as a service
-            downstream_suffix = Path(self.dg.local_project.working_dir).relative_to(
-                self.config.command_handler_work_dir,
-            )
-            upstream_suffix = Path(self.up.local_project.working_dir).relative_to(
-                self.config.command_handler_work_dir,
-            )
-            env = {
-                "PACKIT_DOWNSTREAM_REPO": str(
-                    self.config.command_handler_work_dir / exec_dir / downstream_suffix,
-                ),
-                "PACKIT_UPSTREAM_REPO": str(
-                    self.config.command_handler_work_dir / exec_dir / upstream_suffix,
-                ),
-            }
-        else:
-            env = {
-                variable_name: str(repo.local_project.working_dir)
-                for variable_name, repo in (
-                    ("PACKIT_DOWNSTREAM_REPO", self.dg),
-                    ("PACKIT_UPSTREAM_REPO", self.up),
+
+            exec_dir = Path(self._get_sandcastle_exec_dir())
+            for variable in list(env.keys()):
+                suffix = Path(env[variable]).relative_to(
+                    self.config.command_handler_work_dir,
                 )
-                if repo._local_project is not None
-            }
+                env[variable] = str(
+                    self.config.command_handler_work_dir / exec_dir / suffix,
+                )
 
         # Add version, if provided
         if version:
