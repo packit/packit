@@ -25,7 +25,7 @@ class PkgTool:
         Args:
             fas_username: FAS username (used for cloning)
             directory: operate in this dist-git repository
-            tool: pkgtool to use (fedpkg, centpkg, cbs)
+            tool: pkgtool to use (fedpkg, centpkg, centpkg-sig)
         """
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
@@ -61,15 +61,14 @@ class PkgTool:
             fail=fail,
         ).success
 
-    def sources(self, fail: bool = True) -> str:
+    def sources(self, fail: bool = True) -> bool:
         """Run the 'sources' command
 
         Args:
             fail: Raise an exception if the command fails
 
         Returns:
-            XXX vvv I wonder how is this possible without `output=True` vvv XXX
-            The 'stdout' of the sources command that is executed.
+            True, if the command finished successfully, False otherwise.
         """
         return commands.run_command_remote(
             cmd=[self.tool, "sources"],
