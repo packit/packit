@@ -1,3 +1,7 @@
+# 0.97.3
+
+- We have fixed a bug that caused inconsistency between the promised environment variables (from the docs) and the environment that has been actually provided. Now you should have access to `PACKIT_UPSTREAM_REPO` and `PACKIT_DOWNSTREAM_REPO`, if they have been cloned already, in the `post-upstream-clone` action. (#2327)
+
 # 0.97.2
 
 - We have fixed the syncing of ACLs for `propose-downtream` for CentOS Stream. (#2318)
