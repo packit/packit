@@ -11,6 +11,7 @@ from flexmock import flexmock
 from packit import local_project
 from packit.local_project import (
     CALCULATE,
+    NOT_TO_CALCULATE,
     LocalProject,
     LocalProjectBuilder,
     LocalProjectCalculationState,
@@ -1057,6 +1058,43 @@ def mock_no_parsing(builder: LocalProjectBuilder):
     flexmock(builder).should_receive("_parse_repo_name_from_git_project").never()
     flexmock(builder).should_receive("_parse_namespace_from_git_project").never()
     flexmock(builder).should_receive("_parse_namespace_from_git_url").never()
+
+
+def test_builder_not_calculate_git_repo():
+    cache_path_mock = flexmock(
+        is_dir=lambda: True,
+        iterdir=list,
+        joinpath=lambda x: "/reference/repo/package_name",
+    )
+    repo_cache = RepositoryCache(cache_path=cache_path_mock, add_new=False)
+
+    repo = "package_name"
+    namespace = "my_namespace"
+    git_url = "http://some.example/my_namespace/package_name"
+
+    builder = LocalProjectBuilder(cache=repo_cache)
+    project_mock = (
+        flexmock(service=flexmock(), repo=repo, namespace=namespace)
+        .should_receive("get_git_urls")
+        .and_return({"git": git_url})
+        .mock()
+    )
+    project = builder.build(
+        git_project=project_mock,
+        working_dir=Path(""),
+        git_url=CALCULATE,
+        repo_name=CALCULATE,
+        namespace=CALCULATE,
+        git_repo=NOT_TO_CALCULATE,
+    )
+
+    assert project
+    assert project.git_url == git_url
+    assert project.namespace == namespace
+    assert project.repo_name == repo
+    assert project.git_service
+    assert project.git_project
+    assert not project.git_repo
 
 
 def test_builder_calculate_nothing():
