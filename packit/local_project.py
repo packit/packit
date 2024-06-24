@@ -121,6 +121,10 @@ class LocalProject:
         if refresh:
             self.refresh_the_arguments()
 
+        # skip checkouts if the git repo is not present
+        if not self.git_repo:
+            return
+
         # p-s gives us both, commit hash for a PR and PR ID as well
         # since we want to have 'pr123' in the release field, let's check out
         # the PR itself, so if both are specified, PR ID > ref
@@ -170,12 +174,14 @@ class LocalProject:
         return self._get_ref_from_git_repo() if self.git_repo else None
 
     @property
-    def commit_hexsha(self) -> str:
+    def commit_hexsha(self) -> Optional[str]:
         """
         Get the short commit hash for the current commit.
 
         :return: first 8 characters of the current commit
         """
+        if not self.git_repo:
+            return None
         if self.git_repo.head.is_detached:
             return shorten_commit_hash(self.git_repo.head.commit.hexsha)
         return shorten_commit_hash(self.git_repo.active_branch.commit.hexsha)
