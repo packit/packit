@@ -36,6 +36,7 @@ from packit.config.job_config import (
 )
 from packit.config.notifications import (
     FailureCommentNotificationsConfig,
+    FailureIssueNotificationsConfig,
     NotificationsConfig,
     PullRequestNotificationsConfig,
 )
@@ -186,11 +187,22 @@ class FailureCommentNotificationsSchema(Schema):
         return FailureCommentNotificationsConfig(**data)
 
 
+class FailureIssueNotificationsSchema(Schema):
+    """Configuration of createing issues in upstream."""
+
+    create = fields.Bool(default=True)
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        return FailureIssueNotificationsConfig(**data)
+
+
 class NotificationsSchema(Schema):
     """Configuration of notifications."""
 
     pull_request = fields.Nested(PullRequestNotificationsSchema)
     failure_comment = fields.Nested(FailureCommentNotificationsSchema)
+    failure_issue = fields.Nested(FailureIssueNotificationsSchema)
 
     @post_load
     def make_instance(self, data, **kwargs):
