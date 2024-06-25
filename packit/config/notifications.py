@@ -17,6 +17,13 @@ class FailureCommentNotificationsConfig:
         self.message = message
 
 
+class FailureIssueNotificationsConfig:
+    """Configuration of the failure issue for upstream."""
+
+    def __init__(self, create: bool = True):
+        self.create = create
+
+
 class NotificationsConfig:
     """Configuration of notifications."""
 
@@ -24,6 +31,8 @@ class NotificationsConfig:
         self,
         pull_request: Optional[PullRequestNotificationsConfig] = None,
         failure_comment: Optional[FailureCommentNotificationsConfig] = None,
+        failure_issue: Optional[FailureIssueNotificationsConfig] = None,
     ):
         self.pull_request = pull_request or PullRequestNotificationsConfig()
         self.failure_comment = failure_comment or FailureCommentNotificationsConfig()
+        self.failure_issue = failure_issue or FailureIssueNotificationsConfig()

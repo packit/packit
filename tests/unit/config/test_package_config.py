@@ -1730,6 +1730,7 @@ def test_notifications_section():
         repo_name="package",
     )
     assert not pc.notifications.pull_request.successful_build
+    assert pc.notifications.failure_issue.create
     assert pc.notifications.failure_comment.message is None
 
 
@@ -1743,7 +1744,20 @@ def test_notifications_section_failure_comment_message():
         repo_name="package",
     )
     assert not pc.notifications.pull_request.successful_build
+    assert pc.notifications.failure_issue.create
     assert pc.notifications.failure_comment.message == message
+
+
+def test_notifications_section_failure_issue_create_false():
+    pc = PackageConfig.get_from_dict(
+        {
+            "specfile_path": "package.spec",
+            "notifications": {"failure_issue": {"create": False}},
+        },
+        repo_name="package",
+    )
+    assert not pc.notifications.pull_request.successful_build
+    assert not pc.notifications.failure_issue.create
 
 
 def test_test_command_labels():
