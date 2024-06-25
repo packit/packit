@@ -1,3 +1,6 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
 import xml.etree.ElementTree as ET
 
 import pytest
