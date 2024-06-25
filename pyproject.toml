@@ -56,7 +56,7 @@ dependencies = [
     "rpkg",
     "cachetools",
     "python-fedora",
-    "python-bugzilla"
+    "python-bugzilla",
     "osc"
 ]
 

@@ -232,6 +232,9 @@ def obs(
     package_config: PackageConfig,
     path_or_url,
 ) -> None:
+    """
+    Build selected project in OBS
+    """
     api = get_packit_api(
         config=config,
         package_config=package_config,
@@ -256,6 +259,8 @@ def obs(
         prj_name=prj_name,
         description=description,
     )
+
+    logger.info(f"Using OBS project name = {prj_name}")
 
     url = core.makeurl(_API_URL, ["source", prj_name, "_meta"])
     mf = core.metafile(url, ET.tostring(prj_meta))
