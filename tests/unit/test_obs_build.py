@@ -1,11 +1,8 @@
-# Copyright Contributors to the Packit project.
-# SPDX-License-Identifier: MIT
-
 import xml.etree.ElementTree as ET
 
 import pytest
 
-from packit.cli.builds.obs_build import targets_to_project_meta
+from packit.utils.obs_helper import OBSHelper
 
 _NAME = "home:me:packit"
 _TITLE = "Packit project"
@@ -83,7 +80,7 @@ class TestTargetsToProject:
     ) -> None:
         assert ET.canonicalize(project_meta, strip_text=True) == ET.canonicalize(
             ET.tostring(
-                targets_to_project_meta(
+                OBSHelper.targets_to_project_meta(
                     targets,
                     owner=_PERSON,
                     prj_name=f"home:{_PERSON}:packit",
