@@ -7,7 +7,7 @@ from typing import Optional
 from ogr.parsing import RepoUrl, parse_git_repo
 
 
-@dataclass
+@dataclass(frozen=True)
 class DistGitInstance:
     hostname: str
     alternative_hostname: Optional[str]
