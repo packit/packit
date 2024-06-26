@@ -13,6 +13,7 @@ import logging
 import os
 import re
 import tempfile
+import xml.etree.ElementTree as ET
 from collections.abc import Iterable, Sequence
 from datetime import datetime
 from distutils.dir_util import copy_tree
@@ -29,15 +30,14 @@ from typing import (
 import bugzilla
 import click
 import git
-from osc import conf, core
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
+from osc import conf, core
 from tabulate import tabulate
-import xml.etree.ElementTree as ET
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig, RunCommandType
-from packit.config.aliases import get_branches, DEPRECATED_TARGET_MAP
+from packit.config.aliases import DEPRECATED_TARGET_MAP, get_branches
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -75,10 +75,10 @@ from packit.status import Status
 from packit.sync import SyncFilesItem, sync_files
 from packit.upstream import Upstream
 from packit.utils import commands
-from packit.utils import obs_helper
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
+from packit.utils.obs_helper import OBSHelper
 from packit.utils.repo import (
     commit_exists,
     get_commit_diff,
@@ -92,7 +92,6 @@ from packit.utils.repo import (
     shorten_commit_hash,
 )
 from packit.utils.versions import compare_versions
-from packit.utils.obs_helper import OBSHelper
 from packit.vm_image_build import ImageBuilder
 
 logger = logging.getLogger(__name__)
@@ -241,7 +240,7 @@ class PackitAPI:
                 upstream_local_project=self.upstream_local_project,
             )
         return self._copr_helper
-    
+
     def _get_sandcastle_exec_dir(self):
         # import sandcastle here, we don't want to depend upon
         # sandcastle and python-kube if not in service
@@ -2143,17 +2142,19 @@ The first dist-git commit to be synced is '{short_hash}'.
             return None
 
         return cmd_result.stdout
-    
+
     def create_obs_project(
-            self,
-            project: str,
-            targets: str,
-            owner: Optional[str],
-            package_config: PackageConfig,
-            description: Optional[str]
+        self,
+        project: str,
+        targets: str,
+        owner: Optional[str],
+        package_config: PackageConfig,
+        description: Optional[str],
     ):
         conf.get_config()
-        owner = owner or conf.config["api_host_options"][self.obs_helper._API_URL]["user"]
+        owner = (
+            owner or conf.config["api_host_options"][self.obs_helper._API_URL]["user"]
+        )
         prj_name = project or f"home:{owner}:packit"
 
         targets_list = targets.split(",")
@@ -2186,16 +2187,17 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         return prj_name, pkg_name
 
-    
     def run_obs_build(
-            self,
-            build_dir: str,  # prj_str
-            pkg_name: str,
-            prj_name: str,
-            upstream_ref: Optional[str],
-            wait: bool = False
+        self,
+        build_dir: str,  # prj_str
+        pkg_name: str,
+        prj_name: str,
+        upstream_ref: Optional[str],
+        wait: bool = False,
     ):
-        core.Project.init_project(self.obs_helper._API_URL, (prj_dir := Path(build_dir)), prj_name)
+        core.Project.init_project(
+            self.obs_helper._API_URL, (prj_dir := Path(build_dir)), prj_name,
+        )
 
         (pkg_dir := (prj_dir / pkg_name)).mkdir()
         core.checkout_package(
@@ -2232,8 +2234,9 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         # wait for the build result
         if wait:
-            core.get_results(self.obs_helper._API_URL, prj_name, pkg_name, printJoin="", wait=True)
-
+            core.get_results(
+                self.obs_helper._API_URL, prj_name, pkg_name, printJoin="", wait=True,
+            )
 
     def push_bodhi_update(self, update_alias: str):
         """Push selected bodhi update from testing to stable."""

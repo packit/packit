@@ -1,8 +1,12 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Optional
 
 from osc import core
+
 
 @dataclass(frozen=True)
 class XmlPathEntry:
@@ -62,9 +66,13 @@ class OBSHelper:
 
         if distro == "epel":
             if version == "9":
-                return [XmlPathEntry(project=f"Fedora:EPEL:{version}", repository="stream")]
+                return [
+                    XmlPathEntry(project=f"Fedora:EPEL:{version}", repository="stream"),
+                ]
             if version in ("8", "7"):
-                return [XmlPathEntry(project=f"Fedora:EPEL:{version}", repository="CentOS")]
+                return [
+                    XmlPathEntry(project=f"Fedora:EPEL:{version}", repository="CentOS"),
+                ]
 
         if distro == "opensuse-leap":
             return [
@@ -75,7 +83,9 @@ class OBSHelper:
             if arch == "x86_64":
                 return [XmlPathEntry(project="openSUSE:Factory", repository="snapshot")]
             if arch in ("s390x", "aarch64", "ppc64le"):
-                postfix = {"s390x": "zSystem", "aarch64": "ARM", "ppc64le": "PowerPC"}[arch]
+                postfix = {"s390x": "zSystem", "aarch64": "ARM", "ppc64le": "PowerPC"}[
+                    arch
+                ]
                 return [
                     XmlPathEntry(
                         project=f"openSUSE:Factory:{postfix}",
@@ -84,6 +94,7 @@ class OBSHelper:
                 ]
 
         raise ValueError(f"No preset available for {distro=}, {version=}, {arch=}")
+
     @staticmethod
     def targets_to_project_meta(
         targets: list[str],

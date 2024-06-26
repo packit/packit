@@ -3,8 +3,8 @@
 
 import logging
 import os.path
-from typing import Optional
 from tempfile import TemporaryDirectory
+from typing import Optional
 
 import click
 
@@ -85,7 +85,7 @@ def obs(
         package_config=package_config,
         project=project,
         targets=targets,
-        description=description
+        description=description,
     )
 
     with TemporaryDirectory() as tmp_dir:
@@ -94,5 +94,5 @@ def obs(
             pkg_name=pkg_name,
             prj_name=prj_name,
             wait=wait,
-            upstream_ref=upstream_ref
+            upstream_ref=upstream_ref,
         )
