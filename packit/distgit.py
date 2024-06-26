@@ -200,7 +200,8 @@ class DistGit(PackitRepositoryBase):
         Clone package from dist-git, i.e. from:
         - Fedora's src.[stg.]fedoraproject.org
         - CentOS Stream's gitlab.com/redhat/centos-stream/rpms/
-        depending on configured pkg_tool: {fedpkg(default),fedpkg-stage,centpkg}
+        - CentOS CBS's gitlab.com/CentOS/<SIG>/rpms/
+        depending on configured pkg_tool: {fedpkg(default),fedpkg-stage,centpkg,cbs}
 
         Args:
             target_path: the name of a new directory to clone into
@@ -449,7 +450,7 @@ class DistGit(PackitRepositoryBase):
 
         Args:
             archive: Path to archive to upload to lookaside cache.
-            pkg_tool: Optional, rpkg tool (fedpkg/centpkg) to use to upload.
+            pkg_tool: Optional, rpkg tool (fedpkg/centpkg/cbs) to use to upload.
             offline: Whether to use offline mode of the tool
                      (no actual upload, just local file updates).
 
