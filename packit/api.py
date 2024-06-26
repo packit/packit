@@ -29,9 +29,11 @@ from typing import (
 import bugzilla
 import click
 import git
+from osc import conf, core
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
 from tabulate import tabulate
+import xml.etree.ElementTree as ET
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig, RunCommandType
@@ -73,6 +75,7 @@ from packit.status import Status
 from packit.sync import SyncFilesItem, sync_files
 from packit.upstream import Upstream
 from packit.utils import commands
+from packit.utils import obs_helper
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
@@ -89,6 +92,7 @@ from packit.utils.repo import (
     shorten_commit_hash,
 )
 from packit.utils.versions import compare_versions
+from packit.utils.obs_helper import OBSHelper
 from packit.vm_image_build import ImageBuilder
 
 logger = logging.getLogger(__name__)
@@ -174,6 +178,7 @@ class PackitAPI:
         self._dg: Optional[DistGit] = None
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
+        self.obs_helper = OBSHelper
 
     def __repr__(self):
         return (
@@ -236,7 +241,7 @@ class PackitAPI:
                 upstream_local_project=self.upstream_local_project,
             )
         return self._copr_helper
-
+    
     def _get_sandcastle_exec_dir(self):
         # import sandcastle here, we don't want to depend upon
         # sandcastle and python-kube if not in service
@@ -2138,6 +2143,29 @@ The first dist-git commit to be synced is '{short_hash}'.
             return None
 
         return cmd_result.stdout
+    
+    def run_obs_build(
+            self,
+            build_dir: str,  # prj_str
+            package_name: str,
+            project_name: str,
+            upstream_ref: Optional[str],
+            wait: bool = False
+    ):
+        """
+        Commit a build to the Open Build Service
+        """
+        package_dir = self.obs_helper.init_project(build_dir, package_name, project_name)
+        srpm = self.create_srpm(upstream_ref=upstream_ref, release_suffix="0")
+        self.obs_helper.commit_srpm_and_get_build_results(
+        srpm,
+        project_name,
+        package_name,
+        package_dir,
+        upstream_ref,
+        wait
+        )
+
 
     def push_bodhi_update(self, update_alias: str):
         """Push selected bodhi update from testing to stable."""
