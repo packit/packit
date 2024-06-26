@@ -2196,7 +2196,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         wait: bool = False,
     ):
         core.Project.init_project(
-            self.obs_helper._API_URL, (prj_dir := Path(build_dir)), prj_name,
+            self.obs_helper._API_URL,
+            (prj_dir := Path(build_dir)),
+            prj_name,
         )
 
         (pkg_dir := (prj_dir / pkg_name)).mkdir()
@@ -2235,7 +2237,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         # wait for the build result
         if wait:
             core.get_results(
-                self.obs_helper._API_URL, prj_name, pkg_name, printJoin="", wait=True,
+                self.obs_helper._API_URL,
+                prj_name,
+                pkg_name,
+                printJoin="",
+                wait=True,
             )
 
     def push_bodhi_update(self, update_alias: str):
