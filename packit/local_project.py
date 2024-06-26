@@ -121,6 +121,10 @@ class LocalProject:
         if refresh:
             self.refresh_the_arguments()
 
+        # skip checkouts if the git repo is not present
+        if not self.git_repo:
+            return
+
         # p-s gives us both, commit hash for a PR and PR ID as well
         # since we want to have 'pr123' in the release field, let's check out
         # the PR itself, so if both are specified, PR ID > ref
@@ -170,12 +174,14 @@ class LocalProject:
         return self._get_ref_from_git_repo() if self.git_repo else None
 
     @property
-    def commit_hexsha(self) -> str:
+    def commit_hexsha(self) -> Optional[str]:
         """
         Get the short commit hash for the current commit.
 
         :return: first 8 characters of the current commit
         """
+        if not self.git_repo:
+            return None
         if self.git_repo.head.is_detached:
             return shorten_commit_hash(self.git_repo.head.commit.hexsha)
         return shorten_commit_hash(self.git_repo.active_branch.commit.hexsha)
@@ -622,6 +628,7 @@ class _CalculateType:
 
 
 CALCULATE = _CalculateType()
+NOT_TO_CALCULATE = _CalculateType()
 
 
 T = TypeVar("T")
@@ -660,7 +667,11 @@ class LocalProjectBuilder:
         self._cache = cache
         self.offline = offline
 
-    def _add_prerequisites_to_calculations(self, to_calculate: set[str]) -> None:
+    def _add_prerequisites_to_calculations(
+        self,
+        to_calculate: set[str],
+        not_to_calculate: Optional[set[str]] = None,
+    ) -> None:
         """Adds calculation prerequisites into to_calculate set.
 
         If a caller of this class requests git_repo to be calculated, they should not
@@ -668,6 +679,9 @@ class LocalProjectBuilder:
         calculation set as well.
         """
         logger.debug(f"Attributes requested: {', '.join(to_calculate)}")
+        logger.debug(
+            f"Attributes requested not to be calculated: {', '.join(not_to_calculate)}",
+        )
         dependencies = {}
         change = True
         while change:
@@ -675,6 +689,8 @@ class LocalProjectBuilder:
             for calc in to_calculate.copy():
                 required = set(self.PREREQUISITES.get(calc, []))
                 new_dependencies = required - to_calculate
+                if not_to_calculate:
+                    new_dependencies -= not_to_calculate
                 to_calculate.update(new_dependencies)
                 dependencies.update({calc: dep for dep in new_dependencies})
             change = len(to_calculate) > len_before
@@ -686,6 +702,7 @@ class LocalProjectBuilder:
         self,
         state: LocalProjectCalculationState,
         to_calculate: set[str],
+        not_to_calculate: Optional[set[str]] = None,
     ) -> None:
         """Calculates the requested attributes while also considering transitive relations.
 
@@ -693,7 +710,7 @@ class LocalProjectBuilder:
             state: The initial state which will be updated with new calculated data.
             to_calculate: Set of attributes that need to be calculated.
         """
-        self._add_prerequisites_to_calculations(to_calculate)
+        self._add_prerequisites_to_calculations(to_calculate, not_to_calculate)
         # Remove the already set pieces
         to_calculate = set(filter(lambda a: not getattr(state, a, None), to_calculate))
         logger.debug(f"To-calculate set: {to_calculate}")
@@ -1024,6 +1041,7 @@ class LocalProjectBuilder:
                 )
         """
         to_calculate: set[str] = set()
+        not_to_calculate: set[str] = set()
 
         def check_and_set(
             calc_state: LocalProjectCalculationState,
@@ -1032,6 +1050,8 @@ class LocalProjectBuilder:
         ):
             if value is CALCULATE:
                 to_calculate.add(attr)
+            elif value is NOT_TO_CALCULATE:
+                not_to_calculate.add(attr)
             elif value is not None and value != "":
                 setattr(calc_state, attr, value)
 
@@ -1049,7 +1069,7 @@ class LocalProjectBuilder:
         check_and_set(state, "full_name", full_name)
         check_and_set(state, "namespace", namespace)
         check_and_set(state, "repo_name", repo_name)
-        self._refresh_the_state(state, to_calculate)
+        self._refresh_the_state(state, to_calculate, not_to_calculate)
         # dataclasses.asdict cannot be used because some parts of the calculation state
         # are not deep-copyable (git.Repo and possibly ogr objects). A shallow copy suffices.
         state_dict = {
