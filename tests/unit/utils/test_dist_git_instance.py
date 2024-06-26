@@ -97,7 +97,7 @@ def test_from_url_and_namespace(url: str, namespace: str, expected: DistGitInsta
         ("centpkg", "nispor", "https://gitlab.com/redhat/centos-stream/rpms/nispor"),
         ("fedpkg-stage", "packit", "https://src.stg.fedoraproject.org/rpms/packit"),
         (
-            "cbs-cloud-sig",
+            "centpkg-sig/cloud",
             "hello-world",
             "https://gitlab.com/CentOS/cloud/rpms/hello-world",
         ),
