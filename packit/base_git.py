@@ -589,20 +589,15 @@ class PackitRepositoryBase:
 
     def existing_pr(
         self,
-        title: str,
         target_branch: str,
         source_branch: str,
-        exact_match=True,
     ) -> Optional[PullRequest]:
         """
         Look for an already created PR.
 
         Args:
-            title: Title of the pull request.
-            description: Description of the pull request.
             target_branch: Branch to which the PR is being merged.
             source_branch: Branch from which the changes are being pulled.
-            exact_match: Search for a title exact match?
 
         Return:
             The `PullRequest` object if some existing PR is found, `None`
@@ -613,8 +608,7 @@ class PackitRepositoryBase:
 
         for pr in pull_requests:
             if (
-                (pr.title == title if exact_match else title in pr.title)
-                and pr.target_branch == target_branch
+                pr.target_branch == target_branch
                 and pr.source_branch == source_branch
                 and pr.author == user
             ):

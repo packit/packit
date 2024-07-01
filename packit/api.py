@@ -1180,7 +1180,6 @@ The first dist-git commit to be synced is '{short_hash}'.
                     git_branch=dist_git_branch,
                     repo=self.dg,
                     sync_acls=sync_acls,
-                    pr_title_suffix=version,
                 )
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
@@ -1506,7 +1505,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         git_branch: str,
         repo: Union[Upstream, DistGit],
         sync_acls: bool = False,
-        pr_title_suffix: Optional[str] = "",
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
         try:
@@ -1515,10 +1513,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             logger.error(f"Push to fork failed: {exc}")
             raise
         pr = repo.existing_pr(
-            pr_title.rstrip(f" {pr_title_suffix}"),
             git_branch,
             repo.local_project.ref,
-            exact_match=False,
         )
         if pr is None:
             pr = repo.create_pull(
@@ -1529,8 +1525,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
         else:
             logger.debug(
-                f"PR already exists: {pr.url} updating title"
-                f' "{pr_title}" and description "{pr_description}"',
+                f"PR already exists: {pr.url},"
+                f' updating title ("{pr_title}") and description',
             )
             try:
                 pr.update_info(pr_title, pr_description)
