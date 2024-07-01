@@ -6,12 +6,12 @@ import unittest
 from pathlib import Path
 
 from flexmock import flexmock
-
-from packit.utils.repo import RepositoryCache
 from requre.modules_decorate_all_methods import (
     record_git_module,
     record_tempfile_module,
 )
+
+from packit.utils.repo import RepositoryCache
 
 TEST_PROJECT_URL_TO_CLONE = "https://src.fedoraproject.org/rpms/python-requre.git"
 TEST_PROJECT_NAME = "python-requre"
