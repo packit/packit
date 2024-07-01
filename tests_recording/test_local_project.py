@@ -3,14 +3,14 @@
 
 import distro
 import pytest
-
-from packit.local_project import LocalProject
 from requre.cassette import DataTypes
 from requre.modules_decorate_all_methods import (
     # record_git_module,
     record_requests_module,
     record_tempfile_module,
 )
+
+from packit.local_project import LocalProject
 from tests_recording.testbase import PackitTest
 
 PR_ID = "227"
