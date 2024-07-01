@@ -14,10 +14,9 @@ from packit.local_project import LocalProjectBuilder
 
 
 @pytest.mark.parametrize(
-    "title, target_branch, source_branch, prs, exists",
+    "target_branch, source_branch, prs, exists",
     [
         (
-            "Update",
             "f31",
             "f31-update",
             [
@@ -32,7 +31,6 @@ from packit.local_project import LocalProjectBuilder
             True,
         ),
         (
-            "Update",
             "f32",
             "f31-update",
             [
@@ -47,7 +45,6 @@ from packit.local_project import LocalProjectBuilder
             False,
         ),
         (
-            "Update",
             "f31",
             "f31-update",
             [
@@ -62,7 +59,6 @@ from packit.local_project import LocalProjectBuilder
             False,
         ),
         (
-            "Update",
             "f31",
             "f32-update",
             [
@@ -78,7 +74,7 @@ from packit.local_project import LocalProjectBuilder
         ),
     ],
 )
-def test_existing_pr(git_repo_mock, title, target_branch, source_branch, prs, exists):
+def test_existing_pr(git_repo_mock, target_branch, source_branch, prs, exists):
     user_mock = flexmock().should_receive("get_username").and_return("packit").mock()
     local_project = LocalProjectBuilder().build(
         git_project=flexmock(service="something", get_pr_list=lambda: prs),
@@ -92,7 +88,7 @@ def test_existing_pr(git_repo_mock, title, target_branch, source_branch, prs, ex
         ),
         local_project=local_project,
     )
-    pr = distgit.existing_pr(title, target_branch, source_branch)
+    pr = distgit.existing_pr(target_branch, source_branch)
     if exists:
         assert pr is not None
     else:

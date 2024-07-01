@@ -337,7 +337,6 @@ def test_sync_release_check_pr_instructions(api_mock):
         git_branch=str,
         repo=DistGit,
         sync_acls=False,
-        pr_title_suffix=str,
     ).and_return(flexmock())
     api_mock.sync_release(
         versions=["1.1"],
