@@ -40,7 +40,7 @@ class PackageConfig(MultiplePackages):
         jobs: Optional[list[JobConfig]] = None,
     ):
         self._job_views: list[Union[JobConfig, JobConfigView]] = []
-        self._package_config_views: dict[str, "PackageConfigView"] = {}
+        self._package_config_views: dict[str, PackageConfigView] = {}
         self._raw_dict_with_defaults: Optional[dict] = None
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
@@ -70,7 +70,7 @@ class PackageConfig(MultiplePackages):
             default_specfile_path = None
             # we default to <downstream_package_name>.spec
             # https://packit.dev/docs/configuration/#specfile_path
-            if downstream_package_name := raw_dict.get("downstream_package_name", None):
+            if downstream_package_name := raw_dict.get("downstream_package_name"):
                 default_specfile_path = f"{downstream_package_name}.spec"
             elif search_specfile:
                 default_specfile_path = search_specfile(**specfile_search_args)
@@ -97,7 +97,7 @@ class PackageConfig(MultiplePackages):
         # we need to process defaults first so they get propagated to JobConfigs
         raw_dict.setdefault("config_file_path", config_file_path)
 
-        if packages := raw_dict.get("packages", None):
+        if packages := raw_dict.get("packages"):
             for package in packages.values():
                 up_url_key = "upstream_project_url"
                 if up_url_key in raw_dict:
@@ -139,7 +139,7 @@ class PackageConfig(MultiplePackages):
         if not package_config:
             return None
 
-        package_config_views: dict[str, "PackageConfigView"] = {}
+        package_config_views: dict[str, PackageConfigView] = {}
         for name, package in package_config.packages.items():
             # filter out job data for the package
             jobs = [
