@@ -1083,5 +1083,6 @@ class LocalProjectBuilder:
             merge_pr=merge_pr,
             target_branch=target_branch,
             refresh=False,
+            cache=self._cache,
             **state_dict,
         )
