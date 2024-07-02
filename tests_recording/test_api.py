@@ -119,7 +119,7 @@ class ProposeUpdate(PackitTest):
             f"cd {self.lp.working_dir};"
             f"rpmdev-bumpspec {self._project_specfile_path};"
             f"rpmdev-bumpspec {self._project_specfile_path};"
-            f"git commit -m 'test change' {self._project_specfile_path}",
+            f"git commit --no-verify -m 'test change' {self._project_specfile_path}",
             shell=True,
         )
         changed_upstream_spec_content = self.api.up.absolute_specfile_path.read_text()

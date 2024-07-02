@@ -102,6 +102,7 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
         download_upstream_archives=lambda: ["the-archive"],
     )
     pr = flexmock(url="https://example.com/pull/1")
+    pr.should_receive("update_info").and_return()
     flexmock(DistGit).should_receive("existing_pr").and_return(pr)
 
     pc = get_local_package_config(str(upstream_path))
