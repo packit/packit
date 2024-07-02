@@ -13,6 +13,7 @@ import logging
 import os
 import re
 import tempfile
+import xml.etree.ElementTree as ET
 from collections.abc import Iterable, Sequence
 from datetime import datetime
 from distutils.dir_util import copy_tree
@@ -31,11 +32,12 @@ import click
 import git
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
+from osc import conf, core
 from tabulate import tabulate
 
 from packit.actions import ActionName
 from packit.config import Config, PackageConfig, RunCommandType
-from packit.config.aliases import get_branches
+from packit.config.aliases import DEPRECATED_TARGET_MAP, get_branches
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
@@ -76,6 +78,7 @@ from packit.utils import commands
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
+from packit.utils.obs_helper import OBSHelper
 from packit.utils.repo import (
     commit_exists,
     get_commit_diff,
@@ -174,6 +177,7 @@ class PackitAPI:
         self._dg: Optional[DistGit] = None
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
+        self.obs_helper = OBSHelper
 
     def __repr__(self):
         return (
@@ -2138,6 +2142,107 @@ The first dist-git commit to be synced is '{short_hash}'.
             return None
 
         return cmd_result.stdout
+
+    def create_obs_project(
+        self,
+        project: str,
+        targets: str,
+        owner: Optional[str],
+        package_config: PackageConfig,
+        description: Optional[str],
+    ):
+        conf.get_config()
+        owner = (
+            owner or conf.config["api_host_options"][self.obs_helper._API_URL]["user"]
+        )
+        prj_name = project or f"home:{owner}:packit"
+
+        targets_list = targets.split(",")
+        for target in targets_list:
+            if target in DEPRECATED_TARGET_MAP:
+                logger.warning(
+                    f"Target '{target}' is deprecated. "
+                    f"Please use '{DEPRECATED_TARGET_MAP[target]}' instead.",
+                )
+
+        prj_meta = self.obs_helper.targets_to_project_meta(
+            targets=targets_list,
+            owner=owner,
+            prj_name=prj_name,
+            description=description,
+        )
+
+        logger.info(f"Using OBS project name = {prj_name}")
+
+        url = core.makeurl(self.obs_helper._API_URL, ["source", prj_name, "_meta"])
+        mf = core.metafile(url, ET.tostring(prj_meta))
+        mf.sync()
+
+        pkg_names = list(package_config.packages.keys())
+
+        if len(pkg_names) != 1:
+            raise ValueError("Cannot handle multiple packages in package_config")
+
+        self.obs_helper.create_package(prj_name, (pkg_name := pkg_names[0]))
+
+        return prj_name, pkg_name
+
+    def run_obs_build(
+        self,
+        build_dir: str,  # prj_str
+        pkg_name: str,
+        prj_name: str,
+        upstream_ref: Optional[str],
+        wait: bool = False,
+    ):
+        core.Project.init_project(
+            self.obs_helper._API_URL,
+            (prj_dir := Path(build_dir)),
+            prj_name,
+        )
+
+        (pkg_dir := (prj_dir / pkg_name)).mkdir()
+        core.checkout_package(
+            self.obs_helper._API_URL,
+            prj_name,
+            pkg_name,
+            prj_dir=prj_dir,
+            pathname=pkg_dir,
+        )
+
+        pkg = core.Package(pkg_dir)
+
+        for fname in filter(os.path.isfile, os.listdir(pkg_dir)):
+            pkg.delete_file(fname)
+
+        srpm = self.create_srpm(upstream_ref=upstream_ref, release_suffix="0")
+
+        # don't use the files argument of unpack_srcrpm, it allows for shell
+        # injection unless sanitized carefully
+        core.unpack_srcrpm(str(srpm), pkg_dir)
+
+        core.addFiles(
+            [
+                str(pkg_dir / fname)
+                for fname in filter(os.path.isfile, os.listdir(pkg_dir))
+            ],
+        )
+
+        pkg = core.Package(pkg_dir)
+        msg = "Created by packit"
+        if upstream_ref:
+            msg += f" from upstream revision {upstream_ref}"
+        pkg.commit(msg=msg)
+
+        # wait for the build result
+        if wait:
+            core.get_results(
+                self.obs_helper._API_URL,
+                prj_name,
+                pkg_name,
+                printJoin="",
+                wait=True,
+            )
 
     def push_bodhi_update(self, update_alias: str):
         """Push selected bodhi update from testing to stable."""
