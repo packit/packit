@@ -73,6 +73,9 @@ def obs(
 ) -> None:
     """
     Build selected project in OBS
+
+    Before Running this command, your opensuse user account and password needs to be
+    configured in osc configuration file /root/.config/osc/oscrc. This can be done by running `osc`.
     """
     api = get_packit_api(
         config=config,
