@@ -1,3 +1,7 @@
+# 0.98.0
+
+- Packit now updates its own, not yet merged, pull requests instead of creating new ones for new releases. (#2204)
+
 # 0.97.3
 
 - We have fixed a bug that caused inconsistency between the promised environment variables (from the docs) and the environment that has been actually provided. Now you should have access to `PACKIT_UPSTREAM_REPO` and `PACKIT_DOWNSTREAM_REPO`, if they have been cloned already, in the `post-upstream-clone` action. (#2327)
