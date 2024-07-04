@@ -47,30 +47,10 @@ DISTGIT_INSTANCES = {
         alternative_hostname=None,
         namespace="redhat/centos-stream/rpms",
     ),
-    "centpkg-sig/automotive": DistGitInstance(
+    "centpkg-sig": DistGitInstance(
         hostname="gitlab.com",
         alternative_hostname=None,
-        namespace="CentOS/automotive/rpms",
-    ),
-    "centpkg-sig/cloud": DistGitInstance(
-        hostname="gitlab.com",
-        alternative_hostname=None,
-        namespace="CentOS/cloud/rpms",
-    ),
-    "centpkg-sig/storage": DistGitInstance(
-        hostname="gitlab.com",
-        alternative_hostname=None,
-        namespace="CentOS/storage/rpms",
-    ),
-    "centpkg-sig/isa": DistGitInstance(
-        hostname="gitlab.com",
-        alternative_hostname=None,
-        namespace="CentOS/isa/rpms",
-    ),
-    "centpkg-sig/kmods": DistGitInstance(
-        hostname="gitlab.com",
-        alternative_hostname=None,
-        namespace="CentOS/kmods/rpms",
+        namespace="CentOS/{sig}/rpms",
     ),
 }
 
