@@ -91,17 +91,29 @@ def test_from_url_and_namespace(url: str, namespace: str, expected: DistGitInsta
 
 
 @pytest.mark.parametrize(
-    "pkg_tool, package, expected_url",
+    "dg_instance, package, expected_url",
     (
-        ("fedpkg", "packit", "https://src.fedoraproject.org/rpms/packit"),
-        ("centpkg", "nispor", "https://gitlab.com/redhat/centos-stream/rpms/nispor"),
-        ("fedpkg-stage", "packit", "https://src.stg.fedoraproject.org/rpms/packit"),
         (
-            "centpkg-sig/cloud",
+            DISTGIT_INSTANCES["fedpkg"],
+            "packit",
+            "https://src.fedoraproject.org/rpms/packit",
+        ),
+        (
+            DISTGIT_INSTANCES["centpkg"],
+            "nispor",
+            "https://gitlab.com/redhat/centos-stream/rpms/nispor",
+        ),
+        (
+            DISTGIT_INSTANCES["fedpkg-stage"],
+            "packit",
+            "https://src.stg.fedoraproject.org/rpms/packit",
+        ),
+        (
+            DISTGIT_INSTANCES["centpkg-sig"].for_sig("cloud"),
             "hello-world",
             "https://gitlab.com/CentOS/cloud/rpms/hello-world",
         ),
     ),
 )
-def test_distgit_project_url_from_dg_constant(pkg_tool, package, expected_url):
-    assert DISTGIT_INSTANCES[pkg_tool].distgit_project_url(package) == expected_url
+def test_project_url_from_dg_instance(dg_instance, package, expected_url):
+    assert dg_instance.distgit_project_url(package=package) == expected_url
