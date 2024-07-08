@@ -160,6 +160,10 @@ class CommonPackageConfig:
             the corresponding macro.
         status_name_template: Template for configurable names for status checks.
         sidetag_group: Sidetag group identifier for downstream Koji builds and Bodhi updates.
+        dependents: Packages that depend on this downstream Koji build to be tagged into
+            a particular sidetag group.
+        dependencies: Packages whose downstream Koji builds are required to be tagged into
+            a particular sidetag group by this downstream Koji build or Bodhi update.
     """
 
     def __init__(
@@ -241,6 +245,8 @@ class CommonPackageConfig:
         require: Optional[RequirementsConfig] = None,
         status_name_template: Optional[str] = None,
         sidetag_group: Optional[str] = None,
+        dependents: Optional[list[str]] = None,
+        dependencies: Optional[list[str]] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -355,6 +361,8 @@ class CommonPackageConfig:
         self.parse_time_macros = parse_time_macros or {}
 
         self.sidetag_group = sidetag_group
+        self.dependents: list[str] = dependents or []
+        self.dependencies: list[str] = dependencies or []
 
     @property
     def dist_git_base_url(self) -> str:
