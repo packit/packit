@@ -132,6 +132,27 @@ def test_get_builds_in_tag(error):
     "error",
     [False, True],
 )
+def test_get_build_info(error):
+    info = {"id": 123456, "name": "test", "nvr": "test-1.0-1.fc39"}
+
+    def getBuild(*_, **__):
+        if error:
+            raise Exception
+        return info
+
+    session = flexmock(getBuild=getBuild)
+    for build in [123456, "test-1.0-1.fc39"]:
+        result = KojiHelper(session).get_build_info(build)
+        if error:
+            assert result is None
+        else:
+            assert result == info
+
+
+@pytest.mark.parametrize(
+    "error",
+    [False, True],
+)
 def test_get_tag_info(error):
     info = {"name": "f39-build-side-12345", "id": 12345}
 
