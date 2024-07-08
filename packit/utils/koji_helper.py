@@ -3,7 +3,7 @@
 
 import logging
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, Union
 
 import koji
 from specfile.changelog import ChangelogEntry
@@ -176,6 +176,23 @@ class KojiHelper:
             logger.debug(f"Failed to get builds tagged into {tag} from Koji: {e}")
             return []
         return builds
+
+    def get_build_info(self, build: Union[int, str]) -> Optional[dict]:
+        """
+        Gets build information.
+
+        Args:
+            build: Koji build ID or NVR.
+
+        Returns:
+            Build information or None if there is no such build.
+        """
+        try:
+            info = self.session.getBuild(build)
+        except Exception as e:
+            logger.debug(f"Failed to get build info of {build} from Koji: {e}")
+            return None
+        return info
 
     def get_tag_info(self, tag: str) -> Optional[dict]:
         """
