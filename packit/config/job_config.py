@@ -27,6 +27,7 @@ class JobType(Enum):
     tests = "tests"
     bodhi_update = "bodhi_update"
     vm_image_build = "vm_image_build"
+    koji_build_tag = "koji_build_tag"
 
 
 DEPRECATED_JOB_TYPES = {
@@ -48,6 +49,7 @@ class JobConfigTriggerType(Enum):
     release = "release"
     pull_request = "pull_request"
     commit = "commit"
+    koji_build = "koji_build"
     ignore = "ignore"
 
 
