@@ -450,9 +450,6 @@ class CommonConfigSchema(Schema):
 
     parse_time_macros = fields.Dict(missing=None)
 
-    # sidetag group identifier for downstream Koji builds and Bodhi updates
-    sidetag_group = fields.String(missing=None)
-
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id
@@ -525,6 +522,17 @@ class JobConfigSchema(Schema):
         values=fields.Nested(CommonConfigSchema()),
     )
     package = fields.String(missing=None)
+
+    # sidetag group identifier for downstream Koji builds and Bodhi updates
+    sidetag_group = fields.String(missing=None)
+
+    # packages that depend on this downstream Koji build to be tagged into
+    # a particular sidetag group
+    dependents = fields.List(fields.String(), missing=None)
+
+    # packages whose downstream Koji builds are required to be tagged into
+    # a particular sidetag group by this downstream Koji build or Bodhi update
+    dependencies = fields.List(fields.String(), missing=None)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
