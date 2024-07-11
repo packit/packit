@@ -70,6 +70,9 @@ class JobConfig(MultiplePackages):
         skip_build: bool = False,
         manual_trigger: bool = False,
         labels: Optional[list[str]] = None,
+        sidetag_group: Optional[str] = None,
+        dependents: Optional[list[str]] = None,
+        dependencies: Optional[list[str]] = None,
     ):
         super().__init__(packages)
         # Directly manipulating __dict__ is not recommended.
@@ -81,6 +84,9 @@ class JobConfig(MultiplePackages):
         self.__dict__["skip_build"] = skip_build
         self.__dict__["manual_trigger"] = manual_trigger
         self.__dict__["labels"] = labels
+        self.__dict__["sidetag_group"] = sidetag_group
+        self.__dict__["dependents"] = dependents
+        self.__dict__["dependencies"] = dependencies
 
         # Data for a JobConfigView:
         # a JobConfigView is seraialized/deserialized as a JobConfig
@@ -135,6 +141,9 @@ class JobConfigView(JobConfig):
             job_config.skip_build,
             job_config.manual_trigger,
             job_config.labels,
+            job_config.sidetag_group,
+            job_config.dependents,
+            job_config.dependencies,
         )
         self.__dict__["_view_for_package"] = package
 
