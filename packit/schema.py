@@ -642,6 +642,7 @@ class PackageConfigSchema(Schema):
         # in the config.
         data = self.rearrange_packages(data)
         data = self.rearrange_jobs(data)
+        data = self.process_job_triggers(data)
         logger.debug(f"Repo config after pre-loading:\n{json.dumps(data, indent=4)}")
         return data
 
@@ -787,6 +788,30 @@ class PackageConfigSchema(Schema):
             # as the process doesn't even get to the validation phase.
             raise ValidationError(errors)
 
+        return data
+
+    @staticmethod
+    def process_job_triggers(data: dict) -> dict:
+        """
+        Expands jobs with multiple triggers.
+
+        For example a job with `trigger: commit | koji_build` will be expanded into two jobs
+        with the same options except for `trigger`; the first one will have `trigger: commit`
+        and the second one will have `trigger: koji_build`.
+        """
+        jobs = data["jobs"]
+        i = len(jobs) - 1
+        while i >= 0:
+            triggers = [t.strip() for t in jobs[i].get("trigger", "").split("|")]
+            if len(triggers) <= 1:
+                i -= 1
+                continue
+            original_job = jobs.pop(i)
+            for trigger in reversed(triggers):
+                job = copy.deepcopy(original_job)
+                job["trigger"] = trigger
+                jobs.insert(i, job)
+            i -= 1
         return data
 
     @post_load
