@@ -1270,6 +1270,58 @@ def test_package_config_parse_error(raw):
             ),
             id="vm-image-build",
         ),
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "koji_build",
+                        "trigger": "commit | koji_build",
+                        "sidetag_group": "test",
+                        "dependencies": ["some-package"],
+                        "dist_git_branches": ["fedora-all"],
+                    },
+                ],
+            },
+            PackageConfig(
+                packages={
+                    "package": CommonPackageConfig(
+                        downstream_package_name="package",
+                        specfile_path="fedora/package.spec",
+                    ),
+                },
+                jobs=[
+                    JobConfig(
+                        type=JobType.koji_build,
+                        trigger=JobConfigTriggerType.commit,
+                        sidetag_group="test",
+                        dependencies=["some-package"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                downstream_package_name="package",
+                                specfile_path="fedora/package.spec",
+                                dist_git_branches=["fedora-all"],
+                            ),
+                        },
+                    ),
+                    JobConfig(
+                        type=JobType.koji_build,
+                        trigger=JobConfigTriggerType.koji_build,
+                        sidetag_group="test",
+                        dependencies=["some-package"],
+                        packages={
+                            "package": CommonPackageConfig(
+                                downstream_package_name="package",
+                                specfile_path="fedora/package.spec",
+                                dist_git_branches=["fedora-all"],
+                            ),
+                        },
+                    ),
+                ],
+            ),
+            id="koji_build_with_multiple_triggers",
+        ),
     ],
 )
 def test_package_config_parse(raw, expected):
