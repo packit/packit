@@ -1,3 +1,6 @@
+# 0.99.0
+
+
 # 0.98.0
 
 - Packit now updates its own, not yet merged, pull requests instead of creating new ones for new releases. (#2204)
