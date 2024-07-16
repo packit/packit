@@ -27,7 +27,7 @@ from packit.constants import FROM_SOURCE_GIT_TOKEN
 from packit.distgit import DistGit
 from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.pkgtool import PkgTool
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 from tests.integration.utils import remove_gpg_key_pair
@@ -176,7 +176,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
 
 @pytest.fixture()
 def mock_patching():
-    flexmock(Upstream).should_receive("create_patches").and_return(["patches"])
+    flexmock(GitUpstream).should_receive("create_patches").and_return(["patches"])
     flexmock(DistGit).should_receive("specfile_add_patches").with_args(["patches"])
 
 
@@ -266,7 +266,7 @@ def upstream_instance(upstream_and_remote, tmp_path):
         pc.upstream_project_url = str(u)
         lp = LocalProjectBuilder().build(working_dir=u, git_repo=CALCULATE)
 
-        ups = Upstream(c, pc, lp)
+        ups = GitUpstream(c, pc, lp)
         yield u, ups
 
 

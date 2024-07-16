@@ -43,7 +43,7 @@ from packit.utils.versions import compare_versions
 logger = logging.getLogger(__name__)
 
 
-class Upstream(PackitRepositoryBase):
+class GitUpstream(PackitRepositoryBase):
     """interact with upstream project"""
 
     def __init__(
@@ -110,7 +110,7 @@ class Upstream(PackitRepositoryBase):
         if self._command_handler is None:
             self._command_handler = self.handler_kls(
                 # so that the local_project is evaluated only when needed
-                local_project=Proxy(partial(Upstream.local_project.__get__, self)),  # type: ignore
+                local_project=Proxy(partial(GitUpstream.local_project.__get__, self)),  # type: ignore
                 config=self.config,
             )
         return self._command_handler
@@ -770,7 +770,7 @@ class Upstream(PackitRepositoryBase):
                 f"The `rpmbuild` command failed:\n{ex}",
             ) from ex
 
-        rpms = Upstream._get_rpms_from_rpmbuild_output(out)
+        rpms = GitUpstream._get_rpms_from_rpmbuild_output(out)
         return [Path(rpm) for rpm in rpms]
 
     def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> list[Path]:
@@ -959,7 +959,7 @@ class Upstream(PackitRepositoryBase):
 class SRPMBuilder:
     def __init__(
         self,
-        upstream: Upstream,
+        upstream: GitUpstream,
         srpm_path: Union[Path, str, None] = None,
         srpm_dir: Union[Path, str, None] = None,
         ref: Optional[str] = None,
@@ -1211,7 +1211,7 @@ class SRPMBuilder:
 
 
 class Archive:
-    def __init__(self, upstream: Upstream, version: Optional[str] = None) -> None:
+    def __init__(self, upstream: GitUpstream, version: Optional[str] = None) -> None:
         """
         Creates an instance of `Archive`.
 

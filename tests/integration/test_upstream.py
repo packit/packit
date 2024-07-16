@@ -21,7 +21,7 @@ from packit.actions import ActionName
 from packit.config import Config, get_local_package_config
 from packit.exceptions import PackitSRPMException
 from packit.local_project import LocalProjectBuilder
-from packit.upstream import Archive, SRPMBuilder, Upstream
+from packit.upstream import Archive, GitUpstream, SRPMBuilder
 from packit.utils.commands import cwd
 from packit.utils.repo import create_new_repo
 from tests.spellbook import (
@@ -121,7 +121,7 @@ def test_get_version_no_version_tag(tmp_path):
         pc.upstream_project_url = str(u)
         lp = LocalProjectBuilder().build(working_dir=u)
 
-        ups = Upstream(c, pc, lp)
+        ups = GitUpstream(c, pc, lp)
 
     assert ups.get_specfile_version() == "2.1.1"
 
@@ -154,7 +154,7 @@ def test_set_spec_macro_source(tmp_path):
         pc.upstream_project_url = str(u)
         lp = LocalProjectBuilder().build(working_dir=u)
 
-        ups = Upstream(c, pc, lp)
+        ups = GitUpstream(c, pc, lp)
 
     expected_sources = ups.specfile.sources
     new_ver = "1.2.3"
@@ -189,7 +189,7 @@ def test_set_spec_ver_empty_changelog(tmp_path):
         pc.upstream_project_url = str(u)
         lp = LocalProjectBuilder().build(working_dir=u)
 
-        ups = Upstream(c, pc, lp)
+        ups = GitUpstream(c, pc, lp)
 
     new_ver = "1.2.3"
     ups.specfile.version = new_ver

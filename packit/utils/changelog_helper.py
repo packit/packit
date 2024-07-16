@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ChangelogHelper:
     def __init__(
         self,
-        upstream: "packit.upstream.Upstream",
+        upstream: "packit.upstream.GitUpstream",
         downstream: Optional[DistGit] = None,
         package_config: Optional[MultiplePackages] = None,
     ) -> None:

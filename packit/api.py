@@ -72,7 +72,7 @@ from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
 from packit.sync import SyncFilesItem, sync_files
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from packit.utils import commands
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
@@ -171,7 +171,7 @@ class PackitAPI:
         self.stage = stage
         self._dist_git_clone_path: Optional[str] = dist_git_clone_path
 
-        self._up: Optional[Upstream] = None
+        self._up: Optional[GitUpstream] = None
         self._dg: Optional[DistGit] = None
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
@@ -190,9 +190,9 @@ class PackitAPI:
         )
 
     @property
-    def up(self) -> Upstream:
+    def up(self) -> GitUpstream:
         if self._up is None:
-            self._up = Upstream(
+            self._up = GitUpstream(
                 config=self.config,
                 package_config=self.package_config,
                 local_project=checkout_package_workdir(
@@ -1503,7 +1503,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_title: str,
         pr_description: str,
         git_branch: str,
-        repo: Union[Upstream, DistGit],
+        repo: Union[GitUpstream, DistGit],
         sync_acls: bool = False,
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
@@ -2360,7 +2360,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 f"The `mock` command failed:\n{ex}",
             ) from ex
 
-        rpms = Upstream._get_rpms_from_mock_output(cmd_result.stderr)
+        rpms = GitUpstream._get_rpms_from_mock_output(cmd_result.stderr)
         return [Path(rpm) for rpm in rpms]
 
     def submit_vm_image_build(
