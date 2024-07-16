@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+import tempfile
 from os import getenv
 from pathlib import Path
 from typing import Optional, Union
@@ -25,9 +26,16 @@ class CommandHandler:
 
     name: RunCommandType
 
-    def __init__(self, local_project: LocalProject, config: Config):
+    def __init__(self, config: Config, local_project: Optional[LocalProject] = None):
         self.local_project = local_project
         self.config = config
+
+    @property
+    def working_dir(self) -> Union[str, Path]:
+        if self.local_project:
+            return self.local_project.working_dir
+
+        return tempfile.mkdtemp()
 
     def run_command(
         self,
@@ -88,7 +96,7 @@ class LocalCommandHandler(CommandHandler):
     ) -> commands.CommandResult:
         return commands.run_command(
             cmd=command,
-            cwd=cwd or self.local_project.working_dir,
+            cwd=cwd or self.working_dir,
             output=return_output,
             env=env,
             print_live=print_live,
@@ -107,7 +115,7 @@ class SandcastleCommandHandler(CommandHandler):
 
     name = RunCommandType.sandcastle
 
-    def __init__(self, local_project: LocalProject, config: Config):
+    def __init__(self, config: Config, local_project: Optional[LocalProject] = None):
         super().__init__(local_project=local_project, config=config)
         self.local_project = local_project
         self.config = config
@@ -142,7 +150,10 @@ class SandcastleCommandHandler(CommandHandler):
                     # Do not mount repository cache when it's not used
                     self.config.repository_cache
                     and vol_spec_dict.get("path") == self.config.repository_cache
-                    and not self.local_project.cache.projects_cloned_using_cache
+                    and not (
+                        self.local_project
+                        and self.local_project.cache.projects_cloned_using_cache
+                    )
                 )
             ]
 
@@ -181,7 +192,7 @@ class SandcastleCommandHandler(CommandHandler):
     ) -> commands.CommandResult:
         from sandcastle.exceptions import SandcastleCommandFailed
 
-        cwd = cwd or Path(self.local_project.working_dir).relative_to(
+        cwd = cwd or Path(self.working_dir).relative_to(
             self.config.command_handler_work_dir,
         )
         logger.info(f"Running command: {' '.join(command)} on dir {cwd}")
