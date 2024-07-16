@@ -253,6 +253,7 @@ def get_packit_api(
     dist_git_path: Optional[str] = None,
     job_config_index: Optional[int] = None,
     job_type: Optional[JobType] = None,
+    check_for_non_git_upstream: Optional[bool] = False,
 ) -> PackitAPI:
     """
     Load the package config, set other options and return the PackitAPI
@@ -265,6 +266,13 @@ def get_packit_api(
             try_local_dir_last=True,
             package_config_path=config.package_config_path,
         )
+
+    if check_for_non_git_upstream and package_config.upstream_project_url is None:
+        logger.debug("Upstream will be treated as non-git.")
+        non_git_upstream = True
+    else:
+        non_git_upstream = False
+
     logger.debug(f"job_config_index: {job_config_index}")
     if job_config_index is not None and isinstance(package_config, PackageConfig):
         if job_config_index >= len(package_config.jobs):
@@ -291,6 +299,7 @@ def get_packit_api(
             upstream_local_project=None,
             downstream_local_project=local_project,
             dist_git_clone_path=dist_git_path,
+            non_git_upstream=non_git_upstream,
         )
 
     if not local_project.git_repo:
@@ -342,6 +351,7 @@ def get_packit_api(
         upstream_local_project=lp_upstream,
         downstream_local_project=lp_downstream,
         dist_git_clone_path=dist_git_path,
+        non_git_upstream=non_git_upstream,
     )
 
 
