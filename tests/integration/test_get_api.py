@@ -11,6 +11,7 @@ from packit.config import CommonPackageConfig, JobConfig
 from packit.config.job_config import JobConfigTriggerType, JobType
 from packit.constants import DISTGIT_INSTANCES
 from packit.local_project import CALCULATE, LocalProjectBuilder
+from packit.upstream import NonGitUpstream
 from tests.spellbook import get_test_config, initiate_git_repo
 
 
@@ -223,3 +224,39 @@ def test_get_api(tmp_path, remotes, package_config, is_upstream):
         flexmock(PackitAPI).should_receive("init_kerberos_ticket").once()
         assert api.downstream_local_project
         assert api.dg
+
+
+def test_get_api_non_git_upstream(tmp_path):
+    repo = tmp_path / "project_repo"
+    repo.mkdir(parents=True, exist_ok=True)
+    initiate_git_repo(
+        repo,
+        remotes=[
+            ("origin", "https://src.fedoraproject.org/fork/user/rpms/python-ogr.git"),
+        ],
+    )
+
+    flexmock(utils).should_receive("get_local_package_config").and_return(
+        JobConfig(
+            type=JobType.pull_from_upstream,
+            trigger=JobConfigTriggerType.release,
+            packages={
+                "package": CommonPackageConfig(
+                    dist_git_base_url=DISTGIT_INSTANCES["fedpkg"].url,
+                    dist_git_namespace=DISTGIT_INSTANCES["fedpkg"].namespace,
+                ),
+            },
+        ),
+    )
+
+    c = get_test_config()
+    api = get_packit_api(
+        config=c,
+        local_project=LocalProjectBuilder().build(
+            working_dir=str(repo),
+            git_repo=CALCULATE,
+        ),
+        check_for_non_git_upstream=True,
+    )
+
+    assert isinstance(api.up, NonGitUpstream)
