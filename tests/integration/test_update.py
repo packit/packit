@@ -14,7 +14,7 @@ from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
 
@@ -401,7 +401,9 @@ def test_local_update_generated_spec(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(Upstream).should_receive("get_latest_released_version").and_return("0.1.0")
+    flexmock(GitUpstream).should_receive("get_latest_released_version").and_return(
+        "0.1.0",
+    )
 
     # Simulate generation by moving the spec to a different location
     # We are checking two things:

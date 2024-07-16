@@ -5,7 +5,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.exceptions import PackitException
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 
 
 def test_synch_push_and_up_repo_dirty(
@@ -66,11 +66,11 @@ def test_synch_push_one_commit(
 ):
     """Update upstream if dist-git has a new commit"""
 
-    flexmock(Upstream).should_receive("push_to_fork").and_return(
+    flexmock(GitUpstream).should_receive("push_to_fork").and_return(
         "main",
         "packit.dev",
     ).once()
-    flexmock(Upstream).should_receive("create_pull").and_return(None).once()
+    flexmock(GitUpstream).should_receive("create_pull").and_return(None).once()
 
     assert (
         "dist-git commit to be sync back"
@@ -98,11 +98,11 @@ def test_synch_push_two_commits(
         "",
     )
 
-    flexmock(Upstream).should_receive("push_to_fork").and_return(
+    flexmock(GitUpstream).should_receive("push_to_fork").and_return(
         "main",
         "packit.dev",
     ).once()
-    flexmock(Upstream).should_receive("create_pull").and_return(None).once()
+    flexmock(GitUpstream).should_receive("create_pull").and_return(None).once()
 
     commits = api_instance_sync_push.up.local_project.git_repo.iter_commits()
     commits = [c.summary for c in commits]

@@ -11,7 +11,7 @@ from packit.config.common_package_config import MultiplePackages
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.koji_helper import KojiHelper
 
@@ -27,7 +27,7 @@ class Status:
         self,
         config: Config,
         package_config: MultiplePackages,
-        upstream: Upstream,
+        upstream: GitUpstream,
         distgit: DistGit,
     ):
         self.config = config

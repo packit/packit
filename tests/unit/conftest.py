@@ -12,7 +12,7 @@ import packit
 from packit.config import Config
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from tests.spellbook import CRONIE, get_test_config, initiate_git_repo
 
 
@@ -128,7 +128,7 @@ def local_project_mock(git_project_mock, git_repo_mock):
 
 @pytest.fixture
 def upstream_mock(local_project_mock, package_config_mock):
-    upstream = Upstream(
+    upstream = GitUpstream(
         config=get_test_config(),
         package_config=package_config_mock,
         local_project=LocalProjectBuilder().build(
