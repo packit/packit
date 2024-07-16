@@ -13,12 +13,15 @@ from pathlib import Path
 from typing import Optional, Union
 
 import git
+import rpm
 from lazy_object_proxy import Proxy
 from ogr.services.pagure import PagureProject
+from specfile import Specfile
 
 from packit.actions import ActionName
+from packit.actions_handler import ActionsHandler
 from packit.base_git import PackitRepositoryBase
-from packit.command_handler import CommandHandler
+from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config
 from packit.config.common_package_config import MultiplePackages
 from packit.constants import DATETIME_FORMAT, DEFAULT_ARCHIVE_EXT
@@ -43,8 +46,362 @@ from packit.utils.versions import compare_versions
 logger = logging.getLogger(__name__)
 
 
-class GitUpstream(PackitRepositoryBase):
-    """interact with upstream project"""
+class Upstream:
+    """Interact with upstream project"""
+
+    def __init__(
+        self,
+        config: Config,
+        package_config: MultiplePackages,
+    ):
+        """
+        Args:
+            config: global configuration
+            package_config: configuration of the upstream project
+        """
+        self.config = config
+        self.package_config = package_config
+        self.allowed_gpg_keys: Optional[list[str]] = None
+
+        self._handler_kls = None
+        self._command_handler: Optional[CommandHandler] = None
+        self._actions_handler: Optional[ActionsHandler] = None
+        self._specfile: Optional[Specfile] = None
+
+    def __repr__(self):
+        return (
+            "Upstream("
+            f"config='{self.config}', "
+            f"package_config='{self.package_config}')"
+        )
+
+    @property
+    def absolute_specfile_dir(self) -> Optional[Path]:
+        raise NotImplementedError()
+
+    @property
+    def specfile(self) -> Optional[Specfile]:
+        return self._specfile
+
+    @property
+    def local_project(self) -> Optional[LocalProject]:
+        raise NotImplementedError()
+
+    @property
+    def handler_kls(self):
+        if self._handler_kls is None:
+            logger.debug(f"Command handler: {self.config.command_handler}")
+            self._handler_kls = RUN_COMMAND_HANDLER_MAPPING[self.config.command_handler]
+        return self._handler_kls
+
+    @property
+    def command_handler(self) -> CommandHandler:
+        if self._command_handler is None:
+            self._command_handler = self.handler_kls(
+                config=self.config,
+            )
+        return self._command_handler
+
+    @property
+    def actions_handler(self) -> ActionsHandler:
+        if not self._actions_handler:
+            self._actions_handler = ActionsHandler(
+                self.package_config,
+                self.command_handler,
+            )
+        return self._actions_handler
+
+    @property
+    def commit_hexsha(self) -> Optional[str]:
+        raise NotImplementedError()
+
+    @property
+    def active_branch(self) -> Optional[str]:
+        raise NotImplementedError()
+
+    @property
+    def absolute_specfile_path(self) -> Optional[Path]:
+        raise NotImplementedError()
+
+    @staticmethod
+    def _template2regex(template) -> str:
+        """
+        Converts tag template to regex with named groups.
+
+        Args:
+            template: tag_template string
+        Returns:
+            regex string which can be used by python re module
+        """
+
+        p = re.compile(r"{(.*?)}")
+        return p.sub(r"(?P<\g<1>>.*)", template)
+
+    def get_latest_released_version(self) -> Optional[str]:
+        """
+        Return version of the upstream project for the latest official release
+
+        Returns:
+            the version string (e.g. "1.0.0")
+        """
+
+        version = get_upstream_version(self.package_config.downstream_package_name)
+        logger.info(f"Version in upstream registries is {version!r}.")
+        return version
+
+    def get_version_from_action(self) -> Optional[str]:
+        """Provide version from action"""
+        action_output = self.actions_handler.get_output_from_action(
+            action=ActionName.get_current_version,
+            env=self.package_config.get_package_names_as_env(),
+        )
+        return action_output[-1].strip() if action_output else None
+
+    def get_version_from_tag(self, tag: Optional[str]) -> Optional[str]:
+        """
+        Extracts version from git tag using `upstream_template_tag`.
+
+        Args:
+            tag: Git tag containing version.
+
+        Returns:
+            Version string or `None` if given empty string or `None`.
+        """
+        if not tag:
+            return None
+
+        field = "version"
+        regex = self._template2regex(self.package_config.upstream_tag_template)
+        p = re.compile(regex)
+        match = p.match(tag)
+
+        if match and field in match.groupdict():
+            return match.group(field)
+
+        msg = (
+            f'Unable to extract "{field}" from {tag} using '
+            f"{self.package_config.upstream_tag_template}"
+        )
+        logger.error(msg)
+        raise PackitException(msg)
+
+    def convert_version_to_tag(self, version_: str) -> str:
+        """
+        Converts version to tag using upstream_tag_tepmlate
+
+        Args:
+            version_: version to be converted
+            upstream_template_tag
+
+        Returns:
+             tag
+        """
+        try:
+            tag = self.package_config.upstream_tag_template.format(version=version_)
+        except KeyError as e:
+            msg = (
+                f"Invalid upstream_tag_template: {self.package_config.upstream_tag_template} - "
+                f'"version" placeholder is missing'
+            )
+            logger.error(msg)
+            raise PackitException(msg) from e
+
+        return tag
+
+    def set_specfile(self, specfile: Specfile):
+        self._specfile = specfile
+
+    def get_specfile_version(self) -> str:
+        """provide version from specfile"""
+        # we need to get the version from rpm spec header
+        # (as the version tag might not be present directly in the specfile,
+        # but e.g. imported)
+        version = self.specfile.rpm_spec.sourceHeader[rpm.RPMTAG_VERSION]
+        logger.info(f"Version in spec file is {version!r}.")
+        return version
+
+    def is_command_handler_set(self) -> bool:
+        """return True when command_handler is initialized"""
+        return bool(self._command_handler)
+
+    def get_absolute_specfile_path(self) -> Optional[Path]:
+        raise NotImplementedError()
+
+    def sync_files(self, synced_files, dg):
+        raise NotImplementedError()
+
+    def _expand_git_ref(self, ref: Optional[str]) -> Optional[str]:
+        raise NotImplementedError()
+
+    def is_dirty(self):
+        raise NotImplementedError()
+
+    def create_patches(
+        self,
+        upstream: Optional[str] = None,
+        destination: Optional[Union[str, Path]] = None,
+    ) -> list[PatchMetadata]:
+        raise NotImplementedError()
+
+    def get_last_tag(self, before: Optional[str] = None) -> Optional[str]:
+        raise NotImplementedError()
+
+    def checkout_release(self, upstream_tag: str):
+        raise NotImplementedError()
+
+    def check_last_commit(self):
+        raise NotImplementedError()
+
+    def create_rpms(self, rpm_dir: Union[str, Path, None] = None) -> list[Path]:
+        raise NotImplementedError()
+
+    def push_to_fork(
+        self,
+        branch_name: str,
+        force: bool = False,
+        fork: bool = True,
+        remote_name: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
+    ) -> tuple[str, Optional[str]]:
+        raise NotImplementedError()
+
+    def create_pull(
+        self,
+        pr_title: str,
+        pr_description: str,
+        source_branch: str,
+        target_branch: str,
+        fork_username: Optional[str] = None,
+    ) -> None:
+        raise NotImplementedError()
+
+    def create_branch(
+        self,
+        branch_name: str,
+        base: str = "HEAD",
+        setup_tracking: bool = False,
+    ) -> git.Head:
+        raise NotImplementedError()
+
+    def switch_branch(
+        self,
+        branch: Optional[str] = None,
+        force: Optional[bool] = False,
+    ) -> None:
+        raise NotImplementedError()
+
+    def prepare_upstream_for_srpm_creation(
+        self,
+        upstream_ref: Optional[str] = None,
+        update_release: bool = True,
+        release_suffix: Optional[str] = None,
+        create_symlinks: Optional[bool] = True,
+        merged_ref: Optional[str] = None,
+    ):
+        raise NotImplementedError()
+
+    def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
+        raise NotImplementedError()
+
+    def get_commit_messages(
+        self,
+        after: Optional[str] = None,
+        before: str = "HEAD",
+    ) -> str:
+        raise NotImplementedError()
+
+    def koji_build(
+        self,
+        scratch: bool = False,
+        nowait: bool = False,
+        koji_target: Optional[str] = None,
+        srpm_path: Optional[Path] = None,
+    ):
+        raise NotImplementedError()
+
+    def commit(
+        self,
+        title: str,
+        msg: str,
+        prefix: str = "[packit] ",
+        trailers: Optional[list[tuple[str, str]]] = None,
+    ) -> None:
+        raise NotImplementedError()
+
+    def create_srpm(
+        self,
+        srpm_path: Union[Path, str, None] = None,
+        srpm_dir: Union[Path, str, None] = None,
+    ) -> Path:
+        raise NotImplementedError()
+
+
+class NonGitUpstream(Upstream):
+    """Interact with non-git upstream project"""
+
+    def __repr__(self):
+        return (
+            "NonGitUpstream("
+            f"config='{self.config}', "
+            f"package_config='{self.package_config}')"
+        )
+
+    @property
+    def absolute_specfile_dir(self) -> Optional[Path]:
+        return None
+
+    @property
+    def local_project(self) -> Optional[LocalProject]:
+        return None
+
+    @property
+    def command_handler(self) -> CommandHandler:
+        if self._command_handler is None:
+            self._command_handler = self.handler_kls(
+                config=self.config,
+            )
+        return self._command_handler
+
+    @property
+    def commit_hexsha(self) -> Optional[str]:
+        return None
+
+    @property
+    def active_branch(self) -> Optional[str]:
+        return None
+
+    @property
+    def absolute_specfile_path(self) -> Optional[Path]:
+        return None
+
+    def get_absolute_specfile_path(self) -> Optional[Path]:
+        return None
+
+    def sync_files(self, synced_files, dg):
+        pass
+
+    def _expand_git_ref(self, ref: Optional[str]) -> Optional[str]:
+        return None
+
+    def is_dirty(self):
+        return False
+
+    def create_patches(
+        self,
+        upstream: Optional[str] = None,
+        destination: Optional[Union[str, Path]] = None,
+    ) -> list[PatchMetadata]:
+        pass
+
+    def get_last_tag(self, before: Optional[str] = None) -> Optional[str]:
+        return None
+
+    def checkout_release(self, upstream_tag: str):
+        pass
+
+
+class GitUpstream(PackitRepositoryBase, Upstream):
+    """Interact with git upstream project"""
 
     def __init__(
         self,
@@ -53,9 +410,10 @@ class GitUpstream(PackitRepositoryBase):
         local_project: LocalProject,
     ):
         """
-        :param config: global configuration
-        :param package_config: configuration of the upstream project
-        :param local_project: public offender
+        Args:
+            config: global configuration
+            package_config: configuration of the upstream project
+            local_project: public offender
         """
         self._local_project = local_project
         super().__init__(config=config, package_config=package_config)
@@ -66,7 +424,7 @@ class GitUpstream(PackitRepositoryBase):
 
     def __repr__(self):
         return (
-            "Upstream("
+            "GitUpstream("
             f"config='{self.config}', "
             f"package_config='{self.package_config}', "
             f"local_project='{self.local_project}', "
@@ -106,6 +464,10 @@ class GitUpstream(PackitRepositoryBase):
         return self._local_project
 
     @property
+    def commit_hexsha(self) -> str:
+        return self.local_project.commit_hexsha
+
+    @property
     def command_handler(self) -> CommandHandler:
         if self._command_handler is None:
             self._command_handler = self.handler_kls(
@@ -119,6 +481,9 @@ class GitUpstream(PackitRepositoryBase):
     def active_branch(self) -> str:
         return self.local_project.ref
 
+    def checkout_release(self, upstream_tag: str):
+        self.local_project.checkout_release(upstream_tag)
+
     def push_to_fork(
         self,
         branch_name: str,
@@ -128,7 +493,7 @@ class GitUpstream(PackitRepositoryBase):
         sync_acls: Optional[bool] = False,
     ) -> tuple[str, Optional[str]]:
         """
-        push current branch to fork if fork=True, else to origin
+        Push current branch to fork if fork=True, else to origin.
 
         Args:
             branch_name: the branch where we push
@@ -231,9 +596,12 @@ class GitUpstream(PackitRepositoryBase):
         """
         Create patches from downstream commits.
 
-        :param destination: str
-        :param upstream: str -- git branch or tag
-        :return: [PatchMetadata, ...] list of patches
+        Args:
+            destination: str
+            upstream: str -- git branch or tag
+
+        Returns:
+             [PatchMetadata, ...] list of patches
         """
         upstream = upstream or self.get_specfile_version()
         destination = Path(destination) or self.local_project.working_dir
@@ -259,25 +627,6 @@ class GitUpstream(PackitRepositoryBase):
             str(destination),
             files_to_ignore=files_to_ignore,
         )
-
-    def get_latest_released_version(self) -> Optional[str]:
-        """
-        Return version of the upstream project for the latest official release
-
-        :return: the version string (e.g. "1.0.0")
-        """
-
-        version = get_upstream_version(self.package_config.downstream_package_name)
-        logger.info(f"Version in upstream registries is {version!r}.")
-        return version
-
-    def get_version_from_action(self) -> str:
-        """provide version from action"""
-        action_output = self.actions_handler.get_output_from_action(
-            action=ActionName.get_current_version,
-            env=self.package_config.get_package_names_as_env(),
-        )
-        return action_output[-1].strip() if action_output else None
 
     def get_version(self) -> str:
         """
@@ -428,10 +777,13 @@ class GitUpstream(PackitRepositoryBase):
         before: str = "HEAD",
     ) -> str:
         """
-        :param after: get commit messages after this revision,
-        if None, all commit messages before 'before' will be returned
-        :param before:  get commit messages before this revision
-        :return: commit messages
+        Args:
+            after: get commit messages after this revision,
+                    if None, all commit messages before 'before' will be returned
+            before:  get commit messages before this revision
+
+        Returns:
+            commit messages
         """
         # let's print changes b/w the last 2 revisions;
         # ambiguous argument '0.1.0..HEAD': unknown revision or path not in the working tree.
@@ -653,7 +1005,8 @@ class GitUpstream(PackitRepositoryBase):
         """
         Create patches for the sourcegit and add them to the specfile.
 
-        :param upstream_ref: the base git ref for the source git
+        Args:
+            upstream_ref: the base git ref for the source git
         """
         env = self.package_config.get_package_names_as_env()
         if self.actions_handler.with_action(action=ActionName.create_patches, env=env):
@@ -673,10 +1026,11 @@ class GitUpstream(PackitRepositoryBase):
         """
         Perform a `koji build` in the repository
 
-        :param scratch: should the build be a scratch build?
-        :param nowait: don't wait on build?
-        :param koji_target: koji target to pick (see `koji list-targets`)
-        :param srpm_path: use selected SRPM for build, not dist-git repo & ref
+        Args:
+            scratch: should the build be a scratch build?
+            nowait: don't wait on build?
+            koji_target: koji target to pick (see `koji list-targets`)
+            srpm_path: use selected SRPM for build, not dist-git repo & ref
         """
         if not koji_target:
             raise PackitException(
@@ -846,8 +1200,11 @@ class GitUpstream(PackitRepositoryBase):
         If given globbing pattern, tries to expand it to git ref.
         If no ref given or isn't globbing pattern, returns it.
 
-        :param ref: git ref to be expanded if necessary
-        :return: same ref if is not globbing pattern, otherwise expanded
+        Args:
+            ref: git ref to be expanded if necessary
+
+        Returns:
+            same ref if is not globbing pattern, otherwise expanded
         """
         if not ref or not re.match(r".*[\[\?\*].*", ref):
             # regex matches any globbing pattern (`[`, `?` or `*` is used)
@@ -863,66 +1220,6 @@ class GitUpstream(PackitRepositoryBase):
             cwd=self.local_project.working_dir,
         ).stdout.strip()
         logger.debug(f"Matching tag for {ref}: {tag}")
-
-        return tag
-
-    @staticmethod
-    def _template2regex(template) -> str:
-        """
-        Converts tag template to regex with named groups.
-
-        :param template: tag_template string
-        :return: regex string which can be used by python re module
-        """
-
-        p = re.compile(r"{(.*?)}")
-        return p.sub(r"(?P<\g<1>>.*)", template)
-
-    def get_version_from_tag(self, tag: Optional[str]) -> Optional[str]:
-        """
-        Extracts version from git tag using `upstream_template_tag`.
-
-        Args:
-            tag: Git tag containing version.
-
-        Returns:
-            Version string or `None` if given empty string or `None`.
-        """
-        if not tag:
-            return None
-
-        field = "version"
-        regex = self._template2regex(self.package_config.upstream_tag_template)
-        p = re.compile(regex)
-        match = p.match(tag)
-
-        if match and field in match.groupdict():
-            return match.group(field)
-
-        msg = (
-            f'Unable to extract "{field}" from {tag} using '
-            f"{self.package_config.upstream_tag_template}"
-        )
-        logger.error(msg)
-        raise PackitException(msg)
-
-    def convert_version_to_tag(self, version_: str) -> str:
-        """
-        Converts version to tag using upstream_tag_tepmlate
-
-        :param version_: version to be converted
-        upstream_template_tag
-        :return: tag
-        """
-        try:
-            tag = self.package_config.upstream_tag_template.format(version=version_)
-        except KeyError as e:
-            msg = (
-                f"Invalid upstream_tag_template: {self.package_config.upstream_tag_template} - "
-                f'"version" placeholder is missing'
-            )
-            logger.error(msg)
-            raise PackitException(msg) from e
 
         return tag
 
@@ -954,6 +1251,15 @@ class GitUpstream(PackitRepositoryBase):
             )
 
         return rpms
+
+    def sync_files(self, synced_files, dg):
+        # Make all paths absolute and check that they are within
+        # the working directories of the repositories.
+        for item in synced_files:
+            item.resolve(
+                src_base=self.local_project.working_dir,
+                dest_base=dg.local_project.working_dir,
+            )
 
 
 class SRPMBuilder:
