@@ -164,15 +164,17 @@ class PackitAPI:
         downstream_local_project: LocalProject = None,
         stage: bool = False,
         dist_git_clone_path: Optional[str] = None,
+        non_git_upstream: bool = False,
     ) -> None:
         self.config = config
         self.package_config: MultiplePackages = package_config
         self.upstream_local_project = upstream_local_project
         self.downstream_local_project = downstream_local_project
         self.stage = stage
+        self.non_git_upstream = non_git_upstream
         self._dist_git_clone_path: Optional[str] = dist_git_clone_path
 
-        self._up: Optional[GitUpstream] = None
+        self._up: Optional[Upstream] = None
         self._dg: Optional[DistGit] = None
         self._copr_helper: Optional[CoprHelper] = None
         self._kerberos_initialized = False
@@ -191,15 +193,19 @@ class PackitAPI:
         )
 
     @property
-    def up(self) -> GitUpstream:
+    def up(self) -> Upstream:
         if self._up is None:
-            self._up = GitUpstream(
-                config=self.config,
-                package_config=self.package_config,
-                local_project=checkout_package_workdir(
-                    self.package_config,
-                    self.upstream_local_project,
-                ),
+            self._up = (
+                NonGitUpstream(config=self.config, package_config=self.package_config)
+                if self.non_git_upstream
+                else GitUpstream(
+                    config=self.config,
+                    package_config=self.package_config,
+                    local_project=checkout_package_workdir(
+                        self.package_config,
+                        self.upstream_local_project,
+                    ),
+                )
             )
         return self._up
 
@@ -1327,6 +1333,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         Raises:
             PackitException, if the upstream repo or dist-git is dirty.
         """
+        # this should not be even reachable, just to satisfy mypy
+        if not isinstance(self.up, GitUpstream):
+            logger.debug("Syncing not allowed for non-git upstream.")
+            return None
+
         assert_existence(self.up.local_project, "Upstream local project")
         assert_existence(self.dg.local_project, "Dist-git local project")
 
