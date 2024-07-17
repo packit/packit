@@ -446,6 +446,7 @@ class CommonConfigSchema(Schema):
 
     # Packaging tool used for interaction with lookaside cache
     pkg_tool = fields.String(missing=None)
+    sig = fields.String(missing=None)
     version_update_mask = fields.String(missing=None)
 
     parse_time_macros = fields.Dict(missing=None)

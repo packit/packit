@@ -47,6 +47,11 @@ DISTGIT_INSTANCES = {
         alternative_hostname=None,
         namespace="redhat/centos-stream/rpms",
     ),
+    "centpkg-sig": DistGitInstance(
+        hostname="gitlab.com",
+        alternative_hostname=None,
+        namespace="CentOS/{sig}/rpms",
+    ),
 }
 
 DISTGIT_HOSTNAME_CANDIDATES = set(

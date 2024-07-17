@@ -35,6 +35,7 @@ def _construct_dist_git_instance(
     base_url: Optional[str],
     namespace: Optional[str],
     pkg_tool: Optional[str],
+    sig: Optional[str] = None,
 ) -> DistGitInstance:
     """Construct a dist-git instance information from provided configuration.
 
@@ -42,6 +43,10 @@ def _construct_dist_git_instance(
         base_url: Base URL of the dist-git provided from the config.
         namespace: Namespace in the dist-git provided from the config.
         pkg_tool: Packaging tool to be used provided from the config.
+        sig: SIG that maintains the “downstream” package. Used for adjusting the
+            namespace.
+
+            Defaults to `None`.
 
     Returns:
         Dist-git instance information that is used in config.
@@ -53,7 +58,7 @@ def _construct_dist_git_instance(
 
     # explicitly specified packaging tool overrides too
     if pkg_tool:
-        return DISTGIT_INSTANCES[pkg_tool]
+        return DISTGIT_INSTANCES[pkg_tool].for_sig(sig=sig)
 
     # we try the environment variables
     base_url, namespace = getenv("DISTGIT_URL"), getenv("DISTGIT_NAMESPACE")
@@ -159,6 +164,7 @@ class CommonPackageConfig:
             Keys are macro names and values are macro values. A value of None will undefine
             the corresponding macro.
         status_name_template: Template for configurable names for status checks.
+        sig: Special interest group (SIG) that maintains the “downstream” package.
     """
 
     def __init__(
@@ -239,6 +245,7 @@ class CommonPackageConfig:
         parse_time_macros: Optional[dict[str, str]] = None,
         require: Optional[RequirementsConfig] = None,
         status_name_template: Optional[str] = None,
+        sig: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -265,7 +272,10 @@ class CommonPackageConfig:
             base_url=dist_git_base_url,
             namespace=dist_git_namespace,
             pkg_tool=pkg_tool,
+            sig=sig,
         )
+        self.pkg_tool = pkg_tool
+        self.sig = sig
 
         self.actions = actions or {}
         self.upstream_ref: Optional[str] = upstream_ref
@@ -347,8 +357,6 @@ class CommonPackageConfig:
 
         self.follow_fedora_branching = follow_fedora_branching
         self.upload_sources = upload_sources
-
-        self.pkg_tool = pkg_tool
 
         self.parse_time_macros = parse_time_macros or {}
 
