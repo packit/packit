@@ -1,17 +1,24 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import dataclasses
 from dataclasses import dataclass
 from typing import Optional
 
 from ogr.parsing import RepoUrl, parse_git_repo
 
 
-@dataclass
+@dataclass(frozen=True)
 class DistGitInstance:
     hostname: str
     alternative_hostname: Optional[str]
     namespace: str
+
+    def for_sig(self, sig: Optional[str]) -> "DistGitInstance":
+        if sig is None:
+            return self
+
+        return dataclasses.replace(self, namespace=self.namespace.format(sig=sig))
 
     @property
     def url(self) -> str:

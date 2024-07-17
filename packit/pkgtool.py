@@ -12,7 +12,7 @@ from packit.utils.logging import logger
 
 class PkgTool:
     """
-    Wrapper around fedpkg/centpkg.
+    Wrapper around fedpkg/centpkg/cbs.
     """
 
     def __init__(
@@ -20,22 +20,26 @@ class PkgTool:
         fas_username: Optional[str] = None,
         directory: Union[Path, str, None] = None,
         tool: str = "fedpkg",
+        sig: Optional[str] = None,
     ):
         """
         Args:
             fas_username: FAS username (used for cloning)
             directory: operate in this dist-git repository
-            tool: pkgtool to use (fedpkg, centpkg)
+            tool: pkgtool to use (fedpkg, centpkg, centpkg-sig)
+            sig: name of the SIG; used for adjusting the path during cloning
         """
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
         self.tool = tool
+        self.sig = sig
 
     def __repr__(self):
         return (
             "PkgTool("
             f"fas_username='{self.fas_username}', "
             f"directory='{self.directory}', "
+            f"sig='{self.sig}', "
             f"tool='{self.tool}')"
         )
 
@@ -61,15 +65,14 @@ class PkgTool:
             fail=fail,
         ).success
 
-    def sources(self, fail: bool = True) -> str:
+    def sources(self, fail: bool = True) -> bool:
         """Run the 'sources' command
 
         Args:
             fail: Raise an exception if the command fails
 
         Returns:
-            XXX vvv I wonder how is this possible without `output=True` vvv XXX
-            The 'stdout' of the sources command that is executed.
+            True, if the command finished successfully, False otherwise.
         """
         return commands.run_command_remote(
             cmd=[self.tool, "sources"],
@@ -152,7 +155,11 @@ class PkgTool:
             cmd += ["--branch", branch]
         if anonymous:
             cmd += ["--anonymous"]
-        cmd += [package_name, str(target_path)]
+
+        cmd += [
+            f"{self.sig}/rpms/{package_name}" if self.sig else package_name,
+            str(target_path),
+        ]
 
         error_msg = (
             f"{self.tool} failed to clone repository {package_name}; "

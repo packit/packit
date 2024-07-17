@@ -349,7 +349,7 @@ class PackitAPI:
             commit_msg: Use this commit message in dist-git.
             sync_default_files: Whether to sync the default files, that is: packit.yaml and
                 the spec-file.
-            pkg_tool: What tool (fedpkg/centpkg) to use upload to lookaside cache.
+            pkg_tool: What tool (fedpkg/centpkg/cbs) to use upload to lookaside cache.
             mark_commit_origin: Whether to include a Git-trailer in the dist-git
                 commit message to mark the hash of the upstream (source-git) commit.
             check_sync_status: Check the synchronization status of the source-git
@@ -1545,7 +1545,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             force_new_sources: Download/upload the archive even if it's
                 name is already in the cache or in sources file.
-                Actually, fedpkg/centpkg won't upload it if archive with the same
+                Actually, fedpkg/centpkg/cbs won't upload it if archive with the same
                 name & hash is already there, so this might be useful only if
                 you want to upload archive with the same name but different hash.
             pkg_tool: Tool to upload sources.
@@ -2215,7 +2215,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         if self._kerberos_initialized:
             return
 
-        if not self.pkg_tool.startswith("fedpkg"):
+        if self.pkg_tool.startswith("centpkg"):
             # centpkg doesn't use kerberos
             return
 
