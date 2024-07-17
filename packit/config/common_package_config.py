@@ -164,6 +164,8 @@ class CommonPackageConfig:
             Keys are macro names and values are macro values. A value of None will undefine
             the corresponding macro.
         status_name_template: Template for configurable names for status checks.
+        sync_test_job_statuses_with_builds: Whether to sync test job statuses with corresponding
+            build job statuses.
         sig: Special interest group (SIG) that maintains the “downstream” package.
         osh_diff_scan_after_copr_build: Whether to run a differential scan in
             OpenScanHub after successful Copr build.
@@ -247,6 +249,7 @@ class CommonPackageConfig:
         parse_time_macros: Optional[dict[str, str]] = None,
         require: Optional[RequirementsConfig] = None,
         status_name_template: Optional[str] = None,
+        sync_test_job_statuses_with_builds: bool = True,
         sig: Optional[str] = None,
         osh_diff_scan_after_copr_build: Optional[bool] = True,
     ):
@@ -315,6 +318,7 @@ class CommonPackageConfig:
         self.test_command = test_command or TestCommandConfig()
         self.require = require or RequirementsConfig()
         self.status_name_template = status_name_template
+        self.sync_test_job_statuses_with_builds = sync_test_job_statuses_with_builds
 
         # from deprecated JobMetadataConfig
         self._targets: dict[str, dict[str, Any]]
