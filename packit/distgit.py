@@ -597,6 +597,7 @@ class DistGit(PackitRepositoryBase):
         update_type: str,
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
+        sidetag: Optional[str] = None,
         bugzilla_ids: Optional[list[int]] = None,
     ) -> Optional[tuple[str, str]]:
         """
@@ -609,6 +610,7 @@ class DistGit(PackitRepositoryBase):
               automatic update notes including a changelog diff since the latest stable build
               will be generated.
             koji_builds: List of Koji builds or `None` (picks latest).
+            sidetag: Koji sidetag to create the update from.
             bugzilla_ids: List of Bugzillas that are resolved with the update.
 
         Returns:
@@ -663,6 +665,9 @@ class DistGit(PackitRepositoryBase):
                 bugs = list(map(str, bugzilla_ids))
             if bugzilla_ids_from_changelog:
                 bugs += bugzilla_ids_from_changelog
+
+            if sidetag:
+                save_kwargs["from_tag"] = sidetag
 
             if bugs:
                 save_kwargs["bugs"] = bugs
