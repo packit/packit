@@ -450,6 +450,7 @@ class CommonConfigSchema(Schema):
     version_update_mask = fields.String(missing=None)
 
     parse_time_macros = fields.Dict(missing=None)
+    differential_scan_after_copr_build = fields.Boolean(missing=True)
 
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
