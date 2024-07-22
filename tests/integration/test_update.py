@@ -167,6 +167,7 @@ def test_basic_local_update_use_downstream_specfile_non_git_upstream(
     subprocess.check_call(["git", "tag", "0.1.0", "-f"])
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(api.up).should_receive("sync_files")
 
     api.sync_release(
         dist_git_branch="main",
