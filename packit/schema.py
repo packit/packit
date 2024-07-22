@@ -410,6 +410,7 @@ class CommonConfigSchema(Schema):
     test_command = fields.Nested(TestCommandSchema)
     require = fields.Nested(RequirementsSchema)
     status_name_template = fields.String(missing=None)
+    sync_test_job_statuses_with_builds = fields.Bool(default=True)
 
     # Former 'metadata' keys
     _targets = TargetsListOrDict(missing=None, data_key="targets")
