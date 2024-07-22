@@ -165,8 +165,8 @@ class CommonPackageConfig:
             the corresponding macro.
         status_name_template: Template for configurable names for status checks.
         sig: Special interest group (SIG) that maintains the “downstream” package.
-        differential_scan_after_copr_build: Whether to run a differential scan after
-            successful Copr build.
+        osh_diff_scan_after_copr_build: Whether to run a differential scan in
+            OpenScanHub after successful Copr build.
     """
 
     def __init__(
@@ -248,7 +248,7 @@ class CommonPackageConfig:
         require: Optional[RequirementsConfig] = None,
         status_name_template: Optional[str] = None,
         sig: Optional[str] = None,
-        differential_scan_after_copr_build: Optional[bool] = True,
+        osh_diff_scan_after_copr_build: Optional[bool] = True,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -363,7 +363,7 @@ class CommonPackageConfig:
 
         self.parse_time_macros = parse_time_macros or {}
 
-        self.differential_scan_after_copr_build = differential_scan_after_copr_build
+        self.osh_diff_scan_after_copr_build = osh_diff_scan_after_copr_build
 
     @property
     def dist_git_base_url(self) -> str:
