@@ -8,6 +8,7 @@ import re
 import shlex
 import shutil
 import tarfile
+import tempfile
 from functools import partial, reduce
 from pathlib import Path
 from typing import Optional, Union
@@ -25,6 +26,7 @@ from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
 from packit.config import Config
 from packit.config.common_package_config import MultiplePackages
 from packit.constants import DATETIME_FORMAT, DEFAULT_ARCHIVE_EXT
+from packit.distgit import DistGit
 from packit.exceptions import (
     PackitCommandFailedError,
     PackitException,
@@ -88,6 +90,10 @@ class Upstream:
         raise NotImplementedError()
 
     @property
+    def working_dir(self) -> Optional[Path]:
+        raise NotImplementedError()
+
+    @property
     def handler_kls(self):
         if self._handler_kls is None:
             logger.debug(f"Command handler: {self.config.command_handler}")
@@ -96,11 +102,7 @@ class Upstream:
 
     @property
     def command_handler(self) -> CommandHandler:
-        if self._command_handler is None:
-            self._command_handler = self.handler_kls(
-                config=self.config,
-            )
-        return self._command_handler
+        raise NotImplementedError()
 
     @property
     def actions_handler(self) -> ActionsHandler:
@@ -227,8 +229,14 @@ class Upstream:
     def get_absolute_specfile_path(self) -> Optional[Path]:
         raise NotImplementedError()
 
-    def sync_files(self, synced_files, dg):
-        raise NotImplementedError()
+    def sync_files(self, synced_files: list, dg: DistGit):
+        # Make all paths absolute and check that they are within
+        # the working directories of the repositories.
+        for item in synced_files:
+            item.resolve(
+                src_base=self.working_dir,
+                dest_base=dg.local_project.working_dir,
+            )
 
     def _expand_git_ref(self, ref: Optional[str]) -> Optional[str]:
         raise NotImplementedError()
@@ -335,9 +343,20 @@ class Upstream:
     ) -> Path:
         raise NotImplementedError()
 
+    def clean_working_dir(self):
+        raise NotImplementedError()
+
 
 class NonGitUpstream(Upstream):
     """Interact with non-git upstream project"""
+
+    def __init__(
+        self,
+        config: Config,
+        package_config: MultiplePackages,
+    ):
+        super().__init__(config=config, package_config=package_config)
+        self._working_dir: Optional[Path] = None
 
     def __repr__(self):
         return (
@@ -355,10 +374,20 @@ class NonGitUpstream(Upstream):
         return None
 
     @property
+    def working_dir(self) -> Optional[Path]:
+        if not self._working_dir:
+            self._working_dir = Path(tempfile.mkdtemp())
+            logger.info(
+                f"Created temporary directory for actions and syncing: {self._working_dir}",
+            )
+        return self._working_dir
+
+    @property
     def command_handler(self) -> CommandHandler:
         if self._command_handler is None:
             self._command_handler = self.handler_kls(
                 config=self.config,
+                working_dir=self.working_dir,
             )
         return self._command_handler
 
@@ -376,9 +405,6 @@ class NonGitUpstream(Upstream):
 
     def get_absolute_specfile_path(self) -> Optional[Path]:
         return None
-
-    def sync_files(self, synced_files, dg):
-        pass
 
     def _expand_git_ref(self, ref: Optional[str]) -> Optional[str]:
         return None
@@ -398,6 +424,13 @@ class NonGitUpstream(Upstream):
 
     def checkout_release(self, upstream_tag: str):
         pass
+
+    def clean_working_dir(self):
+        if not self._working_dir:
+            return
+
+        logger.debug(f"Cleaning: {self.working_dir}")
+        shutil.rmtree(self.working_dir, ignore_errors=True)
 
 
 class GitUpstream(PackitRepositoryBase, Upstream):
@@ -464,6 +497,10 @@ class GitUpstream(PackitRepositoryBase, Upstream):
         return self._local_project
 
     @property
+    def working_dir(self) -> Optional[Path]:
+        return self.local_project.working_dir
+
+    @property
     def commit_hexsha(self) -> str:
         return self.local_project.commit_hexsha
 
@@ -480,6 +517,9 @@ class GitUpstream(PackitRepositoryBase, Upstream):
     @property
     def active_branch(self) -> str:
         return self.local_project.ref
+
+    def clean_working_dir(self):
+        pass
 
     def checkout_release(self, upstream_tag: str):
         self.local_project.checkout_release(upstream_tag)
@@ -1251,15 +1291,6 @@ class GitUpstream(PackitRepositoryBase, Upstream):
             )
 
         return rpms
-
-    def sync_files(self, synced_files, dg):
-        # Make all paths absolute and check that they are within
-        # the working directories of the repositories.
-        for item in synced_files:
-            item.resolve(
-                src_base=self.local_project.working_dir,
-                dest_base=dg.local_project.working_dir,
-            )
 
 
 class SRPMBuilder:

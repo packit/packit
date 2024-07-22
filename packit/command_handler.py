@@ -26,14 +26,23 @@ class CommandHandler:
 
     name: RunCommandType
 
-    def __init__(self, config: Config, local_project: Optional[LocalProject] = None):
+    def __init__(
+        self,
+        config: Config,
+        local_project: Optional[LocalProject] = None,
+        working_dir: Optional[Path] = None,
+    ):
         self.local_project = local_project
         self.config = config
+        self._working_dir = working_dir
 
     @property
     def working_dir(self) -> Union[str, Path]:
         if self.local_project:
             return self.local_project.working_dir
+
+        if self._working_dir:
+            return self._working_dir
 
         return tempfile.mkdtemp()
 
