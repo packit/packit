@@ -200,14 +200,14 @@ PACKAGE_OPTION_HELP = (
 
 SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION = (
     "{resolved_bugs}Upstream tag: {upstream_tag}\n"
-    "Upstream commit: {upstream_commit}\n"
+    "{upstream_commit_info}\n"
     "\n"
     "Commit authored by Packit automation (https://packit.dev/)\n"
 )
 
 SYNC_RELEASE_PR_DESCRIPTION = (
     "Upstream tag: {upstream_tag_info}\n"
-    "Upstream commit: {upstream_commit_info}\n"
+    "{upstream_commit_info}\n"
     "{release_monitoring_info}"
     "{resolved_bugzillas_info}"
 )

@@ -18,7 +18,7 @@ from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommand
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
 from packit.local_project import LocalProject, LocalProjectBuilder
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from packit.utils import commands
 from packit.utils.repo import create_new_repo
 from tests.spellbook import can_a_module_be_imported, initiate_git_repo
@@ -46,7 +46,7 @@ def distgit_with_actions():
 
 @pytest.fixture()
 def upstream_with_actions():
-    return Upstream(
+    return GitUpstream(
         config=flexmock(Config()),
         package_config=flexmock(
             PackageConfig(

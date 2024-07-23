@@ -35,6 +35,7 @@ from ogr.exceptions import PagureAPIException
 from tabulate import tabulate
 
 from packit.actions import ActionName
+from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.aliases import get_branches
 from packit.config.common_package_config import MultiplePackages
@@ -72,7 +73,7 @@ from packit.patches import PatchGenerator
 from packit.source_git import SourceGitGenerator
 from packit.status import Status
 from packit.sync import SyncFilesItem, sync_files
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream, NonGitUpstream, Upstream
 from packit.utils import commands
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
@@ -163,12 +164,14 @@ class PackitAPI:
         downstream_local_project: LocalProject = None,
         stage: bool = False,
         dist_git_clone_path: Optional[str] = None,
+        non_git_upstream: bool = False,
     ) -> None:
         self.config = config
         self.package_config: MultiplePackages = package_config
         self.upstream_local_project = upstream_local_project
         self.downstream_local_project = downstream_local_project
         self.stage = stage
+        self.non_git_upstream = non_git_upstream
         self._dist_git_clone_path: Optional[str] = dist_git_clone_path
 
         self._up: Optional[Upstream] = None
@@ -192,13 +195,17 @@ class PackitAPI:
     @property
     def up(self) -> Upstream:
         if self._up is None:
-            self._up = Upstream(
-                config=self.config,
-                package_config=self.package_config,
-                local_project=checkout_package_workdir(
-                    self.package_config,
-                    self.upstream_local_project,
-                ),
+            self._up = (
+                NonGitUpstream(config=self.config, package_config=self.package_config)
+                if self.non_git_upstream
+                else GitUpstream(
+                    config=self.config,
+                    package_config=self.package_config,
+                    local_project=checkout_package_workdir(
+                        self.package_config,
+                        self.upstream_local_project,
+                    ),
+                )
             )
         return self._up
 
@@ -286,7 +293,8 @@ class PackitAPI:
                 ("PACKIT_DOWNSTREAM_REPO", self.dg),
                 ("PACKIT_UPSTREAM_REPO", self.up),
             )
-            if repo._local_project is not None
+            if isinstance(repo, PackitRepositoryBase)
+            and repo._local_project is not None
         }
 
         # Adjust paths for the sandcastle
@@ -381,13 +389,8 @@ class PackitAPI:
             synced_files = self.package_config.get_all_files_to_sync()
         else:
             synced_files = self.package_config.files_to_sync
-        # Make all paths absolute and check that they are within
-        # the working directories of the repositories.
-        for item in synced_files:
-            item.resolve(
-                src_base=self.up.local_project.working_dir,
-                dest_base=self.dg.local_project.working_dir,
-            )
+
+        self.up.sync_files(synced_files, self.dg)
 
         if self.up.actions_handler.with_action(
             action=ActionName.prepare_files,
@@ -1000,7 +1003,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             upstream_tag = tag
             version = self.up.get_version_from_tag(tag)
 
-        assert_existence(self.up.local_project, "Upstream local project")
+        if isinstance(self.up, GitUpstream):
+            assert_existence(self.up.local_project, "Upstream local project")
+
         assert_existence(self.dg.local_project, "Dist-git local project")
         if self.dg.is_dirty():
             raise PackitException(
@@ -1036,7 +1041,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "because this is a source-git repo.",
                 )
             elif not use_local_content:
-                self.up.local_project.checkout_release(upstream_tag)
+                self.up.checkout_release(upstream_tag)
 
             self.dg.create_branch(
                 dist_git_branch,
@@ -1134,7 +1139,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 ActionName.commit_message,
                 env={
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
-                    "PACKIT_UPSTREAM_COMMIT": self.up.local_project.commit_hexsha,
+                    "PACKIT_UPSTREAM_COMMIT": self.up.commit_hexsha,
                     "PACKIT_DEBUG_DIVIDER": COMMIT_ACTION_DIVIDER.strip(),
                     "PACKIT_RESOLVED_BUGS": " ".join(resolved_bugs)
                     if resolved_bugs
@@ -1189,12 +1194,13 @@ The first dist-git commit to be synced is '{short_hash}'.
                 logger.warning(
                     "Please, check whether the `upstream_tag_template` needs to be configured.",
                 )
-            if not use_local_content and not upstream_ref:
+            if not use_local_content and not upstream_ref and current_up_branch:
                 logger.info(f"Checking out the original branch {current_up_branch}.")
                 self.up.local_project.git_repo.git.checkout(current_up_branch, "-f")
             self.dg.refresh_specfile()
             self.dg.local_project.git_repo.git.reset("--hard", "HEAD")
             self.dg.local_project.git_repo.git.clean("-xdf")
+            self.up.clean_working_dir()
 
         return pr
 
@@ -1218,9 +1224,13 @@ The first dist-git commit to be synced is '{short_hash}'.
             # add one more newline so that the text after is not included in autochangelog
             resolved_bugs_msg += "\n"
 
+        upstream_commit_info = (
+            f"Upstream commit: {self.up.commit_hexsha}" if self.up.commit_hexsha else ""
+        )
+
         return SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION.format(
             upstream_tag=upstream_tag,
-            upstream_commit=self.up.local_project.commit_hexsha,
+            upstream_commit_info=upstream_commit_info,
             resolved_bugs=resolved_bugs_msg,
         )
 
@@ -1245,16 +1255,25 @@ The first dist-git commit to be synced is '{short_hash}'.
                 else:
                     resolved_bugzillas_info += f"Resolves: {bug}\n"
 
-        commit = self.up.local_project.commit_hexsha
-        git_url = git_remote_url_to_https_url(
-            self.up.local_project.git_url,
-            with_dot_git_suffix=False,
-        )
+        commit = self.up.commit_hexsha
 
-        tag_link = get_tag_link(git_url, upstream_tag)
-        commit_link = get_commit_link(git_url, commit)
+        if self.up.local_project:
+            git_url = git_remote_url_to_https_url(
+                self.up.local_project.git_url,
+                with_dot_git_suffix=False,
+            )
 
-        commit_info = f"[{commit}]({commit_link})" if commit_link else commit
+            tag_link = get_tag_link(git_url, upstream_tag)
+        else:
+            tag_link = None
+
+        if commit:
+            commit_link = get_commit_link(git_url, commit)
+            commit_info = f"[{commit}]({commit_link})" if commit_link else commit
+            commit_info = f"Upstream commit: {commit_info}"
+        else:
+            commit_info = ""
+
         tag_info = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
         release_monitoring_info = (
             (
@@ -1315,6 +1334,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         Raises:
             PackitException, if the upstream repo or dist-git is dirty.
         """
+        # this should not be even reachable, just to satisfy mypy
+        if not isinstance(self.up, GitUpstream):
+            logger.debug("Syncing not allowed for non-git upstream.")
+            return None
+
         assert_existence(self.up.local_project, "Upstream local project")
         assert_existence(self.dg.local_project, "Dist-git local project")
 
@@ -1503,7 +1527,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_title: str,
         pr_description: str,
         git_branch: str,
-        repo: Union[Upstream, DistGit],
+        repo: Union[GitUpstream, DistGit],
         sync_acls: bool = False,
     ) -> PullRequest:
         # the branch may already be up, let's push forcefully
@@ -2360,7 +2384,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 f"The `mock` command failed:\n{ex}",
             ) from ex
 
-        rpms = Upstream._get_rpms_from_mock_output(cmd_result.stderr)
+        rpms = GitUpstream._get_rpms_from_mock_output(cmd_result.stderr)
         return [Path(rpm) for rpm in rpms]
 
     def submit_vm_image_build(

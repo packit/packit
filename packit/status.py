@@ -87,7 +87,7 @@ class Status:
         :param number_of_releases: int
         :return: List
         """
-        if self.up.local_project.git_project is None:
+        if self.up.local_project is None or self.up.local_project.git_project is None:
             logger.info("We couldn't track any upstream releases.")
             return []
 
@@ -157,6 +157,10 @@ class Status:
         return updates
 
     def get_copr_builds(self, number_of_builds: int = 5) -> list:
-        return CoprHelper(upstream_local_project=self.up.local_project).get_copr_builds(
-            number_of_builds=number_of_builds,
+        return (
+            CoprHelper(upstream_local_project=self.up.local_project).get_copr_builds(
+                number_of_builds=number_of_builds,
+            )
+            if self.up.local_project
+            else []
         )
