@@ -1703,6 +1703,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         update_type: str,
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
+        sidetag: Optional[str] = None,
         bugzilla_ids: Optional[list[int]] = None,
     ) -> Optional[tuple[str, str]]:
         """
@@ -1715,6 +1716,7 @@ The first dist-git commit to be synced is '{short_hash}'.
               automatic update notes including a changelog diff since the latest stable build
               will be generated.
             koji_builds: List of Koji builds or `None` (picks latest).
+            sidetag: Koji sidetag to create the update from.
             bugzilla_ids: List of Bugzillas that are resolved with the update.
 
         Returns:
@@ -1722,10 +1724,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         logger.debug(
             f"Create bodhi update, "
-            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}",
+            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}"
+            + (f", sidetag={sidetag}" if sidetag else ""),
         )
         return self.dg.create_bodhi_update(
             koji_builds=koji_builds,
+            sidetag=sidetag,
             dist_git_branch=dist_git_branch,
             update_notes=update_notes,
             update_type=update_type,
