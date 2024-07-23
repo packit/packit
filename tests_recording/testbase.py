@@ -93,7 +93,7 @@ class PackitTest(unittest.TestCase):
     @property
     def upstream(self):
         if not self._upstream:
-            self._upstream = packit.upstream.Upstream(
+            self._upstream = packit.upstream.GitUpstream(
                 self.config,
                 self.pc,
                 local_project=self.lp,

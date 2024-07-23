@@ -11,7 +11,7 @@ import packit
 from packit.actions import ActionName
 from packit.actions_handler import ActionsHandler
 from packit.exceptions import PackitException
-from packit.upstream import Archive, SRPMBuilder, Upstream
+from packit.upstream import Archive, GitUpstream, SRPMBuilder
 
 
 @pytest.fixture
@@ -90,7 +90,7 @@ def test_create_pull(upstream_mock, upstream_pr_mock, fork_username):
     ],
 )
 def test_get_commands_for_actions(action_config, result):
-    ups = Upstream(
+    ups = GitUpstream(
         package_config=flexmock(
             actions={ActionName.create_archive: action_config},
             synced_files=flexmock(),
@@ -327,7 +327,7 @@ def test_convert_version_to_tag(
     ),
 )
 def test_get_rpms_from_rpmbuild_output(output, expected):
-    assert Upstream._get_rpms_from_rpmbuild_output(output) == expected
+    assert GitUpstream._get_rpms_from_rpmbuild_output(output) == expected
 
 
 @pytest.mark.parametrize(

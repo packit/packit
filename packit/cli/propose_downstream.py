@@ -56,12 +56,14 @@ def sync_release(
     package_config,
     resolved_bugs,
     sync_acls,
+    check_for_non_git_upstream=False,
 ):
     api = get_packit_api(
         config=config,
         package_config=package_config,
         dist_git_path=dist_git_path,
         local_project=path_or_url,
+        check_for_non_git_upstream=check_for_non_git_upstream,
     )
     if pr is None:
         pr = api.package_config.create_pr
@@ -255,4 +257,5 @@ def pull_from_upstream(
         package_config=package_config,
         resolved_bugs=resolve_bug,
         sync_acls=sync_acls,
+        check_for_non_git_upstream=True,
     )

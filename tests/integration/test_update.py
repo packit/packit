@@ -14,7 +14,7 @@ from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
-from packit.upstream import Upstream
+from packit.upstream import GitUpstream
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
 
@@ -111,6 +111,63 @@ def test_basic_local_update_use_downstream_specfile(
     subprocess.check_call(["git", "tag", "0.1.0", "-f"])
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+        use_downstream_specfile=True,
+    )
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+    # do this second time to see whether the specfile is updated correctly
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+        use_downstream_specfile=True,
+    )
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+    assert changelog.count("0.1.0-1") == 1
+
+
+def test_basic_local_update_use_downstream_specfile_non_git_upstream(
+    cwd_upstream,
+    api_instance,
+    distgit_and_remote,
+    mock_remote_functionality_upstream,
+):
+    u, d, api = api_instance
+    api.non_git_upstream = True
+    api._up = None
+
+    # remove the upstream specfile and push the tag that will be checked out
+    u.joinpath("beer.spec").unlink()
+    subprocess.check_call(
+        ["git", "commit", "-m", "remove spec", "-a"],
+        cwd=str(u),
+    )
+    subprocess.check_call(["git", "tag", "0.1.0", "-f"])
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(api.up).should_receive("sync_files")
 
     api.sync_release(
         dist_git_branch="main",
@@ -401,7 +458,9 @@ def test_local_update_generated_spec(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(Upstream).should_receive("get_latest_released_version").and_return("0.1.0")
+    flexmock(GitUpstream).should_receive("get_latest_released_version").and_return(
+        "0.1.0",
+    )
 
     # Simulate generation by moving the spec to a different location
     # We are checking two things:

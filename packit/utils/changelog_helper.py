@@ -193,6 +193,10 @@ class ChangelogHelper:
             logger.warning(
                 f"Unable to find a spec file in downstream: {ex}, copying the one from upstream.",
             )
+            # non-git upstream
+            if not self.up.absolute_specfile_path:
+                raise
+
             shutil.copy2(
                 self.up.absolute_specfile_path,
                 self.dg.get_absolute_specfile_path(),
