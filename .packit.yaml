@@ -108,17 +108,25 @@ jobs:
       - epel-9
 
   - job: koji_build
-    trigger: commit
+    trigger: commit | koji_build
     packit_instances: ["stg"]
     allowed_pr_authors: ["packit-stg", "packit"]
+    sidetag_group: packit-specfile-ogr-releases
+    dependencies:
+      - python-ogr
+      - python-specfile
     dist_git_branches:
       - fedora-all
       - epel-9
 
   - job: bodhi_update
-    trigger: commit
+    trigger: koji_build
     packit_instances: ["stg"]
     allowed_builders: ["packit-stg", "packit"]
+    sidetag_group: packit-specfile-ogr-releases
+    dependencies:
+      - python-ogr
+      - python-specfile
     dist_git_branches:
       - fedora-branched
       - epel-9
