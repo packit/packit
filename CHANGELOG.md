@@ -1,3 +1,8 @@
+# 0.100.0
+
+- `packit pull-from-upstream` now allows omitting `upstream_project_url` in the configuration in which case the interaction with the upstream repository is skipped during release syncing. (#2354)
+- We have implemented a CLI support for Koji builds against CBS Koji instance. (#2267)
+
 # 0.99.0
 
 # 0.98.0
