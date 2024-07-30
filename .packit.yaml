@@ -128,7 +128,7 @@ jobs:
       - python-ogr
       - python-specfile
     dist_git_branches:
-      - fedora-branched
+      - fedora-all
       - epel-9
 #  - job: vm_image_build
 #    trigger: pull_request
