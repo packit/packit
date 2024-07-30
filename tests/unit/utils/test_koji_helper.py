@@ -207,6 +207,43 @@ def test_remove_sidetag(logged_in):
 
 
 @pytest.mark.parametrize(
+    "tag, stable_tags",
+    [
+        ("f37-updates-candidate", ["f37-updates", "f37"]),
+        ("f37-updates-testing", ["f37-updates", "f37"]),
+        ("epel8-testing-candidate", ["epel8"]),
+        ("epel8-testing", ["epel8"]),
+        ("f37-updates", ["f37-updates", "f37"]),
+        ("epel8", ["epel8"]),
+        ("eln", ["eln", "f41"]),
+        ("f40-build-side-12345", ["f40-updates", "f40"]),
+    ],
+)
+def test_get_stable_tags(tag, stable_tags):
+    ancestors = {
+        "f37-updates-candidate": [{"name": "f37-updates"}, {"name": "f37"}],
+        "f37-updates-testing": [{"name": "f37-updates"}, {"name": "f37"}],
+        "epel8-testing-candidate": [{"name": "epel8"}],
+        "epel8-testing": [{"name": "epel8"}],
+        "f37-updates": [{"name": "f37"}],
+        "epel8": [],
+        "eln": [{"name": "f41"}],
+        "f40-build-side-12345": [
+            {"name": "f40-build"},
+            {"name": "f40-override"},
+            {"name": "f40-updates"},
+            {"name": "f40"},
+        ],
+    }
+
+    def getFullInheritance(tag, *_, **__):
+        return ancestors[tag]
+
+    session = flexmock(getFullInheritance=getFullInheritance)
+    assert KojiHelper(session).get_stable_tags(tag) == stable_tags
+
+
+@pytest.mark.parametrize(
     "branch, target",
     [
         ("f39", "f39-candidate"),
@@ -266,19 +303,3 @@ def test_format_changelog(since, formatted_changelog):
 )
 def test_get_candidate_tag(branch, tag):
     assert KojiHelper.get_candidate_tag(branch) == tag
-
-
-@pytest.mark.parametrize(
-    "tag, stable_tags",
-    [
-        ("f37-updates-candidate", ["f37-updates", "f37"]),
-        ("f37-updates-testing", ["f37-updates", "f37"]),
-        ("epel8-testing-candidate", ["epel8"]),
-        ("epel8-testing", ["epel8"]),
-        ("f37-updates", []),
-        ("epel8", []),
-        ("eln", []),
-    ],
-)
-def test_get_stable_tags(tag, stable_tags):
-    assert KojiHelper.get_stable_tags(tag) == stable_tags
