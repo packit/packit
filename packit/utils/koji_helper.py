@@ -268,6 +268,25 @@ class KojiHelper:
         except Exception as e:
             logger.debug(f"Failed to remove sidetag {sidetag} in Koji: {e}")
 
+    def get_stable_tags(self, tag: str) -> list[str]:
+        """
+        Gets a list of stable tags from the specified tag. Only tags without any suffix
+        and tags with "-updates" suffix are considered stable.
+
+        Args:
+            tag: Tag name.
+
+        Returns:
+            List of stable tags. Can be empty.
+        """
+        try:
+            ancestors = self.session.getFullInheritance(tag)
+        except Exception as e:
+            logger.debug(f"Failed to get inheritance of {tag} from Koji: {e}")
+            return []
+        tags = [tag] + [a["name"] for a in ancestors]
+        return [t for t in tags if "-" not in t or t.endswith("-updates")]
+
     @staticmethod
     def get_build_target(dist_git_branch: str) -> str:
         """
@@ -332,24 +351,3 @@ class KojiHelper:
         if dist_git_branch.startswith("epel"):
             return f"{dist_git_branch}-testing-candidate"
         return f"{dist_git_branch}-updates-candidate"
-
-    @staticmethod
-    def get_stable_tags(tag: str) -> list[str]:
-        """
-        Gets a list of stable tags from the specified tag name.
-
-        E.g. for tag f37-updates-testing the result would be [f37-updates, f37],
-        for epel8-testing-candidate it would be [epel8].
-
-        Args:
-            tag: Tag name.
-
-        Returns:
-            List of stable tags deduced. Can be empty.
-        """
-        if not tag.endswith("-candidate") and not tag.endswith("-testing"):
-            return []
-        stable_tag = tag.removesuffix("-candidate").removesuffix("-testing")
-        if stable_tag.endswith("-updates"):
-            return [stable_tag, stable_tag.removesuffix("-updates")]
-        return [stable_tag]
