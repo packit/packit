@@ -1,7 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import koji
 import pytest
 from bodhi.client.bindings import BodhiClient, BodhiClientException
 from flexmock import flexmock
@@ -9,6 +8,7 @@ from munch import Munch
 
 from packit import distgit
 from packit.exceptions import PackitBodhiException
+from packit.utils.koji_helper import KojiHelper
 
 
 @pytest.fixture()
@@ -240,10 +240,8 @@ def bodhi_response():
 
 
 @pytest.fixture()
-def latest_builds_from_koji():
-    return [
-        {"nvr": "sen-0.6.1-1.fc30"},
-    ]
+def latest_build_from_koji():
+    return "sen-0.6.1-1.fc30"
 
 
 @pytest.mark.parametrize(
@@ -272,13 +270,16 @@ def test_basic_bodhi_update(
     update_notes,
     koji_builds,
     bodhi_response,
-    latest_builds_from_koji,
+    latest_build_from_koji,
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
-    flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
-        lambda tag, package, inherit, latest, strict: latest_builds_from_koji,
+    flexmock(KojiHelper).should_receive("get_candidate_tag").and_return(
+        "f30-updates-candidate",
+    )
+    flexmock(KojiHelper).should_receive("get_latest_nvr_in_tag").and_return(
+        latest_build_from_koji,
     )
 
     flexmock(
@@ -315,7 +316,7 @@ def test_bodhi_update_with_bugs(
     update_notes,
     koji_builds,
     bodhi_response,
-    latest_builds_from_koji,
+    latest_build_from_koji,
 ):
     """This test checks that bugzilla IDs can be passed and that bodhi
     authentication works using kerberos."""
@@ -328,17 +329,19 @@ def test_bodhi_update_with_bugs(
     api.config.fas_user = "packit"
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
-    flexmock(koji.ClientSession).should_receive("__getattr__").and_return(
-        lambda tag, package, inherit, latest, strict: latest_builds_from_koji,
+    flexmock(KojiHelper).should_receive("get_candidate_tag").and_return(
+        "f30-updates-candidate",
+    )
+    flexmock(KojiHelper).should_receive("get_latest_nvr_in_tag").and_return(
+        latest_build_from_koji,
     )
 
     flexmock(
         BodhiClient,
-        latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: validate_save(
             kwargs,
             {
-                "builds": koji_builds or [latest_builds_from_koji[0]["nvr"]],
+                "builds": koji_builds or [latest_build_from_koji],
                 "notes": update_notes.format(version="0.0.0"),
                 "type": "enhancement",
                 "bugs": ["1", "2", "3"],
@@ -361,7 +364,6 @@ def test_bodhi_update_auth_with_fas(
     api_instance,
     mock_remote_functionality_upstream,
     bodhi_response,
-    latest_builds_from_koji,
 ):
     u, d, api = api_instance
     api.config.fas_user = "the_fas_username"
@@ -371,7 +373,6 @@ def test_bodhi_update_auth_with_fas(
     flexmock(distgit).should_call("get_bodhi_client")
     flexmock(
         BodhiClient,
-        latest_builds=lambda package: latest_builds_from_koji,
         save=lambda **kwargs: bodhi_response,
         ensure_auth=lambda: None,
     )

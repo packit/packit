@@ -539,7 +539,8 @@ class DistGit(PackitRepositoryBase):
         )
 
         koji_helper = KojiHelper()
-        tag = koji_helper.get_candidate_tag(dist_git_branch)
+        if not (tag := koji_helper.get_candidate_tag(dist_git_branch)):
+            raise PackitException(f"Failed to get candidate tag for {dist_git_branch}")
         build = koji_helper.get_latest_nvr_in_tag(downstream_package_name, tag)
 
         if not build:
