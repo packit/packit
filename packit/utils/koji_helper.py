@@ -223,17 +223,11 @@ class KojiHelper:
         Returns:
             New tag information or None if creation failed.
         """
-        target_name = self.get_build_target(dist_git_branch)
-        try:
-            target = self.session.getBuildTarget(target_name)
-        except Exception as e:
-            logger.debug(f"Failed to get build target {target_name} from Koji: {e}")
-            return None
-        if not target:
-            logger.debug(f"Failed to get build target {target_name} from Koji")
+        if not (target := self.get_build_target(dist_git_branch)):
+            logger.debug(f"Failed to get build target for {dist_git_branch} from Koji")
             return None
         if not (build_tag := target.get("build_tag_name")):
-            logger.debug(f"Failed to get build tag from build target {target_name}")
+            logger.debug(f"Failed to get build tag for {dist_git_branch}")
             return None
         if not self.session.logged_in:
             try:
@@ -268,6 +262,51 @@ class KojiHelper:
         except Exception as e:
             logger.debug(f"Failed to remove sidetag {sidetag} in Koji: {e}")
 
+    def get_build_target(self, dist_git_branch: str) -> Optional[dict]:
+        """
+        Gets a build target from a dist-git branch name.
+
+        Args:
+            dist_git_branch: dist-git branch name.
+
+        Returns:
+            Build target or None if not found.
+        """
+        target_name = self.get_build_target_name(dist_git_branch)
+        try:
+            target = self.session.getBuildTarget(target_name, strict=True)
+        except Exception as e:
+            logger.debug(f"Failed to get build target {target_name} from Koji: {e}")
+            return None
+        return target
+
+    # | Overview of tag names
+    # |------------------------------|----------------------|-------------------------|
+    # |                              | Fedora               | EPEL                    |
+    # |------------------------------|----------------------|-------------------------|
+    # | fresh build                  | fN-updates-candidate | epelN-testing-candidate |
+    # | associated update in testing | fN-updates-testing   | epelN-testing           |
+    # | associated update in stable  | fN-updates/fN        | epelN                   |
+    # |------------------------------|----------------------|-------------------------|
+
+    def get_candidate_tag(self, dist_git_branch: str) -> Optional[str]:
+        """
+        Gets a candidate tag from a dist-git branch name.
+
+        Args:
+            dist_git_branch: dist-git branch name.
+
+        Returns:
+            Name of matching candidate tag or None if not found.
+        """
+        if not (target := self.get_build_target(dist_git_branch)):
+            logger.debug(f"Failed to get build target for {dist_git_branch} from Koji")
+            return None
+        if not (dest_tag := target.get("dest_tag_name")):
+            logger.debug(f"Failed to get dest tag for {dist_git_branch}")
+            return None
+        return dest_tag
+
     def get_stable_tags(self, tag: str) -> list[str]:
         """
         Gets a list of stable tags from the specified tag. Only tags without any suffix
@@ -288,9 +327,9 @@ class KojiHelper:
         return [t for t in tags if "-" not in t or t.endswith("-updates")]
 
     @staticmethod
-    def get_build_target(dist_git_branch: str) -> str:
+    def get_build_target_name(dist_git_branch: str) -> str:
         """
-        Gets a build target from a dist-git branch name.
+        Gets a build target name from a dist-git branch name.
 
         Args:
             dist_git_branch: dist-git branch name.
@@ -324,30 +363,3 @@ class KojiHelper:
                 str(ChangelogEntry.assemble(timestamp, name, text.splitlines())),
             )
         return "\n".join(lines)
-
-    # | Overview of tag names
-    # |------------------------------|----------------------|-------------------------|
-    # |                              | Fedora               | EPEL                    |
-    # |------------------------------|----------------------|-------------------------|
-    # | fresh build                  | fN-updates-candidate | epelN-testing-candidate |
-    # | associated update in testing | fN-updates-testing   | epelN-testing           |
-    # | associated update in stable  | fN-updates/fN        | epelN                   |
-    # |------------------------------|----------------------|-------------------------|
-
-    @staticmethod
-    def get_candidate_tag(dist_git_branch: str) -> str:
-        """
-        Gets a candidate tag from a dist-git branch name.
-
-        E.g. for branch f37 the result would be f37-updates-candidate,
-        for epel8 branch it would be epel8-testing-candidate.
-
-        Args:
-            dist_git_branch: dist-git branch name.
-
-        Returns:
-            Name of matching candidate tag.
-        """
-        if dist_git_branch.startswith("epel"):
-            return f"{dist_git_branch}-testing-candidate"
-        return f"{dist_git_branch}-updates-candidate"

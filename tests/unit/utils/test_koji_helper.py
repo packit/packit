@@ -183,10 +183,11 @@ def test_create_sidetag(error):
 
     session = flexmock(
         logged_in=True,
-        getBuildTarget=lambda _: {"build_tag_name": "f39-build"},
         createSideTag=createSideTag,
     )
-    result = KojiHelper(session).create_sidetag("f39")
+    koji_helper = KojiHelper(session)
+    flexmock(koji_helper, get_build_target=lambda _: {"build_tag_name": "f39-build"})
+    result = koji_helper.create_sidetag("f39")
     if error:
         assert result is None
     else:
@@ -204,6 +205,67 @@ def test_remove_sidetag(logged_in):
     ).mock()
     session.should_receive("removeSideTag").once()
     KojiHelper(session).remove_sidetag("f39-build-side-12345")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [False, True],
+)
+def test_get_build_target(error):
+    target = {
+        "id": 123456,
+        "build_tag_name": "f39-build",
+        "dest_tag_name": "f39-updates-candidate",
+    }
+
+    def getBuildTarget(*_, **__):
+        if error:
+            raise Exception
+        return target
+
+    session = flexmock(getBuildTarget=getBuildTarget)
+    result = KojiHelper(session).get_build_target("f39")
+    if error:
+        assert result is None
+    else:
+        assert result == target
+
+
+@pytest.mark.parametrize(
+    "branch, tag",
+    [
+        ("f39", "f39-updates-candidate"),
+        ("epel9", "epel9-testing-candidate"),
+        ("eln", "eln-updates-candidate"),
+        ("rawhide", "f41-updates-candidate"),
+    ],
+)
+def test_get_candidate_tag(branch, tag):
+    targets = {
+        "f39": {
+            "build_tag_name": "f39-build",
+            "dest_tag_name": "f39-updates-candidate",
+        },
+        "epel9": {
+            "build_tag_name": "epel9-build",
+            "dest_tag_name": "epel9-testing-candidate",
+        },
+        "eln": {
+            "build_tag_name": "eln-build",
+            "dest_tag_name": "eln-updates-candidate",
+        },
+        "rawhide": {
+            "build_tag_name": "f41-build",
+            "dest_tag_name": "f41-updates-candidate",
+        },
+    }
+
+    def get_build_target(branch, *_, **__):
+        return targets[branch]
+
+    koji_helper = KojiHelper()
+    flexmock(koji_helper, get_build_target=get_build_target)
+    assert koji_helper.get_candidate_tag(branch) == tag
 
 
 @pytest.mark.parametrize(
@@ -248,12 +310,13 @@ def test_get_stable_tags(tag, stable_tags):
     [
         ("f39", "f39-candidate"),
         ("epel9", "epel9-candidate"),
+        ("eln", "eln-candidate"),
         ("rawhide", "rawhide"),
         ("main", "rawhide"),
     ],
 )
-def test_get_build_target(branch, target):
-    assert KojiHelper.get_build_target(branch) == target
+def test_get_build_target_name(branch, target):
+    assert KojiHelper.get_build_target_name(branch) == target
 
 
 @pytest.mark.parametrize(
@@ -292,14 +355,3 @@ def test_format_changelog(since, formatted_changelog):
         (1648728000, "Nikola Forró <nforro@redhat.com> - 0.1-1", "- first entry"),
     ]
     assert KojiHelper.format_changelog(changelog, since) == formatted_changelog
-
-
-@pytest.mark.parametrize(
-    "branch, tag",
-    [
-        ("f37", "f37-updates-candidate"),
-        ("epel8", "epel8-testing-candidate"),
-    ],
-)
-def test_get_candidate_tag(branch, tag):
-    assert KojiHelper.get_candidate_tag(branch) == tag
