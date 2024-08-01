@@ -1,3 +1,7 @@
+# 0.100.1
+
+- Dummy release to test the "build in side tags" new feature!
+
 # 0.100.0
 
 - `packit pull-from-upstream` now allows omitting `upstream_project_url` in the configuration in which case the interaction with the upstream repository is skipped during release syncing. (#2354)
