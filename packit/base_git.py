@@ -204,7 +204,39 @@ class PackitRepositoryBase:
         except GitCommandError as exc:
             raise PackitException(f"Failed to switch branch to {branch!r}") from exc
 
-    def search_branch(self, name: str) -> bool:
+    def reset_workdir(
+        self,
+    ) -> None:
+        try:
+            self.local_project.git_repo.head.reset(
+                index=True,
+                working_tree=True,
+            )
+        except GitCommandError as exc:
+            raise PackitException("Failed to reset git working tree") from exc
+        try:
+            self.local_project.git_repo.git.execute(["git", "clean", "-xdf"])
+        except GitCommandError as exc:
+            raise PackitException("Failed to clean git working dir") from exc
+
+    def rebase_branch(
+        self,
+        onto_branch: str,
+    ) -> None:
+        """
+        Rebase onto specified branch.
+
+        Args:
+            branch: branch to rebase onto
+        """
+        try:
+            self.local_project.git_repo.git.rebase(onto_branch)
+        except GitCommandError as exc:
+            raise PackitException(
+                f"Failed to rebase onto branch {onto_branch!r}",
+            ) from exc
+
+    def search_branch(self, name: str, remote="origin") -> bool:
         """
         Does branch exist remotely?
 

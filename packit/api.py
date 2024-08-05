@@ -1115,7 +1115,12 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             if create_pr:
                 local_pr_branch = f"{dist_git_branch}-{local_pr_branch_suffix}"
-                self.dg.checkout_branch(local_pr_branch)
+                self.dg.create_branch(
+                    local_pr_branch,
+                )
+                self.dg.switch_branch(local_pr_branch, force=True)
+                self.dg.reset_workdir()
+                self.dg.rebase_branch(dist_git_branch)
 
             if create_sync_note and self.package_config.create_sync_note:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
