@@ -150,6 +150,8 @@ class Config:
                 try:
                     with open(config_file_name_full) as file:
                         loaded_config = safe_load(file)
+                        # Ignore yaml anchor placeholders
+                        loaded_config.pop("_", None)
                 except Exception as ex:
                     logger.error(f"Cannot load user config {config_file_name_full!r}.")
                     raise PackitException(f"Cannot load user config: {ex!r}.") from ex
