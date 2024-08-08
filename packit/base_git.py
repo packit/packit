@@ -204,7 +204,39 @@ class PackitRepositoryBase:
         except GitCommandError as exc:
             raise PackitException(f"Failed to switch branch to {branch!r}") from exc
 
-    def search_branch(self, name: str) -> bool:
+    def reset_workdir(
+        self,
+    ) -> None:
+        try:
+            self.local_project.git_repo.head.reset(
+                index=True,
+                working_tree=True,
+            )
+        except GitCommandError as exc:
+            raise PackitException("Failed to reset git working tree") from exc
+        try:
+            self.local_project.git_repo.git.execute(["git", "clean", "-xdf"])
+        except GitCommandError as exc:
+            raise PackitException("Failed to clean git working dir") from exc
+
+    def rebase_branch(
+        self,
+        onto_branch: str,
+    ) -> None:
+        """
+        Rebase onto specified branch.
+
+        Args:
+            branch: branch to rebase onto
+        """
+        try:
+            self.local_project.git_repo.git.rebase(onto_branch)
+        except GitCommandError as exc:
+            raise PackitException(
+                f"Failed to rebase onto branch {onto_branch!r}",
+            ) from exc
+
+    def search_branch(self, name: str, remote="origin") -> bool:
         """
         Does branch exist remotely?
 
@@ -216,7 +248,7 @@ class PackitRepositoryBase:
         """
         try:
             self.local_project.git_repo.git.fetch()
-            for ref in self.local_project.git_repo.remote().refs:
+            for ref in self.local_project.git_repo.remote(remote).refs:
                 if ref.remote_head == name:
                     return True
         except GitCommandError as exc:
@@ -225,17 +257,14 @@ class PackitRepositoryBase:
             ) from exc
         return False
 
-    def checkout_branch(
-        self,
-        name: str,
-    ) -> None:
+    def checkout_branch(self, name: str, remote: str = "origin") -> None:
         """
         Checkout remote, already existing, branch "name"
 
         Args:
             name: str
         """
-        if self.search_branch(name):
+        if self.search_branch(name, remote):
             try:
                 self.local_project.git_repo.git.checkout(name)
             except GitCommandError as exc:
@@ -509,7 +538,7 @@ class PackitRepositoryBase:
                     PushInfo.REMOTE_REJECTED,
                     PushInfo.NO_MATCH,  # this looks like it's not used in gitpython
                     PushInfo.REJECTED,
-                    PushInfo.UP_TO_DATE,  # is this an error?
+                    # PushInfo.UP_TO_DATE,  # is this an error?
                 )
             ]
             if any(push_failed):

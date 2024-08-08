@@ -58,6 +58,18 @@ def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
 
 
 @pytest.fixture()
+def mock_remote_functionality_upstream_allow_push_to_fork(
+    upstream_and_remote,
+    distgit_and_remote,
+    distgit_fork_and_remote,
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
+    f, _ = distgit_fork_and_remote
+    return mock_remote_functionality(d, u, distgit_fork=f)
+
+
+@pytest.fixture()
 def mock_remote_functionality_downstream_autochangelog(
     upstream_and_remote,
     distgit_with_autochangelog_and_remote,
@@ -102,7 +114,11 @@ def mock_spec_download_remote_s(
     flexmock(PackitRepositoryBase, download_remote_sources=mock_download_remote_sources)
 
 
-def mock_remote_functionality(distgit: Path, upstream: Path):
+def mock_remote_functionality(
+    distgit: Path,
+    upstream: Path,
+    distgit_fork: Optional[Path] = None,
+):
     def mocked_create_pr(*args, **kwargs):
         return PullRequestReadOnly(
             title="",
@@ -113,6 +129,19 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
             author="",
             source_branch="",
             target_branch="",
+            created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
+        )
+
+    def mocked_create_pr_ff_merge(*args, **kwargs):
+        return PullRequestReadOnly(
+            title="",
+            id=42,
+            status=PRStatus.open,
+            url="",
+            description="",
+            author="",
+            source_branch=kwargs["source_branch"],
+            target_branch=kwargs["target_branch"],
             created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
         )
 
@@ -133,14 +162,25 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
             github_repo=flexmock(),
         ),
     )
-    flexmock(
-        PagureProject,
-        get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
-        fork_create=lambda: None,
-        get_fork=lambda: PagureProject("", "", PagureService()),
-        create_pr=mocked_create_pr,
-        default_branch="main",
-    )
+    if distgit_fork:
+        flexmock(
+            PagureProject,
+            get_git_urls=lambda: {"ssh": str(distgit_fork)},
+            fork_create=lambda: None,
+            get_fork=lambda: PagureService().get_project_from_url(str(distgit_fork)),
+            create_pr=mocked_create_pr_ff_merge,
+            default_branch="main",
+        )
+    else:
+        flexmock(
+            PagureProject,
+            get_git_urls=lambda: {"git": DOWNSTREAM_PROJECT_URL},
+            fork_create=lambda: None,
+            get_fork=lambda: PagureProject("", "", PagureService()),
+            create_pr=mocked_create_pr,
+            default_branch="main",
+        )
+
     flexmock(
         GithubProject,
         get_git_urls=lambda: {"git": UPSTREAM_PROJECT_URL},
@@ -155,13 +195,21 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         git_url="https://packit.dev/rpms/beer",
         git_service=PagureService(),
     )
-    flexmock(
-        DistGit,
-        push_to_fork=lambda *args, **kwargs: None,
-        # let's not hammer the production lookaside cache webserver
-        is_archive_in_lookaside_cache=lambda archive_path: False,
-        local_project=dglp,
-    )
+    if distgit_fork:
+        flexmock(
+            DistGit,
+            # let's not hammer the production lookaside cache webserver
+            is_archive_in_lookaside_cache=lambda archive_path: False,
+            local_project=dglp,
+        )
+    else:
+        flexmock(
+            DistGit,
+            push_to_fork=lambda *args, **kwargs: None,
+            # let's not hammer the production lookaside cache webserver
+            is_archive_in_lookaside_cache=lambda archive_path: False,
+            local_project=dglp,
+        )
     flexmock(DistGit).should_receive("existing_pr").and_return(None)
 
     def mocked_new_sources(sources=None, offline=False):
@@ -171,7 +219,7 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
 
     flexmock(PkgTool, new_sources=mocked_new_sources)
     flexmock(PackitAPI, init_kerberos_ticket=lambda: None)
-    return upstream, distgit
+    return upstream, distgit, distgit_fork
 
 
 @pytest.fixture()

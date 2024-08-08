@@ -882,6 +882,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
+        ff_branch_into: Optional[str] = None,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -909,6 +910,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
+        ff_branch_into: Optional[str] = None,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -935,6 +937,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
+        ff_branch_into: Optional[str] = None,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -971,6 +974,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             pr_description_footer: Footer for the PR description (used by packit-service)
             sync_acls: Whether to sync the ACLs of original repo and
                 fork when creating a PR from fork.
+            ff_branch_into: Option[str] = None
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -1032,6 +1036,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
 
         current_up_branch = self.up.active_branch
+        dist_git_working_branch = ff_branch_into if ff_branch_into else dist_git_branch
         try:
             # we want to check out the tag only when local_content is not set
             # and it's an actual upstream repo and not source-git
@@ -1044,14 +1049,14 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.checkout_release(upstream_tag)
 
             self.dg.create_branch(
-                dist_git_branch,
-                base=f"remotes/origin/{dist_git_branch}",
+                dist_git_working_branch,
+                base=f"remotes/origin/{dist_git_working_branch}",
                 setup_tracking=True,
             )
             # fetch and reset --hard upstream/$branch?
-            logger.info(f"Using {dist_git_branch!r} dist-git branch.")
-            self.dg.update_branch(dist_git_branch)
-            self.dg.switch_branch(dist_git_branch, force=True)
+            logger.info(f"Using {dist_git_working_branch!r} dist-git branch.")
+            self.dg.update_branch(dist_git_working_branch)
+            self.dg.switch_branch(dist_git_working_branch, force=True)
 
             # do not add anything between distgit clone/checkout and saving gpg keys!
             self.up.allowed_gpg_keys = (
@@ -1093,7 +1098,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             if not self.check_version_distance(version, spec_ver, dist_git_branch):
                 raise ReleaseSkippedPackitException(
                     f"The upstream released version {version} does not match "
-                    f"specfile version {spec_ver} at branch {dist_git_branch} "
+                    f"specfile version {spec_ver} at branch {dist_git_working_branch} "
                     f"using the version_update_mask "
                     f'"{self.package_config.version_update_mask}".'
                     "\nYou can change the version_update_mask with an empty string "
@@ -1110,10 +1115,28 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.up.specfile.reload()
 
             if create_pr:
-                local_pr_branch = f"{dist_git_branch}-{local_pr_branch_suffix}"
-                self.dg.checkout_branch(local_pr_branch)
+                local_pr_branch = f"{dist_git_working_branch}-{local_pr_branch_suffix}"
+                if ff_branch_into:
+                    self.dg.setup_remote(fork_remote_name="fork")
+                    if not self.dg.search_branch(local_pr_branch, "fork"):
+                        # source branch has to already exist!
+                        raise PackitException(
+                            f"Branch {dist_git_branch} can not be fast forwarded because "
+                            "source branch {local_pr_branch} can not be found on "
+                            "repo {self.dg.local_project.repo_name}",
+                        )
+                self.dg.create_branch(
+                    local_pr_branch,
+                )
+                self.dg.switch_branch(local_pr_branch, force=True)
+                self.dg.reset_workdir()
+                self.dg.rebase_branch(dist_git_working_branch)
 
-            if create_sync_note and self.package_config.create_sync_note:
+            if (
+                create_sync_note
+                and self.package_config.create_sync_note
+                and not ff_branch_into
+            ):
                 readme_path = self.dg.local_project.working_dir / "README.packit"
                 logger.debug(f"README: {readme_path}")
                 readme_path.write_text(
@@ -1155,19 +1178,20 @@ The first dist-git commit to be synced is '{short_hash}'.
                 or self.get_default_commit_description(upstream_tag, resolved_bugs),
             )
 
-            self.update_dist_git(
-                version,
-                upstream_ref,
-                add_new_sources=add_new_sources,
-                force_new_sources=force_new_sources,
-                upstream_tag=upstream_tag,
-                commit_title=commit_title,
-                commit_msg=commit_description,
-                sync_default_files=sync_default_files,
-                mark_commit_origin=mark_commit_origin,
-                check_dist_git_pristine=False,
-                resolved_bugs=resolved_bugs,
-            )
+            if not ff_branch_into:
+                self.update_dist_git(
+                    version,
+                    upstream_ref,
+                    add_new_sources=add_new_sources,
+                    force_new_sources=force_new_sources,
+                    upstream_tag=upstream_tag,
+                    commit_title=commit_title,
+                    commit_msg=commit_description,
+                    sync_default_files=sync_default_files,
+                    mark_commit_origin=mark_commit_origin,
+                    check_dist_git_pristine=False,
+                    resolved_bugs=resolved_bugs,
+                )
 
             pr = None
             if create_pr:

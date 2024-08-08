@@ -7,12 +7,15 @@ from copr.v3 import Client
 from flexmock import flexmock
 
 import packit
-from packit.config import aliases
+from packit.config import CommonPackageConfig, aliases
 from packit.config.aliases import (
+    ff_branch_into,
     get_aliases,
+    get_all_ff_branches,
     get_all_koji_targets,
     get_branches,
     get_build_targets,
+    get_ff_branches_from,
     get_koji_targets,
     get_versions,
 )
@@ -176,8 +179,170 @@ class TestGetBranches:
         )
         assert get_branches(*names) == versions
 
+    @pytest.mark.parametrize(
+        "names,versions",
+        [
+            (
+                {"fedora-30": {"open_pull_request_for": ["f31"]}, "fedora-stable": {}},
+                {"f30", "f32"},
+            ),
+        ],
+    )
+    def test_get_branches_from_multiple_values_in_dict(self, names, versions):
+        flexmock(packit.config.aliases).should_receive("get_versions").and_return(
+            versions,
+        )
+        assert get_branches(*names) == versions
+
     def test_get_branches_without_default(self):
         assert get_branches(default=None) == set()
+
+    @pytest.mark.parametrize(
+        "config,branches,ff_branches",
+        [
+            (
+                CommonPackageConfig(
+                    dist_git_branches={
+                        "rawhide": {"open_pull_request_for": ["f33"]},
+                        "f35": {},
+                        "f34": {},
+                    },
+                ),
+                {"main", "f35", "f34"},
+                {"main": {"f33"}, "f35": set(), "f34": set()},
+            ),
+            (
+                CommonPackageConfig(
+                    # no sense but possible!
+                    dist_git_branches={
+                        "fedora-branched": {"open_pull_request_for": ["fedora-stable"]},
+                    },
+                ),
+                {"f39", "f40"},
+                {"f39": {"f39", "f40"}, "f40": {"f39", "f40"}},
+            ),
+        ],
+    )
+    def test_get_ff_branches_from(
+        self,
+        config,
+        branches,
+        ff_branches,
+    ):
+        mock_aliases_module = flexmock(packit.config.aliases)
+        mock_aliases_module.should_receive("get_aliases").and_return(
+            {
+                "fedora-all": ["fedora-39", "fedora-40", "fedora-rawhide"],
+                "fedora-stable": ["fedora-39", "fedora-40"],
+                "fedora-development": ["fedora-rawhide"],
+                "fedora-latest": ["fedora-40"],
+                "fedora-latest-stable": ["fedora-40"],
+                "fedora-branched": ["fedora-39", "fedora-40"],
+                "epel-all": ["epel-8", "epel-9"],
+            },
+        )
+
+        assert branches == get_branches(*config.dist_git_branches)
+        for source_branch in branches:
+            assert (
+                get_ff_branches_from(config.dist_git_branches, source_branch)
+                == ff_branches[source_branch]
+            )
+
+    @pytest.mark.parametrize(
+        "config,ff_branches",
+        [
+            (
+                CommonPackageConfig(
+                    dist_git_branches={
+                        "rawhide": {"open_pull_request_for": ["f33"]},
+                        "f35": {},
+                        "f34": {},
+                    },
+                ),
+                {"f33"},
+            ),
+            (
+                CommonPackageConfig(
+                    # no sense but possible!
+                    dist_git_branches={
+                        "fedora-branched": {"open_pull_request_for": ["fedora-stable"]},
+                    },
+                ),
+                {"f39", "f40"},
+            ),
+        ],
+    )
+    def test_get_all_ff_branches(
+        self,
+        config,
+        ff_branches,
+    ):
+        mock_aliases_module = flexmock(packit.config.aliases)
+        mock_aliases_module.should_receive("get_aliases").and_return(
+            {
+                "fedora-all": ["fedora-39", "fedora-40", "fedora-rawhide"],
+                "fedora-stable": ["fedora-39", "fedora-40"],
+                "fedora-development": ["fedora-rawhide"],
+                "fedora-latest": ["fedora-40"],
+                "fedora-latest-stable": ["fedora-40"],
+                "fedora-branched": ["fedora-39", "fedora-40"],
+                "epel-all": ["epel-8", "epel-9"],
+            },
+        )
+
+        assert get_all_ff_branches(config.dist_git_branches) == ff_branches
+
+    @pytest.mark.parametrize(
+        "config,source_target_branch_mapping",
+        [
+            (
+                CommonPackageConfig(
+                    dist_git_branches={
+                        "rawhide": {"open_pull_request_for": ["f33"]},
+                        "f35": {},
+                        "f34": {},
+                    },
+                ),
+                {"main": {"f33"}},
+            ),
+            (
+                CommonPackageConfig(
+                    dist_git_branches={
+                        "fedora-rawhide": {
+                            "open_pull_request_for": ["fedora-stable"],
+                        },
+                    },
+                ),
+                {"main": {"f39", "f40"}},
+            ),
+            (
+                CommonPackageConfig(dist_git_branches=["fedora-develoment"]),
+                {},
+            ),
+        ],
+    )
+    def test_ff_branch_into(
+        self,
+        config,
+        source_target_branch_mapping,
+    ):
+        mock_aliases_module = flexmock(packit.config.aliases)
+        mock_aliases_module.should_receive("get_aliases").and_return(
+            {
+                "fedora-all": ["fedora-39", "fedora-40", "fedora-rawhide"],
+                "fedora-stable": ["fedora-39", "fedora-40"],
+                "fedora-development": ["fedora-rawhide"],
+                "fedora-latest": ["fedora-40"],
+                "fedora-latest-stable": ["fedora-40"],
+                "fedora-branched": ["fedora-39", "fedora-40"],
+                "epel-all": ["epel-8", "epel-9"],
+            },
+        )
+
+        for key, values in source_target_branch_mapping.items():
+            for value in values:
+                assert ff_branch_into(config.dist_git_branches, value) == key
 
 
 class TestGetKojiTargets:

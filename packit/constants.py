@@ -261,3 +261,5 @@ RELEASE_MONITORING_PACKAGE_CHECK_URL = "https://release-monitoring.org//api/v2/p
 # with connection timeout, the actual value will usually be a multiple of what is configured,
 # depending on the number of IP addresses for the target domain
 HTTP_REQUEST_TIMEOUT = (10, 30)
+
+OPEN_PULL_REQUEST_FOR_KEY = "open_pull_request_for"

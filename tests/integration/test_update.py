@@ -7,12 +7,14 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from git import repo
 from specfile import Specfile
 
 from packit.actions import ActionName
 from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
 from packit.distgit import DistGit
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject
 from packit.upstream import GitUpstream
 from tests.integration.conftest import mock_spec_download_remote_s
@@ -63,6 +65,56 @@ def test_basic_local_update(
         changelog = "\n".join(sections.changelog)
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
+
+
+def test_ff_local_update(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream_allow_push_to_fork,
+):
+    """
+    We need to test two updates,
+    the one that creates the source branch
+    and the one that uses the source branch to fast forward a target branch
+
+    main is the source branch
+    f40 is the target branch that can be fast forwarded using main
+    """
+    _, d, api = api_instance
+    _, _, f = mock_remote_functionality_upstream_allow_push_to_fork
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(Specfile).should_call("reload").times(3)
+
+    with pytest.raises(PackitException) as ex:
+        api.sync_release(
+            dist_git_branch="f40",
+            versions=["0.1.0"],
+            ff_branch_into="main",
+        )
+    assert "can not be fast forwarded" in str(ex)
+
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"])
+    assert repo.Repo(d).heads == repo.Repo(f).heads
+
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+    pr = api.sync_release(
+        dist_git_branch="f40",
+        versions=["0.1.0"],
+        ff_branch_into="main",
+    )
+    assert pr.source_branch != pr.target_branch
+    assert pr.source_branch == "main-update"
+    assert pr.target_branch == "f40"
 
 
 def test_basic_local_update_no_upload_to_lookaside(

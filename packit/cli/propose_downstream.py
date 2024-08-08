@@ -14,7 +14,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
 from packit.config import PackageConfig, get_context_settings, pass_config
-from packit.config.aliases import get_branches
+from packit.config.aliases import ff_branch_into, get_all_ff_branches, get_branches
 from packit.constants import (
     PACKAGE_LONG_OPTION,
     PACKAGE_OPTION_HELP,
@@ -24,12 +24,14 @@ from packit.constants import (
 logger = logging.getLogger(__name__)
 
 
-def get_dg_branches(api, dist_git_branch):
+def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
     cmdline_dg_branches = dist_git_branch.split(",") if dist_git_branch else []
     config_dg_branches = []
     if isinstance(api.package_config, PackageConfig):
         config_dg_branches = (
-            api.package_config.get_propose_downstream_dg_branches_value()
+            api.package_config.get_propose_downstream_dg_branches_value(
+                pull_from_upstream=pull_from_upstream,
+            )
         )
 
     default_dg_branch = api.dg.local_project.git_project.default_branch
@@ -37,7 +39,11 @@ def get_dg_branches(api, dist_git_branch):
     dg_branches = (
         cmdline_dg_branches or config_dg_branches or default_dg_branch.split(",")
     )
+    return dg_branches, default_dg_branch
 
+
+def get_dg_branches(api, dist_git_branch):
+    dg_branches, default_dg_branch = get_dist_git_branches(api, dist_git_branch)
     return get_branches(*dg_branches, default_dg_branch=default_dg_branch)
 
 
@@ -68,13 +74,28 @@ def sync_release(
     if pr is None:
         pr = api.package_config.create_pr
 
-    branches_to_update = get_dg_branches(api, dist_git_branch)
+    dist_git_branches, default_dg_branch = get_dist_git_branches(
+        api,
+        dist_git_branch,
+        pull_from_upstream=use_downstream_specfile,
+    )
+    branches_to_update = get_branches(
+        *dist_git_branches,
+        default_dg_branch=default_dg_branch,
+    )
+    ff_branches = get_all_ff_branches(
+        dist_git_branches,
+        default_dg_branch=default_dg_branch,
+    )
+    all_branches = []  # we need to preserve order
+    all_branches.extend(branches_to_update)
+    all_branches.extend(ff_branches)
 
     click.echo(
-        f"Proposing update of the following branches: {', '.join(branches_to_update)}",
+        f"Proposing update of the following branches: {', '.join(all_branches)}",
     )
 
-    for branch in branches_to_update:
+    for branch in all_branches:
         api.sync_release(
             dist_git_branch=branch,
             use_local_content=local_content,
@@ -86,6 +107,7 @@ def sync_release(
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolved_bugs,
             sync_acls=sync_acls,
+            ff_branch_into=ff_branch_into(dist_git_branches, branch),
         )
 
 

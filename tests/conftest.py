@@ -86,6 +86,27 @@ def distgit_and_remote(tmp_path) -> tuple[Path, Path]:
 
 
 @pytest.fixture()
+def distgit_fork_and_remote(tmp_path) -> tuple[Path, Path]:
+    f_remote_path = tmp_path / "dist_git_fork_remote"
+    f_remote_path.mkdir(parents=True, exist_ok=True)
+    create_new_repo(f_remote_path, ["--bare"])
+
+    f = tmp_path / "dist_git_fork"
+    shutil.copytree(DISTGIT, f)
+    initiate_git_repo(
+        f,
+        push=True,
+        remotes=[
+            ("origin", str(f_remote_path)),
+            ("i_am_distgit_fork", "https://src.fedoraproject.org/rpms/fork/python-ogr"),
+        ],
+    )
+    prepare_dist_git_repo(f)
+
+    return f, f_remote_path
+
+
+@pytest.fixture()
 def distgit_with_autochangelog_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "autochangelog_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)

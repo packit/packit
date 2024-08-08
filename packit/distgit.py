@@ -266,6 +266,45 @@ class DistGit(PackitRepositoryBase):
             ) from e
         head.set_commit(remote_ref)
 
+    def setup_remote(
+        self,
+        fork_remote_name: str = "fork",
+        sync_acls: bool = False,
+    ):
+        """
+        Create a remote if it does not exist
+
+        Args:
+            fork_remote_name: local name of the remote where we push to
+            force: push forcefully?
+            sync_acls: whether to sync the ACLs of the original repo and the fork
+        """
+        if fork_remote_name not in [
+            remote.name for remote in self.local_project.git_repo.remotes
+        ]:
+            logger.debug(
+                f"Creating remote {fork_remote_name!r} "
+                f"for dist-git repo {self.local_project.repo_name!r}.",
+            )
+
+            fork = self.local_project.git_project.get_fork()
+            if not fork:
+                self.local_project.git_project.fork_create()
+                fork = self.local_project.git_project.get_fork()
+            if not fork:
+                raise PackitException(
+                    "Unable to create a fork of repository "
+                    f"{self.local_project.git_project.full_repo_name}",
+                )
+            if sync_acls and isinstance(self.local_project.git_project, PagureProject):
+                # synchronize ACLs between original repo and fork for Pagure
+                self.sync_acls(self.local_project.git_project, fork)
+            fork_urls = fork.get_git_urls()
+            self.local_project.git_repo.create_remote(
+                name=fork_remote_name,
+                url=fork_urls["ssh"],
+            )
+
     def push_to_fork(
         self,
         branch_name: str,
@@ -284,29 +323,10 @@ class DistGit(PackitRepositoryBase):
 
         """
         logger.debug(
-            f"About to {'force ' if force else ''}push changes to branch {branch_name!r} "
+            f"About to {'force' if force else ''} push changes to branch {branch_name!r} "
             f"of a fork {fork_remote_name!r} of the dist-git repo.",
         )
-        if fork_remote_name not in [
-            remote.name for remote in self.local_project.git_repo.remotes
-        ]:
-            fork = self.local_project.git_project.get_fork()
-            if not fork:
-                self.local_project.git_project.fork_create()
-                fork = self.local_project.git_project.get_fork()
-            if not fork:
-                raise PackitException(
-                    "Unable to create a fork of repository "
-                    f"{self.local_project.git_project.full_repo_name}",
-                )
-            if sync_acls and isinstance(self.local_project.git_project, PagureProject):
-                # synchronize ACLs between original repo and fork for Pagure
-                self.sync_acls(self.local_project.git_project, fork)
-            fork_urls = fork.get_git_urls()
-            self.local_project.git_repo.create_remote(
-                name=fork_remote_name,
-                url=fork_urls["ssh"],
-            )
+        self.setup_remote(fork_remote_name=fork_remote_name, sync_acls=sync_acls)
 
         try:
             self.push(refspec=branch_name, remote_name=fork_remote_name, force=force)
