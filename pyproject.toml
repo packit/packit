@@ -55,7 +55,6 @@ dependencies = [
     "koji",
     "rpkg",
     "cachetools",
-    "python-fedora",
     "python-bugzilla"
 ]
 
