@@ -230,20 +230,24 @@ class CoprHelper:
                 exist_ok=True,
             )
         except (CoprException, CoprRequestException) as ex:
-            response_status_code = ex.result.__response__.status_code
-            response_reason = ex.result.__response__.reason
-            if response_status_code >= 500:
+            response = ex.result.__response__
+            if response.status_code >= 500:
                 error = (
-                    f"Packit received HTTP {response_status_code} {response_reason} "
+                    f"Packit received HTTP {response.status_code} {response.reason} "
                     "from Copr Service. "
                     "Check the Copr status page: https://copr.fedorainfracloud.org/status/stats/, "
-                    "or ask for help in Fedora Build System matrix channel https://matrix.to/#/#buildsys:fedoraproject.org."
+                    "or ask for help in Fedora Build System matrix channel: "
+                    "https://matrix.to/#/#buildsys:fedoraproject.org."
+                )
+                logger.debug(
+                    f"Unexpected Copr error: {response.status_code} {response.reason}: "
+                    f"{response.text}",
                 )
             else:
                 error = (
                     f"Cannot create a new Copr project "
                     f"(owner={owner} project={project} chroots={chroots}): {ex}. "
-                    f"Copr HTTP response is {response_status_code} {response_reason}."
+                    f"Copr HTTP response is {response.status_code} {response.reason}."
                 )
             logger.error(error)
             logger.error(ex.result)
