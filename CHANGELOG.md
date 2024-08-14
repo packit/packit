@@ -1,3 +1,8 @@
+# 0.100.2
+
+- We have improved logging of Copr errors. (#2383)
+- We have dropped a dependency that was used for Bodhi and is no longer needed. (#2381)
+
 # 0.100.1
 
 - Dummy release to test the "build in side tags" new feature!
