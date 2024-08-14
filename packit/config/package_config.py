@@ -174,9 +174,17 @@ class PackageConfig(MultiplePackages):
             )
         return projects_list[0]
 
-    def get_propose_downstream_dg_branches_value(self) -> Optional[list]:
+    def get_propose_downstream_dg_branches_value(
+        self,
+        pull_from_upstream=False,
+    ) -> Optional[list]:
+        type = (
+            JobType.pull_from_upstream
+            if pull_from_upstream
+            else JobType.propose_downstream
+        )
         for job in self.jobs:
-            if job.type == JobType.propose_downstream:
+            if job.type == type:
                 return job.dist_git_branches
         return []
 

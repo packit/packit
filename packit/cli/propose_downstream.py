@@ -24,12 +24,14 @@ from packit.constants import (
 logger = logging.getLogger(__name__)
 
 
-def get_dg_branches(api, dist_git_branch):
+def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
     cmdline_dg_branches = dist_git_branch.split(",") if dist_git_branch else []
     config_dg_branches = []
     if isinstance(api.package_config, PackageConfig):
         config_dg_branches = (
-            api.package_config.get_propose_downstream_dg_branches_value()
+            api.package_config.get_propose_downstream_dg_branches_value(
+                pull_from_upstream=pull_from_upstream,
+            )
         )
 
     default_dg_branch = api.dg.local_project.git_project.default_branch
@@ -37,7 +39,15 @@ def get_dg_branches(api, dist_git_branch):
     dg_branches = (
         cmdline_dg_branches or config_dg_branches or default_dg_branch.split(",")
     )
+    return dg_branches, default_dg_branch
 
+
+def get_dg_branches(api, dist_git_branch, pull_from_upstream=False):
+    dg_branches, default_dg_branch = get_dist_git_branches(
+        api,
+        dist_git_branch,
+        pull_from_upstream,
+    )
     return get_branches(*dg_branches, default_dg_branch=default_dg_branch)
 
 
@@ -68,7 +78,11 @@ def sync_release(
     if pr is None:
         pr = api.package_config.create_pr
 
-    branches_to_update = get_dg_branches(api, dist_git_branch)
+    branches_to_update = get_dg_branches(
+        api,
+        dist_git_branch,
+        pull_from_upstream=use_downstream_specfile,
+    )
 
     click.echo(
         f"Proposing update of the following branches: {', '.join(branches_to_update)}",
