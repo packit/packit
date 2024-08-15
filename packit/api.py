@@ -2283,7 +2283,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.up.command_handler.clean()
         if self.dg.is_command_handler_set():
             self.dg.command_handler.clean()
-        if self._up:
+        if self._up and self.up.local_project:
             self.up.local_project.free_resources()
 
     @staticmethod
