@@ -132,6 +132,7 @@ class ChangelogHelper:
         if (
             self.package_config.copy_upstream_release_description
             # in pull_from_upstream workflow, upstream git_project can be None
+            and self.up.local_project
             and self.up.local_project.git_project
         ):
             release_description = self.up.local_project.git_project.get_release(
