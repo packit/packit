@@ -22,7 +22,11 @@ from specfile import Specfile
 from packit.actions import ActionName
 from packit.actions_handler import ActionsHandler
 from packit.base_git import PackitRepositoryBase
-from packit.command_handler import RUN_COMMAND_HANDLER_MAPPING, CommandHandler
+from packit.command_handler import (
+    RUN_COMMAND_HANDLER_MAPPING,
+    CommandHandler,
+    SandcastleCommandHandler,
+)
 from packit.config import Config
 from packit.config.common_package_config import MultiplePackages
 from packit.constants import DATETIME_FORMAT, DEFAULT_ARCHIVE_EXT
@@ -376,9 +380,16 @@ class NonGitUpstream(Upstream):
     @property
     def working_dir(self) -> Optional[Path]:
         if not self._working_dir:
-            self._working_dir = Path(tempfile.mkdtemp())
+            if self.handler_kls == SandcastleCommandHandler:
+                path = (
+                    Path(self.config.command_handler_work_dir) / "non-git-working-dir"
+                )
+                path.mkdir(parents=True, exist_ok=True)
+                self._working_dir = path
+            else:
+                self._working_dir = Path(tempfile.mkdtemp())
             logger.info(
-                f"Created temporary directory for actions and syncing: {self._working_dir}",
+                f"Created directory for actions and syncing: {self._working_dir}",
             )
         return self._working_dir
 
