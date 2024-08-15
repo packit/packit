@@ -124,8 +124,17 @@ class SandcastleCommandHandler(CommandHandler):
 
     name = RunCommandType.sandcastle
 
-    def __init__(self, config: Config, local_project: Optional[LocalProject] = None):
-        super().__init__(local_project=local_project, config=config)
+    def __init__(
+        self,
+        config: Config,
+        local_project: Optional[LocalProject] = None,
+        working_dir: Optional[Path] = None,
+    ):
+        super().__init__(
+            local_project=local_project,
+            config=config,
+            working_dir=working_dir,
+        )
         self.local_project = local_project
         self.config = config
         # we import here so that packit does not depend on sandcastle (and thus python-kube)
