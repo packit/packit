@@ -339,6 +339,48 @@ class KojiHelper:
         except Exception as e:
             logger.debug(f"Failed to remove sidetag {sidetag} in Koji: {e}")
 
+    def tag_build(self, nvr: str, tag: str) -> None:
+        """
+        Tags a build into the specified tag.
+
+        Attempts to log in if the underlying session is not authenticated.
+
+        Args:
+            nvr: NVR of the build.
+            tag: Tag name.
+        """
+        if not self.session.logged_in:
+            try:
+                self.session.gssapi_login()
+            except Exception as e:
+                logger.debug(f"Authentication failed: {e}")
+                return
+        try:
+            self.session.tagBuild(tag, nvr)
+        except Exception as e:
+            logger.debug(f"Failed to tag {nvr} into {tag} in Koji: {e}")
+
+    def untag_build(self, nvr: str, tag: str) -> None:
+        """
+        Untags a build from the specified tag.
+
+        Attempts to log in if the underlying session is not authenticated.
+
+        Args:
+            nvr: NVR of the build.
+            tag: Tag name.
+        """
+        if not self.session.logged_in:
+            try:
+                self.session.gssapi_login()
+            except Exception as e:
+                logger.debug(f"Authentication failed: {e}")
+                return
+        try:
+            self.session.untagBuild(tag, nvr, strict=True)
+        except Exception as e:
+            logger.debug(f"Failed to untag {nvr} from {tag} in Koji: {e}")
+
     def get_build_target(self, dist_git_branch: str) -> Optional[dict]:
         """
         Gets a build target from a dist-git branch name.

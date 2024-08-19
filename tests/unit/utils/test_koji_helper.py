@@ -234,6 +234,32 @@ def test_remove_sidetag(logged_in):
 
 
 @pytest.mark.parametrize(
+    "logged_in",
+    [False, True],
+)
+def test_tag_build(logged_in):
+    session = flexmock(logged_in=logged_in)
+    session.should_receive("gssapi_login").and_return().times(
+        0 if logged_in else 1,
+    ).mock()
+    session.should_receive("tagBuild").once()
+    KojiHelper(session).tag_build("test-1.0-1.fc39", "f39-build-side-12345")
+
+
+@pytest.mark.parametrize(
+    "logged_in",
+    [False, True],
+)
+def test_untag_build(logged_in):
+    session = flexmock(logged_in=logged_in)
+    session.should_receive("gssapi_login").and_return().times(
+        0 if logged_in else 1,
+    ).mock()
+    session.should_receive("untagBuild").once()
+    KojiHelper(session).untag_build("test-1.0-1.fc39", "f39-build-side-12345")
+
+
+@pytest.mark.parametrize(
     "error",
     [False, True],
 )
