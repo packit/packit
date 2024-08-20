@@ -1,3 +1,7 @@
+# 0.100.3
+
+- `dist-git init` command now allows `upstream-git-url` not to be specified. (#2387)
+
 # 0.100.2
 
 - We have improved logging of Copr errors. (#2383)
