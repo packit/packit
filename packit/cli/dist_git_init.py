@@ -228,13 +228,6 @@ def init(
         )
         return
 
-    if not (upstream_git_url or upstream_git_url_command):
-        click.echo(
-            "One of --upstream-git-url or --upstream-git-url-command needs to be specified.",
-            err=True,
-        )
-        return
-
     if upstream_git_url_command:
         click.echo(
             f"Running the following command to find upstream git URL: {upstream_git_url_command}",
@@ -288,7 +281,7 @@ class DistGitInitializer:
         self,
         config: Config,
         path_or_url: LocalProjectParameter,
-        upstream_git_url: str,
+        upstream_git_url: Optional[str],
         upstream_tag_template: Optional[str] = None,
         upstream_tag_include: Optional[str] = None,
         upstream_tag_exclude: Optional[str] = None,
@@ -402,10 +395,10 @@ class DistGitInitializer:
         return actions
 
     def generate_package_config_dict(self):
-        # TODO maybe take the URL from spec-file and check if it is a git URL?
-        config: dict[str, Any] = {"upstream_project_url": self.upstream_git_url}
+        config: dict[str, Any] = {}
 
-        optional_config_keys = [
+        options = [
+            "upstream_git_url",
             "upstream_tag_template",
             "upstream_tag_include",
             "upstream_tag_exclude",
@@ -416,10 +409,15 @@ class DistGitInitializer:
             "actions",
         ]
 
-        for key in optional_config_keys:
+        config_key_mappings = {"upstream_git_url": "upstream_project_url"}
+
+        for key in options:
             value = getattr(self, key, None)
             if value:
-                config[key] = value
+                config_key = (
+                    config_key_mappings[key] if key in config_key_mappings else key
+                )
+                config[config_key] = value
 
         config.update(self.kwargs)
 
