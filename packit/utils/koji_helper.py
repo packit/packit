@@ -7,6 +7,7 @@ from typing import Optional, Union
 
 import koji
 from specfile.changelog import ChangelogEntry
+from specfile.utils import NEVR
 
 from packit.constants import KOJI_BASEURL
 
@@ -109,6 +110,82 @@ class KojiHelper:
             NVR of the latest build or None if there is no such build.
         """
         build = self.get_latest_build_in_tag(package, tag)
+        if not build:
+            return None
+        return build["nvr"]
+
+    def get_latest_candidate_build(
+        self,
+        package: str,
+        dist_git_branch: str,
+    ) -> Optional[dict]:
+        """
+        Gets the latest build of a package tagged into the candidate tag for the given branch.
+
+        Args:
+            package: Package name.
+            dist_git_branch: dist-git branch name.
+
+        Returns:
+            Latest build or None if there is no such build.
+        """
+        if not (tag := self.get_candidate_tag(dist_git_branch)):
+            return None
+        return self.get_latest_build_in_tag(package, tag)
+
+    def get_latest_stable_build(
+        self,
+        package: str,
+        dist_git_branch: str,
+        include_candidate: bool = False,
+    ) -> Optional[dict]:
+        """
+        Gets the latest build of a package tagged into any stable or, if requested,
+        the candidate tag for the given branch.
+
+        Args:
+            package: Package name.
+            dist_git_branch: dist-git branch name.
+            include_candidate: Whether to consider also builds tagged
+              into the corresponding candidate tag.
+
+        Returns:
+            Latest build or None if there is no such build.
+        """
+        if not (candidate_tag := self.get_candidate_tag(dist_git_branch)):
+            return None
+        tags = self.get_stable_tags(candidate_tag)
+        if include_candidate:
+            tags.append(candidate_tag)
+        return max(
+            (self.get_latest_build_in_tag(package, t) for t in tags),
+            key=lambda b: NEVR.from_string(b["nvr"]),
+        )
+
+    def get_latest_stable_nvr(
+        self,
+        package: str,
+        dist_git_branch: str,
+        include_candidate: bool = False,
+    ) -> Optional[dict]:
+        """
+        Gets the NVR of the latest build of a package tagged into any stable or, if requested,
+        the candidate tag for the given branch.
+
+        Args:
+            package: Package name.
+            dist_git_branch: dist-git branch name.
+            include_candidate: Whether to consider also builds tagged
+              into the corresponding candidate tag.
+
+        Returns:
+            NVR of the latest build or None if there is no such build.
+        """
+        build = self.get_latest_stable_build(
+            package,
+            dist_git_branch,
+            include_candidate,
+        )
         if not build:
             return None
         return build["nvr"]
@@ -261,6 +338,48 @@ class KojiHelper:
             self.session.removeSideTag(sidetag)
         except Exception as e:
             logger.debug(f"Failed to remove sidetag {sidetag} in Koji: {e}")
+
+    def tag_build(self, nvr: str, tag: str) -> None:
+        """
+        Tags a build into the specified tag.
+
+        Attempts to log in if the underlying session is not authenticated.
+
+        Args:
+            nvr: NVR of the build.
+            tag: Tag name.
+        """
+        if not self.session.logged_in:
+            try:
+                self.session.gssapi_login()
+            except Exception as e:
+                logger.debug(f"Authentication failed: {e}")
+                return
+        try:
+            self.session.tagBuild(tag, nvr)
+        except Exception as e:
+            logger.debug(f"Failed to tag {nvr} into {tag} in Koji: {e}")
+
+    def untag_build(self, nvr: str, tag: str) -> None:
+        """
+        Untags a build from the specified tag.
+
+        Attempts to log in if the underlying session is not authenticated.
+
+        Args:
+            nvr: NVR of the build.
+            tag: Tag name.
+        """
+        if not self.session.logged_in:
+            try:
+                self.session.gssapi_login()
+            except Exception as e:
+                logger.debug(f"Authentication failed: {e}")
+                return
+        try:
+            self.session.untagBuild(tag, nvr, strict=True)
+        except Exception as e:
+            logger.debug(f"Failed to untag {nvr} from {tag} in Koji: {e}")
 
     def get_build_target(self, dist_git_branch: str) -> Optional[dict]:
         """
