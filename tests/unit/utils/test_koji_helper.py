@@ -33,6 +33,32 @@ def test_get_builds(error):
 
 
 @pytest.mark.parametrize(
+    "include_candidate, nvr",
+    [
+        (False, "test-1.0-2.fc40"),
+        (True, "test-2.0-1.fc40"),
+    ],
+)
+def test_get_latest_stable_nvr(include_candidate, nvr):
+    candidate_tags = {"f40": "f40-updates-candidate"}
+    stable_tags = {"f40-updates-candidate": ["f40-updates", "f40"]}
+    builds = {
+        "f40-updates-candidate": {"nvr": "test-2.0-1.fc40"},
+        "f40-updates": {"nvr": "test-1.0-2.fc40"},
+        "f40": {"nvr": "test-1.0-1.fc40"},
+    }
+
+    koji_helper = KojiHelper(flexmock())
+    flexmock(
+        koji_helper,
+        get_candidate_tag=lambda b: candidate_tags[b],
+        get_stable_tags=lambda t: stable_tags[t],
+        get_latest_build_in_tag=lambda _, t: builds[t],
+    )
+    assert koji_helper.get_latest_stable_nvr("test", "f40", include_candidate) == nvr
+
+
+@pytest.mark.parametrize(
     "error",
     [False, True],
 )
@@ -205,6 +231,32 @@ def test_remove_sidetag(logged_in):
     ).mock()
     session.should_receive("removeSideTag").once()
     KojiHelper(session).remove_sidetag("f39-build-side-12345")
+
+
+@pytest.mark.parametrize(
+    "logged_in",
+    [False, True],
+)
+def test_tag_build(logged_in):
+    session = flexmock(logged_in=logged_in)
+    session.should_receive("gssapi_login").and_return().times(
+        0 if logged_in else 1,
+    ).mock()
+    session.should_receive("tagBuild").once()
+    KojiHelper(session).tag_build("test-1.0-1.fc39", "f39-build-side-12345")
+
+
+@pytest.mark.parametrize(
+    "logged_in",
+    [False, True],
+)
+def test_untag_build(logged_in):
+    session = flexmock(logged_in=logged_in)
+    session.should_receive("gssapi_login").and_return().times(
+        0 if logged_in else 1,
+    ).mock()
+    session.should_receive("untagBuild").once()
+    KojiHelper(session).untag_build("test-1.0-1.fc39", "f39-build-side-12345")
 
 
 @pytest.mark.parametrize(
