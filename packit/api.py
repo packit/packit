@@ -292,10 +292,13 @@ class PackitAPI:
             for variable_name, repo in (
                 ("PACKIT_DOWNSTREAM_REPO", self.dg),
                 ("PACKIT_UPSTREAM_REPO", self.up),
+                ("PACKIT_PWD", self.up),
             )
             if isinstance(repo, PackitRepositoryBase)
             and repo._local_project is not None
         }
+        if isinstance(self.up, NonGitUpstream):
+            env.update({"PACKIT_PWD": str(self.up.working_dir)})
 
         # Adjust paths for the sandcastle
         if self.config.command_handler == RunCommandType.sandcastle:
