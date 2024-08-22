@@ -207,12 +207,14 @@ def test_common_env(api_mock):
     assert env == {
         "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/dist-git",
         "PACKIT_UPSTREAM_REPO": "/mock_dir/sandcastle/local-project",
+        "PACKIT_PWD": "/mock_dir/sandcastle/local-project",
     }
     api_mock.config.command_handler = RunCommandType.sandcastle
     env = api_mock.common_env()
     assert env == {
         "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/sandcastle-exec-dir/dist-git",
         "PACKIT_UPSTREAM_REPO": "/mock_dir/sandcastle/sandcastle-exec-dir/local-project",
+        "PACKIT_PWD": "/mock_dir/sandcastle/sandcastle-exec-dir/local-project",
     }
 
 
