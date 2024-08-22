@@ -1230,9 +1230,14 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_commit_info = (
             f"Upstream commit: {self.up.commit_hexsha}" if self.up.commit_hexsha else ""
         )
+        upstream_tag_info = (
+            f"Upstream tag: {upstream_tag}"
+            if not isinstance(self.up, NonGitUpstream)
+            else ""
+        )
 
         return SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION.format(
-            upstream_tag=upstream_tag,
+            upstream_tag=upstream_tag_info,
             upstream_commit_info=upstream_commit_info,
             resolved_bugs=resolved_bugs_msg,
         )
@@ -1277,7 +1282,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         else:
             commit_info = ""
 
-        tag_info = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
+        tag_link = f"[{upstream_tag}]({tag_link})" if tag_link else upstream_tag
         release_monitoring_info = (
             (
                 f"Release monitoring project: "
@@ -1285,6 +1290,11 @@ The first dist-git commit to be synced is '{short_hash}'.
                 f"({RELEASE_MONITORING_PROJECT_URL.format(project_id=release_monitoring_project_id)})\n"
             )
             if release_monitoring_project_id
+            else ""
+        )
+        tag_info = (
+            f"Upstream tag: {tag_link}"
+            if not isinstance(self.up, NonGitUpstream)
             else ""
         )
 
