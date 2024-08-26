@@ -66,6 +66,33 @@ def test_basic_local_update(
     assert "0.1.0" in changelog
 
 
+def test_fast_forward_merge_local_update(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream_fast_forward_merge_branches,
+):
+    _, d, api = api_instance
+    _, _ = mock_remote_functionality_upstream_fast_forward_merge_branches
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(Specfile).should_call("reload").times(1)
+
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+        fast_forward_merge_branches={"f40"},
+    )
+    assert (d / TARBALL_NAME).is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
+    assert (d / "README.packit").is_file()
+    # assert that we have changelog entries for both versions
+    with spec.sections() as sections:
+        changelog = "\n".join(sections.changelog)
+    assert "0.0.0" in changelog
+    assert "0.1.0" in changelog
+
+
 def test_basic_local_update_no_upload_to_lookaside(
     cwd_upstream,
     api_instance,
@@ -83,7 +110,10 @@ def test_basic_local_update_no_upload_to_lookaside(
     ).once()
 
     api.package_config.upload_sources = False
-    api.sync_release(dist_git_branch="main", versions=["0.1.0"])
+    api.sync_release(
+        dist_git_branch="main",
+        versions=["0.1.0"],
+    )
 
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")

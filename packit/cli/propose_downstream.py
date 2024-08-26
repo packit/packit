@@ -14,7 +14,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
 from packit.config import PackageConfig, get_context_settings, pass_config
-from packit.config.aliases import get_branches
+from packit.config.aliases import get_branches, get_fast_forward_branches_from
 from packit.constants import (
     PACKAGE_LONG_OPTION,
     PACKAGE_OPTION_HELP,
@@ -88,6 +88,15 @@ def sync_release(
         f"Proposing update of the following branches: {', '.join(branches_to_update)}",
     )
 
+    dist_git_branches, default_dg_branch = get_dist_git_branches(
+        api,
+        dist_git_branch,
+        pull_from_upstream=use_downstream_specfile,
+    )
+    branches_to_update = get_branches(
+        *dist_git_branches,
+        default_dg_branch=default_dg_branch,
+    )
     for branch in branches_to_update:
         api.sync_release(
             dist_git_branch=branch,
@@ -100,6 +109,11 @@ def sync_release(
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolved_bugs,
             sync_acls=sync_acls,
+            fast_forward_merge_branches=get_fast_forward_branches_from(
+                dist_git_branches=dist_git_branches,
+                source_branch=branch,
+                default=default_dg_branch,
+            ),
         )
 
 
