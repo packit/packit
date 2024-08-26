@@ -206,7 +206,7 @@ class TestGetBranches:
             (
                 CommonPackageConfig(
                     dist_git_branches={
-                        "rawhide": {"open_pull_request_for": ["f33"]},
+                        "rawhide": {"fast_forward_merge_into": ["f33"]},
                         "f35": {},
                         "f34": {},
                     },
@@ -218,7 +218,9 @@ class TestGetBranches:
                 CommonPackageConfig(
                     # no sense but possible!
                     dist_git_branches={
-                        "fedora-branched": {"open_pull_request_for": ["fedora-stable"]},
+                        "fedora-branched": {
+                            "fast_forward_merge_into": ["fedora-stable"],
+                        },
                     },
                 ),
                 {"f39", "f40"},
@@ -251,7 +253,6 @@ class TestGetBranches:
                 get_fast_forward_branches_from(config.dist_git_branches, source_branch)
                 == ff_branches[source_branch]
             )
-
 
 class TestGetKojiTargets:
     @pytest.mark.parametrize("target", ALL_KOJI_TARGETS_SNAPSHOT)
