@@ -7,12 +7,15 @@ from copr.v3 import Client
 from flexmock import flexmock
 
 import packit
-from packit.config import aliases
+from packit.config import CommonPackageConfig, aliases
 from packit.config.aliases import (
     get_aliases,
+    get_all_fast_forward_branches,
     get_all_koji_targets,
     get_branches,
     get_build_targets,
+    get_fast_forward_branches_from,
+    get_fast_forward_source_branch,
     get_koji_targets,
     get_versions,
 )
@@ -196,6 +199,58 @@ class TestGetBranches:
 
     def test_get_branches_without_default(self):
         assert get_branches(default=None) == set()
+
+    @pytest.mark.parametrize(
+        "config,branches,ff_branches",
+        [
+            (
+                CommonPackageConfig(
+                    dist_git_branches={
+                        "rawhide": {"open_pull_request_for": ["f33"]},
+                        "f35": {},
+                        "f34": {},
+                    },
+                ),
+                {"main", "f35", "f34"},
+                {"main": {"f33"}, "f35": set(), "f34": set()},
+            ),
+            (
+                CommonPackageConfig(
+                    # no sense but possible!
+                    dist_git_branches={
+                        "fedora-branched": {"open_pull_request_for": ["fedora-stable"]},
+                    },
+                ),
+                {"f39", "f40"},
+                {"f39": {"f39", "f40"}, "f40": {"f39", "f40"}},
+            ),
+        ],
+    )
+    def test_get_fast_forward_branches_from(
+        self,
+        config,
+        branches,
+        ff_branches,
+    ):
+        mock_aliases_module = flexmock(packit.config.aliases)
+        mock_aliases_module.should_receive("get_aliases").and_return(
+            {
+                "fedora-all": ["fedora-39", "fedora-40", "fedora-rawhide"],
+                "fedora-stable": ["fedora-39", "fedora-40"],
+                "fedora-development": ["fedora-rawhide"],
+                "fedora-latest": ["fedora-40"],
+                "fedora-latest-stable": ["fedora-40"],
+                "fedora-branched": ["fedora-39", "fedora-40"],
+                "epel-all": ["epel-8", "epel-9"],
+            },
+        )
+
+        assert branches == get_branches(*config.dist_git_branches)
+        for source_branch in branches:
+            assert (
+                get_fast_forward_branches_from(config.dist_git_branches, source_branch)
+                == ff_branches[source_branch]
+            )
 
 
 class TestGetKojiTargets:
