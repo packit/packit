@@ -172,9 +172,9 @@ def test_project_from_copr_build_job(package_config, project):
                     ),
                 ],
             ),
-            {
+            [
                 "example",
-            },
+            ],
         ),
         (
             PackageConfig(
@@ -199,7 +199,7 @@ def test_project_from_copr_build_job(package_config, project):
                     ),
                 ],
             ),
-            {"example1", "example2"},
+            ["example1", "example2"],
         ),
         (
             PackageConfig(
@@ -220,7 +220,7 @@ def test_project_from_copr_build_job(package_config, project):
                     ),
                 ],
             ),
-            set(),
+            [],
         ),
     ],
 )
@@ -2342,7 +2342,7 @@ def test_handle_metadata():
         ],
     }
     pc = PackageConfigSchema().load(data)
-    assert pc.jobs[0].dist_git_branches == {"shrek"}
+    assert pc.jobs[0].dist_git_branches == ["shrek"]
 
 
 @pytest.mark.parametrize(

@@ -7,7 +7,6 @@ from textwrap import dedent
 import pytest
 
 from packit.api import PackitAPI
-from packit.exceptions import PackitConfigException
 from packit.utils.commands import cwd
 
 
@@ -50,9 +49,7 @@ from packit.utils.commands import cwd
             """,
             ),
             False,
-            "**** field notifications has an incorrect value:\n"
-            "***** field pull_request has an incorrect value:\n"
-            "****** value at index successful_build: Not a valid boolean.",
+            "value at index successful_build: Not a valid boolean.",
         ),
         ("", True, "packit.yaml is valid and ready to be used"),
         (
@@ -187,6 +184,73 @@ from packit.utils.commands import cwd
         (
             dedent(
                 """\
+                downstream_package_name: packit
+                upstream_package_name: packit_upstream
+                jobs:
+                - job: propose_downstream
+                  trigger: release
+                  dist_git_branches:
+                    fedora-rawhide:
+                      fast_forward_merge_into: [fedora-all]
+            """,
+            ),
+            True,
+            "packit.yaml is valid and ready to be used",
+        ),
+        (
+            dedent(
+                """\
+                downstream_package_name: packit
+                upstream_package_name: packit_upstream
+                jobs:
+                - job: propose_downstream
+                  trigger: release
+                  dist_git_branches:
+                    fedora-rawhide:
+                      fast_forward_merge_into: [f40]
+                    f40:
+                      fast_forward_merge_into: [f39]
+            """,
+            ),
+            True,
+            "packit.yaml is valid and ready to be used",
+        ),
+        (
+            dedent(
+                """\
+                downstream_package_name: packit
+                upstream_package_name: packit_upstream
+                jobs:
+                - job: propose_downstream
+                  trigger: release
+                  dist_git_branches:
+                    fedora-rawhide:
+                      f40
+            """,
+            ),
+            False,
+            "Expected 'list[str]' or 'dict[str, dict[str, list]]'",
+        ),
+        (
+            dedent(
+                """\
+                downstream_package_name: packit
+                upstream_package_name: packit_upstream
+                jobs:
+                - job: propose_downstream
+                  trigger: release
+                  dist_git_branches:
+                    fedora-rawhide:
+                      open_pull_request: f40
+            """,
+            ),
+            False,
+            'Example -> "dist_git_branches":'
+            ' {"fedora-rawhide": {"fast_forward_merge_into": ["f40"]}, epel9: {}}}',
+        ),
+        (
+            dedent(
+                """\
                 dist_git_base_url: https://packit.dev/
                 downstream_package_name: packit
                 upstream_ref: last_commit
@@ -224,6 +288,10 @@ from packit.utils.commands import cwd
         "downstream_name",
         "create_pr",
         "valid_4",
+        "one_mapping_dist_git_prs",
+        "multiple_mappings_dist_git_prs",
+        "missing_fast_forward_merge_into_key",
+        "wrong_fast_forward_merge_into_key",
         "allowed_gpg",
         "slash_in_package_name",
     ],
@@ -241,6 +309,6 @@ def test_schema_validation(tmpdir, raw_package_config, valid, expected_output):
             output = PackitAPI.validate_package_config(Path("test_dir"))
             assert expected_output in output
         else:
-            with pytest.raises(PackitConfigException) as exc:
+            with pytest.raises(Exception) as exc_info:
                 PackitAPI.validate_package_config(Path("test_dir"))
-                assert expected_output in exc
+            assert expected_output in str(exc_info.value)

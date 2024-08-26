@@ -42,7 +42,10 @@ from packit.config.notifications import (
 )
 from packit.config.requirements import LabelRequirementsConfig, RequirementsConfig
 from packit.config.sources import SourcesItem
-from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION
+from packit.constants import (
+    CHROOT_SPECIFIC_COPR_CONFIGURATION,
+    FAST_FORWARD_MERGE_INTO_KEY,
+)
 from packit.sync import SyncFilesItem
 
 logger = getLogger(__name__)
@@ -239,19 +242,72 @@ class RequirementsSchema(Schema):
         return RequirementsConfig(**data)
 
 
-class TargetsListOrDict(fields.Field):
+class ListOrDict(fields.Field):
     """Field type expecting a List[str] or Dict[str, Dict[str, Any]]
     Union is not supported by marshmallow so we have to validate manually :(
     https://github.com/marshmallow-code/marshmallow/issues/1191
     """
 
-    @staticmethod
-    def __is_targets_dict(value) -> bool:
+    def is_dict(self, value) -> bool:
         if (
             not isinstance(value, dict)
             or not all(isinstance(k, str) for k in value)
             or not all(isinstance(v, dict) for v in value.values())
         ):
+            return False
+        return True
+
+
+class DistGitBranches(ListOrDict):
+    ERR_MESSAGE = (
+        "Expected 'list[str]' or 'dict[str, dict[str, list]]', got {value!r} (type {type!r})."
+        '\nExample -> "dist_git_branches": '
+        '{{"fedora-rawhide": {{"fast_forward_merge_into": ["f40"]}}, epel9: {{}}}}}}'
+    )
+
+    def _deserialize(
+        self,
+        value,
+        attr,
+        data,
+        **kwargs,
+    ) -> Union[list[str], dict[str, dict[str, list[str]]], None]:
+        if not (
+            (isinstance(value, list) and all(isinstance(v, str) for v in value))
+            or self.is_dict(value)
+        ):
+            raise ValidationError(
+                self.ERR_MESSAGE.format(value=value, type=type(value)),
+            )
+        return value
+
+    def is_dict(self, value) -> bool:
+        if not super().is_dict(value):
+            return False
+        if isinstance(value, dict):
+            if any(
+                fast_forward_merge_into
+                for fast_forward_merge_into in value.values()
+                if not isinstance(fast_forward_merge_into, dict)
+            ):
+                raise ValidationError(
+                    self.ERR_MESSAGE.format(value=value, type=type(value)),
+                )
+            if any(
+                key
+                for fast_forward_merge_into in value.values()
+                for key in fast_forward_merge_into
+                if key != FAST_FORWARD_MERGE_INTO_KEY
+            ):
+                raise ValidationError(
+                    self.ERR_MESSAGE.format(value=value, type=type(value)),
+                )
+        return True
+
+
+class Targets(ListOrDict):
+    def is_dict(self, value) -> bool:
+        if not super().is_dict(value):
             return False
         # check the 'attributes', e.g. {'distros': ['centos-7']} or
         # {"additional_modules": "ruby:2.7,nodejs:12", "additional_packages": []}
@@ -281,7 +337,7 @@ class TargetsListOrDict(fields.Field):
         targets_dict: dict[str, dict[str, Any]]
         if isinstance(value, list) and all(isinstance(v, str) for v in value):
             targets_dict = {key: {} for key in value}
-        elif self.__is_targets_dict(value):
+        elif self.is_dict(value):
             targets_dict = value
         else:
             raise ValidationError(
@@ -305,11 +361,11 @@ class JobMetadataSchema(Schema):
           dist_git_branch deprecation period.
     """
 
-    _targets = TargetsListOrDict(missing=None, data_key="targets")
+    _targets = Targets(missing=None, data_key="targets")
     timeout = fields.Integer()
     owner = fields.String(missing=None)
     project = fields.String(missing=None)
-    dist_git_branches = fields.List(fields.String(), missing=None)
+    dist_git_branches = DistGitBranches(missing=None)
     branch = fields.String(missing=None)
     scratch = fields.Boolean()
     list_on_homepage = fields.Boolean()
@@ -413,11 +469,11 @@ class CommonConfigSchema(Schema):
     sync_test_job_statuses_with_builds = fields.Bool(default=True)
 
     # Former 'metadata' keys
-    _targets = TargetsListOrDict(missing=None, data_key="targets")
+    _targets = Targets(missing=None, data_key="targets")
     timeout = fields.Integer()
     owner = fields.String(missing=None)
     project = fields.String(missing=None)
-    dist_git_branches = fields.List(fields.String(), missing=None)
+    dist_git_branches = DistGitBranches(missing=None)
     branch = fields.String(missing=None)
     scratch = fields.Boolean()
     list_on_homepage = fields.Boolean()
