@@ -174,11 +174,11 @@ class PackageConfig(MultiplePackages):
             )
         return projects_list[0]
 
-    def get_propose_downstream_dg_branches_value(self) -> Optional[set]:
+    def get_propose_downstream_dg_branches_value(self) -> Optional[list]:
         for job in self.jobs:
             if job.type == JobType.propose_downstream:
                 return job.dist_git_branches
-        return set()
+        return []
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
