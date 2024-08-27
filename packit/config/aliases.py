@@ -211,7 +211,7 @@ def get_fast_forward_branches_from(
             *[key],
             default=default,
             default_dg_branch=default_dg_branch,
-            with_aliases=with_aliases,
+            with_aliases=True,
         )
         expanded_dist_git_branches.update(
             {expanded_key: value for expanded_key in expanded_keys},

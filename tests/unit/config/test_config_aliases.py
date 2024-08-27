@@ -212,7 +212,7 @@ class TestGetBranches:
                     },
                 ),
                 {"main", "f35", "f34"},
-                {"main": {"f33"}, "f35": set(), "f34": set()},
+                {"rawhide": {"f33"}, "main": {"f33"}, "f35": set(), "f34": set()},
             ),
             (
                 CommonPackageConfig(
@@ -248,7 +248,7 @@ class TestGetBranches:
         )
 
         assert branches == get_branches(*config.dist_git_branches)
-        for source_branch in branches:
+        for source_branch in get_branches(*config.dist_git_branches, with_aliases=True):
             assert (
                 get_fast_forward_branches_from(config.dist_git_branches, source_branch)
                 == ff_branches[source_branch]
