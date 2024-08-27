@@ -560,6 +560,11 @@ class MultiplePackages:
                 "there is more than one package in the config.",
             )
 
+    @property
+    def upstream_project_url(self) -> Optional[str]:
+        # upstream_project_url is common for all packages
+        return self._packages[self._first_package].upstream_project_url
+
     def get_package_names_as_env(self) -> dict[str, str]:
         """Creates a dict with package_name,
         downstream_package_name and upstream_package_name.
