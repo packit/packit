@@ -45,7 +45,7 @@ repos:
         additional_dependencies:
           [
             types-click,
-            types-pkg_resources,
+            types-setuptools,
             types-requests,
             types-tabulate,
             types-Deprecated,
