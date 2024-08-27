@@ -529,6 +529,8 @@ class MultiplePackages:
            case. Using 'self.__getattribute__("attribute")' solves this issue.
     """
 
+    up_url_key = "upstream_project_url"
+
     def __init__(self, packages: dict[str, CommonPackageConfig]):
         super().__setattr__("packages", packages)
         super().__setattr__("_first_package", next(iter(packages)))
@@ -537,6 +539,11 @@ class MultiplePackages:
         if name in self.__dict__:
             return self.__dict__[name]
         if len(self.__getattribute__("packages")) == 1:
+            package = self.__getattribute__("packages")[
+                self.__getattribute__("_first_package")
+            ]
+            return getattr(package, name)
+        if name == self.up_url_key:
             package = self.__getattribute__("packages")[
                 self.__getattribute__("_first_package")
             ]
@@ -554,16 +561,14 @@ class MultiplePackages:
                 self.__getattribute__("_first_package")
             ]
             setattr(package, name, value)
+        elif name == self.up_url_key:
+            for package in self.__getattribute__("packages").values():
+                setattr(package, name, value)
         else:
             raise AttributeError(
                 f"It is ambiguous to set {name}: "
                 "there is more than one package in the config.",
             )
-
-    @property
-    def upstream_project_url(self) -> Optional[str]:
-        # upstream_project_url is common for all packages
-        return self._packages[self._first_package].upstream_project_url
 
     def get_package_names_as_env(self) -> dict[str, str]:
         """Creates a dict with package_name,
