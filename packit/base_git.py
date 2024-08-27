@@ -230,10 +230,14 @@ class PackitRepositoryBase:
             branch: branch to rebase onto
         """
         try:
-            self.local_project.git_repo.git.rebase(onto_branch)
+            self.local_project.git_repo.git.rebase(
+                "--onto",
+                onto_branch,
+                f"origin/{onto_branch}",
+            )
         except GitCommandError as exc:
             raise PackitException(
-                f"Failed to rebase onto branch {onto_branch!r}",
+                f"Failed to rebase --onto branch {onto_branch!r}",
             ) from exc
 
     def search_branch(self, name: str, remote="origin") -> bool:
