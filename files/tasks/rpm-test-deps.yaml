@@ -13,26 +13,28 @@
     state: present
   become: true
 
+# DeepDiff version 8.0.0 depends on numpy, avoid it
 - name: (Fedora) Install dependencies as RPMs
   ansible.builtin.dnf:
     name:
       - python3-build
       - python3-pytest-cov
       - python3-pytest-timeout
-      - python3-deepdiff
+      - python3-deepdiff < 8.0.0
       - python3-flexmock
     state: present
   when: ansible_facts['distribution'] == 'Fedora'
   become: true
 
 # packages not in epel, install from PyPI
+# DeepDiff version 8.0.0 depends on numpy, avoid it
 - name: (EPEL) Install dependencies from PyPI
   ansible.builtin.pip:
     name:
       - build
       - pytest-cov
       - pytest-timeout
-      - deepdiff
+      - deepdiff < 8.0.0
       - flexmock
     state: latest
   when: ansible_facts['distribution'] != 'Fedora'
