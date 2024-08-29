@@ -3,7 +3,7 @@
 
 import logging
 from datetime import timedelta
-from typing import Optional, Union
+from typing import Union
 
 from cachetools.func import ttl_cache
 
@@ -177,7 +177,7 @@ def get_branches(
     return branches
 
 
-def get_fast_forward_branches_from(
+def get_fast_forward_merge_branches_for(
     dist_git_branches: Union[list, dict, set, None],
     source_branch: str,
     default: str = DEFAULT_VERSION,
