@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import logging
 import shutil
 import subprocess
 from pathlib import Path
@@ -100,7 +101,11 @@ def test_basic_local_update_use_downstream_specfile(
     api_instance,
     distgit_and_remote,
     mock_remote_functionality_upstream,
+    caplog,
 ):
+    # log specfile debug messages
+    caplog.set_level(logging.DEBUG)
+
     u, d, api = api_instance
     # remove the upstream specfile and push the tag that will be checked out
     u.joinpath("beer.spec").unlink()
@@ -153,7 +158,11 @@ def test_basic_local_update_use_downstream_specfile_non_git_upstream(
     api_instance,
     distgit_and_remote,
     mock_remote_functionality_upstream,
+    caplog,
 ):
+    # log specfile debug messages
+    caplog.set_level(logging.DEBUG)
+
     u, d, api = api_instance
     api.non_git_upstream = True
     api._up = None
