@@ -215,7 +215,7 @@ class PackitRepositoryBase:
         except GitCommandError as exc:
             raise PackitException("Failed to reset git working tree") from exc
         try:
-            self.local_project.git_repo.git.execute(["git", "clean", "-xdf"])
+            self.local_project.git_repo.git.clean(x=True, d=True, force=True)
         except GitCommandError as exc:
             raise PackitException("Failed to clean git working dir") from exc
 
@@ -224,20 +224,19 @@ class PackitRepositoryBase:
         onto_branch: str,
     ) -> None:
         """
-        Rebase onto specified branch.
+        Rebase current branch onto specified branch using remote instance of the specified branch.
 
         Args:
-            branch: branch to rebase onto
+            branch: Branch to rebase onto.
         """
         try:
             self.local_project.git_repo.git.rebase(
-                "--onto",
-                onto_branch,
                 f"origin/{onto_branch}",
+                onto=onto_branch,
             )
         except GitCommandError as exc:
             raise PackitException(
-                f"Failed to rebase --onto branch {onto_branch!r}",
+                f"Failed to rebase onto {onto_branch} using origin/{onto_branch}",
             ) from exc
 
     def search_branch(self, name: str, remote="origin") -> bool:

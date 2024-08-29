@@ -102,10 +102,10 @@ def git_repo_mock():
         git=flexmock(
             checkout=lambda *_: None,
             reset=lambda *_: None,
-            clean=lambda *_: None,
+            clean=lambda *_, **__: None,
             fetch=lambda *_: None,
             execute=lambda *_: None,
-            rebase=lambda *_: None,
+            rebase=lambda *_, **__: None,
         ),
         remote=lambda *_: flexmock(refs=[flexmock(remote_head="")]),
         branches=[],

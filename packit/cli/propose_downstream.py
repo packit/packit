@@ -14,7 +14,7 @@ import click
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
 from packit.config import PackageConfig, get_context_settings, pass_config
-from packit.config.aliases import get_branches, get_fast_forward_branches_from
+from packit.config.aliases import get_branches, get_fast_forward_merge_branches_for
 from packit.constants import (
     PACKAGE_LONG_OPTION,
     PACKAGE_OPTION_HELP,
@@ -109,7 +109,7 @@ def sync_release(
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolved_bugs,
             sync_acls=sync_acls,
-            fast_forward_merge_branches=get_fast_forward_branches_from(
+            fast_forward_merge_branches=get_fast_forward_merge_branches_for(
                 dist_git_branches=dist_git_branches,
                 source_branch=branch,
                 default=default_dg_branch,

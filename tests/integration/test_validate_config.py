@@ -7,6 +7,7 @@ from textwrap import dedent
 import pytest
 
 from packit.api import PackitAPI
+from packit.exceptions import PackitConfigException
 from packit.utils.commands import cwd
 
 
@@ -309,6 +310,6 @@ def test_schema_validation(tmpdir, raw_package_config, valid, expected_output):
             output = PackitAPI.validate_package_config(Path("test_dir"))
             assert expected_output in output
         else:
-            with pytest.raises(Exception) as exc_info:
+            with pytest.raises(PackitConfigException) as exc_info:
                 PackitAPI.validate_package_config(Path("test_dir"))
             assert expected_output in str(exc_info.value)

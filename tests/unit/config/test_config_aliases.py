@@ -10,12 +10,10 @@ import packit
 from packit.config import CommonPackageConfig, aliases
 from packit.config.aliases import (
     get_aliases,
-    get_all_fast_forward_branches,
     get_all_koji_targets,
     get_branches,
     get_build_targets,
-    get_fast_forward_branches_from,
-    get_fast_forward_source_branch,
+    get_fast_forward_merge_branches_for,
     get_koji_targets,
     get_versions,
 )
@@ -228,7 +226,7 @@ class TestGetBranches:
             ),
         ],
     )
-    def test_get_fast_forward_branches_from(
+    def test_get_fast_forward_merge_branches_for(
         self,
         config,
         branches,
@@ -250,9 +248,13 @@ class TestGetBranches:
         assert branches == get_branches(*config.dist_git_branches)
         for source_branch in get_branches(*config.dist_git_branches, with_aliases=True):
             assert (
-                get_fast_forward_branches_from(config.dist_git_branches, source_branch)
+                get_fast_forward_merge_branches_for(
+                    config.dist_git_branches,
+                    source_branch,
+                )
                 == ff_branches[source_branch]
             )
+
 
 class TestGetKojiTargets:
     @pytest.mark.parametrize("target", ALL_KOJI_TARGETS_SNAPSHOT)

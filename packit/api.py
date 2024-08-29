@@ -978,8 +978,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             pr_description_footer: Footer for the PR description (used by packit-service)
             sync_acls: Whether to sync the ACLs of original repo and
                 fork when creating a PR from fork.
-            fast_forward_merge_branches: a list of branches that can be merged with --ff-only flag
-                using dist_git_branch as source branch (if any).
+            fast_forward_merge_branches: Set of branches `dist_git_branch` should be
+                fast-forward-merged into.
 
         Returns:
             The created (or existing if one already exists) PullRequest if
