@@ -169,6 +169,7 @@ class CommonPackageConfig:
         sig: Special interest group (SIG) that maintains the “downstream” package.
         osh_diff_scan_after_copr_build: Whether to run a differential scan in
             OpenScanHub after successful Copr build.
+        csmock_args: Pass additional arguments to csmock
     """
 
     def __init__(
@@ -252,6 +253,7 @@ class CommonPackageConfig:
         sync_test_job_statuses_with_builds: bool = True,
         sig: Optional[str] = None,
         osh_diff_scan_after_copr_build: Optional[bool] = True,
+        csmock_args: Optional[str] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -368,6 +370,8 @@ class CommonPackageConfig:
         self.parse_time_macros = parse_time_macros or {}
 
         self.osh_diff_scan_after_copr_build = osh_diff_scan_after_copr_build
+
+        self.csmock_args = csmock_args
 
     @property
     def dist_git_base_url(self) -> str:
