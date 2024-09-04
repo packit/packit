@@ -453,6 +453,8 @@ class CommonConfigSchema(Schema):
     parse_time_macros = fields.Dict(missing=None)
     osh_diff_scan_after_copr_build = fields.Boolean(missing=True)
 
+    csmock_args = fields.String(missing=None)
+
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id
