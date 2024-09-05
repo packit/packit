@@ -7,12 +7,13 @@ from copr.v3 import Client
 from flexmock import flexmock
 
 import packit
-from packit.config import aliases
+from packit.config import CommonPackageConfig, aliases
 from packit.config.aliases import (
     get_aliases,
     get_all_koji_targets,
     get_branches,
     get_build_targets,
+    get_fast_forward_merge_branches_for,
     get_koji_targets,
     get_versions,
 )
@@ -176,8 +177,83 @@ class TestGetBranches:
         )
         assert get_branches(*names) == versions
 
+    @pytest.mark.parametrize(
+        "names,versions",
+        [
+            (
+                {
+                    "fedora-30": {"fast_forward_merge_into": ["f31"]},
+                    "fedora-stable": {},
+                },
+                {"f30", "f32"},
+            ),
+        ],
+    )
+    def test_get_branches_from_multiple_values_in_dict(self, names, versions):
+        flexmock(packit.config.aliases).should_receive("get_versions").and_return(
+            versions,
+        )
+        assert get_branches(*names) == versions
+
     def test_get_branches_without_default(self):
         assert get_branches(default=None) == set()
+
+    @pytest.mark.parametrize(
+        "config,branches,ff_branches",
+        [
+            (
+                CommonPackageConfig(
+                    dist_git_branches={
+                        "rawhide": {"fast_forward_merge_into": ["f33"]},
+                        "f35": {},
+                        "f34": {},
+                    },
+                ),
+                {"main", "f35", "f34"},
+                {"rawhide": {"f33"}, "main": {"f33"}, "f35": set(), "f34": set()},
+            ),
+            (
+                CommonPackageConfig(
+                    # no sense but possible!
+                    dist_git_branches={
+                        "fedora-branched": {
+                            "fast_forward_merge_into": ["fedora-stable"],
+                        },
+                    },
+                ),
+                {"f39", "f40"},
+                {"f39": {"f39", "f40"}, "f40": {"f39", "f40"}},
+            ),
+        ],
+    )
+    def test_get_fast_forward_merge_branches_for(
+        self,
+        config,
+        branches,
+        ff_branches,
+    ):
+        mock_aliases_module = flexmock(packit.config.aliases)
+        mock_aliases_module.should_receive("get_aliases").and_return(
+            {
+                "fedora-all": ["fedora-39", "fedora-40", "fedora-rawhide"],
+                "fedora-stable": ["fedora-39", "fedora-40"],
+                "fedora-development": ["fedora-rawhide"],
+                "fedora-latest": ["fedora-40"],
+                "fedora-latest-stable": ["fedora-40"],
+                "fedora-branched": ["fedora-39", "fedora-40"],
+                "epel-all": ["epel-8", "epel-9"],
+            },
+        )
+
+        assert branches == get_branches(*config.dist_git_branches)
+        for source_branch in get_branches(*config.dist_git_branches, with_aliases=True):
+            assert (
+                get_fast_forward_merge_branches_for(
+                    config.dist_git_branches,
+                    source_branch,
+                )
+                == ff_branches[source_branch]
+            )
 
 
 class TestGetKojiTargets:

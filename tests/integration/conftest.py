@@ -58,6 +58,16 @@ def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
 
 
 @pytest.fixture()
+def mock_remote_functionality_upstream_fast_forward_merge_branches(
+    upstream_and_remote,
+    distgit_and_remote,
+):
+    u, _ = upstream_and_remote
+    d, _ = distgit_and_remote
+    return mock_remote_functionality(d, u, fast_forward_merge_branch=True)
+
+
+@pytest.fixture()
 def mock_remote_functionality_downstream_autochangelog(
     upstream_and_remote,
     distgit_with_autochangelog_and_remote,
@@ -102,19 +112,25 @@ def mock_spec_download_remote_s(
     flexmock(PackitRepositoryBase, download_remote_sources=mock_download_remote_sources)
 
 
-def mock_remote_functionality(distgit: Path, upstream: Path):
+def mock_remote_functionality(
+    distgit: Path,
+    upstream: Path,
+    fast_forward_merge_branch=False,
+):
+    example_pr = PullRequestReadOnly(
+        title="",
+        id=42,
+        status=PRStatus.open,
+        url="",
+        description="",
+        author="",
+        source_branch="",
+        target_branch="",
+        created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
+    )
+
     def mocked_create_pr(*args, **kwargs):
-        return PullRequestReadOnly(
-            title="",
-            id=42,
-            status=PRStatus.open,
-            url="",
-            description="",
-            author="",
-            source_branch="",
-            target_branch="",
-            created=datetime.datetime(1969, 11, 11, 11, 11, 11, 11),
-        )
+        return example_pr
 
     release = flexmock(body="Some description of the upstream release", url="some-url")
     flexmock(config).should_receive("get_project").and_return(
@@ -141,6 +157,10 @@ def mock_remote_functionality(distgit: Path, upstream: Path):
         create_pr=mocked_create_pr,
         default_branch="main",
     )
+    if fast_forward_merge_branch:
+        flexmock(PagureProject).should_receive("create_pr").times(2).and_return(
+            example_pr,
+        )
     flexmock(
         GithubProject,
         get_git_urls=lambda: {"git": UPSTREAM_PROJECT_URL},

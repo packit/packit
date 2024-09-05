@@ -3,9 +3,11 @@
 
 import logging
 from datetime import timedelta
+from typing import Union
 
 from cachetools.func import ttl_cache
 
+from packit.constants import FAST_FORWARD_MERGE_INTO_KEY
 from packit.exceptions import PackitException
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import run_command
@@ -173,6 +175,63 @@ def get_branches(
             branches.add(sys_and_version)
 
     return branches
+
+
+def get_fast_forward_merge_branches_for(
+    dist_git_branches: Union[list, dict, set, None],
+    source_branch: str,
+    default: str = DEFAULT_VERSION,
+    default_dg_branch: str = "main",
+    with_aliases: bool = False,
+) -> set[str]:
+    """
+    Returns a list of target branches that can be fast forwarded merging
+    the specified source_branch
+    The keys can be aliases, expand them into a temporary structure
+    to be sure that source_branch can be found in the first dictionary.
+    In the inner loop of the downstream sync the expanded aliases are used.
+
+    The branches should be specified as in the following example
+        {"rawhide": {"fast_forward_merge_into": ["f40", "f39"]},
+         "epel9": {}
+        }
+
+    dist_git_branches: dist_git_branches config key; can be a list or dict
+    source_branch: source branch with commits to be merged
+    default: the same as get_branches default parameter
+    default_dg_branch: the same as get_branches default_dg_branch parameter
+    with_aliases: the same as get_branches with_aliases parameter
+    """
+    if not isinstance(dist_git_branches, dict):
+        return set()
+
+    expanded_dist_git_branches = {}
+    for key, value in dist_git_branches.items():
+        expanded_keys = get_branches(
+            *[key],
+            default=default,
+            default_dg_branch=default_dg_branch,
+            with_aliases=True,
+        )
+        expanded_dist_git_branches.update(
+            {expanded_key: value for expanded_key in expanded_keys},
+        )
+
+    if source_branch not in expanded_dist_git_branches:
+        return set()
+
+    if (source_branch_dict := expanded_dist_git_branches[source_branch]) and isinstance(
+        source_branch_dict[FAST_FORWARD_MERGE_INTO_KEY],
+        list,
+    ):
+        return get_branches(
+            *source_branch_dict[FAST_FORWARD_MERGE_INTO_KEY],
+            default=default,
+            default_dg_branch=default_dg_branch,
+            with_aliases=with_aliases,
+        )
+
+    return set()
 
 
 def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> set[str]:
