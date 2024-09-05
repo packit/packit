@@ -211,7 +211,7 @@ class CommonPackageConfig:
         timeout: int = 7200,
         owner: Optional[str] = None,
         project: Optional[str] = None,
-        dist_git_branches: Optional[list[str]] = None,
+        dist_git_branches: Union[list[str], dict[str, dict[str, list]], None] = None,
         branch: Optional[str] = None,
         scratch: bool = False,
         list_on_homepage: bool = False,
@@ -331,8 +331,12 @@ class CommonPackageConfig:
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
-        self.dist_git_branches: set[str] = (
-            set(dist_git_branches) if dist_git_branches else set()
+        self.dist_git_branches: Union[
+            list[str],
+            dict[str, dict[str, list]],
+            None,
+        ] = (
+            dist_git_branches if dist_git_branches else []
         )
         self.branch: str = branch
         self.scratch: bool = scratch

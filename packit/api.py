@@ -886,6 +886,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
+        fast_forward_merge_branches: Optional[set[str]] = None,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -913,6 +914,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
+        fast_forward_merge_branches: Optional[set[str]] = None,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -939,6 +941,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         release_monitoring_project_id: Optional[int] = None,
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
+        fast_forward_merge_branches: Optional[set[str]] = None,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -975,6 +978,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             pr_description_footer: Footer for the PR description (used by packit-service)
             sync_acls: Whether to sync the ACLs of original repo and
                 fork when creating a PR from fork.
+            fast_forward_merge_branches: Set of branches `dist_git_branch` should be
+                fast-forward-merged into.
 
         Returns:
             The created (or existing if one already exists) PullRequest if
@@ -1115,7 +1120,12 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             if create_pr:
                 local_pr_branch = f"{dist_git_branch}-{local_pr_branch_suffix}"
-                self.dg.checkout_branch(local_pr_branch)
+                self.dg.create_branch(
+                    local_pr_branch,
+                )
+                self.dg.switch_branch(local_pr_branch, force=True)
+                self.dg.reset_workdir()
+                self.dg.rebase_branch(dist_git_branch)
 
             if create_sync_note and self.package_config.create_sync_note:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
@@ -1190,6 +1200,18 @@ The first dist-git commit to be synced is '{short_hash}'.
                     repo=self.dg,
                     sync_acls=sync_acls,
                 )
+
+                if fast_forward_merge_branches:
+                    for ff_branch in fast_forward_merge_branches:
+                        pr_title = (
+                            title or f"Update {ff_branch} to upstream release {version}"
+                        )
+                        self.create_or_update_pr(
+                            pr_title=pr_title,
+                            pr_description=f"{pr_description}{pr_instructions}{footer}",
+                            target_branch=ff_branch,
+                            repo=self.dg,
+                        )
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
@@ -1536,6 +1558,36 @@ The first dist-git commit to be synced is '{short_hash}'.
                 fork_username=fork_username,
             )
 
+    def create_or_update_pr(
+        self,
+        pr_title: str,
+        pr_description: str,
+        target_branch: str,
+        repo: Union[GitUpstream, DistGit],
+    ) -> PullRequest:
+        pr = repo.existing_pr(
+            target_branch,
+            repo.local_project.ref,
+        )
+        if pr is None:
+            pr = repo.create_pull(
+                pr_title,
+                pr_description,
+                source_branch=repo.local_project.ref,
+                target_branch=target_branch,
+            )
+        else:
+            logger.debug(
+                f"PR already exists: {pr.url},"
+                f' updating title ("{pr_title}") and description',
+            )
+            try:
+                pr.update_info(pr_title, pr_description)
+            except PagureAPIException as exc:
+                logger.error(f"Update of existing PR {pr.url} failed: {exc}")
+                raise PackitException(f"Update of existing PR {pr.url} failed") from exc
+        return pr
+
     def push_and_create_pr(
         self,
         pr_title: str,
@@ -1550,28 +1602,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         except PackitException as exc:
             logger.error(f"Push to fork failed: {exc}")
             raise
-        pr = repo.existing_pr(
-            git_branch,
-            repo.local_project.ref,
+        return self.create_or_update_pr(
+            pr_title,
+            pr_description,
+            target_branch=git_branch,
+            repo=repo,
         )
-        if pr is None:
-            pr = repo.create_pull(
-                pr_title,
-                pr_description,
-                source_branch=repo.local_project.ref,
-                target_branch=git_branch,
-            )
-        else:
-            logger.debug(
-                f"PR already exists: {pr.url},"
-                f' updating title ("{pr_title}") and description',
-            )
-            try:
-                pr.update_info(pr_title, pr_description)
-            except PagureAPIException as exc:
-                logger.error(f"Update of existing PR {pr.url} failed: {exc}")
-                raise PackitException(f"Update of existing PR {pr.url} failed") from exc
-        return pr
 
     def _handle_sources(
         self,
