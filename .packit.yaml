@@ -49,8 +49,9 @@ jobs:
     trigger: release
     # Use the stage instance once it works in downstream.
     dist_git_branches:
-      - fedora-all
-      - epel-9
+      rawhide:
+        fast_forward_merge_into: [fedora-branched]
+      epel-9: {}
 
   - job: sync_from_downstream
     trigger: commit
@@ -104,8 +105,9 @@ jobs:
   - job: pull_from_upstream
     trigger: release
     dist_git_branches:
-      - fedora-all
-      - epel-9
+      rawhide:
+        fast_forward_merge_into: [fedora-branched]
+      epel-9: {}
 
   - job: koji_build
     trigger: commit | koji_build
