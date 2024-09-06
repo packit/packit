@@ -1,3 +1,10 @@
+# 0.101.0
+
+- Packit now supports passing custom arguments to various static analyzers through `--csmock-args` CLI option and `csmock_args` configuration. (#2402)
+- When synching a new release Packit is now able to fast forward a specified merge to a configured list of branches.
+  Use the `dist_git_branches` new syntax as in this example:
+  `{"rawhide": {"fast_forward_merge_into": ["f40"]}, "fedora-stable": {}}` (#2363)
+
 # 0.100.3
 
 - `dist-git init` command now allows `upstream-git-url` not to be specified. (#2387)
