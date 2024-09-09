@@ -53,6 +53,7 @@ class Config:
         package_config_path=None,
         repository_cache=None,
         add_repositories_to_repository_cache=True,
+        default_parse_time_macros: Optional[dict] = None,
         **kwargs,
     ):
         self.debug: bool = debug
@@ -107,6 +108,7 @@ class Config:
         self.package_config_path = package_config_path
         self.repository_cache = repository_cache
         self.add_repositories_to_repository_cache = add_repositories_to_repository_cache
+        self.default_parse_time_macros = default_parse_time_macros or {}
 
         # because of current load_authentication implementation it will generate false warnings
         # if kwargs:
@@ -130,7 +132,8 @@ class Config:
             f"command_handler_pvc_volume_specs='{self.command_handler_pvc_volume_specs}', "
             f"command_handler_storage_class='{self.command_handler_storage_class}', "
             f"appcode='{self.appcode}', "
-            f"repository_cache='{self.repository_cache}')"
+            f"repository_cache='{self.repository_cache}', "
+            f"default_parse_time_macros='{self.default_parse_time_macros}')"
         )
 
     @classmethod
