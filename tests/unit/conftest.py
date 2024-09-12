@@ -65,6 +65,7 @@ def package_config_mock():
         is_sub_package=False,
         pkg_tool=None,
         version_update_mask="",
+        parse_time_macros={},
     )
     mock.should_receive("get_all_files_to_sync").and_return([])
     mock.should_receive("get_package_names_as_env").and_return({})

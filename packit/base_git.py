@@ -129,15 +129,31 @@ class PackitRepositoryBase:
     @property
     def specfile(self) -> Specfile:
         if self._specfile is None:
+            # both keys (though unlikely) and values could have been interpreted
+            # as numbers by the YAML parser, convert them (back) to strings
+            def convert_to_str(k, v):
+                return str(k), v if v is None else str(v)
+
+            macros = [
+                convert_to_str(k, v)
+                for k, v in self.package_config.parse_time_macros.items()
+            ]
+
+            package_config_macro_keys = [
+                str(k) for k in self.package_config.parse_time_macros
+            ]
+
+            # add default macros if they are not defined in the package config
+            macros += [
+                convert_to_str(k, v)
+                for k, v in self.config.default_parse_time_macros.items()
+                if str(k) not in package_config_macro_keys
+            ]
+
             self._specfile = Specfile(
                 self.absolute_specfile_path,
                 sourcedir=self.absolute_source_dir,
-                macros=[
-                    # both keys (though unlikely) and values could have been interpreted
-                    # as numbers by the YAML parser, convert them (back) to strings
-                    (str(k), v if v is None else str(v))
-                    for k, v in self.package_config.parse_time_macros.items()
-                ],
+                macros=macros,
                 autosave=True,
             )
         return self._specfile

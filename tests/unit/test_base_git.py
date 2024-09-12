@@ -489,7 +489,7 @@ def test_set_spec_content(tmp_path):
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(default_parse_time_macros={}),
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
@@ -644,7 +644,7 @@ def test_set_spec_content_reset_release(
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(default_parse_time_macros={}),
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
@@ -691,7 +691,7 @@ def test_set_spec_content_no_changelog(tmp_path, changelog_section):
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(default_parse_time_macros={}),
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
@@ -793,7 +793,7 @@ def test_set_spec_content_version_macros(
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(default_parse_time_macros={}),
         package_config=flexmock(
             prerelease_suffix_macro=None,
             prerelease_suffix_pattern=None,
@@ -1018,7 +1018,7 @@ def test_set_spec_content_prerelease(
     upstream_specfile = Specfile(upstream_spec_path, sourcedir=tmp_path, autosave=True)
 
     dist_git = PackitRepositoryBase(
-        config=flexmock(),
+        config=flexmock(default_parse_time_macros={}),
         package_config=flexmock(
             prerelease_suffix_macro=prerelease_suffix_macro,
             prerelease_suffix_pattern=prerelease_suffix_pattern,
@@ -1124,3 +1124,41 @@ def test_checkout_branch(tmp_path, remote_branches):
     )
     dist_git.local_project = LocalProject(working_dir=local)
     dist_git.checkout_branch("rawhide-pull_from_upstream")
+
+
+@pytest.mark.parametrize(
+    "package_config_macros,default_macros,result",
+    [
+        pytest.param({}, {"fedora": "0"}, [("fedora", "0")]),
+        pytest.param({"fedora": "39"}, {"fedora": "0"}, [("fedora", "39")]),
+    ],
+)
+def test_default_macro_definitions(
+    tmp_path,
+    package_config_macros,
+    default_macros,
+    result,
+):
+    distgit_spec_contents = (
+        "Name: bring-me-to-the-life\n"
+        "Version: 1\n"
+        "Release: 1\n"
+        "Source0: foo.bar\n"
+        "License: GPLv3+\n"
+        "Summary: evanescence\n"
+        "%description\n-\n\n"
+        "%changelog\n"
+    )
+    distgit_spec_path = tmp_path / "life.spec"
+    distgit_spec_path.write_text(distgit_spec_contents)
+
+    dist_git = PackitRepositoryBase(
+        config=flexmock(default_parse_time_macros=default_macros),
+        package_config=flexmock(
+            prerelease_suffix_macro=None,
+            prerelease_suffix_pattern=None,
+            parse_time_macros=package_config_macros,
+        ),
+    )
+    dist_git._specfile_path = distgit_spec_path
+    assert dist_git.specfile.macros == result

@@ -912,6 +912,7 @@ class UserConfigSchema(Schema):
     pkg_tool = fields.String()
     repository_cache = fields.String(default=None)
     add_repositories_to_repository_cache = fields.Bool(default=True)
+    default_parse_time_macros = fields.Dict(missing=None)
 
     @post_load
     def make_instance(self, data, **kwargs):
