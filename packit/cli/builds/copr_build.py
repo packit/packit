@@ -15,6 +15,7 @@ from packit.config import (
     pass_config,
 )
 from packit.config.aliases import DEPRECATED_TARGET_MAP
+from packit.config.common_package_config import MockBootstrapSetup
 from packit.constants import (
     PACKAGE_LONG_OPTION,
     PACKAGE_OPTION_HELP,
@@ -72,6 +73,12 @@ logger = logging.getLogger(__name__)
     "This should be baseurl from .repo file. "
     "E.g.: http://copr-be.cloud.fedoraproject.org/"
     "results/rhughes/f20-gnome-3-12/fedora-$releasever-$basearch/",
+    default=None,
+)
+@click.option(
+    "--bootstrap",
+    type=click.types.Choice(("default", "on", "off", "image")),
+    help="mock bootstrap feature setup.",
     default=None,
 )
 @click.option(
@@ -138,6 +145,7 @@ def copr(
     preserve_project,
     upstream_ref,
     additional_repos,
+    bootstrap,
     request_admin_if_needed,
     enable_net,
     release_suffix,
@@ -209,6 +217,7 @@ def copr(
         list_on_homepage=list_on_homepage,
         preserve_project=preserve_project,
         additional_repos=additional_repos_list,
+        bootstrap=MockBootstrapSetup(bootstrap) if bootstrap is not None else None,
         request_admin_if_needed=request_admin_if_needed,
         enable_net=enable_net,
         release_suffix=release_suffix,
