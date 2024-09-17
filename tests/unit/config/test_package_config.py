@@ -1652,13 +1652,13 @@ def test_get_package_config_from_repo_empty_no_spec():
     "content, specfile_path",
     [
         ("{}", "packit.spec"),
-        ("{jobs: [{job: build, trigger: commit}]}", "packit.spec"),
+        ("{jobs: [{job: copr_build, trigger: commit}]}", "packit.spec"),
         (
-            "{downstream_package_name: horkyze, jobs: [{job: build, trigger: commit}]}",
+            "{downstream_package_name: horkyze, jobs: [{job: copr_build, trigger: commit}]}",
             "horkyze.spec",
         ),
         (
-            "{upstream_package_name: slize, jobs: [{job: build, trigger: commit}]}",
+            "{upstream_package_name: slize, jobs: [{job: copr_build, trigger: commit}]}",
             "packit.spec",
         ),
     ],
