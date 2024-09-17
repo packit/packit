@@ -1,3 +1,8 @@
+# 0.101.1
+
+- In the user configuration file, it's possible to set `default_parse_time_macros`, e.g. might be helpful in situations like [packit/packit-service#2514](https://github.com/packit/packit-service/issues/2514). (#2408)
+- Packit now allows to configure mock bootstrap feature setup of Copr projects with a new `bootstrap` configuration option. (#2411)
+
 # 0.101.0
 
 - Packit now supports passing custom arguments to various static analyzers through `--csmock-args` CLI option and `csmock_args` configuration. (#2402)
