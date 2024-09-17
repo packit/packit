@@ -1,3 +1,7 @@
+# 0.101.1
+
+- Packit now allows to configure mock bootstrap feature setup of Copr projects with a new `bootstrap` configuration option. (#2411)
+
 # 0.101.0
 
 - Packit now supports passing custom arguments to various static analyzers through `--csmock-args` CLI option and `csmock_args` configuration. (#2402)
