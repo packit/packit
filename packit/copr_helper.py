@@ -18,6 +18,7 @@ from munch import Munch
 
 from packit.config import aliases  # so we can mock in tests
 from packit.config.aliases import get_build_targets
+from packit.config.common_package_config import MockBootstrapSetup
 from packit.constants import CHROOT_SPECIFIC_COPR_CONFIGURATION, COPR2GITHUB_STATE
 from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsException
 from packit.local_project import LocalProject
@@ -181,6 +182,7 @@ class CoprHelper:
         preserve_project: Optional[bool] = False,
         additional_packages: Optional[list[str]] = None,
         additional_repos: Optional[list[str]] = None,
+        bootstrap: Optional[MockBootstrapSetup] = None,
         request_admin_if_needed: bool = False,
         targets_dict: Optional[dict] = None,  # chroot specific configuration
         module_hotfixes: bool = False,
@@ -224,6 +226,7 @@ class CoprHelper:
                 # delete project after the specified period of time
                 delete_after_days=delete_after_days,
                 additional_repos=additional_repos,
+                bootstrap=bootstrap.value if bootstrap is not None else None,
                 instructions=instructions or default_instructions,
                 module_hotfixes=module_hotfixes,
                 follow_fedora_branching=follow_fedora_branching,
@@ -262,6 +265,7 @@ class CoprHelper:
             list_on_homepage=list_on_homepage,
             delete_after_days=delete_after_days,
             module_hotfixes=module_hotfixes,
+            bootstrap=bootstrap,
         )
         try:
             if fields_to_change:
@@ -350,6 +354,7 @@ class CoprHelper:
         list_on_homepage: Optional[bool] = True,
         delete_after_days: Optional[int] = None,
         module_hotfixes: Optional[bool] = False,
+        bootstrap: Optional[MockBootstrapSetup] = None,
     ) -> dict[str, tuple[Any, Any]]:
         fields_to_change: dict[str, tuple[Any, Any]] = {}
         if chroots is not None:
@@ -416,6 +421,12 @@ class CoprHelper:
             fields_to_change["module_hotfixes"] = (
                 copr_proj.module_hotfixes,
                 module_hotfixes,
+            )
+
+        if bootstrap is not None and copr_proj.bootstrap != bootstrap.value:
+            fields_to_change["bootstrap"] = (
+                copr_proj.bootstrap,
+                bootstrap.value,
             )
 
         return fields_to_change

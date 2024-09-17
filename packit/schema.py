@@ -27,6 +27,7 @@ from packit.config import (
 )
 from packit.config.aliases import DEPRECATED_TARGET_MAP
 from packit.config.commands import TestCommandConfig
+from packit.config.common_package_config import MockBootstrapSetup
 from packit.config.job_config import (
     JobConfig,
     JobConfigTriggerType,
@@ -373,6 +374,7 @@ class JobMetadataSchema(Schema):
     use_internal_tf = fields.Boolean()
     additional_packages = fields.List(fields.String(), missing=None)
     additional_repos = fields.List(fields.String(), missing=None)
+    bootstrap = EnumField(MockBootstrapSetup, missing=None)
     fmf_url = fields.String(missing=None)
     fmf_ref = fields.String(missing=None)
     fmf_path = fields.String(missing=None)
@@ -481,6 +483,7 @@ class CommonConfigSchema(Schema):
     use_internal_tf = fields.Boolean()
     additional_packages = fields.List(fields.String(), missing=None)
     additional_repos = fields.List(fields.String(), missing=None)
+    bootstrap = EnumField(MockBootstrapSetup, missing=None)
     fmf_url = fields.String(missing=None)
     fmf_ref = fields.String(missing=None)
     fmf_path = fields.String(missing=None)

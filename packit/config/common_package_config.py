@@ -31,6 +31,13 @@ class Deployment(Enum):
     prod = "prod"
 
 
+class MockBootstrapSetup(Enum):
+    default = "default"
+    on = "on"
+    off = "off"
+    image = "image"
+
+
 def _construct_dist_git_instance(
     base_url: Optional[str],
     namespace: Optional[str],
@@ -137,6 +144,7 @@ class CommonPackageConfig:
         preserve_project: if set, project will not be created as temporary
         additional_packages: buildroot packages for the chroot [DOES NOT WORK YET]
         additional_repos: buildroot additional additional_repos
+        bootstrap: mock bootstrap feature setup
         fmf_url: - git repository containing the metadata (FMF) tree
         fmf_ref: - branch, tag or commit specifying the desired git revision
         fmf_path: - path to the fmf root
@@ -218,6 +226,7 @@ class CommonPackageConfig:
         preserve_project: bool = False,
         additional_packages: Optional[list[str]] = None,
         additional_repos: Optional[list[str]] = None,
+        bootstrap: Optional[MockBootstrapSetup] = None,
         fmf_url: Optional[str] = None,
         fmf_ref: Optional[str] = None,
         fmf_path: Optional[str] = None,
@@ -344,6 +353,9 @@ class CommonPackageConfig:
         self.preserve_project: bool = preserve_project
         self.additional_packages: list[str] = additional_packages or []
         self.additional_repos: list[str] = additional_repos or []
+        self.bootstrap = (
+            bootstrap if bootstrap is not None else MockBootstrapSetup.default
+        )
         self.fmf_url: str = fmf_url
         self.fmf_ref: str = fmf_ref
         self.fmf_path: str = fmf_path

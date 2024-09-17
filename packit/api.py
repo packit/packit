@@ -39,7 +39,7 @@ from packit.actions import ActionName
 from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.aliases import get_branches
-from packit.config.common_package_config import MultiplePackages
+from packit.config.common_package_config import MockBootstrapSetup, MultiplePackages
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
@@ -2087,6 +2087,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         preserve_project: bool = False,
         additional_packages: Optional[list[str]] = None,
         additional_repos: Optional[list[str]] = None,
+        bootstrap: Optional[MockBootstrapSetup] = None,
         request_admin_if_needed: bool = False,
         enable_net: bool = False,
         release_suffix: Optional[str] = None,
@@ -2112,6 +2113,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 automatically deleted after specific period.
             additional_packages: Buildroot packages for the chroot [DOES NOT WORK YET].
             additional_repos: Buildroot additional additional_repos.
+            bootstrap: mock bootstrap feature setup.
             request_admin_if_needed: Specifies whether to ask for admin privileges,
                 if changes to configuration of Copr project are required.
             enable_net: Specifies whether created Copr build should have access
@@ -2151,6 +2153,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             preserve_project=preserve_project,
             additional_packages=additional_packages,
             additional_repos=additional_repos,
+            bootstrap=bootstrap,
             request_admin_if_needed=request_admin_if_needed,
             module_hotfixes=module_hotfixes,
             follow_fedora_branching=follow_fedora_branching,
