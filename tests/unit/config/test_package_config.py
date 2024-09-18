@@ -2358,6 +2358,12 @@ def test_handle_metadata():
         ),
     ],
 )
+@pytest.mark.skip(
+    "upstream_project_name was renamed in upstream_package_name"
+    "but now it is no more a deprecated key (it is invalid now),"
+    "we can fix&enable this test again when we have some"
+    "new pair in deprecated_keys list.",
+)
 def test_deprecated_keys_renamed(config):
     """Deprecated keys are renamed when defined on the top-level."""
     pc = PackageConfigSchema().load(config)
@@ -2368,6 +2374,14 @@ def test_deprecated_keys_renamed(config):
 @pytest.mark.parametrize(
     "config",
     [
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "package.spec",
+                "upstream_project_name": "upstream_package",
+            },
+            id="top_level",
+        ),
         pytest.param(
             {
                 "packages": {
@@ -2415,8 +2429,7 @@ def test_deprecated_keys_renamed(config):
     ],
 )
 def test_deprecated_keys_invalid(config):
-    """Deprecated keys are not renamed in job and package objects and trigger a
-    ValidationError."""
+    """Old deprecated keys are now invalid."""
     with pytest.raises(ValidationError, match=r"upstream_project_name.+Unknown field"):
         PackageConfigSchema().load(config)
 

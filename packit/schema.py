@@ -671,7 +671,7 @@ class PackageConfigSchema(Schema):
     )
 
     # list of deprecated keys and their replacement (new,old)
-    deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
+    deprecated_keys: Union[None, tuple[tuple[str, str]]] = None
 
     @pre_load
     def ordered_preprocess(self, data: dict, **_) -> dict:
@@ -716,6 +716,9 @@ class PackageConfigSchema(Schema):
         :return: processed dictionary
         """
         if not data:  # data is None when .packit.yaml is empty
+            return data
+
+        if not self.deprecated_keys:
             return data
 
         for new_key_name, old_key_name in self.deprecated_keys:
