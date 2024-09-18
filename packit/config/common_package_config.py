@@ -94,7 +94,7 @@ class CommonPackageConfig:
         patch_generation_patch_id_digits: Number of digits used to produce patch IDs when
             adding 'PatchN' tags to the specfile.
         upstream_project_url: URL of the upstream project.
-        upstream_project_name: Name of the upstream project.
+        upstream_package_name: Name of the upstream project.
         downstream_package_name: Name of the package downstream (i.e. in dist-git)
         paths: List of relative paths in the upstream repository, which should be
             considered for this package.
