@@ -4,8 +4,6 @@
 """
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
-import logging
-import warnings
 from enum import Enum
 from os import getenv
 from os.path import basename
@@ -22,7 +20,7 @@ from packit.config.sources import SourcesItem
 from packit.constants import DISTGIT_INSTANCES
 from packit.dist_git_instance import DistGitInstance
 from packit.exceptions import PackitConfigException
-from packit.sync import SyncFilesItem, iter_srcs
+from packit.sync import SyncFilesItem
 
 
 class Deployment(Enum):
@@ -83,11 +81,7 @@ class CommonPackageConfig:
         config_file_path: Path of the configuration file from which this
             configuration was read.
         specfile_path: Path of the specfile in the upstream repo.
-        _files_to_sync: List of files to be synced from the upstream
-            repo to dist-git.
-        _file_to_sync_used: Whether the _files_to_sync config is used.
-            Flag used to provide backwards compatibility with 'synced_files'.
-        synced_files: Deprecated. List of files to be synced from the upstream
+        files_to_sync: List of files to be synced from the upstream
             repo to dist-git.
         patch_generation_ignore_paths: Paths in the upstream repo to be ignored when
             generating patches.
@@ -184,7 +178,6 @@ class CommonPackageConfig:
         self,
         config_file_path: Optional[str] = None,
         specfile_path: Optional[str] = None,
-        synced_files: Optional[list[SyncFilesItem]] = None,
         files_to_sync: Optional[list[SyncFilesItem]] = None,
         dist_git_namespace: Optional[str] = None,
         upstream_project_url: Optional[str] = None,  # can be URL or path
@@ -267,14 +260,7 @@ class CommonPackageConfig:
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
 
-        self._files_to_sync: list[SyncFilesItem] = files_to_sync or []  # new option
-        self._files_to_sync_used: bool = files_to_sync is not None
-        self.synced_files: list[SyncFilesItem] = (
-            synced_files or []
-        )  # old deprecated option
-        if synced_files is not None:
-            self._warn_user()
-
+        self.files_to_sync: list[SyncFilesItem] = files_to_sync or []
         self.patch_generation_ignore_paths = patch_generation_ignore_paths or []
         self.patch_generation_patch_id_digits = patch_generation_patch_id_digits
         self.upstream_project_url: Optional[str] = upstream_project_url
@@ -406,40 +392,6 @@ class CommonPackageConfig:
         """For backward compatibility."""
         return set(self._targets.keys())
 
-    def _warn_user(self):
-        logger = logging.getLogger(__name__)
-        msg = "synced_files option is deprecated. Use files_to_sync option instead."
-        logger.warning(msg)
-        warnings.warn(msg, DeprecationWarning, stacklevel=2)
-        if self._files_to_sync_used:
-            logger.warning(
-                "You are setting both files_to_sync and synced_files."
-                " Packit will use files_to_sync. You should remove "
-                "synced_files since it is deprecated.",
-            )
-
-    @property
-    def files_to_sync(self) -> list[SyncFilesItem]:
-        """
-        synced_files is the old option we want to deprecate.
-        Spec file and configuration file can be automatically added to
-        the list of synced_files (see get_all_files_to_sync method)
-
-        files_to_sync is the new option. Files to be synced are just those listed here.
-        Spec file and configuration file will not be automatically added
-        to the list of files_to_sync (see get_all_files_to_sync method).
-
-        files_to_sync has precedence over synced_files.
-
-        Once the old option will be removed this method can be removed as well.
-        """
-
-        if self._files_to_sync_used:
-            return self._files_to_sync
-        if self.synced_files:
-            return self.synced_files
-        return []
-
     def __repr__(self):
         # required to avoid cyclical imports
         from packit.schema import CommonConfigSchema
@@ -503,33 +455,6 @@ class CommonPackageConfig:
                 upstream_specfile_path if from_downstream else downstream_specfile_path
             ),
         )
-
-    def get_all_files_to_sync(self):
-        """
-        Adds the default files (config file, spec file) to synced files
-        if the new files_to_sync option is not yet used otherwise
-        do not performer any addition to the list of files to be synced.
-
-        When the old option will be removed this method could be removed as well.
-
-        :return: Files to be synced
-        """
-        files = self.files_to_sync
-
-        if not self._files_to_sync_used:
-            if self.specfile_path not in iter_srcs(files):
-                files.append(self.get_specfile_sync_files_item())
-
-            if self.config_file_path and self.config_file_path not in iter_srcs(files):
-                # this relative because of glob: "Non-relative patterns are unsupported"
-                files.append(
-                    SyncFilesItem(
-                        src=[self.config_file_path],
-                        dest=self.config_file_path,
-                    ),
-                )
-
-        return files
 
 
 class MultiplePackages:
