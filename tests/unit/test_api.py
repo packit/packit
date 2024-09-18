@@ -166,7 +166,7 @@ def test_sync_release_version_tag_processing(
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("_prepare_files_to_sync").with_args(
-        synced_files=[],
+        files_to_sync=[],
         full_version=version,
         upstream_tag=tag,
     )
