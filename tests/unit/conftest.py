@@ -11,6 +11,7 @@ import packit
 from packit.config import Config
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
+from packit.sync import SyncFilesItem
 from packit.upstream import GitUpstream
 from tests.spellbook import CRONIE, get_test_config, initiate_git_repo
 
@@ -31,7 +32,10 @@ def mock_get_aliases():
 @pytest.fixture
 def package_config_mock():
     mock = flexmock(
-        synced_files=None,
+        files_to_sync=[
+            SyncFilesItem(src=["specfile path"], dest="new specfile path"),
+            SyncFilesItem(src=["packit config path"], dest="new packit config path"),
+        ],
         upstream_package_name="test_package_name",
         downstream_package_name="test_package_name",
         upstream_tag_template="_",
@@ -48,7 +52,6 @@ def package_config_mock():
         version_update_mask="",
         parse_time_macros={},
     )
-    mock.should_receive("get_all_files_to_sync").and_return([])
     mock.should_receive("get_package_names_as_env").and_return({})
 
     # simulate ‹MultiplePackages›

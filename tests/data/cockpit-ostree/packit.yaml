@@ -1,5 +1,5 @@
 specfile_path: cockpit-ostree.spec
-synced_files:
+files_to_sync:
   - cockpit-ostree.spec
 upstream_package_name: cockpit-ostree
 downstream_package_name: cockpit-ostree
