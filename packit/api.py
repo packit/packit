@@ -391,24 +391,21 @@ class PackitAPI:
                 f"{REPO_NOT_PRISTINE_HINT}",
             )
 
-        if sync_default_files:
-            synced_files = self.package_config.get_all_files_to_sync()
-        else:
-            synced_files = self.package_config.files_to_sync
+        files_to_sync = self.package_config.files_to_sync
 
-        self.up.sync_files(synced_files, self.dg)
+        self.up.sync_files(files_to_sync, self.dg)
 
         if self.up.actions_handler.with_action(
             action=ActionName.prepare_files,
             env=self.common_env(version=version),
         ):
-            synced_files = self._prepare_files_to_sync(
-                synced_files=synced_files,
+            files_to_sync = self._prepare_files_to_sync(
+                files_to_sync=files_to_sync,
                 full_version=version,
                 upstream_tag=upstream_tag,
                 resolved_bugs=resolved_bugs,
             )
-        sync_files(synced_files)
+        sync_files(files_to_sync)
         if upstream_ref and self.up.actions_handler.with_action(
             action=ActionName.create_patches,
             env=self.common_env(version=version),
@@ -1440,7 +1437,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def _prepare_files_to_sync(
         self,
-        synced_files: list[SyncFilesItem],
+        files_to_sync: list[SyncFilesItem],
         full_version: str,
         upstream_tag: str,
         resolved_bugs: Optional[list[str]] = None,
@@ -1453,7 +1450,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         * Sync the content of the spec-file (but changelog) here and exclude spec-file otherwise.
 
         Args:
-            synced_files: A list of SyncFilesItem.
+            files_to_sync: A list of SyncFilesItem.
             full_version: Version to be set in the spec-file.
             upstream_tag: The commit message of this commit is going to be used
                 to update the changelog in the spec-file.
@@ -1463,7 +1460,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             The list of synced files with the spec-file removed if it was updated.
         """
         if self.package_config.sync_changelog:
-            return synced_files
+            return files_to_sync
 
         # add entry to changelog
         ChangelogHelper(self.up, self.dg, self.package_config).update_dist_git(
@@ -1478,7 +1475,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 None,
                 [
                     x.drop_src(self.up.get_absolute_specfile_path())
-                    for x in synced_files
+                    for x in files_to_sync
                 ],
             ),
         )
