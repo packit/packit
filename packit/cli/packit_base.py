@@ -25,19 +25,7 @@ from packit.utils.logging import set_logging
 logger = logging.getLogger("packit")
 
 
-class AliasedGroup(click.Group):
-    def get_command(self, ctx, cmd_name):
-        if cmd_name == "propose-update":
-            click.secho(
-                "WARNING: 'packit propose-update' is deprecated and will be removed. "
-                "Use 'packit propose-downstream' instead.",
-                fg="yellow",
-            )
-            return click.Group.get_command(self, ctx, "propose-downstream")
-        return click.Group.get_command(self, ctx, cmd_name)
-
-
-@click.group("packit", cls=AliasedGroup, context_settings=get_context_settings())
+@click.group("packit", context_settings=get_context_settings())
 @click.option("-d", "--debug", is_flag=True, help="Enable debug logs.")
 @click.option("--fas-user", help="Fedora Account System username.")
 @click.option("-k", "--keytab", help="Path to FAS keytab file.")
