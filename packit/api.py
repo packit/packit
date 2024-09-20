@@ -336,7 +336,6 @@ class PackitAPI:
         upstream_tag: Optional[str],
         commit_title: str,
         commit_msg: str,
-        sync_default_files: bool = True,
         pkg_tool: str = "",
         mark_commit_origin: bool = False,
         check_sync_status: bool = False,
@@ -361,8 +360,6 @@ class PackitAPI:
             commit_title: Commit message title (aka subject-line) in dist-git.
                 Do not commit if this is false-ish.
             commit_msg: Use this commit message in dist-git.
-            sync_default_files: Whether to sync the default files, that is: packit.yaml and
-                the spec-file.
             pkg_tool: What tool (fedpkg/centpkg/cbs) to use upload to lookaside cache.
             mark_commit_origin: Whether to include a Git-trailer in the dist-git
                 commit message to mark the hash of the upstream (source-git) commit.
@@ -883,7 +880,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
@@ -912,7 +908,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
@@ -940,7 +935,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
@@ -969,8 +963,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             create_sync_note: Whether to create a note about the sync in the dist-git repo.
             title: Title (first line) of the commit & PR.
             description: Description of the commit & PR.
-            sync_default_files: Whether to sync the default files, that is:
-                packit.yaml and the spec-file.
             local_pr_branch_suffix: When create_pr is True, we push into a newly created
                 branch and create a PR from it. This param specifies a suffix attached
                 to the created branch name, so that we can have more PRs for the same
@@ -1186,7 +1178,6 @@ The first dist-git commit to be synced is '{short_hash}'.
                 upstream_tag=upstream_tag,
                 commit_title=commit_title,
                 commit_msg=commit_description,
-                sync_default_files=sync_default_files,
                 mark_commit_origin=mark_commit_origin,
                 check_dist_git_pristine=False,
                 resolved_bugs=resolved_bugs,
