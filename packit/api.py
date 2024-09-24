@@ -40,6 +40,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.aliases import get_branches
 from packit.config.common_package_config import MockBootstrapSetup, MultiplePackages
+from packit.config.job_config import JobConfigTriggerType, JobType
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
@@ -1586,7 +1587,50 @@ The first dist-git commit to be synced is '{short_hash}'.
             except PagureAPIException as exc:
                 logger.error(f"Update of existing PR {pr.url} failed: {exc}")
                 raise PackitException(f"Update of existing PR {pr.url} failed") from exc
+        self._warn_about_koji_build_triggering_bug_if_needed(pr)
         return pr
+
+    def _warn_about_koji_build_triggering_bug_if_needed(self, pr: PullRequest) -> None:
+        """
+        Adds a warning comment to a Pagure PR that is susceptible to a bug that breaks
+        Koji build triggering.
+
+        This method can be removed after https://github.com/packit/packit-service/issues/2537
+        is resolved.
+
+        Args:
+            pr: Newly created or updated pull request object.
+        """
+        try:
+            if pr._raw_pr["commit_start"] == pr._raw_pr["commit_stop"]:
+                # PR contains single commit
+                return
+        except (AttributeError, KeyError):
+            # not a Pagure PR
+            return
+        for job in self.package_config.get_job_views():
+            if job.type != JobType.koji_build:
+                continue
+            if job.trigger != JobConfigTriggerType.commit:
+                continue
+            if pr.target_branch not in get_branches(
+                *job.dist_git_branches,
+                default="rawhide",
+                default_dg_branch="rawhide",
+            ):
+                continue
+            # koji_build job that should trigger on PR merge found
+            break
+        else:
+            return
+        pr.comment(
+            "**Warning**\n"
+            "As this pull request contains more than one commit, you may be affected "
+            "by a [bug](https://github.com/packit/packit-service/issues/2537) "
+            "that will prevent the configured `koji_build` job(s) from being triggered "
+            "after this pull request is merged. If that happens, please [trigger the job manually]"
+            "(https://packit.dev/docs/fedora-releases-guide/dist-git-onboarding#retriggering).",
+        )
 
     def push_and_create_pr(
         self,
