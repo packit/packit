@@ -14,6 +14,7 @@ from packit import api as packit_api
 from packit.api import PackitAPI
 from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
 from packit.config.config import Config
+from packit.config.job_config import JobConfigTriggerType, JobType
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, ReleaseSkippedPackitException
@@ -199,6 +200,34 @@ def test_sync_release_create_sync_note(api_mock):
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
+    api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
+
+
+def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    flexmock(pathlib.Path).should_receive("write_text").once()
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.dg.should_receive("push_to_fork").and_return()
+    pr = flexmock(
+        _raw_pr={"commit_start": "1234abc", "commit_stop": "5678def"},
+        target_branch="_",
+    )
+    api_mock.dg.should_receive("create_pull").and_return(pr)
+    api_mock.package_config.should_receive("get_job_views").and_return(
+        [
+            flexmock(
+                type=JobType.koji_build,
+                trigger=JobConfigTriggerType.commit,
+                dist_git_branches="fedora-all",
+            ),
+        ],
+    )
+    flexmock(api).should_receive("get_branches").and_return({"_", "__"})
+    pr.should_receive("comment").once()
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
 
