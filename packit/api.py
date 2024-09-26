@@ -1799,6 +1799,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         koji_builds: Optional[Sequence[str]] = None,
         sidetag: Optional[str] = None,
         bugzilla_ids: Optional[list[int]] = None,
+        alias: Optional[str] = None,
     ) -> Optional[tuple[str, str]]:
         """
         Create bodhi update.
@@ -1812,6 +1813,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             koji_builds: List of Koji builds or `None` (picks latest).
             sidetag: Koji sidetag to create the update from.
             bugzilla_ids: List of Bugzillas that are resolved with the update.
+            alias: Alias of an existing update to edit. If not specified,
+              a new update will be created.
 
         Returns:
             Alias and URL of the update or None if the update was already created.
@@ -1828,6 +1831,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             update_notes=update_notes,
             update_type=update_type,
             bugzilla_ids=bugzilla_ids,
+            alias=alias,
         )
 
     def prepare_sources(
