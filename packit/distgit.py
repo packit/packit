@@ -599,6 +599,7 @@ class DistGit(PackitRepositoryBase):
         koji_builds: Optional[Sequence[str]] = None,
         sidetag: Optional[str] = None,
         bugzilla_ids: Optional[list[int]] = None,
+        alias: Optional[str] = None,
     ) -> Optional[tuple[str, str]]:
         """
         Create bodhi update.
@@ -612,6 +613,8 @@ class DistGit(PackitRepositoryBase):
             koji_builds: List of Koji builds or `None` (picks latest).
             sidetag: Koji sidetag to create the update from.
             bugzilla_ids: List of Bugzillas that are resolved with the update.
+            alias: Alias of an existing update to edit. If not specified,
+              a new update will be created.
 
         Returns:
             Alias and URL of the update or None if the update was already created.
@@ -671,6 +674,9 @@ class DistGit(PackitRepositoryBase):
 
             if bugs:
                 save_kwargs["bugs"] = bugs
+
+            if alias:
+                save_kwargs["edited"] = alias
 
             result = bodhi_client.save(**save_kwargs)
 
