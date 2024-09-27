@@ -8,7 +8,7 @@ from typing import Any, Union
 import requests
 from marshmallow import ValidationError
 
-from packit.config import JobConfig, JobConfigView, JobType
+from packit.config import JobType
 from packit.config.package_config import PackageConfig, get_local_specfile_path
 from packit.constants import (
     ANITYA_MONITORING_CHECK_URL,
@@ -88,18 +88,15 @@ class PackageConfigValidator:
                 ]  # right now we use just the first path in a monorepo package
 
                 if (
-                    pull_from_upstream_jobs := [
+                    any(
                         job
                         for job in package_config.get_job_views()
                         if job.type == JobType.pull_from_upstream
-                    ]
+                    )
                 ) and not self.offline:
                     package_name = package_config.downstream_package_name
                     self.check_upstream_release_monitoring_mapping_exists(package_name)
                     self.check_anitya_monitoring_enabled(package_name)
-                    self.check_upstream_project_url_for_pull_from_upstream(
-                        pull_from_upstream_jobs,
-                    )
 
         output = f"{self.config_file_path.name} does not pass validation:\n"
 
@@ -216,18 +213,3 @@ class PackageConfigValidator:
             logger.error(
                 f"Error while checking monitoring for package {package_name!r}: {e}",
             )
-
-    @staticmethod
-    def check_upstream_project_url_for_pull_from_upstream(
-        jobs: list[Union[JobConfig, JobConfigView]],
-    ):
-        """
-        Check whether the upstream_project_url is set in the config if there
-        are pull_from_upstream jobs configured as this is required in that case.
-        """
-        for job in jobs:
-            if not job.upstream_project_url:
-                raise PackitConfigException(
-                    "`upstream_project_url` is not set and `pull_from_upstream` job"
-                    " is configured. This is not supported at the moment.",
-                )
