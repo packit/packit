@@ -64,7 +64,7 @@ def sync_release(
     force,
     use_downstream_specfile,
     package_config,
-    resolved_bugs,
+    resolve_bug,
     sync_acls,
     check_for_non_git_upstream=False,
 ):
@@ -107,7 +107,7 @@ def sync_release(
             create_pr=pr,
             force=force,
             use_downstream_specfile=use_downstream_specfile,
-            resolved_bugs=resolved_bugs,
+            resolve_bug=resolve_bug,
             sync_acls=sync_acls,
             fast_forward_merge_branches=get_fast_forward_merge_branches_for(
                 dist_git_branches=dist_git_branches,
@@ -238,7 +238,7 @@ def propose_downstream(
         upstream_ref=upstream_ref,
         use_downstream_specfile=False,
         package_config=package_config,
-        resolved_bugs=resolve_bug,
+        resolve_bug=resolve_bug,
         sync_acls=sync_acls,
     )
 
@@ -283,7 +283,7 @@ def pull_from_upstream(
         upstream_ref=None,
         use_downstream_specfile=True,
         package_config=package_config,
-        resolved_bugs=resolve_bug,
+        resolve_bug=resolve_bug,
         sync_acls=sync_acls,
         check_for_non_git_upstream=True,
     )
