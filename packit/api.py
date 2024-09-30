@@ -40,7 +40,6 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.aliases import get_branches
 from packit.config.common_package_config import MockBootstrapSetup, MultiplePackages
-from packit.config.job_config import JobConfigTriggerType, JobType
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
@@ -888,6 +887,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
+        warn_about_koji_build_triggering_bug: bool = False,
     ) -> PullRequest:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -916,6 +916,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
+        warn_about_koji_build_triggering_bug: bool = False,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -943,6 +944,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
+        warn_about_koji_build_triggering_bug: bool = False,
     ) -> Optional[PullRequest]:
         """
         Update given package in dist-git
@@ -1207,12 +1209,18 @@ The first dist-git commit to be synced is '{short_hash}'.
                         pr_title = (
                             title or f"Update {ff_branch} to upstream release {version}"
                         )
-                        self.create_or_update_pr(
+                        ff_branch_pr = self.create_or_update_pr(
                             pr_title=pr_title,
                             pr_description=f"{pr_description}{pr_instructions}{footer}",
                             target_branch=ff_branch,
                             repo=self.dg,
                         )
+                        if warn_about_koji_build_triggering_bug:
+                            self._warn_about_koji_build_triggering_bug_if_needed(
+                                ff_branch_pr,
+                            )
+                if warn_about_koji_build_triggering_bug:
+                    self._warn_about_koji_build_triggering_bug_if_needed(pr)
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
@@ -1587,7 +1595,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             except PagureAPIException as exc:
                 logger.error(f"Update of existing PR {pr.url} failed: {exc}")
                 raise PackitException(f"Update of existing PR {pr.url} failed") from exc
-        self._warn_about_koji_build_triggering_bug_if_needed(pr)
         return pr
 
     def _warn_about_koji_build_triggering_bug_if_needed(self, pr: PullRequest) -> None:
@@ -1607,21 +1614,6 @@ The first dist-git commit to be synced is '{short_hash}'.
                 return
         except (AttributeError, KeyError):
             # not a Pagure PR
-            return
-        for job in self.package_config.get_job_views():
-            if job.type != JobType.koji_build:
-                continue
-            if job.trigger != JobConfigTriggerType.commit:
-                continue
-            if pr.target_branch not in get_branches(
-                *job.dist_git_branches,
-                default="rawhide",
-                default_dg_branch="rawhide",
-            ):
-                continue
-            # koji_build job that should trigger on PR merge found
-            break
-        else:
             return
         pr.comment(
             "**Warning**\n"
