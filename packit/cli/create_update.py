@@ -69,7 +69,7 @@ class BugzillaIDs(click.ParamType):
 )
 @click.option(
     "-b",
-    "--resolve-bugzillas",
+    "--resolve-bug",
     help="Bugzilla IDs that are resolved with the update",
     required=False,
     default=None,
@@ -92,7 +92,7 @@ def create_update(
     koji_build,
     update_notes,
     update_type,
-    resolve_bugzillas,
+    resolve_bug,
     package_config,
     path_or_url,
 ):
@@ -136,7 +136,7 @@ def create_update(
                 dist_git_branch=branch,
                 update_notes=update_notes,
                 update_type=update_type,
-                bugzilla_ids=resolve_bugzillas,
+                bugzilla_ids=resolve_bug,
             )
         except PackitException as ex:  # noqa: PERF203
             click.echo(
