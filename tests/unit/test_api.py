@@ -14,7 +14,6 @@ from packit import api as packit_api
 from packit.api import PackitAPI
 from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
 from packit.config.config import Config
-from packit.config.job_config import JobConfigTriggerType, JobType
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, ReleaseSkippedPackitException
@@ -217,18 +216,13 @@ def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
         target_branch="_",
     )
     api_mock.dg.should_receive("create_pull").and_return(pr)
-    api_mock.package_config.should_receive("get_job_views").and_return(
-        [
-            flexmock(
-                type=JobType.koji_build,
-                trigger=JobConfigTriggerType.commit,
-                dist_git_branches="fedora-all",
-            ),
-        ],
-    )
     flexmock(api).should_receive("get_branches").and_return({"_", "__"})
     pr.should_receive("comment").once()
-    api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
+    api_mock.sync_release(
+        versions=["1.1"],
+        dist_git_branch="_",
+        warn_about_koji_build_triggering_bug=True,
+    )
 
 
 def test_common_env(api_mock):
