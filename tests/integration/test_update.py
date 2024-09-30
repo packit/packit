@@ -719,7 +719,7 @@ def test_local_update_with_specified_tag_template():
     pc = parse_loaded_config(
         {
             "specfile_path": "beer.spec",
-            "synced_files": ["beer.spec"],
+            "files_to_sync": ["beer.spec"],
             "upstream_package_name": "beerware",
             "downstream_package_name": "beer",
             "upstream_tag_template": "v{version}",

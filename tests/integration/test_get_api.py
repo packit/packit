@@ -79,7 +79,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url=None,
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
@@ -88,7 +88,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="some-url",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
@@ -97,7 +97,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="some-url",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
@@ -106,7 +106,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
@@ -115,7 +115,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
@@ -124,7 +124,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
                 downstream_package_name=None,
             ),
             False,
@@ -134,7 +134,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
                 downstream_package_name=None,
             ),
             False,
@@ -144,7 +144,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url=None,
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
                 downstream_package_name=None,
             ),
             False,
@@ -154,7 +154,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url=None,
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
                 downstream_package_name=None,
             ),
             False,
@@ -164,7 +164,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
@@ -176,7 +176,7 @@ def test_url_is_upstream():
             flexmock(
                 upstream_project_url="https://github.com/packit/ogr",
                 dist_git_instance=DISTGIT_INSTANCES["fedpkg"],
-                synced_files=None,
+                files_to_sync=None,
             ),
             True,
         ),
