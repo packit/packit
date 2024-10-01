@@ -1850,7 +1850,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
-            env=self.common_env(),
+            env=self.common_env(version=self.up.get_latest_released_version()),
         )
 
         if update_release is None:
@@ -1960,7 +1960,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
-            env=self.common_env(),
+            env=self.common_env(version=self.up.get_latest_released_version()),
         )
 
         try:
