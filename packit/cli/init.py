@@ -67,6 +67,9 @@ def init(
         ),
     }
 
+    with open(working_dir / ".gitignore", mode="a") as gitignore:
+        print("prepare_sources_result*/", file=gitignore)
+
     generate_config(
         config_file=config_path,
         write_to_file=True,
