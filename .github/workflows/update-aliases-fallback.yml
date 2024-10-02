@@ -1,0 +1,42 @@
+name: Update aliases fallback
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  update-aliases-fallback:
+    # To not run in forks
+    if: github.repository_owner == 'packit'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install Python dependencies
+        run: pip install --upgrade fedora-distro-aliases black
+      - name: Update aliases fallback
+        id: update_aliases_fallback
+        run: |
+          python files/scripts/update_aliases_fallback.py
+          case $? in
+            0) echo "pr=true" >> $GITHUB_OUTPUT;;
+            100) echo "pr=false" >> $GITHUB_OUTPUT; exit 0;;
+            *) exit $?;;
+          esac
+      - name: Create Pull Request
+        if: steps.update_aliases_fallback.outputs.pr == 'true'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          add-paths: packit/config/aliases.py
+          commit-message: Update aliases fallback
+          title: Update aliases fallback
+          body: Update aliases fallback in `packit/config/aliases.py`
+          delete-branch: true
