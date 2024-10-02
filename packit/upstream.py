@@ -152,7 +152,9 @@ class Upstream:
         """
 
         version = get_upstream_version(self.package_config.downstream_package_name)
-        logger.info(f"Version in upstream registries is {version!r}.")
+        logger.info(
+            f"Version retrieved from release-monitoring.org is {version!r}.",
+        )
         return version
 
     def get_version_from_action(self) -> Optional[str]:
@@ -693,7 +695,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
 
         if ups_ver and compare_versions(ups_ver, spec_ver) > 0:
             logger.warning(f"Version {spec_ver!r} in spec file is outdated.")
-            logger.info(f"Picking version {ups_ver!r} from upstream registry.")
+            logger.info(f"Picking version {ups_ver!r} from release-monitoring.org.")
             return ups_ver
 
         logger.info(f"Picking version {spec_ver!r} found in spec file.")
