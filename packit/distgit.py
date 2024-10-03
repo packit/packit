@@ -737,3 +737,25 @@ class DistGit(PackitRepositoryBase):
         bugs = [bug.group(1) for bug in re.finditer(bz_regex, changelog, re.IGNORECASE)]
         logger.debug(f"Bug IDs found in the changelog: {bugs}")
         return bugs
+
+    def get_nvr(self, dist_git_branch: str) -> str:
+        """
+        Get the NVR for the branch.
+
+        Returns:
+            nvr
+        """
+        self.create_branch(
+            dist_git_branch,
+            base=f"remotes/origin/{dist_git_branch}",
+            setup_tracking=True,
+        )
+
+        self.update_branch(dist_git_branch)
+        self.switch_branch(dist_git_branch)
+        pkg_tool = PkgTool(
+            fas_username=self.fas_user,
+            directory=self.local_project.working_dir,
+            tool=self.pkg_tool,
+        )
+        return pkg_tool.verrel()
