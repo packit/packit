@@ -154,8 +154,8 @@ def sync_release_common_options(func):
         "--resolve-bug",
         help="Bug(s) that are resolved with the update, e.g. rhbz#123 (multiple can be specified)",
         required=False,
-        default=None,
         multiple=True,
+        type=click.INT,
     )
     @click.option(
         "--sync-acls",
