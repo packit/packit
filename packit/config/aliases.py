@@ -15,13 +15,13 @@ from packit.utils.decorators import fallback_return_value
 from packit.utils.monitoring import Pushgateway
 
 ALIASES: dict[str, list[str]] = {
-    "fedora-all": ["fedora-38", "fedora-39", "fedora-rawhide"],
-    "fedora-stable": ["fedora-38", "fedora-39"],
-    "fedora-development": ["fedora-rawhide"],
-    "fedora-latest": ["fedora-39"],
-    "fedora-latest-stable": ["fedora-39"],
-    "fedora-branched": ["fedora-38", "fedora-39"],
-    "epel-all": ["epel-7", "epel-8", "epel-9"],
+    "fedora-all": ["fedora-39", "fedora-40", "fedora-41", "fedora-rawhide"],
+    "fedora-stable": ["fedora-39", "fedora-40"],
+    "fedora-development": ["fedora-41", "fedora-rawhide"],
+    "fedora-latest": ["fedora-41"],
+    "fedora-latest-stable": ["fedora-40"],
+    "fedora-branched": ["fedora-39", "fedora-40", "fedora-41"],
+    "epel-all": ["epel-8", "epel-9", "epel-10.0"],
 }
 
 ARCHITECTURE_LIST: list[str] = [
