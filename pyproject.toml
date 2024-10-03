@@ -55,7 +55,8 @@ dependencies = [
     "koji",
     "rpkg",
     "cachetools",
-    "python-bugzilla"
+    "python-bugzilla",
+    "osc >= 1.6.2, != 1.8.2",
 ]
 
 [project.urls]
