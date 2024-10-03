@@ -176,7 +176,7 @@ class ImageBuilder:
         image_name: str,
         image_request: dict,
         image_customizations: dict,
-        repo_url: str,
+        repo_url: Optional[str] = None,
     ):
         """
         Create an image using the Image Builder API.
@@ -233,16 +233,17 @@ class ImageBuilder:
             "image_requests": [image_request],
             "customizations": image_customizations,
         }
-        payload_repositories.append(
-            {
-                "rhsm": False,
-                "baseurl": repo_url,
-                # needs to be the actual key, not link:
-                # https://issues.redhat.com/browse/HMSIB-14
-                # "gpgkey": "https://download.copr.../@cockpit/cockpit-preview/pubkey.gpg",
-                "check_gpg": False,
-            },
-        )
+        if repo_url is not None:
+            payload_repositories.append(
+                {
+                    "rhsm": False,
+                    "baseurl": repo_url,
+                    # needs to be the actual key, not link:
+                    # https://issues.redhat.com/browse/HMSIB-14
+                    # "gpgkey": "https://download.copr.../@cockpit/cockpit-preview/pubkey.gpg",
+                    "check_gpg": False,
+                },
+            )
         response = self.image_builder_request("POST", "compose", payload=payload)
 
         response_json = response.json()
