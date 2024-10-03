@@ -2497,9 +2497,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         image_name: str,
         image_request: dict,
         image_customizations: dict,
-        copr_namespace: str,
-        copr_project: str,
-        copr_chroot: str,
+        copr_namespace: Optional[str] = None,
+        copr_project: Optional[str] = None,
+        copr_chroot: Optional[str] = None,
     ) -> str:
         """
         Submit a VM image build to Image Builder.
@@ -2521,10 +2521,14 @@ The first dist-git commit to be synced is '{short_hash}'.
             Image ID of the submitted image.
         """
         # build_id = self.copr_helper.get_build(build_id=copr_build_id)
-        repo_url = self.copr_helper.get_repo_download_url(
-            owner=copr_namespace,
-            project=copr_project,
-            chroot=copr_chroot,
+        repo_url = (
+            self.copr_helper.get_repo_download_url(
+                owner=copr_namespace,
+                project=copr_project,
+                chroot=copr_chroot,
+            )
+            if copr_project is not None
+            else None
         )
         ib = ImageBuilder(
             refresh_token=self.config.redhat_api_refresh_token,
