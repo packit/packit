@@ -256,6 +256,7 @@ ANITYA_MONITORING_CHECK_URL = (
     "https://src.fedoraproject.org/_dg/anitya/rpms/{package_name}"
 )
 RELEASE_MONITORING_PACKAGE_CHECK_URL = "https://release-monitoring.org//api/v2/packages/?name={package_name}&distribution=Fedora"
+DOWNSTREAM_PACKAGE_CHECK_URL = "https://src.fedoraproject.org/rpms/{package_name}"
 
 # connection timeout and read timeout in seconds
 # with connection timeout, the actual value will usually be a multiple of what is configured,

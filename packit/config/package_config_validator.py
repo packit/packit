@@ -12,6 +12,7 @@ from packit.config import JobType
 from packit.config.package_config import PackageConfig, get_local_specfile_path
 from packit.constants import (
     ANITYA_MONITORING_CHECK_URL,
+    DOWNSTREAM_PACKAGE_CHECK_URL,
     RELEASE_MONITORING_PACKAGE_CHECK_URL,
 )
 from packit.exceptions import PackitConfigException
@@ -86,6 +87,11 @@ class PackageConfigValidator:
                         or any(self.project_path.glob(f))
                     )
                 ]  # right now we use just the first path in a monorepo package
+
+                if not self.offline:
+                    self.check_downstream_package_exists(
+                        package_config.downstream_package_name,
+                    )
 
                 if (
                     any(
@@ -212,4 +218,24 @@ class PackageConfigValidator:
         except requests.exceptions.RequestException as e:
             logger.error(
                 f"Error while checking monitoring for package {package_name!r}: {e}",
+            )
+
+    @staticmethod
+    def check_downstream_package_exists(package_name: str):
+        """
+        Check whether downstream package exists.
+        """
+        try:
+            response = requests.get(
+                DOWNSTREAM_PACKAGE_CHECK_URL.format(package_name=package_name),
+            )
+            result = response.status_code
+            if result == 404:
+                logger.warning(
+                    f"Package {package_name!r} does not exist. Please, make "
+                    f"sure the downstream_package_name is set correctly.",
+                )
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                f"Error while checking existence of package {package_name!r}: {e}",
             )
