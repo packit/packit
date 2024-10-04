@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Tests for Upstream class
+Tests for Distgit class
 """
 
 import pytest
@@ -18,3 +18,9 @@ def test_distgit_commit_empty(distgit_instance):
         str(ex.value)
         == "No changes are present in the dist-git repo: nothing to commit."
     )
+
+
+def test_get_nvr(distgit_instance):
+    d, dg = distgit_instance
+    nvr = dg.get_nvr("main")
+    assert nvr.startswith("dist_git_remote-0.0.0-1")

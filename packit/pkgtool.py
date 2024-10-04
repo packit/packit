@@ -168,3 +168,14 @@ class PkgTool:
             "Kerberos ticket being active."
         )
         commands.run_command(cmd=cmd, error_message=error_msg)
+
+    def verrel(self) -> str:
+        """
+        Run the `verrel` command.
+        """
+        return commands.run_command(
+            cmd=[self.tool, "verrel"],
+            cwd=self.directory,
+            output=True,
+            error_message=f"`{self.tool} verrel` was not successfull",
+        ).stdout.strip()
