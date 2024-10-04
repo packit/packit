@@ -21,20 +21,6 @@ from packit.exceptions import PackitException
 logger = logging.getLogger(__name__)
 
 
-class BugzillaIDs(click.ParamType):
-    name = "bugzilla_ids"
-
-    def convert(self, value, param, ctx):
-        str_ids = value.split(",")
-        try:
-            return [int(bugzilla_id) for bugzilla_id in str_ids]
-        except ValueError as err:
-            raise click.BadParameter(
-                "cannot parse non-integer bugzilla ID. Please use following "
-                "format: id[,id]",
-            ) from err
-
-
 @click.command("create-update", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
@@ -69,11 +55,11 @@ class BugzillaIDs(click.ParamType):
 )
 @click.option(
     "-b",
-    "--resolve-bugzillas",
+    "--resolve-bug",
     help="Bugzilla IDs that are resolved with the update",
     required=False,
-    default=None,
-    type=BugzillaIDs(),
+    multiple=True,
+    type=click.INT,
 )
 @click.option(
     PACKAGE_SHORT_OPTION,
@@ -92,7 +78,7 @@ def create_update(
     koji_build,
     update_notes,
     update_type,
-    resolve_bugzillas,
+    resolve_bug,
     package_config,
     path_or_url,
 ):
@@ -136,7 +122,7 @@ def create_update(
                 dist_git_branch=branch,
                 update_notes=update_notes,
                 update_type=update_type,
-                bugzilla_ids=resolve_bugzillas,
+                bugzilla_ids=resolve_bug,
             )
         except PackitException as ex:  # noqa: PERF203
             click.echo(

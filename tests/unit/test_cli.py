@@ -60,7 +60,7 @@ def test_propose_downstream_command():
         upstream_ref=None,
         use_downstream_specfile=False,
         package_config=PackageConfig,
-        resolved_bugs=None,
+        resolve_bug=None,
         sync_acls=False,
     ).and_return()
     result = call_packit(packit_base, parameters=["propose-downstream", "."])
@@ -84,7 +84,7 @@ def test_pull_from_upstream_command():
         upstream_ref=None,
         use_downstream_specfile=True,
         package_config=PackageConfig,
-        resolved_bugs=None,
+        resolve_bug=None,
         sync_acls=False,
     ).and_return()
     result = call_packit(packit_base, parameters=["pull-from-upstream", "."])
