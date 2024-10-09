@@ -6,6 +6,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Any, Callable, Optional
 
+import backoff
 from cachetools.func import ttl_cache
 from copr.v3 import Client as CoprClient
 from copr.v3.exceptions import (
@@ -24,6 +25,13 @@ from packit.exceptions import PackitCoprProjectException, PackitCoprSettingsExce
 from packit.local_project import LocalProject
 
 logger = logging.getLogger(__name__)
+
+
+def not_copr_race_condition(e):
+    is_race_condition = "already exists" in str(e) and "400" in str(e)
+    if is_race_condition:
+        logger.debug(f"Probably a Copr race condition: {e}, try again.")
+    return not is_race_condition
 
 
 class CoprHelper:
@@ -171,6 +179,12 @@ class CoprHelper:
                 **update_args,
             )
 
+    @backoff.on_exception(
+        backoff.expo,
+        PackitCoprProjectException,
+        max_time=120,
+        giveup=not_copr_race_condition,
+    )
     def create_or_update_copr_project(
         self,
         project: str,
