@@ -15,7 +15,11 @@ import packit
 from packit.api import PackitAPI
 from packit.config import PackageConfig
 from packit.copr_helper import CoprHelper
-from packit.exceptions import PackitCoprException, PackitCoprSettingsException
+from packit.exceptions import (
+    PackitCoprException,
+    PackitCoprProjectException,
+    PackitCoprSettingsException,
+)
 from tests.spellbook import run_packit
 
 
@@ -668,3 +672,71 @@ def test_create_or_update_copr_project(copr_client_mock):
     ).and_return({})
 
     copr_helper.create_or_update_copr_project(**options)
+
+
+def test_create_or_update_copr_project_race_condition(copr_client_mock):
+    copr_helper = CoprHelper(flexmock(git_url="https://gitlab.com/"))
+    flexmock(packit.copr_helper.CoprClient).should_receive(
+        "create_from_config_file",
+    ).and_return(copr_client_mock)
+
+    options = {
+        "chroots": ["centos-stream-8-x86_64"],
+        "description": "my fabulous test",
+        "instructions": None,
+        "owner": "me",
+        "project": "already-present",
+        "targets_dict": {"centos-stream-8": {"additional_packages": ["foo"]}},
+        "module_hotfixes": None,
+    }
+
+    copr_client_mock.project_proxy = flexmock()
+    copr_client_mock.project_chroot_proxy = flexmock()
+    flexmock(copr_client_mock.project_proxy).should_receive("add").twice().and_raise(
+        PackitCoprProjectException("already exists, 400 BAD REQUEST"),
+    ).and_return(
+        flexmock(
+            chroot_repos={"centos-stream-8-x86_64": "https://repo.url"},
+            **options,
+        ),
+    )
+    flexmock(copr_client_mock.project_chroot_proxy).should_receive("get").and_return(
+        {"additional_packages": []},
+    )
+    flexmock(copr_client_mock.project_chroot_proxy).should_receive("edit").with_args(
+        ownername="me",
+        projectname="already-present",
+        chrootname="centos-stream-8-x86_64",
+        additional_packages=["foo"],
+    ).and_return({})
+
+    copr_helper.create_or_update_copr_project(**options)
+
+
+def test_create_or_update_copr_project_no_race_condition(copr_client_mock):
+    copr_helper = CoprHelper(flexmock(git_url="https://gitlab.com/"))
+    flexmock(packit.copr_helper.CoprClient).should_receive(
+        "create_from_config_file",
+    ).and_return(copr_client_mock)
+
+    options = {
+        "chroots": ["centos-stream-8-x86_64"],
+        "description": "my fabulous test",
+        "instructions": None,
+        "owner": "me",
+        "project": "already-present",
+        "targets_dict": {"centos-stream-8": {"additional_packages": ["foo"]}},
+        "module_hotfixes": None,
+    }
+
+    copr_client_mock.project_proxy = flexmock()
+    copr_client_mock.project_chroot_proxy = flexmock()
+    flexmock(copr_client_mock.project_proxy).should_receive("add").once().and_raise(
+        PackitCoprProjectException("500 err"),
+    )
+
+    pytest.raises(
+        PackitCoprProjectException,
+        copr_helper.create_or_update_copr_project,
+        **options,
+    )
