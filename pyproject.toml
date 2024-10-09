@@ -55,7 +55,8 @@ dependencies = [
     "koji",
     "rpkg",
     "cachetools",
-    "python-bugzilla"
+    "python-bugzilla",
+    "backoff",
 ]
 
 [project.urls]
