@@ -152,10 +152,10 @@ def sync_release_common_options(func):
     @click.option(
         "-b",
         "--resolve-bug",
-        help="Bug(s) that are resolved with the update, e.g. rhbz#123 (multiple can be specified)",
+        help="Bug(s) that are resolved with the update, e.g., rhbz#123 (multiple can be specified)",
         required=False,
         multiple=True,
-        type=click.INT,
+        type=click.STRING,
     )
     @click.option(
         "--sync-acls",
