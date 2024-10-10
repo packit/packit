@@ -56,10 +56,10 @@ logger = logging.getLogger(__name__)
 @click.option(
     "-b",
     "--resolve-bug",
-    help="Bugzilla IDs that are resolved with the update",
+    help="Bugzilla IDs that are resolved with the update, e.g., rhbz#1234",
     required=False,
     multiple=True,
-    type=click.INT,
+    type=click.STRING,
 )
 @click.option(
     PACKAGE_SHORT_OPTION,
