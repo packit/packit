@@ -1,3 +1,9 @@
+# 0.102.1
+
+- We have fixed an issue that was introduced during the unification of the interface for passing resolved Bugzillas / Jira tickets to the `sync-release` or `bodhi_update` jobs. (#2442)
+- `packit validate-config` now checks for the existence of downstream package. (#2436)
+- Packit now allows building VM images via CLI without any Copr repository specified. (#2434)
+
 # 0.102.0
 
 - Check for `upstream_project_url` presence in the configuration when `pull_from_upstream` job

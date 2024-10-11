@@ -6,7 +6,7 @@
 %endif
 
 Name:           packit
-Version:        0.102.0
+Version:        0.102.1
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -26,7 +26,7 @@ projects into Fedora operating system.
 Summary:        %{summary}
 # new-sources
 Requires:       fedpkg
-Requires:       git
+Requires:       git-core
 # kinit
 Requires:       krb5-workstation
 # rpmbuild
@@ -79,6 +79,9 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %doc README.md
 
 %changelog
+* Fri Oct 11 2024 Packit Team <hello@packit.dev> - 0.102.1-1
+- New upstream release 0.102.1
+
 * Fri Oct 04 2024 Packit Team <hello@packit.dev> - 0.102.0-1
 - New upstream release 0.102.0
 
