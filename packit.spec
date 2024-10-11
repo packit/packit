@@ -26,7 +26,7 @@ projects into Fedora operating system.
 Summary:        %{summary}
 # new-sources
 Requires:       fedpkg
-Requires:       git
+Requires:       git-core
 # kinit
 Requires:       krb5-workstation
 # rpmbuild
