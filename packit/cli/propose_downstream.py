@@ -107,7 +107,7 @@ def sync_release(
             create_pr=pr,
             force=force,
             use_downstream_specfile=use_downstream_specfile,
-            resolve_bug=resolve_bug,
+            resolved_bugs=resolve_bug,
             sync_acls=sync_acls,
             fast_forward_merge_branches=get_fast_forward_merge_branches_for(
                 dist_git_branches=dist_git_branches,
