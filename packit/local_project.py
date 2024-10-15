@@ -432,6 +432,9 @@ class LocalProject:
             head = self.git_repo.branches[branch_name]
         else:
             head = self.git_repo.create_head(branch_name, commit=base)
+            logger.debug(f"Created branch {branch_name}")
+
+        logger.debug(f"HEAD is now at {head.commit.hexsha} {head.commit.summary}")
 
         if setup_tracking:
             origin = self.git_repo.remote("origin")

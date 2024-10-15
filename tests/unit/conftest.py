@@ -111,7 +111,11 @@ def git_repo_mock():
         remote=lambda *_: flexmock(refs=[flexmock(remote_head="")]),
         branches=[],
         create_head=lambda *_, **__: None,
-        head=flexmock(reset=lambda *_, **__: None),
+        head=flexmock(
+            reset=lambda *_, **__: None,
+            commit=flexmock(hexsha="", summary=""),
+        ),
+        untracked_files=[],
     )
 
 
