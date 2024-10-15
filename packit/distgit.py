@@ -257,6 +257,8 @@ class DistGit(PackitRepositoryBase):
             head = self.local_project.git_repo.heads[branch_name]
         except IndexError as e:
             raise PackitException(f"Branch {branch_name!r} does not exist.") from e
+        else:
+            logger.debug(f"HEAD is now at {head.commit.hexsha} {head.commit.summary}")
         try:
             remote_ref = origin.refs[branch_name]
         except IndexError as e:
@@ -264,6 +266,10 @@ class DistGit(PackitRepositoryBase):
                 f"Branch {branch_name} does not exist in the origin remote.",
             ) from e
         head.set_commit(remote_ref)
+        logger.debug(f"HEAD is now at {head.commit.hexsha} {head.commit.summary}")
+        logger.debug(
+            f"List of untracked files: {self.local_project.git_repo.untracked_files}",
+        )
 
     def push_to_fork(
         self,
