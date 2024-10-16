@@ -96,6 +96,8 @@ from packit.vm_image_build import ImageBuilder
 
 logger = logging.getLogger(__name__)
 
+git.Git.GIT_PYTHON_TRACE = "full"
+
 
 def get_packit_version() -> str:
     try:

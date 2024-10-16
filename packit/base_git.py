@@ -219,6 +219,10 @@ class PackitRepositoryBase:
             self.local_project.git_repo.git.switch(*switch_args)
         except GitCommandError as exc:
             raise PackitException(f"Failed to switch branch to {branch!r}") from exc
+        else:
+            logger.debug(
+                f"List of untracked files: {self.local_project.git_repo.untracked_files}",
+            )
 
     def reset_workdir(
         self,
@@ -230,10 +234,19 @@ class PackitRepositoryBase:
             )
         except GitCommandError as exc:
             raise PackitException("Failed to reset git working tree") from exc
+        else:
+            logger.debug(
+                f"List of untracked files: {self.local_project.git_repo.untracked_files}",
+            )
+
         try:
             self.local_project.git_repo.git.clean(x=True, d=True, force=True)
         except GitCommandError as exc:
             raise PackitException("Failed to clean git working dir") from exc
+        else:
+            logger.debug(
+                f"List of untracked files: {self.local_project.git_repo.untracked_files}",
+            )
 
     def rebase_branch(
         self,
@@ -245,6 +258,8 @@ class PackitRepositoryBase:
         Args:
             branch: Branch to rebase onto.
         """
+        head = self.local_project.git_repo.head
+        logger.debug(f"HEAD is now at {head.commit.hexsha} {head.commit.summary}")
         try:
             self.local_project.git_repo.git.rebase(
                 f"origin/{onto_branch}",
@@ -254,6 +269,11 @@ class PackitRepositoryBase:
             raise PackitException(
                 f"Failed to rebase onto {onto_branch} using origin/{onto_branch}",
             ) from exc
+        else:
+            logger.debug(f"HEAD is now at {head.commit.hexsha} {head.commit.summary}")
+            logger.debug(
+                f"List of untracked files: {self.local_project.git_repo.untracked_files}",
+            )
 
     def search_branch(self, name: str, remote="origin") -> bool:
         """
@@ -308,6 +328,9 @@ class PackitRepositoryBase:
         Perform `git add -A` and `git commit`
         """
         logger.debug("About to add all & commit.")
+        logger.debug(
+            f"List of untracked files: {self.local_project.git_repo.untracked_files}",
+        )
         main_msg = f"{prefix}{title}"
         # add files to index in case some are untracked
         # untracked files don't make a git repo dirty, unless they are staged

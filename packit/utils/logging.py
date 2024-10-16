@@ -77,6 +77,12 @@ def set_logging(
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
+        if logger_name == "packit":
+            # log GitPython messages the same way as default logger
+            git_logger = logging.getLogger("git")
+            git_logger.setLevel(level)
+            git_logger.addHandler(handler)
+
 
 def commits_to_nice_str(commits):
     return "\n".join(
