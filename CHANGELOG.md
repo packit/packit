@@ -1,6 +1,5 @@
 # 0.102.2
 
-
 # 0.102.1
 
 - We have fixed an issue that was introduced during the unification of the interface for passing resolved Bugzillas / Jira tickets to the `sync-release` or `bodhi_update` jobs. (#2442)
