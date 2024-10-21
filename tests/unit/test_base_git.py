@@ -500,10 +500,10 @@ def test_set_spec_content(tmp_path):
 
     dist_git.set_specfile_content(upstream_specfile, None, None)
     with dist_git.specfile.sections() as sections:
-        assert [
+        assert sections.changelog == [
             "* Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1",
             "- Initial package.",
-        ] == sections.changelog
+        ]
         assert dist_git.specfile.expanded_version == "1.0"
         assert "License: MIT" in sections.package
         assert "Summary: evanescence, I was brought to life" in sections.package
