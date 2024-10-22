@@ -1,4 +1,5 @@
 ---
+# A not useful change just to trigger a copr build + scan
 # We want to use both instances for all upstream jobs including the `propose-downstream` one.
 # For downstream, we need to pick just one instance (`stg` in our case)
 # and redefine it for the `koji_build` and `bodhi_update` jobs.
