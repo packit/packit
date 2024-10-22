@@ -1,6 +1,6 @@
 # 0.102.2
 
-*  Fixed passing list of resolved bugs when running `packit propose-downstream` or `packit pull-from-upstream`. (#2447)
+- Fixed passing list of resolved bugs when running `packit propose-downstream` or `packit pull-from-upstream`. (#2447)
 
 # 0.102.1
 
