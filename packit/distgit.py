@@ -684,6 +684,8 @@ class DistGit(PackitRepositoryBase):
             if alias:
                 save_kwargs["edited"] = alias
 
+            logger.debug(f"Saving Bodhi update with args: {save_kwargs}")
+
             result = bodhi_client.save(**save_kwargs)
 
             logger.debug(f"Bodhi response:\n{result}")
