@@ -21,7 +21,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                     {
                         "job": "pull_from_upstream",
                         "trigger": "release",
-                        "dist_git_branches": ["fedora-rawhide"],
+                        "dist_git_branches": {
+                            "fedora-rawhide": {
+                                "fast_forward_merge_into": ["fedora-branched"],
+                            },
+                        },
                     },
                     {
                         "job": "koji_build",
@@ -57,7 +61,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                     {
                         "job": "pull_from_upstream",
                         "trigger": "release",
-                        "dist_git_branches": ["fedora-rawhide"],
+                        "dist_git_branches": {
+                            "fedora-rawhide": {
+                                "fast_forward_merge_into": ["fedora-branched"],
+                            },
+                        },
                     },
                     {
                         "job": "koji_build",
@@ -116,7 +124,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                     {
                         "job": "pull_from_upstream",
                         "trigger": "release",
-                        "dist_git_branches": ["fedora-rawhide"],
+                        "dist_git_branches": {
+                            "fedora-rawhide": {
+                                "fast_forward_merge_into": ["fedora-branched"],
+                            },
+                        },
                     },
                     {
                         "job": "koji_build",
@@ -146,7 +158,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                     {
                         "job": "pull_from_upstream",
                         "trigger": "release",
-                        "dist_git_branches": ["fedora-rawhide"],
+                        "dist_git_branches": {
+                            "fedora-rawhide": {
+                                "fast_forward_merge_into": ["fedora-branched"],
+                            },
+                        },
                     },
                     {
                         "job": "koji_build",
@@ -175,7 +191,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                     {
                         "job": "pull_from_upstream",
                         "trigger": "release",
-                        "dist_git_branches": ["fedora-rawhide"],
+                        "dist_git_branches": {
+                            "fedora-rawhide": {
+                                "fast_forward_merge_into": ["fedora-branched"],
+                            },
+                        },
                     },
                     {
                         "job": "koji_build",
@@ -199,7 +219,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                     {
                         "job": "pull_from_upstream",
                         "trigger": "release",
-                        "dist_git_branches": ["fedora-rawhide"],
+                        "dist_git_branches": {
+                            "fedora-rawhide": {
+                                "fast_forward_merge_into": ["fedora-branched"],
+                            },
+                        },
                     },
                 ],
             },
