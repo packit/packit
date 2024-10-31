@@ -4,11 +4,11 @@
 """
 Generate initial dist-git configuration for packit's release syncing
 """
-
+import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import click
 import yaml
@@ -108,6 +108,15 @@ For more details, see https://packit.dev/docs/configuration/ or contact
     "(defaults to rawhide)",
 )
 @click.option(
+    "--dist-git-branches-mapping",
+    help="""
+    JSON dictionary of target branches in dist-git to release into
+for which `fast_forward_merge_into` syntax will be used, e.g. '{"fedora-rawhide": ["f39", "f40"]}'.
+If not provided and --dist-git-branches is not provided as well,
+defaults to '{"fedora-rawhide": ["fedora-branched"]}').
+    """,
+)
+@click.option(
     "--push-to-distgit",
     "-p",
     default=False,
@@ -161,6 +170,7 @@ def init(
     no_bodhi_update,
     actions_file,
     dist_git_branches,
+    dist_git_branches_mapping,
     push_to_distgit,
     create_pr,
     force,
@@ -240,6 +250,20 @@ def init(
         upstream_git_url = result.stdout.strip()
         click.echo(f"Found the following URL: {upstream_git_url}")
 
+    dist_git_branches_mapping_dict = {}
+    if dist_git_branches_mapping:
+        try:
+            dist_git_branches_mapping_dict = json.loads(dist_git_branches_mapping)
+            if not isinstance(dist_git_branches_mapping_dict, dict):
+                raise ValueError("Parsed JSON is not a dictionary.")
+
+        except (json.JSONDecodeError, ValueError) as e:
+            click.echo(
+                f"Invalid JSON format for --dist-git-branches-mapping: {e}",
+                err=True,
+            )
+            return
+
     DistGitInitializer(
         upstream_git_url=upstream_git_url,
         upstream_tag_template=upstream_tag_template,
@@ -254,6 +278,7 @@ def init(
         allowed_pr_authors=allowed_pr_authors,
         actions_file=actions_file,
         dist_git_branches=dist_git_branches,
+        dist_git_branches_mapping=dist_git_branches_mapping_dict,
         create_pr=create_pr,
         push_to_distgit=push_to_distgit,
         force=force,
@@ -294,6 +319,7 @@ class DistGitInitializer:
         no_bodhi_update: bool = False,
         actions_file: Optional[Path] = None,
         dist_git_branches: Optional[str] = None,
+        dist_git_branches_mapping: Optional[dict] = None,
         push_to_distgit: bool = False,
         create_pr: bool = False,
         force: bool = False,
@@ -318,14 +344,17 @@ class DistGitInitializer:
         self.no_bodhi_update = no_bodhi_update
         self.actions_file = actions_file
         self.dist_git_branches = (
-            dist_git_branches.split(",") if dist_git_branches else ["fedora-rawhide"]
+            dist_git_branches.split(",") if dist_git_branches else None
         )
+        self.dist_git_branches_mapping = dist_git_branches_mapping
         self.push_to_distgit = push_to_distgit
         self.create_pr = create_pr
         self.path_or_url = path_or_url
         self.force = force
         self.commit_msg = commit_msg or COMMIT_MESSAGE
         self.kwargs = kwargs or {}
+
+        self._dist_git_branches_for_pull: Optional[Union[list, dict]] = None
 
     @property
     def working_dir(self):
@@ -342,6 +371,21 @@ class DistGitInitializer:
     @property
     def actions(self):
         return self.parse_actions_from_file() if self.actions_file else {}
+
+    @property
+    def dist_git_branches_for_pull(self) -> Union[list, dict]:
+        if self.dist_git_branches_mapping:
+            self._dist_git_branches_for_pull = {
+                k: {"fast_forward_merge_into": v}
+                for k, v in self.dist_git_branches_mapping.items()
+            }
+        elif self.dist_git_branches:
+            self._dist_git_branches_for_pull = self.dist_git_branches
+        else:
+            self._dist_git_branches_for_pull = {
+                "fedora-rawhide": {"fast_forward_merge_into": ["fedora-branched"]},
+            }
+        return self._dist_git_branches_for_pull
 
     @property
     def package_config_content(self):
@@ -427,7 +471,7 @@ class DistGitInitializer:
                 {
                     "job": "pull_from_upstream",
                     "trigger": "release",
-                    "dist_git_branches": self.dist_git_branches,
+                    "dist_git_branches": self.dist_git_branches_for_pull,
                 },
             )
         if not self.no_koji_build:
@@ -435,7 +479,7 @@ class DistGitInitializer:
                 {
                     "job": "koji_build",
                     "trigger": "commit",
-                    "dist_git_branches": self.dist_git_branches,
+                    "dist_git_branches": self.dist_git_branches or ["fedora-rawhide"],
                 },
             )
 
@@ -447,7 +491,7 @@ class DistGitInitializer:
                     "job": "bodhi_update",
                     "trigger": "commit",
                     # TODO we could compute the branches to exclude from Bodhi (autoupdates)
-                    "dist_git_branches": self.dist_git_branches,
+                    "dist_git_branches": self.dist_git_branches or ["fedora-rawhide"],
                 },
             )
 
