@@ -20,4 +20,4 @@ adjust:
       - how: install
         package: python3-pip
       - how: shell
-        script: pip3 install build 'deepdiff < 8.0.0'  # version 8.0.0 depends on numpy
+        script: pip3 install build deepdiff
