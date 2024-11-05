@@ -339,7 +339,7 @@ class KojiHelper:
         except Exception as e:
             logger.debug(f"Failed to remove sidetag {sidetag} in Koji: {e}")
 
-    def tag_build(self, nvr: str, tag: str) -> None:
+    def tag_build(self, nvr: str, tag: str) -> Optional[str]:
         """
         Tags a build into the specified tag.
 
@@ -348,17 +348,22 @@ class KojiHelper:
         Args:
             nvr: NVR of the build.
             tag: Tag name.
+
+        Returns:
+            Task ID if tagging was successfully requested else None.
         """
         if not self.session.logged_in:
             try:
                 self.session.gssapi_login()
             except Exception as e:
                 logger.debug(f"Authentication failed: {e}")
-                return
+                return None
         try:
-            self.session.tagBuild(tag, nvr)
+            task_id = self.session.tagBuild(tag, nvr)
         except Exception as e:
             logger.debug(f"Failed to tag {nvr} into {tag} in Koji: {e}")
+            return None
+        return str(task_id)
 
     def untag_build(self, nvr: str, tag: str) -> None:
         """
