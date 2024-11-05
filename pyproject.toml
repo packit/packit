@@ -68,7 +68,7 @@ testing = [
     "pytest-cov",
     "pytest-timeout",
     "flexmock",
-    "deepdiff < 8.0.0", # version 8.0.0 depends on numpy
+    "deepdiff",
     "distro",
     "setuptools", # Required for test_upstream.py/test_get_version_macro
     "setuptools-scm", # Required for tests using python-ogr.spec
