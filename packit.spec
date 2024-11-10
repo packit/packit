@@ -6,7 +6,7 @@
 %endif
 
 Name:           packit
-Version:        0.102.2
+Version:        0.103.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -79,6 +79,9 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %doc README.md
 
 %changelog
+* Sun Nov 10 2024 Packit Team <hello@packit.dev> - 0.103.0-1
+- New upstream release 0.103.0
+
 * Mon Oct 21 2024 Packit Team <hello@packit.dev> - 0.102.2-1
 - New upstream release 0.102.2
 
