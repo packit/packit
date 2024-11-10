@@ -1,3 +1,7 @@
+# 0.103.0
+
+- Packit now supports and defaults to `fast_forward_merge_into` syntax via `--dist-git-branches-mapping` in `dist-git init`. (#2456)
+
 # 0.102.2
 
 - Fixed passing list of resolved bugs when running `packit propose-downstream` or `packit pull-from-upstream`. (#2447)
