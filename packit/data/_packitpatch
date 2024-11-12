@@ -12,16 +12,16 @@ set -eu
 # this will print a path to a git repo
 # correct repo is /path/BUILD/<TOP-LEVEL-DIR-IN-ARCHIVE>
 top_level_git_path=$(git rev-parse --show-toplevel)
-second_to_last_dir=$(basename $(dirname ${top_level_git_path}))
+second_to_last_dir=$(basename "$(dirname "${top_level_git_path}")")
 # since rpm 4.20 the actual top level dir is one level deeper
 # /path/BUILD/$NAME-$VERSION-build/<TOP-LEVEL-DIR-IN-ARCHIVE>
 case $second_to_last_dir in *-build)
-    second_to_last_dir=$(basename $(dirname $(dirname ${top_level_git_path})))
+    second_to_last_dir=$(basename "$(dirname "$(dirname "${top_level_git_path}")")")
 esac
 # we cannot override %__scm_setup_patch b/c it is called from %autosetup
 # and some specs have %setup + %autopatch, so we need to make sure
 # the git repo exists here
-if [ $second_to_last_dir != "BUILD" ]; then
+if [ "$second_to_last_dir" != "BUILD" ]; then
   git init
   # we are doing -f to bypass .gitignore which can mask packit.yaml or the specfile
   # https://github.com/packit/dist-git-to-source-git/issues/66#issuecomment-694284493
@@ -37,24 +37,25 @@ if [ "$1" == "%{1}" ]; then
 else
   patch_path=$1
 fi
-patch_name=$(basename $patch_path)
+patch_name=$(basename "$patch_path")
 
 # we process first and second arg above, the rest is for patch
 # and we don't want backup files in our source-git repos
-patch_args=$(echo ${@:3} | sed -e 's/ -b//' -e 's/--backup//')
+patch_args=$(echo "${@:3}" | sed -e 's/ -b//' -e 's/--backup//')
 
 base_commit=$(git rev-parse HEAD)
 # Normalize patch-file name:
 # - replace non-alphanumeric characters with '-'
 # - replace consecutive '-' with a single '-'
 # - remove leading and trailing '-'
-temp_branch="apply-$(echo ${patch_name} | sed -e 's/[^0-9a-z]/-/ig' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')"
-git checkout -b ${temp_branch}
+temp_branch="apply-$(echo "${patch_name}" | sed -e 's/[^0-9a-z]/-/ig' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')"
+git checkout -b "${temp_branch}"
 # Try to apply the patch with 'git am'. This might produce multiple commits.
 # Might succeed OR fail, in which case use 'patch' to apply the patch.
-if ! cat "$patch_path" | git am; then
+if ! git am < "$patch_path"; then
     git am --abort
-    cat "$patch_path" | /usr/bin/patch ${patch_args}
+    # shellcheck disable=SC2086 # patch_args are space delimited arguments, can't be quoted
+    /usr/bin/patch ${patch_args} < "$patch_path"
     git add -f .
     # Patches can be empty, rpmbuild is fine with it.
     # The subject line is relied on when guessing the author
@@ -67,21 +68,21 @@ git checkout -
 
 # Cherry-pick commits from the temp branch, one-by-one, and amend them
 # to include Git-trailers with patch-metadata.
-for commit in $(git rev-list ${base_commit}..${temp_branch} | tac); do
+for commit in $(git rev-list "${base_commit}".."${temp_branch}" | tac); do
     commit_message_file=$(mktemp)
-    git show -s --format=%B $commit > $commit_message_file
+    git show -s --format=%B "$commit" > "$commit_message_file"
     git interpret-trailers --in-place --if-exists replace \
         --trailer "Patch-name=${patch_name}" "$commit_message_file"
     # when patches are applied with -p0, we need to strip the prefix
     # in packit when creating the patch files
-    if echo ${@:3} | grep -E "[-]p0|[-]p 0"; then
+    if echo "${@:3}" | grep -E "[-]p0|[-]p 0"; then
         git interpret-trailers --in-place --if-exists replace \
             --trailer "No-prefix=true" "$commit_message_file"
     fi
-    git cherry-pick --allow-empty $commit
+    git cherry-pick --allow-empty "$commit"
     git commit --allow-empty --amend --file "$commit_message_file"
     rm "$commit_message_file"
 done
 
 # Clean up the temporary branch.
-git branch -D ${temp_branch}
+git branch -D "${temp_branch}"
