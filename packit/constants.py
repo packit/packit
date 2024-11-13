@@ -187,6 +187,8 @@ CHROOT_SPECIFIC_COPR_CONFIGURATION = {
     "additional_repos": [],
     # modules default to string because Copr stores it as string in the DB
     "additional_modules": "",
+    "with_opts": [],
+    "without_opts": [],
 }
 
 PACKAGE_LONG_OPTION = "--package"
