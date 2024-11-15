@@ -358,7 +358,10 @@ def load_packit_yaml(
     try:
         # safe_load() returns None when the file is empty, but this needs
         # to return a dict.
-        return safe_load(raw_text) or {}
+        config = safe_load(raw_text) or {}
+        # Ignore yaml anchor placeholders
+        config.pop("_", None)
+        return config
     except YAMLError as ex:
         logger.error(f"Cannot load package config {config_file_path}.")
         if hasattr(ex, "problem_mark"):
