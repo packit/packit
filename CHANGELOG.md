@@ -1,3 +1,26 @@
+# 0.104.0
+
+- Packit configuration file can now have a placeholder top-level key `_` that is ignored when read.
+  This is useful for storing yaml anchors in complex config files, e.g.:
+
+```yaml
+_:
+  base-test: &base-test
+    job: tests
+    fmf_path: .distro
+jobs:
+  - <<: *base-test
+    trigger: pull_request
+    manual_trigger: true
+  - <<: *internal-test
+    trigger: commit
+    use_internal_tf: true
+```
+
+(#2378)
+
+- You can now define `with_opts` and `without_opts` in target-specific configuration of `copr_build` job to build with `--with` and `--without` rpmbuild options. (#2463)
+
 # 0.103.0
 
 - Packit now supports and defaults to `fast_forward_merge_into` syntax via `--dist-git-branches-mapping` in `dist-git init`. (#2456)
