@@ -675,11 +675,10 @@ class DistGit(PackitRepositoryBase):
             if bugzilla_ids_from_changelog:
                 bugs += bugzilla_ids_from_changelog
 
+            save_kwargs["bugs"] = bugs
+
             if sidetag:
                 save_kwargs["from_tag"] = sidetag
-
-            if bugs:
-                save_kwargs["bugs"] = bugs
 
             if alias:
                 save_kwargs["edited"] = alias
