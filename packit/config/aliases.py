@@ -6,23 +6,12 @@ from datetime import timedelta
 from typing import Union
 
 from cachetools.func import ttl_cache
+from fedora_distro_aliases import get_distro_aliases
+from fedora_distro_aliases.cache import BadCache
 
 from packit.constants import FAST_FORWARD_MERGE_INTO_KEY
 from packit.exceptions import PackitException
-from packit.utils.bodhi import get_bodhi_client
 from packit.utils.commands import run_command
-from packit.utils.decorators import fallback_return_value
-from packit.utils.monitoring import Pushgateway
-
-ALIASES: dict[str, list[str]] = {
-    "fedora-all": ["fedora-39", "fedora-40", "fedora-41", "fedora-rawhide"],
-    "fedora-stable": ["fedora-39", "fedora-40"],
-    "fedora-development": ["fedora-41", "fedora-rawhide"],
-    "fedora-latest": ["fedora-41"],
-    "fedora-latest-stable": ["fedora-40"],
-    "fedora-branched": ["fedora-39", "fedora-40", "fedora-41"],
-    "epel-all": ["epel-8", "epel-9", "epel-10.0"],
-}
 
 ARCHITECTURE_LIST: list[str] = [
     "aarch64",
@@ -43,9 +32,6 @@ DEPRECATED_TARGET_MAP = {
 DEFAULT_VERSION = "fedora-stable"
 
 logger = logging.getLogger(__name__)
-
-
-pushgateway = Pushgateway()
 
 
 def get_versions(*name: str, default=DEFAULT_VERSION) -> set[str]:
@@ -268,68 +254,25 @@ def get_all_koji_targets() -> list[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).stdout.split()
 
 
-def update_metrics():
-    if hasattr(pushgateway, "aliases_fallback_used"):
-        pushgateway.aliases_fallback_used.inc()
-    pushgateway.push()
-
-
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
-@fallback_return_value(ALIASES, callback=update_metrics)
 def get_aliases() -> dict[str, list[str]]:
     """
-    Function to automatically determine fedora-* and epel-* aliases.
-    Current data are fetched via bodhi client, with default base url
-    `https://bodhi.fedoraproject.org/'.
+    A wrapper around `fedora_distro_aliases.get_distro_aliases()`.
 
     Returns:
         Dictionary containing aliases.
+
+    Raises:
+        `PackitException` if aliases cache is not available.
     """
-    bodhi_client = get_bodhi_client()
-    releases = []
-    page = pages = 1
-    while page <= pages:
-        results = bodhi_client.get_releases(exclude_archived=True, page=page)
-        releases.extend(results.releases)
-        page += 1
-        pages = results.pages
-    current_fedora_releases, pending_fedora_releases, epel_releases = [], [], []
+    try:
+        # fedora-distro-aliases caches each successful response from Bodhi
+        # in ~/.cache/fedora-distro-aliases/cache.json and this cache is used
+        # instead of live data in case Bodhi is not accessible
+        distro_aliases = get_distro_aliases(cache=True)
+    except BadCache as ex:
+        raise PackitException(f"Aliases cache unavailable: {ex}") from ex
 
-    for release in filter(
-        lambda r: r.state in ["current", "pending", "frozen"],
-        releases,
-    ):
-        if release.id_prefix == "FEDORA" and release.name != "ELN":
-            name = release.long_name.lower().replace(" ", "-")
-            if release.state == "current":
-                current_fedora_releases.append(name)
-            else:
-                pending_fedora_releases.append(name)
-        elif release.id_prefix == "FEDORA-EPEL":
-            name = release.name.lower()
-            epel_releases.append(name)
-
-    current_fedora_releases.sort(key=lambda x: int(x.rsplit("-")[-1]))
-    pending_fedora_releases.sort(key=lambda x: int(x.rsplit("-")[-1]))
-    # The Fedora with the highest version is "rawhide", but
-    # Bodhi always uses release names, and has no concept of "rawhide".
-    pending_fedora_releases[-1] = "fedora-rawhide"
-
-    #  fedora-34   fedora-35   [ fedora-36 ]   fedora-rawhide
-    #  current     current  [ current/pending ]  pending
-    #
-    # all: everything
-    # stable: everything marked as "current"
-    # development: everything marked as "pending"
-    # latest: the latest with a version number
-    # latest-stable: the last "current"
-    # branched: all with a version number
     return {
-        "fedora-all": current_fedora_releases + pending_fedora_releases,
-        "fedora-stable": current_fedora_releases,
-        "fedora-development": pending_fedora_releases,
-        "fedora-latest": pending_fedora_releases[-2:-1] or current_fedora_releases[-1:],
-        "fedora-latest-stable": current_fedora_releases[-1:],
-        "fedora-branched": current_fedora_releases + pending_fedora_releases[:-1],
-        "epel-all": epel_releases,
+        alias: [d.namever for d in distros] for alias, distros in distro_aliases.items()
     }
