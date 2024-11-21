@@ -48,11 +48,18 @@ check out packit package for the executable.
 
 
 %generate_buildrequires
+%if 0%{?el9}
+# Workaround for hatch-vcs/setuptools_scm not taking the version from git archive correctly
+export SETUPTOOLS_SCM_PRETEND_VERSION="%{version}"
+%endif
 # The -w flag is required for EPEL 9's older hatchling
 %pyproject_buildrequires %{?with_tests:-x testing} %{?el9:-w}
 
 
 %build
+%if 0%{?el9}
+export SETUPTOOLS_SCM_PRETEND_VERSION="%{version}"
+%endif
 %pyproject_wheel
 
 
