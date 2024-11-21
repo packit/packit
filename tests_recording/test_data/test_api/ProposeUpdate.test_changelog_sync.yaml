@@ -8,22 +8,22 @@ X:
               metadata:
                 latency: 0
               output:
-                filename: ProposeUpdate.test_changelog_sync.yaml.packit-dist-gitb6oron6w_1.tar.xz
+                filename: ProposeUpdate.test_changelog_sync.yaml.packit-dist-gith__nvni3_1.tar.xz
                 return_value: null
-                target_path: /tmp/packit-dist-gitb6oron6w
+                target_path: /tmp/packit-dist-gith__nvni3
           to_path:
             all:
               metadata:
                 latency: 0
               output:
-                filename: ProposeUpdate.test_changelog_sync.yaml.tmpyd__73rv_1.tar.xz
+                filename: ProposeUpdate.test_changelog_sync.yaml.tmpjcjw_5hl_1.tar.xz
                 return_value:
                   _bare: false
                   _common_dir: ''
-                  _working_tree_dir: /tmp/tmpyd__73rv
-                  git_dir: /tmp/tmpyd__73rv/.git
-                  working_dir: /tmp/tmpyd__73rv
-                target_path: /tmp/tmpyd__73rv
+                  _working_tree_dir: /tmp/tmpjcjw_5hl
+                  git_dir: /tmp/tmpjcjw_5hl/.git
+                  working_dir: /tmp/tmpjcjw_5hl
+                target_path: /tmp/tmpjcjw_5hl
 _requre:
   DataTypes: 3
   key_strategy: StorageKeysInspectSimple
@@ -32,7 +32,7 @@ git.remote:
   fetch:
     all:
       metadata:
-        latency: 1.1777546405792236
+        latency: 0.7174322605133057
         module_call_list:
         - unittest.case
         - requre.record_and_replace
@@ -95,11 +95,15 @@ git.remote:
       - flags: 4
         note: ''
         old_commit: null
+        remote_ref_path: 'f41       '
+      - flags: 4
+        note: ''
+        old_commit: null
         remote_ref_path: 'main      '
   push:
     all:
       metadata:
-        latency: 9.817913055419922
+        latency: 11.313575506210327
         module_call_list:
         - unittest.case
         - requre.record_and_replace
@@ -114,13 +118,13 @@ git.remote:
         - git.remote
         - push
       output:
-      - _old_commit_sha: 6d244cb
-        flags: 128
+      - _old_commit_sha: null
+        flags: 2
         local_ref:
-        - /tmp/packit-dist-gitb6oron6w/.git
+        - /tmp/packit-dist-gith__nvni3/.git
         - refs/heads/rawhide-update
         remote_ref_string: refs/heads/rawhide-update
-        summary: '6d244cb...8702695 (forced update)
+        summary: '[new branch]
 
           '
 requests.sessions:
@@ -129,7 +133,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre:
         all:
           metadata:
-            latency: 0.691967248916626
+            latency: 0.3942844867706299
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -239,6 +243,7 @@ requests.sessions:
                 subscriptions_url: https://api.github.com/users/packit/subscriptions
                 type: Organization
                 url: https://api.github.com/users/packit
+                user_view_type: public
               owner:
                 avatar_url: https://avatars.githubusercontent.com/u/46870917?v=4
                 events_url: https://api.github.com/users/packit/events{/privacy}
@@ -258,6 +263,7 @@ requests.sessions:
                 subscriptions_url: https://api.github.com/users/packit/subscriptions
                 type: Organization
                 url: https://api.github.com/users/packit
+                user_view_type: public
               permissions:
                 admin: true
                 maintain: true
@@ -266,18 +272,20 @@ requests.sessions:
                 triage: true
               private: false
               pulls_url: https://api.github.com/repos/packit/requre/pulls{/number}
-              pushed_at: '2024-06-17T22:31:18Z'
+              pushed_at: '2024-10-28T23:34:23Z'
               releases_url: https://api.github.com/repos/packit/requre/releases{/id}
               security_and_analysis:
                 dependabot_security_updates:
                   status: enabled
                 secret_scanning:
                   status: enabled
+                secret_scanning_non_provider_patterns:
+                  status: disabled
                 secret_scanning_push_protection:
                   status: disabled
                 secret_scanning_validity_checks:
                   status: disabled
-              size: 1248
+              size: 1253
               squash_merge_commit_message: COMMIT_MESSAGES
               squash_merge_commit_title: COMMIT_OR_PR_TITLE
               ssh_url: git@github.com:packit/requre.git
@@ -294,7 +302,7 @@ requests.sessions:
               topics:
               - hacktoberfest
               trees_url: https://api.github.com/repos/packit/requre/git/trees{/sha}
-              updated_at: '2024-01-19T10:26:39Z'
+              updated_at: '2024-10-23T09:49:34Z'
               url: https://api.github.com/repos/packit/requre
               use_squash_pr_title_as_default: false
               visibility: public
@@ -302,7 +310,7 @@ requests.sessions:
               watchers_count: 7
               web_commit_signoff_required: false
             _next: null
-            elapsed: 0.69145
+            elapsed: 0.393675
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -315,28 +323,28 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 19 Jun 2024 08:40:12 GMT
-              ETag: W/"e87bed8cb0319de59fb16cf49150dbb993cb40b82025a9b187bbfd5a7b51cc66"
-              Last-Modified: Fri, 19 Jan 2024 10:26:39 GMT
+              Date: Thu, 21 Nov 2024 19:51:56 GMT
+              ETag: W/"9af7fba970d51eb777d5033e1dfdda8dcce9dc42c40e7c674c837b7f9852004e"
+              Last-Modified: Wed, 23 Oct 2024 09:49:34 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
-              Server: GitHub.com
+              Server: github.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
-              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept,
+                X-Requested-With
               X-Accepted-OAuth-Scopes: repo
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 2E6E:2F7584:1C44AA:362654:6672996C
+              X-GitHub-Request-Id: E56C:259DB2:84686A:8621A7:673F8F5C
               X-OAuth-Scopes: repo
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4987'
-              X-RateLimit-Reset: '1718788225'
+              X-RateLimit-Remaining: '4999'
+              X-RateLimit-Reset: '1732222316'
               X-RateLimit-Resource: core
-              X-RateLimit-Used: '13'
+              X-RateLimit-Used: '1'
               X-XSS-Protection: '0'
-              github-authentication-token-expiration: 2025-03-13 23:00:00 UTC
+              github-authentication-token-expiration: 2025-01-16 23:00:00 UTC
               x-github-api-version-selected: '2022-11-28'
             raw: !!binary ""
             reason: OK
@@ -344,7 +352,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/.packit.yaml?ref=main:
         all:
           metadata:
-            latency: 0.19806337356567383
+            latency: 0.30016446113586426
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -364,7 +372,7 @@ requests.sessions:
             __store_indicator: 2
             _content:
               _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/a6d16aef6d4cb53f9751cacf7208135761cb603f
+                git: https://api.github.com/repos/packit/requre/git/blobs/d4e0c601c50a7694e1e1d34b8996b934290662e8
                 html: https://github.com/packit/requre/blob/main/.packit.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
               content: 'LS0tCiMgV2Ugd2FudCB0byB1c2UgYm90aCBpbnN0YW5jZXMgZm9yIGFsbCB1
@@ -421,67 +429,71 @@ requests.sessions:
 
                 LTF0IC4vZmVkb3JhLyoudGFyLmd6IHwgaGVhZCAtbiAxIgogIGdldC1jdXJy
 
-                ZW50LXZlcnNpb246CiAgICAtIGhhdGNoIHZlcnNpb24KCnNycG1fYnVpbGRf
+                ZW50LXZlcnNpb246CiAgICAtIGhhdGNoIHZlcnNpb24KCmZpbGVzX3RvX3N5
 
-                ZGVwczoKICAtIHB5dGhvbjMtYnVpbGQKICAtIGhhdGNoCiAgLSBweXRob24z
+                bmM6CiAgLSBzcmM6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMKICAgIGRl
 
-                LWhhdGNoLXZjcwoKam9iczoKICAtIGpvYjogc3luY19mcm9tX2Rvd25zdHJl
+                c3Q6IC4KICAtIC5wYWNraXQueWFtbAoKc3JwbV9idWlsZF9kZXBzOgogIC0g
 
-                YW0KICAgIHRyaWdnZXI6IGNvbW1pdAogIC0gam9iOiBwcm9wb3NlX2Rvd25z
+                cHl0aG9uMy1idWlsZAogIC0gaGF0Y2gKICAtIHB5dGhvbjMtaGF0Y2gtdmNz
 
-                dHJlYW0KICAgIHRyaWdnZXI6IHJlbGVhc2UKICAgIGRpc3RfZ2l0X2JyYW5j
+                Cgpqb2JzOgogIC0gam9iOiBzeW5jX2Zyb21fZG93bnN0cmVhbQogICAgdHJp
 
-                aGVzOgogICAgICAtIGZlZG9yYS1hbGwKICAtIGpvYjogY29wcl9idWlsZAog
+                Z2dlcjogY29tbWl0CiAgLSBqb2I6IHByb3Bvc2VfZG93bnN0cmVhbQogICAg
 
-                ICAgdHJpZ2dlcjogcHVsbF9yZXF1ZXN0CiAgICB0YXJnZXRzOgogICAgICAt
+                dHJpZ2dlcjogcmVsZWFzZQogICAgZGlzdF9naXRfYnJhbmNoZXM6CiAgICAg
 
-                IGZlZG9yYS1hbGwKICAgICAgLSBlcGVsLTkKICAtIGpvYjogY29wcl9idWls
+                IC0gZmVkb3JhLWFsbAogIC0gam9iOiBjb3ByX2J1aWxkCiAgICB0cmlnZ2Vy
 
-                ZAogICAgdHJpZ2dlcjogY29tbWl0CiAgICBicmFuY2g6IG1haW4KICAgIHBy
+                OiBwdWxsX3JlcXVlc3QKICAgIHRhcmdldHM6CiAgICAgIC0gZmVkb3JhLWFs
 
-                b2plY3Q6IHBhY2tpdC1kZXYKICAgIHRhcmdldHM6CiAgICAgIC0gZmVkb3Jh
+                bAogICAgICAtIGVwZWwtOQogIC0gam9iOiBjb3ByX2J1aWxkCiAgICB0cmln
 
-                LWFsbAogICAgICAtIGVwZWwtOQogICAgbGlzdF9vbl9ob21lcGFnZTogVHJ1
+                Z2VyOiBjb21taXQKICAgIGJyYW5jaDogbWFpbgogICAgcHJvamVjdDogcGFj
 
-                ZQogICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQogIC0gam9iOiBjb3ByX2J1
+                a2l0LWRldgogICAgdGFyZ2V0czoKICAgICAgLSBmZWRvcmEtYWxsCiAgICAg
 
-                aWxkCiAgICB0cmlnZ2VyOiByZWxlYXNlCiAgICBwcm9qZWN0OiBwYWNraXQt
+                IC0gZXBlbC05CiAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAgICBwcmVz
 
-                cmVsZWFzZXMKICAgIHRhcmdldHM6CiAgICAgIC0gZmVkb3JhLWFsbAogICAg
+                ZXJ2ZV9wcm9qZWN0OiBUcnVlCiAgLSBqb2I6IGNvcHJfYnVpbGQKICAgIHRy
 
-                ICAtIGVwZWwtOQogICAgbGlzdF9vbl9ob21lcGFnZTogVHJ1ZQogICAgcHJl
+                aWdnZXI6IHJlbGVhc2UKICAgIHByb2plY3Q6IHBhY2tpdC1yZWxlYXNlcwog
 
-                c2VydmVfcHJvamVjdDogVHJ1ZQoKICAjIGRvd25zdHJlYW0gYXV0b21hdGlv
+                ICAgdGFyZ2V0czoKICAgICAgLSBmZWRvcmEtYWxsCiAgICAgIC0gZXBlbC05
 
-                bjoKICAtIGpvYjoga29qaV9idWlsZAogICAgdHJpZ2dlcjogY29tbWl0CiAg
+                CiAgICBsaXN0X29uX2hvbWVwYWdlOiBUcnVlCiAgICBwcmVzZXJ2ZV9wcm9q
 
-                ICBwYWNraXRfaW5zdGFuY2VzOiBbInN0ZyJdCiAgICBkaXN0X2dpdF9icmFu
+                ZWN0OiBUcnVlCgogICMgZG93bnN0cmVhbSBhdXRvbWF0aW9uOgogIC0gam9i
 
-                Y2hlczoKICAgICAgLSBmZWRvcmEtYWxsCiAgICAgIC0gZXBlbC05CiAgLSBq
+                OiBrb2ppX2J1aWxkCiAgICB0cmlnZ2VyOiBjb21taXQKICAgIHBhY2tpdF9p
 
-                b2I6IGJvZGhpX3VwZGF0ZQogICAgdHJpZ2dlcjogY29tbWl0CiAgICBwYWNr
+                bnN0YW5jZXM6IFsic3RnIl0KICAgIGRpc3RfZ2l0X2JyYW5jaGVzOgogICAg
 
-                aXRfaW5zdGFuY2VzOiBbInN0ZyJdCiAgICBkaXN0X2dpdF9icmFuY2hlczoK
+                ICAtIGZlZG9yYS1hbGwKICAgICAgLSBlcGVsLTkKICAtIGpvYjogYm9kaGlf
 
-                ICAgICAgLSBmZWRvcmEtbGF0ZXN0ICMgYnJhbmNoZWQgdmVyc2lvbiwgcmF3
+                dXBkYXRlCiAgICB0cmlnZ2VyOiBjb21taXQKICAgIHBhY2tpdF9pbnN0YW5j
 
-                aGlkZSB1cGRhdGVzIGFyZSBjcmVhdGVkIGF1dG9tYXRpY2FsbHkKICAgICAg
+                ZXM6IFsic3RnIl0KICAgIGRpc3RfZ2l0X2JyYW5jaGVzOgogICAgICAtIGZl
 
-                LSBmZWRvcmEtc3RhYmxlCiAgICAgIC0gZXBlbC05Cg==
+                ZG9yYS1sYXRlc3QgIyBicmFuY2hlZCB2ZXJzaW9uLCByYXdoaWRlIHVwZGF0
+
+                ZXMgYXJlIGNyZWF0ZWQgYXV0b21hdGljYWxseQogICAgICAtIGZlZG9yYS1z
+
+                dGFibGUKICAgICAgLSBlcGVsLTkK
 
                 '
               download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
               encoding: base64
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/a6d16aef6d4cb53f9751cacf7208135761cb603f
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/d4e0c601c50a7694e1e1d34b8996b934290662e8
               html_url: https://github.com/packit/requre/blob/main/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: a6d16aef6d4cb53f9751cacf7208135761cb603f
-              size: 2281
+              sha: d4e0c601c50a7694e1e1d34b8996b934290662e8
+              size: 2361
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             _next: null
-            elapsed: 0.197551
+            elapsed: 0.299558
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -494,28 +506,28 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 19 Jun 2024 08:40:13 GMT
-              ETag: W/"a6d16aef6d4cb53f9751cacf7208135761cb603f"
-              Last-Modified: Tue, 27 Feb 2024 12:36:22 GMT
+              Date: Thu, 21 Nov 2024 19:51:57 GMT
+              ETag: W/"d4e0c601c50a7694e1e1d34b8996b934290662e8"
+              Last-Modified: Wed, 23 Oct 2024 09:49:29 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
-              Server: GitHub.com
+              Server: github.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
-              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept,
+                X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 2E6E:2F7584:1C4678:3629ED:6672996D
+              X-GitHub-Request-Id: E56C:259DB2:846A4C:8623CC:673F8F5D
               X-OAuth-Scopes: repo
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4985'
-              X-RateLimit-Reset: '1718788225'
+              X-RateLimit-Remaining: '4997'
+              X-RateLimit-Reset: '1732222316'
               X-RateLimit-Resource: core
-              X-RateLimit-Used: '15'
+              X-RateLimit-Used: '3'
               X-XSS-Protection: '0'
-              github-authentication-token-expiration: 2025-03-13 23:00:00 UTC
+              github-authentication-token-expiration: 2025-01-16 23:00:00 UTC
               x-github-api-version-selected: '2022-11-28'
             raw: !!binary ""
             reason: OK
@@ -523,7 +535,7 @@ requests.sessions:
       https://api.github.com:443/repos/packit/requre/contents/?ref=main:
         all:
           metadata:
-            latency: 0.20535850524902344
+            latency: 0.2313835620880127
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -595,16 +607,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.gitignore?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/a6d16aef6d4cb53f9751cacf7208135761cb603f
+                git: https://api.github.com/repos/packit/requre/git/blobs/d4e0c601c50a7694e1e1d34b8996b934290662e8
                 html: https://github.com/packit/requre/blob/main/.packit.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/.packit.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/a6d16aef6d4cb53f9751cacf7208135761cb603f
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/d4e0c601c50a7694e1e1d34b8996b934290662e8
               html_url: https://github.com/packit/requre/blob/main/.packit.yaml
               name: .packit.yaml
               path: .packit.yaml
-              sha: a6d16aef6d4cb53f9751cacf7208135761cb603f
-              size: 2281
+              sha: d4e0c601c50a7694e1e1d34b8996b934290662e8
+              size: 2361
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.packit.yaml?ref=main
             - _links:
@@ -621,16 +633,16 @@ requests.sessions:
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.pre-commit-config.yaml?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
+                git: https://api.github.com/repos/packit/requre/git/blobs/7e3e46cb5b56f8193a2ef995430e4005ea81b1a0
                 html: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
                 self: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
               download_url: https://raw.githubusercontent.com/packit/requre/main/.pre-commit-hooks.yaml
-              git_url: https://api.github.com/repos/packit/requre/git/blobs/c84199ac2bf81c70e53aaf6701997b0d475e80ff
+              git_url: https://api.github.com/repos/packit/requre/git/blobs/7e3e46cb5b56f8193a2ef995430e4005ea81b1a0
               html_url: https://github.com/packit/requre/blob/main/.pre-commit-hooks.yaml
               name: .pre-commit-hooks.yaml
               path: .pre-commit-hooks.yaml
-              sha: c84199ac2bf81c70e53aaf6701997b0d475e80ff
-              size: 1608
+              sha: 7e3e46cb5b56f8193a2ef995430e4005ea81b1a0
+              size: 1605
               type: file
               url: https://api.github.com/repos/packit/requre/contents/.pre-commit-hooks.yaml?ref=main
             - _links:
@@ -842,20 +854,20 @@ requests.sessions:
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/requre?ref=main
             - _links:
-                git: https://api.github.com/repos/packit/requre/git/trees/37091c7d0176bfbbd9cf823037f0cb58089c590d
+                git: https://api.github.com/repos/packit/requre/git/trees/e5741154d36c4ca294b05de2167990e0f8c1fbe2
                 html: https://github.com/packit/requre/tree/main/tests
                 self: https://api.github.com/repos/packit/requre/contents/tests?ref=main
               download_url: null
-              git_url: https://api.github.com/repos/packit/requre/git/trees/37091c7d0176bfbbd9cf823037f0cb58089c590d
+              git_url: https://api.github.com/repos/packit/requre/git/trees/e5741154d36c4ca294b05de2167990e0f8c1fbe2
               html_url: https://github.com/packit/requre/tree/main/tests
               name: tests
               path: tests
-              sha: 37091c7d0176bfbbd9cf823037f0cb58089c590d
+              sha: e5741154d36c4ca294b05de2167990e0f8c1fbe2
               size: 0
               type: dir
               url: https://api.github.com/repos/packit/requre/contents/tests?ref=main
             _next: null
-            elapsed: 0.20484
+            elapsed: 0.230624
             encoding: utf-8
             headers:
               Access-Control-Allow-Origin: '*'
@@ -868,36 +880,36 @@ requests.sessions:
               Content-Encoding: gzip
               Content-Security-Policy: default-src 'none'
               Content-Type: application/json; charset=utf-8
-              Date: Wed, 19 Jun 2024 08:40:13 GMT
-              ETag: W/"18f728c41fc4ef4f88ef38cf73a373515c3cb12d"
-              Last-Modified: Fri, 19 Jan 2024 10:26:39 GMT
+              Date: Thu, 21 Nov 2024 19:51:57 GMT
+              ETag: W/"ccb440804194592f6a63bb45a1e67e760dd46a11"
+              Last-Modified: Wed, 23 Oct 2024 09:49:34 GMT
               Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
-              Server: GitHub.com
+              Server: github.com
               Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
               Transfer-Encoding: chunked
-              Vary: Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding,
-                Accept, X-Requested-With
+              Vary: Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept,
+                X-Requested-With
               X-Accepted-OAuth-Scopes: ''
               X-Content-Type-Options: nosniff
               X-Frame-Options: deny
               X-GitHub-Media-Type: github.v3; format=json
-              X-GitHub-Request-Id: 2E6E:2F7584:1C45B9:362861:6672996C
+              X-GitHub-Request-Id: E56C:259DB2:846951:86228F:673F8F5C
               X-OAuth-Scopes: repo
               X-RateLimit-Limit: '5000'
-              X-RateLimit-Remaining: '4986'
-              X-RateLimit-Reset: '1718788225'
+              X-RateLimit-Remaining: '4998'
+              X-RateLimit-Reset: '1732222316'
               X-RateLimit-Resource: core
-              X-RateLimit-Used: '14'
+              X-RateLimit-Used: '2'
               X-XSS-Protection: '0'
-              github-authentication-token-expiration: 2025-03-13 23:00:00 UTC
+              github-authentication-token-expiration: 2025-01-16 23:00:00 UTC
               x-github-api-version-selected: '2022-11-28'
             raw: !!binary ""
             reason: OK
             status_code: 200
-      https://bodhi.fedoraproject.org/releases/?exclude_archived=True&page=1:
+      https://bodhi.fedoraproject.org/releases/?state=current&state=pending&state=frozen&page=1:
         all:
           metadata:
-            latency: 0.6834726333618164
+            latency: 1.0111873149871826
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -905,9 +917,8 @@ requests.sessions:
             - packit.api
             - packit.config.aliases
             - cachetools
-            - packit.utils.decorators
             - packit.config.aliases
-            - bodhi.client.bindings
+            - fedora_distro_aliases
             - requests.api
             - requests.sessions
             - requre.objects
@@ -942,28 +953,28 @@ requests.sessions:
                 testing_repository: null
                 testing_tag: eln-updates-testing
                 version: eln
-              - branch: epel7
-                candidate_tag: epel7-testing-candidate
+              - branch: epel10
+                candidate_tag: epel10.0-testing-candidate
                 composed_by_bodhi: true
-                create_automatic_updates: null
-                dist_tag: epel7
+                create_automatic_updates: false
+                dist_tag: epel10.0
                 eol: null
                 id_prefix: FEDORA-EPEL
-                long_name: Fedora EPEL 7
+                long_name: Fedora EPEL 10.0
                 mail_template: fedora_epel_legacy_errata_template
-                name: EPEL-7
-                override_tag: epel7-override
+                name: EPEL-10.0
+                override_tag: epel10.0-override
                 package_manager: unspecified
-                pending_signing_tag: epel7-signing-pending
-                pending_stable_tag: epel7-pending
-                pending_testing_tag: epel7-testing-pending
+                pending_signing_tag: epel10.0-signing-pending
+                pending_stable_tag: epel10.0-pending
+                pending_testing_tag: epel10.0-testing-pending
                 released_on: null
                 setting_status: null
-                stable_tag: epel7
+                stable_tag: epel10.0
                 state: current
                 testing_repository: null
-                testing_tag: epel7-testing
-                version: '7'
+                testing_tag: epel10.0-testing
+                version: '10'
               - branch: epel8
                 candidate_tag: epel8-testing-candidate
                 composed_by_bodhi: true
@@ -1035,7 +1046,7 @@ requests.sessions:
                 composed_by_bodhi: true
                 create_automatic_updates: false
                 dist_tag: f39
-                eol: '2024-11-12'
+                eol: '2024-11-26'
                 id_prefix: FEDORA
                 long_name: Fedora 39
                 mail_template: fedora_errata_template
@@ -1057,7 +1068,7 @@ requests.sessions:
                 composed_by_bodhi: true
                 create_automatic_updates: false
                 dist_tag: f39-container
-                eol: '2024-11-12'
+                eol: '2024-11-26'
                 id_prefix: FEDORA-CONTAINER
                 long_name: Fedora 39 Containers
                 mail_template: fedora_errata_template
@@ -1079,7 +1090,7 @@ requests.sessions:
                 composed_by_bodhi: true
                 create_automatic_updates: false
                 dist_tag: f39-flatpak
-                eol: '2024-11-12'
+                eol: '2024-11-26'
                 id_prefix: FEDORA-FLATPAK
                 long_name: Fedora 39 Flatpaks
                 mail_template: fedora_errata_template
@@ -1162,26 +1173,26 @@ requests.sessions:
                 testing_repository: null
                 testing_tag: f40-flatpak-updates-testing
                 version: '40'
-              - branch: rawhide
+              - branch: f41
                 candidate_tag: f41-updates-candidate
-                composed_by_bodhi: false
-                create_automatic_updates: true
+                composed_by_bodhi: true
+                create_automatic_updates: false
                 dist_tag: f41
-                eol: null
+                eol: '2025-11-11'
                 id_prefix: FEDORA
                 long_name: Fedora 41
                 mail_template: fedora_errata_template
                 name: F41
                 override_tag: f41-override
-                package_manager: unspecified
+                package_manager: dnf
                 pending_signing_tag: f41-signing-pending
                 pending_stable_tag: f41-updates-pending
                 pending_testing_tag: f41-updates-testing-pending
                 released_on: null
-                setting_status: pre_beta
-                stable_tag: f41
-                state: pending
-                testing_repository: null
+                setting_status: null
+                stable_tag: f41-updates
+                state: current
+                testing_repository: updates-testing
                 testing_tag: f41-updates-testing
                 version: '41'
               - branch: f41
@@ -1200,203 +1211,129 @@ requests.sessions:
                 pending_stable_tag: f41-container-updates-pending
                 pending_testing_tag: f41-container-updates-testing-pending
                 released_on: null
-                setting_status: pre_beta
+                setting_status: null
                 stable_tag: f41-container-updates
                 state: pending
                 testing_repository: null
                 testing_tag: f41-container-updates-testing
                 version: '41'
+              - branch: f41
+                candidate_tag: f41-flatpak-updates-candidate
+                composed_by_bodhi: true
+                create_automatic_updates: false
+                dist_tag: f41-flatpak
+                eol: '2025-11-11'
+                id_prefix: FEDORA-FLATPAK
+                long_name: Fedora 41 Flatpaks
+                mail_template: fedora_errata_template
+                name: F41F
+                override_tag: f41-flatpak-override
+                package_manager: unspecified
+                pending_signing_tag: ''
+                pending_stable_tag: f41-flatpak-updates-pending
+                pending_testing_tag: f41-flatpak-updates-testing-pending
+                released_on: null
+                setting_status: null
+                stable_tag: f41-flatpak-updates
+                state: current
+                testing_repository: null
+                testing_tag: f41-flatpak-updates-testing
+                version: '41'
+              - branch: rawhide
+                candidate_tag: f42-updates-candidate
+                composed_by_bodhi: false
+                create_automatic_updates: true
+                dist_tag: f42
+                eol: null
+                id_prefix: FEDORA
+                long_name: Fedora 42
+                mail_template: fedora_errata_template
+                name: F42
+                override_tag: f42-override
+                package_manager: unspecified
+                pending_signing_tag: f42-signing-pending
+                pending_stable_tag: f42-updates-pending
+                pending_testing_tag: f42-updates-testing-pending
+                released_on: null
+                setting_status: pre_beta
+                stable_tag: f42
+                state: pending
+                testing_repository: null
+                testing_tag: f42-updates-testing
+                version: '42'
+              - branch: f42
+                candidate_tag: f42-container-updates-candidate
+                composed_by_bodhi: true
+                create_automatic_updates: false
+                dist_tag: f42-container
+                eol: null
+                id_prefix: FEDORA-CONTAINER
+                long_name: Fedora 42 Containers
+                mail_template: fedora_errata_template
+                name: F42C
+                override_tag: f42-container-override
+                package_manager: unspecified
+                pending_signing_tag: ''
+                pending_stable_tag: f42-container-updates-pending
+                pending_testing_tag: f42-container-updates-testing-pending
+                released_on: null
+                setting_status: pre_beta
+                stable_tag: f42-container-updates
+                state: pending
+                testing_repository: null
+                testing_tag: f42-container-updates-testing
+                version: '42'
+              - branch: f42
+                candidate_tag: f42-flatpak-updates-candidate
+                composed_by_bodhi: true
+                create_automatic_updates: false
+                dist_tag: f42-flatpak
+                eol: null
+                id_prefix: FEDORA-FLATPAK
+                long_name: Fedora 42 Flatpaks
+                mail_template: fedora_errata_template
+                name: F42F
+                override_tag: f42-flatpak-override
+                package_manager: unspecified
+                pending_signing_tag: ''
+                pending_stable_tag: f42-flatpak-updates-pending
+                pending_testing_tag: f42-flatpak-updates-testing-pending
+                released_on: null
+                setting_status: null
+                stable_tag: f42-flatpak-updates
+                state: pending
+                testing_repository: null
+                testing_tag: f42-flatpak-updates-testing
+                version: '42'
               rows_per_page: 20
-              total: 13
+              total: 17
             _next: null
-            elapsed: 0.675174
+            elapsed: 1.010154
             encoding: utf-8
             headers:
-              AppTime: D=66282
+              AppTime: D=101061
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:22 GMT
+              Date: Thu, 21 Nov 2024 19:52:04 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: gunicorn
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff, nosniff
-              X-Fedora-ProxyServer: proxy11.fedoraproject.org
-              X-Fedora-RequestID: ZnKZdp1ZIosxweblzriRbAAAAgw
+              X-Fedora-ProxyServer: proxy09.fedoraproject.org
+              X-Fedora-RequestID: Zz-PZBvDFJAgvjxbyN5ADAAAAU4
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              content-length: '8979'
+              content-length: '11816'
               content-type: application/json
-              set-cookie: 1caa5c4232b1a1f24f8c4f6e0f496284=54379c9e3297d922e85a653bc349fdb4;
+              set-cookie: 1caa5c4232b1a1f24f8c4f6e0f496284=9b3d538f815f439fcf61f3ecdb5ee24f;
                 path=/; HttpOnly; Secure; SameSite=None
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://id.fedoraproject.org/openidc/.well-known/openid-configuration:
-        all:
-          metadata:
-            latency: 0.5255591869354248
-            module_call_list:
-            - unittest.case
-            - requre.record_and_replace
-            - tests_recording.test_api
-            - packit.api
-            - packit.config.aliases
-            - cachetools
-            - packit.utils.decorators
-            - packit.config.aliases
-            - packit.utils.bodhi
-            - bodhi.client.bindings
-            - bodhi.client.oidcclient
-            - requests.api
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              acr_values_supported:
-              - '0'
-              authorization_endpoint: https://id.fedoraproject.org/openidc/Authorization
-              claim_types_supported:
-              - normal
-              claims_parameter_supported: true
-              claims_supported:
-              - sub
-              - name
-              - given_name
-              - family_name
-              - middle_name
-              - nickname
-              - preferred_username
-              - profile
-              - picture
-              - website
-              - email
-              - email_verified
-              - gender
-              - birthdate
-              - zoneinfo
-              - locale
-              - phone_number
-              - phone_number_verified
-              - address
-              - updated_at
-              display_values_supported:
-              - page
-              - popup
-              grant_types_supported:
-              - authorization_code
-              - implicit
-              - refresh_token
-              id_token_encryption_alg_values_supported: []
-              id_token_encryption_enc_values_supported: []
-              id_token_signing_alg_values_supported:
-              - RS256
-              issuer: https://id.fedoraproject.org/openidc/
-              jwks_uri: https://id.fedoraproject.org/openidc/Jwks
-              op_policy_uri: https://fedoraproject.org/wiki/Legal:PrivacyPolicy/
-              op_tos_uri: https://fedoraproject.org/wiki/Legal:PrivacyPolicy/
-              request_object_encryption_alg_values_supported: []
-              request_object_encryption_enc_values_supported: []
-              request_object_signing_alg_values_supported:
-              - HS256
-              - HS384
-              - HS512
-              - RS256
-              - RS384
-              - RS512
-              - ES256
-              - ES384
-              - ES512
-              - PS256
-              - PS384
-              - PS512
-              - EdDSA
-              - ES256K
-              - none
-              request_parameter_supported: true
-              request_uri_parameter_supported: true
-              require_request_uri_registration: false
-              response_modes_supported:
-              - query
-              - fragment
-              - form_post
-              - oob
-              - none
-              response_types_supported:
-              - code
-              - id_token
-              - token
-              - token id_token
-              scopes_supported:
-              - openid
-              - profile
-              - email
-              - address
-              - phone
-              - https://id.fedoraproject.org/scope/groups
-              - https://id.fedoraproject.org/scope/agreements
-              - https://id.fedoraproject.org/scope/fas-attributes
-              - https://beaker-project.org/oidc/scope
-              - https://github.com/jmflinuxtx/kerneltest-harness/oidc/upload_test_run
-              - https://pagure.io/odcs/new-compose
-              - https://pagure.io/odcs/renew-compose
-              - https://pagure.io/odcs/delete-compose
-              - https://src.fedoraproject.org/push
-              - https://waiverdb.fedoraproject.org/oidc/create-waiver
-              - https://fedoraproject.org/wiki/api
-              service_documentation: https://fedoraproject.org/wiki/Infrastructure/Authentication/
-              subject_types_supported:
-              - pairwise
-              - public
-              token_endpoint: https://id.fedoraproject.org/openidc/Token
-              token_endpoint_auth_methods_supported:
-              - client_secret_basic
-              - client_secret_post
-              token_endpoint_auth_signing_alg_values_supported:
-              - RS256
-              ui_locales_supported:
-              - en
-              userinfo_encryption_alg_values_supported: []
-              userinfo_encryption_enc_values_supported: []
-              userinfo_endpoint: https://id.fedoraproject.org/openidc/UserInfo
-              userinfo_signing_alg_values_supported:
-              - RS256
-            _next: null
-            elapsed: 0.525012
-            encoding: utf-8
-            headers:
-              Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:21 GMT
-              Keep-Alive: timeout=15, max=500
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZdYipC6QZ9bLnuU7rowAABdg
-              X-Frame-Options: SAMEORIGIN, deny
-              X-Xss-Protection: 1; mode=block
-              access-control-allow-origin: '*'
-              apptime: D=9550
-              cache-control: no-cache, no-store, must-revalidate, private
-              content-length: '2752'
-              content-security-policy: frame-ancestors 'none'
-              content-type: application/json
-              pragma: no-cache
-              set-cookie: fedora_ipsilon_session_id=e6470945b892e566e9ee5a092569b5f8948efead;
-                expires=Wed, 19 Jun 2024 08:55:21 GMT; HttpOnly; Max-Age=900; Path=/;
-                Secure
-              x-fedora-appserver: ipsilon02.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
             status_code: 200
       https://src.fedoraproject.org/api/0/fork/csomh/rpms/python-requre:
         all:
           metadata:
-            latency: 0.21957802772521973
+            latency: 0.23195624351501465
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -1457,6 +1394,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -1466,7 +1404,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -1492,31 +1430,31 @@ requests.sessions:
                 name: csomh
                 url_path: user/csomh
             _next: null
-            elapsed: 0.218989
+            elapsed: 0.231296
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:29 GMT
-              Keep-Alive: timeout=15, max=492
+              Date: Thu, 21 Nov 2024 19:52:24 GMT
+              Keep-Alive: timeout=15, max=478
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZffBX42-xyGBM4QkaXAAABtM
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PeJSYxCV2bSsaIXCQ8QAACUE
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=100098
-              content-length: '1924'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-xgievBXQIhOmIRlXVNefaUSHN'
+              apptime: D=116689
+              content-length: '1945'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-PXIMTcyfAaSGWLwohVPauIkzE'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-xgievBXQIhOmIRlXVNefaUSHN'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-PXIMTcyfAaSGWLwohVPauIkzE'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_Q.KEeRLch4tcpJ5okArhkonv6LCs8;
-                Expires=Sat, 20-Jul-2024 08:40:29 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-A.CnsKni8mqavkpTeLaARLdUg3pFA;
+                Expires=Sun, 22-Dec-2024 19:52:24 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -1524,7 +1462,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/jpopelka/rpms/python-requre:
         all:
           metadata:
-            latency: 0.25075316429138184
+            latency: 0.21814250946044922
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -1585,6 +1523,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -1594,7 +1533,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -1620,31 +1559,31 @@ requests.sessions:
                 name: jpopelka
                 url_path: user/jpopelka
             _next: null
-            elapsed: 0.250066
+            elapsed: 0.217573
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:29 GMT
-              Keep-Alive: timeout=15, max=493
+              Date: Thu, 21 Nov 2024 19:52:24 GMT
+              Keep-Alive: timeout=15, max=479
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZffBX42-xyGBM4QkaVgAABsM
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PeJSYxCV2bSsaIXCQ5wAACVQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=134481
-              content-length: '1946'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-ZtNfRwLoaonByV4MRrE3JptTL'
+              apptime: D=103326
+              content-length: '1967'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-YVIKdLFFbEOFT0QqHyY3NVTO5'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-ZtNfRwLoaonByV4MRrE3JptTL'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-YVIKdLFFbEOFT0QqHyY3NVTO5'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_Q.KEeRLch4tcpJ5okArhkonv6LCs8;
-                Expires=Sat, 20-Jul-2024 08:40:29 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-A.CnsKni8mqavkpTeLaARLdUg3pFA;
+                Expires=Sun, 22-Dec-2024 19:52:24 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -1652,7 +1591,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/jscotka/rpms/python-requre:
         all:
           metadata:
-            latency: 0.4127678871154785
+            latency: 0.20970892906188965
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -1713,6 +1652,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -1722,7 +1662,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -1748,31 +1688,31 @@ requests.sessions:
                 name: jscotka
                 url_path: user/jscotka
             _next: null
-            elapsed: 0.412163
+            elapsed: 0.209138
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:26 GMT
-              Keep-Alive: timeout=15, max=498
+              Date: Thu, 21 Nov 2024 19:52:23 GMT
+              Keep-Alive: timeout=15, max=483
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZevBX42-xyGBM4QkaPQAABs8
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-Pd5SYxCV2bSsaIXCQjwAACVQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=297204
-              content-length: '1937'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-bZ9DPIgSVH1lFskAhglFiusIF'
+              apptime: D=95035
+              content-length: '1958'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-MUJDo92sYuIJFBhFULVuT25q6'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-bZ9DPIgSVH1lFskAhglFiusIF'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-MUJDo92sYuIJFBhFULVuT25q6'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq-g.QHGZI-4Xm15CFlOkuTd8wIz-KfU;
-                Expires=Sat, 20-Jul-2024 08:40:26 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9w.H8ILORmwgQwLt8jHzSMIt3BCrPI;
+                Expires=Sun, 22-Dec-2024 19:52:23 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -1780,7 +1720,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/lachmanfrantisek/rpms/python-requre:
         all:
           metadata:
-            latency: 0.9890992641448975
+            latency: 0.22641324996948242
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -1841,6 +1781,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -1850,7 +1791,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -1876,31 +1817,31 @@ requests.sessions:
                 name: lachmanfrantisek
                 url_path: user/lachmanfrantisek
             _next: null
-            elapsed: 0.988467
+            elapsed: 0.225456
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:27 GMT
-              Keep-Alive: timeout=15, max=495
+              Date: Thu, 21 Nov 2024 19:52:23 GMT
+              Keep-Alive: timeout=15, max=481
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZe_BX42-xyGBM4QkaTQAABsY
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-Pd5SYxCV2bSsaIXCQwAAACUQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=871455
-              content-length: '2002'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-pt6MmaFad8PsZrTTTcxDgCo5s'
+              apptime: D=110587
+              content-length: '2023'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-RmLzrrPn8R8gd2Pdn0rnlpb0t'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-pt6MmaFad8PsZrTTTcxDgCo5s'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-RmLzrrPn8R8gd2Pdn0rnlpb0t'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_A.lERFG-IIoEHWx0CgYBEDaCGpMJk;
-                Expires=Sat, 20-Jul-2024 08:40:28 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9w.H8ILORmwgQwLt8jHzSMIt3BCrPI;
+                Expires=Sun, 22-Dec-2024 19:52:23 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -1908,7 +1849,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/lbarczio/rpms/python-requre:
         all:
           metadata:
-            latency: 0.4677150249481201
+            latency: 0.4358022212982178
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -1969,6 +1910,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -1978,7 +1920,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -2000,35 +1942,35 @@ requests.sessions:
               url_path: fork/lbarczio/rpms/python-requre
               user:
                 full_url: https://src.fedoraproject.org/user/lbarczio
-                fullname: "Laura Barcziov\xC3\xA1"
+                fullname: "Laura Barcziov\xE1"
                 name: lbarczio
                 url_path: user/lbarczio
             _next: null
-            elapsed: 0.467131
+            elapsed: 0.435327
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:28 GMT
-              Keep-Alive: timeout=15, max=494
+              Date: Thu, 21 Nov 2024 19:52:23 GMT
+              Keep-Alive: timeout=15, max=480
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZfPBX42-xyGBM4QkaUwAABsQ
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-Pd5SYxCV2bSsaIXCQzwAACVM
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=346183
-              content-length: '1950'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-1C1yzugcsJJydZfzYg2OOjCzm'
+              apptime: D=322612
+              content-length: '1965'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-PfalWFterOl1tylruW62LwXDO'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-1C1yzugcsJJydZfzYg2OOjCzm'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-PfalWFterOl1tylruW62LwXDO'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_A.lERFG-IIoEHWx0CgYBEDaCGpMJk;
-                Expires=Sat, 20-Jul-2024 08:40:28 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9w.H8ILORmwgQwLt8jHzSMIt3BCrPI;
+                Expires=Sun, 22-Dec-2024 19:52:23 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -2036,7 +1978,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/mfocko/rpms/python-requre:
         all:
           metadata:
-            latency: 0.30612874031066895
+            latency: 0.23317694664001465
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -2097,6 +2039,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -2106,7 +2049,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -2132,227 +2075,31 @@ requests.sessions:
                 name: mfocko
                 url_path: user/mfocko
             _next: null
-            elapsed: 0.305532
+            elapsed: 0.232451
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:30 GMT
-              Keep-Alive: timeout=15, max=489
+              Date: Thu, 21 Nov 2024 19:52:25 GMT
+              Keep-Alive: timeout=15, max=475
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZfvBX42-xyGBM4QkaZAAABsw
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PeZSYxCV2bSsaIXCRGQAACUY
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=185745
-              content-length: '1921'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-7vzsSt0gFZnaCPHF36FnflUZC'
+              apptime: D=117341
+              content-length: '1942'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-cHmSVZdW9uAYeNVFla9Rckzbc'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-7vzsSt0gFZnaCPHF36FnflUZC'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-cHmSVZdW9uAYeNVFla9Rckzbc'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_g.Oei93P4PdVAd7Ll2MvzaY7wlso8;
-                Expires=Sat, 20-Jul-2024 08:40:30 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/mmassari/rpms/python-requre:
-        all:
-          metadata:
-            latency: 0.26932287216186523
-            module_call_list:
-            - unittest.case
-            - requre.record_and_replace
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.abstract
-            - ogr.services.pagure.project
-            - ogr.abstract
-            - ogr.services.pagure.project
-            - ogr.abstract
-            - ogr.services.pagure.project
-            - ogr.abstract
-            - ogr.services.pagure.service
-            - ogr.abstract
-            - ogr.services.pagure.service
-            - ogr.abstract
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              access_groups:
-                admin: []
-                collaborator: []
-                commit: []
-                ticket: []
-              access_users:
-                admin: []
-                collaborator: []
-                commit:
-                - jpopelka
-                - jscotka
-                - lachmanfrantisek
-                - lbarczio
-                - mfocko
-                - ttomecek
-                owner:
-                - mmassari
-                ticket: []
-              close_status: []
-              custom_keys: []
-              date_created: '1705674395'
-              date_modified: '1705674409'
-              description: The python-requre package
-              full_url: https://src.fedoraproject.org/fork/mmassari/rpms/python-requre
-              fullname: forks/mmassari/rpms/python-requre
-              id: 69921
-              milestones: {}
-              name: python-requre
-              namespace: rpms
-              parent:
-                access_groups:
-                  admin: []
-                  collaborator: []
-                  commit: []
-                  ticket: []
-                access_users:
-                  admin:
-                  - lachmanfrantisek
-                  - lbarczio
-                  - mfocko
-                  - ttomecek
-                  collaborator: []
-                  commit: []
-                  owner:
-                  - mfocko
-                  ticket: []
-                close_status: []
-                custom_keys: []
-                date_created: '1586178839'
-                date_modified: '1715900688'
-                description: The python-requre package
-                full_url: https://src.fedoraproject.org/rpms/python-requre
-                fullname: rpms/python-requre
-                id: 41574
-                milestones: {}
-                name: python-requre
-                namespace: rpms
-                parent: null
-                priorities: {}
-                tags: []
-                url_path: rpms/python-requre
-                user:
-                  full_url: https://src.fedoraproject.org/user/mfocko
-                  fullname: Matej Focko
-                  name: mfocko
-                  url_path: user/mfocko
-              priorities: {}
-              tags: []
-              url_path: fork/mmassari/rpms/python-requre
-              user:
-                full_url: https://src.fedoraproject.org/user/mmassari
-                fullname: Maja Massarini
-                name: mmassari
-                url_path: user/mmassari
-            _next: null
-            elapsed: 0.268712
-            encoding: utf-8
-            headers:
-              Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:31 GMT
-              Keep-Alive: timeout=15, max=487
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZf_BX42-xyGBM4QkabwAABsM
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=150848
-              content-length: '2060'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-uwCFriPYvjzTIP0LOvRmCxSbA'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-uwCFriPYvjzTIP0LOvRmCxSbA'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
-                https://bodhi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_w.Dc2fxRWM75cTV8NcirHCQqlgTic;
-                Expires=Sat, 20-Jul-2024 08:40:31 GMT; Secure; HttpOnly; Path=/
-              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
-            raw: !!binary ""
-            reason: OK
-            status_code: 200
-      https://src.fedoraproject.org/api/0/fork/mmassari/rpms/python-requre/git/urls:
-        all:
-          metadata:
-            latency: 0.22764039039611816
-            module_call_list:
-            - unittest.case
-            - requre.record_and_replace
-            - tests_recording.test_api
-            - packit.api
-            - packit.distgit
-            - ogr.abstract
-            - ogr.services.pagure.project
-            - ogr.abstract
-            - ogr.services.pagure.project
-            - ogr.abstract
-            - ogr.services.pagure.service
-            - ogr.abstract
-            - ogr.services.pagure.service
-            - ogr.abstract
-            - ogr.services.pagure.service
-            - requests.sessions
-            - requre.objects
-            - requre.cassette
-            - requests.sessions
-            - send
-          output:
-            __store_indicator: 2
-            _content:
-              total_urls: 2
-              urls:
-                git: https://src.fedoraproject.org/forks/mmassari/rpms/python-requre.git
-                ssh: ssh://mmassari@pkgs.fedoraproject.org/forks/mmassari/rpms/python-requre.git
-            _next: null
-            elapsed: 0.227019
-            encoding: utf-8
-            headers:
-              Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:31 GMT
-              Keep-Alive: timeout=15, max=486
-              Referrer-Policy: same-origin
-              Server: Apache
-              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-              X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZf_BX42-xyGBM4QkacgAABtA
-              X-Frame-Options: SAMEORIGIN
-              X-Xss-Protection: 1; mode=block
-              apptime: D=109174
-              content-length: '212'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-EIQDuxr8aLxK3ehKt4IEYUkbj'
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-EIQDuxr8aLxK3ehKt4IEYUkbj'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
-                https://bodhi.fedoraproject.org;
-              content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_w.Dc2fxRWM75cTV8NcirHCQqlgTic;
-                Expires=Sat, 20-Jul-2024 08:40:31 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-Q.9pXVptry_8Ngjbdux-5-R9IGXQI;
+                Expires=Sun, 22-Dec-2024 19:52:25 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -2360,7 +2107,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/nforro/rpms/python-requre:
         all:
           metadata:
-            latency: 0.6652979850769043
+            latency: 0.24159526824951172
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -2368,6 +2115,10 @@ requests.sessions:
             - packit.api
             - packit.distgit
             - ogr.abstract
+            - ogr.read_only
+            - ogr.utils
+            - ogr.abstract
+            - ogr.services.pagure.pull_request
             - ogr.services.pagure.project
             - ogr.abstract
             - ogr.services.pagure.project
@@ -2427,6 +2178,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -2436,7 +2188,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -2462,31 +2214,93 @@ requests.sessions:
                 name: nforro
                 url_path: user/nforro
             _next: null
-            elapsed: 0.664655
+            elapsed: 0.240902
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:30 GMT
-              Keep-Alive: timeout=15, max=488
+              Date: Thu, 21 Nov 2024 19:52:25 GMT
+              Keep-Alive: timeout=15, max=472
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZfvBX42-xyGBM4QkaaAAABsw
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PeZSYxCV2bSsaIXCRPgAACUQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=537659
-              content-length: '2049'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-ylWYMKKhK10sBPd3gBbMADWSV'
+              apptime: D=125875
+              content-length: '2070'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-PkLr285KwYbjWlWxZS7DqZIVK'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-ylWYMKKhK10sBPd3gBbMADWSV'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-PkLr285KwYbjWlWxZS7DqZIVK'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_g.Oei93P4PdVAd7Ll2MvzaY7wlso8;
-                Expires=Sat, 20-Jul-2024 08:40:30 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-Q.9pXVptry_8Ngjbdux-5-R9IGXQI;
+                Expires=Sun, 22-Dec-2024 19:52:25 GMT; Secure; HttpOnly; Path=/
+              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://src.fedoraproject.org/api/0/fork/nforro/rpms/python-requre/git/urls:
+        all:
+          metadata:
+            latency: 0.20948553085327148
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_api
+            - packit.api
+            - packit.distgit
+            - ogr.abstract
+            - ogr.services.pagure.project
+            - ogr.abstract
+            - ogr.services.pagure.project
+            - ogr.abstract
+            - ogr.services.pagure.service
+            - ogr.abstract
+            - ogr.services.pagure.service
+            - ogr.abstract
+            - ogr.services.pagure.service
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              total_urls: 2
+              urls:
+                git: https://src.fedoraproject.org/forks/nforro/rpms/python-requre.git
+                ssh: ssh://nforro@pkgs.fedoraproject.org/forks/nforro/rpms/python-requre.git
+            _next: null
+            elapsed: 0.208924
+            encoding: utf-8
+            headers:
+              Connection: Keep-Alive
+              Date: Thu, 21 Nov 2024 19:52:10 GMT
+              Keep-Alive: timeout=15, max=487
+              Referrer-Policy: same-origin
+              Server: Apache
+              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+              X-Content-Type-Options: nosniff
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PapSYxCV2bSsaIXCPQQAACUQ
+              X-Frame-Options: SAMEORIGIN
+              X-Xss-Protection: 1; mode=block
+              apptime: D=95069
+              content-length: '206'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-O7EL06YrJbZ14tGOHyN23sCTe'
+                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
+                style-src 'self' 'nonce-O7EL06YrJbZ14tGOHyN23sCTe'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                https://bodhi.fedoraproject.org;
+              content-type: application/json
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg6g.rx8VZ7fYL-c1gp6vQ7c8BeE2f0s;
+                Expires=Sun, 22-Dec-2024 19:52:10 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -2494,7 +2308,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/packit-stg/rpms/python-requre:
         all:
           metadata:
-            latency: 0.34555602073669434
+            latency: 0.212937593460083
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -2561,6 +2375,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -2570,7 +2385,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -2596,31 +2411,31 @@ requests.sessions:
                 name: packit-stg
                 url_path: user/packit-stg
             _next: null
-            elapsed: 0.34495
+            elapsed: 0.21238
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:29 GMT
-              Keep-Alive: timeout=15, max=490
+              Date: Thu, 21 Nov 2024 19:52:24 GMT
+              Keep-Alive: timeout=15, max=476
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZffBX42-xyGBM4QkaYwAABtA
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PeJSYxCV2bSsaIXCRBgAACU0
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=226421
-              content-length: '2074'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-QIJQi5x2oKNPeik3A2yeCITAI'
+              apptime: D=98832
+              content-length: '2095'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-nIdFRFJEfsEFl9JxmIA47BTpN'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-QIJQi5x2oKNPeik3A2yeCITAI'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-nIdFRFJEfsEFl9JxmIA47BTpN'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_g.Oei93P4PdVAd7Ll2MvzaY7wlso8;
-                Expires=Sat, 20-Jul-2024 08:40:30 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-A.CnsKni8mqavkpTeLaARLdUg3pFA;
+                Expires=Sun, 22-Dec-2024 19:52:24 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -2628,7 +2443,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/packit/rpms/python-requre:
         all:
           metadata:
-            latency: 0.9335582256317139
+            latency: 0.2133617401123047
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -2695,6 +2510,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -2704,7 +2520,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -2730,31 +2546,31 @@ requests.sessions:
                 name: packit
                 url_path: user/packit
             _next: null
-            elapsed: 0.932948
+            elapsed: 0.212823
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:26 GMT
-              Keep-Alive: timeout=15, max=496
+              Date: Thu, 21 Nov 2024 19:52:23 GMT
+              Keep-Alive: timeout=15, max=482
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZevBX42-xyGBM4QkaQQAABtI
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-Pd5SYxCV2bSsaIXCQsAAACUs
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=815457
-              content-length: '2042'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-1rXqG2RoQ0v67rc0biiNaRiR9'
+              apptime: D=99726
+              content-length: '2063'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-rcJl1WJZUCiBswNeN4I4kdNz8'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-1rXqG2RoQ0v67rc0biiNaRiR9'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-rcJl1WJZUCiBswNeN4I4kdNz8'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq-w.KVFJz99dERPRCN6s4B2GS0JxLFc;
-                Expires=Sat, 20-Jul-2024 08:40:27 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9w.H8ILORmwgQwLt8jHzSMIt3BCrPI;
+                Expires=Sun, 22-Dec-2024 19:52:23 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -2762,7 +2578,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/fork/ttomecek/rpms/python-requre:
         all:
           metadata:
-            latency: 0.20061063766479492
+            latency: 0.24845528602600098
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -2823,6 +2639,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -2832,7 +2649,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -2858,31 +2675,31 @@ requests.sessions:
                 name: ttomecek
                 url_path: user/ttomecek
             _next: null
-            elapsed: 0.199997
+            elapsed: 0.247866
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:29 GMT
-              Keep-Alive: timeout=15, max=491
+              Date: Thu, 21 Nov 2024 19:52:24 GMT
+              Keep-Alive: timeout=15, max=477
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZffBX42-xyGBM4QkaXwAABsY
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PeJSYxCV2bSsaIXCQ-gAACUk
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=77706
-              content-length: '1937'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-9BMXePhM7q3UZAKiAs9sGPib8'
+              apptime: D=133763
+              content-length: '1958'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-L3TGMY1fBpy26Mt95YBM8AMKI'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-9BMXePhM7q3UZAKiAs9sGPib8'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-L3TGMY1fBpy26Mt95YBM8AMKI'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq_Q.KEeRLch4tcpJ5okArhkonv6LCs8;
-                Expires=Sat, 20-Jul-2024 08:40:29 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-A.CnsKni8mqavkpTeLaARLdUg3pFA;
+                Expires=Sun, 22-Dec-2024 19:52:24 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -2890,7 +2707,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/projects?fork=True&pattern=python-requre:
         all:
           metadata:
-            latency: 0.7118961811065674
+            latency: 0.2884078025817871
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -2968,6 +2785,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -2977,7 +2795,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3042,6 +2860,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3051,7 +2870,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3110,6 +2929,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3119,7 +2939,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3178,6 +2998,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3187,7 +3008,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3209,7 +3030,7 @@ requests.sessions:
                 url_path: fork/lbarczio/rpms/python-requre
                 user:
                   full_url: https://src.fedoraproject.org/user/lbarczio
-                  fullname: "Laura Barcziov\xC3\xA1"
+                  fullname: "Laura Barcziov\xE1"
                   name: lbarczio
                   url_path: user/lbarczio
               - access_groups:
@@ -3246,6 +3067,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3255,7 +3077,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3314,6 +3136,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3323,7 +3146,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3382,6 +3205,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3391,7 +3215,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3456,6 +3280,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3465,7 +3290,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3524,6 +3349,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3533,7 +3359,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3598,6 +3424,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3607,7 +3434,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3672,6 +3499,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -3681,7 +3509,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -3708,31 +3536,31 @@ requests.sessions:
                   url_path: user/mmassari
               total_projects: 11
             _next: null
-            elapsed: 0.600022
+            elapsed: 0.287647
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:25 GMT
-              Keep-Alive: timeout=15, max=499
+              Date: Thu, 21 Nov 2024 19:52:22 GMT
+              Keep-Alive: timeout=15, max=484
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZefBX42-xyGBM4QkaMwAABtQ
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PdpSYxCV2bSsaIXCQegAACVQ
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=474606
-              content-length: '26092'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-6zpgNjnKIcwaLsUahFWwsolei'
+              apptime: D=172388
+              content-length: '26361'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-860p54vtmXTi3OC73gq9jWNCQ'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-6zpgNjnKIcwaLsUahFWwsolei'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-860p54vtmXTi3OC73gq9jWNCQ'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq-Q.4O0pOWifIxNuFY06L8-iG1HBHYM;
-                Expires=Sat, 20-Jul-2024 08:40:25 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9g.3v23mmxRei_OQCh2srLC3z1bTSs;
+                Expires=Sun, 22-Dec-2024 19:52:22 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -3740,7 +3568,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/rpms/python-requre/git/branches:
         all:
           metadata:
-            latency: 0.8800265789031982
+            latency: 0.5465741157531738
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -3764,6 +3592,13 @@ requests.sessions:
             __store_indicator: 2
             _content:
               branches:
+              - f41
+              - main
+              - rawhide
+              - f30
+              - f31
+              - f32
+              - f33
               - f34
               - f35
               - f36
@@ -3771,40 +3606,34 @@ requests.sessions:
               - f38
               - f39
               - f40
-              - main
-              - rawhide
-              - f30
-              - f31
-              - f32
-              - f33
               default: rawhide
-              total_branches: 13
+              total_branches: 14
             _next: null
-            elapsed: 0.879451
+            elapsed: 0.546238
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:18 GMT
+              Date: Thu, 21 Nov 2024 19:52:01 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZcvBX42-xyGBM4QkZwgAABsM
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PYZSYxCV2bSsaIXCOcwAACUc
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=501639
-              content-length: '233'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-vdZ0wrpHmpBqbBLrdbpZe47JR'
+              apptime: D=81313
+              content-length: '245'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-yUoieuEorsv3SPFH04X7PlKc9'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-vdZ0wrpHmpBqbBLrdbpZe47JR'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-yUoieuEorsv3SPFH04X7PlKc9'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQq8g.pRSUqNi9BcMrTKOYutww9YNQemM;
-                Expires=Sat, 20-Jul-2024 08:40:18 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg4Q.S46JMNvOtDtlhCeu8wgNVoHQeFc;
+                Expires=Sun, 22-Dec-2024 19:52:01 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -3812,7 +3641,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/rpms/python-requre/pull-requests?page=1&status=Open:
         all:
           metadata:
-            latency: 0.5203766822814941
+            latency: 0.39094066619873047
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -3857,112 +3686,19 @@ requests.sessions:
               requests:
               - assignee: null
                 branch: rawhide
-                branch_from: rawhide-update
-                cached_merge_status: FFORWARD
+                branch_from: rawhide
+                cached_merge_status: unknown
                 closed_at: null
                 closed_by: null
                 comments:
-                - comment: 'Build succeeded.
-
-                    https://fedora.softwarefactory-project.io/zuul/buildset/71ffa94cf7b54ced8107d53bd0d84770
-
-
-                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/a98c8f944f924fa3b9988cd93c327d09)
-                    : SUCCESS in 2m 18s
-
-                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/a03dd0c16d204adeb5bbe73d35d456f9)
-                    : SUCCESS in 17s
-
-                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/42696ec1f07e4f83b3b3b1216d71502a)
-                    : SUCCESS in 12m 03s
-
-                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/5bfd90658ba1411eb047ff7bd8a91386)
-                    : SUCCESS in 11m 36s (non-voting)
-
-                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/7d59b979521645bcb914da54cdb8ffd3)
-                    : SUCCESS in 14m 30s (non-voting)
-
-                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/9a6032d7fe7347f7928af37034e95973)
-                    : SUCCESS in 11m 20s (non-voting)
-
-                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/4526e3b5091a4585952b3a8f66d47565)
-                    : SUCCESS in 11m 04s (non-voting)
-
-                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/301c8a6f4ac5402fa8abed715dcbacb5)
-                    : SUCCESS in 4m 46s (non-voting)
-
-                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/8c64301c21c542dda2a4883a995a689a)
-                    : SUCCESS in 6m 29s (non-voting)
-
-                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/66bf03b7484b4758b35fb162cc2341f9)
-                    : SUCCESS in 15s
-
-                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/ec5f9543f6ec419ea47dc0013a074f33)
-                    : SUCCESS in 15s
-
-                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/d22ec01ff9fc43a98fd504e57bdc4b4e)
-                    : SUCCESS in 1m 46s
-
-                    Skipped 3 jobs
-
-                    '
+                - comment: "**1 new commit added**\n\n * ``Shorten specfile destination\
+                    \ path``\n"
                   commit: null
-                  date_created: '1705912839'
+                  date_created: '1727270262'
                   edited_on: null
                   editor: null
                   filename: null
-                  id: 177686
-                  line: null
-                  notification: false
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/zuul
-                    fullname: Zuul CI Bot (Fabien Boucher)
-                    name: zuul
-                    url_path: user/zuul
-                - comment: rebased onto 7235a8fe0870774baead3d8454d42e0faa77ed8a
-                  commit: null
-                  date_created: '1708342008'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 184072
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/mmassari
-                    fullname: Maja Massarini
-                    name: mmassari
-                    url_path: user/mmassari
-                - comment: rebased onto 0f462fe86f62aa913d1cbfe2222437ff6012cfe5
-                  commit: null
-                  date_created: '1708342373'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 184073
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/mmassari
-                    fullname: Maja Massarini
-                    name: mmassari
-                    url_path: user/mmassari
-                - comment: rebased onto b65dacd339ab96b58658bb1813fd031822c4cc7b
-                  commit: null
-                  date_created: '1708342518'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 184074
+                  id: 221486
                   line: null
                   notification: true
                   parent: null
@@ -3975,54 +3711,54 @@ requests.sessions:
                     url_path: user/mmassari
                 - comment: 'Build succeeded.
 
-                    https://fedora.softwarefactory-project.io/zuul/buildset/7216cb0932de4f0f8c17e04978ee09f2
+                    https://fedora.softwarefactory-project.io/zuul/buildset/3a4fd6ff8d16430f9c5009178d91203b
 
 
-                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/c19b53076b9a4b05b151b9145063a5ed)
-                    : SUCCESS in 1m 46s
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/743a1f83501149feb058c9fabf35a8f6)
+                    : SUCCESS in 1m 32s
 
-                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/ed7d1ec0d8734f06b012e8ffcd4275ff)
-                    : SUCCESS in 16s
-
-                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/97371459d2c24acaa59a34d9c4b43d62)
-                    : SUCCESS in 8m 43s
-
-                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/4349a46b29ed4654965daf4b19548b33)
-                    : SUCCESS in 7m 53s (non-voting)
-
-                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/6ef0d000ddf242b0bd783840e4dff54a)
-                    : SUCCESS in 10m 27s (non-voting)
-
-                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/5fdaf02d7ec14298945971ade7b839b9)
-                    : SUCCESS in 8m 47s (non-voting)
-
-                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/988a69f9cc7c44e6aad1c079d75b13b9)
-                    : SUCCESS in 7m 52s (non-voting)
-
-                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/e3ff8c2f08ab4a75bdad66e115ac88fa)
-                    : SUCCESS in 4m 51s (non-voting)
-
-                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/684cb6f313214b5c8ca00490083b71c0)
-                    : SUCCESS in 5m 43s (non-voting)
-
-                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/4dd53fd4df7e4281a97057d43defa335)
-                    : SUCCESS in 16s
-
-                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/0424696d34bf4009af2f69e36754eeb0)
+                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/e590c6ec8c4d4ccca776513fb4fe0c10)
                     : SUCCESS in 15s
 
-                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/0c615977ed6841d5a47e0ecc4ea69524)
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/2a76d5fe7b104091bd6f4b24781e9021)
+                    : SUCCESS in 8m 34s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/f0550f63802e49638b855d092ecd70ec)
+                    : TIMED_OUT in 6h 00m 50s (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/9ac97a76239641c2bfcbf3e79b011942)
+                    : SUCCESS in 9m 46s (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/423ed03836e949f98e1e4cc0394da86c)
+                    : SUCCESS in 8m 37s (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/4ee99ffc264c4e55bc6ea0076f7c8544)
+                    : SUCCESS in 9m 14s (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/83710e0887964a41826ce5e59bd8e514)
+                    : FAILURE in 3m 39s (non-voting)
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/eac163cd07e940b19dce198e657d859a)
+                    : SUCCESS in 5m 52s (non-voting)
+
+                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/7897ae40cf1e4295a23bf9c64cea559d)
+                    : SUCCESS in 13s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/1b894c9063ae4f62a4fae91eae18d066)
+                    : SUCCESS in 13s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/696879e5090d4f6d99d7bb8505e879de)
                     : SUCCESS in 1m 12s
 
                     Skipped 3 jobs
 
                     '
                   commit: null
-                  date_created: '1708343456'
+                  date_created: '1727292027'
                   edited_on: null
                   editor: null
                   filename: null
-                  id: 184079
+                  id: 221576
                   line: null
                   notification: false
                   parent: null
@@ -4033,188 +3769,13 @@ requests.sessions:
                     fullname: Zuul CI Bot (Fabien Boucher)
                     name: zuul
                     url_path: user/zuul
-                - comment: rebased onto 4c30e042988f19868e4ea47a5c73bd8b5b5fe208
-                  commit: null
-                  date_created: '1718778670'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 204893
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/mmassari
-                    fullname: Maja Massarini
-                    name: mmassari
-                    url_path: user/mmassari
-                - comment: 'Build failed. More information on how to proceed and troubleshoot
-                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
-
-                    https://fedora.softwarefactory-project.io/zuul/buildset/9e0c1107f1c14c1f8d320c1e7461303c
-
-
-                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/1df3c6b154874e2faf7188e880abf235)
-                    : SUCCESS in 1m 37s
-
-                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/65b447373a6f4a5d934d9b27bd3f3e98)
-                    : SUCCESS in 16s
-
-                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/4cbab30c2919400f9c73cbb61e21e3ad)
-                    : SUCCESS in 9m 07s
-
-                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/67eb74178d2b431294fb07a28da05329)
-                    : SUCCESS in 10m 47s (non-voting)
-
-                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/ba4f7d7c1a0145c998f296c23080ede4)
-                    : SUCCESS in 11m 34s (non-voting)
-
-                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/697ab5dddd5648c099fa7323436c6f93)
-                    : SUCCESS in 9m 33s (non-voting)
-
-                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/8db68a1f9e0941a394940be64d2ac553)
-                    : SUCCESS in 8m 33s (non-voting)
-
-                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/7f324850981849d5b45a5ebe79e1a94d)
-                    : SUCCESS in 4m 14s (non-voting)
-
-                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/f857b8f6826848e7917323dd2ab03e49)
-                    : SUCCESS in 6m 13s (non-voting)
-
-                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/d624bb005ae6488db47459681b56f174)
-                    : SUCCESS in 21s
-
-                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/ab107e590eb544c6adaac7f81cee010e)
-                    : SUCCESS in 20s
-
-                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/86b990febf894d4894fe8e7402761b2f)
-                    : FAILURE in 49s
-
-                    Skipped 3 jobs
-
-                    '
-                  commit: null
-                  date_created: '1718779637'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 204896
-                  line: null
-                  notification: false
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/zuul
-                    fullname: Zuul CI Bot (Fabien Boucher)
-                    name: zuul
-                    url_path: user/zuul
-                - comment: rebased onto 4c30e042988f19868e4ea47a5c73bd8b5b5fe208
-                  commit: null
-                  date_created: '1718783553'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 204917
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/mmassari
-                    fullname: Maja Massarini
-                    name: mmassari
-                    url_path: user/mmassari
-                - comment: 'Build failed. More information on how to proceed and troubleshoot
-                    errors available at https://fedoraproject.org/wiki/Zuul-based-ci
-
-                    https://fedora.softwarefactory-project.io/zuul/buildset/8f1de73473bd4592b212d08817b29028
-
-
-                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/5b86de04e7224bc0856aaa3ccb8f675c)
-                    : SUCCESS in 1m 39s
-
-                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/56276b3da80941ce8b29760ef55d8241)
-                    : SUCCESS in 15s
-
-                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/744d7d90ddd549179d448f82b56ed306)
-                    : SUCCESS in 10m 37s
-
-                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/f0612803743f474fa25454f8d42e6feb)
-                    : SUCCESS in 9m 02s (non-voting)
-
-                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/133076ead38e4027805ea47f0542372b)
-                    : SUCCESS in 11m 17s (non-voting)
-
-                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/192437d8f7c644bc826e99170238d3ff)
-                    : SUCCESS in 8m 41s (non-voting)
-
-                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/0d756b6222844448874a7efe400380d6)
-                    : SUCCESS in 9m 09s (non-voting)
-
-                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/d44ed86236274f9e9ed794975032db08)
-                    : SUCCESS in 3m 35s (non-voting)
-
-                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/0247a5394ad14fe490d3d96de274f161)
-                    : SUCCESS in 5m 07s (non-voting)
-
-                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/2beff77198b6489190449d7347e6536f)
-                    : SUCCESS in 13s
-
-                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/0a0bb77713b444f5a71c89ebba3d4b54)
-                    : SUCCESS in 13s
-
-                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/b9f9db6c605c44589572b190f7f22267)
-                    : FAILURE in 40s
-
-                    Skipped 3 jobs
-
-                    '
-                  commit: null
-                  date_created: '1718784521'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 204920
-                  line: null
-                  notification: false
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/zuul
-                    fullname: Zuul CI Bot (Fabien Boucher)
-                    name: zuul
-                    url_path: user/zuul
-                - comment: rebased onto 4c30e042988f19868e4ea47a5c73bd8b5b5fe208
-                  commit: null
-                  date_created: '1718786441'
-                  edited_on: null
-                  editor: null
-                  filename: null
-                  id: 204933
-                  line: null
-                  notification: true
-                  parent: null
-                  reactions: {}
-                  tree: null
-                  user:
-                    full_url: https://src.fedoraproject.org/user/mmassari
-                    fullname: Maja Massarini
-                    name: mmassari
-                    url_path: user/mmassari
-                commit_start: 8702695f60f812fbaacc14e7a5a78c368e239cbc
-                commit_stop: 8702695f60f812fbaacc14e7a5a78c368e239cbc
-                date_created: '1705911676'
-                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/202
-                id: 202
-                initial_comment: 'Upstream tag: [1.0.0](https://github.com/packit/requre/releases/tag/1.0.0)
-
-                  Upstream commit: [a95c47a8](https://github.com/packit/requre/commit/a95c47a8)'
-                last_updated: '1718786441'
+                commit_start: 890b584feb1dc48dde698bc6148800c79969c03d
+                commit_stop: 864313a19aec4071c81e77f8be3a8b2df0493a49
+                date_created: '1727257401'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/206
+                id: 206
+                initial_comment: null
+                last_updated: '1732218741'
                 project:
                   access_groups:
                     admin: []
@@ -4226,6 +3787,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -4235,7 +3797,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -4294,6 +3856,7 @@ requests.sessions:
                       - lachmanfrantisek
                       - lbarczio
                       - mfocko
+                      - mmassari
                       - ttomecek
                       collaborator: []
                       commit: []
@@ -4303,7 +3866,7 @@ requests.sessions:
                     close_status: []
                     custom_keys: []
                     date_created: '1586178839'
-                    date_modified: '1715900688'
+                    date_modified: '1727334763'
                     description: The python-requre package
                     full_url: https://src.fedoraproject.org/rpms/python-requre
                     fullname: rpms/python-requre
@@ -4331,41 +3894,319 @@ requests.sessions:
                 status: Open
                 tags: []
                 threshold_reached: null
-                title: Update rawhide to upstream release 1.0.0
-                uid: bacde6a4d81e4d91a81417eae0895147
-                updated_on: '1718786441'
+                title: Fix downstream specfile path
+                uid: 341e996695924931a12336c5c227e8f1
+                updated_on: '1727292027'
                 user:
                   full_url: https://src.fedoraproject.org/user/mmassari
                   fullname: Maja Massarini
                   name: mmassari
                   url_path: user/mmassari
-              total_requests: 1
+              - assignee: null
+                branch: rawhide
+                branch_from: rawhide
+                cached_merge_status: unknown
+                closed_at: null
+                closed_by: null
+                comments:
+                - comment: "**1 new commit added**\n\n * ``Shorten specfile destination\
+                    \ path``\n"
+                  commit: null
+                  date_created: '1727279153'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 221531
+                  line: null
+                  notification: true
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/mmassari
+                    fullname: Maja Massarini
+                    name: mmassari
+                    url_path: user/mmassari
+                - comment: 'Build succeeded.
+
+                    https://fedora.softwarefactory-project.io/zuul/buildset/01d0932ba0c340dbbc13f9c33af7a765
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/1df541b0ff754e729a0f37aea11f50a0)
+                    : SUCCESS in 1m 32s
+
+                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/e9c1158830014897802167844644f4a9)
+                    : SUCCESS in 15s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/3741f6168c154013b54f136aa07a7a23)
+                    : SUCCESS in 9m 54s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/7cdc5a33baa24fa597f8cd57aefc305f)
+                    : TIMED_OUT in 6h 00m 45s (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/4d4a266bc74649bfb7e975a915e4c47c)
+                    : SUCCESS in 8m 45s (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/7f9a769c67e54ba58d3a87322db1c7e3)
+                    : SUCCESS in 9m 35s (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/690564fa45bc41d8aee3bb69e618c50a)
+                    : SUCCESS in 8m 44s (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/e5515448c60842a689d3d7af2eb0dc63)
+                    : FAILURE in 2m 59s (non-voting)
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/0019fadbaa3e4dd89a4e82d2d064a41f)
+                    : SUCCESS in 5m 22s (non-voting)
+
+                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/48b8741166eb4f5191aefb01464bb9a4)
+                    : SUCCESS in 13s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/e6da4a193cb74d7a8c02ceaa37268a28)
+                    : SUCCESS in 13s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/2db60230071f41f686ed02a0cdb528c7)
+                    : SUCCESS in 1m 04s
+
+                    Skipped 3 jobs
+
+                    '
+                  commit: null
+                  date_created: '1727279154'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 221532
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                - comment: 'Build succeeded.
+
+                    https://fedora.softwarefactory-project.io/zuul/buildset/669c1779a22d47b78fee7a41bd3e1a55
+
+
+                    - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/9b4f7c9398d84416a666d90b0422262b)
+                    : SUCCESS in 1m 40s
+
+                    - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/b76b483097804294b2a02e64ba7beb63)
+                    : SUCCESS in 15s
+
+                    - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/0bba6ceda17048fb862931a3afc1e6aa)
+                    : SUCCESS in 9m 52s
+
+                    - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/96e7a80f242349fc809392fb6c4f75d1)
+                    : TIMED_OUT in 6h 00m 51s (non-voting)
+
+                    - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/70666f3ca80f485185fbba0a45d7dc86)
+                    : SUCCESS in 10m 49s (non-voting)
+
+                    - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/8db2a7846cdb463f9d7e8231e3e4bd83)
+                    : SUCCESS in 8m 22s (non-voting)
+
+                    - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/7ceed939d52d4c3ba562878aaad1d1a6)
+                    : SUCCESS in 10m 27s (non-voting)
+
+                    - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/a7443f727f8348f2a2872555aee789fd)
+                    : FAILURE in 3m 08s (non-voting)
+
+                    - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/07a2b8cd4fc444f4a63f80a733d6aa54)
+                    : SUCCESS in 6m 27s (non-voting)
+
+                    - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/b7e21d98ed4a4a4da08f165ec6691ccc)
+                    : SUCCESS in 15s
+
+                    - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/03a9e54ac695417eb95ae721d01c7d06)
+                    : SUCCESS in 14s
+
+                    - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/a6c475d728ad49a3ba334a980e823f97)
+                    : SUCCESS in 1m 14s
+
+                    Skipped 3 jobs
+
+                    '
+                  commit: null
+                  date_created: '1727300930'
+                  edited_on: null
+                  editor: null
+                  filename: null
+                  id: 221592
+                  line: null
+                  notification: false
+                  parent: null
+                  reactions: {}
+                  tree: null
+                  user:
+                    full_url: https://src.fedoraproject.org/user/zuul
+                    fullname: Zuul CI Bot (Fabien Boucher)
+                    name: zuul
+                    url_path: user/zuul
+                commit_start: 890b584feb1dc48dde698bc6148800c79969c03d
+                commit_stop: 864313a19aec4071c81e77f8be3a8b2df0493a49
+                date_created: '1727257397'
+                full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/205
+                id: 205
+                initial_comment: null
+                last_updated: '1732218741'
+                project:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin:
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mfocko
+                    - mmassari
+                    - ttomecek
+                    collaborator: []
+                    commit: []
+                    owner:
+                    - mfocko
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1586178839'
+                  date_modified: '1727334763'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/rpms/python-requre
+                  fullname: rpms/python-requre
+                  id: 41574
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent: null
+                  priorities: {}
+                  tags: []
+                  url_path: rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/mfocko
+                    fullname: Matej Focko
+                    name: mfocko
+                    url_path: user/mfocko
+                remote_git: null
+                repo_from:
+                  access_groups:
+                    admin: []
+                    collaborator: []
+                    commit: []
+                    ticket: []
+                  access_users:
+                    admin: []
+                    collaborator: []
+                    commit:
+                    - jpopelka
+                    - jscotka
+                    - lachmanfrantisek
+                    - lbarczio
+                    - mfocko
+                    - ttomecek
+                    owner:
+                    - mmassari
+                    ticket: []
+                  close_status: []
+                  custom_keys: []
+                  date_created: '1705674395'
+                  date_modified: '1705674409'
+                  description: The python-requre package
+                  full_url: https://src.fedoraproject.org/fork/mmassari/rpms/python-requre
+                  fullname: forks/mmassari/rpms/python-requre
+                  id: 69921
+                  milestones: {}
+                  name: python-requre
+                  namespace: rpms
+                  parent:
+                    access_groups:
+                      admin: []
+                      collaborator: []
+                      commit: []
+                      ticket: []
+                    access_users:
+                      admin:
+                      - lachmanfrantisek
+                      - lbarczio
+                      - mfocko
+                      - mmassari
+                      - ttomecek
+                      collaborator: []
+                      commit: []
+                      owner:
+                      - mfocko
+                      ticket: []
+                    close_status: []
+                    custom_keys: []
+                    date_created: '1586178839'
+                    date_modified: '1727334763'
+                    description: The python-requre package
+                    full_url: https://src.fedoraproject.org/rpms/python-requre
+                    fullname: rpms/python-requre
+                    id: 41574
+                    milestones: {}
+                    name: python-requre
+                    namespace: rpms
+                    parent: null
+                    priorities: {}
+                    tags: []
+                    url_path: rpms/python-requre
+                    user:
+                      full_url: https://src.fedoraproject.org/user/mfocko
+                      fullname: Matej Focko
+                      name: mfocko
+                      url_path: user/mfocko
+                  priorities: {}
+                  tags: []
+                  url_path: fork/mmassari/rpms/python-requre
+                  user:
+                    full_url: https://src.fedoraproject.org/user/mmassari
+                    fullname: Maja Massarini
+                    name: mmassari
+                    url_path: user/mmassari
+                status: Open
+                tags: []
+                threshold_reached: null
+                title: Fix downstream specfile path
+                uid: d26d6c4e67304a16ab50e03241476658
+                updated_on: '1727300930'
+                user:
+                  full_url: https://src.fedoraproject.org/user/mmassari
+                  fullname: Maja Massarini
+                  name: mmassari
+                  url_path: user/mmassari
+              total_requests: 2
             _next: null
-            elapsed: 0.412168
+            elapsed: 0.282543
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:41 GMT
-              Keep-Alive: timeout=15, max=485
+              Date: Thu, 21 Nov 2024 19:52:22 GMT
+              Keep-Alive: timeout=15, max=486
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZifBX42-xyGBM4QkbVgAABtE
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PdpSYxCV2bSsaIXCQZgAACUw
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=290024
-              content-length: '19054'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-4xPW4RNUWB8WIpw2QhAYXsOFE'
+              apptime: D=160114
+              content-length: '18696'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-fDSyrU6vjckKrKmgyFdDxO9Hz'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-4xPW4RNUWB8WIpw2QhAYXsOFE'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-fDSyrU6vjckKrKmgyFdDxO9Hz'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQrCQ.g2fVSHn94IBNvHSwIArpi-fnHoI;
-                Expires=Sat, 20-Jul-2024 08:40:41 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9g.3v23mmxRei_OQCh2srLC3z1bTSs;
+                Expires=Sun, 22-Dec-2024 19:52:22 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -4373,7 +4214,7 @@ requests.sessions:
       ? https://src.fedoraproject.org/repo/pkgs/rpms/python-requre/requre-0.8.4.tar.gz/sha512/a137032ffe8f732828c9cab984643ca5f8a2e071df45ce071ad6a2970c1c3612d51e063689e02342504ba906f66b7fb598f01e40fb336682576e5743793b6c70/requre-0.8.4.tar.gz
       : all:
           metadata:
-            latency: 0.3897745609283447
+            latency: 0.5157074928283691
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -4391,22 +4232,22 @@ requests.sessions:
             __store_indicator: 0
             _content: false
             _next: null
-            elapsed: 0.389647
+            elapsed: 0.515563
             encoding: null
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:24 GMT
+              Date: Thu, 21 Nov 2024 19:52:05 GMT
               Keep-Alive: timeout=15, max=500
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZeEGZ_PC7NrQ2Q9xS2AAABsM
+              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PZW9pBjE_5ODsCMrssgAABA4
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
               accept-ranges: bytes
-              apptime: D=4003
+              apptime: D=40527
               content-length: '226513'
               content-type: application/x-gzip
               etag: '"374d1-60e60babf1c40"'
@@ -8393,7 +8234,7 @@ requests.sessions:
       https://src.fedoraproject.org/api/0/-/whoami:
         all:
           metadata:
-            latency: 0.19617652893066406
+            latency: 0.2008523941040039
             module_call_list:
             - unittest.case
             - requre.record_and_replace
@@ -8418,48 +8259,50 @@ requests.sessions:
           output:
             __store_indicator: 2
             _content:
-              username: mmassari
+              username: nforro
             _next: null
-            elapsed: 0.195567
+            elapsed: 0.20016
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:42 GMT
-              Keep-Alive: timeout=15, max=484
+              Date: Thu, 21 Nov 2024 19:52:22 GMT
+              Keep-Alive: timeout=15, max=485
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZivBX42-xyGBM4QkbXAAABsQ
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PdpSYxCV2bSsaIXCQcAAACUw
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=79547
-              content-length: '29'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-UHCWxFqYO2uPPKqrGQFvZgBun'
+              apptime: D=85395
+              content-length: '27'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-CB6Sj7ucv5tUal2juI6ZkdUFo'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-UHCWxFqYO2uPPKqrGQFvZgBun'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-CB6Sj7ucv5tUal2juI6ZkdUFo'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQrCg.1ZlF8cTAnPV8a3xPhmkbR--N5Ew;
-                Expires=Sat, 20-Jul-2024 08:40:42 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg9g.3v23mmxRei_OQCh2srLC3z1bTSs;
+                Expires=Sun, 22-Dec-2024 19:52:22 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
             status_code: 200
-      https://src.fedoraproject.org/api/0/rpms/python-requre/pull-request/202:
+      https://src.fedoraproject.org/api/0/rpms/python-requre/pull-request/new:
         all:
           metadata:
-            latency: 2.878798484802246
+            latency: 1.9423234462738037
             module_call_list:
             - unittest.case
             - requre.record_and_replace
             - tests_recording.test_api
             - packit.api
+            - packit.distgit
             - ogr.abstract
-            - ogr.services.pagure.pull_request
+            - ogr.read_only
+            - ogr.utils
             - ogr.abstract
             - ogr.services.pagure.pull_request
             - ogr.abstract
@@ -8481,363 +8324,19 @@ requests.sessions:
               assignee: null
               branch: rawhide
               branch_from: rawhide-update
-              cached_merge_status: FFORWARD
+              cached_merge_status: unknown
               closed_at: null
               closed_by: null
-              comments:
-              - comment: 'Build succeeded.
-
-                  https://fedora.softwarefactory-project.io/zuul/buildset/71ffa94cf7b54ced8107d53bd0d84770
-
-
-                  - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/a98c8f944f924fa3b9988cd93c327d09)
-                  : SUCCESS in 2m 18s
-
-                  - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/a03dd0c16d204adeb5bbe73d35d456f9)
-                  : SUCCESS in 17s
-
-                  - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/42696ec1f07e4f83b3b3b1216d71502a)
-                  : SUCCESS in 12m 03s
-
-                  - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/5bfd90658ba1411eb047ff7bd8a91386)
-                  : SUCCESS in 11m 36s (non-voting)
-
-                  - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/7d59b979521645bcb914da54cdb8ffd3)
-                  : SUCCESS in 14m 30s (non-voting)
-
-                  - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/9a6032d7fe7347f7928af37034e95973)
-                  : SUCCESS in 11m 20s (non-voting)
-
-                  - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/4526e3b5091a4585952b3a8f66d47565)
-                  : SUCCESS in 11m 04s (non-voting)
-
-                  - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/301c8a6f4ac5402fa8abed715dcbacb5)
-                  : SUCCESS in 4m 46s (non-voting)
-
-                  - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/8c64301c21c542dda2a4883a995a689a)
-                  : SUCCESS in 6m 29s (non-voting)
-
-                  - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/66bf03b7484b4758b35fb162cc2341f9)
-                  : SUCCESS in 15s
-
-                  - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/ec5f9543f6ec419ea47dc0013a074f33)
-                  : SUCCESS in 15s
-
-                  - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/d22ec01ff9fc43a98fd504e57bdc4b4e)
-                  : SUCCESS in 1m 46s
-
-                  Skipped 3 jobs
-
-                  '
-                commit: null
-                date_created: '1705912839'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 177686
-                line: null
-                notification: false
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/zuul
-                  fullname: Zuul CI Bot (Fabien Boucher)
-                  name: zuul
-                  url_path: user/zuul
-              - comment: rebased onto 7235a8fe0870774baead3d8454d42e0faa77ed8a
-                commit: null
-                date_created: '1708342008'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 184072
-                line: null
-                notification: true
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
-              - comment: rebased onto 0f462fe86f62aa913d1cbfe2222437ff6012cfe5
-                commit: null
-                date_created: '1708342373'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 184073
-                line: null
-                notification: true
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
-              - comment: rebased onto b65dacd339ab96b58658bb1813fd031822c4cc7b
-                commit: null
-                date_created: '1708342518'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 184074
-                line: null
-                notification: true
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
-              - comment: 'Build succeeded.
-
-                  https://fedora.softwarefactory-project.io/zuul/buildset/7216cb0932de4f0f8c17e04978ee09f2
-
-
-                  - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/c19b53076b9a4b05b151b9145063a5ed)
-                  : SUCCESS in 1m 46s
-
-                  - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/ed7d1ec0d8734f06b012e8ffcd4275ff)
-                  : SUCCESS in 16s
-
-                  - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/97371459d2c24acaa59a34d9c4b43d62)
-                  : SUCCESS in 8m 43s
-
-                  - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/4349a46b29ed4654965daf4b19548b33)
-                  : SUCCESS in 7m 53s (non-voting)
-
-                  - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/6ef0d000ddf242b0bd783840e4dff54a)
-                  : SUCCESS in 10m 27s (non-voting)
-
-                  - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/5fdaf02d7ec14298945971ade7b839b9)
-                  : SUCCESS in 8m 47s (non-voting)
-
-                  - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/988a69f9cc7c44e6aad1c079d75b13b9)
-                  : SUCCESS in 7m 52s (non-voting)
-
-                  - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/e3ff8c2f08ab4a75bdad66e115ac88fa)
-                  : SUCCESS in 4m 51s (non-voting)
-
-                  - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/684cb6f313214b5c8ca00490083b71c0)
-                  : SUCCESS in 5m 43s (non-voting)
-
-                  - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/4dd53fd4df7e4281a97057d43defa335)
-                  : SUCCESS in 16s
-
-                  - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/0424696d34bf4009af2f69e36754eeb0)
-                  : SUCCESS in 15s
-
-                  - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/0c615977ed6841d5a47e0ecc4ea69524)
-                  : SUCCESS in 1m 12s
-
-                  Skipped 3 jobs
-
-                  '
-                commit: null
-                date_created: '1708343456'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 184079
-                line: null
-                notification: false
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/zuul
-                  fullname: Zuul CI Bot (Fabien Boucher)
-                  name: zuul
-                  url_path: user/zuul
-              - comment: rebased onto 4c30e042988f19868e4ea47a5c73bd8b5b5fe208
-                commit: null
-                date_created: '1718778670'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 204893
-                line: null
-                notification: true
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
-              - comment: 'Build failed. More information on how to proceed and troubleshoot
-                  errors available at https://fedoraproject.org/wiki/Zuul-based-ci
-
-                  https://fedora.softwarefactory-project.io/zuul/buildset/9e0c1107f1c14c1f8d320c1e7461303c
-
-
-                  - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/1df3c6b154874e2faf7188e880abf235)
-                  : SUCCESS in 1m 37s
-
-                  - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/65b447373a6f4a5d934d9b27bd3f3e98)
-                  : SUCCESS in 16s
-
-                  - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/4cbab30c2919400f9c73cbb61e21e3ad)
-                  : SUCCESS in 9m 07s
-
-                  - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/67eb74178d2b431294fb07a28da05329)
-                  : SUCCESS in 10m 47s (non-voting)
-
-                  - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/ba4f7d7c1a0145c998f296c23080ede4)
-                  : SUCCESS in 11m 34s (non-voting)
-
-                  - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/697ab5dddd5648c099fa7323436c6f93)
-                  : SUCCESS in 9m 33s (non-voting)
-
-                  - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/8db68a1f9e0941a394940be64d2ac553)
-                  : SUCCESS in 8m 33s (non-voting)
-
-                  - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/7f324850981849d5b45a5ebe79e1a94d)
-                  : SUCCESS in 4m 14s (non-voting)
-
-                  - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/f857b8f6826848e7917323dd2ab03e49)
-                  : SUCCESS in 6m 13s (non-voting)
-
-                  - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/d624bb005ae6488db47459681b56f174)
-                  : SUCCESS in 21s
-
-                  - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/ab107e590eb544c6adaac7f81cee010e)
-                  : SUCCESS in 20s
-
-                  - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/86b990febf894d4894fe8e7402761b2f)
-                  : FAILURE in 49s
-
-                  Skipped 3 jobs
-
-                  '
-                commit: null
-                date_created: '1718779637'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 204896
-                line: null
-                notification: false
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/zuul
-                  fullname: Zuul CI Bot (Fabien Boucher)
-                  name: zuul
-                  url_path: user/zuul
-              - comment: rebased onto 4c30e042988f19868e4ea47a5c73bd8b5b5fe208
-                commit: null
-                date_created: '1718783553'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 204917
-                line: null
-                notification: true
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
-              - comment: 'Build failed. More information on how to proceed and troubleshoot
-                  errors available at https://fedoraproject.org/wiki/Zuul-based-ci
-
-                  https://fedora.softwarefactory-project.io/zuul/buildset/8f1de73473bd4592b212d08817b29028
-
-
-                  - [check-for-arches ](https://fedora.softwarefactory-project.io/zuul/build/5b86de04e7224bc0856aaa3ccb8f675c)
-                  : SUCCESS in 1m 39s
-
-                  - [check-for-eln ](https://fedora.softwarefactory-project.io/zuul/build/56276b3da80941ce8b29760ef55d8241)
-                  : SUCCESS in 15s
-
-                  - [rpm-scratch-build ](https://fedora.softwarefactory-project.io/zuul/build/744d7d90ddd549179d448f82b56ed306)
-                  : SUCCESS in 10m 37s
-
-                  - [rpm-scratch-build-s390x ](https://fedora.softwarefactory-project.io/zuul/build/f0612803743f474fa25454f8d42e6feb)
-                  : SUCCESS in 9m 02s (non-voting)
-
-                  - [rpm-scratch-build-ppc64le ](https://fedora.softwarefactory-project.io/zuul/build/133076ead38e4027805ea47f0542372b)
-                  : SUCCESS in 11m 17s (non-voting)
-
-                  - [rpm-scratch-build-i686 ](https://fedora.softwarefactory-project.io/zuul/build/192437d8f7c644bc826e99170238d3ff)
-                  : SUCCESS in 8m 41s (non-voting)
-
-                  - [rpm-scratch-build-aarch64 ](https://fedora.softwarefactory-project.io/zuul/build/0d756b6222844448874a7efe400380d6)
-                  : SUCCESS in 9m 09s (non-voting)
-
-                  - [rpm-linter ](https://fedora.softwarefactory-project.io/zuul/build/d44ed86236274f9e9ed794975032db08)
-                  : SUCCESS in 3m 35s (non-voting)
-
-                  - [rpm-rpminspect ](https://fedora.softwarefactory-project.io/zuul/build/0247a5394ad14fe490d3d96de274f161)
-                  : SUCCESS in 5m 07s (non-voting)
-
-                  - [check-for-sti-tests ](https://fedora.softwarefactory-project.io/zuul/build/2beff77198b6489190449d7347e6536f)
-                  : SUCCESS in 13s
-
-                  - [check-for-fmf-tests ](https://fedora.softwarefactory-project.io/zuul/build/0a0bb77713b444f5a71c89ebba3d4b54)
-                  : SUCCESS in 13s
-
-                  - [rpm-install-test ](https://fedora.softwarefactory-project.io/zuul/build/b9f9db6c605c44589572b190f7f22267)
-                  : FAILURE in 40s
-
-                  Skipped 3 jobs
-
-                  '
-                commit: null
-                date_created: '1718784521'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 204920
-                line: null
-                notification: false
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/zuul
-                  fullname: Zuul CI Bot (Fabien Boucher)
-                  name: zuul
-                  url_path: user/zuul
-              - comment: rebased onto 4c30e042988f19868e4ea47a5c73bd8b5b5fe208
-                commit: null
-                date_created: '1718786441'
-                edited_on: null
-                editor: null
-                filename: null
-                id: 204933
-                line: null
-                notification: true
-                parent: null
-                reactions: {}
-                tree: null
-                user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
-              commit_start: 8702695f60f812fbaacc14e7a5a78c368e239cbc
-              commit_stop: 8702695f60f812fbaacc14e7a5a78c368e239cbc
-              date_created: '1705911676'
-              full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/202
-              id: 202
+              comments: []
+              commit_start: 7e07e217bf414135a60d7cccc810dfa576ee2895
+              commit_stop: 7e07e217bf414135a60d7cccc810dfa576ee2895
+              date_created: '1732218746'
+              full_url: https://src.fedoraproject.org/rpms/python-requre/pull-request/208
+              id: 208
               initial_comment: 'Upstream tag: [1.0.0](https://github.com/packit/requre/releases/tag/1.0.0)
 
-                Upstream commit: [71d95cee](https://github.com/packit/requre/commit/71d95cee)'
-              last_updated: '1718786442'
+                Upstream commit: [72ea5dd4](https://github.com/packit/requre/commit/72ea5dd4)'
+              last_updated: '1732218746'
               project:
                 access_groups:
                   admin: []
@@ -8849,6 +8348,7 @@ requests.sessions:
                   - lachmanfrantisek
                   - lbarczio
                   - mfocko
+                  - mmassari
                   - ttomecek
                   collaborator: []
                   commit: []
@@ -8858,7 +8358,7 @@ requests.sessions:
                 close_status: []
                 custom_keys: []
                 date_created: '1586178839'
-                date_modified: '1715900688'
+                date_modified: '1727334763'
                 description: The python-requre package
                 full_url: https://src.fedoraproject.org/rpms/python-requre
                 fullname: rpms/python-requre
@@ -8893,16 +8393,16 @@ requests.sessions:
                   - mfocko
                   - ttomecek
                   owner:
-                  - mmassari
+                  - nforro
                   ticket: []
                 close_status: []
                 custom_keys: []
-                date_created: '1705674395'
-                date_modified: '1705674409'
+                date_created: '1696932203'
+                date_modified: '1696932213'
                 description: The python-requre package
-                full_url: https://src.fedoraproject.org/fork/mmassari/rpms/python-requre
-                fullname: forks/mmassari/rpms/python-requre
-                id: 69921
+                full_url: https://src.fedoraproject.org/fork/nforro/rpms/python-requre
+                fullname: forks/nforro/rpms/python-requre
+                id: 66795
                 milestones: {}
                 name: python-requre
                 namespace: rpms
@@ -8917,6 +8417,7 @@ requests.sessions:
                     - lachmanfrantisek
                     - lbarczio
                     - mfocko
+                    - mmassari
                     - ttomecek
                     collaborator: []
                     commit: []
@@ -8926,7 +8427,7 @@ requests.sessions:
                   close_status: []
                   custom_keys: []
                   date_created: '1586178839'
-                  date_modified: '1715900688'
+                  date_modified: '1727334763'
                   description: The python-requre package
                   full_url: https://src.fedoraproject.org/rpms/python-requre
                   fullname: rpms/python-requre
@@ -8945,49 +8446,49 @@ requests.sessions:
                     url_path: user/mfocko
                 priorities: {}
                 tags: []
-                url_path: fork/mmassari/rpms/python-requre
+                url_path: fork/nforro/rpms/python-requre
                 user:
-                  full_url: https://src.fedoraproject.org/user/mmassari
-                  fullname: Maja Massarini
-                  name: mmassari
-                  url_path: user/mmassari
+                  full_url: https://src.fedoraproject.org/user/nforro
+                  fullname: "Nikola Forr\xF3"
+                  name: nforro
+                  url_path: user/nforro
               status: Open
               tags: []
               threshold_reached: null
               title: Update rawhide to upstream release 1.0.0
-              uid: bacde6a4d81e4d91a81417eae0895147
-              updated_on: '1718786441'
+              uid: 17217c8aabb3488495194352a74ef7c2
+              updated_on: '1732218746'
               user:
-                full_url: https://src.fedoraproject.org/user/mmassari
-                fullname: Maja Massarini
-                name: mmassari
-                url_path: user/mmassari
+                full_url: https://src.fedoraproject.org/user/nforro
+                fullname: "Nikola Forr\xF3"
+                name: nforro
+                url_path: user/nforro
             _next: null
-            elapsed: 2.767678
+            elapsed: 1.941712
             encoding: utf-8
             headers:
               Connection: Keep-Alive
-              Date: Wed, 19 Jun 2024 08:40:42 GMT
-              Keep-Alive: timeout=15, max=483
+              Date: Thu, 21 Nov 2024 19:52:26 GMT
+              Keep-Alive: timeout=15, max=471
               Referrer-Policy: same-origin
               Server: Apache
               Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
               X-Content-Type-Options: nosniff
-              X-Fedora-ProxyServer: proxy01.iad2.fedoraproject.org
-              X-Fedora-RequestID: ZnKZivBX42-xyGBM4QkbYQAABso
+              X-Fedora-ProxyServer: proxy10.iad2.fedoraproject.org
+              X-Fedora-RequestID: Zz-PepSYxCV2bSsaIXCRQwAACUk
               X-Frame-Options: SAMEORIGIN
               X-Xss-Protection: 1; mode=block
-              apptime: D=2649503
-              content-length: '17082'
-              content-security-policy: default-src 'self'; script-src 'self' 'nonce-qfnpNRu2MTr9JhtnqVUeIcJHs'
+              apptime: D=1828199
+              content-length: '4370'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-UyxQGbeibfR4mSJgw06VQ7ptN'
                 https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
-                style-src 'self' 'nonce-qfnpNRu2MTr9JhtnqVUeIcJHs'; object-src 'none';
-                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://pdc.fedoraproject.org
-                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                style-src 'self' 'nonce-UyxQGbeibfR4mSJgw06VQ7ptN'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
                 https://bodhi.fedoraproject.org;
               content-type: application/json
-              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiMmE2M2MzMzVhMzFjNjhhYTllMDdlNzM5MWJmMzhiYzhlZDhhNzBmOSJ9.GVQrDA.qWwPKwCKbJfYGVHrUGTG3WwxnIw;
-                Expires=Sat, 20-Jul-2024 08:40:44 GMT; Secure; HttpOnly; Path=/
+              set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-w.gbwBuy5oUG-PSnxIxx16ld_ieo4;
+                Expires=Sun, 22-Dec-2024 19:52:27 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
             raw: !!binary ""
             reason: OK
@@ -8996,7 +8497,7 @@ tempfile:
   mkdtemp:
     all:
       metadata:
-        latency: 8.177757263183594e-05
+        latency: 0.00012302398681640625
         module_call_list:
         - unittest.case
         - requre.record_and_replace
@@ -9007,4 +8508,4 @@ tempfile:
         - requre.cassette
         - tempfile
         - mkdtemp
-      output: /tmp/packit-dist-gitb6oron6w
+      output: /tmp/packit-dist-gith__nvni3

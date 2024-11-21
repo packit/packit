@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
-from munch import munchify
 
 import packit
 from packit.config import Config
@@ -14,24 +13,6 @@ from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
 from packit.upstream import GitUpstream
 from tests.spellbook import CRONIE, get_test_config, initiate_git_repo
-
-
-@pytest.fixture
-def bodhi_client_response():
-    def response_factory(releases_list):
-        releases = [
-            {
-                "name": name,
-                "long_name": long_name,
-                "id_prefix": id_prefix,
-                "state": state,
-            }
-            for name, long_name, id_prefix, state in releases_list
-        ]
-        response = {"releases": releases, "page": 1, "pages": 1}
-        return munchify(response)
-
-    return response_factory
 
 
 @pytest.fixture()

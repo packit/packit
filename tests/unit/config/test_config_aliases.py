@@ -303,19 +303,33 @@ class TestGetAllKojiTargets:
 
 class TestGetAliases:
     @pytest.mark.parametrize(
-        "releases_list, expected_return",
+        "distro_aliases, expected_return",
         [
             pytest.param(
-                [
-                    ("F30", "Fedora 30", "FEDORA", "archived"),
-                    ("F31", "Fedora 31", "FEDORA", "archived"),
-                    ("F32", "Fedora 32", "FEDORA", "current"),
-                    ("F33", "Fedora 33", "FEDORA", "current"),
-                    ("F34", "Fedora 34", "FEDORA", "frozen"),
-                    ("F35", "Fedora 35", "FEDORA", "pending"),
-                    ("F31F", "Fedora 31 Flatpaks", "FEDORA-FLATPAK", "current"),
-                    ("EPEL-8", "Fedora EPEL 8", "FEDORA-EPEL", "current"),
-                ],
+                {
+                    "fedora-all": [
+                        flexmock(namever="fedora-32"),
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                        flexmock(namever="fedora-rawhide"),
+                    ],
+                    "fedora-stable": [
+                        flexmock(namever="fedora-32"),
+                        flexmock(namever="fedora-33"),
+                    ],
+                    "fedora-development": [
+                        flexmock(namever="fedora-34"),
+                        flexmock(namever="fedora-rawhide"),
+                    ],
+                    "fedora-latest": [flexmock(namever="fedora-34")],
+                    "fedora-latest-stable": [flexmock(namever="fedora-33")],
+                    "fedora-branched": [
+                        flexmock(namever="fedora-32"),
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                    ],
+                    "epel-all": [flexmock(namever="epel-8")],
+                },
                 {
                     "fedora-all": [
                         "fedora-32",
@@ -333,16 +347,28 @@ class TestGetAliases:
                 id="after_branching",
             ),
             pytest.param(
-                [
-                    ("F30", "Fedora 30", "FEDORA", "archived"),
-                    ("F31", "Fedora 31", "FEDORA", "archived"),
-                    ("F32", "Fedora 32", "FEDORA", "current"),
-                    ("F33", "Fedora 33", "FEDORA", "current"),
-                    ("F34", "Fedora 34", "FEDORA", "current"),
-                    ("F35", "Fedora 35", "FEDORA", "pending"),
-                    ("F31F", "Fedora 31 Flatpaks", "FEDORA-FLATPAK", "current"),
-                    ("EPEL-8", "Fedora EPEL 8", "FEDORA-EPEL", "current"),
-                ],
+                {
+                    "fedora-all": [
+                        flexmock(namever="fedora-32"),
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                        flexmock(namever="fedora-rawhide"),
+                    ],
+                    "fedora-stable": [
+                        flexmock(namever="fedora-32"),
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                    ],
+                    "fedora-development": [flexmock(namever="fedora-rawhide")],
+                    "fedora-latest": [flexmock(namever="fedora-34")],
+                    "fedora-latest-stable": [flexmock(namever="fedora-34")],
+                    "fedora-branched": [
+                        flexmock(namever="fedora-32"),
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                    ],
+                    "epel-all": [flexmock(namever="epel-8")],
+                },
                 {
                     "fedora-all": [
                         "fedora-32",
@@ -360,16 +386,25 @@ class TestGetAliases:
                 id="after_release",
             ),
             pytest.param(
-                [
-                    ("F30", "Fedora 30", "FEDORA", "archived"),
-                    ("F31", "Fedora 31", "FEDORA", "archived"),
-                    ("F32", "Fedora 32", "FEDORA", "archived"),
-                    ("F33", "Fedora 33", "FEDORA", "current"),
-                    ("F34", "Fedora 34", "FEDORA", "current"),
-                    ("F35", "Fedora 35", "FEDORA", "pending"),
-                    ("F31F", "Fedora 31 Flatpaks", "FEDORA-FLATPAK", "current"),
-                    ("EPEL-8", "Fedora EPEL 8", "FEDORA-EPEL", "current"),
-                ],
+                {
+                    "fedora-all": [
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                        flexmock(namever="fedora-rawhide"),
+                    ],
+                    "fedora-stable": [
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                    ],
+                    "fedora-development": [flexmock(namever="fedora-rawhide")],
+                    "fedora-latest": [flexmock(namever="fedora-34")],
+                    "fedora-latest-stable": [flexmock(namever="fedora-34")],
+                    "fedora-branched": [
+                        flexmock(namever="fedora-33"),
+                        flexmock(namever="fedora-34"),
+                    ],
+                    "epel-all": [flexmock(namever="epel-8")],
+                },
                 {
                     "fedora-all": [
                         "fedora-33",
@@ -387,14 +422,10 @@ class TestGetAliases:
             ),
         ],
     )
-    def test_get_aliases(self, releases_list, expected_return, bodhi_client_response):
-        bodhi_instance_mock = flexmock()
-        bodhi_instance_mock.should_receive("get_releases").and_return(
-            bodhi_client_response(releases_list),
+    def test_get_aliases(self, distro_aliases, expected_return):
+        flexmock(aliases).should_receive("get_distro_aliases").and_return(
+            distro_aliases,
         )
-        flexmock(aliases).should_receive("get_bodhi_client").and_return(
-            bodhi_instance_mock,
-        ).once()
 
         get_aliases.cache_clear()
         aliases_result = get_aliases()
