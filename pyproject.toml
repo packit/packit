@@ -40,6 +40,7 @@ dependencies = [
     "cccolutils",
     "click",
     "copr",
+    "fedora-distro-aliases",
     "lazy_object_proxy",
     "marshmallow",
     "marshmallow-enum",
