@@ -1,3 +1,7 @@
+# 0.104.1
+
+- Packit now uses the fedora-distro-aliases library to expand Fedora aliases. This is Packit's original code being improved and properly maintained by the Copr team. For further suggestions about aliases, use github.com/rpm-software-management/fedora-distro-aliases.
+
 # 0.104.0
 
 - Packit configuration file can now have a placeholder top-level key `_` that is ignored when read.
