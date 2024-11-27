@@ -28,6 +28,7 @@ class ActionName(Enum):
     create_archive = "create-archive"
     get_current_version = "get-current-version"
     fix_spec = "fix-spec-file"
+    post_modifications = "post-modifications"
     changelog_entry = "changelog-entry"
     commit_message = "commit-message"
 

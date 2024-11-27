@@ -731,3 +731,29 @@ def test_local_update_with_specified_tag_template():
     assert (
         api.up.package_config.upstream_tag_template.format(version="0.1.0") == "v0.1.0"
     )
+
+
+def test_basic_local_update_post_modifications_action(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+):
+    u, d, api = api_instance
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(Specfile).should_call("reload").once()
+
+    # just to make PACKIT_DOWNSTREAM_REPO available
+    api.dg._local_project = flexmock()
+
+    api.up.package_config.actions = {
+        ActionName.post_modifications: [
+            f"bash -c 'cd $PACKIT_DOWNSTREAM_REPO && md5sum {TARBALL_NAME} > source.hash'",
+        ],
+    }
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"])
+
+    assert (d / TARBALL_NAME).is_file()
+    assert (d / "source.hash").is_file()
+    spec = Specfile(d / "beer.spec")
+    assert spec.expanded_version == "0.1.0"
