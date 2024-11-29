@@ -429,6 +429,13 @@ class PackitAPI:
             self._handle_sources(
                 force_new_sources=force_new_sources,
                 pkg_tool=pkg_tool,
+                env=self.common_env(version=version),
+            )
+        else:
+            # run the `post-modifications` action even if sources are not being processed
+            self.up.actions_handler.run_action(
+                actions=ActionName.post_modifications,
+                env=self.common_env(version=version),
             )
 
         if commit_title:
@@ -1651,6 +1658,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         force_new_sources: bool,
         pkg_tool: str = "",
+        env: Optional[dict] = None,
     ):
         """Download upstream archive and upload it to dist-git lookaside cache.
 
@@ -1661,6 +1669,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 name & hash is already there, so this might be useful only if
                 you want to upload archive with the same name but different hash.
             pkg_tool: Tool to upload sources.
+            env: Environment to pass to the `post-modifications` action.
         """
         # We need to download the sources beforehand! Previous solution was relying
         # on the HTTP index of the uploaded archives in the lookaside cache which
@@ -1668,6 +1677,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         # to use the `pyrpkg` which needs hash of the archive when doing the lookup,
         # therefore it needs the archive itself beforehand.
         upstream_archives = self.dg.download_upstream_archives()
+
+        self.up.actions_handler.run_action(
+            actions=ActionName.post_modifications,
+            env=env,
+        )
+
         # Check for existing local archives and upload those as well
         local_archives = self.get_local_archives_to_upload()
 
@@ -1864,6 +1879,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
                 merged_ref=merged_ref,
+                env=self.common_env(),
             )
         except Exception as ex:
             raise PackitSRPMException(
@@ -1970,6 +1986,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 upstream_ref=upstream_ref,
                 release_suffix=release_suffix,
                 merged_ref=merged_ref,
+                env=self.common_env(),
             )
         except Exception as ex:
             raise PackitRPMException(

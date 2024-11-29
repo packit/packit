@@ -60,8 +60,10 @@ def test_action_output(upstream_and_remote):
     packit_yaml_dict = yaml.safe_load(packit_yaml_path.read_text())
     # http://www.atlaspiv.cz/?page=detail&beer_id=4187
     the_line_we_want = "MadCat - Imperial Stout Rum Barrel Aged 20°"
+    another_line_we_want = "Zichovec - Malý Ježíšek, Session IPA 10°"
     packit_yaml_dict["actions"] = {
         "post-upstream-clone": [f"bash -c 'echo {the_line_we_want}'"],
+        "post-modifications": [f"bash -c 'echo {another_line_we_want}'"],
     }
     packit_yaml_path.write_text(yaml.dump(packit_yaml_dict))
     out = call_real_packit(
@@ -71,6 +73,7 @@ def test_action_output(upstream_and_remote):
     )
 
     assert f"INFO   {the_line_we_want}\n" in out.decode()
+    assert f"INFO   {another_line_we_want}\n" in out.decode()
     srpm_path = next(upstream_repo_path.glob("*.src.rpm"))
     assert srpm_path.exists()
     build_srpm(srpm_path)
