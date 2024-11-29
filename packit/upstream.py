@@ -311,6 +311,7 @@ class Upstream:
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
         merged_ref: Optional[str] = None,
+        env: Optional[dict] = None,
     ):
         raise NotImplementedError()
 
@@ -1029,6 +1030,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
         merged_ref: Optional[str] = None,
+        env: Optional[dict] = None,
     ):
         """
         1. determine version
@@ -1043,6 +1045,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
             create_symlinks: whether symlinks should be created instead of copying the files
                 (e.g. when the archive is created outside the specfile dir)
             merged_ref: git ref in the upstream repo used to identify correct most recent tag
+            env: environment to pass to the `post-modifications` action
         """
         try:
             self._merged_ref = merged_ref
@@ -1050,6 +1053,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
                 update_release=update_release,
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
+                env=env,
             )
         finally:
             self._merged_ref = None
@@ -1534,6 +1538,7 @@ class SRPMBuilder:
         update_release: bool,
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
+        env: Optional[dict] = None,
     ):
         if self.upstream_ref:
             self._prepare_upstream_using_source_git(update_release, release_suffix)
@@ -1558,6 +1563,11 @@ class SRPMBuilder:
             logger.warning("Therefore skipping downloading of remote sources.")
         else:
             self.upstream.download_remote_sources()
+
+        self.upstream.actions_handler.run_action(
+            actions=ActionName.post_modifications,
+            env=env,
+        )
 
 
 class Archive:
