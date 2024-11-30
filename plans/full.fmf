@@ -1,6 +1,9 @@
 summary: Unit, integration & functional tests.
 discover+:
   filter: tag:full
+prepare+:
+  - how: shell
+    script: mount -o remount,size=2G /tmp
 adjust:
   - when: "initiator == packit"
     because: "have the latest builds of ogr and specfile available for upstream test jobs"
