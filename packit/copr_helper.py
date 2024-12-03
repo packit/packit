@@ -248,7 +248,7 @@ class CoprHelper:
             )
         except (CoprException, CoprRequestException) as ex:
             response = ex.result.__response__
-            if response.status_code >= 500:
+            if response and response.status_code >= 500:
                 error = (
                     f"Packit received HTTP {response.status_code} {response.reason} "
                     "from Copr Service. "
@@ -263,9 +263,10 @@ class CoprHelper:
             else:
                 error = (
                     f"Cannot create a new Copr project "
-                    f"(owner={owner} project={project} chroots={chroots}): {ex}. "
-                    f"Copr HTTP response is {response.status_code} {response.reason}."
+                    f"(owner={owner} project={project} chroots={chroots}): {ex}."
                 )
+                if response:
+                    error += f" Copr HTTP response is {response.status_code} {response.reason}."
             logger.error(error)
             logger.error(ex.result)
             raise PackitCoprProjectException(error) from ex
