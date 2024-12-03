@@ -3,7 +3,7 @@
 
 import logging
 from datetime import date, datetime
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 
 import koji
 from specfile.changelog import ChangelogEntry
@@ -14,18 +14,54 @@ from packit.constants import KOJI_BASEURL
 logger = logging.getLogger(__name__)
 
 
+class SessionWrapper:
+    def __init__(self) -> None:
+        self.session = self._open_session()
+
+    def __getattr__(self, name: str) -> Callable:
+        if name in self.__dict__:
+            return self.__dict__[name]
+        return self._wrap(getattr(self.session, name))
+
+    def _open_session(self) -> koji.ClientSession:
+        return koji.ClientSession(baseurl=KOJI_BASEURL)
+
+    def _wrap(self, call: Callable) -> Callable:
+        call_name = f"{call._VirtualMethod__name}()"  # type: ignore[attr-defined]
+
+        def wrapper(*args, **kwargs):
+            exceptions = []
+            while True:
+                try:
+                    return call(*args, **kwargs)
+                except koji.ActionNotAllowed as e:  # noqa: PERF203
+                    if (type(e), e.faultCode, e.args) in exceptions:
+                        # break the loop if the same exception has already occurred
+                        raise
+                    exceptions.append((type(e), e.faultCode, e.args))
+                    logger.debug(
+                        f"{call_name} requires authenticated Koji session, logging in",
+                    )
+                    self.session.gssapi_login()
+                    continue
+                except koji.AuthError as e:
+                    if (type(e), e.faultCode, e.args) in exceptions:
+                        # break the loop if the same exception has already occurred
+                        raise
+                    exceptions.append((type(e), e.faultCode, e.args))
+                    logger.debug(
+                        f"Koji session authentication error during {call_name}: {e};"
+                        "opening new session",
+                    )
+                    self.session = self._open_session()
+                    continue
+
+        return wrapper
+
+
 class KojiHelper:
-    """
-    Class for querying Koji.
-
-    Attributes:
-        session: Koji client session.
-    """
-
-    def __init__(self, session: Optional[koji.ClientSession] = None) -> None:
-        self.session = (
-            session if session is not None else koji.ClientSession(baseurl=KOJI_BASEURL)
-        )
+    def __init__(self) -> None:
+        self.session = SessionWrapper()
 
     def get_builds(self, package: str, since: datetime) -> list[dict]:
         """
@@ -306,12 +342,6 @@ class KojiHelper:
         if not (build_tag := target.get("build_tag_name")):
             logger.debug(f"Failed to get build tag for {dist_git_branch}")
             return None
-        if not self.session.logged_in:
-            try:
-                self.session.gssapi_login()
-            except Exception as e:
-                logger.debug(f"Authentication failed: {e}")
-                return None
         try:
             info = self.session.createSideTag(build_tag)
         except Exception as e:
@@ -328,12 +358,6 @@ class KojiHelper:
         Args:
             sidetag: Sidetag name.
         """
-        if not self.session.logged_in:
-            try:
-                self.session.gssapi_login()
-            except Exception as e:
-                logger.debug(f"Authentication failed: {e}")
-                return
         try:
             self.session.removeSideTag(sidetag)
         except Exception as e:
@@ -352,12 +376,6 @@ class KojiHelper:
         Returns:
             Task ID if tagging was successfully requested else None.
         """
-        if not self.session.logged_in:
-            try:
-                self.session.gssapi_login()
-            except Exception as e:
-                logger.debug(f"Authentication failed: {e}")
-                return None
         try:
             task_id = self.session.tagBuild(tag, nvr)
         except Exception as e:
@@ -375,12 +393,6 @@ class KojiHelper:
             nvr: NVR of the build.
             tag: Tag name.
         """
-        if not self.session.logged_in:
-            try:
-                self.session.gssapi_login()
-            except Exception as e:
-                logger.debug(f"Authentication failed: {e}")
-                return
         try:
             self.session.untagBuild(tag, nvr, strict=True)
         except Exception as e:

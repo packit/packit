@@ -8,7 +8,7 @@ from munch import Munch
 
 from packit import distgit
 from packit.exceptions import PackitBodhiException
-from packit.utils.koji_helper import KojiHelper
+from packit.utils.koji_helper import KojiHelper, SessionWrapper
 
 
 @pytest.fixture()
@@ -275,6 +275,8 @@ def test_basic_bodhi_update(
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
 
+    flexmock(SessionWrapper).should_receive("_open_session").and_return()
+
     flexmock(KojiHelper).should_receive("get_candidate_tag").and_return(
         "f30-updates-candidate",
     )
@@ -328,6 +330,8 @@ def test_bodhi_update_with_bugs(
     u, d, api = api_instance
     api.config.fas_user = "packit"
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    flexmock(SessionWrapper).should_receive("_open_session").and_return()
 
     flexmock(KojiHelper).should_receive("get_candidate_tag").and_return(
         "f30-updates-candidate",
