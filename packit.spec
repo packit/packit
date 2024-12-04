@@ -48,8 +48,7 @@ check out packit package for the executable.
 
 
 %generate_buildrequires
-# The -w flag is required for EPEL 9's older hatchling
-%pyproject_buildrequires %{?with_tests:-x testing} %{?el9:-w}
+%pyproject_buildrequires %{?with_tests:-x testing}
 
 
 %build
