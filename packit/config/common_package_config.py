@@ -456,6 +456,29 @@ class CommonPackageConfig:
             ),
         )
 
+    def get_all_files_to_sync(self) -> list[SyncFilesItem]:
+        """Adds the default files (config file, spec file) to the files to be synced.
+        If there is no file specified.
+
+        :return: Files to be synced
+        """
+        files = self.files_to_sync
+
+        if not self.files_to_sync:
+            files = []
+            files.append(self.get_specfile_sync_files_item())
+
+            if self.config_file_path:
+                # this relative because of glob: "Non-relative patterns are unsupported"
+                files.append(
+                    SyncFilesItem(
+                        src=[self.config_file_path],
+                        dest=self.config_file_path,
+                    ),
+                )
+
+        return files
+
 
 class MultiplePackages:
     """
