@@ -18,31 +18,14 @@ class JobType(Enum):
 
     propose_downstream = "propose_downstream"
     pull_from_upstream = "pull_from_upstream"
-    build = "build"  # deprecated
     sync_from_downstream = "sync_from_downstream"
     copr_build = "copr_build"
-    production_build = "production_build"  # deprecated
     upstream_koji_build = "upstream_koji_build"
     koji_build = "koji_build"  # downstream koji build
     tests = "tests"
     bodhi_update = "bodhi_update"
     vm_image_build = "vm_image_build"
     koji_build_tag = "koji_build_tag"
-
-
-DEPRECATED_JOB_TYPES = {
-    JobType.build: "The `build` job type aimed to be an alias for "
-    "`copr_build` when Packit supported just one "
-    "build type. "
-    "There are currently more types of builds and just `build` can be misleading. "
-    "Please, be explicit and use `copr_build` instead.",
-    JobType.production_build: "The `production_build` name for upstream Koji build is misleading "
-    "because it is not used to run production/non-scratch builds and "
-    "because it can be confused with the `koji_build` job that is triggered for dist-git commits. "
-    "(The `koji_build` job can trigger both scratch and non-scratch/production builds.) "
-    "To be explicit, use `upstream_koji_build` for builds triggered in upstream "
-    "and `koji_build` for builds triggered in downstream.",
-}
 
 
 class JobConfigTriggerType(Enum):

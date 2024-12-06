@@ -1,5 +1,5 @@
 specfile_path: Fedora/vsftpd.spec
-synced_files:
+files_to_sync:
   - src: Fedora/*
     dest: .
 
