@@ -388,7 +388,7 @@ class PackitAPI:
                 f"{REPO_NOT_PRISTINE_HINT}",
             )
 
-        files_to_sync = self.package_config.files_to_sync
+        files_to_sync = self.package_config.get_all_files_to_sync()
 
         self.up.sync_files(files_to_sync, self.dg)
 
