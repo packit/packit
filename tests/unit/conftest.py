@@ -31,11 +31,12 @@ def mock_get_aliases():
 
 @pytest.fixture
 def package_config_mock():
+    files_to_sync = [
+        SyncFilesItem(src=["specfile path"], dest="new specfile path"),
+        SyncFilesItem(src=["packit config path"], dest="new packit config path"),
+    ]
     mock = flexmock(
-        files_to_sync=[
-            SyncFilesItem(src=["specfile path"], dest="new specfile path"),
-            SyncFilesItem(src=["packit config path"], dest="new packit config path"),
-        ],
+        files_to_sync=[],
         upstream_package_name="test_package_name",
         downstream_package_name="test_package_name",
         upstream_tag_template="_",
@@ -53,6 +54,7 @@ def package_config_mock():
         parse_time_macros={},
     )
     mock.should_receive("get_package_names_as_env").and_return({})
+    mock.should_receive("get_all_files_to_sync").and_return(files_to_sync)
 
     # simulate ‹MultiplePackages›
     mock._first_package = "default"
