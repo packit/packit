@@ -1167,9 +1167,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "PACKIT_UPSTREAM_TAG": upstream_tag,
                     "PACKIT_UPSTREAM_COMMIT": self.up.commit_hexsha,
                     "PACKIT_DEBUG_DIVIDER": COMMIT_ACTION_DIVIDER.strip(),
-                    "PACKIT_RESOLVED_BUGS": " ".join(resolved_bugs)
-                    if resolved_bugs
-                    else "",
+                    "PACKIT_RESOLVED_BUGS": (
+                        " ".join(resolved_bugs) if resolved_bugs else ""
+                    ),
                 }
                 | self.common_env(version),
             )
