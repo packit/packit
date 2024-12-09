@@ -1,7 +1,7 @@
 # Packit (test) dependencies.
 # To run tests locally via 'make check-in-container'.
 
-FROM quay.io/packit/base:c9s
+FROM quay.io/packit/base:fedora
 
 COPY files/tasks/*.yaml /files/tasks/
 COPY files/*.yaml /files/

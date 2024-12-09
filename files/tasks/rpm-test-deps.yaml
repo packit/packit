@@ -9,7 +9,6 @@
       - python3-gitlab
       - python3-pygithub
       - python3-distro
-      - rpmautospec-rpm-macros
     state: present
   become: true
 
@@ -23,6 +22,14 @@
       - python3-flexmock
     state: present
   when: ansible_facts['distribution'] == 'Fedora'
+  become: true
+
+- name: (EPEL) Install dependencies as RPMs
+  ansible.builtin.dnf:
+    name:
+      - rpmautospec-rpm-macros
+    state: present
+  when: ansible_facts['distribution'] != 'Fedora'
   become: true
 
 # packages not in epel, install from PyPI
