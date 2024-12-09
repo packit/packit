@@ -5,8 +5,27 @@ import datetime
 
 import pytest
 from flexmock import flexmock
+from koji import ActionNotAllowed, AuthError, ClientSession
 
 from packit.utils.koji_helper import KojiHelper
+
+
+def koji_session_virtual_method(requires_authentication=False, invalid_session=False):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if getattr(wrapper, "first_call", True):
+                wrapper.first_call = False
+                if requires_authentication:
+                    raise ActionNotAllowed
+                if invalid_session:
+                    raise AuthError
+            wrapper.first_call = False
+            return func(*args, **kwargs)
+
+        wrapper._VirtualMethod__name = func.__name__
+        return wrapper
+
+    return decorator
 
 
 @pytest.mark.parametrize(
@@ -16,16 +35,20 @@ from packit.utils.koji_helper import KojiHelper
 def test_get_builds(error):
     nvrs = [f"test-1.{n}-1.fc37" for n in range(3)]
 
+    @koji_session_virtual_method()
     def getPackageID(*_, **__):
         return 12345
 
+    @koji_session_virtual_method()
     def listBuilds(*_, **__):
         if error:
             raise Exception
         return [{"nvr": nvr} for nvr in nvrs]
 
-    session = flexmock(getPackageID=getPackageID, listBuilds=listBuilds)
-    result = KojiHelper(session).get_nvrs("test", datetime.datetime(2022, 6, 1))
+    flexmock(ClientSession).new_instances(
+        flexmock(getPackageID=getPackageID, listBuilds=listBuilds),
+    )
+    result = KojiHelper().get_nvrs("test", datetime.datetime(2022, 6, 1))
     if error:
         assert result == []
     else:
@@ -48,7 +71,8 @@ def test_get_latest_stable_nvr(include_candidate, nvr):
         "f40": {"nvr": "test-1.0-1.fc40"},
     }
 
-    koji_helper = KojiHelper(flexmock())
+    flexmock(ClientSession).new_instances(flexmock())
+    koji_helper = KojiHelper()
     flexmock(
         koji_helper,
         get_candidate_tag=lambda b: candidate_tags[b],
@@ -65,13 +89,14 @@ def test_get_latest_stable_nvr(include_candidate, nvr):
 def test_get_latest_nvr_in_tag(error):
     nvr = "test-1.0-1.fc37"
 
+    @koji_session_virtual_method()
     def listTagged(*_, **__):
         if error:
             raise Exception
         return [{"nvr": nvr}]
 
-    session = flexmock(listTagged=listTagged)
-    result = KojiHelper(session).get_latest_nvr_in_tag("test", "f37-updates-candidate")
+    flexmock(ClientSession).new_instances(flexmock(listTagged=listTagged))
+    result = KojiHelper().get_latest_nvr_in_tag("test", "f37-updates-candidate")
     if error:
         assert result is None
     else:
@@ -85,13 +110,14 @@ def test_get_latest_nvr_in_tag(error):
 def test_get_build_tags(error):
     tags = ["f37-updates-testing"]
 
+    @koji_session_virtual_method()
     def listTags(*_, **__):
         if error:
             raise Exception
         return [{"name": t} for t in tags]
 
-    session = flexmock(listTags=listTags)
-    result = KojiHelper(session).get_build_tags("test-1.0-1.fc37")
+    flexmock(ClientSession).new_instances(flexmock(listTags=listTags))
+    result = KojiHelper().get_build_tags("test-1.0-1.fc37")
     if error:
         assert result == []
     else:
@@ -109,6 +135,7 @@ def test_get_build_changelog(error):
         (1648728000, "Nikola Forró <nforro@redhat.com> - 0.1-1.fc37", "- first entry"),
     ]
 
+    @koji_session_virtual_method()
     def getRPMHeaders(*_, **__):
         if error:
             raise Exception
@@ -119,8 +146,8 @@ def test_get_build_changelog(error):
             "changelogtext": list(result[2]),
         }
 
-    session = flexmock(getRPMHeaders=getRPMHeaders)
-    result = KojiHelper(session).get_build_changelog("test-0.2-1.fc37")
+    flexmock(ClientSession).new_instances(flexmock(getRPMHeaders=getRPMHeaders))
+    result = KojiHelper().get_build_changelog("test-0.2-1.fc37")
     if error:
         assert result == []
     else:
@@ -141,13 +168,14 @@ def test_get_builds_in_tag(error):
         },
     ]
 
+    @koji_session_virtual_method()
     def listTagged(*_, **__):
         if error:
             raise Exception
         return builds
 
-    session = flexmock(listTagged=listTagged)
-    result = KojiHelper(session).get_builds_in_tag("f39-build-side-12345")
+    flexmock(ClientSession).new_instances(flexmock(listTagged=listTagged))
+    result = KojiHelper().get_builds_in_tag("f39-build-side-12345")
     if error:
         assert result == []
     else:
@@ -161,14 +189,15 @@ def test_get_builds_in_tag(error):
 def test_get_build_info(error):
     info = {"id": 123456, "name": "test", "nvr": "test-1.0-1.fc39"}
 
+    @koji_session_virtual_method()
     def getBuild(*_, **__):
         if error:
             raise Exception
         return info
 
-    session = flexmock(getBuild=getBuild)
+    flexmock(ClientSession).new_instances(flexmock(getBuild=getBuild))
     for build in [123456, "test-1.0-1.fc39"]:
-        result = KojiHelper(session).get_build_info(build)
+        result = KojiHelper().get_build_info(build)
         if error:
             assert result is None
         else:
@@ -176,19 +205,20 @@ def test_get_build_info(error):
 
 
 @pytest.mark.parametrize(
-    "error",
-    [False, True],
+    "error, auth_error",
+    [(False, False), (True, False), (False, True)],
 )
-def test_get_tag_info(error):
+def test_get_tag_info(error, auth_error):
     info = {"name": "f39-build-side-12345", "id": 12345}
 
+    @koji_session_virtual_method(invalid_session=auth_error)
     def getBuildConfig(*_, **__):
         if error:
             raise Exception
         return info
 
-    session = flexmock(getBuildConfig=getBuildConfig)
-    result = KojiHelper(session).get_tag_info("f39-build-side-12345")
+    flexmock(ClientSession).new_instances(flexmock(getBuildConfig=getBuildConfig))
+    result = KojiHelper().get_tag_info("f39-build-side-12345")
     if error:
         assert result is None
     else:
@@ -202,16 +232,16 @@ def test_get_tag_info(error):
 def test_create_sidetag(error):
     info = {"name": "f39-build-side-12345", "id": 12345}
 
+    @koji_session_virtual_method(requires_authentication=True)
     def createSideTag(*_, **__):
         if error:
             raise Exception
         return info
 
-    session = flexmock(
-        logged_in=True,
-        createSideTag=createSideTag,
-    )
-    koji_helper = KojiHelper(session)
+    session = flexmock(createSideTag=createSideTag)
+    session.should_receive("gssapi_login").once()
+    flexmock(ClientSession).new_instances(session)
+    koji_helper = KojiHelper()
     flexmock(koji_helper, get_build_target=lambda _: {"build_tag_name": "f39-build"})
     result = koji_helper.create_sidetag("f39")
     if error:
@@ -225,12 +255,16 @@ def test_create_sidetag(error):
     [False, True],
 )
 def test_remove_sidetag(logged_in):
-    session = flexmock(logged_in=logged_in)
-    session.should_receive("gssapi_login").and_return().times(
+    @koji_session_virtual_method(requires_authentication=not logged_in)
+    def removeSideTag(*_, **__):
+        pass
+
+    session = flexmock(removeSideTag=removeSideTag)
+    session.should_receive("gssapi_login").times(
         0 if logged_in else 1,
-    ).mock()
-    session.should_receive("removeSideTag").once()
-    KojiHelper(session).remove_sidetag("f39-build-side-12345")
+    )
+    flexmock(ClientSession).new_instances(session)
+    KojiHelper().remove_sidetag("f39-build-side-12345")
 
 
 @pytest.mark.parametrize(
@@ -238,12 +272,16 @@ def test_remove_sidetag(logged_in):
     [False, True],
 )
 def test_tag_build(logged_in):
-    session = flexmock(logged_in=logged_in)
-    session.should_receive("gssapi_login").and_return().times(
+    @koji_session_virtual_method(requires_authentication=not logged_in)
+    def tagBuild(*_, **__):
+        return 12345
+
+    session = flexmock(tagBuild=tagBuild)
+    session.should_receive("gssapi_login").times(
         0 if logged_in else 1,
-    ).mock()
-    session.should_receive("tagBuild").once()
-    KojiHelper(session).tag_build("test-1.0-1.fc39", "f39-build-side-12345")
+    )
+    flexmock(ClientSession).new_instances(session)
+    KojiHelper().tag_build("test-1.0-1.fc39", "f39-build-side-12345")
 
 
 @pytest.mark.parametrize(
@@ -251,12 +289,16 @@ def test_tag_build(logged_in):
     [False, True],
 )
 def test_untag_build(logged_in):
-    session = flexmock(logged_in=logged_in)
-    session.should_receive("gssapi_login").and_return().times(
+    @koji_session_virtual_method(requires_authentication=not logged_in)
+    def untagBuild(*_, **__):
+        pass
+
+    session = flexmock(untagBuild=untagBuild)
+    session.should_receive("gssapi_login").times(
         0 if logged_in else 1,
-    ).mock()
-    session.should_receive("untagBuild").once()
-    KojiHelper(session).untag_build("test-1.0-1.fc39", "f39-build-side-12345")
+    )
+    flexmock(ClientSession).new_instances(session)
+    KojiHelper().untag_build("test-1.0-1.fc39", "f39-build-side-12345")
 
 
 @pytest.mark.parametrize(
@@ -270,13 +312,14 @@ def test_get_build_target(error):
         "dest_tag_name": "f39-updates-candidate",
     }
 
+    @koji_session_virtual_method()
     def getBuildTarget(*_, **__):
         if error:
             raise Exception
         return target
 
-    session = flexmock(getBuildTarget=getBuildTarget)
-    result = KojiHelper(session).get_build_target("f39")
+    flexmock(ClientSession).new_instances(flexmock(getBuildTarget=getBuildTarget))
+    result = KojiHelper().get_build_target("f39")
     if error:
         assert result is None
     else:
@@ -315,6 +358,7 @@ def test_get_candidate_tag(branch, tag):
     def get_build_target(branch, *_, **__):
         return targets[branch]
 
+    flexmock(ClientSession).new_instances(flexmock())
     koji_helper = KojiHelper()
     flexmock(koji_helper, get_build_target=get_build_target)
     assert koji_helper.get_candidate_tag(branch) == tag
@@ -350,11 +394,14 @@ def test_get_stable_tags(tag, stable_tags):
         ],
     }
 
+    @koji_session_virtual_method()
     def getFullInheritance(tag, *_, **__):
         return ancestors[tag]
 
-    session = flexmock(getFullInheritance=getFullInheritance)
-    assert KojiHelper(session).get_stable_tags(tag) == stable_tags
+    flexmock(ClientSession).new_instances(
+        flexmock(getFullInheritance=getFullInheritance),
+    )
+    assert KojiHelper().get_stable_tags(tag) == stable_tags
 
 
 @pytest.mark.parametrize(
