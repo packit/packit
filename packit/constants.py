@@ -83,11 +83,6 @@ PACKIT_CONFIG_TEMPLATE = """# See the documentation for more information:
 
 specfile_path: {specfile_path}
 
-# add or remove files that should be synced
-files_to_sync:
-    - {specfile_path}
-    - .packit.yaml
-
 # name in upstream package repository or registry (e.g. in PyPI)
 upstream_package_name: {upstream_package_name}
 # downstream (Fedora) RPM package name
