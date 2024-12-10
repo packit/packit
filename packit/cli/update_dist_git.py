@@ -148,7 +148,6 @@ def update_dist_git(
         upstream_tag=None,
         commit_title=title,
         commit_msg=message,
-        sync_default_files=False,
         pkg_tool=pkg_tool,
         mark_commit_origin=True,
         check_sync_status=not force,
