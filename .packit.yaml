@@ -60,6 +60,7 @@ jobs:
     trigger: pull_request
     targets:
       - fedora-all
+      - fedora-latest-aarch64
       - epel-9
     packages:
       - packit
