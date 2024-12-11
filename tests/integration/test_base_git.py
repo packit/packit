@@ -64,7 +64,7 @@ def test_get_output_from_action_defined_in_sandcastle():
         ),
     )
     packit_repository_base.local_project = LocalProjectBuilder().build(
-        working_dir="/tmp",
+        working_dir="/sandcastle",
     )
 
     flexmock(Sandcastle).should_receive("run")
