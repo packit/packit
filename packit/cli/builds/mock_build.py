@@ -53,6 +53,12 @@ logger = logging.getLogger("packit")
     ),
 )
 @click.option(
+    "--resultdir",
+    default=None,
+    type=click.Path(file_okay=False),
+    help="Specifies the resultdir option for ‹mock› command, for details see mock(1)",
+)
+@click.option(
     PACKAGE_SHORT_OPTION,
     PACKAGE_LONG_OPTION,
     multiple=True,
@@ -72,6 +78,7 @@ def mock(
     release_suffix,
     default_release_suffix,
     root,
+    resultdir,
     package_config,
     path_or_url,
 ):
@@ -99,7 +106,11 @@ def mock(
             release_suffix=release_suffix,
         )
 
-    rpm_paths = api.run_mock_build(root=root, srpm_path=config.srpm_path)
+    rpm_paths = api.run_mock_build(
+        root=root,
+        srpm_path=config.srpm_path,
+        resultdir=resultdir,
+    )
     logger.info("RPMs:")
     for path in rpm_paths:
         logger.info(f" * {path}")

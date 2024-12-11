@@ -124,9 +124,10 @@ select = [
     "W",   # pycodestyle Warning
 ]
 ignore = [
-    "B017", # assert-raises-exception
-    "B022", # useless-contextlib-suppress
-    "RUF003"# Comment contains ambiguous character
+    "B017",    # assert-raises-exception
+    "B022",    # useless-contextlib-suppress
+    "RUF001",  # Comment contains ambiguous character
+    "RUF003",  # Comment contains ambiguous character
 ]
 
 line-length = 100
