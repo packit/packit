@@ -2469,6 +2469,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         srpm_path: Path,
         root: str = "default",
+        resultdir: Union[Path, str, None] = None,
     ) -> list[Path]:
         """
         Performs a mock build with given SRPM and root.
@@ -2479,11 +2480,18 @@ The first dist-git commit to be synced is '{short_hash}'.
                 Defaults to `"default"` mock config which should be a Fedora
                 rawhide.
             srpm_path: Path to the SRPM to be built.
+            resultdir: Path where the mock results should be stored, for details
+                see mock(1).
 
         Returns:
             List of paths to the built RPMs.
         """
-        cmd = ["mock", "--root", root, str(srpm_path)]
+        cmd = ["mock", "--root", root]
+        if resultdir is not None:
+            cmd.append("--resultdir")
+            cmd.append(str(resultdir))
+
+        cmd.append(str(srpm_path))
         escaped_command = " ".join(cmd)
         logger.debug(f"Mock build command: {escaped_command}")
 
