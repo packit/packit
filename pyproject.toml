@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "packitos"
 authors = [
-    { name = "Red Hat", email = "user-cont-team@redhat.com" },
+    { name = "Red Hat", email = "packit@redhat.com" },
 ]
 description = "A set of tools to integrate upstream open source projects into Fedora operating system."
 readme = "README.md"
