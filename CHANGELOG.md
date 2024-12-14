@@ -1,3 +1,7 @@
+# 0.106.0
+
+- We have added a `--resultdir` option for building in mock via our CLI (`packit build in-mock`). (#2475)
+
 # 0.105.0
 
 - There is a new action/hook, `post-modifications`, that is executed after all modifications to the spec file are done and in case of syncing release after all remote sources are downloaded and before uploading to lookaside cache. You can use it for example to construct an additional source that depends on the primary source (that may not yet be available in other actions). (#2474)
