@@ -37,7 +37,7 @@ DEFAULT_VERSION = "fedora-stable"
 logger = logging.getLogger(__name__)
 
 
-def get_versions(*name: str, default=DEFAULT_VERSION) -> set[str]:
+def get_versions(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
     """
     Expand the aliases to the name(s).
 
