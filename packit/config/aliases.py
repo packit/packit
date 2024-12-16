@@ -234,14 +234,14 @@ def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> set[str]:
         if sys_and_version == "fedora-rawhide":
             targets.add("rawhide")
         elif sys_and_version.startswith("fedora"):
-            sys, version = sys_and_version.rsplit("-", maxsplit=1)
+            _, version = sys_and_version.rsplit("-", maxsplit=1)
             targets.add(f"f{version}")
         elif sys_and_version.startswith("el") and sys_and_version[2:].isnumeric():
             targets.add(f"epel{sys_and_version[2:]}")
         elif sys_and_version.startswith("epel"):
             split = sys_and_version.rsplit("-", maxsplit=1)
             if len(split) == 2:
-                sys, version = split
+                _, version = split
                 if version.isnumeric():
                     targets.add(f"epel{version}")
                     continue
