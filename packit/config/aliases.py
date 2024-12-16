@@ -3,8 +3,11 @@
 
 import logging
 from datetime import timedelta
+from itertools import chain
 from typing import Union
 
+import opensuse_distro_aliases
+import requests
 from cachetools.func import ttl_cache
 from fedora_distro_aliases import get_distro_aliases
 from fedora_distro_aliases.cache import BadCache
@@ -257,10 +260,13 @@ def get_all_koji_targets() -> list[str]:
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
 def get_aliases() -> dict[str, list[str]]:
     """
-    A wrapper around `fedora_distro_aliases.get_distro_aliases()`.
+    A wrapper around `fedora_distro_aliases.get_distro_aliases()` and
+    `opensuse_distro_aliases.get_distro_aliases()`.
 
     Returns:
-        Dictionary containing aliases.
+        Dictionary containing aliases, the key is the distribution group and the
+        values is a list of `$name-$version` for the distros belonging to this
+        group.
 
     Raises:
         `PackitException` if aliases cache is not available.
@@ -270,9 +276,16 @@ def get_aliases() -> dict[str, list[str]]:
         # in ~/.cache/fedora-distro-aliases/cache.json and this cache is used
         # instead of live data in case Bodhi is not accessible
         distro_aliases = get_distro_aliases(cache=True)
+
     except BadCache as ex:
         raise PackitException(f"Aliases cache unavailable: {ex}") from ex
 
+    try:
+        opensuse_aliases = opensuse_distro_aliases.get_distro_aliases()
+    except requests.RequestException:
+        opensuse_aliases = opensuse_distro_aliases.CACHED_ACTIVE_DISTRIBUTION_ALIASES
+
     return {
-        alias: [d.namever for d in distros] for alias, distros in distro_aliases.items()
+        alias: [d.namever for d in distros]
+        for alias, distros in chain(distro_aliases.items(), opensuse_aliases.items())
     }
