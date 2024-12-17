@@ -12,6 +12,7 @@ from packit.cli.builds.in_image_builder import in_image_builder
 from packit.cli.builds.koji_build import koji
 from packit.cli.builds.local_build import local
 from packit.cli.builds.mock_build import mock
+from packit.cli.builds.obs_build import obs
 
 logger = logging.getLogger(__name__)
 
@@ -34,3 +35,4 @@ build.add_command(koji)
 build.add_command(local)
 build.add_command(mock)
 build.add_command(in_image_builder)
+build.add_command(obs)
