@@ -193,8 +193,7 @@ def init(
 
     By default, all 3 jobs (`pull_from_upstream`, `koji_build`, `bodhi_update`) for release
     syncing are configured. You can use --no-pull, --no-koji-build or --no-bodhi-update
-     options to not add some of the jobs (at the moment, Bodhi updates are created only for
-     Koji builds built by Packit, therefore --no-koji-build implies also no Bodhi update job).
+     options to not add some of the jobs.
 
     You can either create the Packit config file only locally (default), or create a pull request
     (using --create-pr option) or push directly to the dist-git's default branch
@@ -227,7 +226,7 @@ def init(
     kwargs = {
         other_args[i][2:]: other_args[i + 1] for i in range(0, len(other_args), 2)
     }
-    if no_pull and no_koji_build:
+    if no_pull and no_koji_build and no_koji_build:
         logger.warning("At least one job needs to be defined!")
         return
 
@@ -483,9 +482,7 @@ class DistGitInitializer:
                 },
             )
 
-        # currently it doesn't make sense to create Bodhi job
-        # if Koji job is not configured
-        if not self.no_koji_build and not self.no_bodhi_update:
+        if not self.no_bodhi_update:
             config["jobs"].append(
                 {
                     "job": "bodhi_update",
