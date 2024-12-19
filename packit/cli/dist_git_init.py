@@ -203,16 +203,24 @@ def init(
 
     Examples
 
-    Local generation for dist-git repo in current working directory:
+    Local Packit configuration generation for a dist-git repo in the current working directory:
+
+    \b
+
+        $ packit dist-git init
+
+    Local Packit configuration generation for a dist-git repo in the current working directory
+    configuring git URL for cloning of the upstream repository:
 
     \b
         $ packit dist-git init --upstream-git-url https://github.com/packit/packit .
 
 
-    Local generation for dist-git repo specified by URL that will be cloned to `<my-package>` dir:
+    Local Packit configuration generation for a dist-git repo specified by URL that
+    will be cloned to `<my-package>` dir:
 
     \b
-        $ packit dist-git init --upstream-git-url https://github.com/packit/packit --clone-path
+        $ packit dist-git init --clone-path
         `<my-package>` https://src.fedoraproject.org/rpms/packit
 
     Using arbitrary configuration options that are not provided as the command options
