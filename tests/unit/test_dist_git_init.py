@@ -225,6 +225,11 @@ from packit.cli.dist_git_init import DistGitInitializer
                             },
                         },
                     },
+                    {
+                        "job": "bodhi_update",
+                        "trigger": "commit",
+                        "dist_git_branches": ["fedora-rawhide"],
+                    },
                 ],
             },
             id="no-koji",
