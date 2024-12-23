@@ -389,9 +389,7 @@ class DistGitInitializer:
         elif self.dist_git_branches:
             self._dist_git_branches_for_pull = self.dist_git_branches
         else:
-            self._dist_git_branches_for_pull = {
-                "fedora-rawhide": {"fast_forward_merge_into": ["fedora-branched"]},
-            }
+            self._dist_git_branches_for_pull = ["fedora-rawhide"]
         return self._dist_git_branches_for_pull
 
     @property
