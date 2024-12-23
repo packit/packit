@@ -62,7 +62,7 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
-                synced_files:
+                files_to_sync:
                 - a.md
                 - b.md
                 - c.txt
@@ -84,7 +84,7 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
-                synced_files:
+                files_to_sync:
                 - src: 55
                   dest: a.md
                 - b.md
@@ -103,7 +103,7 @@ from packit.utils.commands import cwd
                 upstream_package_name: packit_upstream
                 allowed_gpg_keys: [gpg]
                 dist_git_namespace: awesome
-                synced_files:
+                files_to_sync:
                 - a.md
                 - b.md
                 - src: c.txt
@@ -283,8 +283,8 @@ from packit.utils.commands import cwd
         "notif_succ_build",
         "empty",
         "valid_2",
-        "synced_files_src",
-        "synced_files_dest",
+        "files_to_sync_src",
+        "files_to_sync_dest",
         "valid_3",
         "downstream_name",
         "create_pr",
