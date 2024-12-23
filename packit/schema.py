@@ -721,13 +721,13 @@ class PackageConfigSchema(Schema):
             return data
 
         for new_key_name, old_key_name in self.deprecated_keys:
-            old_key_value = data.get(old_key_name, None)
+            old_key_value = data.get(old_key_name)
             if old_key_value:
                 logger.warning(
                     f"{old_key_name!r} configuration key was renamed to {new_key_name!r},"
                     f" please update your configuration file.",
                 )
-                new_key_value = data.get(new_key_name, None)
+                new_key_value = data.get(new_key_name)
                 if not new_key_value:
                     # prio: new > old
                     data[new_key_name] = old_key_value
@@ -813,9 +813,9 @@ class PackageConfigSchema(Schema):
                 else None
             )
             if incorrect_packages:
-                errors[
-                    f"jobs[{i}].packages"
-                ] = f"Undefined package(s) referenced: {', '.join(incorrect_packages)}."
+                errors[f"jobs[{i}].packages"] = (
+                    f"Undefined package(s) referenced: {', '.join(incorrect_packages)}."
+                )
                 continue
 
             # There is no 'packages' key in the job, so
