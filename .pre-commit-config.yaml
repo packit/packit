@@ -4,16 +4,16 @@
 
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 24.10.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         exclude: tests_recording/test_data/
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
         exclude: tests_recording/test_data/test_api/
@@ -33,12 +33,12 @@ repos:
       - id: trailing-whitespace
         exclude: ^(tests/data/patches|tests/.+\.patch)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.8.4
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.14.0
     hooks:
       - id: mypy
         args: [--no-strict-optional, --ignore-missing-imports]
@@ -53,7 +53,7 @@ repos:
             types-cachetools,
           ]
   - repo: https://github.com/teemtee/tmt.git
-    rev: 1.29.0
+    rev: 1.40.0
     hooks:
       - id: tmt-lint
   - repo: https://github.com/packit/pre-commit-hooks
@@ -63,9 +63,9 @@ repos:
       - id: check-rebase
         args:
           - https://github.com/packit/packit.git
-        stages: [manual, push]
+        stages: [manual, pre-push]
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.0
+    rev: 0.30.0
     hooks:
       - id: check-github-workflows
         args: ["--verbose"]

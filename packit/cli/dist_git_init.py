@@ -503,9 +503,9 @@ class DistGitInitializer:
     def write_and_push(self):
         # needed for PackitAPI to work
         package_config_dict_for_api = self.package_config_dict
-        package_config_dict_for_api[
-            "specfile_path"
-        ] = f"{self.path_or_url.repo_name}.spec"
+        package_config_dict_for_api["specfile_path"] = (
+            f"{self.path_or_url.repo_name}.spec"
+        )
 
         package_config = PackageConfig.get_from_dict(
             raw_dict=package_config_dict_for_api,
