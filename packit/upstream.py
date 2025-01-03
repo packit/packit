@@ -1820,21 +1820,20 @@ class Archive:
         Returns:
             Archive's top level directory if there is exactly one, `None` otherwise.
         """
-
-        tar = tarfile.open(f"{self.upstream.absolute_specfile_dir}/{archive}")
         root_dirs = set()
-        for tar_item in tar.getmembers():
-            if tar_item.isdir() and "/" not in tar_item.name:
-                root_dirs.add(tar_item.name)
-            # required for archives where top-level dir was added using tar --transform
-            # option - in that case, tar archive will not contain dir related entry
-            if tar_item.isfile() and "/" in tar_item.name:
-                root_dirs.add(tar_item.name.split("/")[0])
+        with tarfile.open(f"{self.upstream.absolute_specfile_dir}/{archive}") as tar:
+            for tar_item in tar.getmembers():
+                if tar_item.isdir() and "/" not in tar_item.name:
+                    root_dirs.add(tar_item.name)
+                # required for archives where top-level dir was added using tar --transform
+                # option - in that case, tar archive will not contain dir related entry
+                if tar_item.isfile() and "/" in tar_item.name:
+                    root_dirs.add(tar_item.name.split("/")[0])
 
-        root_dirs_count = len(root_dirs)
-        archive_root_items_count = len(
-            {i.name for i in tar.getmembers() if "/" not in i.name},
-        )
+            root_dirs_count = len(root_dirs)
+            archive_root_items_count = len(
+                {i.name for i in tar.getmembers() if "/" not in i.name},
+            )
 
         if root_dirs_count == 1:
             root_dir = root_dirs.pop()

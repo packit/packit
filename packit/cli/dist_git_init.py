@@ -463,9 +463,7 @@ class DistGitInitializer:
         for key in options:
             value = getattr(self, key, None)
             if value:
-                config_key = (
-                    config_key_mappings[key] if key in config_key_mappings else key
-                )
+                config_key = config_key_mappings.get(key, key)
                 config[config_key] = value
 
         config.update(self.kwargs)
