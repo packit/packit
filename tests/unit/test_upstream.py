@@ -27,7 +27,9 @@ def tar_mock():
         tarfile_mock = flexmock(packit.upstream.tarfile)
         tarinfo_mock_list = [
             flexmock(
-                name=name, isdir=lambda v=isdir: v, isfile=lambda v=isdir: not isdir,
+                name=name,
+                isdir=lambda v=isdir: v,
+                isfile=lambda v=isdir: not v,
             )
             for name, isdir in archive_items
         ]

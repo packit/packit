@@ -250,13 +250,11 @@ class ListOrDict(fields.Field):
     """
 
     def is_dict(self, value) -> bool:
-        if (
+        return not (
             not isinstance(value, dict)
             or not all(isinstance(k, str) for k in value)
             or not all(isinstance(v, dict) for v in value.values())
-        ):
-            return False
-        return True
+        )
 
 
 class DistGitBranches(ListOrDict):
