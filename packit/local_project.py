@@ -695,7 +695,7 @@ class LocalProjectBuilder:
                 if not_to_calculate:
                     new_dependencies -= not_to_calculate
                 to_calculate.update(new_dependencies)
-                dependencies.update({calc: dep for dep in new_dependencies})
+                dependencies[calc] = new_dependencies
             change = len(to_calculate) > len_before
 
         dep_list = [f"{k} => {v}" for k, v in dependencies.items()]

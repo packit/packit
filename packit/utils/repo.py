@@ -182,12 +182,7 @@ def git_remote_url_to_https_url(
         return inp
 
     optional_suffix = ".git" if inp.endswith(".git") and with_dot_git_suffix else ""
-    url_str = "https://{}/{}/{}{}".format(
-        parsed_repo.hostname,
-        parsed_repo.namespace,
-        parsed_repo.repo,
-        optional_suffix,
-    )
+    url_str = f"https://{parsed_repo.hostname}/{parsed_repo.namespace}/{parsed_repo.repo}{optional_suffix}"
 
     logger.debug(f"URL {inp!r} turned into HTTPS {url_str!r}")
     return url_str

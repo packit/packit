@@ -463,9 +463,7 @@ class DistGitInitializer:
         for key in options:
             value = getattr(self, key, None)
             if value:
-                config_key = (
-                    config_key_mappings[key] if key in config_key_mappings else key
-                )
+                config_key = config_key_mappings.get(key, key)
                 config[config_key] = value
 
         config.update(self.kwargs)
@@ -503,9 +501,9 @@ class DistGitInitializer:
     def write_and_push(self):
         # needed for PackitAPI to work
         package_config_dict_for_api = self.package_config_dict
-        package_config_dict_for_api[
-            "specfile_path"
-        ] = f"{self.path_or_url.repo_name}.spec"
+        package_config_dict_for_api["specfile_path"] = (
+            f"{self.path_or_url.repo_name}.spec"
+        )
 
         package_config = PackageConfig.get_from_dict(
             raw_dict=package_config_dict_for_api,
