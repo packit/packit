@@ -91,7 +91,7 @@ def test_get_commands_for_actions(action_config, result):
     ups = GitUpstream(
         package_config=flexmock(
             actions={ActionName.create_archive: action_config},
-            synced_files=flexmock(),
+            files_to_sync=flexmock(),
         ),
         config=flexmock(),
         local_project=flexmock(),

@@ -76,10 +76,10 @@ class PackageConfigValidator:
                 f"the file is present.",
             )
 
-        synced_files_errors = []
+        files_to_sync_errors = []
         if config:
             for package_config in config.get_package_config_views().values():
-                synced_files_errors = [
+                files_to_sync_errors = [
                     f
                     for f in iter_srcs(package_config.files_to_sync)
                     if not (
@@ -113,7 +113,7 @@ class PackageConfigValidator:
                 for field_name, errors in schema_errors.items():
                     output += self.validate_get_field_output(errors, field_name)
 
-        if synced_files_errors:
+        if files_to_sync_errors:
             output += (
                 "The following {} configured to be synced but "
                 "{} not present in the repository: {}\n"
@@ -123,13 +123,13 @@ class PackageConfigValidator:
                         "paths are",
                         "are",
                     )
-                    if (len(synced_files_errors) > 1)
+                    if (len(files_to_sync_errors) > 1)
                     else ("path is", "is")
                 ),
-                ", ".join(synced_files_errors),
+                ", ".join(files_to_sync_errors),
             )
 
-        if schema_errors or synced_files_errors:
+        if schema_errors or files_to_sync_errors:
             raise PackitConfigException(output)
         return f"{self.config_file_path.name} is valid and ready to be used"
 

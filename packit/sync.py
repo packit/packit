@@ -194,24 +194,24 @@ class SyncFilesItem:
         return None
 
 
-def iter_srcs(synced_files: Sequence[SyncFilesItem]) -> Iterator[str]:
+def iter_srcs(files_to_sync: Sequence[SyncFilesItem]) -> Iterator[str]:
     """Iterate over all the src-s in a list of SyncFilesItem
 
     Args:
-        synced_files: List of SyncFilesItem.
+        files_to_sync: List of SyncFilesItem.
 
     Yields:
         src-s from every SyncFilesItem, one by one.
     """
-    for item in synced_files:
+    for item in files_to_sync:
         yield from item.src
 
 
-def sync_files(synced_files: Sequence[SyncFilesItem]):
+def sync_files(files_to_sync: Sequence[SyncFilesItem]):
     """
     Copy files b/w upstream and downstream repo.
     """
-    for item in synced_files:
+    for item in files_to_sync:
         command = item.command()
         logger.debug(f"Running {command!r} ...")
         run_command(command, print_live=True)

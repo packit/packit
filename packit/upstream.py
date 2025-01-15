@@ -235,10 +235,10 @@ class Upstream:
     def get_absolute_specfile_path(self) -> Optional[Path]:
         raise NotImplementedError()
 
-    def sync_files(self, synced_files: list, dg: DistGit):
+    def sync_files(self, files_to_sync: list, dg: DistGit):
         # Make all paths absolute and check that they are within
         # the working directories of the repositories.
-        for item in synced_files:
+        for item in files_to_sync:
             item.resolve(
                 src_base=self.working_dir,
                 dest_base=dg.local_project.working_dir,
@@ -660,7 +660,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
         upstream = upstream or self.get_specfile_version()
         destination = Path(destination) or self.local_project.working_dir
 
-        sync_files_to_ignore = self.package_config.get_all_files_to_sync()
+        sync_files_to_ignore = self.package_config.files_to_sync
         for file in sync_files_to_ignore:
             file.resolve(
                 src_base=self.local_project.working_dir,
