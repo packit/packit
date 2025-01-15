@@ -208,7 +208,7 @@ def test_job_config_parse(raw, expected_config):
 
 def test_deserialize_job_config_view():
     job_config = JobConfig(
-        type=JobType.build,
+        type=JobType.copr_build,
         trigger=JobConfigTriggerType.commit,
         packages={
             "a": CommonPackageConfig(specfile_path="a.spec"),
@@ -540,7 +540,7 @@ def test_serialize_and_deserialize_job_config(config):
     [
         (
             {
-                "job": "build",
+                "job": "copr_build",
                 "trigger": "release",
                 "packages": {
                     "package": {
@@ -551,32 +551,7 @@ def test_serialize_and_deserialize_job_config(config):
                 },
             },
             {
-                "job": "build",
-                "trigger": "release",
-                "packages": {
-                    "package": {
-                        "specfile_path": "packages.spec",
-                        "enable_net": False,
-                        "branch": "main",
-                    },
-                },
-            },
-            False,
-        ),
-        (
-            {
-                "job": "build",
-                "trigger": "release",
-                "packages": {
-                    "package": {
-                        "specfile_path": "packages.spec",
-                        "enable_net": False,
-                        "branch": "main",
-                    },
-                },
-            },
-            {
-                "job": "build",
+                "job": "copr_build",
                 "trigger": "release",
                 "packages": {
                     "package": {
@@ -590,7 +565,7 @@ def test_serialize_and_deserialize_job_config(config):
         ),
         (
             {
-                "job": "build",
+                "job": "copr_build",
                 "trigger": "release",
                 "packages": {
                     "package": {
@@ -601,7 +576,32 @@ def test_serialize_and_deserialize_job_config(config):
                 },
             },
             {
-                "job": "build",
+                "job": "copr_build",
+                "trigger": "release",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    },
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "job": "copr_build",
+                "trigger": "release",
+                "packages": {
+                    "package": {
+                        "specfile_path": "packages.spec",
+                        "enable_net": False,
+                        "branch": "main",
+                    },
+                },
+            },
+            {
+                "job": "copr_build",
                 "trigger": "release",
                 "packages": {
                     "package": {

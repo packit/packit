@@ -336,7 +336,6 @@ class PackitAPI:
         upstream_tag: Optional[str],
         commit_title: str,
         commit_msg: str,
-        sync_default_files: bool = True,
         pkg_tool: str = "",
         mark_commit_origin: bool = False,
         check_sync_status: bool = False,
@@ -361,8 +360,6 @@ class PackitAPI:
             commit_title: Commit message title (aka subject-line) in dist-git.
                 Do not commit if this is false-ish.
             commit_msg: Use this commit message in dist-git.
-            sync_default_files: Whether to sync the default files, that is: packit.yaml and
-                the spec-file.
             pkg_tool: What tool (fedpkg/centpkg/cbs) to use upload to lookaside cache.
             mark_commit_origin: Whether to include a Git-trailer in the dist-git
                 commit message to mark the hash of the upstream (source-git) commit.
@@ -391,24 +388,21 @@ class PackitAPI:
                 f"{REPO_NOT_PRISTINE_HINT}",
             )
 
-        if sync_default_files:
-            synced_files = self.package_config.get_all_files_to_sync()
-        else:
-            synced_files = self.package_config.files_to_sync
+        files_to_sync = self.package_config.get_all_files_to_sync()
 
-        self.up.sync_files(synced_files, self.dg)
+        self.up.sync_files(files_to_sync, self.dg)
 
         if self.up.actions_handler.with_action(
             action=ActionName.prepare_files,
             env=self.common_env(version=version),
         ):
-            synced_files = self._prepare_files_to_sync(
-                synced_files=synced_files,
+            files_to_sync = self._prepare_files_to_sync(
+                files_to_sync=files_to_sync,
                 full_version=version,
                 upstream_tag=upstream_tag,
                 resolved_bugs=resolved_bugs,
             )
-        sync_files(synced_files)
+        sync_files(files_to_sync)
         if upstream_ref and self.up.actions_handler.with_action(
             action=ActionName.create_patches,
             env=self.common_env(version=version),
@@ -886,7 +880,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
@@ -915,7 +908,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
@@ -943,7 +935,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         create_sync_note: bool = True,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        sync_default_files: bool = True,
         local_pr_branch_suffix: str = "update",
         mark_commit_origin: bool = False,
         use_downstream_specfile: bool = False,
@@ -972,8 +963,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             create_sync_note: Whether to create a note about the sync in the dist-git repo.
             title: Title (first line) of the commit & PR.
             description: Description of the commit & PR.
-            sync_default_files: Whether to sync the default files, that is:
-                packit.yaml and the spec-file.
             local_pr_branch_suffix: When create_pr is True, we push into a newly created
                 branch and create a PR from it. This param specifies a suffix attached
                 to the created branch name, so that we can have more PRs for the same
@@ -1189,7 +1178,6 @@ The first dist-git commit to be synced is '{short_hash}'.
                 upstream_tag=upstream_tag,
                 commit_title=commit_title,
                 commit_msg=commit_description,
-                sync_default_files=sync_default_files,
                 mark_commit_origin=mark_commit_origin,
                 check_dist_git_pristine=False,
                 resolved_bugs=resolved_bugs,
@@ -1440,7 +1428,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def _prepare_files_to_sync(
         self,
-        synced_files: list[SyncFilesItem],
+        files_to_sync: list[SyncFilesItem],
         full_version: str,
         upstream_tag: str,
         resolved_bugs: Optional[list[str]] = None,
@@ -1453,7 +1441,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         * Sync the content of the spec-file (but changelog) here and exclude spec-file otherwise.
 
         Args:
-            synced_files: A list of SyncFilesItem.
+            files_to_sync: A list of SyncFilesItem.
             full_version: Version to be set in the spec-file.
             upstream_tag: The commit message of this commit is going to be used
                 to update the changelog in the spec-file.
@@ -1463,7 +1451,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             The list of synced files with the spec-file removed if it was updated.
         """
         if self.package_config.sync_changelog:
-            return synced_files
+            return files_to_sync
 
         # add entry to changelog
         ChangelogHelper(self.up, self.dg, self.package_config).update_dist_git(
@@ -1478,7 +1466,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 None,
                 [
                     x.drop_src(self.up.get_absolute_specfile_path())
-                    for x in synced_files
+                    for x in files_to_sync
                 ],
             ),
         )

@@ -11,7 +11,6 @@ from marshmallow import (
     Schema,
     ValidationError,
     fields,
-    post_dump,
     post_load,
     pre_load,
     validates_schema,
@@ -436,7 +435,6 @@ class CommonConfigSchema(Schema):
         deserialize="spec_source_id_fm",
         serialize="spec_source_id_serialize",
     )
-    synced_files = fields.List(FilesToSyncField())
     files_to_sync = fields.List(FilesToSyncField())
     actions = ActionField(default={})
     create_pr = fields.Bool(default=True)
@@ -542,32 +540,6 @@ class CommonConfigSchema(Schema):
     def make_instance(self, data, **_):
         return CommonPackageConfig(**data)
 
-    @post_dump(pass_original=True)
-    def adjust_files_to_sync(
-        self,
-        data: dict,
-        original: CommonPackageConfig,
-        **kwargs,
-    ) -> dict:
-        """Fix the files_to_sync field in the serialized object
-
-        B/c CommonPackageConfig.files_to_sync is a derived value, the meaning of the
-        original configuration can be re-established only by checking the
-        '_files_to_sync_used' attribute, and removing the 'files_to_sync' field from
-        the serialized data if it's False.
-
-        Args:
-            data: Already serialized data.
-            original: Original object being serialized.
-
-        Returns:
-            Modified serialized data with the 'files_to_sync' key removed if it was
-            not used in the original object.
-        """
-        if not original._files_to_sync_used:
-            data.pop("files_to_sync", None)
-        return data
-
 
 class JobConfigSchema(Schema):
     """
@@ -671,7 +643,7 @@ class PackageConfigSchema(Schema):
     )
 
     # list of deprecated keys and their replacement (new,old)
-    deprecated_keys = (("upstream_package_name", "upstream_project_name"),)
+    deprecated_keys: Union[None, tuple[tuple[str, str]]] = None
 
     @pre_load
     def ordered_preprocess(self, data: dict, **_) -> dict:
@@ -716,6 +688,9 @@ class PackageConfigSchema(Schema):
         :return: processed dictionary
         """
         if not data:  # data is None when .packit.yaml is empty
+            return data
+
+        if not self.deprecated_keys:
             return data
 
         for new_key_name, old_key_name in self.deprecated_keys:
