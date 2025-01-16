@@ -1,16 +1,19 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import json
 import re
 
 import pytest
 from flexmock import flexmock
 from specfile import Specfile
 
+from packit.cli.utils import get_packit_api
 from packit.config import CommonPackageConfig, Config, PackageConfig
 from packit.constants import DISTGIT_HOSTNAME_CANDIDATES, EXISTING_BODHI_UPDATE_REGEX
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
+from packit.pkgtool import PkgTool
 
 
 @pytest.mark.parametrize(
@@ -232,3 +235,69 @@ def test_upstream_archive_names(spec_source_id, with_coffee, archive_names, tmp_
     )
     flexmock(dg).should_receive("specfile").and_return(specfile)
     assert dg.upstream_archive_names == archive_names
+
+
+def test_pkg_tool_details():
+
+    SPECFILE_CONFIG_YAML = """
+    {
+        "upstream_project_url": "https://github.com/packit/specfile",
+        "upstream_package_name": "specfile",
+        "downstream_package_name": "python-specfile",
+        "packages": {
+            "specfile-centos-integration-sig": {
+                "specfile_path": "centos-integration-sig/python-specfile.spec",
+                "pkg_tool": "centpkg-sig",
+                "sig": "Integration/packit-cbs"
+            },
+            "specfile-epel8": {
+                "specfile_path": "epel8/python-specfile.spec"
+            }
+        },
+        "jobs": [
+            {
+                "job": "propose_downstream",
+                "trigger": "release",
+                "dist_git_branches": ["epel8"],
+                "packages": ["specfile-epel8"]
+            },
+            {
+                "job": "propose_downstream",
+                "trigger": "release",
+                "dist_git_branches": ["c9-sig-integration"],
+                "packages": ["specfile-centos-integration-sig"]
+            }
+        ]
+    }
+    """
+    packages_config_dict = json.loads(SPECFILE_CONFIG_YAML)
+    packages_config = PackageConfig.get_from_dict(packages_config_dict)
+    for package in ["specfile-centos-integration-sig", "specfile-epel8"]:
+        package_view = packages_config.get_package_config_views()[package]
+
+        api = get_packit_api(
+            config=Config(fas_user="maja", pkg_tool="fedpkg"),
+            package_config=package_view,
+            dist_git_path="",
+            local_project=flexmock(git_repo=flexmock(remotes=[])),
+            check_for_non_git_upstream=False,
+        )
+
+        if package == "specfile-centos-integration-sig":
+            flexmock(PkgTool).should_receive("__init__").with_args(
+                fas_username="maja",
+                directory="/tmp",
+                tool="centpkg-sig",
+                sig="Integration/packit-cbs",
+            )
+            flexmock(PkgTool).should_receive("clone").and_return()
+        if package == "specfile-epel8":
+            flexmock(PkgTool).should_receive("__init__").with_args(
+                fas_username="maja",
+                directory="/tmp",
+                tool="fedpkg",
+                sig=None,
+            )
+            flexmock(PkgTool).should_receive("clone").and_return()
+
+        api.dg.clone_package("/tmp")
