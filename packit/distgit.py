@@ -209,7 +209,8 @@ class DistGit(PackitRepositoryBase):
         pkg_tool = PkgTool(
             fas_username=self.fas_user,
             directory=target_path,
-            tool=self.pkg_tool,
+            tool=self.package_config.pkg_tool or self.pkg_tool,
+            sig=self.package_config.sig,
         )
         pkg_tool.clone(
             package_name=self.package_config.downstream_package_name,
