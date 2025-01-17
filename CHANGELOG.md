@@ -1,3 +1,10 @@
+# 1.0.0
+
+- Job type `build` removed after deprecation, is now `copr_build`.
+- Job type `production_build` removed after deprecation, is now `upstream_koji_build`.
+- Key `upstream_project_name` removed after deprecation, is now `upstream_package_name`.
+- Key `synced_files` removed after deprecation, is now `files_to_sync`.
+
 # 0.106.0
 
 - We have added a `--resultdir` option for building in mock via our CLI (`packit build in-mock`). (#2475)
