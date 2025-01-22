@@ -564,7 +564,7 @@ def test_check_version_distance(
     version_update_mask,
     exp,
 ):
-    flexmock(api).should_receive("get_branches").and_return(["f38"])
+    flexmock(api).should_receive("get_branches").and_return({"f38"})
     package_config = flexmock(
         version_update_mask=version_update_mask,
     )
