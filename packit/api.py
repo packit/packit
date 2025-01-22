@@ -791,13 +791,16 @@ The first dist-git commit to be synced is '{short_hash}'.
     ) -> bool:
         """Following this guidelines:
         https://docs.fedoraproject.org/en-US/fesco/Updates_Policy/#philosophy
+        https://docs.fedoraproject.org/en-US/epel/epel-policy-updates/
         we want to avoid major updates of packages within a **stable** release.
 
         current: str, already released version for package
         proposed: str, release we are preparing for package
         target_branch: str, Fedora branch where release the package
         """
-        branches_to_check = get_branches("fedora-branched")
+        branches_to_check = get_branches("fedora-branched").union(
+            get_branches("epel-all"),
+        )
         if (
             self.package_config.version_update_mask
             and target_branch in branches_to_check
