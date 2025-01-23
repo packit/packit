@@ -53,9 +53,6 @@ jobs:
         fast_forward_merge_into: [fedora-branched]
       epel-9: {}
 
-  - job: sync_from_downstream
-    trigger: commit
-
   - job: copr_build
     trigger: pull_request
     targets:
