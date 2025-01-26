@@ -1,3 +1,7 @@
+# 1.0.1
+
+- `version_update_mask` now applies to EPEL dist-git branches in the same way it does to stable Fedora branches. (#2507)
+
 # 1.0.0
 
 - Job type `build` removed after deprecation, is now `copr_build`.
