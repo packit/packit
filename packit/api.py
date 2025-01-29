@@ -33,6 +33,7 @@ import git
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
 from ogr.exceptions import PagureAPIException
+from ogr.services.pagure.pull_request import PagurePullRequest
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -1608,13 +1609,14 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             pr: Newly created or updated pull request object.
         """
-        try:
-            if pr._raw_pr["commit_start"] == pr._raw_pr["commit_stop"]:
-                # PR contains single commit
-                return
-        except (AttributeError, KeyError):
-            # not a Pagure PR
+        if not isinstance(pr, PagurePullRequest):
+            logger.debug("Not a Pagure PR, skipping the warning comment.")
             return
+
+        if pr._raw_pr["commit_start"] == pr._raw_pr["commit_stop"]:
+            # PR contains single commit
+            return
+
         pr.comment(
             "**Warning**\n"
             "As this pull request contains more than one commit, you may be affected "

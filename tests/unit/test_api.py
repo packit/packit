@@ -8,6 +8,7 @@ import pytest
 from bugzilla import Bugzilla
 from flexmock import flexmock
 from munch import Munch
+from ogr.services.pagure.pull_request import PagurePullRequest
 
 from packit import api
 from packit import api as packit_api
@@ -211,13 +212,13 @@ def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.dg.should_receive("push_to_fork").and_return()
-    pr = flexmock(
-        _raw_pr={"commit_start": "1234abc", "commit_stop": "5678def"},
-        target_branch="_",
+    pr = PagurePullRequest(
+        raw_pr={"commit_start": "1234abc", "commit_stop": "5678def", "branch": "_"},
+        project=flexmock(),
     )
     api_mock.dg.should_receive("create_pull").and_return(pr)
     flexmock(api).should_receive("get_branches").and_return({"_", "__"})
-    pr.should_receive("comment").once()
+    flexmock(pr).should_receive("comment").once()
     api_mock.sync_release(
         versions=["1.1"],
         dist_git_branch="_",
