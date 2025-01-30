@@ -33,6 +33,9 @@ import git
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
 from ogr.exceptions import PagureAPIException
+from ogr.services.gitlab.project import GitlabProject
+from ogr.services.pagure.project import PagureProject
+from ogr.services.pagure.pull_request import PagurePullRequest
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -52,8 +55,11 @@ from packit.constants import (
     RELEASE_MONITORING_PROJECT_URL,
     REPO_NOT_PRISTINE_HINT,
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
+    SYNC_RELEASE_PR_CHECKLIST,
     SYNC_RELEASE_PR_DESCRIPTION,
-    SYNC_RELEASE_PR_INSTRUCTIONS,
+    SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS,
+    SYNC_RELEASE_PR_KOJI_NOTE,
+    SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS,
     SYNCING_NOTE,
 )
 from packit.copr_helper import CoprHelper
@@ -1142,15 +1148,6 @@ The first dist-git commit to be synced is '{short_hash}'.
             pr_title = (
                 title or f"Update {dist_git_branch} to upstream release {version}"
             )
-            pr_instructions = (
-                SYNC_RELEASE_PR_INSTRUCTIONS.format(
-                    package=self.dg.local_project.repo_name,
-                    branch=local_pr_branch,
-                    user=self.config.fas_user,
-                )
-                if create_pr and add_pr_instructions
-                else ""
-            )
 
             # Evaluate the commit title and message
             commit_msg_action_output = self.up.actions_handler.get_output_from_action(
@@ -1192,6 +1189,11 @@ The first dist-git commit to be synced is '{short_hash}'.
                     upstream_tag=upstream_tag,
                     release_monitoring_project_id=release_monitoring_project_id,
                     resolved_bugs=resolved_bugs,
+                )
+                pr_instructions = (
+                    f"\n---\n\n{self.get_pr_instructions(local_pr_branch=local_pr_branch)}\n"
+                    if add_pr_instructions
+                    else ""
                 )
                 footer = (
                     f"\n---\n\n{pr_description_footer}" if pr_description_footer else ""
@@ -1351,6 +1353,34 @@ The first dist-git commit to be synced is '{short_hash}'.
         title = lines[0] or f"({self.dg.local_project.commit_hexsha})"
         description = "\n".join(lines[1:]).strip()
         return f"Update upstream to latest dist-git commit: {title}", description
+
+    def get_pr_instructions(self, local_pr_branch: str) -> str:
+        """
+        Get instructions for the update that will be included in the PR description.
+
+        Args:
+            local_pr_branch: PR branch for local checkout
+
+        Returns: instructions to include in PR
+        """
+        instructions: list[str] = []
+        if isinstance(self.dg.local_project.git_project, PagureProject):
+            instructions.append(
+                SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS.format(
+                    package=self.dg.local_project.repo_name,
+                    branch=local_pr_branch,
+                    user=self.config.fas_user,
+                ),
+            )
+            # TODO once Koji builds work for GitLab, this should be handled differently
+            instructions.append(SYNC_RELEASE_PR_KOJI_NOTE)
+
+        if isinstance(self.dg.local_project.git_project, GitlabProject):
+            instructions.append(SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS)
+
+        instructions.append(SYNC_RELEASE_PR_CHECKLIST)
+
+        return "\n\n---\n\n".join(instruction for instruction in instructions)
 
     def sync_push(
         self,
@@ -1608,13 +1638,14 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             pr: Newly created or updated pull request object.
         """
-        try:
-            if pr._raw_pr["commit_start"] == pr._raw_pr["commit_stop"]:
-                # PR contains single commit
-                return
-        except (AttributeError, KeyError):
-            # not a Pagure PR
+        if not isinstance(pr, PagurePullRequest):
+            logger.debug("Not a Pagure PR, skipping the warning comment.")
             return
+
+        if pr._raw_pr["commit_start"] == pr._raw_pr["commit_stop"]:
+            # PR contains single commit
+            return
+
         pr.comment(
             "**Warning**\n"
             "As this pull request contains more than one commit, you may be affected "
