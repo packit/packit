@@ -1,6 +1,6 @@
 # 1.1.0
 
-- Packit now supports building packages in the open build service (#2067)
+- Thanks to the work of [Bryan Elee](https://github.com/rxbryan) (as part of his Google Summer of Code work) and [Dan Čermák](https://github.com/dcermak), there is a new `packit build in-obs` CLI command to trigger a build in [OBS](https://build.opensuse.org/). Please, try it and let us know how it works and if you find it useful.  (#2067)
 
 # 1.0.1
 
