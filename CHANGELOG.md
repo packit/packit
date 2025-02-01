@@ -1,3 +1,7 @@
+# 1.1.0
+
+- Packit now supports building packages in the open build service (#2067)
+
 # 1.0.1
 
 - `version_update_mask` now applies to EPEL dist-git branches in the same way it does to stable Fedora branches. (#2507)
