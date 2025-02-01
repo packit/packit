@@ -906,6 +906,123 @@ requests.sessions:
             raw: !!binary ""
             reason: OK
             status_code: 200
+      https://api.opensuse.org/public/source/openSUSE?view=productlist&expand=1&format=xml:
+        all:
+          metadata:
+            latency: 2.0559027194976807
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_api
+            - packit.api
+            - packit.config.aliases
+            - cachetools
+            - packit.config.aliases
+            - opensuse_distro_aliases
+            - requests.api
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 1
+            _content: "<productlist count=\"30\">\n  <product name=\"openSUSE-Addon-NonOss\"\
+              \ cpe=\"cpe:/o:opensuse:opensuse-addon-nonoss:20250123\" originproject=\"\
+              openSUSE:Factory\" originpackage=\"000product\" mtime=\"1737670982\"\
+              />\n  <product name=\"openSUSE\" cpe=\"cpe:/o:opensuse:opensuse:20250123\"\
+              \ originproject=\"openSUSE:Factory\" originpackage=\"000product\" mtime=\"\
+              1737670982\"/>\n  <product name=\"MicroOS\" cpe=\"cpe:/o:opensuse:microos:20250123\"\
+              \ originproject=\"openSUSE:Factory\" originpackage=\"000product\" mtime=\"\
+              1737670982\"/>\n  <product name=\"Aeon\" cpe=\"cpe:/o:opensuse:aeon:20250123\"\
+              \ originproject=\"openSUSE:Factory\" originpackage=\"000product\" mtime=\"\
+              1737670982\"/>\n  <product name=\"Kalpa\" cpe=\"cpe:/o:opensuse:kalpa:20250123\"\
+              \ originproject=\"openSUSE:Factory\" originpackage=\"000product\" mtime=\"\
+              1737670982\"/>\n  <product name=\"Leap-Micro\" cpe=\"cpe:/o:opensuse:leap-micro:6.1\"\
+              \ originproject=\"openSUSE:Leap:Micro:6.1\" originpackage=\"000product\"\
+              \ mtime=\"1733347355\"/>\n  <product name=\"Leap-Micro\" cpe=\"cpe:/o:opensuse:leap-micro:6.0\"\
+              \ originproject=\"openSUSE:Leap:Micro:6.0\" originpackage=\"000product\"\
+              \ mtime=\"1717159269\"/>\n  <product name=\"Leap-Micro\" cpe=\"cpe:/o:opensuse:leap-micro:5.5\"\
+              \ originproject=\"openSUSE:Leap:Micro:5.5\" originpackage=\"000product\"\
+              \ mtime=\"1696948985\"/>\n  <product name=\"Leap-Micro\" cpe=\"cpe:/o:opensuse:leap-micro:5.4\"\
+              \ originproject=\"openSUSE:Leap:Micro:5.4\" originpackage=\"000product\"\
+              \ mtime=\"1682595799\"/>\n  <product name=\"Leap-Micro\" cpe=\"cpe:/o:opensuse:leap-micro:5.3\"\
+              \ originproject=\"openSUSE:Leap:Micro:5.3\" originpackage=\"000product\"\
+              \ mtime=\"1668462197\"/>\n  <product name=\"Leap-Micro\" cpe=\"cpe:/o:opensuse:leap-micro:5.2\"\
+              \ originproject=\"openSUSE:Leap:Micro:5.2\" originpackage=\"000product\"\
+              \ mtime=\"1655743352\"/>\n  <product name=\"Leap-Addon-NonOss\" cpe=\"\
+              cpe:/o:opensuse:leap-addon-nonoss:15.6\" originproject=\"openSUSE:Leap:15.6\"\
+              \ originpackage=\"000product\" mtime=\"1718882265\"/>\n  <product name=\"\
+              Leap\" cpe=\"cpe:/o:opensuse:leap:15.6\" originproject=\"openSUSE:Leap:15.6\"\
+              \ originpackage=\"000product\" mtime=\"1718882265\"/>\n  <product name=\"\
+              Leap-Addon-NonOss\" cpe=\"cpe:/o:opensuse:leap-addon-nonoss:15.5\" originproject=\"\
+              openSUSE:Leap:15.5\" originpackage=\"000product\" mtime=\"1684852341\"\
+              />\n  <product name=\"Leap\" cpe=\"cpe:/o:opensuse:leap:15.5\" originproject=\"\
+              openSUSE:Leap:15.5\" originpackage=\"000product\" mtime=\"1684852341\"\
+              />\n  <product name=\"Leap-Addon-NonOss\" cpe=\"cpe:/o:opensuse:leap-addon-nonoss:15.4\"\
+              \ originproject=\"openSUSE:Leap:15.4\" originpackage=\"000product\"\
+              \ mtime=\"1653589470\"/>\n  <product name=\"Leap\" cpe=\"cpe:/o:opensuse:leap:15.4\"\
+              \ originproject=\"openSUSE:Leap:15.4\" originpackage=\"000product\"\
+              \ mtime=\"1653589470\"/>\n  <product name=\"Leap-Addon-NonOss\" cpe=\"\
+              cpe:/o:opensuse:leap-addon-nonoss:15.3\" originproject=\"openSUSE:Leap:15.3:Update:Respin\"\
+              \ originpackage=\"000product\" mtime=\"1646420134\"/>\n  <product name=\"\
+              Leap\" cpe=\"cpe:/o:opensuse:leap:15.3\" originproject=\"openSUSE:Leap:15.3:Update:Respin\"\
+              \ originpackage=\"000product\" mtime=\"1646420134\"/>\n  <product name=\"\
+              openSUSE-Addon-NonOss\" cpe=\"cpe:/o:opensuse:opensuse-addon-nonoss:15.2\"\
+              \ originproject=\"openSUSE:Leap:15.2\" originpackage=\"000product\"\
+              \ mtime=\"1593153191\"/>\n  <product name=\"openSUSE\" cpe=\"cpe:/o:opensuse:opensuse:15.2\"\
+              \ originproject=\"openSUSE:Leap:15.2\" originpackage=\"000product\"\
+              \ mtime=\"1593153191\"/>\n  <product name=\"openSUSE-Addon-NonOss\"\
+              \ cpe=\"cpe:/o:opensuse:opensuse-addon-nonoss:15.1\" originproject=\"\
+              openSUSE:Leap:15.1\" originpackage=\"000product\" mtime=\"1557886751\"\
+              />\n  <product name=\"openSUSE\" cpe=\"cpe:/o:opensuse:opensuse:15.1\"\
+              \ originproject=\"openSUSE:Leap:15.1\" originpackage=\"000product\"\
+              \ mtime=\"1557886751\"/>\n  <product name=\"openSUSE\" cpe=\"cpe:/o:opensuse:opensuse:15.0\"\
+              \ originproject=\"openSUSE:Leap:15.0\" originpackage=\"000product\"\
+              \ mtime=\"1526463153\"/>\n  <product name=\"openSUSE-Addon-NonOss\"\
+              \ cpe=\"cpe:/o:opensuse:opensuse-addon-nonoss:15.0\" originproject=\"\
+              openSUSE:Leap:15.0\" originpackage=\"000product\" mtime=\"1526463153\"\
+              />\n  <product name=\"openSUSE-Addon-NonOss\" cpe=\"cpe:/o:opensuse:opensuse-addon-nonoss:42.2\"\
+              \ originproject=\"openSUSE:Leap:42.2\" originpackage=\"_product\" mtime=\"\
+              1478347756\"/>\n  <product name=\"openSUSE\" cpe=\"cpe:/o:opensuse:opensuse:42.2\"\
+              \ originproject=\"openSUSE:Leap:42.2\" originpackage=\"_product\" mtime=\"\
+              1478347756\"/>\n  <product name=\"openSUSE-Addon-NonOss\" cpe=\"cpe:/o:opensuse:opensuse-addon-nonoss:42.3\"\
+              \ originproject=\"openSUSE:Leap:42.3\" originpackage=\"_product\" mtime=\"\
+              1500481143\"/>\n  <product name=\"openSUSE\" cpe=\"cpe:/o:opensuse:opensuse:42.3\"\
+              \ originproject=\"openSUSE:Leap:42.3\" originpackage=\"_product\" mtime=\"\
+              1500481143\"/>\n  <product name=\"openSUSE-Kubic\" cpe=\"cpe:/o:opensuse:opensuse-kubic:20170719\"\
+              \ originproject=\"openSUSE:Leap:42.3\" originpackage=\"_product\" mtime=\"\
+              1500481143\"/>\n</productlist>\n"
+            _next: null
+            elapsed: 2.055589
+            encoding: utf-8
+            headers:
+              Connection: Keep-Alive
+              Date: Fri, 24 Jan 2025 12:41:19 GMT
+              Keep-Alive: timeout=15, max=100
+              Server: Apache/2.4.58 (Linux/SUSE)
+              Strict-Transport-Security: max-age=31536000
+              Transfer-Encoding: chunked
+              cache-control: max-age=0, private, must-revalidate
+              content-encoding: gzip
+              content-type: application/xml; charset=utf-8
+              etag: W/"37547da7f066cf0682ab8f716902e32e"
+              referrer-policy: strict-origin-when-cross-origin
+              status: 200 OK
+              vary: Accept-Encoding
+              x-content-type-options: nosniff
+              x-download-options: noopen
+              x-frame-options: SAMEORIGIN
+              x-opensuse-apiversion: 2.11~alpha.20250122T141423.1d2ed363b
+              x-opensuse-runtimes: '{"view":58.58029992773663,"db":248.15871001780033,"backend":0}'
+              x-permitted-cross-domain-policies: none
+              x-powered-by: Phusion Passenger(R)
+              x-request-id: 14a8f0b5-ed3b-4f7e-bc0b-7eee687fc41c
+              x-runtime: '0.717574'
+              x-xss-protection: 1; mode=block
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
       https://bodhi.fedoraproject.org/releases/?state=current&state=pending&state=frozen&page=1:
         all:
           metadata:
@@ -1585,6 +1702,179 @@ requests.sessions:
               set-cookie: disgit_pagure=eyJfcGVybWFuZW50Ijp0cnVlLCJjc3JmX3Rva2VuIjoiYTYxOTQ3YWUyOTFjZjY0NjM5MThlNWM0NzAyOTYyZjZjOTJlYmZlOSJ9.GiEg-A.CnsKni8mqavkpTeLaARLdUg3pFA;
                 Expires=Sun, 22-Dec-2024 19:52:24 GMT; Secure; HttpOnly; Path=/
               x-fedora-appserver: pkgs01.iad2.fedoraproject.org
+            raw: !!binary ""
+            reason: OK
+            status_code: 200
+      https://get.opensuse.org/api/v0/distributions.json:
+        all:
+          metadata:
+            latency: 0.13317346572875977
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_api
+            - packit.api
+            - packit.config.aliases
+            - cachetools
+            - packit.config.aliases
+            - opensuse_distro_aliases
+            - requests.api
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              Leap:
+              - name: openSUSE Leap
+                state: Alpha
+                upgrade-weight: 10
+                version: '16.0'
+              - name: openSUSE Leap
+                state: Stable
+                upgrade-weight: 9
+                version: '15.6'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 8
+                version: '15.5'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 7
+                version: '15.4'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 6
+                version: '15.3'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 5
+                version: '15.2'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 4
+                version: '15.1'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 3
+                version: '15.0'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 2
+                version: '42.3'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 1
+                version: '42.2'
+              - name: openSUSE Leap
+                state: EOL
+                upgrade-weight: 0
+                version: '42.1'
+              LeapMicro:
+              - name: openSUSE Leap Micro
+                state: Stable
+                upgrade-weight: 6
+                version: '6.1'
+              - name: openSUSE Leap Micro
+                state: Stable
+                upgrade-weight: 5
+                version: '6.0'
+              - name: openSUSE Leap Micro
+                state: Stable
+                upgrade-weight: 4
+                version: '5.5'
+              - name: openSUSE Leap Micro
+                state: EOL
+                upgrade-weight: 3
+                version: '5.4'
+              - name: openSUSE Leap Micro
+                state: EOL
+                upgrade-weight: 2
+                version: '5.3'
+              - name: openSUSE Leap Micro
+                state: EOL
+                upgrade-weight: 1
+                version: '5.2'
+              Tumbleweed:
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250122
+                version: '20250122'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250121
+                version: '20250121'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250120
+                version: '20250120'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250119
+                version: '20250119'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250118
+                version: '20250118'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250117
+                version: '20250117'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250116
+                version: '20250116'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250115
+                version: '20250115'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250114
+                version: '20250114'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250113
+                version: '20250113'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250112
+                version: '20250112'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250109
+                version: '20250109'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250108
+                version: '20250108'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250106
+                version: '20250106'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250105
+                version: '20250105'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250103
+                version: '20250103'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250102
+                version: '20250102'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20250101
+                version: '20250101'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20241226
+                version: '20241226'
+              - name: openSUSE Tumbleweed
+                upgrade-weight: 20241224
+                version: '20241224'
+            _next: null
+            elapsed: 0.133022
+            encoding: utf-8
+            headers:
+              cache-control: max-age=2419200
+              content-encoding: gzip
+              content-type: application/json
+              date: Fri, 24 Jan 2025 12:41:18 GMT
+              etag: W/"67938221-10f0"
+              expires: Fri, 21 Feb 2025 12:41:18 GMT
+              last-modified: Fri, 24 Jan 2025 12:05:53 GMT
+              referrer-policy: no-referrer-when-downgrade
+              strict-transport-security: max-age=15768000
+              transfer-encoding: chunked
+              vary: Accept-Encoding
+              x-content-type-options: nosniff
+              x-xss-protection: 1; mode=block
             raw: !!binary ""
             reason: OK
             status_code: 200

@@ -3,8 +3,11 @@
 
 import logging
 from datetime import timedelta
+from itertools import chain
 from typing import Union
 
+import opensuse_distro_aliases
+import requests
 from cachetools.func import ttl_cache
 from fedora_distro_aliases import get_distro_aliases
 from fedora_distro_aliases.cache import BadCache
@@ -34,7 +37,7 @@ DEFAULT_VERSION = "fedora-stable"
 logger = logging.getLogger(__name__)
 
 
-def get_versions(*name: str, default=DEFAULT_VERSION) -> set[str]:
+def get_versions(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
     """
     Expand the aliases to the name(s).
 
@@ -67,7 +70,7 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
     names = list(name) or [default]
     possible_sys_and_versions: set[str] = set()
     for one_name in names:
-        name_split = one_name.rsplit("-", maxsplit=2)
+        name_split = one_name.rsplit("-", maxsplit=3)
         l_name_split = len(name_split)
 
         if l_name_split < 2:  # only one part
@@ -87,7 +90,8 @@ def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
             architecture = "x86_64"  # use the x86_64 as a default
 
         else:  # "name-version-architecture"
-            sys_name, version, architecture = name_split
+            sys_name, architecture = name_split[0], name_split[-1]
+            version = "-".join(name_split[1:-1])
             if architecture not in ARCHITECTURE_LIST:
                 # we don't know the architecture => probably wrongly parsed
                 # (e.g. "opensuse-leap-15.0")
@@ -231,14 +235,14 @@ def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> set[str]:
         if sys_and_version == "fedora-rawhide":
             targets.add("rawhide")
         elif sys_and_version.startswith("fedora"):
-            sys, version = sys_and_version.rsplit("-", maxsplit=1)
+            _, version = sys_and_version.rsplit("-", maxsplit=1)
             targets.add(f"f{version}")
         elif sys_and_version.startswith("el") and sys_and_version[2:].isnumeric():
             targets.add(f"epel{sys_and_version[2:]}")
         elif sys_and_version.startswith("epel"):
             split = sys_and_version.rsplit("-", maxsplit=1)
             if len(split) == 2:
-                sys, version = split
+                _, version = split
                 if version.isnumeric():
                     targets.add(f"epel{version}")
                     continue
@@ -257,10 +261,13 @@ def get_all_koji_targets() -> list[str]:
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
 def get_aliases() -> dict[str, list[str]]:
     """
-    A wrapper around `fedora_distro_aliases.get_distro_aliases()`.
+    A wrapper around `fedora_distro_aliases.get_distro_aliases()` and
+    `opensuse_distro_aliases.get_distro_aliases()`.
 
     Returns:
-        Dictionary containing aliases.
+        Dictionary containing aliases, the key is the distribution group and the
+        values is a list of `$name-$version` for the distros belonging to this
+        group.
 
     Raises:
         `PackitException` if aliases cache is not available.
@@ -270,9 +277,16 @@ def get_aliases() -> dict[str, list[str]]:
         # in ~/.cache/fedora-distro-aliases/cache.json and this cache is used
         # instead of live data in case Bodhi is not accessible
         distro_aliases = get_distro_aliases(cache=True)
+
     except BadCache as ex:
         raise PackitException(f"Aliases cache unavailable: {ex}") from ex
 
+    try:
+        opensuse_aliases = opensuse_distro_aliases.get_distro_aliases()
+    except requests.RequestException:
+        opensuse_aliases = opensuse_distro_aliases.CACHED_ACTIVE_DISTRIBUTION_ALIASES
+
     return {
-        alias: [d.namever for d in distros] for alias, distros in distro_aliases.items()
+        alias: [d.namever for d in distros]
+        for alias, distros in chain(distro_aliases.items(), opensuse_aliases.items())
     }

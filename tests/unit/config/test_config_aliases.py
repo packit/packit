@@ -96,6 +96,25 @@ class TestGetBuildTargets:
                     "fedora-rawhide-x86_64",
                 },
             ),
+            (
+                "opensuse-leap-all",
+                {
+                    "opensuse-leap-15.5-x86_64",
+                    "opensuse-leap-15.4-x86_64",
+                    "opensuse-leap-15.3-x86_64",
+                },
+            ),
+            (
+                "opensuse-all",
+                {
+                    "opensuse-tumbleweed-x86_64",
+                    "opensuse-leap-15.5-x86_64",
+                    "opensuse-leap-15.4-x86_64",
+                    "opensuse-leap-15.3-x86_64",
+                },
+            ),
+            ("opensuse-leap-15.5-aarch64", {"opensuse-leap-15.5-aarch64"}),
+            ("opensuse-tumbleweed-ppc64le", {"opensuse-tumbleweed-ppc64le"}),
         ],
     )
     def test_get_build_targets(self, name, targets, mock_get_aliases):
