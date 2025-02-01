@@ -8,6 +8,7 @@ import pytest
 from flexmock import flexmock
 
 import packit
+import packit.config.aliases
 from packit.config import Config
 from packit.distgit import DistGit
 from packit.local_project import LocalProjectBuilder
@@ -25,6 +26,17 @@ def mock_get_aliases():
             "fedora-stable": ["fedora-31", "fedora-32"],
             "fedora-development": ["fedora-33", "fedora-rawhide"],
             "epel-all": ["epel-6", "epel-7", "epel-8"],
+            "opensuse-leap-all": [
+                "opensuse-leap-15.5",
+                "opensuse-leap-15.4",
+                "opensuse-leap-15.3",
+            ],
+            "opensuse-all": [
+                "opensuse-tumbleweed",
+                "opensuse-leap-15.5",
+                "opensuse-leap-15.4",
+                "opensuse-leap-15.3",
+            ],
         },
     )
 
