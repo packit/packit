@@ -1,3 +1,7 @@
+# 1.1.0
+
+- Thanks to the work of [Bryan Elee](https://github.com/rxbryan) (as part of his Google Summer of Code work) and [Dan Čermák](https://github.com/dcermak), there is a new `packit build in-obs` CLI command to trigger a build in [OBS](https://build.opensuse.org/). (#2067)
+
 # 1.0.1
 
 - `version_update_mask` now applies to EPEL dist-git branches in the same way it does to stable Fedora branches. (#2507)
