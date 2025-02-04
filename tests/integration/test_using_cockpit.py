@@ -54,7 +54,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         push_to_fork=lambda *args, **kwargs: None,
         is_archive_in_lookaside_cache=lambda archive_path: False,
         upload_to_lookaside_cache=lambda archives, pkg_tool, offline: None,
-        download_upstream_archives=lambda: ["the-archive"],
+        download_upstream_archives=lambda: [dist_git_path / "the-archive"],
     )
     flexmock(DistGit).should_receive("existing_pr").and_return(None)
     flexmock(
@@ -99,7 +99,7 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
         push_to_fork=lambda *args, **kwargs: None,
         is_archive_in_lookaside_cache=lambda archive_path: False,
         upload_to_lookaside_cache=lambda archives, pkg_tool, offline: None,
-        download_upstream_archives=lambda: ["the-archive"],
+        download_upstream_archives=lambda: [dist_git_path / "the-archive"],
     )
     pr = flexmock(url="https://example.com/pull/1")
     pr.should_receive("update_info").and_return()

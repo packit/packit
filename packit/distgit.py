@@ -406,6 +406,11 @@ class DistGit(PackitRepositoryBase):
         )
         return archive_names
 
+    @property
+    def git_tracked_files(self) -> list[str]:
+        """List of files tracked by git."""
+        return [p for p, _ in self.local_project.git_repo.index.entries]
+
     def download_upstream_archives(self) -> list[Path]:
         """
         Fetch archives for the current upstream release defined in dist-git's spec
