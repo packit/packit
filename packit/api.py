@@ -415,6 +415,9 @@ class PackitAPI:
 
         sync_files(files_to_sync)
 
+        # reload the dist-git spec file as it has been most likely synced
+        self.dg.specfile.reload()
+
         if upstream_ref:
             if self.up.actions_handler.with_action(
                 action=ActionName.create_patches,
