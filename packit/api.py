@@ -1700,6 +1700,14 @@ The first dist-git commit to be synced is '{short_hash}'.
         # therefore it needs the archive itself beforehand.
         upstream_archives = self.dg.download_upstream_archives()
 
+        # Filter out git-tracked upstream archives
+        untracked_upstream_archives = [
+            archive
+            for archive in upstream_archives
+            if str(archive.relative_to(self.dg.absolute_source_dir))
+            not in self.dg.git_tracked_files
+        ]
+
         self.up.actions_handler.run_action(
             actions=ActionName.post_modifications,
             env=env,
@@ -1708,7 +1716,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         # Check for existing local archives and upload those as well
         local_archives = self.get_local_archives_to_upload()
 
-        archives = upstream_archives + local_archives
+        archives = untracked_upstream_archives + local_archives
 
         if (
             not self.should_archives_be_uploaded_to_lookaside(archives)
@@ -1754,9 +1762,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         local_archives_to_upload = []
         for local_archive in local_archives:
             archive_path = self.dg.absolute_source_dir / local_archive
-            if not archive_path.exists() or local_archive in [
-                path for path, _ in self.dg.local_project.git_repo.index.entries
-            ]:
+            if not archive_path.exists() or local_archive in self.dg.git_tracked_files:
                 logger.debug(
                     f"Local archive {archive_path} doesn't exist or is tracked by git. "
                     f"Skipping the handling of it.",
