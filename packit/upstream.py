@@ -1072,6 +1072,8 @@ class GitUpstream(PackitRepositoryBase, Upstream):
                 destination=str(self.absolute_specfile_dir),
             )
             self.specfile_add_patches(patches)
+        else:
+            self.specfile.reload()  # the specfile could have been changed by the action
 
     def koji_build(
         self,
@@ -1568,6 +1570,7 @@ class SRPMBuilder:
             actions=ActionName.post_modifications,
             env=env,
         )
+        self.upstream.specfile.reload()  # the specfile could have been changed by the action
 
 
 class Archive:
