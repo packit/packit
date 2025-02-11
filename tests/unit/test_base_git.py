@@ -439,7 +439,7 @@ def test_download_remote_sources(
         assert url == next(expected_urls)
         return flexmock(
             raise_for_status=lambda: None,
-            iter_content=lambda **_: iter([b"1"]),
+            raw=flexmock(stream=lambda *_, **__: iter([b"1"])),
         )
 
     flexmock(requests).should_receive("get").replace_with(mocked_get)
