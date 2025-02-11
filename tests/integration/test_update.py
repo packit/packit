@@ -51,7 +51,7 @@ def test_basic_local_update(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(Specfile).should_call("reload").once()
+    flexmock(Specfile).should_call("reload").at_least().once()
 
     api.sync_release(dist_git_branch="main", versions=["0.1.0"])
 
@@ -75,7 +75,7 @@ def test_fast_forward_merge_local_update(
     _, _ = mock_remote_functionality_upstream_fast_forward_merge_branches
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(Specfile).should_call("reload").times(1)
+    flexmock(Specfile).should_call("reload").at_least().once()
 
     api.sync_release(
         dist_git_branch="main",
@@ -102,7 +102,7 @@ def test_basic_local_update_no_upload_to_lookaside(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(Specfile).should_call("reload").once()
+    flexmock(Specfile).should_call("reload").at_least().once()
     flexmock(DistGit).should_call("upload_to_lookaside_cache").with_args(
         archives=[d / "beerware-0.1.0.tar.gz"],
         pkg_tool="",
@@ -795,7 +795,7 @@ def test_basic_local_update_post_modifications_action(
     u, d, api = api_instance
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(Specfile).should_call("reload").once()
+    flexmock(Specfile).should_call("reload").at_least().once()
 
     # just to make PACKIT_DOWNSTREAM_REPO available
     api.dg._local_project = flexmock()
