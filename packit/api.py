@@ -408,22 +408,36 @@ class PackitAPI:
                 upstream_tag=upstream_tag,
                 resolved_bugs=resolved_bugs,
             )
+        else:
+            # reload spec files as they could have been changed by the action
+            self.up.specfile.reload()
+            self.dg.specfile.reload()
+
         sync_files(files_to_sync)
-        if upstream_ref and self.up.actions_handler.with_action(
-            action=ActionName.create_patches,
-            env=self.common_env(version=version),
-        ):
-            patches = self.up.create_patches(
-                upstream=upstream_ref,
-                destination=str(self.dg.absolute_specfile_dir),
-            )
-            # Undo identical patches, but don't remove them
-            # from the list, so that they are added to the spec-file.
-            PatchGenerator.undo_identical(patches, self.dg.local_project.git_repo)
-            self.dg.specfile_add_patches(
-                patches,
-                self.package_config.patch_generation_patch_id_digits,
-            )
+
+        # reload the dist-git spec file as it has been most likely synced
+        self.dg.specfile.reload()
+
+        if upstream_ref:
+            if self.up.actions_handler.with_action(
+                action=ActionName.create_patches,
+                env=self.common_env(version=version),
+            ):
+                patches = self.up.create_patches(
+                    upstream=upstream_ref,
+                    destination=str(self.dg.absolute_specfile_dir),
+                )
+                # Undo identical patches, but don't remove them
+                # from the list, so that they are added to the spec-file.
+                PatchGenerator.undo_identical(patches, self.dg.local_project.git_repo)
+                self.dg.specfile_add_patches(
+                    patches,
+                    self.package_config.patch_generation_patch_id_digits,
+                )
+            else:
+                # reload spec files as they could have been changed by the action
+                self.up.specfile.reload()
+                self.dg.specfile.reload()
 
         if add_new_sources or force_new_sources:
             self._handle_sources(
@@ -437,6 +451,9 @@ class PackitAPI:
                 actions=ActionName.post_modifications,
                 env=self.common_env(version=version),
             )
+            # reload spec files as they could have been changed by the action
+            self.up.specfile.reload()
+            self.dg.specfile.reload()
 
         if commit_title:
             trailers = (
@@ -1103,6 +1120,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                 env=self.common_env(version=version),
             )
 
+            # reload spec files as they could have been changed by the action
+            self.up.specfile.reload()
+            self.dg.specfile.reload()
+
             # compare versions here because users can mangle with specfile in
             # post_upstream_clone action
             spec_ver = self.up.get_specfile_version()
@@ -1125,8 +1146,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                 actions=ActionName.pre_sync,
                 env=self.common_env(version=version),
             )
-            if not use_downstream_specfile:
-                self.up.specfile.reload()
+
+            # reload spec files as they could have been changed by the action
+            self.up.specfile.reload()
+            self.dg.specfile.reload()
 
             if create_pr:
                 local_pr_branch = f"{dist_git_branch}-{local_pr_branch_suffix}"
@@ -1713,6 +1736,10 @@ The first dist-git commit to be synced is '{short_hash}'.
             env=env,
         )
 
+        # reload spec files as they could have been changed by the action
+        self.up.specfile.reload()
+        self.dg.specfile.reload()
+
         # Check for existing local archives and upload those as well
         local_archives = self.get_local_archives_to_upload()
 
@@ -1898,6 +1925,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             env=self.common_env(),
         )
 
+        # reload spec file as it could have been changed by the action
+        self.up.specfile.reload()
+
         if update_release is None:
             update_release = self.package_config.update_release
         try:
@@ -2008,6 +2038,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             actions=ActionName.post_upstream_clone,
             env=self.common_env(),
         )
+
+        # reload spec file as it could have been changed by the action
+        self.up.specfile.reload()
 
         try:
             self.up.prepare_upstream_for_srpm_creation(

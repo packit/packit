@@ -168,6 +168,10 @@ def test_sync_release_version_tag_processing(
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
     api_mock.should_receive("_prepare_files_to_sync").with_args(
         files_to_sync=[],
         full_version=version,
@@ -189,6 +193,10 @@ def test_sync_release_do_not_create_sync_note(api_mock):
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.up.package_config.create_sync_note = False
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
@@ -201,6 +209,10 @@ def test_sync_release_create_sync_note(api_mock):
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
@@ -214,6 +226,10 @@ def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
     api_mock.dg.should_receive("push_to_fork").and_return()
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
     pr = PagurePullRequest(
         raw_pr={"commit_start": "1234abc", "commit_stop": "5678def", "branch": "_"},
         project=flexmock(),
@@ -298,6 +314,10 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     flexmock(pathlib.Path).should_receive("write_text").once()
     api.up.should_receive("get_specfile_version").and_return("0")
     api.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    api.dg.should_receive("get_specfile_version").and_return("0")
+    api.dg.should_receive("specfile").and_return(
         flexmock().should_receive("reload").mock(),
     )
     api.should_receive("push_and_create_pr").and_return(flexmock())
@@ -391,6 +411,10 @@ def test_sync_release_check_pr_instructions(api_mock, pr_description, project):
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
     api_mock.should_receive("push_and_create_pr").with_args(
         pr_title=str,
         pr_description=pr_description,
