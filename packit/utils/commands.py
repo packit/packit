@@ -85,7 +85,8 @@ def run_command(
     # we need to pass complete env to Popen, otherwise we lose everything from os.environ
     cmd_env = os.environ
     if env:
-        cmd_env.update(env)
+        # before updating the env, replace any potential None values with empty strings
+        cmd_env.update({k: v if v is not None else "" for k, v in env.items()})
 
     # we can't use universal newlines here b/c the output from the command can be encoded
     # in something alien and we would "can't decode this using utf-8" errors
