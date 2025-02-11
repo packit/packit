@@ -643,13 +643,13 @@ class PackitRepositoryBase:
             try:
                 with requests.get(
                     url,
-                    headers={"User-Agent": user_agent},
+                    headers={"User-Agent": user_agent, "Accept-Encoding": "identity"},
                     timeout=HTTP_REQUEST_TIMEOUT,
                     stream=True,
                 ) as response:
                     response.raise_for_status()
                     with open(source_path, "wb") as f:
-                        for chunk in response.iter_content(chunk_size=8192):
+                        for chunk in response.raw.stream(8192, decode_content=False):
                             f.write(chunk)
             except requests.exceptions.RequestException as e:
                 msg = f"Failed to download source from {url}"
