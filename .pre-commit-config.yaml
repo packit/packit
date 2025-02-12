@@ -64,6 +64,12 @@ repos:
         args:
           - https://github.com/packit/packit.git
         stages: [manual, pre-push]
+  - repo: https://github.com/packit/requre
+    rev: 0.8.4
+    hooks:
+      - id: requre-purge
+        # Do not run in pre-commit.ci as it requires too much time
+        stages: [manual, pre-push]
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.31.0
     hooks:
