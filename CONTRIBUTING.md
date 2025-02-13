@@ -64,6 +64,9 @@ To (re-)generate response file(s):
 - remove files from [tests_recording/test_data/](tests_recording/test_data) you want to re-generate
 - set tokens in your [~/.config/.packit.yaml](https://packit.dev/docs/configuration/#user-configuration-file)
 - `make check-in-container-regenerate-data`
+- if you realize after recording that one of your tokens is invalid,
+  make sure to remove the files to be re-generated again
+  before or after updating it, otherwise the tests may still attempt to use the invalid one
 - commit changed/new files
 
 See also [tests_recording/README.md](tests_recording/README.md)
