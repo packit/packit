@@ -1,3 +1,7 @@
+# 1.1.1
+
+- Packit doesn't attempt to upload git-tracked remote sources (for example a [GPG keyring](https://docs.fedoraproject.org/en-US/packaging-guidelines/#_verifying_signatures)) to lookaside cache anymore when syncing release. (#2518)
+
 # 1.1.0
 
 - Thanks to the work of [Bryan Elee](https://github.com/rxbryan) (as part of his Google Summer of Code work) and [Dan Čermák](https://github.com/dcermak), there is a new `packit build in-obs` CLI command to trigger a build in [OBS](https://build.opensuse.org/). (#2067)
