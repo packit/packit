@@ -77,6 +77,15 @@ class JobConfig(MultiplePackages):
         # re-built at runtime
         self.__dict__["_view_for_package"] = None
 
+    def __str__(self):
+        # simpler string representation that's used for logging
+        members = [
+            f"type: {self.type}",
+            f"trigger: {self.trigger}",
+            f"identifier: {self.identifier}",
+        ]
+        return f"JobConfig({', '.join(members)})"
+
     def __repr__(self):
         # required to avoid cyclical imports
         from packit.schema import JobConfigSchema
