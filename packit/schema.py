@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import copy
+import functools
 import json
 from collections.abc import Mapping
 from logging import getLogger
@@ -656,29 +657,28 @@ class PackageConfigSchema(Schema):
             Transformed configuration dictionary with defaults
             for 'packages' and 'jobs' set.
         """
-        # Create a deepcopy(), so that loading doesn't modify the
-        # dictionary received.
-        data = copy.deepcopy(data)
-        data = self.rename_deprecated_keys(data)
-        # Don't use 'setdefault' in this case, as we should expect
-        # downstream_package_name only if there is no 'packages' key.
-        if "packages" not in data:
-            package_name = data.pop("downstream_package_name")
-            paths = data.pop("paths", ["./"])
-            data["packages"] = {
-                package_name: {
-                    "downstream_package_name": package_name,
-                    "paths": paths,
-                },
-            }
-        data.setdefault("jobs", get_default_jobs())
-        # By this point, we expect both 'packages' and 'jobs' to be present
-        # in the config.
-        data = self.rearrange_packages(data)
-        data = self.rearrange_jobs(data)
-        data = self.process_job_triggers(data)
-        logger.debug(f"Repo config after pre-loading:\n{json.dumps(data, indent=4)}")
-        return data
+        # Log the config before any pre-processing is done
+        logger.debug(
+            "Package config before pre-loading: %s",
+            json.dumps(data, separators=(",", ":")),
+        )
+
+        return functools.reduce(
+            lambda d, f: f(d),
+            [
+                self.rename_deprecated_keys,
+                self._convert_to_monorepo,
+                self._set_default_jobs,
+                # By this point, we expect both 'packages' and 'jobs' to be
+                # present in the config.
+                self.rearrange_packages,
+                self.rearrange_jobs,
+                self.process_job_triggers,
+            ],
+            # Create a deepcopy(), so that loading doesn't modify the
+            # dictionary received.
+            copy.deepcopy(data),
+        )
 
     def rename_deprecated_keys(self, data: dict) -> dict:
         """
@@ -705,6 +705,45 @@ class PackageConfigSchema(Schema):
                     # prio: new > old
                     data[new_key_name] = old_key_value
                 del data[old_key_name]
+        return data
+
+    @staticmethod
+    def _convert_to_monorepo(data: dict) -> dict:
+        """Converts the package config to the monorepo syntax, if it's
+        a single-package config.
+
+        Args:
+            data: package config of either single-repo or monorepo package.
+
+        Returns:
+            Dictionary that adheres to the monorepo syntax.
+        """
+
+        # Don't use 'setdefault' in this case, as we should expect
+        # downstream_package_name only if there is no 'packages' key.
+        if "packages" not in data:
+            package_name = data.pop("downstream_package_name")
+            paths = data.pop("paths", ["./"])
+            data["packages"] = {
+                package_name: {
+                    "downstream_package_name": package_name,
+                    "paths": paths,
+                },
+            }
+        return data
+
+    @staticmethod
+    def _set_default_jobs(data: dict) -> dict:
+        """Add default jobs, if none are configured.
+
+        Args:
+            data: package config that may or may not contain any jobs defined.
+
+        Returns:
+            Dictionary with package config that contains default jobs if none
+            were present.
+        """
+        data.setdefault("jobs", get_default_jobs())
         return data
 
     @staticmethod
