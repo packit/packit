@@ -84,7 +84,7 @@ class JobConfig(MultiplePackages):
         s = JobConfigSchema()
         # For __repr__() return a JSON-encoded string, by using dumps().
         # Mind the 's'!
-        return f"JobConfig: {s.dumps(self)}"
+        return f"<JobConfig: {s.dumps(self)}>"
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict) -> "JobConfig":
