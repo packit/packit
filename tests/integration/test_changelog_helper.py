@@ -28,7 +28,9 @@ def upstream(upstream_instance):
 
 @pytest.fixture
 def downstream():
-    yield flexmock(DistGit)
+    dg = flexmock(DistGit)
+    dg.specfile = flexmock(reload=lambda: None)
+    yield dg
 
 
 def test_srpm_action(upstream, downstream):

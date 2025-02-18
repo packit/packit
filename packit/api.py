@@ -1160,6 +1160,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                 self.dg.reset_workdir()
                 self.dg.rebase_branch(dist_git_branch)
 
+                # reload dist-git spec file as it could have been changed
+                self.dg.specfile.reload()
+
             if create_sync_note and self.package_config.create_sync_note:
                 readme_path = self.dg.local_project.working_dir / "README.packit"
                 logger.debug(f"README: {readme_path}")
@@ -1185,6 +1188,10 @@ The first dist-git commit to be synced is '{short_hash}'.
                 }
                 | self.common_env(version),
             )
+
+            # reload spec files as they could have been changed by the action
+            self.up.specfile.reload()
+            self.dg.specfile.reload()
 
             commit_title, commit_description = get_commit_message_from_action(
                 output=commit_msg_action_output,
