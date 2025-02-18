@@ -83,6 +83,7 @@ class JobConfig(MultiplePackages):
             f"type: {self.type}",
             f"trigger: {self.trigger}",
             f"identifier: {self.identifier}",
+            f"packages: {sorted(self.packages.keys())}",
         ]
         return f"JobConfig({', '.join(members)})"
 
