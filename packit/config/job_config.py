@@ -77,6 +77,16 @@ class JobConfig(MultiplePackages):
         # re-built at runtime
         self.__dict__["_view_for_package"] = None
 
+    def __str__(self):
+        # simpler string representation that's used for logging
+        members = [
+            f"type: {self.type}",
+            f"trigger: {self.trigger}",
+            f"identifier: {self.identifier}",
+            f"packages: {sorted(self.packages.keys())}",
+        ]
+        return f"JobConfig({', '.join(members)})"
+
     def __repr__(self):
         # required to avoid cyclical imports
         from packit.schema import JobConfigSchema
@@ -84,7 +94,7 @@ class JobConfig(MultiplePackages):
         s = JobConfigSchema()
         # For __repr__() return a JSON-encoded string, by using dumps().
         # Mind the 's'!
-        return f"JobConfig: {s.dumps(self)}"
+        return f"<JobConfig: {s.dumps(self)}>"
 
     @classmethod
     def get_from_dict(cls, raw_dict: dict) -> "JobConfig":
