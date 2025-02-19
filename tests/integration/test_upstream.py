@@ -259,6 +259,7 @@ def test_create_archive_spec_subdir(upstream_instance, with_create_archive_actio
     spec_path = packaging_dir / "some.spec"
     spec_path.write_text("asd")
     ups._specfile_path = spec_path
+    ups._specfile = flexmock(reload=lambda: None)
 
     ups.create_archive()
 
@@ -701,6 +702,7 @@ def test_create_archive_not_create_symlink(upstream_instance):
     spec_path = packaging_dir / "some.spec"
     spec_path.write_text("asd")
     ups._specfile_path = spec_path
+    ups._specfile = flexmock(reload=lambda: None)
 
     ups.create_archive(create_symlink=False)
 

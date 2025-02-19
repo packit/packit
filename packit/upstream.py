@@ -1628,6 +1628,9 @@ class Archive:
                 action=ActionName.create_archive,
                 env=env,
             )
+
+            self.upstream.specfile.reload()  # the specfile could have been changed by the action
+
             if not outputs:
                 raise PackitException("No output from create-archive action.")
 
