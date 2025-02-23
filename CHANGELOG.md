@@ -1,3 +1,7 @@
+# 1.2.0
+
+- Packit reloads spec file after `create-archive` to keep user changes. (#2533)
+
 # 1.1.1
 
 - Packit doesn't attempt to upload git-tracked remote sources (for example a [GPG keyring](https://docs.fedoraproject.org/en-US/packaging-guidelines/#_verifying_signatures)) to lookaside cache anymore when syncing release. (#2518)
