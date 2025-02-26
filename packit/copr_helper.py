@@ -89,11 +89,14 @@ class CoprHelper:
         For the provided iterable of names, expand them using get_build_targets() into valid
         Copr chhroot names and intersect this set with current available Copr chroots.
 
-        :param name: name(s) of the system and version or target name. (passed to
+        Args:
+            name: name(s) of the system and version or target name. (passed to
                     packit.config.aliases.get_build_targets() function)
                 or target name (e.g. "fedora-30-x86_64" or "fedora-stable-x86_64")
-        :param default: used if no positional argument was given
-        :return: set of build targets available also in copr chroots
+            default: used if no positional argument was given
+
+        Returns:
+            Set of build targets available also in copr chroots.
         """
         build_targets = aliases.get_build_targets(*name, default=default)
         logger.info(f"Build targets: {build_targets} ")
@@ -205,7 +208,8 @@ class CoprHelper:
         """
         Create or update a project in copr.
 
-        Raises PackitCoprException on any problems.
+        Raises:
+             PackitCoprException on any problems.
         """
         default_description = (
             "Continuous builds initiated by Packit service.\n"
@@ -486,7 +490,9 @@ class CoprHelper:
     def get_copr_builds(self, number_of_builds: int = 5) -> list:
         """
         Get the copr builds of this project done by packit.
-        :return: list of builds
+
+        Returns:
+            List of builds.
         """
         client = CoprClient.create_from_config_file()
 
@@ -532,10 +538,11 @@ class CoprHelper:
         """
         Get build details from Copr.
 
-        Arguments:
-            build_id -- Copr build id.
+        Args:
+            build_id: Copr build id.
 
-        :return: Dict
+        Returns:
+             Dict of build details.
         """
         return self.copr_client.build_proxy.get(build_id)
 
