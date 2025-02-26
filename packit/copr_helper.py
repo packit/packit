@@ -539,6 +539,24 @@ class CoprHelper:
         """
         return self.copr_client.build_proxy.get(build_id)
 
+    def cancel_build(self, build_id: int) -> bool:
+        """
+        Cancel a build with given ID.
+
+        Args:
+            build_id: Copr build ID.
+
+        Returns:
+            Whether the cancelling was successful.
+        """
+        logger.info(f"Cancelling build with ID {build_id}")
+        try:
+            self.copr_client.build_proxy.cancel(build_id)
+            return True
+        except CoprRequestException as ex:
+            logger.error(f"Failed to cancel build {build_id}: {ex}")
+            return False
+
     def get_repo_download_url(self, owner: str, project: str, chroot: str) -> str:
         """Provide a link to yum repo for the particular chroot"""
         copr_proj = self.copr_client.project_proxy.get(
