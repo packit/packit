@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+from collections import namedtuple
 from datetime import timedelta
 from itertools import chain
-from typing import Union
+from typing import Optional, Union
 
 import opensuse_distro_aliases
 import requests
@@ -34,143 +35,181 @@ DEPRECATED_TARGET_MAP = {
 
 DEFAULT_VERSION = "fedora-stable"
 
+Distro = namedtuple("Distro", ["namever", "branch"])
+
 logger = logging.getLogger(__name__)
 
 
-def get_versions(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
+@ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
+def get_aliases() -> dict[str, set[Distro]]:
     """
-    Expand the aliases to the name(s).
+    A wrapper around `fedora_distro_aliases.get_distro_aliases()`
+    and `opensuse_distro_aliases.get_distro_aliases()`.
 
-    :param name: name(s) of the system and version (e.g. "fedora-30" or "fedora-stable")
-    :param default: used if no positional argument was given
-    :return: set of string containing system name and version
+    Returns:
+        Dict where the key is the alias and the value is a set of `Distro` tuples.
+
+    Raises:
+        `PackitException` if aliases cache is not available.
     """
-    if not (default or name):
-        return set()
+    try:
+        # fedora-distro-aliases caches each successful response from Bodhi
+        # in ~/.cache/fedora-distro-aliases/cache.json and this cache is used
+        # instead of live data in case Bodhi is not accessible
+        distro_aliases = get_distro_aliases(cache=True)
+    except BadCache as ex:
+        raise PackitException(f"Aliases cache unavailable: {ex}") from ex
 
-    names = list(name) or [default]
-    versions: set[str] = set()
-    for one_name in names:
-        versions.update(get_aliases().get(one_name, [one_name]))
-    return versions
+    try:
+        opensuse_aliases = opensuse_distro_aliases.get_distro_aliases()
+    except requests.RequestException:
+        opensuse_aliases = opensuse_distro_aliases.CACHED_ACTIVE_DISTRIBUTION_ALIASES
 
-
-def get_build_targets(*name: str, default: str = DEFAULT_VERSION) -> set[str]:
-    """
-    Expand the aliases to the name(s) and transfer to the build targets.
-
-    :param name: name(s) of the system and version (e.g. "fedora-30" or "fedora-stable")
-            or target name (e.g. "fedora-30-x86_64" or "fedora-stable-x86_64")
-    :param default: used if no positional argument was given
-    :return: set of build targets
-    """
-    if not (default or name):
-        return set()
-
-    names = list(name) or [default]
-    possible_sys_and_versions: set[str] = set()
-    for one_name in names:
-        name_split = one_name.rsplit("-", maxsplit=3)
-        l_name_split = len(name_split)
-
-        if l_name_split < 2:  # only one part
-            # => cannot guess anything other than rawhide
-            if "rawhide" in one_name:
-                sys_name, version, architecture = "fedora", "rawhide", "x86_64"
-
-            else:
-                err_msg = (
-                    f"Cannot get build target from '{one_name}'"
-                    f", packit understands values like these: '{list(get_aliases().keys())}'."
-                )
-                raise PackitException(err_msg.format(one_name=one_name))
-
-        elif l_name_split == 2:  # "name-version"
-            sys_name, version = name_split
-            architecture = "x86_64"  # use the x86_64 as a default
-
-        else:  # "name-version-architecture"
-            sys_name, architecture = name_split[0], name_split[-1]
-            version = "-".join(name_split[1:-1])
-            if architecture not in ARCHITECTURE_LIST:
-                # we don't know the architecture => probably wrongly parsed
-                # (e.g. "opensuse-leap-15.0")
-                sys_name, version, architecture = (
-                    f"{sys_name}-{version}",
-                    architecture,
-                    "x86_64",
-                )
-
-        possible_sys_and_versions.update(
-            {
-                f"{sys_and_version}-{architecture}"
-                for sys_and_version in get_versions(f"{sys_name}-{version}")
-            },
-        )
     return {
-        DEPRECATED_TARGET_MAP.get(target, target)
-        for target in possible_sys_and_versions
+        alias: {
+            Distro(d.namever, d.branch if hasattr(d, "branch") else d.namever)
+            for d in distros
+        }
+        for alias, distros in chain(distro_aliases.items(), opensuse_aliases.items())
     }
 
 
+def expand_aliases(
+    *targets: str,
+    default: Optional[str] = DEFAULT_VERSION,
+) -> set[Union[Distro, str]]:
+    """
+    Expands aliases in the given list of targets. Also converts
+    known distro names and dist-git branch names to `Distro` tuples.
+
+    Args:
+        targets: List of targets, e.g. fedora-stable or epel-9.
+        default: Default to use if no target was specified.
+
+    Returns:
+        Set of `Distro` objects or `$name-$version` strings.
+    """
+    aliases = get_aliases()
+    result: set[Union[Distro, str]] = set()
+    for target in list(targets) or ([default] if default else []):
+        if target in aliases:
+            # expand alias
+            result.update(aliases[target])
+        else:
+            result.update(
+                # try to convert target to Distro
+                [
+                    distro
+                    for distro in chain(aliases["fedora-all"], aliases["epel-all"])
+                    if target in distro
+                ]
+                # use the original string
+                or [target],
+            )
+    return result
+
+
 def get_branches(
-    *name: str,
-    default: str = DEFAULT_VERSION,
+    *targets: str,
+    default: Optional[str] = DEFAULT_VERSION,
     default_dg_branch: str = "main",
     with_aliases: bool = False,
 ) -> set[str]:
     """
-    Expand the aliases to the name(s) and transfer to the dist-git branch name.
+    Transforms targets into dist-git branch names.
 
     Args:
-        name: Name(s) of the system and version (e.g. "fedora-stable"
-            or "fedora-30") or branch name (e.g. "f30" or "epel8").
-        default: Used if no positional argument was given.
-        default_dg_branch: Default branch of dist-git repository.
-        with_aliases: If set to `True`, returns branches including aliases.
-            Can be used for reacting to webhooks where push can be done against
-            either the branch itself or its alias.
-
+        targets: List of targets, e.g. fedora-stable or epel-9.
+        default: Default to use if no target was specified.
+        default_dg_branch: Default branch of the dist-git repo.
+        with_aliases: Whether to include branch aliases, e.g. rawhide for main.
             Defaults to `False`.
 
     Returns:
         Set of dist-git branch names.
     """
-    if not (default or name):
-        return set()
 
-    names = list(name) or [default]
-    branches = set()
+    def branch_name(x):
+        if isinstance(x, Distro):
+            if x.branch == "rawhide":
+                # use default branch instead of rawhide
+                return default_dg_branch
+            return x.branch
+        return x
 
-    for sys_and_version in get_versions(*names):
-        if "rawhide" in sys_and_version:
-            branches.add(default_dg_branch)
-            if with_aliases:
-                branches.add("rawhide")
-        elif sys_and_version.startswith("fedora"):
-            sys, version = sys_and_version.rsplit("-", maxsplit=1)
-            branches.add(f"f{version}")
-        elif sys_and_version.startswith("epel"):
-            split = sys_and_version.rsplit("-", maxsplit=1)
-            if len(split) < 2:
-                branches.add(sys_and_version)
-                continue
-            sys, version = sys_and_version.rsplit("-", maxsplit=1)
-            if version.isnumeric() and int(version) <= 6:
-                branches.add(f"el{version}")
-            else:
-                branches.add(f"epel{version}")
-        else:
-            # We don't know, let's leave the original name.
-            branches.add(sys_and_version)
-
+    branches = {branch_name(x) for x in expand_aliases(*targets, default=default)}
+    if with_aliases and default_dg_branch in branches:
+        branches.add("rawhide")
     return branches
+
+
+def get_koji_targets(
+    *targets: str,
+    default: Optional[str] = DEFAULT_VERSION,
+) -> set[str]:
+    """
+    Transforms targets into Koji target names.
+
+    Args:
+        targets: List of targets, e.g. fedora-stable or epel-9.
+        default: Default to use if no target was specified.
+
+    Returns:
+        Set of Koji target names.
+    """
+
+    def koji_target_name(x):
+        if isinstance(x, Distro):
+            # Koji targets are equal to branch names except for EPEL <= 6
+            if x.branch.startswith("el"):
+                return x.namever.replace("-", "")
+            return x.branch
+        return x
+
+    return {koji_target_name(x) for x in expand_aliases(*targets, default=default)}
+
+
+def get_build_targets(
+    *targets: str,
+    default: Optional[str] = DEFAULT_VERSION,
+) -> set[str]:
+    """
+    Transforms targets into mock/Copr chroot names.
+
+    Args:
+        targets: List of targets, e.g. fedora-stable or epel-9.
+        default: Default to use if no target was specified.
+
+    Returns:
+        Set of mock/Copr chroot names.
+    """
+
+    def chroot_name(x):
+        if isinstance(x, Distro):
+            if x.namever.startswith("epel-10."):
+                # TODO: change this accordingly once mock/Copr chroot names
+                #       for minor EPEL versions are known
+                return "epel-10"
+            return x.namever
+        return x
+
+    chroots: set[str] = set()
+    for target in list(targets) or ([default] if default else []):
+        if target.endswith(tuple(f"-{arch}" for arch in ARCHITECTURE_LIST)):
+            namever, arch = target.rsplit("-", maxsplit=1)
+        else:
+            namever, arch = target, "x86_64"
+        chroots.update(
+            chroot_name(x) + f"-{arch}"
+            for x in expand_aliases(namever, default=default)
+        )
+    return {DEPRECATED_TARGET_MAP.get(t, t) for t in chroots}
 
 
 def get_fast_forward_merge_branches_for(
     dist_git_branches: Union[list, dict, set, None],
     source_branch: str,
-    default: str = DEFAULT_VERSION,
+    default: Optional[str] = DEFAULT_VERSION,
     default_dg_branch: str = "main",
     with_aliases: bool = False,
 ) -> set[str]:
@@ -224,69 +263,5 @@ def get_fast_forward_merge_branches_for(
     return set()
 
 
-def get_koji_targets(*name: str, default=DEFAULT_VERSION) -> set[str]:
-    if not (default or name):
-        return set()
-
-    names = list(name) or [default]
-    targets = set()
-
-    for sys_and_version in get_versions(*names):
-        if sys_and_version == "fedora-rawhide":
-            targets.add("rawhide")
-        elif sys_and_version.startswith("fedora"):
-            _, version = sys_and_version.rsplit("-", maxsplit=1)
-            targets.add(f"f{version}")
-        elif sys_and_version.startswith("el") and sys_and_version[2:].isnumeric():
-            targets.add(f"epel{sys_and_version[2:]}")
-        elif sys_and_version.startswith("epel"):
-            split = sys_and_version.rsplit("-", maxsplit=1)
-            if len(split) == 2:
-                _, version = split
-                if version.isnumeric():
-                    targets.add(f"epel{version}")
-                    continue
-            targets.add(sys_and_version)
-        else:
-            # We don't know, let's leave the original name.
-            targets.add(sys_and_version)
-
-    return targets
-
-
 def get_all_koji_targets() -> list[str]:
     return run_command(["koji", "list-targets", "--quiet"], output=True).stdout.split()
-
-
-@ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
-def get_aliases() -> dict[str, list[str]]:
-    """
-    A wrapper around `fedora_distro_aliases.get_distro_aliases()` and
-    `opensuse_distro_aliases.get_distro_aliases()`.
-
-    Returns:
-        Dictionary containing aliases, the key is the distribution group and the
-        values is a list of `$name-$version` for the distros belonging to this
-        group.
-
-    Raises:
-        `PackitException` if aliases cache is not available.
-    """
-    try:
-        # fedora-distro-aliases caches each successful response from Bodhi
-        # in ~/.cache/fedora-distro-aliases/cache.json and this cache is used
-        # instead of live data in case Bodhi is not accessible
-        distro_aliases = get_distro_aliases(cache=True)
-
-    except BadCache as ex:
-        raise PackitException(f"Aliases cache unavailable: {ex}") from ex
-
-    try:
-        opensuse_aliases = opensuse_distro_aliases.get_distro_aliases()
-    except requests.RequestException:
-        opensuse_aliases = opensuse_distro_aliases.CACHED_ACTIVE_DISTRIBUTION_ALIASES
-
-    return {
-        alias: [d.namever for d in distros]
-        for alias, distros in chain(distro_aliases.items(), opensuse_aliases.items())
-    }

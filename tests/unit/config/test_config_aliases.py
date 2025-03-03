@@ -9,21 +9,21 @@ from flexmock import flexmock
 import packit
 from packit.config import CommonPackageConfig, aliases
 from packit.config.aliases import (
+    expand_aliases,
     get_aliases,
     get_all_koji_targets,
     get_branches,
     get_build_targets,
     get_fast_forward_merge_branches_for,
     get_koji_targets,
-    get_versions,
+    opensuse_distro_aliases,
 )
 from packit.copr_helper import CoprHelper
-from packit.exceptions import PackitException
 from tests.spellbook import ALL_KOJI_TARGETS_SNAPSHOT
 
 
 @pytest.mark.usefixtures("mock_get_aliases")
-class TestGetVersions:
+class TestExpandAliases:
     @pytest.mark.parametrize(
         "name,versions",
         [
@@ -34,12 +34,24 @@ class TestGetVersions:
             ("opensuse-leap-15.0", {"opensuse-leap-15.0"}),
             ("fedora-stable", {"fedora-31", "fedora-32"}),
             ("fedora-development", {"fedora-33", "fedora-rawhide"}),
-            ("fedora-all", {"fedora-31", "fedora-32", "fedora-33", "fedora-rawhide"}),
+            (
+                "fedora-all",
+                {
+                    "fedora-29",
+                    "fedora-30",
+                    "fedora-31",
+                    "fedora-32",
+                    "fedora-33",
+                    "fedora-rawhide",
+                },
+            ),
             ("centos-stream-8", {"centos-stream-8"}),
         ],
     )
-    def test_get_versions(self, name, versions, mock_get_aliases):
-        assert get_versions(name) == versions
+    def test_expand_aliases(self, name, versions, mock_get_aliases):
+        assert {
+            v.namever if hasattr(v, "namever") else v for v in expand_aliases(name)
+        } == versions
 
     @pytest.mark.parametrize(
         "names,versions",
@@ -52,11 +64,13 @@ class TestGetVersions:
             ([], {"fedora-31", "fedora-32"}),
         ],
     )
-    def test_get_versions_from_multiple_values(self, names, versions):
-        assert get_versions(*names) == versions
+    def test_expand_aliases_from_multiple_values(self, names, versions):
+        assert {
+            v.namever if hasattr(v, "namever") else v for v in expand_aliases(*names)
+        } == versions
 
-    def test_get_versions_empty_without_default(self):
-        assert get_versions(default=None) == set()
+    def test_expand_aliases_empty_without_default(self):
+        assert expand_aliases(default=None) == set()
 
 
 @pytest.mark.usefixtures("mock_get_aliases")
@@ -90,6 +104,8 @@ class TestGetBuildTargets:
             (
                 "fedora-all",
                 {
+                    "fedora-29-x86_64",
+                    "fedora-30-x86_64",
                     "fedora-31-x86_64",
                     "fedora-32-x86_64",
                     "fedora-33-x86_64",
@@ -120,16 +136,6 @@ class TestGetBuildTargets:
     def test_get_build_targets(self, name, targets, mock_get_aliases):
         assert get_build_targets(name) == targets
 
-    def test_get_build_targets_invalid_input(self):
-        name = "rafhajd"
-        with pytest.raises(PackitException) as ex:
-            get_build_targets(name)
-        err_msg = (
-            f"Cannot get build target from '{name}'"
-            f", packit understands values like these: "
-        )
-        assert err_msg in str(ex.value)
-
     def test_get_build_targets_without_default(self):
         assert get_build_targets(default="") == set()
 
@@ -150,6 +156,7 @@ class TestGetBuildTargets:
         assert get_build_targets(*names) == versions
 
 
+@pytest.mark.usefixtures("mock_get_aliases")
 class TestGetBranches:
     @pytest.mark.parametrize(
         "name,default_dg_branch,branches",
@@ -172,12 +179,12 @@ class TestGetBranches:
             ("epel7", None, {"epel7"}),
             ("el6", None, {"el6"}),
             ("epel-6", None, {"el6"}),
-            ("fedora-all", None, {"f31", "f32", "f33", "main"}),
-            ("fedora-all", "main", {"f31", "f32", "f33", "main"}),
-            ("fedora-all", "master", {"f31", "f32", "f33", "master"}),
+            ("fedora-all", None, {"f29", "f30", "f31", "f32", "f33", "main"}),
+            ("fedora-all", "main", {"f29", "f30", "f31", "f32", "f33", "main"}),
+            ("fedora-all", "master", {"f29", "f30", "f31", "f32", "f33", "master"}),
         ],
     )
-    def test_get_branches(self, name, default_dg_branch, branches, mock_get_aliases):
+    def test_get_branches(self, name, default_dg_branch, branches):
         if default_dg_branch:
             assert get_branches(name, default_dg_branch=default_dg_branch) == branches
         else:
@@ -191,9 +198,6 @@ class TestGetBranches:
         ],
     )
     def test_get_branches_from_multiple_values(self, names, versions):
-        flexmock(packit.config.aliases).should_receive("get_versions").and_return(
-            versions,
-        )
         assert get_branches(*names) == versions
 
     @pytest.mark.parametrize(
@@ -204,14 +208,11 @@ class TestGetBranches:
                     "fedora-30": {"fast_forward_merge_into": ["f31"]},
                     "fedora-stable": {},
                 },
-                {"f30", "f32"},
+                {"f30", "f31", "f32"},
             ),
         ],
     )
     def test_get_branches_from_multiple_values_in_dict(self, names, versions):
-        flexmock(packit.config.aliases).should_receive("get_versions").and_return(
-            versions,
-        )
         assert get_branches(*names) == versions
 
     def test_get_branches_without_default(self):
@@ -223,25 +224,25 @@ class TestGetBranches:
             (
                 CommonPackageConfig(
                     dist_git_branches={
-                        "rawhide": {"fast_forward_merge_into": ["f33"]},
-                        "f35": {},
-                        "f34": {},
+                        "rawhide": {"fast_forward_merge_into": ["f30"]},
+                        "f31": {},
+                        "f32": {},
                     },
                 ),
-                {"main", "f35", "f34"},
-                {"rawhide": {"f33"}, "main": {"f33"}, "f35": set(), "f34": set()},
+                {"main", "f31", "f32"},
+                {"rawhide": {"f30"}, "main": {"f30"}, "f31": set(), "f32": set()},
             ),
             (
                 CommonPackageConfig(
                     # no sense but possible!
                     dist_git_branches={
-                        "fedora-branched": {
+                        "fedora-stable": {
                             "fast_forward_merge_into": ["fedora-stable"],
                         },
                     },
                 ),
-                {"f39", "f40"},
-                {"f39": {"f39", "f40"}, "f40": {"f39", "f40"}},
+                {"f31", "f32"},
+                {"f31": {"f31", "f32"}, "f32": {"f31", "f32"}},
             ),
         ],
     )
@@ -251,19 +252,6 @@ class TestGetBranches:
         branches,
         ff_branches,
     ):
-        mock_aliases_module = flexmock(packit.config.aliases)
-        mock_aliases_module.should_receive("get_aliases").and_return(
-            {
-                "fedora-all": ["fedora-39", "fedora-40", "fedora-rawhide"],
-                "fedora-stable": ["fedora-39", "fedora-40"],
-                "fedora-development": ["fedora-rawhide"],
-                "fedora-latest": ["fedora-40"],
-                "fedora-latest-stable": ["fedora-40"],
-                "fedora-branched": ["fedora-39", "fedora-40"],
-                "epel-all": ["epel-8", "epel-9"],
-            },
-        )
-
         assert branches == get_branches(*config.dist_git_branches)
         for source_branch in get_branches(*config.dist_git_branches, with_aliases=True):
             assert (
@@ -275,6 +263,7 @@ class TestGetBranches:
             )
 
 
+@pytest.mark.usefixtures("mock_get_aliases")
 class TestGetKojiTargets:
     @pytest.mark.parametrize("target", ALL_KOJI_TARGETS_SNAPSHOT)
     def test_preserve_koji_targets_single(self, target):
@@ -299,8 +288,8 @@ class TestGetKojiTargets:
             ("epel7", {"epel7"}),
             ("el6", {"epel6"}),
             ("epel-6", {"epel6"}),
-            ("fedora-all", {"f31", "f32", "f33", "rawhide"}),
-            ("epel-all", {"epel6", "epel7", "epel8"}),
+            ("fedora-all", {"f29", "f30", "f31", "f32", "f33", "rawhide"}),
+            ("epel-all", {"epel6", "epel7", "epel8", "epel9", "epel10.0", "epel10"}),
         ],
     )
     def test_get_koji_targets(self, name, targets, mock_get_aliases):
@@ -445,29 +434,36 @@ class TestGetAliases:
         flexmock(aliases).should_receive("get_distro_aliases").and_return(
             distro_aliases,
         )
+        flexmock(opensuse_distro_aliases).should_receive(
+            "get_distro_aliases",
+        ).and_return({})
 
         get_aliases.cache_clear()
         aliases_result = get_aliases()
 
-        assert Counter(aliases_result["fedora-stable"]) == Counter(
+        assert Counter(d.namever for d in aliases_result["fedora-stable"]) == Counter(
             expected_return["fedora-stable"],
         )
-        assert Counter(aliases_result["fedora-development"]) == Counter(
+        assert Counter(
+            d.namever for d in aliases_result["fedora-development"]
+        ) == Counter(
             expected_return["fedora-development"],
         )
-        assert Counter(aliases_result["fedora-all"]) == Counter(
+        assert Counter(d.namever for d in aliases_result["fedora-all"]) == Counter(
             expected_return["fedora-all"],
         )
-        assert Counter(aliases_result["fedora-latest"]) == Counter(
+        assert Counter(d.namever for d in aliases_result["fedora-latest"]) == Counter(
             expected_return["fedora-latest"],
         )
-        assert Counter(aliases_result["fedora-latest-stable"]) == Counter(
+        assert Counter(
+            d.namever for d in aliases_result["fedora-latest-stable"]
+        ) == Counter(
             expected_return["fedora-latest-stable"],
         )
-        assert Counter(aliases_result["fedora-branched"]) == Counter(
+        assert Counter(d.namever for d in aliases_result["fedora-branched"]) == Counter(
             expected_return["fedora-branched"],
         )
-        assert Counter(aliases_result["epel-all"]) == Counter(
+        assert Counter(d.namever for d in aliases_result["epel-all"]) == Counter(
             expected_return["epel-all"],
         )
 

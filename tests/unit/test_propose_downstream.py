@@ -269,6 +269,7 @@ from packit.config import (
         ),
     ],
 )
+@pytest.mark.usefixtures("mock_get_aliases")
 def test_get_dist_git_branches(package_config, cmdline, expected):
     api = flexmock(PackitAPI)
     api.package_config = package_config
