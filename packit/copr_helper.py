@@ -101,7 +101,6 @@ class CoprHelper:
         build_targets = aliases.get_build_targets(*name, default=default)
         logger.info(f"Build targets: {build_targets} ")
         copr_chroots = self.get_available_chroots()
-        logger.info(f"Copr chroots: {copr_chroots} ")
         logger.info(f"Result set: {set(build_targets) & set(copr_chroots)}")
         return set(build_targets) & set(copr_chroots)
 
