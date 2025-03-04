@@ -8,6 +8,7 @@
       - python3-deprecated
       - python3-gitlab
       - python3-pygithub
+      - python3-pyforgejo
       - python3-distro
     state: present
   become: true
