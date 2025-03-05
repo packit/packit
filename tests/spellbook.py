@@ -17,6 +17,7 @@ from packit.config import Config
 from packit.patches import PatchMetadata
 from packit.utils.commands import cwd, run_command
 from packit.utils.repo import create_new_repo
+from packit.utils.versions import compare_versions
 
 TESTS_DIR = Path(__file__).parent
 DATA_DIR = TESTS_DIR / "data"
@@ -735,3 +736,13 @@ def run_packit(*args, working_dir=None, **kwargs):
     with cwd(working_dir):
         cli_runner = CliRunner()
         cli_runner.invoke(packit_base, *args, catch_exceptions=False, **kwargs)
+
+
+def is_suitable_pyforgejo_rpm_installed() -> bool:
+    try:
+        version = subprocess.check_output(
+            ["rpm", "-q", "--qf=%{VERSION}", "python3-pyforgejo"],
+        ).decode()
+    except subprocess.CalledProcessError:
+        return False
+    return compare_versions(version, "2.0.0") >= 0
