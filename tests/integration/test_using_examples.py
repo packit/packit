@@ -17,6 +17,7 @@ from tests.spellbook import (
     build_srpm,
     get_test_config,
     initiate_git_repo,
+    is_suitable_pyforgejo_rpm_installed,
 )
 
 
@@ -24,7 +25,13 @@ from tests.spellbook import (
     params=[
         (UP_EDD, "0.3", "https://github.com/psss/edd"),
         (UP_VSFTPD, "3.0.3", "https://github.com/olysonek/vsftpd"),
-        (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
+        pytest.param(
+            (DG_OGR, None, "https://src.fedoraproject.org/rpms/python-ogr"),
+            marks=pytest.mark.xfail(
+                not is_suitable_pyforgejo_rpm_installed(),
+                reason="ogr (S)RPM build requires python3-pyforgejo >= 2.0.0",
+            ),
+        ),
     ],
     ids=["edd", "vsftpd", "ogr"],
 )

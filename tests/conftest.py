@@ -21,6 +21,7 @@ from tests.spellbook import (
     UPSTREAM_WEIRD_SOURCES,
     UPSTREAM_WITH_MUTLIPLE_SOURCES,
     initiate_git_repo,
+    is_suitable_pyforgejo_rpm_installed,
     prepare_dist_git_repo,
 )
 
@@ -106,7 +107,17 @@ def distgit_with_autochangelog_and_remote(tmp_path) -> tuple[Path, Path]:
     return d, d_remote_path
 
 
-@pytest.fixture()
+@pytest.fixture(
+    params=[
+        pytest.param(
+            "",
+            marks=pytest.mark.xfail(
+                not is_suitable_pyforgejo_rpm_installed(),
+                reason="ogr (S)RPM build requires python3-pyforgejo >= 2.0.0",
+            ),
+        ),
+    ],
+)
 def ogr_distgit_and_remote(tmp_path) -> tuple[Path, Path]:
     d_remote_path = tmp_path / "ogr_dist_git_remote"
     d_remote_path.mkdir(parents=True, exist_ok=True)
