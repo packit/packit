@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 @ttl_cache(maxsize=1, ttl=timedelta(hours=12).seconds)
-def get_aliases() -> dict[str, set[Distro]]:
+def get_aliases() -> dict[str, list[Distro]]:
     """
     A wrapper around `fedora_distro_aliases.get_distro_aliases()`
     and `opensuse_distro_aliases.get_distro_aliases()`.
@@ -66,10 +66,10 @@ def get_aliases() -> dict[str, set[Distro]]:
         opensuse_aliases = opensuse_distro_aliases.CACHED_ACTIVE_DISTRIBUTION_ALIASES
 
     return {
-        alias: {
+        alias: [
             Distro(d.namever, d.branch if hasattr(d, "branch") else d.namever)
             for d in distros
-        }
+        ]
         for alias, distros in chain(distro_aliases.items(), opensuse_aliases.items())
     }
 
