@@ -1,3 +1,6 @@
+# 1.3.0
+
+
 # 1.2.0
 
 - Packit reloads spec file after `create-archive` to keep user changes. (#2533)
