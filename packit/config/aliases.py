@@ -8,7 +8,6 @@ from itertools import chain
 from typing import Optional, Union
 
 import opensuse_distro_aliases
-import requests
 from cachetools.func import ttl_cache
 from fedora_distro_aliases import get_distro_aliases
 from fedora_distro_aliases.cache import BadCache
@@ -62,7 +61,11 @@ def get_aliases() -> dict[str, list[Distro]]:
 
     try:
         opensuse_aliases = opensuse_distro_aliases.get_distro_aliases()
-    except requests.RequestException:
+    except Exception as e:
+        logger.error(
+            "Using cached openSUSE distro aliases, "
+            f"`opensuse_distro_aliases.get_distro_aliases()` failed: {e}",
+        )
         opensuse_aliases = opensuse_distro_aliases.CACHED_ACTIVE_DISTRIBUTION_ALIASES
 
     return {
