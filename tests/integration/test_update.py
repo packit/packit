@@ -76,11 +76,23 @@ def test_fast_forward_merge_local_update(
     mock_spec_download_remote_s(d)
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
     flexmock(Specfile).should_call("reload").at_least().once()
+    flexmock(api.dg).should_call("create_pull").with_args(
+        str,
+        str,
+        source_branch="main-update",
+        target_branch="main",
+    ).once()
+    flexmock(api.dg).should_call("create_pull").with_args(
+        str,
+        str,
+        source_branch="main-update",
+        target_branch="f30",
+    ).once()
 
     api.sync_release(
         dist_git_branch="main",
         versions=["0.1.0"],
-        fast_forward_merge_branches={"f40"},
+        fast_forward_merge_branches={"f30"},
     )
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")

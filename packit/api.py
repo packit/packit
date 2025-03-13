@@ -1235,6 +1235,40 @@ The first dist-git commit to be synced is '{short_hash}'.
 
                 if fast_forward_merge_branches:
                     for ff_branch in fast_forward_merge_branches:
+                        logger.info(
+                            f"Syncing branch {ff_branch} defined in `fast_forward_merge_into`",
+                        )
+                        self.dg.refresh_specfile()
+                        self.dg.create_branch(
+                            ff_branch,
+                            base=f"remotes/origin/{ff_branch}",
+                            setup_tracking=True,
+                        )
+                        self.dg.update_branch(ff_branch)
+                        self.dg.switch_branch(ff_branch, force=True)
+
+                        try:
+                            spec_ver = self.dg.get_specfile_version()
+                        except FileNotFoundError:
+                            continue
+
+                        self.dg.switch_branch(local_pr_branch, force=True)
+
+                        if not self.check_version_distance(
+                            version,
+                            spec_ver,
+                            ff_branch,
+                        ):
+                            logger.info(
+                                f"The upstream released version {version} does not match "
+                                f"specfile version {spec_ver} at branch {ff_branch} "
+                                f"using the version_update_mask "
+                                f'"{self.package_config.version_update_mask}".'
+                                "\nYou can change the version_update_mask with an empty string "
+                                "to skip this check.",
+                            )
+                            continue
+
                         pr_title = (
                             title or f"Update {ff_branch} to upstream release {version}"
                         )
@@ -1248,6 +1282,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                             self._warn_about_koji_build_triggering_bug_if_needed(
                                 ff_branch_pr,
                             )
+
                 if warn_about_koji_build_triggering_bug:
                     self._warn_about_koji_build_triggering_bug_if_needed(pr)
             else:
