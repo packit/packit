@@ -58,7 +58,6 @@ jobs:
     targets:
       - fedora-all
       - fedora-all-aarch64
-      - epel-9
     packages:
       - packit
 
@@ -66,7 +65,6 @@ jobs:
     trigger: pull_request
     targets:
       - fedora-all
-      - epel-9
     packages:
       - packit
 
@@ -76,7 +74,6 @@ jobs:
     targets:
       - fedora-all
       - fedora-all-aarch64
-      - epel-9
     project: packit-dev
     list_on_homepage: True
     preserve_project: True
@@ -85,9 +82,8 @@ jobs:
     trigger: commit
     branch: stable
     targets:
-      - fedora-stable
-      - fedora-stable-aarch64
-      - epel-9
+      - fedora-latest-stable
+      - fedora-latest-stable-aarch64
     project: packit-stable
     list_on_homepage: True
     preserve_project: True
@@ -97,7 +93,6 @@ jobs:
     targets:
       - fedora-stable
       - fedora-stable-aarch64
-      - epel-9
     project: packit-releases
     list_on_homepage: True
     preserve_project: True
@@ -108,7 +103,6 @@ jobs:
     dist_git_branches:
       rawhide:
         fast_forward_merge_into: [fedora-branched]
-      epel-9: {}
 
   - job: koji_build
     trigger: commit | koji_build
@@ -120,7 +114,6 @@ jobs:
       - python-specfile
     dist_git_branches:
       - fedora-all
-      - epel-9
 
   - job: bodhi_update
     trigger: koji_build
@@ -132,7 +125,6 @@ jobs:
       - python-specfile
     dist_git_branches:
       - fedora-all
-      - epel-9
 #  - job: vm_image_build
 #    trigger: pull_request
 #    packit_instances: ["stg"]
