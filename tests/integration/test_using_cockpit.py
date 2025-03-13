@@ -117,12 +117,15 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
     flexmock(api.up, get_specfile_version=lambda: "178")
 
     with cwd(upstream_path):
-        assert pr == api.sync_release(
-            dist_git_branch="main",
-            use_local_content=False,
-            versions=["179"],
-            force_new_sources=False,
-            create_pr=True,
+        assert (
+            pr
+            == api.sync_release(
+                dist_git_branch="main",
+                use_local_content=False,
+                versions=["179"],
+                force_new_sources=False,
+                create_pr=True,
+            )[0]
         )
 
 

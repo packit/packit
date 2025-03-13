@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 from flexmock import flexmock
+from ogr.abstract import PullRequest
 from specfile import Specfile
 
 from packit.actions import ActionName
@@ -89,11 +90,14 @@ def test_fast_forward_merge_local_update(
         target_branch="f30",
     ).once()
 
-    api.sync_release(
+    _, additional_prs = api.sync_release(
         dist_git_branch="main",
         versions=["0.1.0"],
         fast_forward_merge_branches={"f30"},
     )
+    assert list(additional_prs.keys()) == ["f30"]
+    assert isinstance(additional_prs["f30"], PullRequest)
+
     assert (d / TARBALL_NAME).is_file()
     spec = Specfile(d / "beer.spec")
     assert spec.expanded_version == "0.1.0"
