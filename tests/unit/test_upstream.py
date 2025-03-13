@@ -121,6 +121,7 @@ def test_get_current_version(action_output, version, expected_result, upstream_m
     flexmock(ActionsHandler).should_receive("get_output_from_action").and_return(
         action_output,
     )
+    upstream_mock._specfile = flexmock().should_receive("reload").once().mock()
     upstream_mock.should_receive("get_last_tag").and_return("_mocked")
     upstream_mock.should_receive("get_version_from_tag").and_return(version)
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
@@ -616,7 +617,7 @@ def test_fix_spec(
         expanded_release=original_release_number_from_spec,
         raw_release=f"{original_release_number_from_spec}{disttag}",
     )
-    upstream_mock._specfile.should_receive("reload").once()
+    upstream_mock._specfile.should_receive("reload").at_least().once()
 
     if update_release:
         upstream_mock._specfile.should_receive("add_changelog_entry")

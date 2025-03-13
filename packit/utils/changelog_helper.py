@@ -82,6 +82,12 @@ class ChangelogHelper:
             ActionName.changelog_entry,
             env=env,
         )
+
+        # reload spec files as they could have been changed by the action
+        self.up.specfile.reload()
+        if self.dg:
+            self.dg.specfile.reload()
+
         if not messages:
             return None
 
