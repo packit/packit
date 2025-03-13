@@ -916,7 +916,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
-    ) -> PullRequest:
+    ) -> tuple[PullRequest, dict[str, PullRequest]]:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
     @overload
@@ -971,7 +971,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
-    ) -> Optional[PullRequest]:
+    ) -> Optional[tuple[PullRequest, dict[str, PullRequest]]]:
         """
         Update given package in dist-git
 
@@ -1009,7 +1009,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                 fast-forward-merged into.
 
         Returns:
-            The created (or existing if one already exists) PullRequest if
+            Tuple of the created (or existing if one already exists) PullRequest and
+             dictionary of branches from fast_forward_merge_branches as keys and
+             PullRequest objects as values if
             create_pr is True, else None.
 
         Raises:
@@ -1211,6 +1213,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
 
             pr = None
+            ff_prs = {}
+
             if create_pr:
                 pr_description = self.get_pr_description(
                     upstream_tag=upstream_tag,
@@ -1278,6 +1282,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                             target_branch=ff_branch,
                             repo=self.dg,
                         )
+                        ff_prs[ff_branch] = ff_branch_pr
                         if warn_about_koji_build_triggering_bug:
                             self._warn_about_koji_build_triggering_bug_if_needed(
                                 ff_branch_pr,
@@ -1301,7 +1306,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.dg.local_project.git_repo.git.clean("-xdf")
             self.up.clean_working_dir()
 
-        return pr
+        return pr, ff_prs if create_pr else None
 
     def get_default_commit_description(
         self,
