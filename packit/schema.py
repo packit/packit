@@ -511,6 +511,8 @@ class CommonConfigSchema(Schema):
 
     csmock_args = fields.String(missing=None)
 
+    use_target_repo_for_fmf_url = fields.Boolean(missing=False)
+
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id

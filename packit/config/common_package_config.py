@@ -172,6 +172,9 @@ class CommonPackageConfig:
         osh_diff_scan_after_copr_build: Whether to run a differential scan in
             OpenScanHub after successful Copr build.
         csmock_args: Pass additional arguments to csmock
+        use_target_repo_for_fmf_url: If the target repo should be used for test.fmf.url
+            field in a Testing Farm request (useful for PRs coming from a fork,
+            where, by default, the fork repo is used).
     """
 
     def __init__(
@@ -256,6 +259,7 @@ class CommonPackageConfig:
         sig: Optional[str] = None,
         osh_diff_scan_after_copr_build: Optional[bool] = True,
         csmock_args: Optional[str] = None,
+        use_target_repo_for_fmf_url: Optional[bool] = False,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -374,6 +378,8 @@ class CommonPackageConfig:
         self.osh_diff_scan_after_copr_build = osh_diff_scan_after_copr_build
 
         self.csmock_args = csmock_args
+
+        self.use_target_repo_for_fmf_url = use_target_repo_for_fmf_url
 
     @property
     def dist_git_base_url(self) -> str:
