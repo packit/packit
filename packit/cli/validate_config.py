@@ -28,12 +28,13 @@ logger = logging.getLogger(__name__)
     help="Do not make remote API calls requiring network access.",
 )
 @click.option(
-    "-c", "--config",
-    type=click.Path(exists=True),  
+    "-c",
+    "--config",
+    type=click.Path(exists=True),
     help="Path to a specific Packit configuration file.",
 )
 @cover_packit_exception
-def validate_config(path_or_url: LocalProject, offline: bool,config: str):
+def validate_config(path_or_url: LocalProject, offline: bool, config: str):
     """
     Validate PackageConfig.
 
@@ -45,10 +46,9 @@ def validate_config(path_or_url: LocalProject, offline: bool,config: str):
     PATH_OR_URL argument is a local path or a URL to a git repository with packit configuration file
     """
 
-    
     logger.info(config)
     output = PackitAPI.validate_package_config(path_or_url.working_dir, offline)
     logger.info(output)
-    
+
     # logger.info(path_or_url)
     # TODO: print more if config.debug
