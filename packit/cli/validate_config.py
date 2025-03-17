@@ -75,5 +75,3 @@ def validate_config(path_or_url: LocalProject, offline: bool, config: str = None
     logger.info(output)
 
     # TODO: print more if config.debug
-validate_config.py
-3 KB
