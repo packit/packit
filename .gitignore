@@ -28,3 +28,4 @@ ENV/
 *.tar.gz
 
 .coverage*
+node_modules/
