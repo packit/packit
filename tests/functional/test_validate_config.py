@@ -2,11 +2,14 @@
 # SPDX-License-Identifier: MIT
 
 """
-Functional tests the validate-config command
+Functional tests for the validate-config command.
 """
 
+import logging
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
 import yaml
 from click.testing import CliRunner
 
@@ -20,12 +23,6 @@ def test_srpm_command_for_path(upstream_or_distgit_path, tmp_path):
         call_real_packit_and_return_exit_code(
             parameters=["--debug", "validate-config", str(upstream_or_distgit_path)],
         )
-
-
-import logging
-from pathlib import Path
-
-import pytest
 
 
 @pytest.fixture
@@ -55,6 +52,7 @@ def test_valid_config_option(tmp_path, dummy_local_project, caplog):
         patch(
             "packit.cli.validate_config.PackageConfigValidator",
         ) as mock_validator_cls,
+        caplog.at_level(logging.INFO),
     ):
         mock_load.return_value = {
             "specfile_path": "valid.spec",
@@ -63,14 +61,14 @@ def test_valid_config_option(tmp_path, dummy_local_project, caplog):
         }
         instance = mock_validator_cls.return_value
         instance.validate.return_value = "Configuration is valid"
-        with caplog.at_level(logging.INFO):
-            result = runner.invoke(
-                validate_config,
-                [dummy_local_project.working_dir, "--config", str(config)],
-            )
-        assert result.exit_code == 0
-        assert f"Validating config file: {config}" in caplog.text
-        assert "Configuration is valid" in caplog.text
+        result = runner.invoke(
+            validate_config,
+            [dummy_local_project.working_dir, "--config", str(config)],
+        )
+
+    assert result.exit_code == 0
+    assert f"Validating config file: {config}" in caplog.text
+    assert "Configuration is valid" in caplog.text
 
 
 def test_missing_config_file(tmp_path, dummy_local_project, caplog):
@@ -85,11 +83,12 @@ def test_missing_config_file(tmp_path, dummy_local_project, caplog):
             return_value=dummy_local_project,
         ),
         patch(
-            "packit.cli.validate_config.find_packit_yaml", return_value=missing_config,
+            "packit.cli.validate_config.find_packit_yaml",
+            return_value=missing_config,
         ),
+        caplog.at_level(logging.ERROR),
     ):
-        with caplog.at_level(logging.ERROR):
-            result = runner.invoke(validate_config, [dummy_local_project.working_dir])
+        runner.invoke(validate_config, [dummy_local_project.working_dir])
     assert "Configuration file not found:" in caplog.text
     assert str(missing_config) in caplog.text
 
@@ -107,11 +106,13 @@ def test_yaml_syntax_error(tmp_path, dummy_local_project, caplog):
             return_value=dummy_local_project,
         ),
         patch("packit.cli.validate_config.load_packit_yaml") as mock_load,
+        caplog.at_level(logging.ERROR),
     ):
         mock_load.side_effect = yaml.YAMLError("Simulated YAML syntax error")
-        with caplog.at_level(logging.ERROR):
-            result = runner.invoke(
-                validate_config,
-                [dummy_local_project.working_dir, "--config", str(config)],
-            )
+
+        runner.invoke(
+            validate_config,
+            [dummy_local_project.working_dir, "--config", str(config)],
+        )
+
     assert "Failed to parse YAML file" in caplog.text

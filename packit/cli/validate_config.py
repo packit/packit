@@ -8,6 +8,7 @@ Validate PackageConfig
 import logging
 import os
 from pathlib import Path
+from typing import Optional
 
 import click
 import yaml
@@ -18,7 +19,6 @@ from packit.config import get_context_settings
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.local_project import LocalProject
-from packit.utils.logging import set_logging
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,12 @@ logger = logging.getLogger(__name__)
     help="Path to a specific Packit configuration file.",
 )
 @cover_packit_exception
-def validate_config(path_or_url: LocalProject, offline: bool, config: str = None, debug: bool = None):
+def validate_config(
+    path_or_url: LocalProject,
+    offline: bool,
+    config: Optional[str] = None,
+    debug: Optional[bool] = None,
+):
     """
     Validate PackageConfig.
 
@@ -47,7 +52,8 @@ def validate_config(path_or_url: LocalProject, offline: bool, config: str = None
     - checks incorrect types
     - checks whether monitoring is enabled if 'pull_from_upstream' is used
 
-    PATH_OR_URL argument is a local path or a URL to a git repository with a packit configuration file.
+    PATH_OR_URL argument is a local path or a URL
+    to a git repository with a packit configuration file.
     """
     config_path = (
         Path(config)
@@ -68,7 +74,10 @@ def validate_config(path_or_url: LocalProject, offline: bool, config: str = None
         return
 
     validator = PackageConfigValidator(
-        config_path, config_content, path_or_url.working_dir, offline
+        config_path,
+        config_content,
+        path_or_url.working_dir,
+        offline,
     )
 
     output = validator.validate()
