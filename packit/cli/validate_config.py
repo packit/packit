@@ -18,6 +18,7 @@ from packit.config import get_context_settings
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.local_project import LocalProject
+from packit.utils.logging import set_logging
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ logger = logging.getLogger(__name__)
     help="Path to a specific Packit configuration file.",
 )
 @cover_packit_exception
-def validate_config(path_or_url: LocalProject, offline: bool, config: str = None):
+def validate_config(path_or_url: LocalProject, offline: bool, config: str = None, debug: bool = None):
     """
     Validate PackageConfig.
 
@@ -48,40 +49,31 @@ def validate_config(path_or_url: LocalProject, offline: bool, config: str = None
 
     PATH_OR_URL argument is a local path or a URL to a git repository with a packit configuration file.
     """
+    config_path = (
+        Path(config)
+        if config
+        else find_packit_yaml(path_or_url.working_dir, try_local_dir_last=True)
+    )
+
+    if not config_path.exists():
+        logger.error(f"Configuration file not found: {config_path}")
+        return
+
+    logger.info(f"Validating config file: {config_path}")
+
     try:
-        logger.info(
-            f"Using configuration file: {config}"
-            if config
-            else "No custom config provided.",
-        )
-
-        config_path = (
-            Path(config)
-            if config
-            else find_packit_yaml(path_or_url.working_dir, try_local_dir_last=True)
-        )
-
-        logger.info(f"Validating config file: {config_path}")
-
-        if not config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_path}")
-
-        try:
-            config_content = load_packit_yaml(config_path)
-        except yaml.YAMLError as e:
-            logger.error(f"Failed to parse YAML file: {e}")
-            raise
-
-        validator = PackageConfigValidator(
-            config_path, config_content, path_or_url.working_dir, offline,
-        )
-
-        output = validator.validate()
-        logger.info(output)
-
-    except FileNotFoundError as e:
-        logger.error(f"Error: {e}")
+        config_content = load_packit_yaml(config_path)
     except yaml.YAMLError as e:
-        logger.error(f"YAML parsing error: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        logger.error(f"Failed to parse YAML file: {e}")
+        return
+
+    validator = PackageConfigValidator(
+        config_path, config_content, path_or_url.working_dir, offline
+    )
+
+    output = validator.validate()
+    logger.info(output)
+
+    # TODO: print more if config.debug
+validate_config.py
+3 KB
