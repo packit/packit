@@ -1,6 +1,6 @@
 # 1.3.0
 
-- Cached values of OpenSUSE aliases are used for any exception coming from `opensuse_distro_aliases` to not break a code flow if there is any problem with getting the online ones.  (#2548)
+- Cached values of OpenSUSE aliases are used for any exception coming from `opensuse_distro_aliases` to not break a code flow if there is any problem with getting the online ones. (#2548)
 - A couple of other small improvements.
 
 # 1.2.0
