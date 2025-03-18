@@ -21,6 +21,7 @@ from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
+from packit.cli.config import config
 
 logger = logging.getLogger("packit")
 
@@ -83,6 +84,7 @@ packit_base.add_command(source_git)
 packit_base.add_command(prepare_sources)
 packit_base.add_command(dist_git)
 packit_base.add_command(scan_in_osh)
+packit_base.add_command(config)
 
 if __name__ == "__main__":
     packit_base()
