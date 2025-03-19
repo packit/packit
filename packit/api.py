@@ -1122,7 +1122,9 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             # reload spec files as they could have been changed by the action
             self.up.specfile.reload()
-            self.dg.specfile.reload()
+            # downstream spec file doesn't have to exist yet
+            with contextlib.suppress(FileNotFoundError):
+                self.dg.specfile.reload()
 
             # compare versions here because users can mangle with specfile in
             # post_upstream_clone action
@@ -1149,7 +1151,9 @@ The first dist-git commit to be synced is '{short_hash}'.
 
             # reload spec files as they could have been changed by the action
             self.up.specfile.reload()
-            self.dg.specfile.reload()
+            # downstream spec file doesn't have to exist yet
+            with contextlib.suppress(FileNotFoundError):
+                self.dg.specfile.reload()
 
             if create_pr:
                 local_pr_branch = f"{dist_git_branch}-{local_pr_branch_suffix}"
