@@ -5,7 +5,10 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
   release:
-    types: [released]
+    # • `released` reacts to stable releases
+    # • `prereleased` reacts to pre-releases
+    # • `published` reacts to both
+    types: [published]
 
 jobs:
   build:
