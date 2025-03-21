@@ -7,6 +7,7 @@ from importlib.metadata import version
 import click
 
 from packit.cli.build import build
+from packit.cli.config import config
 from packit.cli.create_update import create_update
 from packit.cli.dist_git import dist_git
 from packit.cli.init import init
@@ -21,7 +22,6 @@ from packit.cli.sync_from_downstream import sync_from_downstream
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
-from packit.cli.config import config
 
 logger = logging.getLogger("packit")
 
