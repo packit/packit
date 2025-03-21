@@ -53,8 +53,15 @@ logger = logging.getLogger("packit")
     ),
 )
 @click.option(
+    "--default-resultdir",
+    "default_mock_resultdir",
+    is_flag=True,
+    flag_value=True,
+    help="Use the default result directory from mock",
+)
+@click.option(
     "--resultdir",
-    default=None,
+    default=".",
     type=click.Path(file_okay=False),
     help="Specifies the resultdir option for ‹mock› command, for details see mock(1)",
 )
@@ -79,6 +86,7 @@ def mock(
     default_release_suffix,
     root,
     resultdir,
+    default_mock_resultdir,
     package_config,
     path_or_url,
 ):
@@ -105,6 +113,9 @@ def mock(
             srpm_dir=api.up.local_project.working_dir,
             release_suffix=release_suffix,
         )
+
+    if default_mock_resultdir:
+        resultdir = None
 
     rpm_paths = api.run_mock_build(
         root=root,
