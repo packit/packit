@@ -54,7 +54,7 @@ logger = logging.getLogger("packit")
 )
 @click.option(
     "--resultdir",
-    default=None,
+    default=".",
     type=click.Path(file_okay=False),
     help="Specifies the resultdir option for ‹mock› command, for details see mock(1)",
 )
