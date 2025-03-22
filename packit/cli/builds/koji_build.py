@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+
 @click.command("in-koji", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
@@ -188,7 +189,9 @@ def koji(
                         release_suffix=release_suffix,
                         srpm_path=config.srpm_path,
                     )
-                    click.echo(f"Started build for branch '{branch}', target '{target}'.")
+                    click.echo(
+                        f"Started build for branch '{branch}', target '{target}'.",
+                    )
                 except PackitCommandFailedError as ex:
                     logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
                     logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
