@@ -25,6 +25,9 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger(__name__)
 
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
 @click.command("in-koji", context_settings=get_context_settings())
 @click.option(
     "--dist-git-branch",
@@ -100,7 +103,7 @@ def koji(
     out of the current checkout and sends it to koji.
 
     PATH_OR_URL argument is a local path or a URL to the upstream git repository,
-    it defaults to the current working directory
+    it defaults to the current working directory.
     """
     api = get_packit_api(
         config=config,
@@ -138,27 +141,63 @@ def koji(
             "multiple values at the same time.",
         )
 
-    for target in targets_to_build:
-        for branch in branches_to_build:
-            try:
-                out = api.build(
-                    dist_git_branch=branch,
-                    scratch=scratch,
-                    nowait=not wait,
-                    koji_target=target,
-                    from_upstream=from_upstream,
-                    release_suffix=release_suffix,
-                    srpm_path=config.srpm_path,
-                )
-            except PackitCommandFailedError as ex:  # noqa: PERF203
-                logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
-                logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
-                click.echo(
-                    f"Build for branch '{branch}' failed. \n"
-                    f">>> {logs_stdout}\n"
-                    f"!!! {logs_stderr}\n",
-                    err=True,
-                )
-            else:
-                if out:
-                    print(ensure_str(out))
+    if wait:
+        # Wait for all builds to complete
+        build_futures = {}
+        with ThreadPoolExecutor() as executor:
+            for target in targets_to_build:
+                for branch in branches_to_build:
+                    build_futures[
+                        executor.submit(
+                            api.build,
+                            dist_git_branch=branch,
+                            scratch=scratch,
+                            nowait=False,  # Always wait for completion in this mode
+                            koji_target=target,
+                            from_upstream=from_upstream,
+                            release_suffix=release_suffix,
+                            srpm_path=config.srpm_path,
+                        )
+                    ] = (branch, target)
+
+            for future in as_completed(build_futures):
+                branch, target = build_futures[future]
+                try:
+                    out = future.result()
+                    if out:
+                        print(ensure_str(out))
+                except PackitCommandFailedError as ex:
+                    logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
+                    logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
+                    click.echo(
+                        f"Build for branch '{branch}', target '{target}' failed. \n"
+                        f">>> {logs_stdout}\n"
+                        f"!!! {logs_stderr}\n",
+                        err=True,
+                    )
+    else:
+        # Start all builds but do NOT wait for them to finish
+        for target in targets_to_build:
+            for branch in branches_to_build:
+                try:
+                    api.build(
+                        dist_git_branch=branch,
+                        scratch=scratch,
+                        nowait=True,  # Do not wait for completion
+                        koji_target=target,
+                        from_upstream=from_upstream,
+                        release_suffix=release_suffix,
+                        srpm_path=config.srpm_path,
+                    )
+                    click.echo(
+                        f"Started build for branch '{branch}', target '{target}'.",
+                    )
+                except PackitCommandFailedError as ex:
+                    logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
+                    logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
+                    click.echo(
+                        f"Build for branch '{branch}', target '{target}' failed to start. \n"
+                        f">>> {logs_stdout}\n"
+                        f"!!! {logs_stderr}\n",
+                        err=True,
+                    )
