@@ -2315,12 +2315,20 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_ref: Optional[str] = None,
         release_suffix: Optional[str] = None,
         base_srpm: Optional[Path] = None,
+        base_nvr: Optional[str] = None,
         comment: Optional[str] = "Submitted through Packit.",
         csmock_args: Optional[str] = None,
     ) -> str:
         """
         Perform a build through OpenScanHub.
         """
+
+        if base_srpm and base_nvr:
+            logger.error(
+                "Either base SRPM or NVR can be specified for differential scans but not both",
+            )
+            return None
+
         # `osh-cli` requires a kerberos ticket.
         self.init_kerberos_ticket()
 
@@ -2337,6 +2345,13 @@ The first dist-git commit to be synced is '{short_hash}'.
                 "version-diff-build",
                 "--srpm=" + str(srpm_path),
                 "--base-srpm=" + str(base_srpm),
+            ]
+        elif base_nvr:
+            cmd = [
+                "osh-cli",
+                "version-diff-build",
+                "--srpm=" + str(srpm_path),
+                "--base-nvr=" + base_nvr,
             ]
         else:
             cmd = ["osh-cli", "mock-build", str(srpm_path)]

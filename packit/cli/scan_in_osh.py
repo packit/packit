@@ -44,6 +44,11 @@ logger = logging.getLogger(__name__)
     default=None,
 )
 @click.option(
+    "--base-nvr",
+    help="Base NVR in Koji to perform a differential build against",
+    default=None,
+)
+@click.option(
     "--comment",
     help="Comment for the build",
     default="Submitted through Packit.",
@@ -60,6 +65,7 @@ def scan_in_osh(
     package_config,
     target,
     base_srpm,
+    base_nvr,
     comment,
     csmock_args,
 ):
@@ -81,6 +87,7 @@ def scan_in_osh(
     cmd_result_stdout = api.run_osh_build(
         chroot=target,
         base_srpm=base_srpm,
+        base_nvr=base_nvr,
         comment=comment,
         csmock_args=csmock_args,
     )
