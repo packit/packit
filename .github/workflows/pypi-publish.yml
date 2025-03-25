@@ -18,14 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-tags: true
           persist-credentials: false
 
       - uses: actions/setup-python@v5
-
-      - name: Get history and tags for SCM versioning to work
-        run: |
-          git fetch --prune --unshallow
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Build a source tarball and a binary wheel
         # https://pypa-build.readthedocs.io
