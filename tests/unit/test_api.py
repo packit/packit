@@ -677,3 +677,37 @@ def test_get_upstream_release_monitoring_bug(package_name, version, response, re
     assert (
         PackitAPI.get_upstream_release_monitoring_bug(package_name, version) == result
     )
+
+
+def test_prepare_files_to_sync_when_sync_changelog_is_false(
+    config_mock,
+    package_config_mock,
+):
+    """Test that upstream spec file is excluded from files_to_sync when sync_changelog is False."""
+    # Mock package configuration with sync_changelog=False
+    package_config_mock.sync_changelog = False
+
+    # Create API instance
+    api = PackitAPI(config=config_mock, package_config=package_config_mock)
+
+    # Setup required mocks
+    flexmock(api)
+    api._up = flexmock(get_absolute_specfile_path=lambda: "/path/to/upstream/spec.spec")
+    api._dg = flexmock()
+
+    # Setup mock for ChangelogHelper
+    flexmock(ChangelogHelper).should_receive("update_dist_git").once()
+
+    # Create a mock SyncFilesItem with upstream spec file
+    sync_item = SyncFilesItem(src=["/path/to/upstream/spec.spec"], dest="spec.spec")
+    files_to_sync = [sync_item]
+
+    # Call method being tested
+    result = api._prepare_files_to_sync(
+        files_to_sync=files_to_sync,
+        full_version="1.0.0",
+        upstream_tag="v1.0.0",
+    )
+
+    # Verify that the spec file is excluded (result should be an empty list)
+    assert len(result) == 0
