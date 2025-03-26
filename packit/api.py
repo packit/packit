@@ -1490,42 +1490,42 @@ The first dist-git commit to be synced is '{short_hash}'.
         resolved_bugs: Optional[list[str]] = None,
     ) -> list[SyncFilesItem]:
         """
-        Returns the list of files to sync to dist-git as is.
+        Returns the list of files to sync to dist-git with the spec file removed.
 
-        With spec-file, we have two modes:
-        * The `sync_changelog` option is set. => Spec-file can be synced as other files.
-        * Sync the content of the spec-file (but changelog) here and exclude spec-file otherwise.
-
-        Args:
-            files_to_sync: A list of SyncFilesItem.
-            full_version: Version to be set in the spec-file.
-            upstream_tag: The commit message of this commit is going to be used
-                to update the changelog in the spec-file.
-            resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
-
-        Returns:
-            The list of synced files with the spec-file removed if it was updated.
+        If a SyncFilesItem represents a directory (whose src points to a directory)
+        that might contain the spec file, an extra rsync filter is added to exclude
+        the spec file (using its basename). This ensures that the upstream spec file
+        is never synced.
         """
         if self.package_config.sync_changelog:
             return files_to_sync
 
-        # add entry to changelog
+        # add entry to changelog because the spec file is not synced
         ChangelogHelper(self.up, self.dg, self.package_config).update_dist_git(
             full_version=full_version,
             upstream_tag=upstream_tag,
             resolved_bugs=resolved_bugs,
         )
 
-        # exclude spec, we have special plans for it
-        return list(
-            filter(
-                None,
-                [
-                    x.drop_src(self.up.get_absolute_specfile_path())
-                    for x in files_to_sync
-                ],
-            ),
-        )
+        specfile = self.up.get_absolute_specfile_path()
+        new_files = []
+        for item in files_to_sync:
+            filtered_item = item.drop_src(specfile)
+            if filtered_item is None:
+                continue
+
+            if filtered_item.src:
+                for src in filtered_item.src:
+                    if specfile.is_relative_to(src):
+                        rel_spec = specfile.relative_to(src)
+                        exclude_rule = f"--filter='- {rel_spec}'"
+                        if exclude_rule not in filtered_item.filters:
+                            filtered_item.filters.append(exclude_rule)
+
+            if filtered_item.src:
+                new_files.append(filtered_item)
+
+        return new_files
 
     def sync_from_downstream(
         self,
