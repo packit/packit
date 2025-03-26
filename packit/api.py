@@ -408,7 +408,7 @@ class PackitAPI:
             # reload spec files as they could have been changed by the action
             self.up.specfile.reload()
             self.dg.specfile.reload()
-            
+
         # Always call _prepare_files_to_sync to handle the spec file exclusion
         # when sync_changelog is False, regardless of prepare_files configuration
         files_to_sync = self._prepare_files_to_sync(
@@ -477,15 +477,16 @@ class PackitAPI:
                 prefix="",
                 trailers=trailers,
             )
-            
+
     def sync_files(self, files_to_sync):
         """
         Copy files between upstream and downstream repo.
- 
+
         Args:
             files_to_sync: List of SyncFilesItem objects defining what to sync
         """
         from packit.sync import sync_files as sync_files_function
+
         sync_files_function(files_to_sync)
 
     @staticmethod
