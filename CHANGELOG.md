@@ -1,3 +1,7 @@
+# 1.4.0
+
+- Packit CLI now submits Koji builds in parallel. (#2568)
+
 # 1.3.0
 
 - Cached values of OpenSUSE aliases are used for any exception coming from `opensuse_distro_aliases` to not break a code flow if there is any problem with getting the online ones. (#2548)
