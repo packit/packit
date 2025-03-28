@@ -7,6 +7,7 @@ from importlib.metadata import version
 import click
 
 from packit.cli.build import build
+from packit.cli.config import config
 from packit.cli.create_update import create_update
 from packit.cli.dist_git import dist_git
 from packit.cli.init import init
@@ -83,6 +84,7 @@ packit_base.add_command(source_git)
 packit_base.add_command(prepare_sources)
 packit_base.add_command(dist_git)
 packit_base.add_command(scan_in_osh)
+packit_base.add_command(config)
 
 if __name__ == "__main__":
     packit_base()
