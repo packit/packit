@@ -2324,6 +2324,10 @@ The first dist-git commit to be synced is '{short_hash}'.
         # `osh-cli` requires a kerberos ticket.
         self.init_kerberos_ticket()
 
+        analyzer = None
+        config = None
+        profile = None
+
         if not srpm_path:
             srpm_path = self.create_srpm(
                 upstream_ref=upstream_ref,
@@ -2347,10 +2351,36 @@ The first dist-git commit to be synced is '{short_hash}'.
         if csmock_args:
             cmd.append("--csmock-args=" + shlex.quote(csmock_args))
 
-        cmd.append("--config=" + str(chroot))
+        # osh_options = self.package_config.osh_options.__dict__
+
+        # if osh_options is not None:
+        #     analyzer = osh_options.get("analyzer")
+        #     config = osh_options.get("config")
+        #     profile = osh_options.get("profile")
+
+        osh_config = str(chroot)
+
+        if osh_options := self.package_config.osh_options.__dict__:
+            if analyzer := osh_options.get("analyzer"):
+                cmd.append("--analyzer=" + shlex.quote(analyzer))
+            if profile := osh_options.get("profile"):
+                cmd.append("--profile=" + shlex.quote(profile))
+            if config := osh_options.get("config"):
+                osh_config = shlex.quote(config)
+
+        # if analyzer:
+        #     cmd.append("--analyzer=" + shlex.quote(analyzer))
+        # if profile:
+        #     cmd.append("--profile=" + shlex.quote(profile))
+
+        # osh_config = str(chroot) if config is None else shlex.quote(config)
+
+        cmd.append("--config=" + osh_config)
         cmd.append("--nowait")
         cmd.append("--json")
         cmd.append("--comment=" + comment)
+
+        logger.info(f"Full command passed to osh-cli -> {cmd}")
 
         try:
             cmd_result = commands.run_command(cmd, output=True)
