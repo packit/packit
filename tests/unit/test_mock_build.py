@@ -1,7 +1,10 @@
-import os
-from unittest.mock import patch, MagicMock, call
-import pytest
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+from unittest.mock import MagicMock, patch
+
 from packit.api import PackitAPI  # Import PackitAPI class
+
 
 def test_build_in_mock_default_resultdir():
     """Ensure that --resultdir defaults to '.' when not provided."""
@@ -25,7 +28,9 @@ def test_build_in_mock_default_resultdir():
         actual_calls = mock_run_mock_build.call_args_list
 
         # Print expected behavior
-        print(f"\n EXPECTED: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})")
+        print(
+            f"\n EXPECTED: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})",
+        )
 
         # Print actual function calls for verification
         print("\n ACTUAL calls to run_mock_build:", actual_calls)
@@ -40,11 +45,17 @@ def test_build_in_mock_default_resultdir():
 
         # Assert that resultdir defaults to '.'
         try:
-            mock_run_mock_build.assert_called_with(srpm_path=srpm_path, resultdir=expected_resultdir)
-            print("\n TEST PASSED: run_mock_build was called with the expected arguments!\n")
-            print(f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})")
+            mock_run_mock_build.assert_called_with(
+                srpm_path=srpm_path, resultdir=expected_resultdir,
+            )
+            print(
+                "\n TEST PASSED: run_mock_build was called with the expected arguments!\n",
+            )
+            print(
+                f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})",
+            )
             print(f"ACTUAL CALL(S): {actual_calls}")
-        except AssertionError as e:
+        except AssertionError:
             print("\n TEST FAILED!")
             # print(f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})")
             # print(f"ACTUAL CALL(S): {actual_calls}")
