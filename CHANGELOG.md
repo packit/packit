@@ -1,3 +1,7 @@
+# 1.4.1
+
+- Packit now supports `--base-nvr` option while submitting scans to OpenScanHub. The base nvr is pulled in from koji to perform a differential scan. (#2569)
+
 # 1.4.0
 
 - Packit CLI now submits Koji builds in parallel. (#2568)
