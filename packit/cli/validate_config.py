@@ -19,7 +19,7 @@ from packit.local_project import LocalProject
 logger = logging.getLogger(__name__)
 
 
-@click.command("validate-config", context_settings=get_context_settings())
+@click.command("validate", context_settings=get_context_settings())
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @click.option(
     "--offline",
