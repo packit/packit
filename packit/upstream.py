@@ -163,6 +163,9 @@ class Upstream:
             action=ActionName.get_current_version,
             env=self.package_config.get_package_names_as_env(),
         )
+
+        self.specfile.reload()  # the specfile could have been changed by the action
+
         return action_output[-1].strip() if action_output else None
 
     def get_version_from_tag(self, tag: Optional[str]) -> Optional[str]:

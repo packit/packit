@@ -28,12 +28,11 @@ def cockpit_ostree(tmp_path, upstream_without_config):
     flexmock(repo, get_namespace_and_repo_name=lambda url: ("asd", "qwe"))
     d = tmp_path / "dg"
     d.mkdir()
-    initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)
-
     shutil.copy2(
         UP_COCKPIT_OSTREE / "cockpit-ostree.spec.dg",
         d / "cockpit-ostree.spec",
     )
+    initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)
 
     return u, d
 
