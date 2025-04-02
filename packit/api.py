@@ -916,7 +916,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
-    ) -> PullRequest:
+    ) -> tuple[PullRequest, dict[str, PullRequest]]:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
     @overload
@@ -971,7 +971,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
-    ) -> Optional[PullRequest]:
+    ) -> Optional[tuple[PullRequest, dict[str, PullRequest]]]:
         """
         Update given package in dist-git
 
@@ -1009,7 +1009,9 @@ The first dist-git commit to be synced is '{short_hash}'.
                 fast-forward-merged into.
 
         Returns:
-            The created (or existing if one already exists) PullRequest if
+            Tuple of the created (or existing if one already exists) PullRequest and
+             dictionary of branches from fast_forward_merge_branches as keys and
+             PullRequest objects as values if
             create_pr is True, else None.
 
         Raises:
@@ -1211,6 +1213,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
 
             pr = None
+            ff_prs = {}
+
             if create_pr:
                 pr_description = self.get_pr_description(
                     upstream_tag=upstream_tag,
@@ -1235,6 +1239,40 @@ The first dist-git commit to be synced is '{short_hash}'.
 
                 if fast_forward_merge_branches:
                     for ff_branch in fast_forward_merge_branches:
+                        logger.info(
+                            f"Syncing branch {ff_branch} defined in `fast_forward_merge_into`",
+                        )
+                        self.dg.refresh_specfile()
+                        self.dg.create_branch(
+                            ff_branch,
+                            base=f"remotes/origin/{ff_branch}",
+                            setup_tracking=True,
+                        )
+                        self.dg.update_branch(ff_branch)
+                        self.dg.switch_branch(ff_branch, force=True)
+
+                        try:
+                            spec_ver = self.dg.get_specfile_version()
+                        except FileNotFoundError:
+                            continue
+
+                        self.dg.switch_branch(local_pr_branch, force=True)
+
+                        if not self.check_version_distance(
+                            version,
+                            spec_ver,
+                            ff_branch,
+                        ):
+                            logger.info(
+                                f"The upstream released version {version} does not match "
+                                f"specfile version {spec_ver} at branch {ff_branch} "
+                                f"using the version_update_mask "
+                                f'"{self.package_config.version_update_mask}".'
+                                "\nYou can change the version_update_mask with an empty string "
+                                "to skip this check.",
+                            )
+                            continue
+
                         pr_title = (
                             title or f"Update {ff_branch} to upstream release {version}"
                         )
@@ -1244,10 +1282,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                             target_branch=ff_branch,
                             repo=self.dg,
                         )
+                        ff_prs[ff_branch] = ff_branch_pr
                         if warn_about_koji_build_triggering_bug:
                             self._warn_about_koji_build_triggering_bug_if_needed(
                                 ff_branch_pr,
                             )
+
                 if warn_about_koji_build_triggering_bug:
                     self._warn_about_koji_build_triggering_bug_if_needed(pr)
             else:
@@ -1266,7 +1306,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.dg.local_project.git_repo.git.clean("-xdf")
             self.up.clean_working_dir()
 
-        return pr
+        return pr, ff_prs if create_pr else None
 
     def get_default_commit_description(
         self,
