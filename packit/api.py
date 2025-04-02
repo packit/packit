@@ -2582,9 +2582,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             List of paths to the built RPMs.
         """
-        # Default to current directory if resultdir is None
-        if resultdir is None:
-            resultdir = "."
 
         cmd = ["mock", "--root", root]
 

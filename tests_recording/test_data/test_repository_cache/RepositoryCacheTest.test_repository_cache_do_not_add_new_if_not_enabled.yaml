@@ -4,31 +4,31 @@ X:
       StoreFiles:
         RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml:
           to_path:
-          - metadata:
-              latency: 0
-            output:
-              filename: RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml.clone1_1.tar.xz
-              return_value:
-                _bare: false
-                _common_dir: null
-                _working_tree_dir: /tmp/tmpmg1mraeq/clone1
-                git_dir: /tmp/tmpmg1mraeq/clone1/.git
-                working_dir: /tmp/tmpmg1mraeq/clone1
-              target_path: /tmp/tmpmg1mraeq/clone1
+            - metadata:
+                latency: 0
+              output:
+                filename: RepositoryCacheTest.test_repository_cache_do_not_add_new_if_not_enabled.yaml.clone1_1.tar.xz
+                return_value:
+                  _bare: false
+                  _common_dir: null
+                  _working_tree_dir: /tmp/tmpmg1mraeq/clone1
+                  git_dir: /tmp/tmpmg1mraeq/clone1/.git
+                  working_dir: /tmp/tmpmg1mraeq/clone1
+                target_path: /tmp/tmpmg1mraeq/clone1
 _requre:
   DataTypes: 1
   key_strategy: StorageKeysInspectSimple
   version_storage_file: 3
 tempfile:
   mkdtemp:
-  - metadata:
-      latency: 6.461143493652344e-05
-      module_call_list:
-      - unittest.case
-      - requre.record_and_replace
-      - tests_recording.test_repository_cache
-      - requre.objects
-      - requre.cassette
-      - tempfile
-      - mkdtemp
-    output: /tmp/tmpmg1mraeq
+    - metadata:
+        latency: 6.461143493652344e-05
+        module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_repository_cache
+          - requre.objects
+          - requre.cassette
+          - tempfile
+          - mkdtemp
+      output: /tmp/tmpmg1mraeq

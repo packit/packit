@@ -8,12 +8,12 @@ tempfile:
       metadata:
         latency: 5.364418029785156e-05
         module_call_list:
-        - unittest.case
-        - requre.record_and_replace
-        - tests_recording.test_local_project
-        - tests_recording.testbase
-        - requre.objects
-        - requre.cassette
-        - tempfile
-        - mkdtemp
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_local_project
+          - tests_recording.testbase
+          - requre.objects
+          - requre.cassette
+          - tempfile
+          - mkdtemp
       output: /tmp/tmphl25fu79

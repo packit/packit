@@ -4,53 +4,53 @@ X:
       StoreFiles:
         RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml:
           to_path:
-          - metadata:
-              latency: 0
-            output:
-              filename: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.python-requre_1.tar.xz
-              return_value:
-                _bare: false
-                _common_dir: null
-                _working_tree_dir: /tmp/tmp3ycby7i7/cache/python-requre
-                git_dir: /tmp/tmp3ycby7i7/cache/python-requre/.git
-                working_dir: /tmp/tmp3ycby7i7/cache/python-requre
-              target_path: /tmp/tmp3ycby7i7/cache/python-requre
-          - metadata:
-              latency: 0
-            output:
-              filename: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.clone1_1.tar.xz
-              return_value:
-                _bare: false
-                _common_dir: null
-                _working_tree_dir: /tmp/tmp3ycby7i7/clone1
-                git_dir: /tmp/tmp3ycby7i7/clone1/.git
-                working_dir: /tmp/tmp3ycby7i7/clone1
-              target_path: /tmp/tmp3ycby7i7/clone1
-          - metadata:
-              latency: 0
-            output:
-              filename: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.clone2_1.tar.xz
-              return_value:
-                _bare: false
-                _common_dir: null
-                _working_tree_dir: /tmp/tmp3ycby7i7/clone2
-                git_dir: /tmp/tmp3ycby7i7/clone2/.git
-                working_dir: /tmp/tmp3ycby7i7/clone2
-              target_path: /tmp/tmp3ycby7i7/clone2
+            - metadata:
+                latency: 0
+              output:
+                filename: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.python-requre_1.tar.xz
+                return_value:
+                  _bare: false
+                  _common_dir: null
+                  _working_tree_dir: /tmp/tmp3ycby7i7/cache/python-requre
+                  git_dir: /tmp/tmp3ycby7i7/cache/python-requre/.git
+                  working_dir: /tmp/tmp3ycby7i7/cache/python-requre
+                target_path: /tmp/tmp3ycby7i7/cache/python-requre
+            - metadata:
+                latency: 0
+              output:
+                filename: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.clone1_1.tar.xz
+                return_value:
+                  _bare: false
+                  _common_dir: null
+                  _working_tree_dir: /tmp/tmp3ycby7i7/clone1
+                  git_dir: /tmp/tmp3ycby7i7/clone1/.git
+                  working_dir: /tmp/tmp3ycby7i7/clone1
+                target_path: /tmp/tmp3ycby7i7/clone1
+            - metadata:
+                latency: 0
+              output:
+                filename: RepositoryCacheTest.test_repository_cache_add_new_and_use_it.yaml.clone2_1.tar.xz
+                return_value:
+                  _bare: false
+                  _common_dir: null
+                  _working_tree_dir: /tmp/tmp3ycby7i7/clone2
+                  git_dir: /tmp/tmp3ycby7i7/clone2/.git
+                  working_dir: /tmp/tmp3ycby7i7/clone2
+                target_path: /tmp/tmp3ycby7i7/clone2
 _requre:
   DataTypes: 1
   key_strategy: StorageKeysInspectSimple
   version_storage_file: 3
 tempfile:
   mkdtemp:
-  - metadata:
-      latency: 5.8650970458984375e-05
-      module_call_list:
-      - unittest.case
-      - requre.record_and_replace
-      - tests_recording.test_repository_cache
-      - requre.objects
-      - requre.cassette
-      - tempfile
-      - mkdtemp
-    output: /tmp/tmp3ycby7i7
+    - metadata:
+        latency: 5.8650970458984375e-05
+        module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_repository_cache
+          - requre.objects
+          - requre.cassette
+          - tempfile
+          - mkdtemp
+      output: /tmp/tmp3ycby7i7
