@@ -29,9 +29,9 @@ def test_build_in_mock_default_resultdir():
 
         # Print expected behavior
         print(
-            f"\n EXPECTED: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})",
+            f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, "
+            f"resultdir={expected_resultdir})",
         )
-
         # Print actual function calls for verification
         print("\n ACTUAL calls to run_mock_build:", actual_calls)
 
@@ -46,17 +46,17 @@ def test_build_in_mock_default_resultdir():
         # Assert that resultdir defaults to '.'
         try:
             mock_run_mock_build.assert_called_with(
-                srpm_path=srpm_path, resultdir=expected_resultdir,
+                srpm_path=srpm_path,
+                resultdir=expected_resultdir,
             )
             print(
                 "\n TEST PASSED: run_mock_build was called with the expected arguments!\n",
             )
             print(
-                f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})",
+                f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, "
+                f"resultdir={expected_resultdir})",
             )
             print(f"ACTUAL CALL(S): {actual_calls}")
         except AssertionError:
             print("\n TEST FAILED!")
-            # print(f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, resultdir={expected_resultdir})")
-            # print(f"ACTUAL CALL(S): {actual_calls}")
             raise  # Re-raise the error so pytest catches it
