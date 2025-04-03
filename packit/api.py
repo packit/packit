@@ -2582,9 +2582,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             List of paths to the built RPMs.
         """
-
         cmd = ["mock", "--root", root]
-
         if resultdir is not None:
             cmd.append("--resultdir")
             cmd.append(str(resultdir))

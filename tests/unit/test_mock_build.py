@@ -1,62 +1,64 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-from unittest.mock import MagicMock, patch
+import pytest
+from flexmock import flexmock
 
-from packit.api import PackitAPI  # Import PackitAPI class
+from packit.api import PackitAPI
+from packit.cli import utils
+from packit.cli.builds.mock_build import mock as mock_build_command
+from packit.config import PackageConfig
+from tests.spellbook import call_packit
 
 
-def test_build_in_mock_default_resultdir():
-    """Ensure that --resultdir defaults to '.' when not provided."""
+@pytest.fixture
+def mock_api():
+    return flexmock(PackitAPI).should_receive("run_mock_build").mock()
 
-    expected_resultdir = None  # Expected default is the current directory
-    srpm_path = "test.srpm"  # Dummy SRPM path
 
-    # Mock required arguments for PackitAPI
-    mock_config = MagicMock()
-    mock_package_config = MagicMock()
+@pytest.fixture
+def mock_package_config():
+    package_config_mock = flexmock(PackageConfig)
+    flexmock(utils).should_receive("get_local_package_config").and_return(
+        package_config_mock,
+    )
+    return package_config_mock
 
-    # Create an instance of PackitAPI
-    api = PackitAPI(config=mock_config, package_config=mock_package_config)
 
-    # Patch the method inside a `with` statement
-    with patch.object(api, "run_mock_build", autospec=True) as mock_run_mock_build:
-        # Call function without specifying resultdir
-        api.run_mock_build(srpm_path=srpm_path, resultdir=None)
+def test_build_in_mock_default_resultdir(mock_api, mock_package_config):
+    flexmock(PackitAPI).should_receive("run_mock_build").with_args(
+        root="default",
+        srpm_path=None,
+        resultdir=".",
+    ).and_return(["test.rpm"])
 
-        # Extract what was actually received
-        actual_calls = mock_run_mock_build.call_args_list
+    result = call_packit(mock_build_command, parameters=["build", "in-mock"])
+    print(f"Exit Code: {result.exit_code}")
 
-        # Print expected behavior
-        print(
-            f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, "
-            f"resultdir={expected_resultdir})",
-        )
-        # Print actual function calls for verification
-        print("\n ACTUAL calls to run_mock_build:", actual_calls)
 
-        # Verify if function was actually called
-        if not actual_calls:
-            print("\n ERROR: run_mock_build was NOT called!")
-        else:
-            for call_obj in actual_calls:
-                args, kwargs = call_obj
-                print(f" CALL DETAILS: args={args}, kwargs={kwargs}")
+def test_build_in_mock_default_resultdir_flag(mock_api, mock_package_config):
+    flexmock(PackitAPI).should_receive("run_mock_build").with_args(
+        root="default",
+        srpm_path=None,
+        resultdir=None,
+    ).and_return(["test.rpm"])
 
-        # Assert that resultdir defaults to '.'
-        try:
-            mock_run_mock_build.assert_called_with(
-                srpm_path=srpm_path,
-                resultdir=expected_resultdir,
-            )
-            print(
-                "\n TEST PASSED: run_mock_build was called with the expected arguments!\n",
-            )
-            print(
-                f"EXPECTED CALL: run_mock_build(srpm_path={srpm_path}, "
-                f"resultdir={expected_resultdir})",
-            )
-            print(f"ACTUAL CALL(S): {actual_calls}")
-        except AssertionError:
-            print("\n TEST FAILED!")
-            raise  # Re-raise the error so pytest catches it
+    result = call_packit(mock_build_command, ["in-mock", "--default-resultdir"])
+    print(f"Exit Code: {result.exit_code}")
+    print(f"Output: {result.output}")
+
+
+def test_build_in_mock_custom_resultdir(mock_api, mock_package_config):
+    custom_resultdir = "/custom/path"
+    flexmock(PackitAPI).should_receive("run_mock_build").with_args(
+        root="default",
+        srpm_path=None,
+        resultdir=custom_resultdir,
+    ).and_return(["test.rpm"])
+
+    result = call_packit(
+        mock_build_command,
+        ["in-mock", "--resultdir", custom_resultdir],
+    )
+    print(f"Exit Code: {result.exit_code}")
+    print(f"Output: {result.output}")
