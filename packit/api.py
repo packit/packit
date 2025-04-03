@@ -2402,10 +2402,22 @@ The first dist-git commit to be synced is '{short_hash}'.
         if csmock_args:
             cmd.append("--csmock-args=" + shlex.quote(csmock_args))
 
-        cmd.append("--config=" + str(chroot))
+        osh_config = str(chroot)
+
+        if osh_options := self.package_config.osh_options:
+            if analyzer := osh_options.analyzer:
+                cmd.append("--analyzer=" + shlex.quote(analyzer))
+            if profile := osh_options.profile:
+                cmd.append("--profile=" + shlex.quote(profile))
+            if config := osh_options.config:
+                osh_config = shlex.quote(config)
+
+        cmd.append("--config=" + osh_config)
         cmd.append("--nowait")
         cmd.append("--json")
         cmd.append("--comment=" + comment)
+
+        logger.info(f"Full command passed to osh-cli -> {cmd}")
 
         try:
             cmd_result = commands.run_command(cmd, output=True)
