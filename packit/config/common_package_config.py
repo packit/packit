@@ -74,6 +74,36 @@ def _construct_dist_git_instance(
     return DISTGIT_INSTANCES["fedpkg"]
 
 
+class OshOptionsConfig:
+    """
+    Configuration class for processing additional OpenScanHub (OSH) options.
+    """
+
+    def __init__(
+        self,
+        analyzer: Optional[str] = None,
+        config: Optional[str] = None,
+        profile: Optional[str] = None,
+    ):
+        self.analyzer = analyzer
+        self.config = config
+        self.profile = profile
+
+    def __repr__(self):
+        from packit.schema import OshOptionsSchema  # For Avoiding cyclical imports
+
+        schema = OshOptionsSchema()
+        return f"OshOptionsConfig: {schema.dumps(self)}"
+
+    def __eq__(self, other: object):
+        if not isinstance(other, OshOptionsConfig):
+            return False
+        from packit.schema import OshOptionsSchema
+
+        schema = OshOptionsSchema()
+        return schema.dump(self) == schema.dump(other)
+
+
 class CommonPackageConfig:
     """Common configuration
 
@@ -260,6 +290,7 @@ class CommonPackageConfig:
         osh_diff_scan_after_copr_build: Optional[bool] = True,
         csmock_args: Optional[str] = None,
         use_target_repo_for_fmf_url: Optional[bool] = False,
+        osh_options: Optional[OshOptionsConfig] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
         self.specfile_path: Optional[str] = specfile_path
@@ -378,6 +409,7 @@ class CommonPackageConfig:
         self.osh_diff_scan_after_copr_build = osh_diff_scan_after_copr_build
 
         self.csmock_args = csmock_args
+        self.osh_options = osh_options or OshOptionsConfig()
 
         self.use_target_repo_for_fmf_url = use_target_repo_for_fmf_url
 
