@@ -1,3 +1,8 @@
+# 1.6.0
+
+- When using `fast_forward_merge_into`, `version_update_mask` is now correctly being taken into consideration. (#2551)
+- We have introduced a new command group `config` for configuration-related commands and moved `validate-config` command under it, resulting in the new command being `packit config validate`. (#2559)
+
 # 1.5.0
 
 - Packit now supports `--base-nvr` option while submitting scans to OpenScanHub. The base nvr is pulled in from koji to perform a differential scan. (#2569)
