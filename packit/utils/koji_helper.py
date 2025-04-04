@@ -416,6 +416,33 @@ class KojiHelper:
             return None
         return target
 
+    def get_branch_from_target_name(self, target_name: str) -> Optional[str]:
+        """
+        Gets a dist-git branch name from a build target name.
+
+        Args:
+            target_name: Build target name.
+
+        Returns:
+            dist-git branch name or None if not found.
+        """
+        try:
+            target = self.session.getBuildTarget(target_name, strict=True)
+        except Exception as e:
+            logger.debug(f"Failed to get build target {target_name} from Koji: {e}")
+            return None
+        if not (dest_tag := target.get("dest_tag_name")):
+            logger.debug(f"Failed to get dest tag of {target_name}")
+            return None
+        # special cases where branch names don't match tag names
+        for branch in ["rawhide", "epel10"]:
+            if dest_tag == self.get_candidate_tag(branch):
+                return branch
+        if not (stable_tags := self.get_stable_tags(dest_tag)):
+            return None
+        # the tag on top of the inheritance chain should match branch name
+        return stable_tags[-1]
+
     # | Overview of tag names
     # |------------------------------|----------------------|-------------------------|
     # |                              | Fedora               | EPEL                    |

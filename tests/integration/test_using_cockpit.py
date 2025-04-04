@@ -28,12 +28,13 @@ def cockpit_ostree(tmp_path, upstream_without_config):
     flexmock(repo, get_namespace_and_repo_name=lambda url: ("asd", "qwe"))
     d = tmp_path / "dg"
     d.mkdir()
-    initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)
 
     shutil.copy2(
         UP_COCKPIT_OSTREE / "cockpit-ostree.spec.dg",
         d / "cockpit-ostree.spec",
     )
+
+    initiate_git_repo(d, upstream_remote=upstream_without_config, push=True)
 
     return u, d
 
@@ -117,12 +118,15 @@ def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
     flexmock(api.up, get_specfile_version=lambda: "178")
 
     with cwd(upstream_path):
-        assert pr == api.sync_release(
-            dist_git_branch="main",
-            use_local_content=False,
-            versions=["179"],
-            force_new_sources=False,
-            create_pr=True,
+        assert (
+            pr
+            == api.sync_release(
+                dist_git_branch="main",
+                use_local_content=False,
+                versions=["179"],
+                force_new_sources=False,
+                create_pr=True,
+            )[0]
         )
 
 

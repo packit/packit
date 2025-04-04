@@ -1,4 +1,5 @@
-execute:
-    how: tmt
 discover:
     how: fmf
+
+execute:
+    how: tmt

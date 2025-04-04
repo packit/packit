@@ -30,3 +30,4 @@ jobs:
           title: Release ${{ inputs.version }}
           body: Update the changelog and the specfile for release ${{ inputs.version }}.
           delete-branch: true
+          token: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}

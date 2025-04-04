@@ -1,3 +1,21 @@
+# 1.6.0
+
+- When using `fast_forward_merge_into`, `version_update_mask` is now correctly being taken into consideration. (#2551)
+- We have introduced a new command group `config` for configuration-related commands and moved `validate-config` command under it, resulting in the new command being `packit config validate`. (#2559)
+
+# 1.5.0
+
+- Packit now supports `--base-nvr` option while submitting scans to OpenScanHub. The base nvr is pulled in from koji to perform a differential scan. (#2569)
+
+# 1.4.0
+
+- Packit CLI now submits Koji builds in parallel. (#2568)
+
+# 1.3.0
+
+- Cached values of OpenSUSE aliases are used for any exception coming from `opensuse_distro_aliases` to not break a code flow if there is any problem with getting the online ones. (#2548)
+- A couple of other small improvements.
+
 # 1.2.0
 
 - Packit reloads spec file after `create-archive` to keep user changes. (#2533)

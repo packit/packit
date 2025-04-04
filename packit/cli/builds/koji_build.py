@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from os import getcwd
 
 import click
@@ -138,27 +139,42 @@ def koji(
             "multiple values at the same time.",
         )
 
-    for target in targets_to_build:
-        for branch in branches_to_build:
-            try:
-                out = api.build(
-                    dist_git_branch=branch,
-                    scratch=scratch,
-                    nowait=not wait,
-                    koji_target=target,
-                    from_upstream=from_upstream,
-                    release_suffix=release_suffix,
-                    srpm_path=config.srpm_path,
+    build_futures = {}
+    with ThreadPoolExecutor() as executor:
+        for target in targets_to_build:
+            for branch in branches_to_build:
+                click.echo(
+                    f"Starting build for branch '{branch}', target '{target}'...",
                 )
-            except PackitCommandFailedError as ex:  # noqa: PERF203
+                build_futures[
+                    executor.submit(
+                        api.build,
+                        dist_git_branch=branch,
+                        scratch=scratch,
+                        nowait=not wait,
+                        koji_target=target,
+                        from_upstream=from_upstream,
+                        release_suffix=release_suffix,
+                        srpm_path=config.srpm_path,
+                    )
+                ] = (branch, target)
+
+        for future in as_completed(build_futures):
+            branch, target = build_futures[future]
+            try:
+                out = future.result()
+                click.echo(f"Completed build for branch '{branch}', target '{target}'.")
+            except PackitCommandFailedError as ex:
                 logs_stdout = "\n>>> ".join(ex.stdout_output.strip().split("\n"))
                 logs_stderr = "\n!!! ".join(ex.stderr_output.strip().split("\n"))
                 click.echo(
-                    f"Build for branch '{branch}' failed. \n"
+                    f"Build for branch '{branch}', target '{target}' failed. \n"
                     f">>> {logs_stdout}\n"
                     f"!!! {logs_stderr}\n",
                     err=True,
                 )
             else:
                 if out:
-                    print(ensure_str(out))
+                    click.echo(ensure_str(out))
+
+        click.echo("All builds processed.")

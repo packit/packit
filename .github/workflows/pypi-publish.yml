@@ -5,17 +5,22 @@ name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
   release:
-    types: [released]
+    # • `released` reacts to stable releases
+    # • `prereleased` reacts to pre-releases
+    # • `published` reacts to both
+    types: [published]
 
 jobs:
-  build-n-publish:
+  build:
+    name: Build distribution 📦
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write # for trusted publishing
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
 
       - name: Get history and tags for SCM versioning to work
         run: |
@@ -27,6 +32,30 @@ jobs:
         run: |
           python -m pip install build
           python -m build
+
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish:
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/packitos/
+    permissions:
+      id-token: write # for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
 
       - name: Publish 📦 to PyPI
         # https://github.com/pypa/gh-action-pypi-publish

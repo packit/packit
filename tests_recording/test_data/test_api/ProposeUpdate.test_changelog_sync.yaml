@@ -1695,6 +1695,103 @@ requests.sessions:
             raw_decoded: !!binary ""
             reason: OK
             status_code: 200
+      https://src.fedoraproject.org/api/0/rpms/python-requre:
+        all:
+          metadata:
+            latency: 0.2782013416290283
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_api
+            - packit.api
+            - packit.distgit
+            - ogr.abstract
+            - ogr.services.pagure.project
+            - ogr.abstract
+            - ogr.services.pagure.project
+            - ogr.abstract
+            - ogr.services.pagure.project
+            - ogr.abstract
+            - ogr.services.pagure.project
+            - ogr.abstract
+            - ogr.services.pagure.service
+            - ogr.abstract
+            - ogr.services.pagure.service
+            - requests.sessions
+            - requre.objects
+            - requre.cassette
+            - requests.sessions
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              access_groups:
+                admin: []
+                collaborator: []
+                commit: []
+                ticket: []
+              access_users:
+                admin:
+                - lachmanfrantisek
+                - lbarczio
+                - mfocko
+                - mmassari
+                - ttomecek
+                collaborator: []
+                commit: []
+                owner:
+                - mfocko
+                ticket: []
+              close_status: []
+              custom_keys: []
+              date_created: '1586178839'
+              date_modified: '1727334763'
+              description: The python-requre package
+              full_url: https://src.fedoraproject.org/rpms/python-requre
+              fullname: rpms/python-requre
+              id: 41574
+              milestones: {}
+              name: python-requre
+              namespace: rpms
+              parent: null
+              priorities: {}
+              tags: []
+              url_path: rpms/python-requre
+              user:
+                full_url: https://src.fedoraproject.org/user/mfocko
+                fullname: Matej Focko
+                name: mfocko
+                url_path: user/mfocko
+            _next: null
+            elapsed: 0.2
+            encoding: utf-8
+            headers:
+              Connection: Keep-Alive
+              Date: Fri, 01 Nov 2019 13-36-03 GMT
+              Keep-Alive: timeout=15, max=496
+              Referrer-Policy: same-origin
+              Server: Apache
+              Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+              X-Content-Type-Options: nosniff
+              X-Fedora-ProxyServer: proxy01.phx2.fedoraproject.org
+              X-Fedora-RequestID: XcFVKMi@EiqyqRlV7q32fgBBBkM
+              X-Frame-Options: SAMEORIGIN
+              X-Xss-Protection: 1; mode=block
+              apptime: D=159113
+              content-length: '964'
+              content-security-policy: default-src 'self'; script-src 'self' 'nonce-lopW8WA2WUUtzuuGPGuN8Gy3q'
+                https://apps.fedoraproject.org https://mdapi.fedoraproject.org https://transtats.fedoraproject.org;
+                style-src 'self' 'nonce-lopW8WA2WUUtzuuGPGuN8Gy3q'; object-src 'none';
+                base-uri 'self'; img-src 'self' https:; connect-src 'self' https://apps.fedoraproject.org
+                https://mdapi.fedoraproject.org https://transtats.fedoraproject.org
+                https://bodhi.fedoraproject.org;
+              content-type: application/json
+              set-cookie: a 'b';
+              x-fedora-appserver: pkgs01.iad2.fedoraproject.org
+            raw: !!binary ""
+            raw_decoded: !!binary ""
+            reason: OK
+            status_code: 200
       https://src.fedoraproject.org/api/0/fork/csomh/rpms/python-requre:
         all:
           metadata:

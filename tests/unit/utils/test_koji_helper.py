@@ -327,6 +327,65 @@ def test_get_build_target(error):
 
 
 @pytest.mark.parametrize(
+    "target, branch",
+    [
+        ("f41-candidate", "f41"),
+        ("f43-candidate", "rawhide"),
+        ("epel9", "epel9"),
+        ("epel10.1-candidate", "epel10"),
+    ],
+)
+def test_get_branch_from_target_name(target, branch):
+    targets = {
+        "f41-candidate": {
+            "build_tag_name": "f41-build",
+            "dest_tag_name": "f41-updates-candidate",
+        },
+        "f43-candidate": {
+            "build_tag_name": "f43-build",
+            "dest_tag_name": "f43-updates-candidate",
+        },
+        "epel9": {
+            "build_tag_name": "epel9-build",
+            "dest_tag_name": "epel9-testing-candidate",
+        },
+        "epel10.1-candidate": {
+            "build_tag_name": "epel10.1-build",
+            "dest_tag_name": "epel10.1-testing-candidate",
+        },
+    }
+
+    candidate_tags = {
+        "rawhide": "f43-updates-candidate",
+        "epel10": "epel10.1-testing-candidate",
+    }
+
+    stable_tags = {
+        "f41-updates-candidate": ["f41-updates", "f41"],
+        "epel9-testing-candidate": ["epel9"],
+    }
+
+    @koji_session_virtual_method()
+    def getBuildTarget(target_name, *_, **__):
+        return targets[target_name]
+
+    def get_candidate_tag(branch, *_, **__):
+        return candidate_tags[branch]
+
+    def get_stable_tags(tag, *_, **__):
+        return stable_tags[tag]
+
+    flexmock(ClientSession).new_instances(flexmock(getBuildTarget=getBuildTarget))
+    koji_helper = KojiHelper()
+    flexmock(
+        koji_helper,
+        get_candidate_tag=get_candidate_tag,
+        get_stable_tags=get_stable_tags,
+    )
+    assert koji_helper.get_branch_from_target_name(target) == branch
+
+
+@pytest.mark.parametrize(
     "branch, tag",
     [
         ("f39", "f39-updates-candidate"),
