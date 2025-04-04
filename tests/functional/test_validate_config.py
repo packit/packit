@@ -23,6 +23,7 @@ def test_srpm_command_for_path(upstream_or_distgit_path, tmp_path):
             parameters=["--debug", "validate-config", str(upstream_or_distgit_path)],
         )
 
+
 @pytest.fixture
 def dummy_local_project(tmp_path):
     """Fixture that creates a mock local project with a working directory."""
