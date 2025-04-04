@@ -6,10 +6,20 @@ require:
   - python3-packit
   - python3-specfile
   - python3-requests-kerberos
+
 component:
   - packit
-tier: 2
+
+tier: 1
 tag:
   - requre
+
 test: pytest-3 -v .
 duration: 10m
+
+adjust:
+  - when: initiator == human
+    because: "Install openSUSE deps that get pulled in on TF by installing Packit RPM"
+    require+:
+      - osc
+      - python3-opensuse-distro-aliases
