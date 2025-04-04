@@ -7,6 +7,7 @@ Validate PackageConfig
 
 import logging
 import os
+from typing import Optional
 
 import click
 
@@ -28,7 +29,11 @@ logger = logging.getLogger(__name__)
     help="Do not make remote API calls requiring network access.",
 )
 @cover_packit_exception
-def validate_config(path_or_url: LocalProject, offline: bool):
+def validate_config(
+    path_or_url: LocalProject,
+    offline: bool,
+    config: Optional[str] = None,
+):
     """
     Validate PackageConfig.
 
@@ -39,6 +44,7 @@ def validate_config(path_or_url: LocalProject, offline: bool):
 
     PATH_OR_URL argument is a local path or a URL to a git repository with packit configuration file
     """
-    output = PackitAPI.validate_package_config(path_or_url.working_dir, offline)
+
+    output = PackitAPI.validate_package_config(path_or_url.working_dir, offline, config)
     logger.info(output)
     # TODO: print more if config.debug
