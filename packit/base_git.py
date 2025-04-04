@@ -565,8 +565,8 @@ class PackitRepositoryBase:
         self._specfile = specfile
 
     def is_dirty(self) -> bool:
-        """is the git repo dirty?"""
-        return self.local_project.git_repo.is_dirty()
+        """is the git repo dirty (ignoring submodules)?"""
+        return self.local_project.git_repo.is_dirty(submodules=False)
 
     def push(self, refspec: str, remote_name: str = "origin", force: bool = False):
         """push selected refspec to a git remote"""
