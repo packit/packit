@@ -51,7 +51,6 @@ jobs:
     dist_git_branches:
       rawhide:
         fast_forward_merge_into: [fedora-branched]
-      epel-9: {}
 
   - job: copr_build
     trigger: pull_request
