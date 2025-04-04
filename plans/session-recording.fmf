@@ -1,7 +1,7 @@
 summary: Session recording testcases
 
 discover+:
-  filter: tier:2
+  filter: tag:requre
 
 adjust:
   - when: "initiator == packit"

@@ -10,7 +10,7 @@ require:
 component:
   - packit
 
-tier: 2
+tier: 1
 tag:
   - requre
 
