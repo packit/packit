@@ -30,6 +30,7 @@ from typing import (
 import bugzilla
 import click
 import git
+import yaml
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
 from ogr.exceptions import PagureAPIException
@@ -2569,11 +2570,17 @@ The first dist-git commit to be synced is '{short_hash}'.
             self.up.local_project.free_resources()
 
     @staticmethod
-    def validate_package_config(working_dir: Path, offline: bool = False) -> str:
+    def validate_package_config(
+        working_dir: Path,
+        offline: bool = False,
+        config: Optional[str] = None,
+    ) -> Optional[str]:
         """Validate package config.
 
         Args:
             working_dir: Directory with the package config.
+            config: Optional path to a specific Packit configuration file to validate.
+            If not provided, the default config file in the working directory will be used.
 
         Returns:
             String that the config is valid.
@@ -2581,14 +2588,31 @@ The first dist-git commit to be synced is '{short_hash}'.
         Raises:
             PackitConfigException: when the config is not valid
         """
-
-        config_path = find_packit_yaml(
-            working_dir,
-            try_local_dir_last=True,
+        config_path = (
+            Path(config)
+            if config
+            else find_packit_yaml(working_dir, try_local_dir_last=True)
         )
-        config_content = load_packit_yaml(config_path)
-        v = PackageConfigValidator(config_path, config_content, working_dir, offline)
-        return v.validate()
+
+        if not config_path.exists():
+            logger.error(f"Configuration file not found: {config_path}")
+            return None
+
+        logger.info(f"Validating config file: {config_path}")
+
+        try:
+            config_content = load_packit_yaml(config_path)
+        except yaml.YAMLError as e:
+            logger.error(f"Failed to parse YAML file: {e}")
+            return None
+
+        validator = PackageConfigValidator(
+            config_path,
+            config_content,
+            working_dir,
+            offline,
+        )
+        return validator.validate()
 
     def init_source_git(
         self,
