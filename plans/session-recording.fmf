@@ -15,9 +15,13 @@ adjust:
       - how: shell
         script: sed -i -n '/^priority=/!p;$apriority=5' /etc/yum.repos.d/*:packit:packit-dev.repo
 
-      # upgrade ogr and specfile in case they are already installed
+      # upgrade or install ‹ogr›, if needed
       - how: shell
-        script: dnf -y upgrade python3-ogr python3-specfile
+        script: dnf -y upgrade python3-ogr || dnf -y install python3-ogr
+
+      # upgrade or install ‹specfile›, if needed
+      - how: shell
+        script: dnf -y upgrade python3-specfile || dnf -y install python3-specfile
 
   - when: "distro <= rhel-9 or distro <= centos-9 or distro == centos-stream-8 or distro == centos-stream-9"
     prepare+:
