@@ -3,6 +3,7 @@
 
 import pathlib
 from contextlib import suppress as does_not_raise
+from pathlib import Path
 
 import pytest
 from bugzilla import Bugzilla
@@ -677,3 +678,89 @@ def test_get_upstream_release_monitoring_bug(package_name, version, response, re
     assert (
         PackitAPI.get_upstream_release_monitoring_bug(package_name, version) == result
     )
+
+
+def get_api_instance_for_sync_test(dummy_spec):
+    # Create an instance with sync_changelog disabled.
+    config = Config()
+    package_config = flexmock(sync_changelog=False)
+    api = PackitAPI(config, package_config)
+    up = flexmock()
+    up.should_receive("get_absolute_specfile_path").and_return(Path(dummy_spec))
+    api._up = up
+    api._dg = flexmock()
+    return api
+
+
+def test_prepare_files_to_sync_excludes_upstream_spec_file(tmp_path):
+    """
+    Verify that _prepare_files_to_sync excludes the upstream spec file.
+    When a SyncFilesItem represents a directory, an rsync exclude filter
+    is added unconditionally.
+    """
+    dummy_spec = tmp_path / "specfile.spec"
+    api = get_api_instance_for_sync_test(dummy_spec)
+    # Expect that update_dist_git is called even though the spec file will not be synced.
+    flexmock(ChangelogHelper).should_receive("update_dist_git").once().and_return(None)
+
+    # Create a file_included mock that simulates a directory.
+    file_included = flexmock(name="file_included")
+    # Set its src property to a directory path
+    file_included.src = [str(tmp_path)]
+    # Ensure the filters list is initially empty.
+    file_included.filters = []
+    file_included.should_receive("drop_src").with_args(dummy_spec).once().and_return(
+        file_included,
+    )
+
+    # Create a file_excluded mock that represents the spec file.
+    file_excluded = flexmock(name="file_excluded")
+    file_excluded.should_receive("drop_src").with_args(dummy_spec).once().and_return(
+        None,
+    )
+
+    result = api._prepare_files_to_sync(
+        files_to_sync=[file_included, file_excluded],
+        full_version="1.0.0",
+        upstream_tag="v1.0.0",
+        resolved_bugs=None,
+    )
+    # The expected exclude rule is based on the basename of the spec file.
+    expected_rule = f"--filter='- {dummy_spec.name}'"
+    # Assert the file_included now has the exclude rule.
+    assert expected_rule in file_included.filters
+    # And only file_included is kept in the result.
+    assert result == [file_included]
+
+
+def test_prepare_files_to_sync_keeps_all_files_when_none_is_spec(tmp_path):
+    """
+    Verify that if none of the files represent the upstream spec,
+    all items are kept. For items whose source is not a directory,
+    no extra filter is added.
+    """
+    dummy_spec = tmp_path / "specfile.spec"
+    api = get_api_instance_for_sync_test(str(dummy_spec))
+    flexmock(ChangelogHelper).should_receive("update_dist_git").once().and_return(None)
+
+    # Create two file mocks with non-directory sources.
+    file1 = flexmock(name="file1")
+    file2 = flexmock(name="file2")
+    # Set src properties to non-directory paths.
+    file1.src = ["/some/file.txt"]
+    file1.filters = []
+    file2.src = ["/some/file2.txt"]
+    file2.filters = []
+    file1.should_receive("drop_src").with_args(dummy_spec).once().and_return(file1)
+    file2.should_receive("drop_src").with_args(dummy_spec).once().and_return(file2)
+
+    result = api._prepare_files_to_sync(
+        files_to_sync=[file1, file2],
+        full_version="1.0.0",
+        upstream_tag="v1.0.0",
+        resolved_bugs=None,
+    )
+    # Since the sources are not directories, no filter rule is added.
+    assert file1.filters == []
+    assert file2.filters == []
+    assert result == [file1, file2]
