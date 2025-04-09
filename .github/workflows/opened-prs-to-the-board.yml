@@ -1,0 +1,13 @@
+name: Move PRs into the Kanban board
+
+on:
+  pull_request_target:
+
+jobs:
+  add-pr-to-the-kanban-board:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.3.0
+        with:
+          project-url: https://github.com/orgs/packit/projects/7
+          github-token: ${{ secrets.RELEASEBOT_GITHUB_TOKEN }}
