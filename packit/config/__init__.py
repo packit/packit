@@ -5,6 +5,7 @@ from packit.config.common_package_config import (
     CommonPackageConfig,
     Deployment,
     MultiplePackages,
+    OshOptionsConfig,
 )
 from packit.config.config import (
     Config,
@@ -37,6 +38,7 @@ __all__ = [
     MultiplePackages.__name__,
     PackageConfig.__name__,
     RunCommandType.__name__,
+    OshOptionsConfig.__name__,
     "get_context_settings",
     "get_default_map_from_file",
     "parse_loaded_config",

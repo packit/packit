@@ -23,6 +23,7 @@ from packit.config import (
     CommonPackageConfig,
     Config,
     Deployment,
+    OshOptionsConfig,
     PackageConfig,
 )
 from packit.config.aliases import DEPRECATED_TARGET_MAP
@@ -411,6 +412,20 @@ def validate_repo_name(value):
     return True
 
 
+class OshOptionsSchema(Schema):
+    """
+    Schema for processing additional osh options
+    """
+
+    analyzer = fields.String(missing=None)
+    config = fields.String(missing=None)
+    profile = fields.String(missing=None)
+
+    @post_load
+    def make_instance(self, data, **_):
+        return OshOptionsConfig(**data)
+
+
 class CommonConfigSchema(Schema):
     """
     Common configuration options and methods for a package.
@@ -510,6 +525,7 @@ class CommonConfigSchema(Schema):
     osh_diff_scan_after_copr_build = fields.Boolean(missing=True)
 
     csmock_args = fields.String(missing=None)
+    osh_options = fields.Nested(OshOptionsSchema)
 
     use_target_repo_for_fmf_url = fields.Boolean(missing=False)
 
