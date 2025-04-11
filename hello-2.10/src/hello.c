@@ -107,7 +107,7 @@ main (int argc, char *argv[])
 
   exit (EXIT_SUCCESS);
 }
-
+
 
 /* Print help info.  This long message is split into
    several pieces to help translators be able to align different
@@ -161,7 +161,7 @@ Report bugs to: %s\n"), PACKAGE_BUGREPORT);
   fputs (_("General help using GNU software: <http://www.gnu.org/gethelp/>\n"),
 	 stdout);
 }
-
+
 
 
 /* Print version and copyright information.  */

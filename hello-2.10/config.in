@@ -980,4 +980,3 @@
 #else
 # define _GL_ATTRIBUTE_CONST /* empty */
 #endif
-

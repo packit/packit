@@ -213,7 +213,7 @@ LIBRARIES = $(noinst_LIBRARIES)
 AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
-am__v_AR_1 = 
+am__v_AR_1 =
 lib_libhello_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 =
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -243,11 +243,11 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 = 
+am__v_GEN_1 =
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 = 
+am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -257,13 +257,13 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
+am__v_CC_1 =
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
+am__v_CCLD_1 =
 SOURCES = $(lib_libhello_a_SOURCES) $(EXTRA_lib_libhello_a_SOURCES) \
 	$(hello_SOURCES)
 DIST_SOURCES = $(lib_libhello_a_SOURCES) \
@@ -271,31 +271,31 @@ DIST_SOURCES = $(lib_libhello_a_SOURCES) \
 AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
 am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
 am__v_DVIPS_0 = @echo "  DVIPS   " $@;
-am__v_DVIPS_1 = 
+am__v_DVIPS_1 =
 AM_V_MAKEINFO = $(am__v_MAKEINFO_@AM_V@)
 am__v_MAKEINFO_ = $(am__v_MAKEINFO_@AM_DEFAULT_V@)
 am__v_MAKEINFO_0 = @echo "  MAKEINFO" $@;
-am__v_MAKEINFO_1 = 
+am__v_MAKEINFO_1 =
 AM_V_INFOHTML = $(am__v_INFOHTML_@AM_V@)
 am__v_INFOHTML_ = $(am__v_INFOHTML_@AM_DEFAULT_V@)
 am__v_INFOHTML_0 = @echo "  INFOHTML" $@;
-am__v_INFOHTML_1 = 
+am__v_INFOHTML_1 =
 AM_V_TEXI2DVI = $(am__v_TEXI2DVI_@AM_V@)
 am__v_TEXI2DVI_ = $(am__v_TEXI2DVI_@AM_DEFAULT_V@)
 am__v_TEXI2DVI_0 = @echo "  TEXI2DVI" $@;
-am__v_TEXI2DVI_1 = 
+am__v_TEXI2DVI_1 =
 AM_V_TEXI2PDF = $(am__v_TEXI2PDF_@AM_V@)
 am__v_TEXI2PDF_ = $(am__v_TEXI2PDF_@AM_DEFAULT_V@)
 am__v_TEXI2PDF_0 = @echo "  TEXI2PDF" $@;
-am__v_TEXI2PDF_1 = 
+am__v_TEXI2PDF_1 =
 AM_V_texinfo = $(am__v_texinfo_@AM_V@)
 am__v_texinfo_ = $(am__v_texinfo_@AM_DEFAULT_V@)
 am__v_texinfo_0 = -q
-am__v_texinfo_1 = 
+am__v_texinfo_1 =
 AM_V_texidevnull = $(am__v_texidevnull_@AM_V@)
 am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
 am__v_texidevnull_0 = > /dev/null
-am__v_texidevnull_1 = 
+am__v_texidevnull_1 =
 INFO_DEPS = $(srcdir)/doc/hello.info
 TEXINFO_TEX = $(top_srcdir)/build-aux/texinfo.tex
 am__TEXINFO_TEX_DIR = $(top_srcdir)/build-aux
@@ -1335,7 +1335,7 @@ MOSTLYCLEANFILES = lib/core lib/*.stackdump lib/errno.h lib/errno.h-t \
 	lib/string.h-t lib/sys/types.h lib/sys/types.h-t lib/unistd.h \
 	lib/unistd.h-t lib/wchar.h lib/wchar.h-t lib/wctype.h \
 	lib/wctype.h-t
-MOSTLYCLEANDIRS = 
+MOSTLYCLEANDIRS =
 
 # The BUILT_SOURCES created by this Makefile snippet are not used via #include
 # statements but through direct file reference. Therefore this snippet must be
@@ -1457,7 +1457,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.in:  $(am__configure_deps) 
+$(srcdir)/config.in:  $(am__configure_deps)
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
@@ -1599,7 +1599,7 @@ src/$(DEPDIR)/$(am__dirstamp):
 	@: > src/$(DEPDIR)/$(am__dirstamp)
 src/hello.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 
-hello$(EXEEXT): $(hello_OBJECTS) $(hello_DEPENDENCIES) $(EXTRA_hello_DEPENDENCIES) 
+hello$(EXEEXT): $(hello_OBJECTS) $(hello_DEPENDENCIES) $(EXTRA_hello_DEPENDENCIES)
 	@rm -f hello$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(hello_OBJECTS) $(hello_LDADD) $(LIBS)
 
@@ -2104,7 +2104,7 @@ check-TESTS:
 	log_list=`echo $$log_list`; trs_list=`echo $$trs_list`; \
 	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) TEST_LOGS="$$log_list"; \
 	exit $$?;
-recheck: all 
+recheck: all
 	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 	@set +e; $(am__set_TESTS_bases); \
 	bases=`for i in $$bases; do echo $$i; done \
