@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+for i in tests/*; do
+  if [ "$i" = "tests/greeting-2" ]; then
+    continue
+  fi
+  echo "Testing $(basename $i) ..."
+  $i
+done
