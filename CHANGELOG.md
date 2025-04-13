@@ -1,3 +1,7 @@
+# 1.7.0
+
+- We have implemented a set of options `osh_options` that allow you to customize OpenScanHub scans via config. (#2570)
+
 # 1.6.0
 
 - When using `fast_forward_merge_into`, `version_update_mask` is now correctly being taken into consideration. (#2551)
