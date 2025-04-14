@@ -1627,7 +1627,7 @@ class Archive:
         }
         env = env | self.upstream.package_config.get_package_names_as_env()
         env = env | self.upstream.package_config.get_specfile_path_env()
-        
+
         if self.upstream.actions_handler.has_action(action=ActionName.create_archive):
             outputs = self.upstream.actions_handler.get_output_from_action(
                 action=ActionName.create_archive,
