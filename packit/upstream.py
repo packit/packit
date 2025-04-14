@@ -159,9 +159,11 @@ class Upstream:
 
     def get_version_from_action(self) -> Optional[str]:
         """Provide version from action"""
+        env = self.package_config.get_package_names_as_env()
+        env |= self.package_config.get_specfile_path_env()
         action_output = self.actions_handler.get_output_from_action(
             action=ActionName.get_current_version,
-            env=self.package_config.get_package_names_as_env(),
+            env=env,
         )
         return action_output[-1].strip() if action_output else None
 
@@ -1506,6 +1508,7 @@ class SRPMBuilder:
                 self.upstream.local_project.ref,
             ),
         }
+        env = env | self.upstream.package_config.get_specfile_path_env()
 
         # in case we are given template as a release suffix
         if release_suffix and reduce(
@@ -1626,6 +1629,8 @@ class Archive:
             "PACKIT_PROJECT_NAME_VERSION": dir_name,
         }
         env = env | self.upstream.package_config.get_package_names_as_env()
+        env = env | self.upstream.package_config.get_specfile_path_env()
+        
         if self.upstream.actions_handler.has_action(action=ActionName.create_archive):
             outputs = self.upstream.actions_handler.get_output_from_action(
                 action=ActionName.create_archive,
