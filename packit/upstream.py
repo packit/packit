@@ -1629,7 +1629,7 @@ class Archive:
             "PACKIT_PROJECT_NAME_VERSION": dir_name,
         }
         env = env | self.upstream.package_config.get_package_names_as_env()
-        
+
         if self.upstream.actions_handler.has_action(action=ActionName.create_archive):
             outputs = self.upstream.actions_handler.get_output_from_action(
                 action=ActionName.create_archive,
