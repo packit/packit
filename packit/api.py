@@ -296,8 +296,12 @@ class PackitAPI:
             Dictionary with environment variables that are exposed to the
             action.
         """
+
+        # Add specfile path
+        env = self.up.package_config.get_base_env()
+
         # Add paths to the repositories
-        env = {
+        env = env | {
             variable_name: str(repo.local_project.working_dir)
             for variable_name, repo in (
                 ("PACKIT_DOWNSTREAM_REPO", self.dg),
@@ -332,8 +336,8 @@ class PackitAPI:
         # Add package names
         env |= self.up.package_config.get_package_names_as_env()
 
-        # Add specfile path
-        env |= self.up.package_config.get_specfile_path_env()
+        # # Add specfile path
+        # env |= self.up.package_config.get_base_env()
 
         return env
 

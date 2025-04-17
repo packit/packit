@@ -597,19 +597,26 @@ class MultiplePackages:
             raise PackitConfigException("No packages in config")
         raise PackitConfigException("Multiple packages in config")
 
-    def get_specfile_path_env(self) -> dict[str, str]:
+    def get_base_env(self) -> dict[str, str]:
         """Creates a dict with a single key for specfile_path,
         to be set in the environment variables
 
         If the specfile_path value is not set in the
         config file, it defaults to <downstream_package_name>.spec
-        :param action: The current action being carried out, used for logging info
+
+        If the config contains multiple packages
+        raise an Exception.
+
         :return: dict[str, str]
         """
 
-        if not (specfile_path := self.specfile_path):
-            specfile_path = f"{self.downstream_package_name}.spec"
+        if len(self.packages) == 1:
+            for packit_package_name, package_config in self.packages.items():
+                if not (specfile_path := package_config.specfile_path):
+                    specfile_path = f"{self.downstream_package_name}.spec"
 
-        env = {}
-        env["PACKIT_SPECFILE_PATH"] = specfile_path
-        return env
+                env = {}
+                env["PACKIT_SPECFILE_PATH"] = specfile_path
+                return env
+            raise PackitConfigException("No packages in config")
+        raise PackitConfigException("Multiple packages in config")
