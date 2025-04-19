@@ -336,9 +336,6 @@ class PackitAPI:
         # Add package names
         env |= self.up.package_config.get_package_names_as_env()
 
-        # # Add specfile path
-        # env |= self.up.package_config.get_base_env()
-
         return env
 
     def update_dist_git(

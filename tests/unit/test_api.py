@@ -168,6 +168,7 @@ def test_sync_release_version_tag_processing(
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
     api_mock.dg.should_receive("get_specfile_version").and_return("0")
     api_mock.dg.should_receive("specfile").and_return(
         flexmock().should_receive("reload").mock(),
@@ -192,6 +193,7 @@ def test_sync_release_do_not_create_sync_note(api_mock):
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
     api_mock.up.package_config.create_sync_note = False
     api_mock.dg.should_receive("get_specfile_version").and_return("0")
     api_mock.dg.should_receive("specfile").and_return(
@@ -209,6 +211,7 @@ def test_sync_release_create_sync_note(api_mock):
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
     api_mock.dg.should_receive("get_specfile_version").and_return("0")
     api_mock.dg.should_receive("specfile").and_return(
         flexmock().should_receive("reload").mock(),
@@ -225,6 +228,7 @@ def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
     api_mock.dg.should_receive("push_to_fork").and_return()
     api_mock.dg.should_receive("get_specfile_version").and_return("0")
     api_mock.dg.should_receive("specfile").and_return(
@@ -245,6 +249,7 @@ def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
 
 
 def test_common_env(api_mock):
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
     env = api_mock.common_env()
     assert env == {
         "PACKIT_DOWNSTREAM_REPO": "/mock_dir/sandcastle/dist-git",
@@ -411,6 +416,7 @@ def test_sync_release_check_pr_instructions(api_mock, pr_description, project):
         flexmock().should_receive("reload").mock(),
     )
     api_mock.up.package_config.should_receive("get_package_names_as_env").and_return({})
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
     api_mock.dg.should_receive("get_specfile_version").and_return("0")
     api_mock.dg.should_receive("specfile").and_return(
         flexmock().should_receive("reload").mock(),
