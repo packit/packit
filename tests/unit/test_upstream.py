@@ -126,6 +126,9 @@ def test_get_current_version(action_output, version, expected_result, upstream_m
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
         {},
     )
+    upstream_mock.package_config.should_receive("get_base_env").and_return(
+        {},
+    )
     assert upstream_mock.get_current_version() == expected_result
 
 
@@ -357,6 +360,9 @@ def test_release_suffix(
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
         {},
     )
+    upstream_mock.package_config.should_receive("get_base_env").and_return(
+        {},
+    )
     flexmock(upstream_mock).should_receive("specfile").and_return(
         flexmock(expanded_release=expanded_release_suffix)
         .should_receive("reload")
@@ -467,6 +473,9 @@ def test_get_spec_release(
         current_git_tag_version,
     )
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
+        {},
+    )
+    upstream_mock.package_config.should_receive("get_base_env").and_return(
         {},
     )
 
@@ -595,6 +604,7 @@ def test_fix_spec(
     upstream_mock.package_config.should_receive("get_package_names_as_env").and_return(
         {},
     )
+    upstream_mock.package_config.should_receive("get_base_env").and_return({})
     archive = "an_archive_name"
     current_git_tag_version = "4.5"
     original_release_number_from_spec = "2"
