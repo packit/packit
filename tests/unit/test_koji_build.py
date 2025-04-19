@@ -137,7 +137,10 @@ def test_koji_build(package_config_yaml, how_many_builds):
         flexmock(PackitAPI).should_receive("build").and_return().twice()
 
     from packit.utils import commands
-    flexmock(commands).should_receive("run_command").and_return("Repository cloned successfully")
+
+    flexmock(commands).should_receive("run_command").and_return(
+        "Repository cloned successfully",
+    )
 
     runner = CliRunner()
     runner.invoke(packit_base, ["build", "in-koji"])
