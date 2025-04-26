@@ -341,6 +341,7 @@ def test_fix_spec_action_with_macros(upstream_instance):
             "PACKIT_CONFIG_PACKAGE_NAME": "beer",
             "PACKIT_UPSTREAM_PACKAGE_NAME": "beerware",
             "PACKIT_DOWNSTREAM_PACKAGE_NAME": "beer",
+            "PACKIT_SPECFILE_PATH": "beer.spec",
         },
     )
 

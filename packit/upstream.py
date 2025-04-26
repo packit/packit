@@ -159,11 +159,9 @@ class Upstream:
 
     def get_version_from_action(self) -> Optional[str]:
         """Provide version from action"""
-        env = self.package_config.get_package_names_as_env()
-        env |= self.package_config.get_specfile_path_env()
         action_output = self.actions_handler.get_output_from_action(
             action=ActionName.get_current_version,
-            env=env,
+            env = self.package_config.get_base_env(),
         )
         return action_output[-1].strip() if action_output else None
 
@@ -1070,7 +1068,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
         Args:
             upstream_ref: the base git ref for the source git
         """
-        env = self.package_config.get_package_names_as_env()
+        env = self.package_config.get_base_env()
         if self.actions_handler.with_action(action=ActionName.create_patches, env=env):
             patches = self.create_patches(
                 upstream=upstream_ref,
@@ -1498,7 +1496,8 @@ class SRPMBuilder:
         # * PACKIT_PROJECT - info about the project which we obtained
         # * PACKIT_RPMSPEC - data for the project's specfile assembled by us
         #                  - RPMSPEC is more descriptive than just SPEC
-        env = {
+        env = self.upstream.package_config.get_base_env()
+        env = env | {
             "PACKIT_PROJECT_VERSION": self.current_version,
             # Spec file %release field which packit sets by default
             "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(release_suffix),
@@ -1508,7 +1507,6 @@ class SRPMBuilder:
                 self.upstream.local_project.ref,
             ),
         }
-        env = env | self.upstream.package_config.get_specfile_path_env()
 
         # in case we are given template as a release suffix
         if release_suffix and reduce(
@@ -1526,7 +1524,6 @@ class SRPMBuilder:
             new_release = release_suffix.format(**env)
         else:
             new_release = self.upstream.get_spec_release(release_suffix)
-        env = env | self.upstream.package_config.get_package_names_as_env()
 
         if self.upstream.actions_handler.with_action(
             action=ActionName.fix_spec,
@@ -1624,13 +1621,11 @@ class Archive:
         dir_name = f"{package_name}-{self.version}"
         logger.debug(f"Name + version = {dir_name}")
 
-        env = {
+        env = self.upstream.package_config.get_base_env()
+        env = env | {
             "PACKIT_PROJECT_VERSION": self.version,
             "PACKIT_PROJECT_NAME_VERSION": dir_name,
         }
-        env = env | self.upstream.package_config.get_package_names_as_env()
-        env = env | self.upstream.package_config.get_specfile_path_env()
-        
         if self.upstream.actions_handler.has_action(action=ActionName.create_archive):
             outputs = self.upstream.actions_handler.get_output_from_action(
                 action=ActionName.create_archive,

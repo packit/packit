@@ -202,6 +202,7 @@ def test_update_distgit_changelog_entry_action_pass_env_vars(
         "PACKIT_RESOLVED_BUGS": "rhbz#123 rhbz#124",
         "PACKIT_PROJECT_UPSTREAM_TAG": "0.1.0",
         "PACKIT_PROJECT_PREVIOUS_VERSION": "0.0.0",
+        "PACKIT_SPECFILE_PATH": "beer.spec",
     }
     flexmock(upstream.actions_handler).should_receive(
         "get_output_from_action",

@@ -72,13 +72,13 @@ class ChangelogHelper:
             Changelog entry or `None` if action is not present.
         """
         resolved_bugs_str = " ".join(resolved_bugs) if resolved_bugs else ""
-        env = self.package_config.get_package_names_as_env() | {
+        env = self.package_config.get_base_env()
+        env = env | {
             "PACKIT_PROJECT_VERSION": version,
             "PACKIT_RESOLVED_BUGS": resolved_bugs_str,
             "PACKIT_PROJECT_UPSTREAM_TAG": upstream_tag or "",
             "PACKIT_PROJECT_PREVIOUS_VERSION": previous_version or "",
         }
-        env = env | self.package_config.get_specfile_path_env()
         messages = self.up.actions_handler.get_output_from_action(
             ActionName.changelog_entry,
             env=env,
