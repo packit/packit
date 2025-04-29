@@ -17,7 +17,6 @@ from marshmallow import (
     validates_schema,
 )
 
-from packit._compat.marshmallow import EnumField
 from packit.actions import ActionName
 from packit.config import (
     CommonPackageConfig,
@@ -373,7 +372,7 @@ class JobMetadataSchema(Schema):
     use_internal_tf = fields.Boolean()
     additional_packages = fields.List(fields.String(), load_default=None)
     additional_repos = fields.List(fields.String(), load_default=None)
-    bootstrap = EnumField(MockBootstrapSetup, load_default=None)
+    bootstrap = fields.Enum(MockBootstrapSetup, load_default=None)
     fmf_url = fields.String(load_default=None)
     fmf_ref = fields.String(load_default=None)
     fmf_path = fields.String(load_default=None)
@@ -475,7 +474,7 @@ class CommonConfigSchema(Schema):
     srpm_build_deps = fields.List(fields.String(), load_default=None)
     identifier = fields.String(load_default=None)
     packit_instances = fields.List(
-        EnumField(Deployment),
+        fields.Enum(Deployment),
         load_default=[Deployment.prod],
     )
     issue_repository = fields.String(load_default=None)
@@ -504,7 +503,7 @@ class CommonConfigSchema(Schema):
     use_internal_tf = fields.Boolean()
     additional_packages = fields.List(fields.String(), load_default=None)
     additional_repos = fields.List(fields.String(), load_default=None)
-    bootstrap = EnumField(MockBootstrapSetup, load_default=None)
+    bootstrap = fields.Enum(MockBootstrapSetup, load_default=None)
     fmf_url = fields.String(load_default=None)
     fmf_ref = fields.String(load_default=None)
     fmf_path = fields.String(load_default=None)
@@ -574,8 +573,8 @@ class JobConfigSchema(Schema):
     Schema for processing JobConfig config data.
     """
 
-    job = EnumField(JobType, required=True, attribute="type")
-    trigger = EnumField(JobConfigTriggerType, required=True)
+    job = fields.Enum(JobType, required=True, attribute="type")
+    trigger = fields.Enum(JobConfigTriggerType, required=True)
     skip_build = fields.Boolean()
     manual_trigger = fields.Boolean()
     labels = fields.List(fields.String(), load_default=None)

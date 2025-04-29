@@ -8,7 +8,6 @@ from flexmock import flexmock
 from marshmallow import ValidationError
 from ogr import GithubService, PagureService
 
-from packit._compat.marshmallow import USE_MARSHMALLOW_ENUM
 from packit.config import (
     CommonPackageConfig,
     Config,
@@ -138,11 +137,7 @@ def test_job_config_not_equal(job_config_simple, job_config_full):
 def test_job_config_blah():
     with pytest.raises(ValidationError) as ex:
         JobConfig.get_from_dict({"job": "asdqwe", "trigger": "salt"})
-    if USE_MARSHMALLOW_ENUM:
-        assert "'trigger': ['Invalid enum member salt']" in str(ex.value)
-        assert "'job': ['Invalid enum member asdqwe']" in str(ex.value)
-    else:
-        assert "Must be one of" in str(ex.value)
+    assert "Must be one of" in str(ex.value)
 
 
 def expanded_job_config_dict(**kwargs):
