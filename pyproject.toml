@@ -43,7 +43,7 @@ dependencies = [
     "fedora-distro-aliases",
     "lazy_object_proxy",
     "marshmallow >= 3.13.0",
-    "marshmallow-enum",
+    "marshmallow-enum",  # TODO: Remove when requiring marshmallow>=3.18
     "munch",
     "ogr",
     "packaging",

@@ -16,8 +16,8 @@ from marshmallow import (
     pre_load,
     validates_schema,
 )
-from marshmallow_enum import EnumField
 
+from packit._compat.marshmallow import EnumField
 from packit.actions import ActionName
 from packit.config import (
     CommonPackageConfig,
