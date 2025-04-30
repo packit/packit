@@ -16,7 +16,6 @@ from marshmallow import (
     pre_load,
     validates_schema,
 )
-from marshmallow_enum import EnumField
 
 from packit.actions import ActionName
 from packit.config import (
@@ -72,9 +71,9 @@ class SyncFilesItemSchema(Schema):
 
     src = StringOrListOfStringsField()
     dest = fields.String()
-    mkpath = fields.Boolean(default=False)
-    delete = fields.Boolean(default=False)
-    filters = fields.List(fields.String(), missing=None)
+    mkpath = fields.Boolean(dump_default=False)
+    delete = fields.Boolean(dump_default=False)
+    filters = fields.List(fields.String(), load_default=None)
 
 
 class FilesToSyncField(fields.Field):
@@ -175,7 +174,7 @@ class SourceSchema(Schema):
 class PullRequestNotificationsSchema(Schema):
     """Configuration of commenting on pull requests."""
 
-    successful_build = fields.Bool(default=False)
+    successful_build = fields.Bool(dump_default=False)
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -185,7 +184,7 @@ class PullRequestNotificationsSchema(Schema):
 class FailureCommentNotificationsSchema(Schema):
     """Configuration of commenting on failures."""
 
-    message = fields.String(missing=None)
+    message = fields.String(load_default=None)
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -195,7 +194,7 @@ class FailureCommentNotificationsSchema(Schema):
 class FailureIssueNotificationsSchema(Schema):
     """Configuration of createing issues in upstream."""
 
-    create = fields.Bool(default=True)
+    create = fields.Bool(dump_default=True)
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -217,8 +216,8 @@ class NotificationsSchema(Schema):
 class TestCommandSchema(Schema):
     """Configuration of test command."""
 
-    default_labels = fields.List(fields.String, missing=None)
-    default_identifier = fields.String(missing=None)
+    default_labels = fields.List(fields.String, load_default=None)
+    default_identifier = fields.String(load_default=None)
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -237,7 +236,7 @@ class LabelRequirementsSchema(Schema):
 class RequirementsSchema(Schema):
     """Configuration of test command."""
 
-    label = fields.Nested(LabelRequirementsSchema, missing=None)
+    label = fields.Nested(LabelRequirementsSchema, load_default=None)
 
     @post_load
     def make_instance(self, data, **kwargs):
@@ -361,28 +360,28 @@ class JobMetadataSchema(Schema):
           dist_git_branch deprecation period.
     """
 
-    _targets = Targets(missing=None, data_key="targets")
+    _targets = Targets(load_default=None, data_key="targets")
     timeout = fields.Integer()
-    owner = fields.String(missing=None)
-    project = fields.String(missing=None)
-    dist_git_branches = DistGitBranches(missing=None)
-    branch = fields.String(missing=None)
+    owner = fields.String(load_default=None)
+    project = fields.String(load_default=None)
+    dist_git_branches = DistGitBranches(load_default=None)
+    branch = fields.String(load_default=None)
     scratch = fields.Boolean()
     list_on_homepage = fields.Boolean()
     preserve_project = fields.Boolean()
     use_internal_tf = fields.Boolean()
-    additional_packages = fields.List(fields.String(), missing=None)
-    additional_repos = fields.List(fields.String(), missing=None)
-    bootstrap = EnumField(MockBootstrapSetup, missing=None)
-    fmf_url = fields.String(missing=None)
-    fmf_ref = fields.String(missing=None)
-    fmf_path = fields.String(missing=None)
+    additional_packages = fields.List(fields.String(), load_default=None)
+    additional_repos = fields.List(fields.String(), load_default=None)
+    bootstrap = fields.Enum(MockBootstrapSetup, load_default=None)
+    fmf_url = fields.String(load_default=None)
+    fmf_ref = fields.String(load_default=None)
+    fmf_path = fields.String(load_default=None)
     skip_build = fields.Boolean()
-    env = fields.Dict(keys=fields.String(), missing=None)
-    enable_net = fields.Boolean(missing=False)
-    tmt_plan = fields.String(missing=None)
-    tf_post_install_script = fields.String(missing=None)
-    tf_extra_params = fields.Dict(missing=None)
+    env = fields.Dict(keys=fields.String(), load_default=None)
+    enable_net = fields.Boolean(load_default=False)
+    tmt_plan = fields.String(load_default=None)
+    tf_post_install_script = fields.String(load_default=None)
+    tf_extra_params = fields.Dict(load_default=None)
     module_hotfixes = fields.Boolean()
 
     @pre_load
@@ -417,9 +416,9 @@ class OshOptionsSchema(Schema):
     Schema for processing additional osh options
     """
 
-    analyzer = fields.String(missing=None)
-    config = fields.String(missing=None)
-    profile = fields.String(missing=None)
+    analyzer = fields.String(load_default=None)
+    config = fields.String(load_default=None)
+    profile = fields.String(load_default=None)
 
     @post_load
     def make_instance(self, data, **_):
@@ -431,103 +430,112 @@ class CommonConfigSchema(Schema):
     Common configuration options and methods for a package.
     """
 
-    config_file_path = fields.String(missing=None)
-    specfile_path = fields.String(missing=None)
-    downstream_package_name = fields.String(missing=None)
-    upstream_project_url = fields.String(missing=None)
-    upstream_package_name = fields.String(missing=None, validate=validate_repo_name)
+    config_file_path = fields.String(load_default=None)
+    specfile_path = fields.String(load_default=None)
+    downstream_package_name = fields.String(load_default=None)
+    upstream_project_url = fields.String(load_default=None)
+    upstream_package_name = fields.String(
+        load_default=None,
+        validate=validate_repo_name,
+    )
     paths = fields.List(fields.String())
-    upstream_ref = fields.String(missing=None)
+    upstream_ref = fields.String(load_default=None)
     upstream_tag_template = fields.String()
     archive_root_dir_template = fields.String()
     dist_git_url = NotProcessedField(
-        additional_message="it is generated from dist_git_base_url and downstream_package_name",
+        metadata={
+            "additional_message": "it is generated from dist_git_base_url and "
+            "downstream_package_name",
+        },
         load_only=True,
     )
-    dist_git_base_url = fields.String(mising=None)
-    dist_git_namespace = fields.String(missing=None)
-    allowed_gpg_keys = fields.List(fields.String(), missing=None)
+    dist_git_base_url = fields.String(load_default=None)
+    dist_git_namespace = fields.String(load_default=None)
+    allowed_gpg_keys = fields.List(fields.String(), load_default=None)
     spec_source_id = fields.Method(
         deserialize="spec_source_id_fm",
         serialize="spec_source_id_serialize",
     )
     files_to_sync = fields.List(FilesToSyncField())
-    actions = ActionField(default={})
-    create_pr = fields.Bool(default=True)
-    sync_changelog = fields.Bool(default=False)
-    create_sync_note = fields.Bool(default=True)
-    patch_generation_ignore_paths = fields.List(fields.String(), missing=None)
+    actions = ActionField(dump_default={})
+    create_pr = fields.Bool(dump_default=True)
+    sync_changelog = fields.Bool(dump_default=False)
+    create_sync_note = fields.Bool(dump_default=True)
+    patch_generation_ignore_paths = fields.List(fields.String(), load_default=None)
     patch_generation_patch_id_digits = fields.Integer(
-        missing=4,
-        default=4,
+        load_default=4,
+        dump_default=4,
         validate=lambda x: x >= 0,
     )
     notifications = fields.Nested(NotificationsSchema)
-    copy_upstream_release_description = fields.Bool(default=False)
-    sources = fields.List(fields.Nested(SourceSchema), missing=None)
-    merge_pr_in_ci = fields.Bool(default=True)
-    srpm_build_deps = fields.List(fields.String(), missing=None)
-    identifier = fields.String(missing=None)
-    packit_instances = fields.List(EnumField(Deployment), missing=[Deployment.prod])
-    issue_repository = fields.String(missing=None)
-    release_suffix = fields.String(missing=None)
-    update_release = fields.Bool(default=True)
+    copy_upstream_release_description = fields.Bool(dump_default=False)
+    sources = fields.List(fields.Nested(SourceSchema), load_default=None)
+    merge_pr_in_ci = fields.Bool(dump_default=True)
+    srpm_build_deps = fields.List(fields.String(), load_default=None)
+    identifier = fields.String(load_default=None)
+    packit_instances = fields.List(
+        fields.Enum(Deployment),
+        load_default=[Deployment.prod],
+    )
+    issue_repository = fields.String(load_default=None)
+    release_suffix = fields.String(load_default=None)
+    update_release = fields.Bool(dump_default=True)
     upstream_tag_include = fields.String()
     upstream_tag_exclude = fields.String()
     prerelease_suffix_pattern = fields.String()
-    prerelease_suffix_macro = fields.String(missing=None)
-    upload_sources = fields.Bool(default=True)
+    prerelease_suffix_macro = fields.String(load_default=None)
+    upload_sources = fields.Bool(dump_default=True)
     test_command = fields.Nested(TestCommandSchema)
     require = fields.Nested(RequirementsSchema)
-    status_name_template = fields.String(missing=None)
-    sync_test_job_statuses_with_builds = fields.Bool(default=True)
+    status_name_template = fields.String(load_default=None)
+    sync_test_job_statuses_with_builds = fields.Bool(dump_default=True)
 
     # Former 'metadata' keys
-    _targets = Targets(missing=None, data_key="targets")
+    _targets = Targets(load_default=None, data_key="targets")
     timeout = fields.Integer()
-    owner = fields.String(missing=None)
-    project = fields.String(missing=None)
-    dist_git_branches = DistGitBranches(missing=None)
-    branch = fields.String(missing=None)
+    owner = fields.String(load_default=None)
+    project = fields.String(load_default=None)
+    dist_git_branches = DistGitBranches(load_default=None)
+    branch = fields.String(load_default=None)
     scratch = fields.Boolean()
     list_on_homepage = fields.Boolean()
     preserve_project = fields.Boolean()
     use_internal_tf = fields.Boolean()
-    additional_packages = fields.List(fields.String(), missing=None)
-    additional_repos = fields.List(fields.String(), missing=None)
-    bootstrap = EnumField(MockBootstrapSetup, missing=None)
-    fmf_url = fields.String(missing=None)
-    fmf_ref = fields.String(missing=None)
-    fmf_path = fields.String(missing=None)
-    env = fields.Dict(keys=fields.String(), missing=None)
-    enable_net = fields.Boolean(missing=False)
-    allowed_pr_authors = fields.List(fields.String(), missing=None)
-    allowed_committers = fields.List(fields.String(), missing=None)
-    allowed_builders = fields.List(fields.String(), missing=None)
-    tmt_plan = fields.String(missing=None)
-    tf_post_install_script = fields.String(missing=None)
-    tf_extra_params = fields.Dict(missing=None)
+    additional_packages = fields.List(fields.String(), load_default=None)
+    additional_repos = fields.List(fields.String(), load_default=None)
+    bootstrap = fields.Enum(MockBootstrapSetup, load_default=None)
+    fmf_url = fields.String(load_default=None)
+    fmf_ref = fields.String(load_default=None)
+    fmf_path = fields.String(load_default=None)
+    env = fields.Dict(keys=fields.String(), load_default=None)
+    enable_net = fields.Boolean(load_default=False)
+    allowed_pr_authors = fields.List(fields.String(), load_default=None)
+    allowed_committers = fields.List(fields.String(), load_default=None)
+    allowed_builders = fields.List(fields.String(), load_default=None)
+    tmt_plan = fields.String(load_default=None)
+    tf_post_install_script = fields.String(load_default=None)
+    tf_extra_params = fields.Dict(load_default=None)
     module_hotfixes = fields.Boolean()
 
     # Image Builder integration
-    image_distribution = fields.String(missing=None)
+    image_distribution = fields.String(load_default=None)
     # these two are freeform so that users can immediately use IB's new features
-    image_request = fields.Dict(missing=None)
-    image_customizations = fields.Dict(missing=None)
-    copr_chroot = fields.String(missing=None)
+    image_request = fields.Dict(load_default=None)
+    image_customizations = fields.Dict(load_default=None)
+    copr_chroot = fields.String(load_default=None)
 
     # Packaging tool used for interaction with lookaside cache
-    pkg_tool = fields.String(missing=None)
-    sig = fields.String(missing=None)
-    version_update_mask = fields.String(missing=None)
+    pkg_tool = fields.String(load_default=None)
+    sig = fields.String(load_default=None)
+    version_update_mask = fields.String(load_default=None)
 
-    parse_time_macros = fields.Dict(missing=None)
-    osh_diff_scan_after_copr_build = fields.Boolean(missing=True)
+    parse_time_macros = fields.Dict(load_default=None)
+    osh_diff_scan_after_copr_build = fields.Boolean(load_default=True)
 
-    csmock_args = fields.String(missing=None)
+    csmock_args = fields.String(load_default=None)
     osh_options = fields.Nested(OshOptionsSchema)
 
-    use_target_repo_for_fmf_url = fields.Boolean(missing=False)
+    use_target_repo_for_fmf_url = fields.Boolean(load_default=False)
 
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
@@ -565,27 +573,27 @@ class JobConfigSchema(Schema):
     Schema for processing JobConfig config data.
     """
 
-    job = EnumField(JobType, required=True, attribute="type")
-    trigger = EnumField(JobConfigTriggerType, required=True)
+    job = fields.Enum(JobType, required=True, attribute="type")
+    trigger = fields.Enum(JobConfigTriggerType, required=True)
     skip_build = fields.Boolean()
     manual_trigger = fields.Boolean()
-    labels = fields.List(fields.String(), missing=None)
+    labels = fields.List(fields.String(), load_default=None)
     packages = fields.Dict(
         keys=fields.String(),
         values=fields.Nested(CommonConfigSchema()),
     )
-    package = fields.String(missing=None)
+    package = fields.String(load_default=None)
 
     # sidetag group identifier for downstream Koji builds and Bodhi updates
-    sidetag_group = fields.String(missing=None)
+    sidetag_group = fields.String(load_default=None)
 
     # packages that depend on this downstream Koji build to be tagged into
     # a particular sidetag group
-    dependents = fields.List(fields.String(), missing=None)
+    dependents = fields.List(fields.String(), load_default=None)
 
     # packages whose downstream Koji builds are required to be tagged into
     # a particular sidetag group by this downstream Koji build or Bodhi update
-    dependencies = fields.List(fields.String(), missing=None)
+    dependencies = fields.List(fields.String(), load_default=None)
 
     @pre_load
     def ordered_preprocess(self, data, **_):
@@ -940,12 +948,12 @@ class UserConfigSchema(Schema):
     command_handler_storage_class = fields.String()
     appcode = fields.String()
     kerberos_realm = fields.String()
-    package_config_path = fields.String(default=None)
+    package_config_path = fields.String(dump_default=None)
     koji_build_command = fields.String()
     pkg_tool = fields.String()
-    repository_cache = fields.String(default=None)
-    add_repositories_to_repository_cache = fields.Bool(default=True)
-    default_parse_time_macros = fields.Dict(missing=None)
+    repository_cache = fields.String(dump_default=None)
+    add_repositories_to_repository_cache = fields.Bool(dump_default=True)
+    default_parse_time_macros = fields.Dict(load_default=None)
 
     @post_load
     def make_instance(self, data, **kwargs):

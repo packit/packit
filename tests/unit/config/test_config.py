@@ -137,8 +137,7 @@ def test_job_config_not_equal(job_config_simple, job_config_full):
 def test_job_config_blah():
     with pytest.raises(ValidationError) as ex:
         JobConfig.get_from_dict({"job": "asdqwe", "trigger": "salt"})
-    assert "'trigger': ['Invalid enum member salt']" in str(ex.value)
-    assert "'job': ['Invalid enum member asdqwe']" in str(ex.value)
+    assert "Must be one of" in str(ex.value)
 
 
 def expanded_job_config_dict(**kwargs):
