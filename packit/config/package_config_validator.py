@@ -61,6 +61,20 @@ class PackageConfigValidator:
                 dir=self.config_file_path.parent,
                 repo_name=self.project_path.name,
             )
+            if config.upstream_tag_template:
+                # Check if the upstream_tag_template is a string
+                if not isinstance(config.upstream_tag_template, str):
+                    raise PackitConfigException(
+                        "'upstream_tag_template' must be a string.",
+                    )
+                # Validate if the upstream_tag_template is a valid format string
+                try:
+                    config.upstream_tag_template.format(version="1.0.0")
+                except Exception as ex:
+                    raise PackitConfigException(
+                        f"'upstream_tag_template' is not a valid format string: {ex}",
+                    ) from ex  # Use 'from ex' to indicate the cause of the new exception
+
         except ValidationError as e:
             schema_errors = e.messages
 
