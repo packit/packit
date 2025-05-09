@@ -1,3 +1,8 @@
+# 1.8.0
+
+- You can now validate a Packit config passed to the Packit CLI via a path, e.g., `packit config validate -c /tmp/my-custom-packit-config.yml`. (#2556)
+- The `--resultdir` argument in `build_in_mock` now defaults to the current directory (`"."`), preventing loss of build artifacts when not explicitly set. (#2567)
+
 # 1.7.0
 
 - We have implemented a set of options `osh_options` that allow you to customize OpenScanHub scans via config. (#2570)
