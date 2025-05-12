@@ -560,7 +560,7 @@ class CoprHelper:
             self.copr_client.build_proxy.cancel(build_id)
             return True
         except CoprRequestException as ex:
-            logger.error(f"Failed to cancel build {build_id}: {ex}")
+            logger.warning(f"Failed to cancel build {build_id}: {ex}")
             return False
 
     def get_repo_download_url(self, owner: str, project: str, chroot: str) -> str:
