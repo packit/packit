@@ -286,6 +286,7 @@ class PackitAPI:
           config
         * `PACKIT_UPSTREAM_PACKAGE_NAME` — name of the upstream package
         * `PACKIT_DOWNSTREAM_PACKAGE_NAME` — name of the downstream package
+        * `PACKIT_SPECFILE_PATH` — path to the specfile
 
         Args:
             version: Optional version to be passed to the environment. Defaults
@@ -296,8 +297,10 @@ class PackitAPI:
             Dictionary with environment variables that are exposed to the
             action.
         """
+        # Add environment variables common to all actions
+        env = self.up.package_config.get_base_env()
         # Add paths to the repositories
-        env = {
+        env = env | {
             variable_name: str(repo.local_project.working_dir)
             for variable_name, repo in (
                 ("PACKIT_DOWNSTREAM_REPO", self.dg),
@@ -328,9 +331,6 @@ class PackitAPI:
         # Add version, if provided
         if version:
             env["PACKIT_PROJECT_VERSION"] = version
-
-        # Add package names
-        env |= self.up.package_config.get_package_names_as_env()
 
         return env
 
