@@ -160,6 +160,13 @@ def test_get_current_version(action_output, version, expected_result, upstream_m
             pytest.raises(PackitException),
             id="no_match_found",
         ),
+        pytest.param(
+            "test_package_name-1.0.0",
+            "{upstream_package_name}-{version}",
+            "1.0.0",
+            does_not_raise(),
+            id="test with upstream_package_name in template",
+        ),
     ],
 )
 def test_get_version_from_tag(
@@ -279,6 +286,13 @@ def test_get_archive_root_dir_from_template(
             "1.0.0",
             pytest.raises(PackitException),
             id="invalid_template",
+        ),
+        pytest.param(
+            "1.0.0",
+            "{upstream_package_name}-{version}",
+            "test_package_name-1.0.0",
+            does_not_raise(),
+            id="upstream package name in the template",
         ),
     ],
 )

@@ -205,7 +205,10 @@ class Upstream:
              tag
         """
         try:
-            tag = self.package_config.upstream_tag_template.format(version=version_)
+            tag = self.package_config.upstream_tag_template.format(
+                version=version_,
+                upstream_package_name=self.package_config.upstream_package_name,
+            )
         except KeyError as e:
             msg = (
                 f"Invalid upstream_tag_template: {self.package_config.upstream_tag_template} - "
