@@ -81,8 +81,8 @@ jobs:
     trigger: commit
     branch: stable
     targets:
-      - fedora-latest-stable
-      - fedora-latest-stable-aarch64
+      - fedora-stable
+      - fedora-stable-aarch64
     project: packit-stable
     list_on_homepage: True
     preserve_project: True
