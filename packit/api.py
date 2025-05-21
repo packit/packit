@@ -12,7 +12,6 @@ import copy
 import logging
 import os
 import re
-import shlex
 import tempfile
 from collections.abc import Iterable, Sequence
 from datetime import datetime
@@ -2401,17 +2400,17 @@ The first dist-git commit to be synced is '{short_hash}'.
             csmock_args = self.package_config.csmock_args
 
         if csmock_args:
-            cmd.append("--csmock-args=" + shlex.quote(csmock_args))
+            cmd.append("--csmock-args=" + csmock_args)
 
-        osh_config = str(chroot)
+        osh_config = chroot
 
         if osh_options := self.package_config.osh_options:
             if analyzer := osh_options.analyzer:
-                cmd.append("--analyzer=" + shlex.quote(analyzer))
+                cmd.append("--analyzer=" + analyzer)
             if profile := osh_options.profile:
-                cmd.append("--profile=" + shlex.quote(profile))
+                cmd.append("--profile=" + profile)
             if config := osh_options.config:
-                osh_config = shlex.quote(config)
+                osh_config = config
 
         cmd.append("--config=" + osh_config)
         cmd.append("--nowait")
