@@ -21,6 +21,7 @@ class ActionName(Enum):
     - tests/integration/test_base_git.py
     """
 
+    run_condition = "run-condition"
     post_upstream_clone = "post-upstream-clone"
     pre_sync = "pre-sync"
     create_patches = "create-patches"
