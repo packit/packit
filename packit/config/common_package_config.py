@@ -593,9 +593,7 @@ class MultiplePackages:
                 env["PACKIT_DOWNSTREAM_PACKAGE_NAME"] = (
                     package_config.downstream_package_name or ""
                 )
-                if not (specfile_path := package_config.specfile_path):
-                    specfile_path = f"{self.downstream_package_name}.spec"
-                env["PACKIT_SPECFILE_PATH"] = specfile_path
+                env["PACKIT_SPECFILE_PATH"] = package_config.specfile_path
                 return env
             raise PackitConfigException("No packages in config")
         raise PackitConfigException("Multiple packages in config")
