@@ -205,6 +205,8 @@ class CommonPackageConfig:
         use_target_repo_for_fmf_url: If the target repo should be used for test.fmf.url
             field in a Testing Farm request (useful for PRs coming from a fork,
             where, by default, the fork repo is used).
+        clone_repos_before_run_condition: Whether to clone the repos before running
+            the run-condition action.
     """
 
     def __init__(
@@ -290,6 +292,7 @@ class CommonPackageConfig:
         osh_diff_scan_after_copr_build: Optional[bool] = True,
         csmock_args: Optional[str] = None,
         use_target_repo_for_fmf_url: Optional[bool] = False,
+        clone_repos_before_run_condition: Optional[bool] = False,
         osh_options: Optional[OshOptionsConfig] = None,
     ):
         self.config_file_path: Optional[str] = config_file_path
@@ -412,6 +415,8 @@ class CommonPackageConfig:
         self.osh_options = osh_options or OshOptionsConfig()
 
         self.use_target_repo_for_fmf_url = use_target_repo_for_fmf_url
+
+        self.clone_repos_before_run_condition = clone_repos_before_run_condition
 
     @property
     def dist_git_base_url(self) -> str:

@@ -537,6 +537,8 @@ class CommonConfigSchema(Schema):
 
     use_target_repo_for_fmf_url = fields.Boolean(load_default=False)
 
+    clone_repos_before_run_condition = fields.Boolean(load_default=False)
+
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id
