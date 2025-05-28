@@ -581,9 +581,9 @@ class MultiplePackages:
                 "there is more than one package in the config.",
             )
 
-    def get_package_names_as_env(self) -> dict[str, str]:
-        """Creates a dict with package_name,
-        downstream_package_name and upstream_package_name.
+    def get_base_env(self) -> dict[str, str]:
+        """Creates a dict containing the environment variables
+        common to all actions
 
         If the config contains multiple packages
         raise an Exception.
@@ -598,6 +598,7 @@ class MultiplePackages:
                 env["PACKIT_DOWNSTREAM_PACKAGE_NAME"] = (
                     package_config.downstream_package_name or ""
                 )
+                env["PACKIT_SPECFILE_PATH"] = package_config.specfile_path
                 return env
             raise PackitConfigException("No packages in config")
         raise PackitConfigException("Multiple packages in config")
