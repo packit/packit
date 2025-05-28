@@ -74,7 +74,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                     logger.error(exc)
                     click.echo(
                         "Unexpected exception occurred,\n"
-                        "please fill an issue here:\n"
+                        "please file an issue here:\n"
                         "https://github.com/packit/packit/issues",
                         err=True,
                     )
