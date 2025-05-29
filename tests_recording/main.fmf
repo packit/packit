@@ -28,10 +28,3 @@ adjust:
     because: "flexmock is not in EPEL 10: https://bugzilla.redhat.com/show_bug.cgi?id=2351835"
     require-:
       - python3-flexmock
-
-  - when: initiator == packit
-    because: "Fix Dubious Ownership, add a safe directory exception for CI"
-    prepare+:
-     - how: shell
-       name: fix-dubious-ownership-for-tmp
-       script: 'git config --global safe.directory /tmp/*'
