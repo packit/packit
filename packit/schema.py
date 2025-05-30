@@ -906,7 +906,12 @@ class PackageConfigSchema(Schema):
         jobs = data["jobs"]
         i = len(jobs) - 1
         while i >= 0:
-            triggers = [t.strip() for t in jobs[i].get("trigger", "").split("|")]
+            if not isinstance(job_trigger := jobs[i].get("trigger", ""), str):
+                # let schema validation handle this
+                i -= 1
+                continue
+
+            triggers = [t.strip() for t in job_trigger.split("|")]
             if len(triggers) <= 1:
                 i -= 1
                 continue
