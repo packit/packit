@@ -161,7 +161,7 @@ class Upstream:
         """Provide version from action"""
         action_output = self.actions_handler.get_output_from_action(
             action=ActionName.get_current_version,
-            env = self.package_config.get_base_env(),
+            env=self.package_config.get_base_env(),
         )
         return action_output[-1].strip() if action_output else None
 

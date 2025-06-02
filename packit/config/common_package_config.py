@@ -582,7 +582,7 @@ class MultiplePackages:
             )
 
     def get_base_env(self) -> dict[str, str]:
-        """Creates a dict containing the environment variables 
+        """Creates a dict containing the environment variables
         common to all actions
 
         If the config contains multiple packages
