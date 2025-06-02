@@ -45,6 +45,16 @@ def mock_get_aliases():
                 Distro("epel-10.0", "epel10.0"),
                 Distro("epel-10.1", "epel10"),
             ],
+            "epel-10-all": [
+                Distro("epel-10.0", "epel10.0"),
+                Distro("epel-10.1", "epel10"),
+            ],
+            "epel-10-branched": [
+                Distro("epel-10.0", "epel10.0"),
+            ],
+            "epel-10": [
+                Distro("epel-10.1", "epel10"),
+            ],
             "opensuse-leap-all": [
                 "opensuse-leap-15.5",
                 "opensuse-leap-15.4",

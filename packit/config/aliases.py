@@ -189,10 +189,15 @@ def get_build_targets(
 
     def chroot_name(x):
         if isinstance(x, Distro):
-            if x.namever.startswith("epel-10."):
-                # TODO: change this accordingly once mock/Copr chroot names
-                #       for minor EPEL versions are known
-                return "epel-10"
+            name, ver = x.namever.split("-", maxsplit=1)
+            if name == "epel":
+                # handle minor versions of EPEL 10+
+                majorver = int(ver.split(".", maxsplit=1)[0])
+                if majorver >= 10:
+                    if "." in x.branch:
+                        return f"rhel+{name}-{majorver}"
+                    return f"{name}-{majorver}"
+                return x.namever
             return x.namever
         return x
 
