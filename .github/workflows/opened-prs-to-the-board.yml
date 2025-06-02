@@ -5,6 +5,7 @@ on:
 
 jobs:
   add-pr-to-the-kanban-board:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/add-to-project@v0.3.0
