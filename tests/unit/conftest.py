@@ -94,7 +94,7 @@ def package_config_mock():
         version_update_mask="",
         parse_time_macros={},
     )
-    mock.should_receive("get_package_names_as_env").and_return({})
+    mock.should_receive("get_base_env").and_return({})
     mock.should_receive("get_all_files_to_sync").and_return(files_to_sync)
 
     # simulate ‹MultiplePackages›
