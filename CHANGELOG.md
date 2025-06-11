@@ -1,3 +1,8 @@
+# 1.9.0
+
+- Packit now exposes `specfile_path` as the environment variable `PACKIT_SPECFILE_PATH` for all Packit action hooks to reference from the config. (#2589)
+- We have added a support for passing `upstream_package_name` to the `upstream_tag_template` option. (#2604)
+
 # 1.8.0
 
 - You can now validate a Packit config passed to the Packit CLI via a path, e.g., `packit config validate -c /tmp/my-custom-packit-config.yml`. (#2556)
