@@ -269,6 +269,37 @@ class PackitAPI:
 
         return self.config.pkg_tool
 
+    def _get_common_env_paths(self) -> dict[str, str]:
+        paths = {
+            variable_name: str(repo.local_project.working_dir)
+            for variable_name, repo in (
+                ("PACKIT_DOWNSTREAM_REPO", self.dg),
+                ("PACKIT_UPSTREAM_REPO", self.up),
+                ("PACKIT_PWD", self.up),
+            )
+            if isinstance(repo, PackitRepositoryBase)
+            and repo._local_project is not None
+        }
+        if isinstance(self.up, NonGitUpstream):
+            paths.update({"PACKIT_PWD": str(self.up.working_dir)})
+
+        # Adjust paths for the sandcastle
+        if self.config.command_handler == RunCommandType.sandcastle:
+            # working dirs should be placed under
+            # self.config.command_handler_working_dir
+            # when running this code as a service
+
+            exec_dir = Path(self._get_sandcastle_exec_dir())
+            for variable in list(paths.keys()):
+                suffix = Path(paths[variable]).relative_to(
+                    self.config.command_handler_work_dir,
+                )
+                paths[variable] = str(
+                    self.config.command_handler_work_dir / exec_dir / suffix,
+                )
+
+        return paths
+
     def common_env(self, version: Optional[str] = None) -> dict[str, str]:
         """
         Constructs an environment with variables that are shared across multiple
@@ -298,34 +329,9 @@ class PackitAPI:
         """
         # Add environment variables common to all actions
         env = self.up.package_config.get_base_env()
+
         # Add paths to the repositories
-        env = env | {
-            variable_name: str(repo.local_project.working_dir)
-            for variable_name, repo in (
-                ("PACKIT_DOWNSTREAM_REPO", self.dg),
-                ("PACKIT_UPSTREAM_REPO", self.up),
-                ("PACKIT_PWD", self.up),
-            )
-            if isinstance(repo, PackitRepositoryBase)
-            and repo._local_project is not None
-        }
-        if isinstance(self.up, NonGitUpstream):
-            env.update({"PACKIT_PWD": str(self.up.working_dir)})
-
-        # Adjust paths for the sandcastle
-        if self.config.command_handler == RunCommandType.sandcastle:
-            # working dirs should be placed under
-            # self.config.command_handler_working_dir
-            # when running this code as a service
-
-            exec_dir = Path(self._get_sandcastle_exec_dir())
-            for variable in list(env.keys()):
-                suffix = Path(env[variable]).relative_to(
-                    self.config.command_handler_work_dir,
-                )
-                env[variable] = str(
-                    self.config.command_handler_work_dir / exec_dir / suffix,
-                )
+        env.update(self._get_common_env_paths())
 
         # Add version, if provided
         if version:
