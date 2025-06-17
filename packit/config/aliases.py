@@ -103,7 +103,11 @@ def expand_aliases(
                 # try to convert target to Distro
                 [
                     distro
-                    for distro in chain(aliases["fedora-all"], aliases["epel-all"])
+                    for distro in chain(
+                        aliases["fedora-all"],
+                        aliases["epel-all"],
+                        [Distro("fedora-eln", "eln")],
+                    )
                     if target in distro
                 ]
                 # use the original string
@@ -164,7 +168,7 @@ def get_koji_targets(
     def koji_target_name(x):
         if isinstance(x, Distro):
             # Koji targets are equal to branch names except for EPEL <= 6
-            if x.branch.startswith("el"):
+            if x.branch.startswith("el") and x.branch != "eln":
                 return x.namever.replace("-", "")
             return x.branch
         return x
