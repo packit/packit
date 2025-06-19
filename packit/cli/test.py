@@ -42,7 +42,8 @@ def test(
     package_config,
     target,
     context,
-    rpm_paths
+    rpm_paths,
+    path_or_url,
 ):
     """
     Run tmt tests locally without needing a PR or release
@@ -52,6 +53,7 @@ def test(
     api = get_packit_api(
         config=config,
         package_config=package_config,
+        local_project=path_or_url,
     )
 
     cmd_result_stdout = api.run_local_test(
