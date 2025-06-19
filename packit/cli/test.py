@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.command("test", context_settings=get_context_settings(), short_help="Run tmt tests locally")
+@pass_config
 @cover_packit_exception
 @iterate_packages
 @click.option(
