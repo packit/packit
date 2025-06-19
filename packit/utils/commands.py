@@ -72,6 +72,7 @@ def run_command(
         requested to keep the output, they are provided as decoded strings in the
         data structure.
     """
+    print("got inside run_command")
     if not isinstance(cmd, list):
         cmd = shlex.split(cmd)
 

@@ -2788,6 +2788,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         Run tests locally via tmt.
         """
 
+        print("got inside run_local_test")
         if not rpm_paths:
             # TODO: call packit build first if no rpm+path specified and collect artifacts.
             raise PackitException("At least one --rpm_path is required")
@@ -2804,6 +2805,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         """
         build base tmt command to be sent to tmt
         """
+        print("_build_tmt_cmd")
         cmd = [
             "tmt",
             "-c", "initiator=packit",
