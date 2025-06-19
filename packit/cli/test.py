@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 @click.command("test", context_settings=get_context_settings(), short_help="Run tmt tests locally")
-@pass_config
-@cover_packit_exception
-@iterate_packages
+# @pass_config
+# @cover_packit_exception
+# @iterate_packages
 @click.option(
     "--rpm_paths",
     multiple=True,
@@ -37,6 +37,9 @@ logger = logging.getLogger(__name__)
     default="initiator=packit",
 )
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
+@pass_config
+@cover_packit_exception
+@iterate_packages
 def test(
     config,
     package_config,
