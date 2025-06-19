@@ -14,29 +14,21 @@ from packit.config import (
     get_context_settings,
     pass_config,
 )
-from packit.constants import (
-    PACKAGE_LONG_OPTION,
-    PACKAGE_OPTION_HELP,
-    PACKAGE_SHORT_OPTION,
-)
-
 logger = logging.getLogger(__name__)
 
 
-@click.command("test", context_settings=get_context_settings())
-@pass_config
+@click.command("test", context_settings=get_context_settings(), short_help="Run tmt tests locally")
 @cover_packit_exception
 @iterate_packages
 @click.option(
-    PACKAGE_SHORT_OPTION,
-    PACKAGE_LONG_OPTION,
+    "--rpm_paths",
     multiple=True,
-    help=PACKAGE_OPTION_HELP.format(action="build"),
+    help="Path(s) to RPMs that should be installed in the test environment."
 )
 @click.option(
-    "--target",
-    help="Chroot to build in. (defaults to 'fedora-rawhide-x86_64')",
-    default="fedora-rawhide-x86_64",
+    "--chroot",
+    default="fedora-latest",
+    help="Container/VM image to use (same syntax as --target elsewhere)."
 )
 @click.option(
     "--context",
@@ -49,6 +41,7 @@ def test(
     package_config,
     target,
     context,
+    rpm_paths
 ):
     """
     Run tmt tests locally without needing a PR or release
@@ -58,14 +51,13 @@ def test(
         package_config=package_config,
     )
 
-    cmd_result_stdout = api.run_osh_build(
+    cmd_result_stdout = api.run_local_test(
         chroot=target,
-        comment=context,
+        context=context,
+        rpm_paths=rpm_paths,
     )
 
     if cmd_result_stdout:
-        build_url = json.loads(cmd_result_stdout)["url"]
-        logger.info(f"Scan URL: {build_url}")
+        # TODO : What to do with response from tmt
         sys.exit(0)
-
     sys.exit(1)
