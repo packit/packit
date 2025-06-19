@@ -46,6 +46,8 @@ def test(
     """
     Run tmt tests locally without needing a PR or release
     """
+    print("got inside test command")
+    logger.debug("got inside test command")
     api = get_packit_api(
         config=config,
         package_config=package_config,
