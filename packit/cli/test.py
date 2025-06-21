@@ -14,6 +14,11 @@ from packit.config import (
     get_context_settings,
     pass_config,
 )
+from packit.constants import (
+    PACKAGE_LONG_OPTION,
+    PACKAGE_OPTION_HELP,
+    PACKAGE_SHORT_OPTION,
+)
 logger = logging.getLogger(__name__)
 
 
