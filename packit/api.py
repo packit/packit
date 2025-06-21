@@ -2780,7 +2780,7 @@ The first dist-git commit to be synced is '{short_hash}'.
     
     def run_local_test(
         self,
-        chroot: Optional[str] = "fedora-rawhide-x86_64",
+        target: Optional[str] = "fedora-latest",
         rpm_paths: Optional[list[str]] = None,
         test_name: Optional[str] = None,
     ) -> str:
@@ -2793,7 +2793,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             # TODO: call packit build first if no rpm+path specified and collect artifacts.
             raise PackitException("At least one --rpm_path is required")
         
-        cmd = self._build_tmt_cmd(rpm_paths, test_name, chroot)
+        cmd = self._build_tmt_cmd(rpm_paths, test_name, target=target)
         try:
             cmd_result = commands.run_command(cmd, output=True)
         except PackitCommandFailedError as ex:
@@ -2801,7 +2801,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return None
         return cmd_result.stdout
     
-    def _build_tmt_cmd(self, rpm_paths, test_name, chroot):
+    def _build_tmt_cmd(self, rpm_paths, test_name, target):
         """
         build base tmt command to be sent to tmt
         """
@@ -2810,7 +2810,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             "tmt",
             "-c", "initiator=packit",
             "run", "--all",
-            "provision", "--how", "container", "--image", f"fedora:{chroot}",
+            "provision", "--how", "container", "--image", f"fedora:{target}",
             "prepare",  "--how", "install",
         ]
         for rpm in rpm_paths:

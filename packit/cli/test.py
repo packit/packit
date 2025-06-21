@@ -71,7 +71,7 @@ def test(
     )
 
     cmd_result_stdout = api.run_local_test(
-        chroot=target,
+        target=target,
         context=context,
         rpm_paths=rpm_paths,
     )
