@@ -38,9 +38,9 @@ logger = logging.getLogger(__name__)
     help="Path(s) to RPMs that should be installed in the test environment."
 )
 @click.option(
-    "--chroot",
+    "--target",
     default="fedora-latest",
-    help="Container/VM image to use (same syntax as --target elsewhere)."
+    help="Container/VM image to use."
 )
 @click.option(
     "--context",
