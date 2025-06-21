@@ -1,7 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import json
 import logging
 import os
 import sys
@@ -19,10 +18,13 @@ from packit.constants import (
     PACKAGE_OPTION_HELP,
     PACKAGE_SHORT_OPTION,
 )
+
 logger = logging.getLogger(__name__)
 
 
-@click.command("test", context_settings=get_context_settings(), short_help="Run tmt tests locally")
+@click.command(
+    "test", context_settings=get_context_settings(), short_help="Run tmt tests locally",
+)
 # @pass_config
 # @cover_packit_exception
 # @iterate_packages
@@ -35,13 +37,9 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--rpm_paths",
     multiple=True,
-    help="Path(s) to RPMs that should be installed in the test environment."
+    help="Path(s) to RPMs that should be installed in the test environment.",
 )
-@click.option(
-    "--target",
-    default="fedora-latest",
-    help="Container/VM image to use."
-)
+@click.option("--target", default="fedora-latest", help="Container/VM image to use.")
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception

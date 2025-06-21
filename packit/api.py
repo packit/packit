@@ -2777,7 +2777,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             refresh_token=self.config.redhat_api_refresh_token,
         )
         return ib.get_image_status(build_id)
-    
+
     def run_local_test(
         self,
         target: Optional[str] = "fedora-latest",
@@ -2792,7 +2792,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         if not rpm_paths:
             # TODO: call packit build first if no rpm+path specified and collect artifacts.
             raise PackitException("At least one --rpm_path is required")
-        
+
         cmd = self._build_tmt_cmd(rpm_paths, test_name, target=target)
         try:
             cmd_result = commands.run_command(cmd, output=True)
@@ -2800,7 +2800,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             logger.error(ex.stderr_output)
             return None
         return cmd_result.stdout
-    
+
     def _build_tmt_cmd(self, rpm_paths, test_name, target):
         """
         build base tmt command to be sent to tmt
@@ -2808,14 +2808,21 @@ The first dist-git commit to be synced is '{short_hash}'.
         print("_build_tmt_cmd")
         cmd = [
             "tmt",
-            "-c", "initiator=packit",
-            "run", "--all",
-            "provision", "--how", "container", "--image", f"fedora:{target}",
-            "prepare",  "--how", "install",
+            "-c",
+            "initiator=packit",
+            "run",
+            "--all",
+            "provision",
+            "--how",
+            "container",
+            "--image",
+            f"fedora:{target}",
+            "prepare",
+            "--how",
+            "install",
         ]
         for rpm in rpm_paths:
             cmd += ["--package", os.path.abspath(rpm)]
         if test_name:
             cmd += ["test", "--name", test_name]
         return cmd
-
