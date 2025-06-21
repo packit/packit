@@ -42,11 +42,6 @@ logger = logging.getLogger(__name__)
     default="fedora-latest",
     help="Container/VM image to use."
 )
-@click.option(
-    "--context",
-    help="Comment for the build test",
-    default="initiator=packit",
-)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
@@ -55,7 +50,6 @@ def test(
     config,
     package_config,
     target,
-    context,
     rpm_paths,
     path_or_url,
 ):
@@ -72,7 +66,6 @@ def test(
 
     cmd_result_stdout = api.run_local_test(
         target=target,
-        context=context,
         rpm_paths=rpm_paths,
     )
 
