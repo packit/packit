@@ -22,6 +22,12 @@ logger = logging.getLogger(__name__)
 # @cover_packit_exception
 # @iterate_packages
 @click.option(
+    PACKAGE_SHORT_OPTION,
+    PACKAGE_LONG_OPTION,
+    multiple=True,
+    help=PACKAGE_OPTION_HELP.format(action="source build"),
+)
+@click.option(
     "--rpm_paths",
     multiple=True,
     help="Path(s) to RPMs that should be installed in the test environment."

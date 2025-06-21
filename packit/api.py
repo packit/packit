@@ -2801,7 +2801,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             return None
         return cmd_result.stdout
     
-    def _build_tmt_cmd(rpm_paths, test_name, chroot):
+    def _build_tmt_cmd(self, rpm_paths, test_name, chroot):
         """
         build base tmt command to be sent to tmt
         """
