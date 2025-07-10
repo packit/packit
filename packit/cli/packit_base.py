@@ -19,10 +19,10 @@ from packit.cli.source_git import source_git
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
+from packit.cli.test import test
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
-from packit.cli.test import test
 
 logger = logging.getLogger("packit")
 
