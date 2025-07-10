@@ -2777,13 +2777,13 @@ The first dist-git commit to be synced is '{short_hash}'.
             refresh_token=self.config.redhat_api_refresh_token,
         )
         return ib.get_image_status(build_id)
-    
+
     def run_local_test(
-    self,
-    target: Optional[str] = "fedora:rawhide",
-    rpm_paths: Optional[list[str]] = None,
-    run_all: bool = False,
-    plans: Optional[list[str]] = None,
+        self,
+        target: Optional[str] = "fedora:rawhide",
+        rpm_paths: Optional[list[str]] = None,
+        run_all: bool = False,
+        plans: Optional[list[str]] = None,
     ) -> Optional[str]:
         """
         Run tests locally via tmt.
@@ -2792,9 +2792,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         if not rpm_paths:
             raise PackitException("At least one --rpm_path is required")
 
-        if run_all and plans:
-            raise PackitException("Only one of --run-all, or --plans may be used.")
-
         cmd = self._build_tmt_cmd(
             rpm_paths=rpm_paths,
             target=target,
@@ -2802,7 +2799,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             plans=plans,
         )
 
-        logger.debug("Running tmt command:", " ".join(cmd))
+        logger.debug("Running tmt command: %s", cmd)
 
         try:
             cmd_result = commands.run_command(cmd, output=True)
@@ -2810,7 +2807,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             logger.error(ex.stderr_output)
             return None
         return cmd_result.stdout
-    
+
     def _build_tmt_cmd(self, rpm_paths, target, run_all, plans):
         """
         build base tmt command to be sent to tmt
@@ -2818,7 +2815,8 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         cmd = [
             "tmt",
-            "-c", "initiator=packit",
+            "-c",
+            "initiator=packit",
             "run",
         ]
 
@@ -2826,19 +2824,23 @@ The first dist-git commit to be synced is '{short_hash}'.
             for plan in plans:
                 cmd += ["plan", f"--name={plan}"]
 
-        if run_all:
-            cmd.append("--all")
-
         cmd += [
-            "discover", "--how", "fmf",
-            "provision", "--how", "container", "--image", target,
-            "prepare", "--how", "install",
+            "discover",
+            "--how",
+            "fmf",
+            "provision",
+            "--how",
+            "container",
+            "--image",
+            target,
+            "prepare",
+            "--how",
+            "install",
         ]
 
         for rpm in rpm_paths:
             cmd += ["--package", os.path.abspath(rpm)]
 
         cmd += ["execute", "report"]
-        
-        return cmd
 
+        return cmd

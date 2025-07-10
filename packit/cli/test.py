@@ -1,7 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import json
 import logging
 import os
 import sys
@@ -19,13 +18,15 @@ from packit.constants import (
     PACKAGE_OPTION_HELP,
     PACKAGE_SHORT_OPTION,
 )
+
 logger = logging.getLogger(__name__)
 
 
-@click.command("test", context_settings=get_context_settings(), short_help="Run tmt tests locally")
-# @pass_config
-# @cover_packit_exception
-# @iterate_packages
+@click.command(
+    "test",
+    context_settings=get_context_settings(),
+    short_help="Run tmt tests locally",
+)
 @click.option(
     PACKAGE_SHORT_OPTION,
     PACKAGE_LONG_OPTION,
@@ -35,23 +36,11 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--rpm_paths",
     multiple=True,
-    help="Path(s) to RPMs that should be installed in the test environment."
+    help="Path(s) to RPMs that should be installed in the test environment.",
 )
-@click.option(
-    "--target",
-    default="fedora:rawhide",
-    help="Container/VM image to use."
-)
-@click.option(
-    "--run-all",
-    is_flag=True,
-    help="flag to run all discovered test plans."
-)
-@click.option(
-    "--plans",
-    multiple=True,
-    help="List of specific tmt plans to run."
-)
+@click.option("--target", default="fedora:rawhide", help="Container/VM image to use.")
+@click.option("--run-all", is_flag=True, help="flag to run all discovered test plans.")
+@click.option("--plans", multiple=True, help="List of specific tmt plans to run.")
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @pass_config
 @cover_packit_exception
