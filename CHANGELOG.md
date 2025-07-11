@@ -1,3 +1,8 @@
+# 1.10.0
+
+- We have fixed a minor bug caused by adding the `PACKIT_SPECFILE_PATH` to the environment of Packit actions. (#2627)
+- We have added a support for ELN aliases in Packit. (#2630)
+
 # 1.9.0
 
 - Packit now exposes `specfile_path` as the environment variable `PACKIT_SPECFILE_PATH` for all Packit action hooks to reference from the config. (#2589)
