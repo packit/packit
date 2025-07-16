@@ -2777,3 +2777,96 @@ The first dist-git commit to be synced is '{short_hash}'.
             refresh_token=self.config.redhat_api_refresh_token,
         )
         return ib.get_image_status(build_id)
+
+    def run_local_test(
+        self,
+        target: Optional[str] = "fedora:rawhide",
+        rpm_paths: Optional[list[str]] = None,
+        run_all: bool = False,
+        plans: Optional[list[str]] = None,
+    ) -> Optional[str]:
+        """
+        Run tests locally via tmt.
+        """
+
+        if not rpm_paths:
+            raise PackitException("At least one --rpm_path is required")
+
+        cmd = self._build_tmt_cmd(
+            rpm_paths=rpm_paths,
+            target=target,
+            run_all=run_all,
+            plans=plans,
+        )
+
+        logger.debug("Running tmt command: %s", cmd)
+
+        try:
+            cmd_result = commands.run_command(cmd, output=True)
+        except PackitCommandFailedError as ex:
+            logger.error(ex.stderr_output)
+            return None
+        # response appears in stderr for some weird reason
+        return cmd_result.stderr
+
+    def _build_tmt_cmd(
+        self,
+        rpm_paths: list[str],
+        target: str,
+        run_all: bool,
+        plans: Optional[list[str]],
+    ) -> list[str]:
+        """
+        Build base tmt command to be sent to tmt.
+
+        :param rpm_paths: List of paths to local RPMs to install
+        :param target: Target container image (e.g. 'fedora:41')
+        :param run_all: Whether to run all plans (currently unused)
+        :param plans: Optional list of TMT plan names to run
+        :return: List of command-line arguments for the `tmt` command
+        """
+        cmd = [
+            "tmt",
+            "-c",
+            "initiator=packit",
+            "run",
+        ]
+
+        if plans:
+            for plan in plans:
+                cmd += ["plan", f"--name={plan}"]
+
+        cmd += [
+            "discover",
+            "--how",
+            "fmf",
+            "provision",
+            "--how",
+            "container",
+            "--image",
+            target,
+            "prepare",
+            "--how",
+            "install",
+        ]
+
+        for rpm in rpm_paths:
+            cmd += ["--package", os.path.abspath(rpm)]
+
+        cmd += ["execute", "report"]
+        return cmd
+
+    def parse_tmt_response(self, stdout: str) -> tuple[int, int]:
+        """
+        Parse the TMT command stdout and extract the number of executed and passed tests.
+
+        :param stdout: The standard output from a `tmt run` command
+        :return: A tuple (executed, passed) representing test counts
+        """
+        executed_match = re.search(r"summary:\s+(\d+)\s+test[s]?\s+executed", stdout)
+        passed_match = re.search(r"summary:\s+(\d+)\s+test[s]?\s+passed", stdout)
+
+        executed = int(executed_match.group(1)) if executed_match else 0
+        passed = int(passed_match.group(1)) if passed_match else 0
+
+        return executed, passed
