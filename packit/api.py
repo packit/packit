@@ -2781,21 +2781,35 @@ The first dist-git commit to be synced is '{short_hash}'.
     def run_local_test(
         self,
         target: Optional[str] = "fedora:rawhide",
-        rpm_paths: Optional[list[str]] = None,
-        run_all: bool = False,
+        rpm_paths: Optional[list[Path]] = None,
         plans: Optional[list[str]] = None,
+        release_suffix: Optional[str] = None,
+        default_release_suffix: bool = False,
+        upstream_ref: Optional[str] = None,
+        srpm_dir: Optional[Union[Path, str]] = None,
+        default_mock_resultdir: bool = True,
+        resultdir: Union[Path, str, None] = None,
+        root: str = "default",
     ) -> Optional[str]:
         """
         Run tests locally via tmt.
         """
 
         if not rpm_paths:
-            raise PackitException("At least one --rpm_path is required")
+            rpm_paths = self._generate_rpms_for_tmt_test(
+                package_config=self.package_config,
+                release_suffix=release_suffix,
+                default_release_suffix=default_release_suffix,
+                upstream_ref=upstream_ref,
+                srpm_dir=srpm_dir,
+                default_mock_resultdir=default_mock_resultdir,
+                resultdir=resultdir,
+                root=root,
+            )
 
         cmd = self._build_tmt_cmd(
             rpm_paths=rpm_paths,
             target=target,
-            run_all=run_all,
             plans=plans,
         )
 
@@ -2811,9 +2825,8 @@ The first dist-git commit to be synced is '{short_hash}'.
 
     def _build_tmt_cmd(
         self,
-        rpm_paths: list[str],
+        rpm_paths: list[Path],
         target: str,
-        run_all: bool,
         plans: Optional[list[str]],
     ) -> list[str]:
         """
@@ -2856,6 +2869,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         cmd += ["execute", "report"]
         return cmd
 
+    @staticmethod
     def parse_tmt_response(self, stdout: str) -> tuple[int, int]:
         """
         Parse the TMT command stdout and extract the number of executed and passed tests.
@@ -2870,3 +2884,48 @@ The first dist-git commit to be synced is '{short_hash}'.
         passed = int(passed_match.group(1)) if passed_match else 0
 
         return executed, passed
+
+    def _generate_rpms_for_tmt_test(
+        self,
+        package_config: MultiplePackages,
+        release_suffix: Optional[str] = None,
+        default_release_suffix: bool = False,
+        upstream_ref: Optional[str] = None,
+        srpm_dir: Optional[Union[Path, str]] = None,
+        default_mock_resultdir: bool = True,
+        resultdir: Union[Path, str, None] = None,
+        root: str = "default",
+    ) -> list[Path]:
+        """
+        Generates rpms from the contents of the source code
+
+        :return: A list of rpms generated.
+        """
+        logger.info(
+            "No RPM passed for local test, proceeding to generate rpms automatically...",
+        )
+        release_suffix = ChangelogHelper.resolve_release_suffix(
+            package_config,
+            release_suffix,
+            default_release_suffix,
+        )
+
+        srpm_path = self.create_srpm(
+            upstream_ref=upstream_ref,
+            srpm_dir=srpm_dir,
+            release_suffix=release_suffix,
+        )
+
+        if default_mock_resultdir:
+            resultdir = None
+
+        rpm_paths = self.run_mock_build(
+            root=root,
+            srpm_path=srpm_path,
+            resultdir=resultdir,
+        )
+
+        logger.info("RPMs:")
+        for path in rpm_paths:
+            logger.info(f" * {path}")
+        return rpm_paths
