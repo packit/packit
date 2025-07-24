@@ -190,8 +190,34 @@ class SyncFilesItem:
         if new_src:
             self_copy = copy.copy(self)
             self_copy.src = new_src
+            # self.src may be a directory, in which case we need to add filter rules
+            # to exclude the src files as well.
+            # Note: criteria check is ignored here, consider dropping the input?
+            self_copy._drop_src_as_filter(src)
             return self_copy
         return None
+
+    def _drop_src_as_filter(self, src: Union[str, Path]) -> None:
+        """Add a rsync filter to drop the 'src' (see drop_src).
+
+        Args:
+            src: A path to be removed.
+        """
+        # Note: The filters added apply to all items in self.src
+        #   Ideally we could exclude the file with the absolute path *not* relative to
+        #   the transfer root.
+        src_path = Path(src)
+        for s in self.src:
+            s_path = Path(s)
+            if not s_path.is_dir():
+                # We only care about adding filters to dirs. Files should have been
+                # handled by drop_src.
+                continue
+            if not src_path.is_relative_to(s_path):
+                # Nothing to do
+                continue
+            filter_rule = f"- /{src_path.relative_to(s_path)}"
+            self.filters.append(filter_rule)
 
 
 def iter_srcs(files_to_sync: Sequence[SyncFilesItem]) -> Iterator[str]:
