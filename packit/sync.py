@@ -171,7 +171,7 @@ class SyncFilesItem:
 
     def drop_src(
         self,
-        src: Union[str, Path],
+        src: Optional[Union[str, Path]],
         criteria=lambda x, y: x == str(y),
     ) -> Optional["SyncFilesItem"]:
         """Remove 'src' from the list of src-s
@@ -197,12 +197,16 @@ class SyncFilesItem:
             return self_copy
         return None
 
-    def _drop_src_as_filter(self, src: Union[str, Path]) -> None:
+    def _drop_src_as_filter(self, src: Optional[Union[str, Path]]) -> None:
         """Add a rsync filter to drop the 'src' (see drop_src).
 
         Args:
             src: A path to be removed.
         """
+
+        if not src:
+            return
+
         # Note: The filters added apply to all items in self.src
         #   Ideally we could exclude the file with the absolute path *not* relative to
         #   the transfer root.
