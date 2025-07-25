@@ -1,3 +1,7 @@
+# 1.11.0
+
+- `packit test` will support running and validating TMT tests locally without having to raise a PR or triggering a release, including result parsing and basic failure reporting. (#2632)
+
 # 1.10.0
 
 - We have fixed a minor bug caused by adding the `PACKIT_SPECFILE_PATH` to the environment of Packit actions. (#2627)
