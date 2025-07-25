@@ -1,6 +1,6 @@
 # 1.11.0
 
-- `packit test` will support running and validating TMT tests locally without having to raise a PR or triggering a release, including result parsing and basic failure reporting. (#2632)
+- `packit test` now supports running and validating TMT tests locally without requiring a PR or a release, including result parsing and basic failure reporting. (#2632)
 
 # 1.10.0
 
