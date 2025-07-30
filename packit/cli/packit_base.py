@@ -19,6 +19,7 @@ from packit.cli.source_git import source_git
 from packit.cli.srpm import srpm
 from packit.cli.status import status
 from packit.cli.sync_from_downstream import sync_from_downstream
+from packit.cli.test import test
 from packit.cli.validate_config import validate_config
 from packit.config import Config, get_context_settings
 from packit.utils.logging import set_logging
@@ -85,6 +86,7 @@ packit_base.add_command(prepare_sources)
 packit_base.add_command(dist_git)
 packit_base.add_command(scan_in_osh)
 packit_base.add_command(config)
+packit_base.add_command(test)
 
 if __name__ == "__main__":
     packit_base()
