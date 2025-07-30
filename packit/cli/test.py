@@ -39,9 +39,13 @@ logger = logging.getLogger(__name__)
     help="Path(s) to RPMs that should be installed in the test environment.",
 )
 @click.option("--target", default="fedora:rawhide", help="Container/VM image to use.")
-@click.option("--run-all", is_flag=True, help="flag to run all discovered test plans.")
 @click.option("--plans", multiple=True, help="List of specific tmt plans to run.")
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
+@click.option(
+    "--clean-before/--no-clean-before",
+    default=True,
+    help="Run 'tmt clean --all' before starting the test (default: enabled).",
+)
 @pass_config
 @cover_packit_exception
 @iterate_packages
@@ -51,8 +55,8 @@ def test(
     target,
     rpm_paths,
     path_or_url,
-    run_all,
     plans,
+    clean_before,
 ):
     """
     Run tmt tests locally without needing a PR or release
@@ -63,23 +67,32 @@ def test(
         local_project=path_or_url,
     )
 
-    stdout = api.run_local_test(
+    # TODO: Expose options for mock build as CLI flags instead of using hardcoded values.
+    tmt_output = api.run_local_test(
         target=target,
         rpm_paths=rpm_paths,
-        run_all=run_all,
         plans=plans,
+        release_suffix=None,
+        default_release_suffix=False,
+        upstream_ref=None,
+        srpm_dir=api.up.local_project.working_dir,
+        default_mock_resultdir=True,
+        resultdir=".",
+        root="default",
+        clean_before=clean_before,
     )
 
-    if stdout:
-        no_of_executed_tests, no_of_passed_tests = api.parse_tmt_response(
-            stdout,
-        )
-        if no_of_executed_tests == no_of_passed_tests and no_of_executed_tests > 0:
-            logger.info(f"✅ All {no_of_passed_tests} tests passed.")
-            sys.exit(0)
-        else:
-            logger.error("Error! ❌ Some tests failed.")
-            logger.error("--- tmt stdout ---")
-            logger.error(stdout)
-            sys.exit(1)
+    if not tmt_output:
+        sys.exit(1)
+
+    no_of_executed_tests, no_of_passed_tests = api.parse_tmt_response(
+        tmt_output,
+    )
+    if no_of_executed_tests == no_of_passed_tests and no_of_executed_tests > 0:
+        logger.info(f"All {no_of_passed_tests} test(s) passed.")
+        sys.exit(0)
+
+    logger.error("Error! Some tests failed.")
+    logger.error("--- tmt stdout ---")
+    logger.error(tmt_output)
     sys.exit(1)
