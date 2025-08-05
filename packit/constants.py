@@ -89,6 +89,13 @@ upstream_package_name: {upstream_package_name}
 downstream_package_name: {downstream_package_name}
 """
 
+PRECOMMIT_CONFIG = {
+    # check validity of Packit configuration
+    "repo": "https://github.com/packit/pre-commit-hooks",
+    "rev": "v1.3.0",
+    "hooks": [{"id": "validate-config"}],
+}
+
 SANDCASTLE_WORK_DIR = "/sandcastle"
 SANDCASTLE_IMAGE = "docker.io/usercont/sandcastle"
 SANDCASTLE_DEFAULT_PROJECT = "myproject"
