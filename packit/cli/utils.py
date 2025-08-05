@@ -369,3 +369,17 @@ def get_existing_config(working_dir: Path) -> Optional[Path]:
         if config_file_path.is_file():
             return config_file_path
     return None
+
+
+def get_git_repo(working_dir: Path) -> Optional[Path]:
+    git_path = working_dir / ".git"
+    if git_path.is_dir():
+        return git_path
+    return None
+
+
+def get_precommit_hook(git_dir: Path) -> Optional[Path]:
+    hook_file_path = git_dir / "/hooks/pre-commit"
+    if hook_file_path.is_file():
+        return hook_file_path
+    return None

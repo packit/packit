@@ -13,7 +13,12 @@ from typing import Optional
 import click
 
 from packit.cli.types import LocalProjectParameter
-from packit.cli.utils import cover_packit_exception, get_existing_config
+from packit.cli.utils import (
+    cover_packit_exception,
+    get_existing_config,
+    get_git_repo,
+    get_precommit_hook,
+)
 from packit.config import get_context_settings
 from packit.config.config import pass_config
 from packit.config.package_config import get_local_specfile_path
@@ -45,6 +50,23 @@ def init(
     as a source-git repo.
     """
     working_dir = path_or_url.working_dir
+    git_dir = get_git_repo(working_dir)
+    if not git_dir:
+        raise PackitException(
+            " .git repository not found."
+            " Initialize current repository as a git repo first and install pre-commit`",
+            " Install pre-commit using `pip install pre-commit`",
+            " Then install git hook using `pre-commit install`",
+        )
+
+    hook_file_path = get_precommit_hook(git_dir)
+    if not hook_file_path:
+        raise PackitException(
+            " Pre-commit hook not found."
+            " Install pre-commit using `pip install pre-commit`",
+            " Then install git hook using `pre-commit install`",
+        )
+
     config_path = get_existing_config(working_dir)
     if config_path:
         if not force:
