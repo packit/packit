@@ -17,12 +17,17 @@ from packit.cli.utils import (
     cover_packit_exception,
     get_existing_config,
     get_git_repo,
+    get_precommit_config,
     get_precommit_hook,
 )
 from packit.config import get_context_settings
 from packit.config.config import pass_config
 from packit.config.package_config import get_local_specfile_path
-from packit.constants import PACKIT_CONFIG_TEMPLATE
+from packit.constants import (
+    PACKIT_CONFIG_TEMPLATE,
+    PRECOMMIT_CHECK_REBASE_TEMPLATE,
+    PRECOMMIT_VALIDATE_CONFIG,
+)
 from packit.exceptions import PackitException
 
 logger = logging.getLogger(__name__)
@@ -65,6 +70,16 @@ def init(
             " Pre-commit hook not found."
             " Install pre-commit using `pip install pre-commit`",
             " Then install git hook using `pre-commit install`",
+        )
+
+    precommit_config_path = get_precommit_config(working_dir)
+    if precommit_config_path:
+        # TODO url would be valid, but path probably wouldnt....
+        append_precommit_config(precommit_config_path, url=path_or_url)
+    else:
+        raise PackitException(
+            " Pre-commit configuration file .pre-commit-config.yaml not found."
+            " Ensure that this file is present.",
         )
 
     config_path = get_existing_config(working_dir)
@@ -127,3 +142,15 @@ def generate_config(
         logger.debug(f"Packit config file '{config_file}' changed.")
 
     return output_config
+
+
+def append_precommit_config(config_file: Path, url):
+    """
+    Append packit-specific configuration to .pre-commit-config.yaml
+    """
+    check_rebase = PRECOMMIT_CHECK_REBASE_TEMPLATE.format(upstream_url=url)
+
+    with config_file.open("a") as f:
+        f.write(check_rebase)
+        f.write(PRECOMMIT_VALIDATE_CONFIG)
+        logger.debug(f"Pre-commit config file '{config_file}' changed.")
