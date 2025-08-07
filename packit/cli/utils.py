@@ -378,13 +378,6 @@ def get_git_repo(working_dir: Path) -> Optional[Path]:
     return None
 
 
-def get_precommit_hook(git_dir: Path) -> Optional[Path]:
-    hook_file_path = git_dir / "hooks/pre-commit"
-    if hook_file_path.is_file():
-        return hook_file_path
-    return None
-
-
 def get_precommit_config(working_dir: Path) -> Optional[Path]:
     config_file_path = working_dir / ".pre-commit-config.yaml"
     if config_file_path.is_file():

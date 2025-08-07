@@ -18,7 +18,6 @@ from packit.cli.utils import (
     get_existing_config,
     get_git_repo,
     get_precommit_config,
-    get_precommit_hook,
 )
 from packit.config import get_context_settings
 from packit.config.config import pass_config
@@ -59,27 +58,20 @@ def init(
     if not git_dir:
         raise PackitException(
             " .git repository not found."
-            " Initialize current repository as a git repo first and install pre-commit`",
-            " Install pre-commit using `pip install pre-commit`",
-            " Then install git hook using `pre-commit install`",
-        )
-
-    hook_file_path = get_precommit_hook(git_dir)
-    if not hook_file_path:
-        raise PackitException(
-            " Pre-commit hook not found."
-            " Install pre-commit using `pip install pre-commit`",
-            " Then install git hook using `pre-commit install`",
+            " Initialize current repository as a git repo first.",
         )
 
     precommit_config_path = get_precommit_config(working_dir)
     if precommit_config_path:
-        # TODO url would be valid, but path probably wouldnt....
+        # TODO url would be valid, but path probably wouldn't....
         append_precommit_config(precommit_config_path, url=path_or_url)
     else:
         raise PackitException(
             " Pre-commit configuration file .pre-commit-config.yaml not found."
-            " Ensure that this file is present.",
+            " Please ensure that this file is present.",
+            " ",
+            " You might also want to install pre-commit. You can use:",
+            " `pip install pre-commit && pre-commit install`",
         )
 
     config_path = get_existing_config(working_dir)
