@@ -89,20 +89,12 @@ upstream_package_name: {upstream_package_name}
 downstream_package_name: {downstream_package_name}
 """
 
-PRECOMMIT_CHECK_REBASE_TEMPLATE = """
--   repo: https://github.com/packit/pre-commit-hooks
-    rev: v1.2.0
-    hooks:
-      - id: check-rebase
-        args: {upstream_url}
-"""
-
-PRECOMMIT_VALIDATE_CONFIG = """
--   repo: https://github.com/packit/pre-commit-hooks
-    rev: v1.2.0
-    hooks:
-      - id: validate-config
-"""
+PRECOMMIT_CONFIG = {
+    # check validity of Packit configuration
+    "repo": "https://github.com/packit/pre-commit-hooks",
+    "rev": "v1.2.0",
+    "hooks": [{"id": "validate-config"}],
+}
 
 SANDCASTLE_WORK_DIR = "/sandcastle"
 SANDCASTLE_IMAGE = "docker.io/usercont/sandcastle"

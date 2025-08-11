@@ -4,6 +4,7 @@
 import copy
 import functools
 import logging
+import os
 import pathlib
 import sys
 from pathlib import Path
@@ -383,3 +384,13 @@ def get_precommit_config(working_dir: Path) -> Optional[Path]:
     if config_file_path.is_file():
         return config_file_path
     return None
+
+
+def is_file_empty(file: Path):
+    with open(file) as f:
+        f.seek(0, os.SEEK_END)
+        size = f.tell()
+        if size:
+            return False
+
+    return True
