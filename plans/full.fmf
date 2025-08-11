@@ -31,9 +31,5 @@ adjust:
         script: pip3 install build deepdiff
 
   - when: "distro == rhel-10 or distro == centos-10 or distro == centos-stream-10"
-    because: "flexmock is not in EPEL 10: https://bugzilla.redhat.com/show_bug.cgi?id=2351835"
-    prepare+:
-      - how: install
-        package: python3-pip
-      - how: shell
-        script: pip3 install flexmock
+    because: "We are missing dependencies in EL10 that prohibit us from building."
+    enabled: false
