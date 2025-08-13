@@ -28,8 +28,8 @@ issue_repository: https://github.com/packit/packit
 
 actions:
   create-archive:
-    - "python3 -m build --sdist --outdir ."
-    - "sh -c 'echo packitos-$(hatch version).tar.gz'"
+    - "sh -c 'hatch build -t sdist 2>&1 | tee hatch_build.log'"
+    - "tail -n1 hatch_build.log"
   get-current-version:
     - "hatch version"
   pre-sync:
