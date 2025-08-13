@@ -18,7 +18,6 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import (
     cover_packit_exception,
     get_existing_config,
-    get_git_repo,
     get_precommit_config,
     is_file_empty,
 )
@@ -30,6 +29,7 @@ from packit.constants import (
     PRECOMMIT_CONFIG,
 )
 from packit.exceptions import PackitException
+from packit.utils import is_git_repo
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +56,8 @@ def init(
     as a source-git repo.
     """
     working_dir = path_or_url.working_dir
-    git_dir = get_git_repo(working_dir)
-    if not git_dir:
+
+    if is_git_repo(working_dir):
         raise PackitException(
             " .git repository not found."
             " Initialize current repository as a git repo first in order"

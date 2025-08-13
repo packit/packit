@@ -372,13 +372,6 @@ def get_existing_config(working_dir: Path) -> Optional[Path]:
     return None
 
 
-def get_git_repo(working_dir: Path) -> Optional[Path]:
-    git_path = working_dir / ".git"
-    if git_path.is_dir():
-        return git_path
-    return None
-
-
 def get_precommit_config(working_dir: Path) -> Optional[Path]:
     config_file_path = working_dir / ".pre-commit-config.yaml"
     if config_file_path.is_file():
