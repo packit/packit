@@ -489,6 +489,10 @@ def gnupg_key_fingerprint(gnupg_instance: GPG, private_gpg_key: str):
 def upstream_without_config(tmp_path):
     u_remote = tmp_path / "upstream_remote"
     u_remote.mkdir()
+
+    precommit_conf = u_remote / ".pre-commit-config.yaml"
+    precommit_conf.touch()
+
     create_new_repo(u_remote, ["--bare"])
 
     return u_remote
