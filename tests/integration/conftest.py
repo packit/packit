@@ -498,6 +498,16 @@ def upstream_without_config(tmp_path):
     return u_remote
 
 
+@pytest.fixture()
+def upstream_without_precommit_config(tmp_path):
+    u_remote = tmp_path / "upstream_remote_without_conf"
+    u_remote.mkdir()
+
+    create_new_repo(u_remote, ["--bare"])
+
+    return u_remote
+
+
 @pytest.fixture
 def create_archive():
     def create_archive_factory(output_path):
