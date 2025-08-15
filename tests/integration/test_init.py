@@ -48,6 +48,24 @@ def test_init_fail(cwd_upstream_or_distgit):
     assert result.exit_code == 2  # packit config already exists --force needed
 
 
+def test_init_with_precommit_flag(upstream_without_precommit_config):
+    result = call_packit(
+        parameters=["init", "--with_precommit"],
+        working_dir=upstream_without_precommit_config,
+    )
+
+    assert result.exit_code == 0
+
+    config_file = upstream_without_precommit_config / ".pre-commit-config.yaml"
+    assert (config_file).is_file()
+
+    expected = {"repos": [PACKIT_PRECOMMIT_CONFIG]}
+    yaml = ruamel.yaml.YAML()
+    data = yaml.load(config_file)
+
+    assert data == expected
+
+
 def test_init_missing_precommit_config(upstream_without_precommit_config):
     config_file = upstream_without_precommit_config / ".pre-commit-config.yaml"
     assert not (config_file).is_file()

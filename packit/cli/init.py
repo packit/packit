@@ -42,13 +42,15 @@ logger = logging.getLogger(__name__)
     is_flag=True,
     help="Reset config to default if already exists.",
 )
+@click.option(
+    "--with_precommit",
+    default=False,
+    is_flag=True,
+    help="Automatically creates an empty precommit configuration file if missing.",
+)
 @pass_config
 @cover_packit_exception
-def init(
-    config,
-    path_or_url,
-    force,
-):
+def init(config, path_or_url, force, with_precommit):
     """
     Create the initial Packit configuration in a repository
 
@@ -56,6 +58,7 @@ def init(
     as a source-git repo.
     """
     working_dir = path_or_url.working_dir
+    precommit_config_path = None
 
     if is_git_repo(working_dir):
         raise PackitException(
@@ -64,7 +67,12 @@ def init(
             " to set up Packit config validation upon pre-commit.",
         )
 
-    precommit_config_path = get_precommit_config(working_dir)
+    if with_precommit:
+        precommit_config_path = working_dir / ".pre-commit-config.yaml"
+        precommit_config_path.touch()
+    else:
+        precommit_config_path = get_precommit_config(working_dir)
+
     if precommit_config_path:
         generate_precommit_config(precommit_config_path)
     else:
