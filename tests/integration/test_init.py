@@ -110,7 +110,7 @@ def test_init_invalid_syntax_precommit_config(upstream_without_config):
     assert data == INVALID_PRECOMMIT_CONFIG
 
 
-def test_init_preexisting_precommit_config(upstream_without_config):
+def test_init_valid_precommit_config(upstream_without_config):
     config_file = upstream_without_config / ".pre-commit-config.yaml"
     yaml = ruamel.yaml.YAML()
     data = VALID_PRECOMMIT_CONFIG
@@ -124,6 +124,25 @@ def test_init_preexisting_precommit_config(upstream_without_config):
 
     expected = data
     expected["repos"].append(PACKIT_PRECOMMIT_CONFIG)
+    data = yaml.load(config_file)
+
+    assert data == expected
+
+
+def test_init_preexisting_precommit_config(upstream_without_config):
+    config_file = upstream_without_config / ".pre-commit-config.yaml"
+    yaml = ruamel.yaml.YAML()
+    data = VALID_PRECOMMIT_CONFIG
+    data["repos"].append(PACKIT_PRECOMMIT_CONFIG)
+
+    with open(config_file, "w") as f:
+        yaml.dump(data, f)
+
+    result = call_packit(parameters=["init"], working_dir=upstream_without_config)
+
+    assert result.exit_code == 0
+
+    expected = data
     data = yaml.load(config_file)
 
     assert data == expected
