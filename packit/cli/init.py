@@ -58,7 +58,6 @@ def init(config, path_or_url, force, with_precommit):
     as a source-git repo.
     """
     working_dir = path_or_url.working_dir
-    precommit_config_path = None
 
     if is_git_repo(working_dir):
         raise PackitException(
@@ -67,11 +66,11 @@ def init(config, path_or_url, force, with_precommit):
             " to set up Packit config validation upon pre-commit.",
         )
 
-    if with_precommit:
+    precommit_config_path = get_precommit_config(working_dir)
+
+    if with_precommit and not precommit_config_path:
         precommit_config_path = working_dir / ".pre-commit-config.yaml"
         precommit_config_path.touch()
-    else:
-        precommit_config_path = get_precommit_config(working_dir)
 
     if precommit_config_path:
         generate_precommit_config(precommit_config_path)
