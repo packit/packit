@@ -1,2 +1,6 @@
 # Needed for setuptools-scm
 .git_archival.txt  export-subst
+
+# Mark requre responses as generated
+/tests_recording/test_data/**/*.tar.xz linguist-generated
+/tests_recording/test_data/**/*.yaml linguist-generated
