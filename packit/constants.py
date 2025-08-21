@@ -22,6 +22,10 @@ CONFIG_FILE_NAMES = {
     "packit.yml",
 }
 
+PROJECT_LOCAL_CONFIG_FILE = ".packitLocal.yaml"
+
+ALLOWED_LOCAL_OVERRIDES = {"debug", "fas_user", "fas_password", "plans"}
+
 # local branch name when checking out a PR before we merge it with the target branch
 LP_TEMP_PR_CHECKOUT_NAME = "pr-changes"
 

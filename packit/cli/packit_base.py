@@ -11,6 +11,7 @@ from packit.cli.config import config
 from packit.cli.create_update import create_update
 from packit.cli.dist_git import dist_git
 from packit.cli.init import init
+from packit.cli.init_local_yaml import init_local_yaml
 from packit.cli.prepare_sources import prepare_sources
 from packit.cli.propose_downstream import propose_downstream, pull_from_upstream
 from packit.cli.push_updates import push_updates
@@ -87,6 +88,7 @@ packit_base.add_command(dist_git)
 packit_base.add_command(scan_in_osh)
 packit_base.add_command(config)
 packit_base.add_command(test)
+packit_base.add_command(init_local_yaml)
 
 if __name__ == "__main__":
     packit_base()
