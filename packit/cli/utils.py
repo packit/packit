@@ -4,6 +4,7 @@
 import copy
 import functools
 import logging
+import os
 import pathlib
 import sys
 from pathlib import Path
@@ -369,3 +370,14 @@ def get_existing_config(working_dir: Path) -> Optional[Path]:
         if config_file_path.is_file():
             return config_file_path
     return None
+
+
+def get_precommit_config(working_dir: Path) -> Optional[Path]:
+    config_file_path = working_dir / ".pre-commit-config.yaml"
+    if config_file_path.is_file():
+        return config_file_path
+    return None
+
+
+def is_file_empty(file: Path):
+    return os.path.getsize(file) == 0
