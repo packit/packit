@@ -380,10 +380,4 @@ def get_precommit_config(working_dir: Path) -> Optional[Path]:
 
 
 def is_file_empty(file: Path):
-    with open(file) as f:
-        f.seek(0, os.SEEK_END)
-        size = f.tell()
-        if size:
-            return False
-
-    return True
+    return os.path.getsize(file) == 0

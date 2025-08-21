@@ -7,7 +7,6 @@ Generate initial configuration for packit
 
 import logging
 import os
-import sys
 from pathlib import Path
 from typing import Optional
 
@@ -52,14 +51,15 @@ logger = logging.getLogger(__name__)
 @cover_packit_exception
 def init(config, path_or_url, force, with_precommit):
     """
-    Create the initial Packit configuration in a repository
+    Create the initial Packit configuration in a repository and add
+    a pre-commit check to validate Packit configuration file
 
     See 'packit source-git init', if you want to initialize a repository
     as a source-git repo.
     """
     working_dir = path_or_url.working_dir
 
-    if is_git_repo(working_dir):
+    if not is_git_repo(working_dir):
         raise PackitException(
             " .git repository not found."
             " Initialize current repository as a git repo first in order"
@@ -155,7 +155,7 @@ def generate_precommit_config(config_file: Path):
     data = yaml.load(config_file)
 
     if not is_file_empty(config_file):
-        if is_precommit_config_present(data):
+        if is_packit_precommit_config_present(data):
             return
 
         data = prepare_precommit_config(data)
@@ -164,15 +164,13 @@ def generate_precommit_config(config_file: Path):
         # add configuration to empty file
         data = {"repos": [PRECOMMIT_CONFIG]}
 
-    yaml.dump(data, sys.stdout)  # testing purposes
-
     with open(config_file, "w") as f:
         yaml.dump(data, f)
 
     logger.debug(f"Pre-commit config file '{config_file}' changed.")
 
 
-def is_precommit_config_present(data):
+def is_packit_precommit_config_present(data):
     """
     Check whether packit-specific configuration is already
     present in .pre-commit-config.yaml
@@ -186,7 +184,12 @@ def is_precommit_config_present(data):
     if not isinstance(data["repos"], list):
         return False
 
-    return PRECOMMIT_CONFIG in data["repos"]
+    repos = data["repos"]
+    return any(
+        repo.get("repo") == PRECOMMIT_CONFIG.get("repo")
+        and repo.get("hooks") == PRECOMMIT_CONFIG.get("hooks")
+        for repo in repos
+    )
 
 
 def prepare_precommit_config(data):
@@ -198,7 +201,7 @@ def prepare_precommit_config(data):
         if isinstance(data["repos"], list):
             data["repos"].append(PRECOMMIT_CONFIG)
         elif isinstance(data["repos"], dict):
-            print(
+            raise PackitException(
                 " Unexpected structure of .pre-commit-config.yaml."
                 " A list is supposed to follow the 'repos' keyword."
                 " Please consult the official pre-commit documentation.",
