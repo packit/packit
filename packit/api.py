@@ -85,6 +85,7 @@ from packit.utils import commands, obs_helper
 from packit.utils.bodhi import get_bodhi_client
 from packit.utils.changelog_helper import ChangelogHelper
 from packit.utils.extensions import assert_existence
+from packit.utils.local_test_utils import LocalTestUtils
 from packit.utils.repo import (
     commit_exists,
     get_commit_diff,
@@ -2781,21 +2782,44 @@ The first dist-git commit to be synced is '{short_hash}'.
     def run_local_test(
         self,
         target: Optional[str] = "fedora:rawhide",
-        rpm_paths: Optional[list[str]] = None,
-        run_all: bool = False,
+        rpm_paths: Optional[list[Path]] = None,
         plans: Optional[list[str]] = None,
+        release_suffix: Optional[str] = None,
+        default_release_suffix: bool = False,
+        upstream_ref: Optional[str] = None,
+        srpm_dir: Optional[Union[Path, str]] = None,
+        default_mock_resultdir: bool = True,
+        resultdir: Union[Path, str, None] = None,
+        root: Optional[str] = None,
+        clean_before: bool = True,
     ) -> Optional[str]:
         """
         Run tests locally via tmt.
         """
+        if clean_before:
+            logger.info("Cleaning tmt artifacts before running tmt test...")
+            self.clean_tmt_artifacts()
+
+        if root is None and target:
+            root = LocalTestUtils.tmt_target_to_mock_root(target=target)
+
+        logger.debug("Building rpm in mock root %s and tmt image %s ", root, target)
 
         if not rpm_paths:
-            raise PackitException("At least one --rpm_path is required")
+            rpm_paths = self._generate_rpms_for_tmt_test(
+                package_config=self.package_config,
+                release_suffix=release_suffix,
+                default_release_suffix=default_release_suffix,
+                upstream_ref=upstream_ref,
+                srpm_dir=srpm_dir,
+                default_mock_resultdir=default_mock_resultdir,
+                resultdir=resultdir,
+                root=root,
+            )
 
-        cmd = self._build_tmt_cmd(
+        cmd = LocalTestUtils._build_tmt_cmd(
             rpm_paths=rpm_paths,
             target=target,
-            run_all=run_all,
             plans=plans,
         )
 
@@ -2809,64 +2833,76 @@ The first dist-git commit to be synced is '{short_hash}'.
         # response appears in stderr for some weird reason
         return cmd_result.stderr
 
-    def _build_tmt_cmd(
+    def clean_tmt_artifacts(self):
+        """
+        Clean TMT run data and environment before test starts.
+        """
+        try:
+            commands.run_command(["tmt", "clean"])
+            logger.info("tmt artifacts cleaned up.")
+        except PackitCommandFailedError as ex:
+            logger.error(f"ERROR! Failed to clean tmt artifacts: {ex.stderr_output}")
+
+    def _generate_rpms_for_tmt_test(
         self,
-        rpm_paths: list[str],
-        target: str,
-        run_all: bool,
-        plans: Optional[list[str]],
-    ) -> list[str]:
+        package_config: MultiplePackages,
+        release_suffix: Optional[str] = None,
+        default_release_suffix: bool = False,
+        upstream_ref: Optional[str] = None,
+        srpm_dir: Optional[Union[Path, str]] = None,
+        default_mock_resultdir: bool = True,
+        resultdir: Union[Path, str, None] = None,
+        root: str = "default",
+    ) -> list[Path]:
         """
-        Build base tmt command to be sent to tmt.
+        Generates rpms from the contents of the source code
 
-        :param rpm_paths: List of paths to local RPMs to install
-        :param target: Target container image (e.g. 'fedora:41')
-        :param run_all: Whether to run all plans (currently unused)
-        :param plans: Optional list of TMT plan names to run
-        :return: List of command-line arguments for the `tmt` command
+        Args:
+            package_config: Configuration object containing package-specific
+               settings for one or more packages in the repository (supports monorepos).
+           release_suffix: Custom suffix to append to the RPM
+               release number. Defaults to None.
+           default_release_suffix: Whether to use the default release
+               suffix format. Defaults to False.
+           upstream_ref: Git reference (branch, tag, or commit)
+               from the upstream repository to build from. Defaults to None (uses current state).
+           srpm_dir: Directory path where Source RPM
+               files are located or should be created. Defaults to None.
+           default_mock_resultdir: Whether to use Mock's default result
+               directory for build outputs. Defaults to True.
+           resultdir: Custom directory path where the
+               generated RPM files should be stored. Defaults to None.
+           root: Mock build environment/chroot configuration to use
+               (e.g., "fedora-39-x86_64"). Defaults to "default".
+
+        Returns:
+            A list of file paths for rpms generated.
         """
-        cmd = [
-            "tmt",
-            "-c",
-            "initiator=packit",
-            "run",
-        ]
+        logger.info(
+            "No RPM passed for local test, proceeding to generate rpms automatically...",
+        )
+        release_suffix = ChangelogHelper.resolve_release_suffix(
+            package_config,
+            release_suffix,
+            default_release_suffix,
+        )
 
-        if plans:
-            for plan in plans:
-                cmd += ["plan", f"--name={plan}"]
+        srpm_path = self.create_srpm(
+            upstream_ref=upstream_ref,
+            srpm_dir=srpm_dir,
+            release_suffix=release_suffix,
+        )
 
-        cmd += [
-            "discover",
-            "--how",
-            "fmf",
-            "provision",
-            "--how",
-            "container",
-            "--image",
-            target,
-            "prepare",
-            "--how",
-            "install",
-        ]
+        if default_mock_resultdir:
+            resultdir = None
 
-        for rpm in rpm_paths:
-            cmd += ["--package", os.path.abspath(rpm)]
+        rpm_paths = self.run_mock_build(
+            root=root,
+            srpm_path=srpm_path,
+            resultdir=resultdir,
+        )
 
-        cmd += ["execute", "report"]
-        return cmd
-
-    def parse_tmt_response(self, stdout: str) -> tuple[int, int]:
-        """
-        Parse the TMT command stdout and extract the number of executed and passed tests.
-
-        :param stdout: The standard output from a `tmt run` command
-        :return: A tuple (executed, passed) representing test counts
-        """
-        executed_match = re.search(r"summary:\s+(\d+)\s+test[s]?\s+executed", stdout)
-        passed_match = re.search(r"summary:\s+(\d+)\s+test[s]?\s+passed", stdout)
-
-        executed = int(executed_match.group(1)) if executed_match else 0
-        passed = int(passed_match.group(1)) if passed_match else 0
-
-        return executed, passed
+        logger.info("RPMs:")
+        for path in rpm_paths:
+            logger.info(f" * {path}")
+        return rpm_paths
