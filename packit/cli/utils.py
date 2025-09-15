@@ -4,6 +4,7 @@
 import copy
 import functools
 import logging
+import os
 import pathlib
 import sys
 from pathlib import Path
@@ -365,7 +366,22 @@ def get_hostname_or_none(url: str) -> Optional[str]:
 def get_existing_config(working_dir: Path) -> Optional[Path]:
     # find name of config file if already exists
     for config_file_name in CONFIG_FILE_NAMES:
-        config_file_path = working_dir / config_file_name
-        if config_file_path.is_file():
+        config_file_path = get_file(working_dir, config_file_name)
+        if config_file_path:
             return config_file_path
     return None
+
+
+def get_precommit_config(working_dir: Path) -> Optional[Path]:
+    return get_file(working_dir, ".pre-commit-config.yaml")
+
+
+def get_file(working_dir: Path, filename: str) -> Optional[Path]:
+    file_path = working_dir / filename
+    if file_path.is_file():
+        return file_path
+    return None
+
+
+def is_file_empty(file: Path):
+    return os.path.getsize(file) == 0
