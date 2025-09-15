@@ -9,7 +9,7 @@ import pytest
 from packit.exceptions import PackitException
 
 # from flexmock import flexmock
-from packit.sync import SyncFilesItem, check_subpath
+from packit.sync import SyncFilesItem, check_subpath, sync_files
 
 
 @contextmanager
@@ -90,6 +90,37 @@ def test_drop_src(item, drop, result):
     to make sure the types of 'src' and 'y' match.
     """
     assert result == item.drop_src(**drop)
+
+
+def test_drop_src_dir(tmp_path):
+    """Check files are dropped when src is a dir also."""
+
+    # This functionality requires to check that a file exists and is relative to the src paths
+    src_dir = tmp_path / "src"
+    dest_dir = tmp_path / "dest"
+    ignore_file = src_dir / "ignore_me"
+    sync_file = src_dir / "sync_me"
+
+    # Create the dirs and files
+    src_dir.mkdir()
+    ignore_file.touch()
+    sync_file.touch()
+
+    sync = SyncFilesItem(
+        src=["src/"],
+        dest="dest/",
+    )
+
+    sync.resolve(src_base=tmp_path, dest_base=tmp_path)
+
+    sync.drop_src(ignore_file)
+    assert "- /ignore_me" in sync.filters
+
+    # Do the actual rsync and double-check the actual results
+    sync_files([sync])
+    assert dest_dir.exists()
+    assert (dest_dir / "sync_me").exists()
+    assert not (dest_dir / "ignore_me").exists()
 
 
 @pytest.mark.parametrize(
