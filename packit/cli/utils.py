@@ -13,12 +13,19 @@ from typing import Optional, Union
 import click
 from github import GithubException
 from ogr.parsing import parse_git_repo
+from ogr.services.github import GithubService
 
 from packit.api import PackitAPI
 from packit.config import Config, JobType, get_local_package_config
 from packit.config.common_package_config import MultiplePackages
 from packit.config.package_config import PackageConfig
-from packit.constants import CONFIG_FILE_NAMES, DISTRO_DIR, SRC_GIT_CONFIG
+from packit.constants import (
+    CONFIG_FILE_NAMES,
+    DISTRO_DIR,
+    PACKIT_NAMESPACE,
+    PRECOMMIT_HOOK_REPO,
+    SRC_GIT_CONFIG,
+)
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
 
@@ -374,6 +381,14 @@ def get_existing_config(working_dir: Path) -> Optional[Path]:
 
 def get_precommit_config(working_dir: Path) -> Optional[Path]:
     return get_file(working_dir, ".pre-commit-config.yaml")
+
+
+def get_latest_precommit_hook_release() -> Optional[str]:
+    service = GithubService(token=None)
+    project = service.get_project(repo=PRECOMMIT_HOOK_REPO, namespace=PACKIT_NAMESPACE)
+
+    release = project.get_latest_release()
+    return release.tag_name if release else None
 
 
 def get_file(working_dir: Path, filename: str) -> Optional[Path]:

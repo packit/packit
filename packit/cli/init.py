@@ -17,6 +17,7 @@ from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import (
     cover_packit_exception,
     get_existing_config,
+    get_latest_precommit_hook_release,
     get_precommit_config,
     is_file_empty,
 )
@@ -25,7 +26,7 @@ from packit.config.config import pass_config
 from packit.config.package_config import get_local_specfile_path
 from packit.constants import (
     PACKIT_CONFIG_TEMPLATE,
-    PRECOMMIT_CONFIG,
+    PRECOMMIT_CONFIG_TEMPLATE,
 )
 from packit.exceptions import PackitException
 from packit.utils import is_git_repo
@@ -182,7 +183,8 @@ def generate_precommit_config(config_file: Path):
 
     else:
         # add configuration to empty file
-        data = {"repos": [PRECOMMIT_CONFIG]}
+        precommit_config = get_latest_precommit_hook()
+        data = {"repos": [precommit_config]}
 
     with open(config_file, "w") as f:
         yaml.dump(data, f, default_flow_style=False)
@@ -206,10 +208,10 @@ def is_packit_precommit_config_present(data):
 
     repos = data["repos"]
     return any(
-        repo.get("repo") == PRECOMMIT_CONFIG.get("repo")
+        repo.get("repo") == PRECOMMIT_CONFIG_TEMPLATE.get("repo")
         # [NOTE] If we introduce more hooks, make sure to check for subset rather than equality.
         # Or drop the check entirely.
-        and repo.get("hooks") == PRECOMMIT_CONFIG.get("hooks")
+        and repo.get("hooks") == PRECOMMIT_CONFIG_TEMPLATE.get("hooks")
         for repo in repos
     )
 
@@ -219,9 +221,11 @@ def prepare_precommit_config(data):
     Go over loaded YAML config file and try to add packit-specific configuration
     Raise an error if there is a problem with the file structure
     """
+    precommit_config = get_latest_precommit_hook()
+
     if isinstance(data, dict) and "repos" in data:
         if isinstance(data["repos"], list):
-            data["repos"].append(PRECOMMIT_CONFIG)
+            data["repos"].append(precommit_config)
         elif isinstance(data["repos"], dict):
             raise PackitException(
                 "Unexpected structure of .pre-commit-config.yaml."
@@ -229,9 +233,9 @@ def prepare_precommit_config(data):
                 " Please consult the official pre-commit documentation.",
             )
         else:
-            data["repos"] = [PRECOMMIT_CONFIG]
+            data["repos"] = [precommit_config]
     elif isinstance(data, dict):
-        data["repos"] = [PRECOMMIT_CONFIG]
+        data["repos"] = [precommit_config]
     elif isinstance(data, list):
         raise PackitException(
             "Unexpected structure of .pre-commit-config.yaml:"
@@ -247,3 +251,19 @@ def prepare_precommit_config(data):
         )
 
     return data
+
+
+def get_latest_precommit_hook() -> dict:
+    """
+    Get the latest release of precommit hook and return precommit
+    config containing the latest release
+    """
+    latest_release = get_latest_precommit_hook_release()
+    if not latest_release:
+        raise PackitException(
+            "Something went wrong trying to fetch latest precommit release.",
+        )
+    precommit_config = PRECOMMIT_CONFIG_TEMPLATE.copy()
+    precommit_config["rev"] = latest_release
+
+    return precommit_config

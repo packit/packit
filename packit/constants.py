@@ -5,6 +5,10 @@ import itertools
 
 from packit.dist_git_instance import DistGitInstance
 
+PACKIT_NAMESPACE = "packit"
+
+PRECOMMIT_HOOK_REPO = "pre-commit-hooks"
+
 DG_PR_COMMENT_KEY_SG_PR = "Source-git pull request ID"
 DG_PR_COMMENT_KEY_SG_COMMIT = "Source-git commit"
 
@@ -89,10 +93,9 @@ upstream_package_name: {upstream_package_name}
 downstream_package_name: {downstream_package_name}
 """
 
-PRECOMMIT_CONFIG = {
+PRECOMMIT_CONFIG_TEMPLATE = {
     # check validity of Packit configuration
     "repo": "https://github.com/packit/pre-commit-hooks",
-    "rev": "v1.3.0",
     "hooks": [{"id": "validate-config"}],
 }
 

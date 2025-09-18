@@ -51,6 +51,14 @@ HELLO_RELEASE = "1.0.1"
 
 
 @pytest.fixture()
+def mock_precommit_release():
+    project = flexmock()
+    release = flexmock(tag_name="v1.1.1")
+    flexmock(GithubService).should_receive("get_project").and_return(project)
+    project.should_receive("get_latest_release").and_return(release)
+
+
+@pytest.fixture()
 def mock_remote_functionality_upstream(upstream_and_remote, distgit_and_remote):
     u, _ = upstream_and_remote
     d, _ = distgit_and_remote
