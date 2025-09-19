@@ -1,3 +1,18 @@
+# 1.12.0
+
+- Packit now automatically invokes an rpm build in mock when no rpm test is passed using `--rpm_paths` before running local tests with `packit test`. (#2636)
+- Fixed an issue where the upstream spec file was synchronized without applying packit's patches. (#2637)
+  This happened when syncing a folder that contains the specfile, e.g.:
+
+```yaml
+files_to_sync:
+  - src: distro/
+    dest: ./
+specfile_path: distro/my_pkg.spec
+```
+
+- `packit init` now automatically adds a packit-specific pre-commit hook to user's pre-commit configuration file if present. Two new flags were added, which modify this behavior. (#2641)
+
 # 1.11.0
 
 - `packit test` now supports running and validating TMT tests locally without requiring a PR or a release, including result parsing and basic failure reporting. (#2632)
