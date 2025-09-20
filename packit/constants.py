@@ -22,13 +22,6 @@ CONFIG_FILE_NAMES = {
     "packit.yml",
 }
 
-LOCAL_USER_CONFIG_FILE_NAMES = {
-    ".packitLocal.yaml",
-    ".packitLocal.yml",
-    "packitLocal.yaml",
-    "packitLocal.yml",
-}
-
 PROJECT_LOCAL_CONFIG_FILE = ".packitLocal.yaml"
 
 ALLOWED_LOCAL_OVERRIDES: list[str] = []
