@@ -480,6 +480,7 @@ class CommonConfigSchema(Schema):
     issue_repository = fields.String(load_default=None)
     release_suffix = fields.String(load_default=None)
     update_release = fields.Bool(dump_default=True)
+    preserve_spec = fields.Bool(dump_default=False)
     upstream_tag_include = fields.String()
     upstream_tag_exclude = fields.String()
     prerelease_suffix_pattern = fields.String()
