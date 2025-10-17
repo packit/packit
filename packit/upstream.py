@@ -315,6 +315,7 @@ class Upstream:
         create_symlinks: Optional[bool] = True,
         merged_ref: Optional[str] = None,
         env: Optional[dict] = None,
+        preserve_spec: bool = False,
     ):
         raise NotImplementedError()
 
@@ -1034,6 +1035,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
         create_symlinks: Optional[bool] = True,
         merged_ref: Optional[str] = None,
         env: Optional[dict] = None,
+        preserve_spec: bool = False,
     ):
         """
         1. determine version
@@ -1049,6 +1051,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
                 (e.g. when the archive is created outside the specfile dir)
             merged_ref: git ref in the upstream repo used to identify correct most recent tag
             env: environment to pass to the `post-modifications` action
+            preserve_spec: preserve spec file without updating
         """
         try:
             self._merged_ref = merged_ref
@@ -1057,6 +1060,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
                 env=env,
+                preserve_spec=preserve_spec,
             )
         finally:
             self._merged_ref = None
@@ -1489,6 +1493,7 @@ class SRPMBuilder:
             archive: Path to the archive.
             update_release: Should Release be updated?
             release_suffix: Append this suffix to the %release.
+            preserve_spec: Should spec file be preserved without updating?
         """
         current_commit = self.upstream.local_project.commit_hexsha
         # the logic behind the naming:
@@ -1544,6 +1549,7 @@ class SRPMBuilder:
         release_suffix: Optional[str] = None,
         create_symlinks: Optional[bool] = True,
         env: Optional[dict] = None,
+        preserve_spec: bool = False,
     ):
         if self.upstream_ref:
             self._prepare_upstream_using_source_git(update_release, release_suffix)
@@ -1552,11 +1558,12 @@ class SRPMBuilder:
                 version=self.current_version,
                 create_symlink=create_symlinks,
             )
-            self._fix_specfile_to_use_local_archive(
-                archive=created_archive,
-                update_release=update_release,
-                release_suffix=release_suffix,
-            )
+            if not preserve_spec:
+                self._fix_specfile_to_use_local_archive(
+                    archive=created_archive,
+                    update_release=update_release,
+                    release_suffix=release_suffix,
+                )
 
         # https://github.com/packit/packit-service/issues/314
         if Path(self.upstream.local_project.working_dir).joinpath("sources").exists():
