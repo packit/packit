@@ -257,7 +257,7 @@ class ChangelogHelper:
             msg = f"- Downstream changes ({current_commit})"
         self.up.specfile.release = release_to_update
         if msg is not None:
-            self.up.specfile.add_changelog_entry(msg)
+            self.up.specfile.add_changelog_entry(self.sanitize_entry(msg))
 
     def prepare_upstream_locally(
         self,
@@ -298,4 +298,4 @@ class ChangelogHelper:
             logger.debug(f"Setting Release in spec to {release!r}.")
             self.up.specfile.release = release
         if msg is not None:
-            self.up.specfile.add_changelog_entry(msg)
+            self.up.specfile.add_changelog_entry(self.sanitize_entry(msg))
