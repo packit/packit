@@ -39,7 +39,7 @@ def cockpit_ostree(tmp_path, upstream_without_config):
     return u, d
 
 
-def test_update_on_cockpit_ostree(cockpit_ostree):
+def test_update_on_cockpit_ostree(cockpit_ostree, bugzilla_mock):
     upstream_path, dist_git_path = cockpit_ostree
 
     def mocked_new_sources(sources=None):
@@ -84,7 +84,7 @@ def test_update_on_cockpit_ostree(cockpit_ostree):
         )
 
 
-def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree):
+def test_update_on_cockpit_ostree_pr_exists(cockpit_ostree, bugzilla_mock):
     upstream_path, dist_git_path = cockpit_ostree
 
     def mocked_new_sources(sources=None):

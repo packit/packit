@@ -114,6 +114,7 @@ def test_source_git_status_synced(
     distgit_and_remote,
     api,
     request,
+    bugzilla_mock,
 ):
     """Dist-git and source-git are in sync."""
     api_instance = request.getfixturevalue(api)
@@ -129,6 +130,7 @@ def test_source_git_status_dist_git_ahead(
     distgit_and_remote,
     api,
     request,
+    bugzilla_mock,
 ):
     """Dist-git has extra commits that must be synced."""
     api_instance = request.getfixturevalue(api)
@@ -150,6 +152,7 @@ def test_source_git_status_source_git_ahead(
     distgit_and_remote,
     api,
     request,
+    bugzilla_mock,
 ):
     """Source-git has extra commits that must be synced."""
     api_instance = request.getfixturevalue(api)
@@ -169,6 +172,7 @@ def test_source_git_status_history_diverges(
     distgit_and_remote,
     api,
     request,
+    bugzilla_mock,
 ):
     """Both source-git and dist-git have extra commits that must be
     synced (diversion)."""
