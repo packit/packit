@@ -248,3 +248,47 @@ def test_update_distgit_no_distgit_specfile(
 
     with downstream._specfile.sections() as sections:
         assert "Some release 0.1.0" in sections.changelog
+
+
+def test_prepare_upstream_locally_sanitizes_macros(upstream, downstream):
+    """Test that prepare_upstream_locally() sanitizes RPM macros in changelog messages."""
+    package_config = upstream.package_config
+    package_config.actions = {
+        ActionName.changelog_entry: [
+            "echo - Updated %{version} and %epoch in spec",
+        ],
+    }
+    ChangelogHelper(upstream, downstream, package_config).prepare_upstream_locally(
+        version="0.1.0",
+        commit="abc123",
+        update_release=True,
+        release="42",
+    )
+
+    with upstream.specfile.sections() as sections:
+        assert "- Updated %%{version} and %%epoch in spec" in sections.changelog
+
+
+def test_prepare_upstream_using_source_git_sanitizes_macros(
+    upstream,
+    downstream,
+):
+    """Test that prepare_upstream_using_source_git() sanitizes RPM macros in changelog messages."""
+    package_config = upstream.package_config
+    package_config.actions = {
+        ActionName.changelog_entry: [
+            "echo - Source-git change with %global and %{name}",
+        ],
+    }
+
+    ChangelogHelper(
+        upstream,
+        downstream,
+        package_config,
+    ).prepare_upstream_using_source_git(
+        update_release=True,
+        release_suffix="1",
+    )
+
+    with upstream.specfile.sections() as sections:
+        assert "- Source-git change with %%global and %%{name}" in sections.changelog
