@@ -29,11 +29,7 @@ from tests.spellbook import (
 
 @pytest.fixture()
 def bugzilla_mock():
-    bugzilla = flexmock(Bugzilla)
-    bugzilla.should_receive("__init__")
-    bugzilla.should_receive("query").and_return([])
-
-    return bugzilla
+    flexmock(Bugzilla).new_instances(flexmock(query=lambda *_, **__: []))
 
 
 def get_git_repo_and_remote(
