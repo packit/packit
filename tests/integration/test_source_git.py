@@ -97,7 +97,6 @@ def test_basic_local_update_without_patching(
     distgit_and_remote,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
-    bugzilla_mock,
 ):
     """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git
     Check that the upstream commit hash is saved when 'mock_commit_origin' is set.
@@ -129,7 +128,6 @@ def test_basic_local_update_empty_patch(
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
     ref,
-    bugzilla_mock,
 ):
     """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git
     Check that by default commit origin is not marked in dist-git.
@@ -157,7 +155,6 @@ def test_basic_local_update_patch_content(
     distgit_and_remote,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
-    bugzilla_mock,
 ):
     """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git
     Check that commit origin is not marked when 'mark_commit_origin' is set to False.
@@ -301,7 +298,6 @@ def test_basic_local_update_patch_content_with_metadata(
     distgit_and_remote,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
-    bugzilla_mock,
 ):
     """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
@@ -353,7 +349,6 @@ def test_basic_local_update_patch_content_with_metadata_and_patch_ignored(
     distgit_and_remote,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
-    bugzilla_mock,
 ):
     """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 
@@ -401,7 +396,6 @@ def test_basic_local_update_patch_content_with_downstream_patch(
     distgit_and_remote,
     mock_remote_functionality_sourcegit,
     api_instance_source_git,
-    bugzilla_mock,
 ):
     """propose-downstream for sourcegit test: mock remote API, use local upstream and dist-git"""
 

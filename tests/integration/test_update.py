@@ -71,7 +71,6 @@ def test_fast_forward_merge_local_update(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream_fast_forward_merge_branches,
-    bugzilla_mock,
 ):
     _, d, api = api_instance
     _, _ = mock_remote_functionality_upstream_fast_forward_merge_branches
@@ -193,7 +192,6 @@ def test_basic_local_update_use_downstream_specfile(
     distgit_and_remote,
     mock_remote_functionality_upstream,
     caplog,
-    bugzilla_mock,
 ):
     # log specfile debug messages
     caplog.set_level(logging.DEBUG)
@@ -251,7 +249,6 @@ def test_basic_local_update_use_downstream_specfile_non_git_upstream(
     distgit_and_remote,
     mock_remote_functionality_upstream,
     caplog,
-    bugzilla_mock,
 ):
     # log specfile debug messages
     caplog.set_level(logging.DEBUG)
@@ -364,7 +361,6 @@ def test_basic_local_update_with_adding_second_source(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -470,7 +466,6 @@ def test_basic_local_update_with_adding_second_local_source(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -519,7 +514,6 @@ def test_basic_local_update_with_adding_second_local_source_tracked_by_git(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -565,7 +559,6 @@ def test_basic_local_update_with_removing_second_source(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -613,7 +606,6 @@ def test_local_update_generated_spec(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """Check that specfile can be generated on clone."""
     u, d, api = api_instance
@@ -671,7 +663,6 @@ def test_basic_local_update_copy_upstream_release_description(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git,
     set copy_upstream_release_description in package config to True"""
@@ -747,7 +738,6 @@ def test_basic_local_update_direct_push(
     api_instance,
     distgit_and_remote,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     """basic propose-downstream test: mock remote API, use local upstream and dist-git"""
     u, d, api = api_instance
@@ -772,7 +762,6 @@ def test_update_downstream_changelog_even_if_has_autochangelog(
     api_instance,
     distgit_with_autochangelog_and_remote,
     mock_remote_functionality_downstream_autochangelog,
-    bugzilla_mock,
 ):
     """Check that a new entry is added to the %changelog section of the the spec-file in dist-git,
     when sync_changelog is set, even if the spec-file in dist-git uses %autochangelog"""
@@ -800,7 +789,6 @@ def test_basic_local_update_direct_push_no_dg_spec(
     api_instance,
     distgit_and_remote,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     u, d, api = api_instance
     d.joinpath("beer.spec").unlink()
@@ -863,7 +851,6 @@ def test_basic_local_update_post_modifications_action(
     cwd_upstream,
     api_instance,
     mock_remote_functionality_upstream,
-    bugzilla_mock,
 ):
     u, d, api = api_instance
     mock_spec_download_remote_s(d)

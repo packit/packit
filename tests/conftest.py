@@ -27,7 +27,7 @@ from tests.spellbook import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def bugzilla_mock():
     flexmock(Bugzilla).new_instances(flexmock(query=lambda *_, **__: []))
 

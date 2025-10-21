@@ -156,7 +156,6 @@ def test_sync_release_version_tag_processing(
     get_specfile_version_return,
     expectation,
     api_mock,
-    bugzilla_mock,
 ):
     api_mock.up.package_config.upstream_tag_template = "v{version}"
     api_mock.up.should_receive("get_latest_released_version").and_return(
@@ -185,7 +184,7 @@ def test_sync_release_version_tag_processing(
         api_mock.sync_release(versions=versions, tag=tag, dist_git_branch="_")
 
 
-def test_sync_release_do_not_create_sync_note(api_mock, bugzilla_mock):
+def test_sync_release_do_not_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").never()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
@@ -202,7 +201,7 @@ def test_sync_release_do_not_create_sync_note(api_mock, bugzilla_mock):
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
 
-def test_sync_release_create_sync_note(api_mock, bugzilla_mock):
+def test_sync_release_create_sync_note(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").once()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
@@ -218,7 +217,7 @@ def test_sync_release_create_sync_note(api_mock, bugzilla_mock):
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
 
 
-def test_sync_release_warn_about_koji_build_triggering_bug(api_mock, bugzilla_mock):
+def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     flexmock(pathlib.Path).should_receive("write_text").once()
     api_mock.up.should_receive("get_specfile_version").and_return("0")
@@ -282,12 +281,7 @@ def test_dg_downstream_package_name_is_set(
     assert api_mock.dg.package_config.downstream_package_name == expectation
 
 
-def test_sync_release_sync_files_call(
-    config_mock,
-    upstream_mock,
-    distgit_mock,
-    bugzilla_mock,
-):
+def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     pc = PackageConfig(
         packages={
             "package": CommonPackageConfig(
@@ -408,12 +402,7 @@ def test_sync_release_sync_files_call(
         ),
     ],
 )
-def test_sync_release_check_pr_instructions(
-    api_mock,
-    bugzilla_mock,
-    pr_description,
-    project,
-):
+def test_sync_release_check_pr_instructions(api_mock, pr_description, project):
     api_mock.dg.local_project.git_project = project
 
     flexmock(PatchGenerator).should_receive("undo_identical")
@@ -440,7 +429,7 @@ def test_sync_release_check_pr_instructions(
     )
 
 
-def test_sync_release_downgrade(api_mock, bugzilla_mock):
+def test_sync_release_downgrade(api_mock):
     flexmock(PatchGenerator).should_receive("undo_identical")
     api_mock.up.should_receive("get_specfile_version").and_return("0")
     api_mock.up.should_receive("specfile").and_return(
@@ -684,7 +673,7 @@ def test_check_version_distance(
     ),
 )
 def test_get_upstream_release_monitoring_bug(package_name, version, response, result):
-    flexmock(Bugzilla).should_receive("query").and_return(response)
+    flexmock(Bugzilla).new_instances(flexmock(query=lambda *_, **__: response))
     assert (
         PackitAPI.get_upstream_release_monitoring_bug(package_name, version) == result
     )
