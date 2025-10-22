@@ -19,6 +19,10 @@ from packit.utils.changelog_helper import ChangelogHelper
             "- Use %{_bindir}/%{name} for %install",
             "- Use %%{_bindir}/%%{name} for %%install",
         ),
+        (
+            "- nested %{?version:.%{name}} macro",
+            "- nested %%{?version:.%%{name}} macro",
+        ),
         # Shell and expression expansions
         (
             "- got rid of all shell (%(...)) and expression (%[...]) expansions",
@@ -26,6 +30,8 @@ from packit.utils.changelog_helper import ChangelogHelper
         ),
         # Already escaped - should not double-escape
         ("- already escaped %%global", "- already escaped %%global"),
+        # Odd number of percent signs
+        ("- weird %%%global combination", "- weird %%%%global combination"),
         # Asterisks at line start
         ("- first item\n* second item", "- first item\n * second item"),
         ("* first item\n* second item", " * first item\n * second item"),

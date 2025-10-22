@@ -90,9 +90,17 @@ class ChangelogHelper:
 
     @staticmethod
     def sanitize_entry(entry: str) -> str:
-        # escape macro references and macro/shell/expression expansions
-        # that could break spec file parsing
-        entry = re.sub(r"(?<!%)%(?=(\w+|[{[(]))", "%%", entry)
+        # TODO: we can use specfile.ValueParser for sanitization once
+        # https://github.com/packit/specfile/issues/495 is resolved.
+        #
+        # 1. split the entry by '%%' to protect already sanitized percent sign occurrences
+        # 2. in each part escape macro references and macro/shell/expression expansions
+        #    that could break spec file parsing
+        # 3. join parts by '%%' again
+        entry = "%%".join(
+            [re.sub(r"%(?=(\w+|[{[(]))", "%%", part) for part in entry.split("%%")],
+        )
+
         # prepend asterisk at the start of a line with a space in order
         # not to break identification of entry boundaries
         return re.sub(r"^[*]", " *", entry, flags=re.MULTILINE)
