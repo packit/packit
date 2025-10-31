@@ -115,5 +115,7 @@ def test_pull_from_upstream_with_dry_run():
         resolve_bug=None,
         sync_acls=False,
     ).and_return()
-    result = call_packit(packit_base, parameters=["pull-from-upstream", ".", "--dry-run"])
+    result = call_packit(
+        packit_base, parameters=["pull-from-upstream", ".", "--dry-run"],
+    )
     assert result.exit_code == 0
