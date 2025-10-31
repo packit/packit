@@ -52,6 +52,7 @@ def test_propose_downstream_command():
         dist_git_path=None,
         dist_git_branch=None,
         force_new_sources=False,
+        dry_run=False,
         pr=None,
         path_or_url=LocalProject,
         version=None,
@@ -76,6 +77,7 @@ def test_pull_from_upstream_command():
         dist_git_path=None,
         dist_git_branch=None,
         force_new_sources=False,
+        dry_run=False,
         pr=None,
         path_or_url=LocalProject,
         version=None,
@@ -88,4 +90,30 @@ def test_pull_from_upstream_command():
         sync_acls=False,
     ).and_return()
     result = call_packit(packit_base, parameters=["pull-from-upstream", "."])
+    assert result.exit_code == 0
+
+
+def test_pull_from_upstream_with_dry_run():
+    """Test that --dry-run flag is properly passed to sync_release"""
+    flexmock(utils).should_receive("get_local_package_config").and_return(
+        flexmock().should_receive("get_package_config_views").and_return({}).mock(),
+    )
+    flexmock(propose_downstream_module).should_receive("sync_release").with_args(
+        config=Config,
+        dist_git_path=None,
+        dist_git_branch=None,
+        force_new_sources=False,
+        dry_run=True,
+        pr=None,
+        path_or_url=LocalProject,
+        version=None,
+        force=False,
+        local_content=False,
+        upstream_ref=None,
+        use_downstream_specfile=True,
+        package_config=PackageConfig,
+        resolve_bug=None,
+        sync_acls=False,
+    ).and_return()
+    result = call_packit(packit_base, parameters=["pull-from-upstream", ".", "--dry-run"])
     assert result.exit_code == 0
