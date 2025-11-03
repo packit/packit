@@ -673,7 +673,7 @@ def test_check_version_distance(
     ),
 )
 def test_get_upstream_release_monitoring_bug(package_name, version, response, result):
-    flexmock(Bugzilla).should_receive("query").and_return(response)
+    flexmock(Bugzilla).new_instances(flexmock(query=lambda *_, **__: response))
     assert (
         PackitAPI.get_upstream_release_monitoring_bug(package_name, version) == result
     )

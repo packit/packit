@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from bugzilla import Bugzilla
 from deepdiff import DeepDiff
 from flexmock import flexmock
 
@@ -24,6 +25,11 @@ from tests.spellbook import (
     is_suitable_pyforgejo_rpm_installed,
     prepare_dist_git_repo,
 )
+
+
+@pytest.fixture(autouse=True)
+def bugzilla_mock():
+    flexmock(Bugzilla).new_instances(flexmock(query=lambda *_, **__: []))
 
 
 def get_git_repo_and_remote(
