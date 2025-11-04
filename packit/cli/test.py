@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
     ),
 )
 @click.option(
-    "--plans",
+    "--plan",
     multiple=True,
     help=(
         "List of specific tmt plans to run. Can be used multiple times. "
@@ -83,7 +83,7 @@ def test(
     target,
     rpm_paths,
     path_or_url,
-    plans,
+    plan,
     clean_before,
 ):
     """
@@ -99,7 +99,7 @@ def test(
     tmt_output = api.run_local_test(
         target=target,
         rpm_paths=rpm_paths,
-        plans=plans,
+        plans=plan,
         release_suffix=None,
         default_release_suffix=False,
         upstream_ref=None,
