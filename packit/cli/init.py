@@ -42,13 +42,13 @@ logger = logging.getLogger(__name__)
     help="Reset config to default if already exists.",
 )
 @click.option(
-    "--without_precommit",
+    "--without-precommit",
     default=False,
     is_flag=True,
     help="Skip adding packit-specific pre-commit configuration hook.",
 )
 @click.option(
-    "--force_precommit",
+    "--force-precommit",
     default=False,
     is_flag=True,
     help="Create pre-commit configuration file if missing.",
@@ -68,7 +68,7 @@ def init(config, path_or_url, force, without_precommit, force_precommit):
 
     if without_precommit and force_precommit:
         raise PackitException(
-            "--without_precommit and --force_precommit are"
+            "--without-precommit and --force-precommit are"
             " mutually exclusive flags.",
         )
 
@@ -160,7 +160,7 @@ def init_precommit(
             " Initialize current repository as a git repo first in order"
             " to set up Packit config validation upon pre-commit."
             " If you want do not want to use pre-commit for this purpose,"
-            " re-run `packit init` using `--without_precommit` flag.",
+            " re-run `packit init` using `--without-precommit` flag.",
         )
 
     generate_precommit_config(precommit_config_path)

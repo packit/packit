@@ -52,7 +52,7 @@ def test_init_fail(cwd_upstream_or_distgit):
 
 def test_init_force_precommit_flag(upstream_without_precommit_config_not_bare):
     result = call_packit(
-        parameters=["init", "--force_precommit"],
+        parameters=["init", "--force-precommit"],
         working_dir=upstream_without_precommit_config_not_bare,
     )
 
@@ -76,7 +76,7 @@ def test_init_without_precommit_flag(upstream_without_config_not_bare):
         yaml.dump(user_data, f, default_flow_style=False)
 
     result = call_packit(
-        parameters=["init", "--without_precommit"],
+        parameters=["init", "--without-precommit"],
         working_dir=upstream_without_config_not_bare,
     )
 
@@ -93,7 +93,7 @@ def test_init_without_precommit_flag(upstream_without_config_not_bare):
 
 def test_init_exclusive_flags(upstream_without_precommit_config_not_bare):
     result = call_packit(
-        parameters=["init", "--without_precommit", "--force_precommit"],
+        parameters=["init", "--without-precommit", "--force-precommit"],
         working_dir=upstream_without_precommit_config_not_bare,
     )
 
