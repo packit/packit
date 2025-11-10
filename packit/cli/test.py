@@ -30,7 +30,13 @@ logger = logging.getLogger(__name__)
 @click.command(
     "test",
     context_settings=get_context_settings(),
-    short_help="Run tmt tests locally",
+    help="""
+        Run tmt tests locally using content from the upstream repository.
+
+        This command builds RPMs from the current repository state and runs
+        tests in containerized environments, mimicking Packit's testing service
+        behavior for local debugging and development.
+    """,
 )
 @click.option(
     PACKAGE_SHORT_OPTION,
@@ -41,10 +47,27 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--rpm_paths",
     multiple=True,
-    help="Path(s) to RPMs that should be installed in the test environment.",
+    help=(
+        "Path to RPM file(s) to test. Can be used multiple times."
+        "If not provided, RPMs will be built automatically from source."
+    ),
 )
-@click.option("--target", default="fedora:rawhide", help="Container/VM image to use.")
-@click.option("--plans", multiple=True, help="List of specific tmt plans to run.")
+@click.option(
+    "--target",
+    default="fedora:rawhide",
+    help=(
+        "Container image for the testing environment, "
+        "e.g., `fedora:39`, `centos:stream9`."
+    ),
+)
+@click.option(
+    "--plan",
+    multiple=True,
+    help=(
+        "List of specific tmt plans to run. Can be used multiple times. "
+        "If not specified, all plans are executed."
+    ),
+)
 @click.argument("path_or_url", type=LocalProjectParameter(), default=os.path.curdir)
 @click.option(
     "--clean-before/--no-clean-before",
@@ -60,7 +83,7 @@ def test(
     target,
     rpm_paths,
     path_or_url,
-    plans,
+    plan,
     clean_before,
 ):
     """
@@ -76,7 +99,7 @@ def test(
     tmt_output = api.run_local_test(
         target=target,
         rpm_paths=rpm_paths,
-        plans=plans,
+        plans=plan,
         release_suffix=None,
         default_release_suffix=False,
         upstream_ref=None,
