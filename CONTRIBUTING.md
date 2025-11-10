@@ -19,6 +19,10 @@ command:
 
     $ pip3 install --user --editable .
 
+You can alternatively also run it straight out of the source tree:
+
+    $ python3 -m packit.cli.packit_base <command> <args>
+
 ## Testing
 
 Tests are stored in the [tests](/tests) directory:
