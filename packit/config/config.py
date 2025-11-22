@@ -157,6 +157,7 @@ class Config:
                     logger.error(f"Cannot load user config {config_file_name_full!r}.")
                     raise PackitException(f"Cannot load user config: {ex!r}.") from ex
                 break
+
         return Config.get_from_dict(raw_dict=loaded_config)
 
     @classmethod
@@ -286,6 +287,69 @@ class Config:
             Proxy of a GitProject instance or None.
         """
         return Proxy(partial(self._get_project, url, required, get_project_kwargs))
+
+    # @classmethod
+    # def get_project_local_config(cls) -> dict:
+    #     """
+    #     Load project-local configuration from .packitLocal.yaml
+    #     This file is not version controlled and contains local overrides.
+    #     """
+    #     git_root = cls._find_git_root()
+    #     if not git_root:
+    #         # If project is not a git repo, try current directory
+    #         git_root = Path.cwd()
+
+    #     config_file = git_root / ".packitLocal.yaml"
+    #     if not config_file.is_file():
+    #         logger.debug(f"No project-local config found at {config_file}")
+    #         return {}
+
+    #     try:
+    #         with open(config_file) as file:
+    #             loaded_config = safe_load(file) or {}
+    #             logger.debug(f"Loaded project-local config from {config_file}")
+    #             return loaded_config
+    #     except Exception as ex:
+    #         logger.warning(f"Cannot load project-local config {config_file!r}: {ex}")
+    #         return {}
+
+    # @classmethod
+    # def _merge_configs(cls, base: dict, override: dict) -> dict:
+    #     """
+    #     Deep merge override config into base config.
+    #     Override values take precedence.
+    #     """
+    #     from copy import deepcopy
+
+    #     result = deepcopy(base)
+
+    #     for key, value in override.items():
+    #         if (
+    #             key in result
+    #             and isinstance(result[key], dict)
+    #             and isinstance(value, dict)
+    #         ):
+    #             result[key] = cls._merge_configs(result[key], value)
+    #         else:
+    #             result[key] = value
+
+    #     return result
+
+    # @classmethod
+    # def _validate_project_local_config(cls, config: dict) -> dict:
+    #     """
+    #     Validate project-local config to ensure only safe overrides are applied.
+    #     """
+    #     validated = {}
+    #     for key, value in config.items():
+    #         if key in ALLOWED_LOCAL_OVERRIDES:
+    #             validated[key] = value
+    #         else:
+    #             logger.warning(
+    #                 f"Ignoring disallowed override key in .packitLocal.yaml: {key}. "
+    #                 f"Allowed keys are: {', '.join(sorted(ALLOWED_LOCAL_OVERRIDES))}",
+    #             )
+    #     return validated
 
 
 pass_config = click.make_pass_decorator(Config)
