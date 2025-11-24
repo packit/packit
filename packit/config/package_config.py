@@ -19,7 +19,7 @@ from packit.config.job_config import (
     JobConfigView,
     JobType,
 )
-from packit.constants import CONFIG_FILE_NAMES
+from packit.constants import CONFIG_FILE_NAMES, PACKAGE_CONFIG_HEADERS
 from packit.exceptions import PackitConfigException
 
 logger = logging.getLogger(__name__)
@@ -502,6 +502,7 @@ def get_package_config_from_repo(
         config_file_content = project.get_file_content(
             path=package_config_path,
             ref=ref,
+            headers=PACKAGE_CONFIG_HEADERS,
         )
     except FileNotFoundError:
         logger.warning(
