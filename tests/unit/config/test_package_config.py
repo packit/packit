@@ -29,7 +29,7 @@ from packit.config.package_config import (
     get_specfile_path_from_repo,
 )
 from packit.config.sources import SourcesItem
-from packit.constants import CONFIG_FILE_NAMES
+from packit.constants import CONFIG_FILE_NAMES, PACKAGE_CONFIG_HEADERS
 from packit.exceptions import PackitConfigException
 from packit.schema import PackageConfigSchema
 from packit.sync import SyncFilesItem
@@ -1579,6 +1579,7 @@ def test_get_package_config_from_repo(
         project.should_receive("get_file_content").with_args(
             path=config_name,
             ref=None,
+            headers=PACKAGE_CONFIG_HEADERS,
         ).and_return(content.format(config_name=config_name)).once()
     project.should_receive("full_repo_name").and_return("a/b")
     project.should_receive("get_files").with_args(ref=None, recursive=False).and_return(
@@ -1605,6 +1606,7 @@ def test_get_package_config_from_repo_explicit_path():
     project.should_receive("get_file_content").with_args(
         path=config_name,
         ref=None,
+        headers=PACKAGE_CONFIG_HEADERS,
     ).and_return(
         """\
 upstream_project_url: https://github.com/packit/packit

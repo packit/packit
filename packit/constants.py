@@ -277,3 +277,5 @@ DOWNSTREAM_PACKAGE_CHECK_URL = "https://src.fedoraproject.org/rpms/{package_name
 HTTP_REQUEST_TIMEOUT = (10, 30)
 
 FAST_FORWARD_MERGE_INTO_KEY = "fast_forward_merge_into"
+
+PACKAGE_CONFIG_HEADERS = {"Accept": "application/yaml"}
