@@ -93,6 +93,8 @@ def package_config_mock():
         pkg_tool=None,
         version_update_mask="",
         parse_time_macros={},
+        version_suffix=None,
+        release_suffix=None,
     )
     mock.should_receive("get_base_env").and_return({})
     mock.should_receive("get_all_files_to_sync").and_return(files_to_sync)

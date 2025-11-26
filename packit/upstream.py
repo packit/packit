@@ -9,7 +9,7 @@ import shlex
 import shutil
 import tarfile
 import tempfile
-from functools import partial, reduce
+from functools import partial
 from pathlib import Path
 from typing import Optional, Union
 
@@ -961,6 +961,7 @@ class GitUpstream(PackitRepositoryBase, Upstream):
             commit: Commit to be set in the changelog.
             release: Release to be set in the spec-file.
             update_release: Whether to change Release in the spec-file.
+                Only affects Release when version_suffix is not set.
                 Defaults to `True`.
         """
         self._fix_spec_source(archive)
@@ -1504,6 +1505,34 @@ class SRPMBuilder:
             release_suffix: Append this suffix to the %release.
         """
         current_commit = self.upstream.local_project.commit_hexsha
+        config_version_suffix = self.upstream.package_config.version_suffix
+        config_release_suffix = self.upstream.package_config.release_suffix
+
+        # Warn if version_suffix is used together with release_suffix
+        if config_version_suffix and config_release_suffix:
+            logger.warning(
+                "Both version_suffix and release_suffix are set. "
+                "version_suffix takes precedence; release_suffix will be ignored.",
+            )
+        if config_version_suffix and update_release:
+            logger.info(
+                "Note: update_release=True has no effect when version_suffix is set. "
+                "The Release field will be kept from spec file.",
+            )
+
+        auto_generated_release = self.upstream.get_spec_release(
+            "" if config_version_suffix else release_suffix,
+        )
+
+        # Determine initial release
+        if config_version_suffix:
+            # Version gets the suffix, Release unchanged from spec
+            # This is intentional: we don't want timestamp info in both Version and Release
+            new_release = self.upstream.specfile.expanded_release
+        else:
+            # Version unchanged, Release gets suffix
+            new_release = auto_generated_release
+
         # the logic behind the naming:
         # * PACKIT - our namespace
         # * PACKIT_PROJECT - info about the project which we obtained
@@ -1513,7 +1542,9 @@ class SRPMBuilder:
         env = env | {
             "PACKIT_PROJECT_VERSION": self.current_version,
             # Spec file %release field which packit sets by default
-            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(release_suffix),
+            "PACKIT_RPMSPEC_RELEASE": auto_generated_release,
+            # Snapshot identifier without release number (for version suffixes)
+            "PACKIT_RPMSPEC_SNAPSHOTID": self.upstream.get_spec_snapshotid(),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
             "PACKIT_PROJECT_BRANCH": sanitize_version(
@@ -1521,11 +1552,20 @@ class SRPMBuilder:
             ),
         }
 
+        version_to_use = self.current_version
+        if config_version_suffix:
+            expanded_suffix = config_version_suffix
+            if any(macro in config_version_suffix for macro in env):
+                # version_suffix contains macros to be expanded
+                expanded_suffix = config_version_suffix.format(**env)
+            version_to_use = f"{self.current_version}{expanded_suffix}"
+            env["PACKIT_PROJECT_VERSION"] = version_to_use
+
         # in case we are given template as a release suffix
-        if release_suffix and reduce(
-            lambda has_macro, macro: has_macro or (macro in release_suffix),
-            env.keys(),
-            False,
+        if (
+            not config_version_suffix
+            and release_suffix
+            and any(macro in release_suffix for macro in env)
         ):
             # The release_suffix contains macros to be expanded
             # do not use it to format the PACKIT_RPMSPEC_RELEASE!
@@ -1535,8 +1575,6 @@ class SRPMBuilder:
             # like when no release_suffix is given: so use "" instead.
             env["PACKIT_RPMSPEC_RELEASE"] = self.upstream.get_spec_release("")
             new_release = release_suffix.format(**env)
-        else:
-            new_release = self.upstream.get_spec_release(release_suffix)
 
         if self.upstream.actions_handler.with_action(
             action=ActionName.fix_spec,
@@ -1544,7 +1582,7 @@ class SRPMBuilder:
         ):
             self.upstream.fix_spec(
                 archive=archive,
-                version=self.current_version,
+                version=version_to_use,
                 commit=current_commit,
                 update_release=update_release,
                 release=new_release,
