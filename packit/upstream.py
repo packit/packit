@@ -877,26 +877,21 @@ class GitUpstream(PackitRepositoryBase, Upstream):
             )
             raise
 
-    def get_spec_release(self, release_suffix: Optional[str] = None) -> Optional[str]:
-        """Assemble pieces of the spec file %release field we intend to set
-        within the default fix-spec-file action
+    def get_snapshotid(self) -> str:
+        """Assemble the snapshot portion of the release identifier
+        (timestamp + branch + git describe) without the release number.
+
+        This is suitable for use in version suffixes for post-release snapshots.
 
         The format is:
-            {original_release_number}.{current_time}.{sanitized_current_branch}{git_desc_suffix}
+            {current_time}.{sanitized_current_branch}{git_desc_suffix}
 
         Example:
-            1.20210913173257793557.packit.experiment.24.g8b618e91
+            20210913173257793557.packit.experiment.24.g8b618e91
 
         Returns:
-            string which is meant to be put into a spec file %release field by packit
+            Snapshot identifier string suitable for version suffixes.
         """
-        original_release_number = self.specfile.expanded_release.split(".", 1)[0]
-
-        if release_suffix:
-            return f"{original_release_number}.{release_suffix}"
-
-        # we only care about the first number in the release
-        # so that we can re-run `packit srpm`
         git_des_command = [
             "git",
             "describe",
@@ -926,10 +921,28 @@ class GitUpstream(PackitRepositoryBase, Upstream):
         current_branch = self.local_project.ref
         sanitized_current_branch = sanitize_version(current_branch)
         current_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-        return (
-            f"{original_release_number}.{current_time}."
-            f"{sanitized_current_branch}{git_desc_suffix}"
-        )
+        return f"{current_time}.{sanitized_current_branch}{git_desc_suffix}"
+
+    def get_spec_release(self, release_suffix: Optional[str] = None) -> Optional[str]:
+        """Assemble pieces of the spec file %release field we intend to set
+        within the default fix-spec-file action
+
+        The format is:
+            {original_release_number}.{current_time}.{sanitized_current_branch}{git_desc_suffix}
+
+        Example:
+            1.20210913173257793557.packit.experiment.24.g8b618e91
+
+        Returns:
+            string which is meant to be put into a spec file %release field by packit
+        """
+        original_release_number = self.specfile.expanded_release.split(".", 1)[0]
+
+        if release_suffix:
+            return f"{original_release_number}.{release_suffix}"
+
+        snapshot = self.get_snapshotid()
+        return f"{original_release_number}.{snapshot}"
 
     def fix_spec(
         self,
