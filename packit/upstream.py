@@ -9,7 +9,7 @@ import shlex
 import shutil
 import tarfile
 import tempfile
-from functools import partial, reduce
+from functools import partial
 from pathlib import Path
 from typing import Optional, Union
 
@@ -1504,6 +1504,7 @@ class SRPMBuilder:
             release_suffix: Append this suffix to the %release.
         """
         current_commit = self.upstream.local_project.commit_hexsha
+        new_release = self.upstream.get_spec_release(release_suffix)
         # the logic behind the naming:
         # * PACKIT - our namespace
         # * PACKIT_PROJECT - info about the project which we obtained
@@ -1513,7 +1514,9 @@ class SRPMBuilder:
         env = env | {
             "PACKIT_PROJECT_VERSION": self.current_version,
             # Spec file %release field which packit sets by default
-            "PACKIT_RPMSPEC_RELEASE": self.upstream.get_spec_release(release_suffix),
+            "PACKIT_RPMSPEC_RELEASE": new_release,
+            # Snapshot identifier without release number (for version suffixes)
+            "PACKIT_RPMSPEC_SNAPSHOTID": self.upstream.get_spec_snapshotid(),
             "PACKIT_PROJECT_COMMIT": current_commit,
             "PACKIT_PROJECT_ARCHIVE": archive,
             "PACKIT_PROJECT_BRANCH": sanitize_version(
@@ -1521,12 +1524,15 @@ class SRPMBuilder:
             ),
         }
 
+        new_version = self.current_version
+        config_version_suffix = self.upstream.package_config.version_suffix
+        if config_version_suffix:
+            expanded_suffix = config_version_suffix.format(**env)
+            new_version = f"{self.current_version}{expanded_suffix}"
+            # XXX env["PACKIT_PROJECT_VERSION"] = new_version
+
         # in case we are given template as a release suffix
-        if release_suffix and reduce(
-            lambda has_macro, macro: has_macro or (macro in release_suffix),
-            env.keys(),
-            False,
-        ):
+        if release_suffix and any(macro in release_suffix for macro in env):
             # The release_suffix contains macros to be expanded
             # do not use it to format the PACKIT_RPMSPEC_RELEASE!
             # Otherwise, you will obtain something like
@@ -1535,8 +1541,6 @@ class SRPMBuilder:
             # like when no release_suffix is given: so use "" instead.
             env["PACKIT_RPMSPEC_RELEASE"] = self.upstream.get_spec_release("")
             new_release = release_suffix.format(**env)
-        else:
-            new_release = self.upstream.get_spec_release(release_suffix)
 
         if self.upstream.actions_handler.with_action(
             action=ActionName.fix_spec,
@@ -1544,7 +1548,7 @@ class SRPMBuilder:
         ):
             self.upstream.fix_spec(
                 archive=archive,
-                version=self.current_version,
+                version=new_version,
                 commit=current_commit,
                 update_release=update_release,
                 release=new_release,
