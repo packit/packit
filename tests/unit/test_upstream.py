@@ -368,6 +368,9 @@ def test_release_suffix(
     flexmock(upstream_mock).should_receive("get_spec_release").and_return(
         expanded_release_suffix,
     )
+    flexmock(upstream_mock).should_receive("get_spec_snapshotid").and_return(
+        "snapshot_id",
+    )
     upstream_mock.package_config.should_receive("get_base_env").and_return(
         {},
     )
@@ -649,3 +652,74 @@ def test_fix_spec(
 
     if update_release:
         assert upstream_mock._specfile.release == expected_release_suffix
+
+
+@pytest.mark.parametrize(
+    "version_suffix,expected_version",
+    [
+        pytest.param(
+            None,
+            "5.3.0.0",
+            id="Version suffix None",
+        ),
+        pytest.param(
+            "",
+            "5.3.0.0",
+            id="Empty version suffix",
+        ),
+        pytest.param(
+            "^20251210",
+            "5.3.0.0^20251210",
+            id="Static version suffix with caret",
+        ),
+        pytest.param(
+            "^{PACKIT_RPMSPEC_SNAPSHOTID}",
+            "5.3.0.0^1234.mock_ref.24.g8b618e9",
+            id="Version suffix with variable expansion",
+        ),
+        pytest.param(
+            "^{PACKIT_RPMSPEC_SNAPSHOTID}.{PACKIT_PROJECT_COMMIT}",
+            "5.3.0.0^1234.mock_ref.24.g8b618e9.abc123def",
+            id="Version suffix with multiple variable expansion",
+        ),
+    ],
+)
+def test_version_suffix(
+    upstream_mock,
+    version_suffix,
+    expected_version,
+):
+    """Test version_suffix functionality including macro expansion"""
+    original_version_from_spec = "5.3.0.0"
+    archive = f"test-package-{original_version_from_spec}.tar.gz"
+    original_release_number_from_spec = "2"
+    commit_hexsha = "abc123def"
+    snapshot_id = "1234.mock_ref.24.g8b618e9"
+
+    upstream_mock.package_config.version_suffix = version_suffix
+    upstream_mock.local_project.commit_hexsha = commit_hexsha
+
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(
+        original_version_from_spec,
+    )
+    flexmock(upstream_mock).should_receive("get_spec_snapshotid").and_return(
+        snapshot_id,
+    )
+    upstream_mock._specfile = flexmock(
+        expanded_release=original_release_number_from_spec,
+    )
+    upstream_mock._specfile.should_receive("reload").once()
+
+    flexmock(upstream_mock).should_receive("fix_spec").with_args(
+        archive=archive,
+        version=expected_version,
+        commit=commit_hexsha,
+        update_release=True,
+        release=f"{original_release_number_from_spec}.{snapshot_id}",
+    ).once()
+
+    SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+        archive=archive,
+        update_release=True,
+        release_suffix="",
+    )
