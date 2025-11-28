@@ -654,6 +654,33 @@ def test_fix_spec(
         assert upstream_mock._specfile.release == expected_release_suffix
 
 
+def test_get_spec_snapshotid(upstream_mock):
+    """Test snapshot ID generation format: timestamp.branch.git_describe"""
+    upstream_mock.local_project.ref = "main"
+    upstream_mock.local_project.working_dir = "/fake/path"
+    fixed_time = "20210913173257793557"
+    flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: fixed_time))),
+    )
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("run_command").with_args(
+        [
+            "git",
+            "describe",
+            "--tags",
+            "--long",
+            "--match",
+            "*",
+        ],
+        output=True,
+        cwd="/fake/path",
+    ).and_return(flexmock(stdout="1.0.0-24-g8b618e91"))
+
+    result = upstream_mock.get_spec_snapshotid()
+
+    assert result == "20210913173257793557.main.24.g8b618e91"
+
+
 @pytest.mark.parametrize(
     "version_suffix,release_suffix,expected_version,expected_release,base_version,snapshot_id",
     [
