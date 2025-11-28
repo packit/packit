@@ -368,6 +368,9 @@ def test_release_suffix(
     flexmock(upstream_mock).should_receive("get_spec_release").and_return(
         expanded_release_suffix,
     )
+    flexmock(upstream_mock).should_receive("get_spec_snapshotid").and_return(
+        "snapshot_id",
+    )
     upstream_mock.package_config.should_receive("get_base_env").and_return(
         {},
     )
@@ -649,3 +652,200 @@ def test_fix_spec(
 
     if update_release:
         assert upstream_mock._specfile.release == expected_release_suffix
+
+
+def test_get_spec_snapshotid(upstream_mock):
+    """Test snapshot ID generation format: timestamp.branch.git_describe"""
+    upstream_mock.local_project.ref = "main"
+    upstream_mock.local_project.working_dir = "/fake/path"
+    fixed_time = "20210913173257793557"
+    flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: fixed_time))),
+    )
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("run_command").with_args(
+        [
+            "git",
+            "describe",
+            "--tags",
+            "--long",
+            "--match",
+            "*",
+        ],
+        output=True,
+        cwd="/fake/path",
+    ).and_return(flexmock(stdout="1.0.0-24-g8b618e91"))
+
+    result = upstream_mock.get_spec_snapshotid()
+
+    assert result == "20210913173257793557.main.24.g8b618e91"
+
+
+@pytest.mark.parametrize(
+    "version_suffix,release_suffix,expected_version,expected_release,base_version,snapshot_id",
+    [
+        pytest.param(
+            "^20251120",
+            None,
+            "5.3.0.0^20251120",
+            "2%{?dist}",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="static_version_suffix_with_caret",
+        ),
+        pytest.param(
+            None,
+            "7",
+            "5.3.0.0",
+            "2.7",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="none_version_suffix_uses_release_suffix",
+        ),
+        pytest.param(
+            "",
+            "7",
+            "5.3.0.0",
+            "2.7",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="empty_version_suffix_uses_release_suffix",
+        ),
+        pytest.param(
+            None,
+            None,
+            "5.3.0.0",
+            "2.1234.mock_ref.24.g8b618e9",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="both_suffixes_none_uses_auto_release",
+        ),
+        pytest.param(
+            "",
+            "",
+            "5.3.0.0",
+            "2.1234.mock_ref.24.g8b618e9",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="both_suffixes_empty_uses_auto_release",
+        ),
+        pytest.param(
+            "^20251120",
+            "7",
+            "5.3.0.0^20251120",
+            "2%{?dist}",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="version_suffix_precedence_over_release_suffix",
+        ),
+        pytest.param(
+            "^{PACKIT_RPMSPEC_SNAPSHOTID}",
+            None,
+            "5.3.0.0^1234.mock_ref.24.g8b618e9",
+            "2%{?dist}",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="version_suffix_macro_PACKIT_RPMSPEC_SNAPSHOTID",
+        ),
+        pytest.param(
+            "^{PACKIT_RPMSPEC_SNAPSHOTID}.{PACKIT_PROJECT_COMMIT}",
+            None,
+            "5.3.0.0^1234.mock_ref.24.g8b618e9.abc123def",
+            "2%{?dist}",
+            "5.3.0.0",
+            "1234.mock_ref.24.g8b618e9",
+            id="version_suffix_multiple_macros",
+        ),
+    ],
+)
+def test_version_suffix(
+    upstream_mock,
+    version_suffix,
+    release_suffix,
+    expected_version,
+    expected_release,
+    base_version,
+    snapshot_id,
+):
+    """Test version_suffix functionality including macro expansion and precedence."""
+    archive = f"test-package-{base_version}.tar.gz"
+    original_release_from_spec = "2%{?dist}"
+    commit_hexsha = "abc123def"
+
+    upstream_mock.package_config.version_suffix = version_suffix
+    upstream_mock.package_config.release_suffix = release_suffix
+    upstream_mock.local_project.commit_hexsha = commit_hexsha
+
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(
+        base_version,
+    )
+    flexmock(upstream_mock).should_receive("get_spec_snapshotid").and_return(
+        snapshot_id,
+    )
+
+    if version_suffix:
+        # version_suffix is set - get_spec_release called with None
+        auto_release = f"2.{snapshot_id}"
+        flexmock(upstream_mock).should_receive("get_spec_release").with_args(
+            "",
+        ).and_return(auto_release)
+    else:
+        # version_suffix not set - get_spec_release called with release_suffix
+        # and returns the expected_release value
+        flexmock(upstream_mock).should_receive("get_spec_release").with_args(
+            release_suffix,
+        ).and_return(expected_release)
+
+    upstream_mock._specfile = flexmock(expanded_release=original_release_from_spec)
+    upstream_mock._specfile.should_receive("reload").once()
+
+    flexmock(upstream_mock).should_receive("fix_spec").with_args(
+        archive=archive,
+        version=expected_version,
+        commit=commit_hexsha,
+        update_release=True,
+        release=expected_release,
+    ).once()
+
+    SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+        archive=archive,
+        update_release=True,
+        release_suffix=release_suffix,
+    )
+
+
+def test_version_suffix_and_release_suffix_warning(upstream_mock, caplog):
+    """Test that warning is logged when both version_suffix and release_suffix are set."""
+    import logging
+
+    archive = "test-package-5.3.0.0.tar.gz"
+    base_version = "5.3.0.0"
+    original_release_from_spec = "2%{?dist}"
+    snapshot_id = "1234.mock_ref.24.g8b618e9"
+
+    upstream_mock.package_config.version_suffix = "^20251120"
+    upstream_mock.package_config.release_suffix = "7"
+
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(
+        base_version,
+    )
+    flexmock(upstream_mock).should_receive("get_spec_snapshotid").and_return(
+        snapshot_id,
+    )
+
+    upstream_mock._specfile = flexmock(expanded_release=original_release_from_spec)
+    upstream_mock._specfile.should_receive("reload").once()
+
+    flexmock(upstream_mock).should_receive("fix_spec").once()
+
+    # Capture logs at WARNING level
+    with caplog.at_level(logging.WARNING):
+        SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+            archive=archive,
+            update_release=True,
+            release_suffix="7",
+        )
+
+    # Assert expected warnings
+    assert "Both version_suffix and release_suffix are set" in caplog.text
+    assert "version_suffix takes precedence" in caplog.text
