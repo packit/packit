@@ -3,14 +3,17 @@
 
 import copy
 
+import pytest
 import yaml
 
 from packit.utils.commands import cwd
 from tests.spellbook import call_packit
 
+pytestmark = pytest.mark.usefixtures("mock_precommit_release")
+
 PACKIT_PRECOMMIT_CONFIG = {
     "repo": "https://github.com/packit/pre-commit-hooks",
-    "rev": "v1.3.0",
+    "rev": "v1.1.1",
     "hooks": [{"id": "validate-config"}],
 }
 
@@ -50,7 +53,9 @@ def test_init_fail(cwd_upstream_or_distgit):
     assert result.exit_code == 2  # packit config already exists --force needed
 
 
-def test_init_force_precommit_flag(upstream_without_precommit_config_not_bare):
+def test_init_force_precommit_flag(
+    upstream_without_precommit_config_not_bare,
+):
     result = call_packit(
         parameters=["init", "--force-precommit"],
         working_dir=upstream_without_precommit_config_not_bare,
@@ -115,7 +120,9 @@ def test_init_missing_precommit_config(upstream_without_precommit_config_not_bar
     assert not (config_file).is_file()
 
 
-def test_init_empty_precommit_config(upstream_without_config_not_bare):
+def test_init_empty_precommit_config(
+    upstream_without_config_not_bare,
+):
     config_file = upstream_without_config_not_bare / ".pre-commit-config.yaml"
 
     result = call_packit(
@@ -132,7 +139,9 @@ def test_init_empty_precommit_config(upstream_without_config_not_bare):
     assert data == expected
 
 
-def test_init_random_precommit_config(upstream_without_config_not_bare):
+def test_init_random_precommit_config(
+    upstream_without_config_not_bare,
+):
     config_file = upstream_without_config_not_bare / ".pre-commit-config.yaml"
     random_data = "Random file content"
     with open(config_file, "w") as f:
@@ -151,7 +160,9 @@ def test_init_random_precommit_config(upstream_without_config_not_bare):
         assert random_data == data
 
 
-def test_init_invalid_syntax_precommit_config(upstream_without_config_not_bare):
+def test_init_invalid_syntax_precommit_config(
+    upstream_without_config_not_bare,
+):
     config_file = upstream_without_config_not_bare / ".pre-commit-config.yaml"
     data = copy.deepcopy(INVALID_PRECOMMIT_CONFIG)
 
@@ -171,7 +182,9 @@ def test_init_invalid_syntax_precommit_config(upstream_without_config_not_bare):
     assert data == INVALID_PRECOMMIT_CONFIG
 
 
-def test_init_valid_precommit_config(upstream_without_config_not_bare):
+def test_init_valid_precommit_config(
+    upstream_without_config_not_bare,
+):
     config_file = upstream_without_config_not_bare / ".pre-commit-config.yaml"
     data = copy.deepcopy(VALID_PRECOMMIT_CONFIG)
 
@@ -241,7 +254,9 @@ def test_init_preexisting_precommit_config_different_rev(
     assert data == expected
 
 
-def test_init_search_for_specfile_root(upstream_without_config_not_bare):
+def test_init_search_for_specfile_root(
+    upstream_without_config_not_bare,
+):
     with cwd(upstream_without_config_not_bare):
         (upstream_without_config_not_bare / "file.spec").touch()
         call_packit(parameters=["init"])
@@ -250,7 +265,9 @@ def test_init_search_for_specfile_root(upstream_without_config_not_bare):
             assert "\nspecfile_path: file.spec\n" in f.read()
 
 
-def test_init_search_for_specfile_recursive(upstream_without_config_not_bare):
+def test_init_search_for_specfile_recursive(
+    upstream_without_config_not_bare,
+):
     with cwd(upstream_without_config_not_bare):
         nested_path = upstream_without_config_not_bare / "awesome_directory" / "nested"
         nested_path.mkdir(parents=True, exist_ok=True)
