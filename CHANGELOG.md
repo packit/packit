@@ -1,3 +1,7 @@
+# 1.13.0
+
+- `packit init` now automatically retrieves the latest version of the pre-commit hook to be added to the user's pre-commit configuration file. (#2651)
+
 # 1.12.0
 
 - Packit now automatically invokes an rpm build in mock when no rpm test is passed using `--rpm_paths` before running local tests with `packit test`. (#2636)
