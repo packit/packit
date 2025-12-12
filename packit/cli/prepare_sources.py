@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from packit.cli.options import preserve_spec_option
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
 from packit.config import get_context_settings, pass_config
@@ -56,6 +57,7 @@ def load_job_config(job_config):
         "Defaults to value set in configuration, which defaults to yes."
     ),
 )
+@preserve_spec_option
 @click.option(
     "--bump/--no-bump",
     default=None,
@@ -151,6 +153,7 @@ def prepare_sources(
     target_branch,
     create_symlinks,
     package_config,
+    preserve_spec,
 ):
     """
     Prepare sources for a new SRPM build using content of the upstream repository.
@@ -197,4 +200,5 @@ def prepare_sources(
         release_suffix=release_suffix,
         result_dir=result_dir,
         create_symlinks=create_symlinks,
+        preserve_spec=preserve_spec,
     )

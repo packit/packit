@@ -1957,6 +1957,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         result_dir: Optional[Union[Path, str]] = None,
         create_symlinks: Optional[bool] = True,
         merged_ref: Optional[str] = None,
+        preserve_spec: Optional[bool] = None,
     ) -> None:
         """
         Prepare sources for an SRPM build.
@@ -1970,6 +1971,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 (currently when the archive is created outside the specfile dir, or in the future
                  if we will create symlinks in some other places)
             merged_ref: git ref in the upstream repo used to identify correct most recent tag
+            preserve_spec: whether to preserve spec file without updating
+                if True, update_release is also set to False
         """
         self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
@@ -1981,10 +1984,16 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         if update_release is None:
             update_release = self.package_config.update_release
+        if preserve_spec is None:
+            preserve_spec = self.package_config.preserve_spec
+        # If preserving spec, don't update release either
+        if preserve_spec:
+            update_release = False
         try:
             self.up.prepare_upstream_for_srpm_creation(
                 upstream_ref=upstream_ref,
                 update_release=update_release,
+                preserve_spec=preserve_spec,
                 release_suffix=release_suffix,
                 create_symlinks=create_symlinks,
                 merged_ref=merged_ref,
@@ -2024,6 +2033,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
         merged_ref: Optional[str] = None,
+        preserve_spec: Optional[bool] = None,
     ) -> Path:
         """
         Create srpm from the upstream repo
@@ -2035,6 +2045,8 @@ The first dist-git commit to be synced is '{short_hash}'.
             release_suffix: specifies local release suffix. `None` represents default suffix.
             update_release: whether to change Release in the spec-file
             merged_ref: git ref in the upstream repo used to identify correct most recent tag
+            preserve_spec: whether to preserve spec file without updating
+                if True, update_release is also set to False
 
         Returns:
             a path to the srpm
@@ -2045,6 +2057,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 update_release,
                 release_suffix,
                 merged_ref=merged_ref,
+                preserve_spec=preserve_spec,
             )
             try:
                 srpm_path = self.up.create_srpm(

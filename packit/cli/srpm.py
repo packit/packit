@@ -6,6 +6,7 @@ import os
 
 import click
 
+from packit.cli.options import preserve_spec_option
 from packit.cli.types import LocalProjectParameter
 from packit.cli.utils import cover_packit_exception, get_packit_api, iterate_packages
 from packit.config import get_context_settings, pass_config
@@ -40,6 +41,7 @@ logger = logging.getLogger("packit")
         "Defaults to value set in configuration, which defaults to yes."
     ),
 )
+@preserve_spec_option
 @click.option(
     "--bump/--no-bump",
     default=None,
@@ -85,6 +87,7 @@ def srpm(
     release_suffix,
     default_release_suffix,
     package_config,
+    preserve_spec,
 ):
     """
     Create new SRPM (.src.rpm file) using content of the upstream repository.
@@ -115,5 +118,6 @@ def srpm(
         upstream_ref=upstream_ref,
         update_release=update_release,
         release_suffix=release_suffix,
+        preserve_spec=preserve_spec,
     )
     logger.info(f"SRPM: {srpm_path}")
