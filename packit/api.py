@@ -923,6 +923,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
+        dry_run: bool = False,
     ) -> tuple[PullRequest, dict[str, PullRequest]]:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -951,6 +952,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
+        dry_run: bool = False,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -978,6 +980,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         warn_about_koji_build_triggering_bug: bool = False,
+        dry_run: bool = False,
     ) -> Optional[tuple[PullRequest, dict[str, PullRequest]]]:
         """
         Update given package in dist-git
@@ -1014,6 +1017,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 fork when creating a PR from fork.
             fast_forward_merge_branches: Set of branches `dist_git_branch` should be
                 fast-forward-merged into.
+            dry_run: If True, skip all remote operations (no upload to lookaside cache,
+                no push to remote, no PR creation). Only update local dist-git files.
 
         Returns:
             Tuple of the created (or existing if one already exists) PullRequest and
@@ -1298,7 +1303,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                 if warn_about_koji_build_triggering_bug:
                     self._warn_about_koji_build_triggering_bug_if_needed(pr)
             else:
-                self.dg.push(refspec=f"HEAD:{dist_git_branch}")
+                if not dry_run:
+                    self.dg.push(refspec=f"HEAD:{dist_git_branch}")
+                else:
+                    logger.info(
+                        f"Dry-run mode: skipping push to remote 'origin' on branch '{dist_git_branch}'.",
+                    )
         finally:
             # version should hold the plain version string
             if version.startswith("v"):

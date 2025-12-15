@@ -56,6 +56,7 @@ def sync_release(
     dist_git_path,
     dist_git_branch,
     force_new_sources,
+    dry_run,
     pr,
     local_content,
     path_or_url,
@@ -75,7 +76,12 @@ def sync_release(
         local_project=path_or_url,
         check_for_non_git_upstream=check_for_non_git_upstream,
     )
-    if pr is None:
+
+    # In dry-run mode, override settings to prevent remote operations
+    if dry_run:
+        click.echo("Running in dry-run mode: no remote operations will be performed.")
+        pr = False
+    elif pr is None:
         pr = api.package_config.create_pr
 
     branches_to_update = get_dg_branches(
@@ -102,6 +108,7 @@ def sync_release(
             dist_git_branch=branch,
             use_local_content=local_content,
             versions=[version] if version else [],
+            add_new_sources=not dry_run,
             force_new_sources=force_new_sources,
             upstream_ref=upstream_ref,
             create_pr=pr,
@@ -109,6 +116,7 @@ def sync_release(
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolve_bug,
             sync_acls=sync_acls,
+            dry_run=dry_run,
             fast_forward_merge_branches=get_fast_forward_merge_branches_for(
                 dist_git_branches=dist_git_branches,
                 source_branch=branch,
@@ -133,6 +141,13 @@ def sync_release_common_options(func):
         is_flag=True,
         default=False,
         help="Upload the new sources also when the archive is already in the lookaside cache.",
+    )
+    @click.option(
+        "--dry-run",
+        is_flag=True,
+        default=False,
+        help="Do not perform any remote operations (no upload, no push, no PR). "
+        "Only update local dist-git files for inspection.",
     )
     @click.option(
         "--pr/--no-pr",
@@ -206,6 +221,7 @@ def propose_downstream(
     dist_git_path,
     dist_git_branch,
     force_new_sources,
+    dry_run,
     pr,
     path_or_url,
     version,
@@ -230,6 +246,7 @@ def propose_downstream(
         dist_git_path=dist_git_path,
         dist_git_branch=dist_git_branch,
         force_new_sources=force_new_sources,
+        dry_run=dry_run,
         pr=pr,
         path_or_url=path_or_url,
         version=version,
@@ -253,6 +270,7 @@ def pull_from_upstream(
     dist_git_path,
     dist_git_branch,
     force_new_sources,
+    dry_run,
     pr,
     path_or_url,
     version,
@@ -275,6 +293,7 @@ def pull_from_upstream(
         dist_git_path=dist_git_path,
         dist_git_branch=dist_git_branch,
         force_new_sources=force_new_sources,
+        dry_run=dry_run,
         pr=pr,
         path_or_url=path_or_url,
         version=version,
