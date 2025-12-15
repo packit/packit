@@ -6,7 +6,6 @@
         - packit-tests-rpm
         - packit-tests-pip-deps
         - packit-tests-git-main
-        - packit-tests-rpm-sess-rec
         - packit-tests-pip-deps-sess-rec
         - packit-tests-git-main-sess-rec
         - reverse-dep-packit-service-tests
