@@ -1,0 +1,14 @@
+# [WARNING]
+# People listed here should be the ones that have contributed major
+# changes (e.g., features or refactors) to the listed file and
+# are likely to provide help, if you feel confused or even lost.
+#
+# By no means they are expected to be the sole maintainers
+# of those files, nor on on-call duty if any issue arises.
+
+# This is a comment.
+# Each line is a file pattern followed by one or more owners.
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence
+* @packit/the-packit-team
