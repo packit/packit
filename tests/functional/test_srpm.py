@@ -176,3 +176,18 @@ def test_srpm_symlinking_relative_path(upstream_and_remote):
 def test_srpm_symlinking_absolute_path(upstream_and_remote):
     upstream_repo_path = upstream_and_remote[0]
     _test_srpm_symlinking(upstream_repo_path, upstream_repo_path)
+
+
+def test_srpm_with_preserve_spec(cwd_upstream_or_distgit):
+    """Test that --preserve-spec flag prevents spec file modifications during SRPM build"""
+    # Read original spec file content before srpm build
+    spec_path = next(cwd_upstream_or_distgit.glob("*.spec"))
+    original_spec = spec_path.read_text()
+
+    call_real_packit(
+        parameters=["--debug", "srpm", "--preserve-spec"],
+        cwd=cwd_upstream_or_distgit,
+    )
+
+    # Spec file in original location should not be modified
+    assert spec_path.read_text() == original_spec

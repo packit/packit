@@ -6,6 +6,8 @@ Functional tests for prepare-sources command
 """
 from pathlib import Path
 
+import pytest
+
 from packit.utils.commands import cwd
 from tests.functional.spellbook import call_real_packit
 
@@ -40,3 +42,23 @@ def test_prepare_sources_command(cwd_upstream_or_distgit):
     assert tarball_path.exists()
     specfile_path = next(result_dir.glob("*.spec"))
     assert specfile_path.exists()
+
+
+@pytest.mark.parametrize(
+    "cwd_upstream_or_distgit",
+    ["upstream", "upstream-with-multiple-sources"],  # Only test upstream variants
+    indirect=True,
+)
+def test_prepare_sources_with_preserve_spec(cwd_upstream_or_distgit):
+    """Test that --preserve-spec flag prevents spec file modifications"""
+    # Read original spec file content before prepare-sources
+    spec_path = next(cwd_upstream_or_distgit.glob("*.spec"))
+    original_spec = spec_path.read_text()
+
+    call_real_packit(
+        parameters=["--debug", "prepare-sources", "--preserve-spec"],
+        cwd=cwd_upstream_or_distgit,
+    )
+
+    # Spec file in original location should not be modified
+    assert spec_path.read_text() == original_spec
