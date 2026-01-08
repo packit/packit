@@ -1,3 +1,7 @@
+# 1.14.0
+
+- We have added the `--preserve-spec` flag to the `prepare-sources` and `srpm` commands. When used, Packit will not change the spec file in any way (e.g., release is not bumped, Source0 is not changed). When enabled, it implies `--no-update-release`. (#2653)
+
 # 1.13.0
 
 - `packit init` now automatically retrieves the latest version of the pre-commit hook to be added to the user's pre-commit configuration file. (#2651)
