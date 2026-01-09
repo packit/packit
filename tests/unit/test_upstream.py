@@ -368,6 +368,9 @@ def test_release_suffix(
     flexmock(upstream_mock).should_receive("get_spec_release").and_return(
         expanded_release_suffix,
     )
+    flexmock(upstream_mock).should_receive("get_snapshotid").and_return(
+        "snapshot_id",
+    )
     upstream_mock.package_config.should_receive("get_base_env").and_return(
         {},
     )
@@ -649,3 +652,101 @@ def test_fix_spec(
 
     if update_release:
         assert upstream_mock._specfile.release == expected_release_suffix
+
+
+def test_get_snapshotid(upstream_mock):
+    """Test snapshot ID generation format: timestamp.branch.git_describe"""
+    upstream_mock.local_project.ref = "main"
+    upstream_mock.local_project.working_dir = "/fake/path"
+    fixed_time = "20210913173257793557"
+    flexmock(sys.modules["packit.upstream"]).should_receive("datetime").and_return(
+        flexmock(datetime=flexmock(now=flexmock(strftime=lambda f: fixed_time))),
+    )
+
+    flexmock(sys.modules["packit.upstream"]).should_receive("run_command").with_args(
+        [
+            "git",
+            "describe",
+            "--tags",
+            "--long",
+            "--match",
+            "*",
+        ],
+        output=True,
+        cwd="/fake/path",
+    ).and_return(flexmock(stdout="1.0.0-24-g8b618e91"))
+
+    result = upstream_mock.get_snapshotid()
+
+    assert result == "20210913173257793557.main.24.g8b618e91"
+
+
+@pytest.mark.parametrize(
+    "version_suffix,expected_version",
+    [
+        pytest.param(
+            None,
+            "5.3.0.0",
+            id="Version suffix None",
+        ),
+        pytest.param(
+            "",
+            "5.3.0.0",
+            id="Empty version suffix",
+        ),
+        pytest.param(
+            "^20251210",
+            "5.3.0.0^20251210",
+            id="Static version suffix with caret",
+        ),
+        pytest.param(
+            "^{PACKIT_PROJECT_SNAPSHOTID}",
+            "5.3.0.0^1234.mock_ref.24.g8b618e9",
+            id="Version suffix with variable expansion",
+        ),
+        pytest.param(
+            "^{PACKIT_PROJECT_SNAPSHOTID}.{PACKIT_PROJECT_COMMIT}",
+            "5.3.0.0^1234.mock_ref.24.g8b618e9.abc123def",
+            id="Version suffix with multiple variable expansion",
+        ),
+    ],
+)
+def test_version_suffix(
+    upstream_mock,
+    version_suffix,
+    expected_version,
+):
+    """Test version_suffix functionality including macro expansion"""
+    original_version_from_spec = "5.3.0.0"
+    archive = f"test-package-{original_version_from_spec}.tar.gz"
+    original_release_number_from_spec = "2"
+    commit_hexsha = "abc123def"
+    snapshot_id = "1234.mock_ref.24.g8b618e9"
+
+    upstream_mock.package_config.version_suffix = version_suffix
+    upstream_mock.local_project.commit_hexsha = commit_hexsha
+
+    flexmock(upstream_mock).should_receive("get_current_version").and_return(
+        original_version_from_spec,
+    )
+    flexmock(upstream_mock).should_receive("get_snapshotid").and_return(
+        snapshot_id,
+    )
+    upstream_mock._specfile = flexmock(
+        expanded_release=original_release_number_from_spec,
+    )
+    upstream_mock._specfile.should_receive("reload").once()
+
+    flexmock(upstream_mock).should_receive("fix_spec").with_args(
+        archive=archive,
+        version=expected_version,
+        commit=commit_hexsha,
+        update_release=True,
+        release=f"{original_release_number_from_spec}.{snapshot_id}",
+    ).once()
+
+    SRPMBuilder(upstream_mock)._fix_specfile_to_use_local_archive(
+        archive=archive,
+        update_release=True,
+        release_suffix="",
+    )
