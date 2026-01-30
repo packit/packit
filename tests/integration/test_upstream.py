@@ -326,15 +326,17 @@ def test_fix_spec_action_with_macros(upstream_instance):
     )
 
     flexmock(upstream.local_project).should_receive("commit_hexsha").and_return("4321")
-    flexmock(upstream).should_receive("get_spec_release").with_args(
-        release_suffix="",
-    ).and_return("1.1234.main.0.1221")
+    flexmock(upstream).should_receive("get_snapshotid").and_return(
+        "1234.main.0.1221",
+    )
 
     flexmock(upstream.actions_handler).should_receive("with_action").with_args(
         action=ActionName.fix_spec,
         env={
             "PACKIT_PROJECT_VERSION": "0.1.0",
             "PACKIT_RPMSPEC_RELEASE": "1.1234.main.0.1221",
+            "PACKIT_RPMSPEC_VERSION": "0.1.0",
+            "PACKIT_PROJECT_SNAPSHOTID": "1234.main.0.1221",
             "PACKIT_PROJECT_COMMIT": "4321",
             "PACKIT_PROJECT_ARCHIVE": "archive.tar.gz",
             "PACKIT_PROJECT_BRANCH": "main",
