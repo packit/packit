@@ -19,7 +19,11 @@ from packit.config.job_config import (
     JobConfigView,
     JobType,
 )
-from packit.constants import CONFIG_FILE_NAMES, PACKAGE_CONFIG_HEADERS
+from packit.constants import (
+    ALLOWED_LOCAL_OVERRIDES,
+    CONFIG_FILE_NAMES,
+    PACKAGE_CONFIG_HEADERS,
+)
 from packit.exceptions import PackitConfigException
 
 logger = logging.getLogger(__name__)
@@ -286,6 +290,7 @@ def find_packit_yaml(
     *directory: Union[Path, str],
     try_local_dir_first: bool = False,
     try_local_dir_last: bool = False,
+    suffix: str = "",
 ) -> Path:
     """
     Find packit config in provided directories.
@@ -300,6 +305,9 @@ def find_packit_yaml(
             last.
 
             Defaults to `False`.
+        suffix: Optional suffix to append to the config filename stem
+            before the extension. For example,
+            suffix="Local" would check for `.packitLocal.yaml`.
 
     Returns:
         Path to the config.
@@ -327,6 +335,9 @@ def find_packit_yaml(
 
     for config_dir in directories:
         for config_file_name in CONFIG_FILE_NAMES:
+            if suffix:
+                path = Path(config_file_name)
+                config_file_name = f"{path.stem}{suffix}{path.suffix}"
             config_file_name_full = config_dir / config_file_name
             if config_file_name_full.is_file():
                 logger.debug(f"Local package config found: {config_file_name_full}")
@@ -416,6 +427,19 @@ def get_local_package_config(
         )
 
     loaded_config = load_packit_yaml(config_file_path=config_file_name)
+
+    try:
+        local_config_file_name = find_packit_yaml(
+            *directory,
+            try_local_dir_first=True,
+            try_local_dir_last=False,
+            suffix="Local",
+        )
+        local_loaded_config = load_packit_yaml(config_file_path=local_config_file_name)
+        local_loaded_config = validate_project_local_config(local_loaded_config)
+        loaded_config = merge_configs(loaded_config, local_loaded_config)
+    except PackitConfigException:
+        logger.debug("No local packit config found; skipping merge.")
 
     return parse_loaded_config(
         loaded_config=loaded_config,
@@ -602,3 +626,37 @@ def get_specfile_path_from_repo(
         logger.debug(f"No spec file found in {project.full_repo_name!r}")
         return None
     return spec_files[0]
+
+
+def merge_configs(base: dict, override: dict) -> dict:
+    """
+    Deep merge override config into base config.
+    Override values take precedence.
+    """
+    from copy import deepcopy
+
+    result = deepcopy(base)
+
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = merge_configs(result[key], value)
+        else:
+            result[key] = value
+
+    return result
+
+
+def validate_project_local_config(config: dict) -> dict:
+    """
+    Validate project-local config to ensure only safe overrides are applied.
+    """
+    validated = {}
+    for key, value in config.items():
+        if key in ALLOWED_LOCAL_OVERRIDES:
+            validated[key] = value
+        else:
+            logger.warning(
+                f"Ignoring disallowed override key in .packitLocal.yaml: {key}. "
+                f"Allowed keys are: {', '.join(sorted(ALLOWED_LOCAL_OVERRIDES))}",
+            )
+    return validated
