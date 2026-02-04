@@ -715,3 +715,66 @@ def test_job_metadata_targets(config, is_valid):
     else:
         with pytest.raises(ValidationError):
             JobMetadataSchema().load(config)
+
+
+@pytest.mark.parametrize(
+    "raw_package_config",
+    [
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "fedora/package.spec",
+                "jobs": [
+                    {
+                        "job": "bodhi_update",
+                        "trigger": "commit",
+                        "bodhi_extra_params": {
+                            "type": "bugfix",
+                            "suggest": "reboot",
+                            "stable_karma": 5,
+                        },
+                    },
+                ],
+            },
+            id="bodhi_extra_params_at_job_level",
+        ),
+        pytest.param(
+            {
+                "downstream_package_name": "package",
+                "specfile_path": "fedora/package.spec",
+                "bodhi_extra_params": {
+                    "type": "bugfix",
+                    "suggest": "reboot",
+                    "stable_karma": 5,
+                },
+                "jobs": [
+                    {
+                        "job": "bodhi_update",
+                        "trigger": "commit",
+                    },
+                ],
+            },
+            id="bodhi_extra_params_at_package_level",
+        ),
+    ],
+)
+def test_job_config_bodhi_extra_params(raw_package_config):
+    """Test bodhi_extra_params at both package and job level produce same result."""
+    expected = JobConfig(
+        type=JobType.bodhi_update,
+        trigger=JobConfigTriggerType.commit,
+        packages={
+            "package": CommonPackageConfig(
+                downstream_package_name="package",
+                specfile_path="fedora/package.spec",
+                bodhi_extra_params={
+                    "type": "bugfix",
+                    "suggest": "reboot",
+                    "stable_karma": 5,
+                },
+            ),
+        },
+    )
+
+    config = PackageConfig.get_from_dict(raw_package_config)
+    assert config.jobs[0] == expected
