@@ -517,6 +517,7 @@ class CommonConfigSchema(Schema):
     tmt_plan = fields.String(load_default=None)
     tf_post_install_script = fields.String(load_default=None)
     tf_extra_params = fields.Dict(load_default=None)
+    bodhi_extra_params = fields.Dict(load_default=None)
     module_hotfixes = fields.Boolean()
 
     # Image Builder integration

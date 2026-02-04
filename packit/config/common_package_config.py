@@ -273,6 +273,7 @@ class CommonPackageConfig:
         tmt_plan: Optional[str] = None,
         tf_post_install_script: Optional[str] = None,
         tf_extra_params: Optional[dict[Any, Any]] = None,
+        bodhi_extra_params: Optional[dict[Any, Any]] = None,
         module_hotfixes: bool = False,
         # # vm-image-build
         # example: "rhel-86"
@@ -404,6 +405,7 @@ class CommonPackageConfig:
         )
         self.tmt_plan = tmt_plan
         self.tf_extra_params = tf_extra_params or {}
+        self.bodhi_extra_params = bodhi_extra_params or {}
         self.tf_post_install_script = tf_post_install_script
         self.module_hotfixes = module_hotfixes
 

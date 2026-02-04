@@ -25,7 +25,7 @@ from packit.config import (
     PackageConfig,
     get_local_package_config,
 )
-from packit.constants import EXISTING_BODHI_UPDATE_REGEX
+from packit.constants import DEFAULT_BODHI_UPDATE_TYPE, EXISTING_BODHI_UPDATE_REGEX
 from packit.exceptions import (
     PackitBodhiException,
     PackitConfigException,
@@ -605,19 +605,18 @@ class DistGit(PackitRepositoryBase):
     def create_bodhi_update(
         self,
         dist_git_branch: str,
-        update_type: str,
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
         sidetag: Optional[str] = None,
         bugzilla_ids: Optional[list[int]] = None,
         alias: Optional[str] = None,
+        extra_params: Optional[dict] = None,
     ) -> Optional[tuple[str, str]]:
         """
         Create bodhi update.
 
         Args:
             dist_git_branch: Git reference.
-            update_type: Type of the update, check CLI.
             update_notes: Notes about the update to be displayed in Bodhi. If not specified,
               automatic update notes including a changelog diff since the latest stable build
               will be generated.
@@ -626,12 +625,16 @@ class DistGit(PackitRepositoryBase):
             bugzilla_ids: List of Bugzillas that are resolved with the update.
             alias: Alias of an existing update to edit. If not specified,
               a new update will be created.
+            extra_params: Additional Bodhi parameters (suggest, stable_karma, etc.).
 
         Returns:
             Alias and URL of the update or None if the update was already created.
         """
+        extra_params = {"type": DEFAULT_BODHI_UPDATE_TYPE} | (extra_params or {})
+
         logger.debug(
-            f"About to create a Bodhi update of type {update_type!r} from {dist_git_branch!r}",
+            f"About to create a Bodhi update of type {extra_params['type']!r} "
+            f"from {dist_git_branch!r}",
         )
 
         bodhi_client = get_bodhi_client()
@@ -670,7 +673,6 @@ class DistGit(PackitRepositoryBase):
             save_kwargs = {
                 "builds": koji_builds,
                 "notes": rendered_note,
-                "type": update_type,
             }
 
             bugs = []
@@ -687,6 +689,9 @@ class DistGit(PackitRepositoryBase):
 
             if alias:
                 save_kwargs["edited"] = alias
+
+            # Merge additional Bodhi parameters, prevent overwritting current keys
+            save_kwargs = extra_params | save_kwargs
 
             logger.debug(f"Saving Bodhi update with args: {save_kwargs}")
 

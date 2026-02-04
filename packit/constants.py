@@ -31,6 +31,7 @@ DATETIME_FORMAT = "%Y%m%d%H%M%S%f"
 DEFAULT_ARCHIVE_EXT = ".tar.gz"
 
 DEFAULT_BODHI_NOTE = "New upstream release: {version}"
+DEFAULT_BODHI_UPDATE_TYPE = "enhancement"
 EXISTING_BODHI_UPDATE_REGEX = r".*Update for \S+ already exists.*"
 
 FEDORA_DOMAIN = "fedoraproject.org"
