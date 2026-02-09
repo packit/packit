@@ -4,6 +4,7 @@
 """
 Generate initial dist-git configuration for packit's release syncing
 """
+
 import json
 import logging
 import os
