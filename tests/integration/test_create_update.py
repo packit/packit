@@ -436,3 +436,59 @@ def test_bodhi_update_fails(
             koji_builds=[build_nvr],
         )
     assert str(ex.value).startswith("There is a problem with creating a bodhi update")
+
+
+def test_bodhi_update_with_custom_params(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+    bodhi_response,
+    latest_build_from_koji,
+):
+    """Test that bodhi_extra_params from job config are passed to Bodhi."""
+
+    def validate_save(kwargs, expected_kwargs):
+        assert kwargs == expected_kwargs
+        return bodhi_response
+
+    u, d, api = api_instance
+
+    # Set bodhi_extra_params in the package config
+    api.package_config.bodhi_extra_params = {
+        "suggest": "reboot",
+        "stable_karma": 5,
+        "unstable_karma": -3,
+        "stable_days": 7,
+    }
+
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+    flexmock(SessionWrapper).should_receive("_open_session").and_return()
+    flexmock(KojiHelper).should_receive("get_candidate_tag").and_return(
+        "f30-updates-candidate",
+    )
+    flexmock(KojiHelper).should_receive("get_latest_nvr_in_tag").and_return(
+        latest_build_from_koji,
+    )
+
+    expected_save_kwargs = {
+        "builds": ["sen-0.6.1-1.fc30"],
+        "notes": "Automatic update for sen-0.6.1-1.fc30.",
+        "type": "enhancement",
+        "bugs": [],
+        # Custom params from bodhi_extra_params:
+        "suggest": "reboot",
+        "stable_karma": 5,
+        "unstable_karma": -3,
+        "stable_days": 7,
+    }
+
+    flexmock(
+        BodhiClient,
+        save=lambda **kwargs: validate_save(kwargs, expected_save_kwargs),
+        ensure_auth=lambda: None,
+    )
+
+    api.create_update(
+        dist_git_branch="f30",
+        koji_builds=["sen-0.6.1-1.fc30"],
+    )

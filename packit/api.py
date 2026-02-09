@@ -49,6 +49,7 @@ from packit.constants import (
     BUGZILLA_HOSTNAME,
     BUGZILLA_URL,
     COMMIT_ACTION_DIVIDER,
+    DEFAULT_BODHI_UPDATE_TYPE,
     DISTRO_DIR,
     FROM_DIST_GIT_TOKEN,
     FROM_SOURCE_GIT_TOKEN,
@@ -1909,7 +1910,7 @@ The first dist-git commit to be synced is '{short_hash}'.
     def create_update(
         self,
         dist_git_branch: str,
-        update_type: str,
+        update_type: str = DEFAULT_BODHI_UPDATE_TYPE,
         update_notes: Optional[str] = None,
         koji_builds: Optional[Sequence[str]] = None,
         sidetag: Optional[str] = None,
@@ -1921,7 +1922,7 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         Args:
             dist_git_branch: Git reference.
-            update_type: Type of the update, check CLI.
+            update_type: Type of the update, defaults to "enhancement".
             update_notes: Notes about the update to be displayed in Bodhi. If not specified,
               automatic update notes including a changelog diff since the latest stable build
               will be generated.
@@ -1934,9 +1935,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             Alias and URL of the update or None if the update was already created.
         """
+        params = self.package_config.bodhi_extra_params | {"type": update_type}
+
         logger.debug(
             f"Create bodhi update, "
-            f"builds={koji_builds}, dg_branch={dist_git_branch}, type={update_type}"
+            f"builds={koji_builds}, dg_branch={dist_git_branch}, extra_params={params}"
             + (f", sidetag={sidetag}" if sidetag else ""),
         )
         return self.dg.create_bodhi_update(
@@ -1944,9 +1947,9 @@ The first dist-git commit to be synced is '{short_hash}'.
             sidetag=sidetag,
             dist_git_branch=dist_git_branch,
             update_notes=update_notes,
-            update_type=update_type,
             bugzilla_ids=bugzilla_ids,
             alias=alias,
+            extra_params=params,
         )
 
     def prepare_sources(

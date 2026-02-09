@@ -53,7 +53,7 @@ repos:
             types-cachetools,
           ]
   - repo: https://github.com/teemtee/tmt.git
-    rev: 1.41.0
+    rev: 1.66.0
     hooks:
       - id: tmt-lint
   - repo: https://github.com/packit/pre-commit-hooks
