@@ -64,7 +64,9 @@ class S3LookasideCache:
             parts.insert(0, self.prefix)
         return "/".join(parts)
 
-    def hash_file(self, filename: Union[str, Path], hashtype: Optional[str] = None) -> str:
+    def hash_file(
+        self, filename: Union[str, Path], hashtype: Optional[str] = None,
+    ) -> str:
         """Compute hash of a local file."""
         hashtype = hashtype or self.hashtype
         try:

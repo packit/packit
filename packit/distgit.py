@@ -514,11 +514,15 @@ class DistGit(PackitRepositoryBase):
         import pyrpkg.errors
         import pyrpkg.sources
 
-        package_name = lookaside._get_package(self.package_config.downstream_package_name)
+        package_name = lookaside._get_package(
+            self.package_config.downstream_package_name,
+        )
         sources_path = Path(self.local_project.working_dir) / "sources"
 
         try:
-            sources_file = pyrpkg.sources.SourcesFile(sources_path, "bsd", replace=False)
+            sources_file = pyrpkg.sources.SourcesFile(
+                sources_path, "bsd", replace=False,
+            )
         except (pyrpkg.errors.MalformedLineError, ValueError):
             sources_file = pyrpkg.sources.SourcesFile(sources_path, "bsd", replace=True)
 
