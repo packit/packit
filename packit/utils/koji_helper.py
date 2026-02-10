@@ -398,6 +398,24 @@ class KojiHelper:
         except Exception as e:
             logger.debug(f"Failed to untag {nvr} from {tag} in Koji: {e}")
 
+    def cancel_task(self, task_id: int) -> bool:
+        """
+        Cancels a task and its children recursively.
+
+        Args:
+            task_id: Koji task ID.
+
+        Returns:
+            Whether the cancellation was successful.
+        """
+        logger.info(f"Cancelling Koji task with ID {task_id}")
+        try:
+            self.session.cancelTask(task_id, recurse=True)
+            return True
+        except Exception as e:
+            logger.debug(f"Failed to cancel Koji task {task_id}: {e}")
+            return False
+
     def get_build_target(self, dist_git_branch: str) -> Optional[dict]:
         """
         Gets a build target from a dist-git branch name.
