@@ -66,6 +66,7 @@ dependencies = [
 Homepage = "https://github.com/packit/packit"
 
 [project.optional-dependencies]
+s3 = ["boto3"]
 testing = [
     "pytest",
     "pytest-cov",
