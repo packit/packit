@@ -687,12 +687,9 @@ def test_basic_local_update_copy_upstream_release_description(
     with spec.sections() as sections:
         changelog = "\n".join(sections.changelog)
 
-    assert (
-        """- 0.1.0-1
+    assert """- 0.1.0-1
 Some description of the upstream release
-"""
-        in changelog
-    )
+""" in changelog
 
     assert "0.0.0" in changelog
     assert "0.1.0" in changelog
