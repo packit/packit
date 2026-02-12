@@ -1,3 +1,8 @@
+# 1.15.0
+
+- The `version_suffix` configuration option is now supported in Packit. This option is meant for appending information to the Version field in RPM spec files. This is useful for post-release snapshots following RPM versioning conventions. The `version_suffix` behaves similarly to the already existing `release_suffix` and also supports expansion of environment variables. (#2664)
+- Packit now supports `bodhi_extra_params` configuration option to customize creating Bodhi updates. (#2682)
+
 # 1.14.0
 
 - We have added the `--preserve-spec` flag to the `prepare-sources` and `srpm` commands. When used, Packit will not change the spec file in any way (e.g., release is not bumped, Source0 is not changed). When enabled, it implies `--no-update-release`. (#2653)
