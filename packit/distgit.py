@@ -458,6 +458,9 @@ class DistGit(PackitRepositoryBase):
 
         If the archive is already uploaded, the rpkg tool doesn't do anything.
 
+        For S3-based lookaside caches, uploads are done directly using boto3
+        without shelling out to a CLI tool.
+
         Args:
             archive: Path to archive to upload to lookaside cache.
             pkg_tool: Optional, rpkg tool (fedpkg/centpkg/cbs) to use to upload.
@@ -469,10 +472,26 @@ class DistGit(PackitRepositoryBase):
         """
         logger.info("About to upload to lookaside cache.")
         logger.debug(f"Archives to upload: {archives}")
+
+        tool = pkg_tool or self.pkg_tool
+        lookaside = LookasideCache(tool)
+
+        if lookaside.is_s3_backend:
+            self._upload_to_s3_lookaside(archives, lookaside, offline)
+        else:
+            self._upload_via_pkg_tool(archives, tool, offline)
+
+    def _upload_via_pkg_tool(
+        self,
+        archives: Iterable[Path],
+        pkg_tool: str,
+        offline: bool,
+    ) -> None:
+        """Upload archives using the pkg_tool CLI (fedpkg/centpkg/etc)."""
         pkg_tool_ = PkgTool(
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
-            tool=pkg_tool or self.pkg_tool,
+            tool=pkg_tool,
         )
         try:
             pkg_tool_.new_sources(
@@ -484,6 +503,51 @@ class DistGit(PackitRepositoryBase):
                 f"'{pkg_tool_.tool} new-sources' failed for the following reason: {ex!r}",
             )
             raise PackitException(ex) from ex
+
+    def _upload_to_s3_lookaside(
+        self,
+        archives: Iterable[Path],
+        lookaside: "LookasideCache",
+        offline: bool,
+    ) -> None:
+        """Upload archives directly to S3 lookaside cache."""
+        import pyrpkg.errors
+        import pyrpkg.sources
+
+        package_name = lookaside._get_package(
+            self.package_config.downstream_package_name,
+        )
+        sources_path = Path(self.local_project.working_dir) / "sources"
+
+        try:
+            sources_file = pyrpkg.sources.SourcesFile(
+                sources_path, "bsd", replace=False,
+            )
+        except (pyrpkg.errors.MalformedLineError, ValueError):
+            sources_file = pyrpkg.sources.SourcesFile(sources_path, "bsd", replace=True)
+
+        for archive in archives:
+            archive_path = Path(archive)
+            file_hash = lookaside.cache.hash_file(str(archive_path))
+            filename = archive_path.name
+
+            logger.info(f"Uploading {filename} to S3 lookaside cache")
+
+            try:
+                lookaside.cache.upload(
+                    name=package_name,
+                    filepath=str(archive_path),
+                    hash=file_hash,
+                    offline=offline,
+                )
+            except Exception as ex:
+                raise PackitException(
+                    f"Failed to upload {filename} to S3 lookaside cache: {ex}",
+                ) from ex
+
+            sources_file.add_entry(lookaside.cache.hashtype, filename, file_hash)
+
+        sources_file.write()
 
     def is_archive_in_lookaside_cache(self, archive_path: Union[Path, str]) -> bool:
         """
