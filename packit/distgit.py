@@ -12,6 +12,7 @@ from typing import Optional, Union
 import cccolutils
 import git
 from bodhi.client.bindings import BodhiClientException
+from bodhi.client.oidcclient import OIDCClientError
 from lazy_object_proxy import Proxy
 from ogr.abstract import PullRequest
 from ogr.services.pagure import PagureProject
@@ -711,7 +712,7 @@ class DistGit(PackitRepositoryBase):
 
             return result["alias"], result["url"]
 
-        except BodhiClientException as ex:
+        except (BodhiClientException, OIDCClientError) as ex:
             # don't logger.error here as it will end in sentry and it may just
             # be a transient issue: e.g. waiting for a build to be tagged
             logger.info(ex)
