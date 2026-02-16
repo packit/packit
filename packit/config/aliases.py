@@ -255,7 +255,7 @@ def get_fast_forward_merge_branches_for(
             with_aliases=True,
         )
         expanded_dist_git_branches.update(
-            {expanded_key: value for expanded_key in expanded_keys},
+            dict.fromkeys(expanded_keys, value),
         )
 
     if source_branch not in expanded_dist_git_branches:
