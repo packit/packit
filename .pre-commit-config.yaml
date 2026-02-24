@@ -57,7 +57,7 @@ repos:
     hooks:
       - id: tmt-lint
   - repo: https://github.com/packit/pre-commit-hooks
-    rev: v1.2.0
+    rev: v1.3.0
     hooks:
       - id: validate-config # passes when packit not installed (e.g. in CI)
       - id: check-rebase
