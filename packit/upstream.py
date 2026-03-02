@@ -450,6 +450,11 @@ class NonGitUpstream(Upstream):
         logger.debug(f"Cleaning: {self.working_dir}")
         shutil.rmtree(self.working_dir, ignore_errors=True)
 
+        # invalidate cached properties depending on working dir
+        self._working_dir = None
+        self._command_handler = None
+        self._actions_handler = None
+
 
 class GitUpstream(PackitRepositoryBase, Upstream):
     """Interact with git upstream project"""
