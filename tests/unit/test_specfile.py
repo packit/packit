@@ -21,23 +21,20 @@ Summary: evanescence
     "spec_content, has_autochangelog",
     [
         pytest.param(
-            spec
-            + """
+            spec + """
 %autochangelog
 """,
             True,
         ),
         pytest.param(
-            spec
-            + """
+            spec + """
 * Mon Mar 04 2019 Foo Bor <foo-bor@example.com> - 1.0-1
 - Initial package.
 """,
             False,
         ),
         pytest.param(
-            spec
-            + """
+            spec + """
  # %autochangelog
 """,
             False,
