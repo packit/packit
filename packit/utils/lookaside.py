@@ -13,6 +13,8 @@ from packit.exceptions import PackitLookasideCacheException
 
 logger = logging.getLogger(__name__)
 
+LOOKASIDE_TYPE_S3 = "s3"
+
 
 class LookasideCache:
     def __init__(self, pkg_tool: str) -> None:
@@ -36,8 +38,22 @@ class LookasideCache:
                 "Failed to parse the rpkg config",
             ) from e
 
+        self._lookaside_type = self._config.get("lookaside_type", "cgi")
+
+        if self._lookaside_type == LOOKASIDE_TYPE_S3:
+            self.cache = self._create_s3_cache()
+        else:
+            self.cache = self._create_cgi_cache()
+
+    @property
+    def is_s3_backend(self) -> bool:
+        """Returns True if using S3 backend."""
+        return self._lookaside_type == LOOKASIDE_TYPE_S3
+
+    def _create_cgi_cache(self):
+        """Create a CGI-based lookaside cache (fedpkg/centpkg style)."""
         try:
-            self.cache = pyrpkg.lookaside.CGILookasideCache(
+            return pyrpkg.lookaside.CGILookasideCache(
                 self._config["lookasidehash"],
                 self._config["lookaside"],
                 self._config["lookaside_cgi"],
@@ -45,6 +61,23 @@ class LookasideCache:
         except KeyError as e:
             raise PackitLookasideCacheException(
                 "Failed to create a CGI for lookaside cache",
+            ) from e
+
+    def _create_s3_cache(self):
+        """Create an S3-based lookaside cache."""
+        from packit.utils.s3_lookaside import S3LookasideCache
+
+        try:
+            return S3LookasideCache(
+                hashtype=self._config["lookasidehash"],
+                bucket=self._config["lookaside_bucket"],
+                prefix=self._config.get("lookaside_prefix", ""),
+                region=self._config.get("lookaside_region", "us-east-1"),
+                endpoint_url=self._config.get("lookaside_endpoint_url"),
+            )
+        except KeyError as e:
+            raise PackitLookasideCacheException(
+                f"Missing required S3 lookaside config: {e}",
             ) from e
 
     def _get_package(self, package: str) -> str:
