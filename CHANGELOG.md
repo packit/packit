@@ -1,3 +1,7 @@
+# 1.15.1
+
+- We have fixed a bug that prevented running `sync_release()` on a `PackitAPI` instance initialized with `non_git_upstream=True` repeatedly due to an improper clean-up. (#2691)
+
 # 1.15.0
 
 - The `version_suffix` configuration option is now supported in Packit. This option is meant for appending information to the Version field in RPM spec files. This is useful for post-release snapshots following RPM versioning conventions. The `version_suffix` behaves similarly to the already existing `release_suffix` and also supports expansion of environment variables. (#2664)
