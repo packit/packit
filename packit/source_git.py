@@ -109,6 +109,7 @@ class SourceGitGenerator:
                 path,
                 sourcedir=self.dist_git.working_dir,
                 autosave=True,
+                sanitize=True,
             )
         return self._dist_git_specfile
 
@@ -354,6 +355,7 @@ class SourceGitGenerator:
             f"{self.distro_dir}/{self.pkg_name}.spec",
             sourcedir=self.dist_git.working_dir,
             autosave=True,
+            sanitize=True,
         )
         with spec.patches() as patches:
             patches.clear()

@@ -155,6 +155,7 @@ class PackitRepositoryBase:
                 sourcedir=self.absolute_source_dir,
                 macros=macros,
                 autosave=True,
+                sanitize=True,
             )
         return self._specfile
 
