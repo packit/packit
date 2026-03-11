@@ -98,6 +98,11 @@ raw-options.version_scheme = "no-guess-dev"
 [tool.hatch.build.targets.wheel]
 packages = ["packit"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  ".git_archival.txt",
+]
+
 [tool.pytest.ini_options]
 filterwarnings = "ignore::DeprecationWarning"
 addopts = '-m "not slow"'
