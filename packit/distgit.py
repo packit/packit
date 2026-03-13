@@ -446,6 +446,7 @@ class DistGit(PackitRepositoryBase):
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
             tool=pkg_tool or self.pkg_tool,
+            command_handler=self.command_handler,
         )
         pkg_tool_.sources()
 
@@ -775,5 +776,6 @@ class DistGit(PackitRepositoryBase):
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
             tool=self.pkg_tool,
+            command_handler=self.command_handler,
         )
         return pkg_tool.verrel()
