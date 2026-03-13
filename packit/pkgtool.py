@@ -1,10 +1,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import shlex
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Optional, Union
 
+from packit.command_handler import CommandHandler
 from packit.exceptions import PackitCommandFailedError
 from packit.utils import commands  # so we can mock utils
 from packit.utils.logging import logger
@@ -21,6 +23,7 @@ class PkgTool:
         directory: Union[Path, str, None] = None,
         tool: str = "fedpkg",
         sig: Optional[str] = None,
+        command_handler: Optional[CommandHandler] = None,
     ):
         """
         Args:
@@ -28,11 +31,14 @@ class PkgTool:
             directory: operate in this dist-git repository
             tool: pkgtool to use (fedpkg, centpkg, centpkg-sig)
             sig: name of the SIG; used for adjusting the path during cloning
+            command_handler: command handler to use, if not set, commands will be
+                executed directly
         """
         self.fas_username = fas_username
         self.directory = Path(directory) if directory else None
         self.tool = tool
         self.sig = sig
+        self.command_handler = command_handler
 
     def __repr__(self):
         return (
@@ -42,6 +48,48 @@ class PkgTool:
             f"sig='{self.sig}', "
             f"tool='{self.tool}')"
         )
+
+    def _run_command(
+        self,
+        cmd: Union[list[str], str],
+        error_message: Optional[str] = None,
+        cwd: Union[str, Path, None] = None,
+        fail: bool = True,
+        output: bool = False,
+        env: Optional[dict] = None,
+        print_live: bool = False,
+    ) -> commands.CommandResult:
+        """Runs the specified command using the associated command handler or directly."""
+        if self.command_handler is None:
+            return commands.run_command(
+                cmd,
+                error_message,
+                cwd,
+                fail,
+                output,
+                env,
+                print_live,
+            )
+        try:
+            return self.command_handler.run_command(
+                command=cmd if isinstance(cmd, list) else shlex.split(cmd),
+                return_output=output,
+                env=env,
+                cwd=cwd,
+                print_live=print_live,
+            )
+        except PackitCommandFailedError:
+            if not fail:
+                return commands.CommandResult(success=False)
+            raise
+        except Exception as ex:
+            if not fail:
+                return commands.CommandResult(success=False)
+            raise PackitCommandFailedError(
+                error_message or f"Command {cmd!r} failed.",
+                stdout_output=getattr(ex, "output", ""),
+                stderr_output="",
+            ) from ex
 
     def new_sources(
         self,
@@ -57,7 +105,7 @@ class PkgTool:
         if offline:
             cmd.append("--offline")
         sources_ = [str(source) for source in sources] if sources else []
-        return commands.run_command_remote(
+        return self._run_command(
             cmd=cmd + sources_,
             cwd=self.directory,
             error_message="Adding new sources failed:",
@@ -74,7 +122,7 @@ class PkgTool:
         Returns:
             True, if the command finished successfully, False otherwise.
         """
-        return commands.run_command_remote(
+        return self._run_command(
             cmd=[self.tool, "sources"],
             cwd=self.directory,
             error_message="Downloading source files from the lookaside cache failed:",
@@ -112,7 +160,7 @@ class PkgTool:
             cmd += ["--srpm", str(srpm_path)]
 
         try:
-            return commands.run_command_remote(
+            return self._run_command(
                 cmd=cmd,
                 cwd=self.directory,
                 error_message="Submission of build to koji failed.",
@@ -167,13 +215,13 @@ class PkgTool:
             "from Fedora dist-git - this may require SSH keys set up or "
             "Kerberos ticket being active."
         )
-        commands.run_command(cmd=cmd, error_message=error_msg)
+        self._run_command(cmd=cmd, error_message=error_msg)
 
     def verrel(self) -> str:
         """
         Run the `verrel` command.
         """
-        return commands.run_command(
+        return self._run_command(
             cmd=[self.tool, "verrel"],
             cwd=self.directory,
             output=True,
