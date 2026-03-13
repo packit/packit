@@ -775,5 +775,6 @@ class DistGit(PackitRepositoryBase):
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
             tool=self.pkg_tool,
+            command_handler=self.command_handler,
         )
         return pkg_tool.verrel()
