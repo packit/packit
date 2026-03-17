@@ -56,6 +56,30 @@ def test_get_builds(error):
 
 
 @pytest.mark.parametrize(
+    "include_candidate",
+    [False, True],
+)
+def test_get_latest_stable_build_no_build(include_candidate):
+    candidate_tags = {"f40": "f40-updates-candidate"}
+    stable_tags = {"f40-updates-candidate": ["f40-updates", "f40"]}
+    builds = {
+        "f40-updates-candidate": None,
+        "f40-updates": None,
+        "f40": None,
+    }
+
+    flexmock(ClientSession).new_instances(flexmock())
+    koji_helper = KojiHelper()
+    flexmock(
+        koji_helper,
+        get_candidate_tag=lambda b: candidate_tags[b],
+        get_stable_tags=lambda t: stable_tags[t],
+        get_latest_build_in_tag=lambda _, t: builds[t],
+    )
+    assert koji_helper.get_latest_stable_build("test", "f40", include_candidate) is None
+
+
+@pytest.mark.parametrize(
     "include_candidate, nvr",
     [
         (False, "test-1.0-2.fc40"),

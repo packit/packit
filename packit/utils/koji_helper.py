@@ -194,8 +194,9 @@ class KojiHelper:
         if include_candidate:
             tags.append(candidate_tag)
         return max(
-            (self.get_latest_build_in_tag(package, t) for t in tags),
+            (b for t in tags if (b := self.get_latest_build_in_tag(package, t))),
             key=lambda b: NEVR.from_string(b["nvr"]),
+            default=None,
         )
 
     def get_latest_stable_nvr(
