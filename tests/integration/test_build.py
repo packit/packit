@@ -17,14 +17,27 @@ def test_basic_build(
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
-    flexmock(commands).should_receive("run_command_remote").with_args(
-        cmd=["fedpkg", "build", "--scratch", "--nowait", "--target", "asdqwe"],
-        cwd=api.dg.local_project.working_dir,
-        error_message="Submission of build to koji failed.",
+
+    def run_command_remote(
+        cmd,
+        error_message=None,
+        cwd=None,
         fail=True,
-        output=True,
-        print_live=True,
-    ).once().and_return(flexmock(stdout=""))
+        output=False,
+        env=None,
+        print_live=False,
+    ):
+        assert cmd[:-1] == ["koji", "build", "--scratch", "--nowait", "asdqwe"]
+        assert cmd[-1].startswith("https://src.fedoraproject.org/rpms/")
+        assert cwd == api.dg.local_project.working_dir
+        assert fail
+        assert output
+        assert print_live
+        return flexmock(stdout="")
+
+    flexmock(commands).should_receive("run_command_remote").replace_with(
+        run_command_remote,
+    ).once()
 
     api.build("main", scratch=True, nowait=True, koji_target="asdqwe")
 
