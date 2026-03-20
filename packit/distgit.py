@@ -34,8 +34,8 @@ from packit.exceptions import (
 )
 from packit.local_project import CALCULATE, LocalProject, LocalProjectBuilder
 from packit.pkgtool import PkgTool
+from packit.utils import commands
 from packit.utils.bodhi import get_bodhi_client
-from packit.utils.commands import cwd
 from packit.utils.koji_helper import KojiHelper
 from packit.utils.lookaside import LookasideCache
 
@@ -420,7 +420,7 @@ class DistGit(PackitRepositoryBase):
         """
         archives = []
         logger.info(f"Downloading archives: {self.upstream_archive_names}")
-        with cwd(self.local_project.working_dir):
+        with commands.cwd(self.local_project.working_dir):
             self.download_remote_sources(self.pkg_tool)
         for upstream_archive_name in self.upstream_archive_names:
             archive = self.absolute_source_dir / upstream_archive_name
@@ -446,6 +446,7 @@ class DistGit(PackitRepositoryBase):
             fas_username=self.config.fas_user,
             directory=self.local_project.working_dir,
             tool=pkg_tool or self.pkg_tool,
+            command_handler=self.command_handler,
         )
         pkg_tool_.sources()
 
@@ -513,7 +514,7 @@ class DistGit(PackitRepositoryBase):
         koji_target: Optional[str] = None,
     ):
         """
-        Perform a `fedpkg build` in the repository
+        Perform a `koji build` in the repository
 
         :param scratch: should the build be a scratch build?
         :param nowait: don't wait on build?
@@ -522,12 +523,27 @@ class DistGit(PackitRepositoryBase):
         Returns:
             The 'stdout' of the build command.
         """
-        pkg_tool = PkgTool(
-            fas_username=self.fas_user,
-            directory=self.local_project.working_dir,
-            tool=self.pkg_tool,
-        )
-        return pkg_tool.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        cmd = ["koji", "build"]
+        if scratch:
+            cmd.append("--scratch")
+        if nowait:
+            cmd.append("--nowait")
+        if koji_target:
+            cmd.append(koji_target)
+        else:
+            branch = self.local_project.git_repo.active_branch.name
+            cmd.append(
+                "rawhide" if branch in ("rawhide", "main") else f"{branch}-candidate",
+            )
+        package = self.package_config.downstream_package_name
+        ref = next(self.local_project.git_repo.iter_commits()).hexsha
+        cmd.append(f"https://src.fedoraproject.org/rpms/{package}.git#{ref}")
+        return commands.run_command_remote(
+            cmd=cmd,
+            cwd=self.local_project.working_dir,
+            output=True,
+            print_live=True,
+        ).stdout
 
     @staticmethod
     def get_latest_build_for_branch(downstream_package_name, dist_git_branch):
@@ -775,5 +791,6 @@ class DistGit(PackitRepositoryBase):
             fas_username=self.fas_user,
             directory=self.local_project.working_dir,
             tool=self.pkg_tool,
+            command_handler=self.command_handler,
         )
         return pkg_tool.verrel()

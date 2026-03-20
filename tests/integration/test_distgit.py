@@ -22,5 +22,10 @@ def test_distgit_commit_empty(distgit_instance):
 
 def test_get_nvr(distgit_instance):
     d, dg = distgit_instance
+    # avoid failure on missing `DistGit.local_project.__get__`
+    dg._command_handler = dg.handler_kls(
+        local_project=dg.local_project,
+        config=dg.config,
+    )
     nvr = dg.get_nvr("main")
     assert nvr.startswith("dist_git_remote-0.0.0-1")
