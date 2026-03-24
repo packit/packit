@@ -1,3 +1,7 @@
+# 1.15.2
+
+- Packit now uses the specfile library's sanitization when parsing spec files.
+
 # 1.15.1
 
 - We have fixed a bug that prevented running `sync_release()` on a `PackitAPI` instance initialized with `non_git_upstream=True` repeatedly due to an improper clean-up. (#2691)
