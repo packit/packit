@@ -210,9 +210,16 @@ class SandcastleCommandHandler(CommandHandler):
     ) -> commands.CommandResult:
         from sandcastle.exceptions import SandcastleCommandFailed
 
-        cwd = cwd or Path(self.working_dir).relative_to(
-            self.config.command_handler_work_dir,
-        )
+        cwd = Path(cwd or self.working_dir)
+        if cwd.is_absolute():
+            try:
+                cwd = cwd.relative_to(self.config.command_handler_work_dir)
+            except ValueError as ex:
+                raise SandcastleCommandFailed(
+                    f"Absolute working directory '{cwd}' is not within "
+                    f"Sandcastle working directory '{self.config.command_handler_work_dir}'. "
+                    "All absolute paths for Sandcastle commands must be relative to its root.",
+                ) from ex
         logger.info(f"Running command: {' '.join(command)} on dir {cwd}")
 
         out = ""
