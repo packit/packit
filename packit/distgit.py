@@ -535,9 +535,9 @@ class DistGit(PackitRepositoryBase):
             cmd.append(
                 "rawhide" if branch in ("rawhide", "main") else f"{branch}-candidate",
             )
-        package = self.package_config.downstream_package_name
+        url = self.local_project.git_project.get_git_urls()["git"]
         ref = next(self.local_project.git_repo.iter_commits()).hexsha
-        cmd.append(f"https://src.fedoraproject.org/rpms/{package}.git#{ref}")
+        cmd.append(f"git+{url}#{ref}")
         return commands.run_command_remote(
             cmd=cmd,
             cwd=self.local_project.working_dir,
