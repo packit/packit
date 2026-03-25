@@ -8,6 +8,7 @@ from flexmock import flexmock
 
 from packit.local_project import LocalProject
 from packit.utils import commands
+from tests.integration.conftest import DOWNSTREAM_PROJECT_URL
 
 
 def test_basic_build(
@@ -28,7 +29,7 @@ def test_basic_build(
         print_live=False,
     ):
         assert cmd[:-1] == ["koji", "build", "--scratch", "--nowait", "asdqwe"]
-        assert cmd[-1].startswith("https://src.fedoraproject.org/rpms/")
+        assert cmd[-1].startswith(f"git+{DOWNSTREAM_PROJECT_URL}")
         assert cwd == api.dg.local_project.working_dir
         assert fail
         assert output
