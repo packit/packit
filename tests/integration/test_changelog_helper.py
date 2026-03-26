@@ -115,6 +115,63 @@ def test_update_distgit_when_copy_upstream_release_description(
         assert "- Resolves: rhbz#123" in sections.changelog
 
 
+def test_update_distgit_release_description_with_trailing_newlines(
+    upstream,
+    distgit_instance,
+):
+    """Test that trailing newlines in release description are removed."""
+    _, downstream = distgit_instance
+    package_config = upstream.package_config
+    package_config.copy_upstream_release_description = True
+    upstream.local_project.git_project = (
+        flexmock()
+        .should_receive("get_release")
+        .with_args(tag_name="0.1.0", name="0.1.0")
+        .and_return(flexmock(body="Some release 0.1.0\n\n"))
+        .mock()
+    )
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
+        resolved_bugs=["rhbz#123"],
+    )
+
+    with downstream._specfile.sections() as sections:
+        changelog_str = str(sections.changelog)
+        # Verify the description and bug line are consecutive (no blank line between)
+        assert "Some release 0.1.0\n- Resolves: rhbz#123" in changelog_str
+
+
+def test_update_distgit_multiple_resolved_bugs(
+    upstream,
+    distgit_instance,
+):
+    """Test that multiple resolved bugs are formatted on separate lines."""
+    _, downstream = distgit_instance
+    package_config = upstream.package_config
+    package_config.copy_upstream_release_description = True
+    upstream.local_project.git_project = (
+        flexmock()
+        .should_receive("get_release")
+        .with_args(tag_name="0.1.0", name="0.1.0")
+        .and_return(flexmock(body="Some release"))
+        .mock()
+    )
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
+        resolved_bugs=["rhbz#123", "rhbz#456", "rhbz#789"],
+    )
+
+    with downstream._specfile.sections() as sections:
+        changelog_str = str(sections.changelog)
+        # Verify release description followed by bugs with only single newlines
+        expected = "Some release\n- Resolves: rhbz#123\n- Resolves: rhbz#456\n- Resolves: rhbz#789"
+        assert expected in changelog_str
+
+
 @pytest.mark.skipif(
     rpm.__version__ < "4.16",
     reason="%autochangelog requires rpm 4.16 or higher",

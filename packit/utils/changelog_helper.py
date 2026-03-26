@@ -149,12 +149,12 @@ class ChangelogHelper:
                 name=full_version,
             ).body
             if release_description:
-                comment = release_description
+                # remove extra newlines at the end
+                comment = release_description.rstrip()
 
         if not action_output and resolved_bugs:
-            comment += "\n"
-            for bug in resolved_bugs:
-                comment += f"- Resolves: {bug}\n"
+            bug_lines = "\n".join(f"- Resolves: {bug}" for bug in resolved_bugs)
+            comment += f"\n{bug_lines}"
 
         return self.sanitize_entry(comment)
 
