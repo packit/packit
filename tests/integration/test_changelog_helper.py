@@ -172,6 +172,30 @@ def test_update_distgit_multiple_resolved_bugs(
         assert expected in changelog_str
 
 
+def test_update_distgit_action_output_trailing_newlines(
+    upstream,
+    distgit_instance,
+):
+    """Test that trailing newlines in changelog action output are removed."""
+    _, downstream = distgit_instance
+    package_config = upstream.package_config
+    # Echo command produces trailing newline, printf adds extra newlines
+    package_config.actions = {
+        ActionName.changelog_entry: "printf '- Custom entry from action\\n\\n'",
+    }
+
+    ChangelogHelper(upstream, downstream, package_config).update_dist_git(
+        upstream_tag="0.1.0",
+        full_version="0.1.0",
+    )
+
+    with downstream._specfile.sections() as sections:
+        changelog_str = str(sections.changelog)
+        # Verify action output with trailing newlines stripped (one blank line before next entry)
+        expected = "- Custom entry from action\n\n* Sun Feb 24 2019"
+        assert expected in changelog_str
+
+
 @pytest.mark.skipif(
     rpm.__version__ < "4.16",
     reason="%autochangelog requires rpm 4.16 or higher",
