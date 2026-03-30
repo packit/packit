@@ -137,7 +137,8 @@ class ChangelogHelper:
             previous_version=previous_specfile_version,
         )
 
-        comment = action_output or default_changelog_entry
+        # Remove extra newlines at the end for consistency
+        comment = (action_output or default_changelog_entry).rstrip()
         if (
             self.package_config.copy_upstream_release_description
             # in pull_from_upstream workflow, upstream git_project can be None
@@ -149,12 +150,11 @@ class ChangelogHelper:
                 name=full_version,
             ).body
             if release_description:
-                comment = release_description
+                comment = release_description.rstrip()
 
         if not action_output and resolved_bugs:
-            comment += "\n"
-            for bug in resolved_bugs:
-                comment += f"- Resolves: {bug}\n"
+            bug_lines = "\n".join(f"- Resolves: {bug}" for bug in resolved_bugs)
+            comment += f"\n{bug_lines}"
 
         return self.sanitize_entry(comment)
 
