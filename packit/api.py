@@ -35,7 +35,6 @@ from ogr.abstract import PullRequest
 from ogr.exceptions import PagureAPIException
 from ogr.services.gitlab.project import GitlabProject
 from ogr.services.pagure.project import PagureProject
-from ogr.services.pagure.pull_request import PagurePullRequest
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -923,7 +922,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
-        warn_about_koji_build_triggering_bug: bool = False,
     ) -> tuple[PullRequest, dict[str, PullRequest]]:
         """Overload for type-checking; return PullRequest if create_pr=True."""
 
@@ -951,7 +949,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
-        warn_about_koji_build_triggering_bug: bool = False,
     ) -> None:
         """Overload for type-checking; return None if create_pr=False."""
 
@@ -978,7 +975,6 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
-        warn_about_koji_build_triggering_bug: bool = False,
     ) -> Optional[tuple[PullRequest, dict[str, PullRequest]]]:
         """
         Update given package in dist-git
@@ -1284,20 +1280,12 @@ The first dist-git commit to be synced is '{short_hash}'.
                         pr_title = (
                             title or f"Update {ff_branch} to upstream release {version}"
                         )
-                        ff_branch_pr = self.create_or_update_pr(
+                        ff_prs[ff_branch] = self.create_or_update_pr(
                             pr_title=pr_title,
                             pr_description=f"{pr_description}{pr_instructions}{footer}",
                             target_branch=ff_branch,
                             repo=self.dg,
                         )
-                        ff_prs[ff_branch] = ff_branch_pr
-                        if warn_about_koji_build_triggering_bug:
-                            self._warn_about_koji_build_triggering_bug_if_needed(
-                                ff_branch_pr,
-                            )
-
-                if warn_about_koji_build_triggering_bug:
-                    self._warn_about_koji_build_triggering_bug_if_needed(pr)
             else:
                 self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
@@ -1701,34 +1689,6 @@ The first dist-git commit to be synced is '{short_hash}'.
                 logger.error(f"Update of existing PR {pr.url} failed: {exc}")
                 raise PackitException(f"Update of existing PR {pr.url} failed") from exc
         return pr
-
-    def _warn_about_koji_build_triggering_bug_if_needed(self, pr: PullRequest) -> None:
-        """
-        Adds a warning comment to a Pagure PR that is susceptible to a bug that breaks
-        Koji build triggering.
-
-        This method can be removed after https://github.com/packit/packit-service/issues/2537
-        is resolved.
-
-        Args:
-            pr: Newly created or updated pull request object.
-        """
-        if not isinstance(pr, PagurePullRequest):
-            logger.debug("Not a Pagure PR, skipping the warning comment.")
-            return
-
-        if pr._raw_pr["commit_start"] == pr._raw_pr["commit_stop"]:
-            # PR contains single commit
-            return
-
-        pr.comment(
-            "**Warning**\n"
-            "As this pull request contains more than one commit, you may be affected "
-            "by a [bug](https://github.com/packit/packit-service/issues/2537) "
-            "that will prevent the configured `koji_build` job(s) from being triggered "
-            "after this pull request is merged. If that happens, please [trigger the job manually]"
-            "(https://packit.dev/docs/fedora-releases-guide/dist-git-onboarding#retriggering).",
-        )
 
     def push_and_create_pr(
         self,

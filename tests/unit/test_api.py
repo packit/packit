@@ -10,7 +10,6 @@ from flexmock import flexmock
 from munch import Munch
 from ogr.services.gitlab.project import GitlabProject
 from ogr.services.pagure.project import PagureProject
-from ogr.services.pagure.pull_request import PagurePullRequest
 
 from packit import api
 from packit import api as packit_api
@@ -215,33 +214,6 @@ def test_sync_release_create_sync_note(api_mock):
     )
     api_mock.should_receive("push_and_create_pr").and_return(flexmock())
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_")
-
-
-def test_sync_release_warn_about_koji_build_triggering_bug(api_mock):
-    flexmock(PatchGenerator).should_receive("undo_identical")
-    flexmock(pathlib.Path).should_receive("write_text").once()
-    api_mock.up.should_receive("get_specfile_version").and_return("0")
-    api_mock.up.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock(),
-    )
-    api_mock.up.package_config.should_receive("get_base_env").and_return({})
-    api_mock.dg.should_receive("push_to_fork").and_return()
-    api_mock.dg.should_receive("get_specfile_version").and_return("0")
-    api_mock.dg.should_receive("specfile").and_return(
-        flexmock().should_receive("reload").mock(),
-    )
-    pr = PagurePullRequest(
-        raw_pr={"commit_start": "1234abc", "commit_stop": "5678def", "branch": "_"},
-        project=flexmock(),
-    )
-    api_mock.dg.should_receive("create_pull").and_return(pr)
-    flexmock(api).should_receive("get_branches").and_return({"_", "__"})
-    flexmock(pr).should_receive("comment").once()
-    api_mock.sync_release(
-        versions=["1.1"],
-        dist_git_branch="_",
-        warn_about_koji_build_triggering_bug=True,
-    )
 
 
 def test_common_env(api_mock):
