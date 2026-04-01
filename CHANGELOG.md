@@ -1,3 +1,7 @@
+# 1.15.3
+
+- We've fixed the formatting of the strings Packit appends to the changelog. Now there will be at most one blank line before or after the Packit comment. (#2707)
+
 # 1.15.2
 
 - Packit now uses the specfile library's sanitization when parsing spec files.
