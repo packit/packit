@@ -28,24 +28,20 @@ class TestTargetsToProject:
         [
             (
                 ["fedora-rawhide-x86_64"],
-                head
-                + """
+                head + """
 <repository name="fedora-rawhide-x86_64">
   <path project="Fedora:Rawhide" repository="standard"/>
   <arch>x86_64</arch>
-"""
-                + tail,
+""" + tail,
             ),
             (
                 ["fedora-rawhide-x86_64", "fedora-rawhide-aarch64"],
-                head
-                + """
+                head + """
 <repository name="fedora-rawhide-x86_64-aarch64">
   <path project="Fedora:Rawhide" repository="standard"/>
   <arch>x86_64</arch>
   <arch>aarch64</arch>
-"""
-                + tail,
+""" + tail,
             ),
             (
                 [
@@ -55,8 +51,7 @@ class TestTargetsToProject:
                     "opensuse-leap-15.5-ppc64le",
                     "opensuse-tumbleweed-x86_64",
                 ],
-                head
-                + """
+                head + """
 <repository name="fedora-rawhide-x86_64-aarch64">
   <path project="Fedora:Rawhide" repository="standard"/>
   <arch>x86_64</arch>
@@ -70,8 +65,7 @@ class TestTargetsToProject:
 <repository name="opensuse-tumbleweed-x86_64">
   <path project="openSUSE:Factory" repository="snapshot"/>
   <arch>x86_64</arch>
-"""
-                + tail,
+""" + tail,
             ),
         ],
     )
