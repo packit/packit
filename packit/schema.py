@@ -16,6 +16,7 @@ from marshmallow import (
     pre_load,
     validates_schema,
 )
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
 
 from packit.actions import ActionName
 from packit.config import (
@@ -401,6 +402,17 @@ class JobMetadataSchema(Schema):
         return data
 
 
+def validate_version_specifiers(value):
+    """
+    marshmallow validation for a PEP 440 version specifier set.
+    """
+    try:
+        SpecifierSet(value)
+    except InvalidSpecifier as e:
+        raise ValidationError(f"Invalid version specifier set: {e}") from e
+    return True
+
+
 def validate_repo_name(value):
     """
     marshmallow validation for a repository name. Any
@@ -531,6 +543,10 @@ class CommonConfigSchema(Schema):
     pkg_tool = fields.String(load_default=None)
     sig = fields.String(load_default=None)
     version_update_mask = fields.String(load_default=None)
+    version_update_specifiers = fields.String(
+        load_default=None,
+        validate=validate_version_specifiers,
+    )
 
     parse_time_macros = fields.Dict(load_default=None)
     osh_diff_scan_after_copr_build = fields.Boolean(load_default=True)

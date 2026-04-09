@@ -35,6 +35,9 @@ from ogr.abstract import PullRequest
 from ogr.exceptions import PagureAPIException
 from ogr.services.gitlab.project import GitlabProject
 from ogr.services.pagure.project import PagureProject
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
+from packaging.version import InvalidVersion
+from packaging.version import Version as PkgVersion
 from tabulate import tabulate
 
 from packit.actions import ActionName
@@ -852,6 +855,44 @@ The first dist-git commit to be synced is '{short_hash}'.
                 return False
         return True
 
+    def check_accepted_version(self, proposed: str) -> bool:
+        """
+        Check the proposed version against the configured PEP 440 version specifier set.
+
+        Args:
+            proposed: Version proposed to be synced.
+
+        Returns:
+            True if the proposed version satisfies the configured specifier set
+            or if the relevant configuration option is missing. False otherwise.
+        """
+        if not self.package_config.version_update_specifiers:
+            return True
+        try:
+            specifier_set = SpecifierSet(
+                self.package_config.version_update_specifiers,
+            )
+        except InvalidSpecifier:
+            logger.error(
+                f"Invalid version specifier set: "
+                f"{self.package_config.version_update_specifiers!r}",
+            )
+            return False
+        try:
+            proposed_version = PkgVersion(proposed)
+        except InvalidVersion:
+            logger.error(
+                f"Cannot parse proposed version {proposed!r} as PEP 440 version.",
+            )
+            return False
+        if proposed_version not in specifier_set:
+            logger.debug(
+                f"Proposed version {proposed} does not satisfy "
+                f"specifier set {self.package_config.version_update_specifiers!r}.",
+            )
+            return False
+        return True
+
     @staticmethod
     def get_upstream_release_monitoring_bug(
         package_name: str,
@@ -1148,6 +1189,14 @@ The first dist-git commit to be synced is '{short_hash}'.
                     "to skip this check.",
                 )
 
+            if not self.check_accepted_version(version):
+                raise ReleaseSkippedPackitException(
+                    f"The upstream released version {version} does not satisfy "
+                    f"the version_update_specifiers "
+                    f'"{self.package_config.version_update_specifiers}".'
+                    "\nYou can remove version_update_specifiers to skip this check.",
+                )
+
             self.dg.check_last_commit()
 
             self.up.actions_handler.run_action(
@@ -1274,6 +1323,15 @@ The first dist-git commit to be synced is '{short_hash}'.
                                 f'"{self.package_config.version_update_mask}".'
                                 "\nYou can change the version_update_mask with an empty string "
                                 "to skip this check.",
+                            )
+                            continue
+
+                        if not self.check_accepted_version(version):
+                            logger.info(
+                                f"The upstream released version {version} does not satisfy "
+                                f"the version_update_specifiers "
+                                f'"{self.package_config.version_update_specifiers}".'
+                                "\nYou can remove version_update_specifiers to skip this check.",
                             )
                             continue
 

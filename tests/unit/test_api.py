@@ -612,6 +612,83 @@ def test_check_version_distance(
 
 
 @pytest.mark.parametrize(
+    "proposed_version, version_update_specifiers, exp",
+    (
+        pytest.param(
+            "4.0.0",
+            None,
+            True,
+            id="no specifiers configured",
+        ),
+        pytest.param(
+            "4.0.0",
+            ">=3.0, <4.0",
+            False,
+            id="proposed version does not satisfy specifiers",
+        ),
+        pytest.param(
+            "3.11.0",
+            ">=3.0, <4.0",
+            True,
+            id="proposed version satisfies specifiers",
+        ),
+        pytest.param(
+            "4.0.0",
+            "!=4.0.0",
+            False,
+            id="proposed version excluded by specifiers",
+        ),
+        pytest.param(
+            "4.0.0",
+            ">=3.0",
+            True,
+            id="proposed version satisfies open-ended specifier",
+        ),
+        pytest.param(
+            "3.10.5",
+            "~=3.10.0",
+            True,
+            id="proposed version satisfies compatible release specifier",
+        ),
+        pytest.param(
+            "3.11.0",
+            "~=3.10.0",
+            False,
+            id="proposed version too distant for compatible release specifier",
+        ),
+        pytest.param(
+            "4.0.0",
+            ">>>invalid",
+            False,
+            id="invalid specifier returns False",
+        ),
+        pytest.param(
+            "not-a-version",
+            ">=3.0",
+            False,
+            id="unparseable proposed version returns False",
+        ),
+    ),
+)
+def test_check_accepted_version(
+    proposed_version,
+    version_update_specifiers,
+    exp,
+):
+    package_config = flexmock(
+        version_update_specifiers=version_update_specifiers,
+    )
+    config = Config()
+
+    assert (
+        PackitAPI(config, package_config).check_accepted_version(
+            proposed_version,
+        )
+        == exp
+    )
+
+
+@pytest.mark.parametrize(
     "package_name, version, response, result",
     (
         pytest.param(

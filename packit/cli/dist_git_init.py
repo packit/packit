@@ -66,6 +66,11 @@ For more details, see https://packit.dev/docs/configuration/ or contact
     help="Python regex used for comparison of the old and the new version. ",
 )
 @click.option(
+    "--version-update-specifiers",
+    help="PEP 440 version specifier set (e.g. '>=1.0, <2.0') "
+    "used to filter the proposed version. ",
+)
+@click.option(
     "--issue-repository",
     help="URL of a git repository that can be used for reporting errors in form of issues. ",
 )
@@ -162,6 +167,7 @@ def init(
     upstream_tag_include,
     upstream_tag_exclude,
     version_update_mask,
+    version_update_specifiers,
     issue_repository,
     no_pull,
     no_koji_build,
@@ -277,6 +283,7 @@ def init(
         upstream_tag_include=upstream_tag_include,
         upstream_tag_exclude=upstream_tag_exclude,
         version_update_mask=version_update_mask,
+        version_update_specifiers=version_update_specifiers,
         issue_repository=issue_repository,
         no_pull=no_pull,
         no_koji_build=no_koji_build,
@@ -318,6 +325,7 @@ class DistGitInitializer:
         upstream_tag_include: Optional[str] = None,
         upstream_tag_exclude: Optional[str] = None,
         version_update_mask: Optional[str] = None,
+        version_update_specifiers: Optional[str] = None,
         issue_repository: Optional[str] = None,
         no_pull: bool = False,
         no_koji_build: bool = False,
@@ -339,6 +347,7 @@ class DistGitInitializer:
         self.upstream_tag_include = upstream_tag_include
         self.upstream_tag_exclude = upstream_tag_exclude
         self.version_update_mask = version_update_mask
+        self.version_update_specifiers = version_update_specifiers
         self.issue_repository = issue_repository
         self.no_pull = no_pull
         self.no_koji_build = no_koji_build
@@ -452,6 +461,7 @@ class DistGitInitializer:
             "upstream_tag_include",
             "upstream_tag_exclude",
             "version_update_mask",
+            "version_update_specifiers",
             "issue_repository",
             "allowed_committers",
             "allowed_pr_authors",
