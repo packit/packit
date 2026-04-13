@@ -92,6 +92,7 @@ def package_config_mock():
         is_sub_package=False,
         pkg_tool=None,
         version_update_mask="",
+        version_update_specifiers="",
         parse_time_macros={},
         version_suffix=None,
         release_suffix=None,

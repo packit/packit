@@ -196,6 +196,9 @@ class CommonPackageConfig:
         version_update_mask: String containing a reg exp. The old version contained in the
             specfile and the newly released version have both to match this reg exp
             otherwise Packit shall not sync the release downstream.
+        version_update_specifiers: String containing a PEP 440 version specifier set
+            (comma-delimited, e.g. ">=1.0, <2.0"). The proposed version must satisfy
+            the specifier set, otherwise Packit shall not sync the release downstream.
         parse_time_macros: Dict with macros to (un)define before parsing specfile.
             Keys are macro names and values are macro values. A value of None will undefine
             the corresponding macro.
@@ -289,6 +292,7 @@ class CommonPackageConfig:
         upload_sources: bool = True,
         pkg_tool: Optional[str] = None,
         version_update_mask: Optional[str] = None,
+        version_update_specifiers: Optional[str] = None,
         test_command: Optional[TestCommandConfig] = None,
         parse_time_macros: Optional[dict[str, str]] = None,
         require: Optional[RequirementsConfig] = None,
@@ -357,6 +361,7 @@ class CommonPackageConfig:
         self.upstream_tag_include = upstream_tag_include
         self.upstream_tag_exclude = upstream_tag_exclude
         self.version_update_mask = version_update_mask
+        self.version_update_specifiers = version_update_specifiers
         self.prerelease_suffix_pattern = prerelease_suffix_pattern
         self.prerelease_suffix_macro = prerelease_suffix_macro
         self.test_command = test_command or TestCommandConfig()

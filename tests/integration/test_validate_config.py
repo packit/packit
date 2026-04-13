@@ -277,6 +277,36 @@ from packit.utils.commands import cwd
             False,
             " Repository name must be a valid filename.",
         ),
+        (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                version_update_specifiers: ">=1.0, <2.0"
+            """,
+            ),
+            True,
+            "packit.yaml is valid and ready to be used",
+        ),
+        (
+            dedent(
+                """\
+                dist_git_base_url: https://packit.dev/
+                downstream_package_name: packit
+                upstream_ref: last_commit
+                upstream_package_name: packit_upstream
+                allowed_gpg_keys: [gpg]
+                dist_git_namespace: awesome
+                version_update_specifiers: "not a valid specifier"
+            """,
+            ),
+            False,
+            "version_update_specifiers: Invalid version specifier set:",
+        ),
     ],
     ids=[
         "valid_1",
@@ -295,6 +325,8 @@ from packit.utils.commands import cwd
         "wrong_fast_forward_merge_into_key",
         "allowed_gpg",
         "slash_in_package_name",
+        "valid_version_update_specifiers",
+        "invalid_version_update_specifiers",
     ],
 )
 def test_schema_validation(tmpdir, raw_package_config, valid, expected_output):
