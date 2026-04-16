@@ -11,12 +11,12 @@ from marshmallow import ValidationError
 from packit.config import JobType
 from packit.config.package_config import PackageConfig, get_local_specfile_path
 from packit.constants import (
-    ANITYA_MONITORING_CHECK_URL,
     DOWNSTREAM_PACKAGE_CHECK_URL,
     RELEASE_MONITORING_PACKAGE_CHECK_URL,
 )
 from packit.exceptions import PackitConfigException
 from packit.sync import iter_srcs
+from packit.utils.release_monitoring import get_monitoring_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -194,30 +194,33 @@ class PackageConfigValidator:
         Check whether the monitoring for the particular package is enabled
         and warn in case not.
         """
-        try:
-            response = requests.get(
-                ANITYA_MONITORING_CHECK_URL.format(package_name=package_name),
-            )
-            result = response.json()
-            if result.get("monitoring") == "no-monitoring":
-                logger.warning(
-                    f"Monitoring for package {package_name!r} is disabled. Please, visit "
-                    f"https://src.fedoraproject.org/rpms/{package_name} and "
-                    f"set `Monitoring status` on the left side to `Monitoring`, "
-                    f"otherwise `pull_from_upstream` job won't be triggered.",
-                )
-            if result.get("monitoring") == "monitoring-with-scratch":
-                logger.warning(
-                    f"Monitoring for package {package_name!r} is set to "
-                    f"`Monitoring and scratch builds`. Please, visit "
-                    f"https://src.fedoraproject.org/rpms/{package_name} and "
-                    f"set it to `Monitoring` on the left side (Monitoring status) "
-                    f"to avoid duplicated scratch builds for new releases.",
-                )
+        metadata = get_monitoring_metadata(package_name)
 
-        except requests.exceptions.RequestException as e:
-            logger.error(
-                f"Error while checking monitoring for package {package_name!r}: {e}",
+        if metadata is None or not metadata.monitoring:
+            logger.warning(
+                f"Monitoring for package {package_name!r} is disabled "
+                f"or could not be determined. Please, add a `monitoring.toml` "
+                f"file to the dist-git repo (see "
+                f"https://the-new-hotness.readthedocs.io/en/stable/"
+                f"user-guide.html#notifications-settings) or visit "
+                f"https://src.fedoraproject.org/rpms/{package_name} and "
+                f"set `Monitoring status` on the left side to `Monitoring` "
+                f"(see https://the-new-hotness.readthedocs.io/en/stable/"
+                f"user-guide.html#notifications-settings-legacy), "
+                f"otherwise `pull_from_upstream` job won't be triggered.",
+            )
+        elif metadata.scratch_build:
+            logger.warning(
+                f"Monitoring for package {package_name!r} is set to include "
+                f"scratch builds. Please, update the `monitoring.toml` file "
+                f"in the dist-git repo (see "
+                f"https://the-new-hotness.readthedocs.io/en/stable/"
+                f"user-guide.html#notifications-settings) or visit "
+                f"https://src.fedoraproject.org/rpms/{package_name} and "
+                f"update `Monitoring status` on the left side to disable "
+                f"scratch builds (see https://the-new-hotness.readthedocs.io/"
+                f"en/stable/user-guide.html#notifications-settings-legacy) "
+                f"and avoid duplicated scratch builds for new releases.",
             )
 
     @staticmethod
