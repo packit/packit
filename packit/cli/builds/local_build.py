@@ -19,7 +19,13 @@ from packit.utils.changelog_helper import ChangelogHelper
 logger = logging.getLogger("packit")
 
 
-def build_rpms_from_specfile(api, upstream_ref, release_suffix, default_release_suffix):
+def build_rpms_from_specfile(
+    api,
+    upstream_ref,
+    update_release,
+    release_suffix,
+    default_release_suffix,
+):
     """
     Build RPMs from the specfile definition and return the paths to the built RPMs.
     """
@@ -31,6 +37,7 @@ def build_rpms_from_specfile(api, upstream_ref, release_suffix, default_release_
 
     return api.create_rpms(
         upstream_ref=upstream_ref,
+        update_release=update_release,
         release_suffix=release_suffix,
     )
 
@@ -58,6 +65,14 @@ def log_rpms(rpms):
     help="Git ref of the last upstream commit in the current branch "
     "from which packit should generate patches "
     "(this option implies the repository is source-git).",
+)
+@click.option(
+    "--update-release/--no-update-release",
+    default=None,
+    help=(
+        "Specifies whether to update Release. "
+        "Defaults to value set in configuration, which defaults to yes."
+    ),
 )
 @click.option(
     "--release-suffix",
@@ -92,6 +107,7 @@ def log_rpms(rpms):
 def local(
     config,
     upstream_ref,
+    update_release,
     release_suffix,
     default_release_suffix,
     package_config,
@@ -115,6 +131,7 @@ def local(
         else build_rpms_from_specfile(
             api,
             upstream_ref,
+            update_release,
             release_suffix,
             default_release_suffix,
         )

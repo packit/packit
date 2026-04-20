@@ -2104,6 +2104,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         self,
         upstream_ref: Optional[str] = None,
         rpm_dir: Optional[str] = None,
+        update_release: Optional[bool] = None,
         release_suffix: Optional[str] = None,
         merged_ref: Optional[str] = None,
     ) -> list[Path]:
@@ -2113,12 +2114,16 @@ The first dist-git commit to be synced is '{short_hash}'.
         Args:
             upstream_ref: Git reference to the upstream commit.
             rpm_dir: Path to the directory where the RPMs are meant to be placed.
+            update_release: Whether to change Release in the spec-file.
             release_suffix: Release suffix that is used during modification of specfile.
             merged_ref: git ref in the upstream repo used to identify correct most recent tag
 
         Returns:
             List of paths to the built RPMs.
         """
+        if update_release is None:
+            update_release = self.package_config.update_release
+
         self.up.actions_handler.run_action(
             actions=ActionName.post_upstream_clone,
             env=self.common_env(),
@@ -2130,6 +2135,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         try:
             self.up.prepare_upstream_for_srpm_creation(
                 upstream_ref=upstream_ref,
+                update_release=update_release,
                 release_suffix=release_suffix,
                 merged_ref=merged_ref,
                 env=self.common_env(),
