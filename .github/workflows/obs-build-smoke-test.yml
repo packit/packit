@@ -10,6 +10,10 @@ on:
 
 jobs:
   build-packit-in-obs:
+    # disabled for now because it's failing to auth with OBS
+    #   HTTP Error 401: Unauthorized
+    #   https://github.com/packit/packit/issues/2398
+    if: false
     runs-on: ubuntu-latest
 
     steps:
