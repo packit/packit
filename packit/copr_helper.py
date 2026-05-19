@@ -350,17 +350,16 @@ class CoprHelper:
         fields_to_change: dict[str, tuple],
     ):
         logger.info(f"Updating copr project '{owner}/{project}'")
+        kwargs: dict[str, Any] = {}
         for field, (old, new) in fields_to_change.items():
             logger.debug(f"{field}: {old} -> {new}")
-            kwargs: dict[str, Any] = {
-                arg_name: new for arg_name, (old, new) in fields_to_change.items()
-            }
-            logger.debug(f"Copr edit arguments: {kwargs}")
-            self.copr_client.project_proxy.edit(
-                ownername=owner,
-                projectname=project,
-                **kwargs,
-            )
+            kwargs[field] = new
+        logger.debug(f"Copr edit arguments: {kwargs}")
+        self.copr_client.project_proxy.edit(
+            ownername=owner,
+            projectname=project,
+            **kwargs,
+        )
 
     def get_fields_to_change(
         self,
