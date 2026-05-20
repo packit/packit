@@ -10,6 +10,6 @@ on:
 jobs:
   check_release_notes:
     name: Notes are either written, or there are none
-    uses: packit/.github/.github/workflows/check-release-notes.yml@main
+    uses: packit/.github/.github/workflows/check-release-notes.yml@2837c96caf71966609451ad0323552ef4be11a23
     with:
       description: ${{ github.event.pull_request.body }}

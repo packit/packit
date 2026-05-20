@@ -11,7 +11,7 @@ jobs:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release') && github.repository_owner == 'packit'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - name: Create GitHub release
         run: |
           VERSION=$(grep -oP '^# \K[0-9.]*' CHANGELOG.md | head -n 1)
