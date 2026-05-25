@@ -14,16 +14,16 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           fetch-depth: 0
       - name: Prepare release content
-        uses: packit/prepare-release@v1
+        uses: packit/prepare-release@3b7d729bf7a233a9696171d06abf9b8ef31e6e94 # v1
         with:
           version: ${{ inputs.version }}
           specfiles: packit.spec
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
           labels: release
           commit-message: Release ${{ inputs.version }}

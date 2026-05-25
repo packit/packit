@@ -17,7 +17,7 @@ jobs:
             image: packit
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
 
       - name: Install QEMU dependency
         run: |
@@ -27,7 +27,7 @@ jobs:
       - name: Build Image
         id: build-image
         # https://github.com/marketplace/actions/buildah-build
-        uses: redhat-actions/buildah-build@v2
+        uses: redhat-actions/buildah-build@7a95fa7ee0f02d552a32753e7414641a04307056 # v2
         with:
           dockerfiles: ${{ matrix.dockerfile }}
           image: ${{ matrix.image }}
@@ -37,7 +37,7 @@ jobs:
 
       - name: Push To Quay
         # https://github.com/marketplace/actions/push-to-registry
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@5ed88d269cf581ea9ef6dd6806d01562096bee9c # v2
         with:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
