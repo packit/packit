@@ -4,6 +4,7 @@
 """
 Processing RPM spec file patches.
 """
+
 import datetime
 import email
 import logging

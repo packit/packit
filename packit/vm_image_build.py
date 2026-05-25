@@ -9,6 +9,7 @@ Guides and more info about Image Builder:
     https://www.redhat.com/en/blog/using-hosted-image-builder-its-api
     https://github.com/packit/research/tree/main/image-builder
 """
+
 import logging
 from typing import Optional, Union
 

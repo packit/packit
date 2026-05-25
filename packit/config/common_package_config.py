@@ -4,6 +4,7 @@
 """
 Common package config attributes so they can be imported both in PackageConfig and JobConfig
 """
+
 from enum import Enum
 from os import getenv
 from os.path import basename
