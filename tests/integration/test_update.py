@@ -16,6 +16,7 @@ from packit.api import Config, PackitAPI
 from packit.config import parse_loaded_config
 from packit.distgit import DistGit
 from packit.local_project import LocalProject
+from packit.sync import SyncFilesItem
 from packit.upstream import GitUpstream
 from tests.integration.conftest import mock_spec_download_remote_s
 from tests.spellbook import TARBALL_NAME
@@ -871,3 +872,82 @@ def test_basic_local_update_post_modifications_action(
     assert (d / "source.hash").is_file()
     spec = Specfile(d / "beer.spec")
     assert spec.expanded_version == "0.1.0"
+
+
+def test_local_source_tracked_in_dist_git_via_action(
+    cwd_upstream,
+    api_instance,
+    mock_remote_functionality_upstream,
+):
+    """
+    https://github.com/packit/packit/issues/2365
+
+    A new local ``Source`` file (no URL) should be possible to track in
+    dist-git's VCS instead of being uploaded to the lookaside cache.
+    The workaround is to stage the file in dist-git's Git index from a
+    ``post-modifications`` action; ``_handle_sources`` then sees the file as
+    git-tracked and skips it when uploading to the lookaside cache.
+    """
+    u, d, api = api_instance
+    extra_source = "pkg.service"
+
+    # Add ``Source1: pkg.service`` to both upstream and dist-git spec files.
+    for git_path in [u, d]:
+        with Specfile(git_path / "beer.spec", autosave=True).sources() as sources:
+            sources.append(extra_source)
+        subprocess.check_call(["git", "add", "beer.spec"], cwd=git_path)
+        subprocess.check_call(
+            ["git", "commit", "-m", f"Add {extra_source} as Source1"],
+            cwd=git_path,
+        )
+
+    # Ship the file in upstream and re-tag.
+    (u / extra_source).write_text(
+        "[Unit]\nDescription=Beer service\n",
+        encoding="utf-8",
+    )
+    subprocess.check_call(["git", "add", extra_source], cwd=u)
+    subprocess.check_call(
+        ["git", "commit", "-m", f"Add {extra_source}"],
+        cwd=u,
+    )
+    subprocess.check_call(["git", "tag", "0.1.0", "-f"], cwd=u)
+
+    # Ask packit to sync the new file to dist-git ...
+    api.up.package_config.files_to_sync.append(
+        SyncFilesItem(src=[extra_source], dest=extra_source),
+    )
+    # ... and stage it in dist-git's Git index so it ends up in VCS,
+    # not in the lookaside cache.
+    # Wrap in ``bash -c`` so the shell expands ``$PACKIT_DOWNSTREAM_REPO``;
+    # ``run_command`` uses ``shell=False`` and would otherwise pass the
+    # variable literally to git.
+    api.up.package_config.actions = {
+        ActionName.post_modifications: [
+            f"bash -c 'git -C \"$PACKIT_DOWNSTREAM_REPO\" add {extra_source}'",
+        ],
+    }
+
+    mock_spec_download_remote_s(d)
+    flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
+
+    # Make ``PACKIT_DOWNSTREAM_REPO`` available to ``post-modifications``.
+    # ``mock_remote_functionality`` replaces ``DistGit.local_project`` at the
+    # class level but ``_get_common_env_paths`` also checks ``_local_project``
+    # on the instance.
+    api.dg._local_project = api.dg.local_project
+
+    # Only the tarball ends up in the lookaside upload — pkg.service is
+    # filtered out because it is git-tracked.
+    flexmock(api.dg).should_call("upload_to_lookaside_cache").with_args(
+        archives=[d / TARBALL_NAME],
+        pkg_tool="",
+        offline=False,
+    ).once()
+
+    api.sync_release(dist_git_branch="main", versions=["0.1.0"])
+
+    # The file is present in dist-git's working tree ...
+    assert (d / extra_source).is_file()
+    # ... and tracked by git there.
+    assert extra_source in api.dg.git_tracked_files
