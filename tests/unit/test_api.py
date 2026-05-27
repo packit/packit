@@ -726,3 +726,66 @@ def test_get_upstream_release_monitoring_bug(package_name, version, response, re
     assert (
         PackitAPI.get_upstream_release_monitoring_bug(package_name, version) == result
     )
+
+
+@pytest.mark.parametrize(
+    "local_archive_names, existing_files, git_tracked_files, expected_to_upload",
+    [
+        pytest.param(
+            ["pkg.service"],
+            ["pkg.service"],
+            ["pkg.service"],
+            [],
+            id="local-source-is-git-tracked-skipped",
+        ),
+        pytest.param(
+            ["pkg.service"],
+            ["pkg.service"],
+            [],
+            ["pkg.service"],
+            id="local-source-not-git-tracked-uploaded",
+        ),
+        pytest.param(
+            ["pkg.service"],
+            [],
+            [],
+            [],
+            id="local-source-missing-skipped",
+        ),
+        pytest.param(
+            ["pkg.service", "pkg.socket"],
+            ["pkg.service", "pkg.socket"],
+            ["pkg.service"],
+            ["pkg.socket"],
+            id="mixed-only-untracked-uploaded",
+        ),
+    ],
+)
+def test_get_local_archives_to_upload_skips_git_tracked(
+    api_mock,
+    tmp_path,
+    local_archive_names,
+    existing_files,
+    git_tracked_files,
+    expected_to_upload,
+):
+    """
+    https://github.com/packit/packit/issues/2365
+
+    ``get_local_archives_to_upload`` is the single point that decides whether
+    a local ``Source`` (no URL) is uploaded to the lookaside cache. A file
+    that is already tracked in dist-git's Git index must be skipped — that is
+    what the workaround in
+    ``docs/configuration/downstream/source-files-in-dist-git`` relies on.
+    """
+    api_mock.dg.should_receive("local_archive_names").and_return(local_archive_names)
+    api_mock.dg.should_receive("absolute_source_dir").and_return(tmp_path)
+    api_mock.dg.should_receive("git_tracked_files").and_return(git_tracked_files)
+    # ``local_project_mock`` in conftest stubs ``Path.write_text`` to a no-op,
+    # so create the files with ``touch`` instead.
+    for filename in existing_files:
+        (tmp_path / filename).touch()
+
+    result = api_mock.get_local_archives_to_upload()
+
+    assert result == [tmp_path / name for name in expected_to_upload]
