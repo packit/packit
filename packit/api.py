@@ -5,7 +5,6 @@
 This is the official python interface for packit.
 """
 
-
 import asyncio
 import contextlib
 import copy

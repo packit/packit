@@ -4,6 +4,7 @@
 """
 Tests for Upstream class
 """
+
 import os
 import re
 import shutil
