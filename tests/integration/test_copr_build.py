@@ -39,6 +39,7 @@ def test_copr_build_existing_project(cwd_upstream_or_distgit, api_instance):
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
+            runtime_dependencies=[],
             ownername=owner,
             module_hotfixes=False,
         ),
@@ -88,6 +89,7 @@ def test_copr_build_existing_project_change_settings(
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
+            runtime_dependencies=[],
             ownername=owner,
             module_hotfixes=False,
         ),
@@ -195,15 +197,25 @@ def test_copr_build_existing_project_munch_no_settings_change(
         list_on_homepage=False,
         preserve_project=False,
         additional_repos=None,
+        runtime_dependencies=None,
     )
 
     assert build_id == "1"
     assert url == f"https://copr.fedorainfracloud.org/coprs/build/{build.id}/"
 
 
+@pytest.mark.parametrize(
+    "runtime_dependencies",
+    [
+        pytest.param(None, id="default"),
+        pytest.param([], id="empty"),
+        pytest.param(["other-repo"], id="other"),
+    ],
+)
 def test_copr_build_existing_project_munch_additional_repos_change(
     cwd_upstream_or_distgit,
     api_instance,
+    runtime_dependencies,
 ):
     u, d, api = api_instance
     owner = "the-owner"
@@ -214,6 +226,7 @@ def test_copr_build_existing_project_munch_additional_repos_change(
         munchify(
             {
                 "additional_repos": [],
+                "runtime_dependencies": "",
                 "auto_prune": True,
                 "chroot_repos": {
                     "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
@@ -233,7 +246,20 @@ def test_copr_build_existing_project_munch_additional_repos_change(
         ),
     )
 
-    flexmock(ProjectProxy).should_receive("edit").and_return().once()
+    expected_runtime_dependencies = (
+        "new-repo" if runtime_dependencies is None else "\n".join(runtime_dependencies)
+    )
+    edit_args = {
+        "ownername": owner,
+        "projectname": project,
+        "additional_repos": ["new-repo"],
+    }
+    # The empty case is the same as before, so it is not added to edit args
+    if expected_runtime_dependencies != "":
+        edit_args["runtime_dependencies"] = expected_runtime_dependencies
+    flexmock(ProjectProxy).should_receive("edit").with_args(
+        **edit_args,
+    ).and_return().once()
 
     flexmock(CoprHelper).should_receive("get_copr_client").and_return(
         Client(config={"copr_url": "https://copr.fedorainfracloud.org"}),
@@ -254,6 +280,7 @@ def test_copr_build_existing_project_munch_additional_repos_change(
         list_on_homepage=False,
         preserve_project=False,
         additional_repos=["new-repo"],
+        runtime_dependencies=runtime_dependencies,
     )
 
     assert build_id == "1"
