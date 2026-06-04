@@ -1,3 +1,7 @@
+# 1.16.1
+
+- Empty on purpose (#2717)
+
 # 1.16.0
 
 - Packit CLI has a new option `--[no-]update-release` that, by default, follows the value of the option set in the config, and also allows you to override manually, if necessary. (#2713)
