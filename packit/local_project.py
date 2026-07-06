@@ -543,7 +543,7 @@ class LocalProject:
             f"refs/remotes/{remote}/pr/{pr_id}",
             target_branch_name,
         )
-        self.git_repo.branches[target_branch_name].checkout()
+        self.git_repo.branches[target_branch_name].checkout(force=True)
         target_branch = self.git_repo.branches[target_branch_name]
 
         commit_sha = shorten_commit_hash(target_branch.commit.hexsha)
