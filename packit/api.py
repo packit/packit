@@ -967,8 +967,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         dry_run: bool = False,
-    ) -> tuple[PullRequest, dict[str, PullRequest]]:
-        """Overload for type-checking; return PullRequest if create_pr=True."""
+    ) -> tuple[Optional[PullRequest], dict[str, PullRequest]]:
+        """Overload for type-checking; return tuple with optional PullRequest (None if dry_run=True)."""
 
     @overload
     def sync_release(
@@ -1022,7 +1022,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
         dry_run: bool = False,
-    ) -> Optional[tuple[PullRequest, dict[str, PullRequest]]]:
+    ) -> Optional[tuple[Optional[PullRequest], dict[str, PullRequest]]]:
         """
         Update given package in dist-git
 
@@ -1064,8 +1064,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             Tuple of the created (or existing if one already exists) PullRequest and
              dictionary of branches from fast_forward_merge_branches as keys and
-             PullRequest objects as values if
-            create_pr is True, else None.
+             PullRequest objects as values if create_pr is True, else None.
+             When dry_run is True, PullRequest will be None (PR is not created).
+             When create_pr is False, returns None.
 
         Raises:
             PackitException, if both 'version' and 'tag' are provided.
