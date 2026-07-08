@@ -968,7 +968,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         fast_forward_merge_branches: Optional[set[str]] = None,
         dry_run: bool = False,
     ) -> tuple[Optional[PullRequest], dict[str, PullRequest]]:
-        """Overload for type-checking; return tuple with optional PullRequest (None if dry_run=True)."""
+        """Overload: return PullRequest if create_pr=True (None if dry_run=True)."""
 
     @overload
     def sync_release(
@@ -1855,7 +1855,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         # or because force_new_sources is set.
         if dry_run:
             logger.info(
-                "Dry run: updating sources file without uploading to lookaside cache for archives: %s",
+                "Dry run: updating sources file without uploading "
+                "to lookaside cache for archives: %s",
                 [archive.name for archive in archives],
             )
         else:

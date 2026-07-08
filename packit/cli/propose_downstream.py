@@ -169,7 +169,8 @@ def sync_release_common_options(func):
         "--dry-run",
         is_flag=True,
         default=False,
-        help="Prepare dist-git repository locally without pushing to remote or uploading to lookaside cache.",
+        help="Prepare dist-git locally without pushing to remote "
+        "or uploading to lookaside cache.",
     )
     @click.option(
         PACKAGE_SHORT_OPTION,
