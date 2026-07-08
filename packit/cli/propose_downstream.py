@@ -166,6 +166,12 @@ def sync_release_common_options(func):
         help="Sync ACLs between dist-git repo and the fork, is considered only with --pr option.",
     )
     @click.option(
+        "--dry-run",
+        is_flag=True,
+        default=False,
+        help="Prepare dist-git repository locally without pushing to remote or uploading to lookaside cache.",
+    )
+    @click.option(
         PACKAGE_SHORT_OPTION,
         PACKAGE_LONG_OPTION,
         multiple=True,
@@ -199,12 +205,6 @@ def sync_release_common_options(func):
     help="Git ref of the last upstream commit in the current branch "
     "from which packit should generate patches "
     "(this option implies the repository is source-git).",
-)
-@click.option(
-    "--dry-run",
-    is_flag=True,
-    default=False,
-    help="Prepare dist-git repository locally without pushing to remote or uploading to lookaside cache.",
 )
 @pass_config
 @cover_packit_exception
@@ -255,12 +255,6 @@ def propose_downstream(
 
 @click.command("pull-from-upstream", context_settings=get_context_settings())
 @sync_release_common_options
-@click.option(
-    "--dry-run",
-    is_flag=True,
-    default=False,
-    help="Prepare dist-git repository locally without pushing to remote or uploading to lookaside cache.",
-)
 @pass_config
 @cover_packit_exception
 @iterate_packages
