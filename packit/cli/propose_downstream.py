@@ -66,6 +66,7 @@ def sync_release(
     package_config,
     resolve_bug,
     sync_acls,
+    dry_run,
     check_for_non_git_upstream=False,
 ):
     api = get_packit_api(
@@ -109,6 +110,7 @@ def sync_release(
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolve_bug,
             sync_acls=sync_acls,
+            dry_run=dry_run,
             fast_forward_merge_branches=get_fast_forward_merge_branches_for(
                 dist_git_branches=dist_git_branches,
                 source_branch=branch,
@@ -198,6 +200,12 @@ def sync_release_common_options(func):
     "from which packit should generate patches "
     "(this option implies the repository is source-git).",
 )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Prepare dist-git repository locally without pushing to remote or uploading to lookaside cache.",
+)
 @pass_config
 @cover_packit_exception
 @iterate_packages
@@ -215,6 +223,7 @@ def propose_downstream(
     sync_acls,
     resolve_bug,
     package_config,
+    dry_run,
 ):
     """
     Land a new upstream release in Fedora using upstream packit config.
@@ -240,11 +249,18 @@ def propose_downstream(
         package_config=package_config,
         resolve_bug=resolve_bug,
         sync_acls=sync_acls,
+        dry_run=dry_run,
     )
 
 
 @click.command("pull-from-upstream", context_settings=get_context_settings())
 @sync_release_common_options
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Prepare dist-git repository locally without pushing to remote or uploading to lookaside cache.",
+)
 @pass_config
 @cover_packit_exception
 @iterate_packages
@@ -260,6 +276,7 @@ def pull_from_upstream(
     sync_acls,
     resolve_bug,
     package_config,
+    dry_run,
 ):
     """
     Land a new upstream release in Fedora using downstream packit config.
@@ -285,5 +302,6 @@ def pull_from_upstream(
         package_config=package_config,
         resolve_bug=resolve_bug,
         sync_acls=sync_acls,
+        dry_run=dry_run,
         check_for_non_git_upstream=True,
     )
