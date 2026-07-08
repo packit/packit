@@ -789,3 +789,47 @@ def test_get_local_archives_to_upload_skips_git_tracked(
     result = api_mock.get_local_archives_to_upload()
 
     assert result == [tmp_path / name for name in expected_to_upload]
+
+
+def test_sync_release_dry_run_skips_remote_operations(api_mock):
+    """Test that dry_run=True skips push and PR creation but does local work."""
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    # In dry-run mode, push_and_create_pr should NOT be called
+    api_mock.should_receive("push_and_create_pr").never()
+    # But update_dist_git should still be called
+    api_mock.should_receive("update_dist_git").once()
+    
+    api_mock.sync_release(versions=["1.1"], dist_git_branch="_", dry_run=True)
+
+
+def test_sync_release_dry_run_skips_push_when_create_pr_false(api_mock):
+    """Test that dry_run=True skips direct push when create_pr=False."""
+    flexmock(PatchGenerator).should_receive("undo_identical")
+    api_mock.up.should_receive("get_specfile_version").and_return("0")
+    api_mock.up.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    api_mock.up.package_config.should_receive("get_base_env").and_return({})
+    api_mock.dg.should_receive("get_specfile_version").and_return("0")
+    api_mock.dg.should_receive("specfile").and_return(
+        flexmock().should_receive("reload").mock(),
+    )
+    # In dry-run mode with create_pr=False, dg.push should NOT be called
+    api_mock.dg.should_receive("push").never()
+    api_mock.should_receive("update_dist_git").once()
+    
+    api_mock.sync_release(
+        versions=["1.1"], 
+        dist_git_branch="_", 
+        create_pr=False,
+        dry_run=True,
+    )
