@@ -116,7 +116,8 @@ def test_propose_downstream_with_dry_run():
         dry_run=True,
     ).and_return()
     result = call_packit(
-        packit_base, parameters=["propose-downstream", ".", "--dry-run"],
+        packit_base,
+        parameters=["propose-downstream", ".", "--dry-run"],
     )
     assert result.exit_code == 0
 
@@ -144,6 +145,7 @@ def test_pull_from_upstream_with_dry_run():
         dry_run=True,
     ).and_return()
     result = call_packit(
-        packit_base, parameters=["pull-from-upstream", ".", "--dry-run"],
+        packit_base,
+        parameters=["pull-from-upstream", ".", "--dry-run"],
     )
     assert result.exit_code == 0

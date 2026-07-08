@@ -807,7 +807,7 @@ def test_sync_release_dry_run_skips_remote_operations(api_mock):
     api_mock.should_receive("push_and_create_pr").never()
     # But update_dist_git should still be called
     api_mock.should_receive("update_dist_git").once()
-    
+
     api_mock.sync_release(versions=["1.1"], dist_git_branch="_", dry_run=True)
 
 
@@ -826,10 +826,10 @@ def test_sync_release_dry_run_skips_push_when_create_pr_false(api_mock):
     # In dry-run mode with create_pr=False, dg.push should NOT be called
     api_mock.dg.should_receive("push").never()
     api_mock.should_receive("update_dist_git").once()
-    
+
     api_mock.sync_release(
-        versions=["1.1"], 
-        dist_git_branch="_", 
+        versions=["1.1"],
+        dist_git_branch="_",
         create_pr=False,
         dry_run=True,
     )
