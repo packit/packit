@@ -966,9 +966,37 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
-        dry_run: bool = False,
-    ) -> tuple[Optional[PullRequest], dict[str, PullRequest]]:
-        """Overload: return PullRequest if create_pr=True (None if dry_run=True)."""
+        dry_run: Literal[False] = False,
+    ) -> tuple[PullRequest, dict[str, PullRequest]]:
+        """Overload: return PullRequest when create_pr=True and dry_run=False."""
+
+    @overload
+    def sync_release(
+        self,
+        dist_git_branch: Optional[str] = None,
+        versions: Optional[list[str]] = None,
+        tag: Optional[str] = None,
+        use_local_content=False,
+        add_new_sources=True,
+        force_new_sources=False,
+        upstream_ref: Optional[str] = None,
+        create_pr: Literal[True] = True,
+        force: bool = False,
+        create_sync_note: bool = True,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        local_pr_branch_suffix: str = "update",
+        mark_commit_origin: bool = False,
+        use_downstream_specfile: bool = False,
+        add_pr_instructions: bool = False,
+        resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
+        pr_description_footer: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
+        fast_forward_merge_branches: Optional[set[str]] = None,
+        dry_run: Literal[True] = ...,
+    ) -> tuple[None, dict[str, PullRequest]]:
+        """Overload: return None when create_pr=True but dry_run=True."""
 
     @overload
     def sync_release(
@@ -996,7 +1024,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         fast_forward_merge_branches: Optional[set[str]] = None,
         dry_run: bool = False,
     ) -> None:
-        """Overload for type-checking; return None if create_pr=False."""
+        """Overload: return None when create_pr=False."""
 
     def sync_release(
         self,
