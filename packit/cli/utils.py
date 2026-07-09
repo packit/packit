@@ -300,7 +300,7 @@ def get_packit_api(
             ) from e
         logger.debug(f"Final package (job) config: {package_config}")
 
-    if dist_git_path and Path(dist_git_path) == local_project.working_dir:
+    if dist_git_path and Path(dist_git_path).resolve() == local_project.working_dir.resolve():
         return PackitAPI(
             config=config,
             package_config=package_config,
