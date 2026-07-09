@@ -1875,6 +1875,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         if (
             not self.should_archives_be_uploaded_to_lookaside(archives)
             and not force_new_sources
+            and not dry_run
         ):
             return
 
