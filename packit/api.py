@@ -12,10 +12,10 @@ import copy
 import logging
 import os
 import re
+import shutil
 import tempfile
 from collections.abc import Iterable, Sequence
-from datetime import datetime
-from distutils.dir_util import copy_tree
+from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import (
@@ -2040,9 +2040,10 @@ The first dist-git commit to be synced is '{short_hash}'.
             result_dir: directory where the specfile directory content should be copied
         """
         logger.debug(f"Copying {self.up.absolute_specfile_dir} -> {result_dir}")
-        copy_tree(
+        shutil.copytree(
             str(self.up.absolute_specfile_dir),
             str(result_dir),
+            dirs_exist_ok=True,
             preserve_symlinks=True,
         )
 
@@ -2550,7 +2551,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 update["date_testing"],
                 "%Y-%m-%d %H:%M:%S",
             )
-            return (datetime.utcnow() - date_testing).days
+            return (datetime.now(timezone.utc) - date_testing).days
         return 0
 
     def push_updates(self, update_alias: Optional[str] = None):
