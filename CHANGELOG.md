@@ -1,3 +1,7 @@
+# 1.16.2
+
+- Add HTTP timeouts and make `get_monitoring_metadata()` unauthenticated which should improve the UX of `packit validate`. (#2730)
+
 # 1.16.1
 
 - Fixed a couple of Copr-related issues. (#2721, #2727)
