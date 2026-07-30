@@ -214,6 +214,9 @@ class CommonPackageConfig:
             where, by default, the fork repo is used).
         clone_repos_before_run_condition: Whether to clone the repos before running
             the run-condition action.
+        skip_missing_branched_composes: If set, targets corresponding to freshly
+            branched Fedora releases whose Testing Farm compose is not yet available
+            will be silently skipped instead of reported as errors.
     """
 
     def __init__(
@@ -303,6 +306,7 @@ class CommonPackageConfig:
         csmock_args: Optional[str] = None,
         use_target_repo_for_fmf_url: Optional[bool] = False,
         clone_repos_before_run_condition: Optional[bool] = False,
+        skip_missing_branched_composes: bool = False,
         osh_options: Optional[OshOptionsConfig] = None,
         preserve_spec: bool = False,
     ):
@@ -432,6 +436,8 @@ class CommonPackageConfig:
         self.use_target_repo_for_fmf_url = use_target_repo_for_fmf_url
 
         self.clone_repos_before_run_condition = clone_repos_before_run_condition
+
+        self.skip_missing_branched_composes = skip_missing_branched_composes
 
     @property
     def dist_git_base_url(self) -> str:
