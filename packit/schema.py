@@ -558,6 +558,8 @@ class CommonConfigSchema(Schema):
 
     clone_repos_before_run_condition = fields.Boolean(load_default=False)
 
+    skip_missing_branched_composes = fields.Boolean(load_default=False)
+
     @staticmethod
     def spec_source_id_serialize(value: CommonPackageConfig):
         return value.spec_source_id
