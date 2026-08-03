@@ -4,6 +4,7 @@
 """
 Functions and classes dealing with syncing files between repositories
 """
+
 import copy
 import glob
 import logging

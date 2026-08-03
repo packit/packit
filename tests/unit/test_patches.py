@@ -190,9 +190,7 @@ Signed-off-by: Everyday Programmer <eprog@redhat.com>
 
 def test_remove_prefixes(patch):
     remove_prefixes(patch)
-    assert (
-        patch.read_text()
-        == """\
+    assert patch.read_text() == """\
 From 477fb1b17ee5fa84913102e964239c0d28019b8a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Everyday=20Programmer?= <eprog@redhat.com>
 Date: Wed, 18 Aug 2021 10:06:09 +0200
@@ -224,7 +222,6 @@ index e69de29..e892e75 100644
 --
 2.31.1
 """
-    )
 
 
 body = """This is an explanation why the content was added."""
