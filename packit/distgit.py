@@ -655,8 +655,6 @@ class DistGit(PackitRepositoryBase):
         )
 
         bodhi_client = get_bodhi_client()
-        # make sure we have the credentials
-        bodhi_client.ensure_auth()
 
         if not koji_builds:
             koji_builds = [
@@ -687,6 +685,9 @@ class DistGit(PackitRepositoryBase):
                 rendered_note,
             )
         try:
+            # make sure we have the credentials
+            bodhi_client.ensure_auth()
+
             save_kwargs = {
                 "builds": koji_builds,
                 "notes": rendered_note,
