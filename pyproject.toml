@@ -58,8 +58,6 @@ dependencies = [
     "python-bugzilla",
     "backoff",
     "tomli; python_version < '3.11'",
-    # osc 1.8.2 introduced a regression that was fixed via https://github.com/openSUSE/osc/pull/1595 in 1.8.3
-    "osc >= 1.6.2, != 1.8.2",
     "opensuse-distro-aliases",
 ]
 
@@ -80,6 +78,10 @@ testing = [
 dev = [
     "packitos[testing]",
     "pre-commit",
+]
+osc = [
+    # osc 1.8.2 introduced a regression that was fixed via https://github.com/openSUSE/osc/pull/1595 in 1.8.3
+    "osc >= 1.6.2, != 1.8.2",
 ]
 
 [project.scripts]
