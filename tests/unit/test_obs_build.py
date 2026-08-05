@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
+pytest.importorskip("osc")
+
 from packit.utils import obs_helper
 
 _NAME = "home:me:packit"
