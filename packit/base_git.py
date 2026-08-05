@@ -13,7 +13,8 @@ import requests
 import rpm
 from git import GitCommandError, PushInfo
 from ogr.abstract import AccessLevel, GitProject, PullRequest
-from ogr.services.pagure import PagureProject
+from ogr.exceptions import OgrNetworkError
+from ogr.services.pagure import PagureProject, PagureService
 from specfile import Specfile
 from specfile.exceptions import (
     DuplicateSourceException,
@@ -37,6 +38,21 @@ from packit.utils.lookaside import LookasideCache
 from packit.utils.repo import RepositoryCache, commit_message_file
 
 logger = getLogger(__name__)
+
+
+def _is_auth_failure(ex: BaseException) -> bool:
+    """Whether an exception (or its cause chain) looks like repeated 401s.
+
+    urllib3/requests report exhausted auth retries as "too many 401 error
+    responses" inside a RetryError/ConnectionError; ogr may wrap that into
+    an OgrNetworkError whose __cause__ still carries the message.
+    """
+    current: Optional[BaseException] = ex
+    while current is not None:
+        if "401" in str(current):
+            return True
+        current = current.__cause__
+    return False
 
 
 class PackitRepositoryBase:
@@ -671,7 +687,25 @@ class PackitRepositoryBase:
 
     def get_user(self) -> Optional[str]:
         if self.local_project.git_service:
-            return self.local_project.git_service.user.get_username()
+            try:
+                return self.local_project.git_service.user.get_username()
+            except (requests.exceptions.RequestException, OgrNetworkError) as ex:
+                # A missing or invalid pagure API key surfaces as repeated 401s
+                # from the whoami call ("too many 401 error responses"), which
+                # is not actionable for users. Translate it, but only for
+                # pagure and only when the failure really is an auth failure —
+                # everything else propagates unchanged.
+                if (
+                    isinstance(self.local_project.git_service, PagureService)
+                    and _is_auth_failure(ex)
+                ):
+                    raise PackitException(
+                        "You need to add an API key for pagure in your packit "
+                        "config file. See "
+                        "https://packit.dev/docs/configuration#user-configuration-file "
+                        "for details.",
+                    ) from ex
+                raise
         return None
 
     def existing_pr(
