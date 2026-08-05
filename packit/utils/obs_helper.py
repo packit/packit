@@ -11,6 +11,7 @@ from typing import Optional
 
 try:
     from osc import conf, core
+
     _OSC_AVAILABLE = True
 except ImportError:
     _OSC_AVAILABLE = False
