@@ -695,10 +695,9 @@ class PackitRepositoryBase:
                 # is not actionable for users. Translate it, but only for
                 # pagure and only when the failure really is an auth failure —
                 # everything else propagates unchanged.
-                if (
-                    isinstance(self.local_project.git_service, PagureService)
-                    and _is_auth_failure(ex)
-                ):
+                if isinstance(
+                    self.local_project.git_service, PagureService,
+                ) and _is_auth_failure(ex):
                     raise PackitException(
                         "You need to add an API key for pagure in your packit "
                         "config file. See "

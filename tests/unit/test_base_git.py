@@ -8,6 +8,7 @@ from typing import Optional, Union
 import pytest
 from distro import linux_distribution
 from flexmock import flexmock
+from ogr.services.pagure import PagureService
 from specfile import Specfile
 from specfile.changelog import ChangelogEntry
 
@@ -23,8 +24,6 @@ from packit.upstream import GitUpstream
 from packit.utils import commands
 from packit.utils.repo import create_new_repo
 from tests.spellbook import can_a_module_be_imported, initiate_git_repo
-
-from ogr.services.pagure import PagureService
 
 
 @pytest.fixture()
