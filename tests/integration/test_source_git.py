@@ -187,12 +187,9 @@ def test_basic_local_update_patch_content(
     ).decode()
 
     assert "From-source-git-commit" not in git.Repo(distgit).head.commit.message
-    assert (
-        """
+    assert """
 -Version:        0.0.0
-+Version:        0.1.0"""
-        in git_diff
-    )
++Version:        0.1.0""" in git_diff
     # Make sure the patches are placed after Source0, but outside %if %endif
     patches = """\
 Source0:        %{upstream_name}-%{version}.tar.gz
@@ -212,14 +209,11 @@ Source0:        %{upstream_name}-%{version}.tar.gz
 
     assert "Patch0004:" not in git_diff
 
-    assert (
-        """ - 0.1.0-1
+    assert """ - 0.1.0-1
 +- Initial brewing
 +
  * Sun Feb 24 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.0.0-1
- - No brewing, yet."""
-        in git_diff
-    )
+ - No brewing, yet.""" in git_diff
 
     patch_1_3 = """
 +Subject: [PATCH 1/3] switching to amarillo hops
@@ -230,64 +224,47 @@ Source0:        %{upstream_name}-%{version}.tar.gz
 +
 +diff --git a/hops b/hops"""
     assert patch_1_3 in git_diff
-    assert (
-        """\
+    assert """\
 +--- a/hops
 ++++ b/hops
 +@@ -1 +1 @@
 +-Cascade
 ++Amarillo
-+--"""
-        in git_diff
-    )
++--""" in git_diff
 
-    assert (
-        """\
+    assert """\
 +Subject: [PATCH 2/3] actually, let's do citra
 +
 +---
 + hops | 2 +-
 + 1 file changed, 1 insertion(+), 1 deletion(-)
 +
-+diff --git a/hops b/hops"""
-        in git_diff
-    )
-    assert (
-        (
-            """\
++diff --git a/hops b/hops""" in git_diff
+    assert ("""\
 +--- a/hops
 ++++ b/hops
 +@@ -1 +1 @@
 +-Amarillo
 ++Citra
-+--"""
-        )
-        in git_diff
-    )
++--""") in git_diff
 
-    assert (
-        """
+    assert """
 +--- a/big-source-file.txt
 ++++ b/big-source-file.txt
 +@@ -1,2 +1 @@
 +-This is a testing file
 +-containing some text.
-++new changes"""
-        in git_diff
-    )
+++new changes""" in git_diff
 
     # diff of the source files (not synced) should not be directly in the git diff
-    assert (
-        """
+    assert """
 +Subject: [PATCH 3/3] source change
 +
 +---
 + big-source-file.txt | 3 +--
 + 1 file changed, 1 insertion(+), 2 deletions(-)
 +
-+diff --git a/big-source-file.txt b/big-source-file.txt"""
-        in git_diff
-    )
++diff --git a/big-source-file.txt b/big-source-file.txt""" in git_diff
 
     # ignored file should not be in the diff
     assert "--- a/ignored_file.txt\n" not in git_diff
