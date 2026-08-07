@@ -59,8 +59,7 @@ def main() -> None:
         schema = PackageConfigSchema.json_schema()
     except Exception as e:
         print(
-            f"Error: Failed to generate JSON Schema.\n"
-            f"Details: {e}",
+            f"Error: Failed to generate JSON Schema.\n" f"Details: {e}",
             file=sys.stderr,
         )
         sys.exit(1)
