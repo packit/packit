@@ -66,6 +66,14 @@ class StringOrListOfStringsField(fields.Field):
             return [value]
         raise ValidationError(f"Expected 'list[str]' or 'str', got {type(value)!r}.")
 
+    def _jsonschema_type_mapping(self):
+        return {
+            "anyOf": [
+                {"type": "string"},
+                {"type": "array", "items": {"type": "string"}},
+            ],
+        }
+
 
 class SyncFilesItemSchema(Schema):
     """Schema for SyncFilesItem"""
@@ -101,6 +109,35 @@ class FilesToSyncField(fields.Field):
             return SyncFilesItem(src=[value], dest=value)
         raise ValidationError(f"Expected 'dict' or 'str', got {type(value)!r}.")
 
+    def _jsonschema_type_mapping(self):
+        return {
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "type": "object",
+                    "properties": {
+                        "src": {
+                            "anyOf": [
+                                {"type": "string"},
+                                {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                },
+                            ],
+                        },
+                        "dest": {"type": "string"},
+                        "mkpath": {"type": "boolean"},
+                        "delete": {"type": "boolean"},
+                        "filters": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                    },
+                    "required": ["src", "dest"],
+                },
+            ],
+        }
+
 
 class ActionField(fields.Field):
     """
@@ -134,6 +171,17 @@ class ActionField(fields.Field):
         if invalid_actions:
             raise ValidationError(f"Unknown action(s) provided: {invalid_actions}")
 
+    def _jsonschema_type_mapping(self):
+        return {
+            "type": "object",
+            "additionalProperties": {
+                "anyOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ],
+            },
+        }
+
 
 class NotProcessedField(fields.Field):
     """
@@ -157,6 +205,10 @@ class NotProcessedField(fields.Field):
         additional_message = self.metadata.get("additional_message")
         if additional_message:
             logger.warning(f"{additional_message}")
+
+    def _jsonschema_type_mapping(self):
+        # This field is deprecated and not processed — accept anything.
+        return {}
 
 
 class SourceSchema(Schema):
@@ -256,6 +308,14 @@ class ListOrDict(fields.Field):
             or not all(isinstance(k, str) for k in value)
             or not all(isinstance(v, dict) for v in value.values())
         )
+
+    def _jsonschema_type_mapping(self):
+        return {
+            "anyOf": [
+                {"type": "array", "items": {"type": "string"}},
+                {"type": "object"},
+            ],
+        }
 
 
 class DistGitBranches(ListOrDict):
@@ -467,6 +527,11 @@ class CommonConfigSchema(Schema):
     spec_source_id = fields.Method(
         deserialize="spec_source_id_fm",
         serialize="spec_source_id_serialize",
+        metadata={
+            "_jsonschema_type_mapping": {
+                "anyOf": [{"type": "string"}, {"type": "integer"}],
+            },
+        },
     )
     files_to_sync = fields.List(FilesToSyncField())
     actions = ActionField(dump_default={})
@@ -947,6 +1012,21 @@ class PackageConfigSchema(Schema):
     @post_load
     def make_instance(self, data: dict, **_) -> PackageConfig:
         return PackageConfig(**data)
+
+    @classmethod
+    def json_schema(cls) -> dict:
+        """Generate a JSON Schema (Draft-07) for the PackageConfig.
+
+        Uses ``marshmallow-jsonschema`` to introspect the marshmallow
+        schema and produce a JSON Schema dict suitable for submission to
+        the `Schema Store <https://www.schemastore.org/>`_.
+
+        Returns:
+            A dict representing the JSON Schema.
+        """
+        from marshmallow_jsonschema import JSONSchema
+
+        return JSONSchema().dump(cls())
 
 
 class UserConfigSchema(Schema):
