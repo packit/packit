@@ -1,3 +1,7 @@
+# 1.16.3
+
+- Packit now retries when it encounters connection errors during authentication when attempting to create a Bodhi update. (#2749)
+
 # 1.16.2
 
 - Add HTTP timeouts and make `get_monitoring_metadata()` unauthenticated which should improve the UX of `packit validate`. (#2730)
