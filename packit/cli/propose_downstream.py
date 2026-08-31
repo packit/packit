@@ -20,11 +20,17 @@ from packit.constants import (
     PACKAGE_OPTION_HELP,
     PACKAGE_SHORT_OPTION,
 )
+from packit.utils import get_default_branch
 
 logger = logging.getLogger(__name__)
 
 
-def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
+def get_dist_git_branches(
+    api,
+    dist_git_branch,
+    pull_from_upstream=False,
+    dry_run=False,
+):
     cmdline_dg_branches = dist_git_branch.split(",") if dist_git_branch else []
     config_dg_branches = []
     if isinstance(api.package_config, PackageConfig):
@@ -34,7 +40,14 @@ def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
             )
         )
 
-    default_dg_branch = api.dg.local_project.git_project.default_branch
+    if dry_run:
+        # In dry-run mode nothing is pushed to the remote, so avoid contacting
+        # the forge API (it fails for packages that don't exist on the remote,
+        # e.g. a local-only dist-git clone) and determine the default branch
+        # from the local config instead.
+        default_dg_branch = get_default_branch(api.dg.local_project.git_repo)
+    else:
+        default_dg_branch = api.dg.local_project.git_project.default_branch
 
     dg_branches = (
         cmdline_dg_branches or config_dg_branches or default_dg_branch.split(",")
@@ -42,11 +55,12 @@ def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
     return dg_branches, default_dg_branch
 
 
-def get_dg_branches(api, dist_git_branch, pull_from_upstream=False):
+def get_dg_branches(api, dist_git_branch, pull_from_upstream=False, dry_run=False):
     dg_branches, default_dg_branch = get_dist_git_branches(
         api,
         dist_git_branch,
         pull_from_upstream,
+        dry_run=dry_run,
     )
     return get_branches(*dg_branches, default_dg_branch=default_dg_branch)
 
@@ -83,6 +97,7 @@ def sync_release(
         api,
         dist_git_branch,
         pull_from_upstream=use_downstream_specfile,
+        dry_run=dry_run,
     )
 
     click.echo(
@@ -93,6 +108,7 @@ def sync_release(
         api,
         dist_git_branch,
         pull_from_upstream=use_downstream_specfile,
+        dry_run=dry_run,
     )
     branches_to_update = get_branches(
         *dist_git_branches,
