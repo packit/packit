@@ -345,12 +345,17 @@ class DistGit(PackitRepositoryBase):
             project.fork_create()
             project_fork = project.get_fork()
 
+        # [XXX] once dist-git migration is complete, allow_maintainer_edit
+        # can be set to True directly without the check for PagureProject
         try:
             dist_git_pr = project_fork.create_pr(
                 title=pr_title,
                 body=pr_description,
                 source_branch=source_branch,
                 target_branch=target_branch,
+                allow_maintainer_edit=(
+                    None if isinstance(project, PagureProject) else True
+                ),
             )
         except Exception as ex:
             logger.error(f"There was an error while creating the PR: {ex!r}")
