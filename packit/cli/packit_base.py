@@ -87,6 +87,7 @@ packit_base.add_command(dist_git)
 packit_base.add_command(scan_in_osh)
 packit_base.add_command(config)
 packit_base.add_command(test)
+# packit_base.add_command(init_local_yaml)
 
 if __name__ == "__main__":
     packit_base()

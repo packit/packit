@@ -157,6 +157,7 @@ class Config:
                     logger.error(f"Cannot load user config {config_file_name_full!r}.")
                     raise PackitException(f"Cannot load user config: {ex!r}.") from ex
                 break
+
         return Config.get_from_dict(raw_dict=loaded_config)
 
     @classmethod
