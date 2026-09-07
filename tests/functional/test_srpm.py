@@ -4,6 +4,7 @@
 """
 Functional tests for srpm command
 """
+
 import subprocess
 from pathlib import Path
 

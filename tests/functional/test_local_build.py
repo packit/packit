@@ -4,6 +4,7 @@
 """
 Functional tests for local-build command
 """
+
 import re
 from pathlib import Path
 from subprocess import CalledProcessError

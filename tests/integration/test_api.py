@@ -1,9 +1,10 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-"""    custom_path = "sooooorc.rpm"
+"""custom_path = "sooooorc.rpm"
 Functional tests for srpm comand
 """
+
 from pathlib import Path
 
 
