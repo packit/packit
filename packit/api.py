@@ -45,6 +45,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.aliases import get_branches
 from packit.config.common_package_config import MockBootstrapSetup, MultiplePackages
+from packit.config.job_config import JobType
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
@@ -1453,11 +1454,37 @@ The first dist-git commit to be synced is '{short_hash}'.
             else ""
         )
 
+        job_types = {job.type for job in self.package_config.jobs}
+        automatic_steps = []
+
+        if JobType.koji_build in job_types:
+            automatic_steps.append(
+                "- Packit will **automatically** build the package in Koji"
+            )
+        else:
+            automatic_steps.append(
+                "- Packit will **NOT** automatically build the package in Koji"
+            )
+
+        if JobType.bodhi_update in job_types:
+            automatic_steps.append(
+                "- Packit will **automatically** create a Bodhi update"
+            )
+        else:
+            automatic_steps.append(
+                "- Packit will **NOT** automatically create a Bodhi update"
+            )
+
+        automatic_steps_info = (
+            "\nWhen this PR is merged:\n" + "\n".join(automatic_steps) + "\n"
+        )
+
         return SYNC_RELEASE_PR_DESCRIPTION.format(
             upstream_tag_info=tag_info,
             upstream_commit_info=commit_info,
             release_monitoring_info=release_monitoring_info,
             resolved_bugzillas_info=resolved_bugzillas_info,
+            automatic_steps_info=automatic_steps_info,
         )
 
     def get_pr_default_title_and_description(self):
