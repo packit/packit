@@ -464,9 +464,9 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             None,
             None,
             "Upstream tag: 1.0.0\nUpstream commit: _\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -474,9 +474,9 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             None,
             None,
             "Upstream tag: [1.0.0](tag-link)\nUpstream commit: _\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -484,29 +484,31 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             None,
             None,
             "Upstream tag: [1.0.0](tag-link)\nUpstream commit: [_](commit-link)\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
             "",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\n" "Upstream commit: _\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "Upstream tag: [1.0.0](tag-link)\n"
+            "Upstream commit: _\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
             "commit-link",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\n" "Upstream commit: [_](commit-link)\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "Upstream tag: [1.0.0](tag-link)\n"
+            "Upstream commit: [_](commit-link)\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -516,9 +518,9 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream tag: [1.0.0](tag-link)\n"
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -529,9 +531,9 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
             "Resolves: [rhbz#1234](https://bugzilla.redhat.com/show_bug.cgi?id=1234)\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -542,9 +544,9 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
             "Resolves: rhbz#not-a-number\n"
-                "\nWhen this PR is merged:\n"
-                "- Packit will **NOT** automatically build the package in Koji\n"
-                "- Packit will **NOT** automatically create a Bodhi update\n",
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
     ],
 )
