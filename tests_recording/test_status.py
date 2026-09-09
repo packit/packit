@@ -1,5 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+
+import pytest
 from requre.cassette import DataTypes
 from requre.helpers.files import StoreFiles
 from requre.helpers.simple_object import Simple
@@ -57,6 +59,11 @@ class TestStatus(PackitTest):
     def test_status(self):
         assert self.status
 
+    @pytest.mark.skip(
+        "Test fails after dist-git service mapping update in ogr"
+        " because it makes an API call against Forgejo dist-git."
+        " Requires re-recording once Forgejo dist-git is deployed.",
+    )
     def test_distgen_versions(self):
         table = self.status.get_dg_versions()
         assert table
@@ -76,6 +83,11 @@ class TestStatus(PackitTest):
         table = self.status.get_up_releases()
         assert len(table) >= 1
 
+    @pytest.mark.skip(
+        "Test fails after dist-git service mapping update in ogr"
+        " because it makes an API call against Forgejo dist-git."
+        " Requires re-recording once Forgejo dist-git is deployed.",
+    )
     def test_dowstream_pr(self):
         table = self.status.get_downstream_prs()
         assert len(table) >= 0
