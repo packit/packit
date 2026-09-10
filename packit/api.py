@@ -357,6 +357,7 @@ class PackitAPI:
         check_sync_status: bool = False,
         check_dist_git_pristine: bool = True,
         resolved_bugs: Optional[list[str]] = None,
+        dry_run: bool = False,
     ):
         """Update a dist-git repo from an upstream (aka source-git) repo
 
@@ -383,6 +384,7 @@ class PackitAPI:
                 and dist-git repos prior to performing the update.
             check_dist_git_pristine: Check whether the dist-git is pristine.
             resolved_bugs: List of bugs that are resolved by the update (e.g. [rhbz#123]).
+            dry_run: Skip uploading to lookaside cache if True.
         """
         if check_sync_status:
             status = self.sync_status()
@@ -454,6 +456,7 @@ class PackitAPI:
                 force_new_sources=force_new_sources,
                 pkg_tool=pkg_tool,
                 env=self.common_env(version=version),
+                dry_run=dry_run,
             )
         else:
             # run the `post-modifications` action even if sources are not being processed
@@ -963,8 +966,37 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
+        dry_run: Literal[False] = False,
     ) -> tuple[PullRequest, dict[str, PullRequest]]:
-        """Overload for type-checking; return PullRequest if create_pr=True."""
+        """Overload: return PullRequest when create_pr=True and dry_run=False."""
+
+    @overload
+    def sync_release(
+        self,
+        dist_git_branch: Optional[str] = None,
+        versions: Optional[list[str]] = None,
+        tag: Optional[str] = None,
+        use_local_content=False,
+        add_new_sources=True,
+        force_new_sources=False,
+        upstream_ref: Optional[str] = None,
+        create_pr: Literal[True] = True,
+        force: bool = False,
+        create_sync_note: bool = True,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        local_pr_branch_suffix: str = "update",
+        mark_commit_origin: bool = False,
+        use_downstream_specfile: bool = False,
+        add_pr_instructions: bool = False,
+        resolved_bugs: Optional[list[str]] = None,
+        release_monitoring_project_id: Optional[int] = None,
+        pr_description_footer: Optional[str] = None,
+        sync_acls: Optional[bool] = False,
+        fast_forward_merge_branches: Optional[set[str]] = None,
+        dry_run: Literal[True] = ...,
+    ) -> tuple[None, dict[str, PullRequest]]:
+        """Overload: return None when create_pr=True but dry_run=True."""
 
     @overload
     def sync_release(
@@ -990,8 +1022,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
+        dry_run: bool = False,
     ) -> None:
-        """Overload for type-checking; return None if create_pr=False."""
+        """Overload: return None when create_pr=False."""
 
     def sync_release(
         self,
@@ -1016,7 +1049,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         pr_description_footer: Optional[str] = None,
         sync_acls: Optional[bool] = False,
         fast_forward_merge_branches: Optional[set[str]] = None,
-    ) -> Optional[tuple[PullRequest, dict[str, PullRequest]]]:
+        dry_run: bool = False,
+    ) -> Optional[tuple[Optional[PullRequest], dict[str, PullRequest]]]:
         """
         Update given package in dist-git
 
@@ -1052,12 +1086,15 @@ The first dist-git commit to be synced is '{short_hash}'.
                 fork when creating a PR from fork.
             fast_forward_merge_branches: Set of branches `dist_git_branch` should be
                 fast-forward-merged into.
+            dry_run: Prepare dist-git locally without pushing to remote or uploading to
+                lookaside cache.
 
         Returns:
             Tuple of the created (or existing if one already exists) PullRequest and
              dictionary of branches from fast_forward_merge_branches as keys and
-             PullRequest objects as values if
-            create_pr is True, else None.
+             PullRequest objects as values if create_pr is True, else None.
+             When dry_run is True, PullRequest will be None (PR is not created).
+             When create_pr is False, returns None.
 
         Raises:
             PackitException, if both 'version' and 'tag' are provided.
@@ -1263,6 +1300,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 mark_commit_origin=mark_commit_origin,
                 check_dist_git_pristine=False,
                 resolved_bugs=resolved_bugs,
+                dry_run=dry_run,
             )
 
             pr = None
@@ -1282,15 +1320,21 @@ The first dist-git commit to be synced is '{short_hash}'.
                 footer = (
                     f"\n---\n\n{pr_description_footer}" if pr_description_footer else ""
                 )
-                pr = self.push_and_create_pr(
-                    pr_title=pr_title,
-                    pr_description=f"{pr_description}{pr_instructions}{footer}",
-                    git_branch=dist_git_branch,
-                    repo=self.dg,
-                    sync_acls=sync_acls,
-                )
+                if dry_run:
+                    logger.info(
+                        "Dry run: skipping push and PR creation for branch %s",
+                        dist_git_branch,
+                    )
+                else:
+                    pr = self.push_and_create_pr(
+                        pr_title=pr_title,
+                        pr_description=f"{pr_description}{pr_instructions}{footer}",
+                        git_branch=dist_git_branch,
+                        repo=self.dg,
+                        sync_acls=sync_acls,
+                    )
 
-                if fast_forward_merge_branches:
+                if fast_forward_merge_branches and not dry_run:
                     for ff_branch in fast_forward_merge_branches:
                         logger.info(
                             f"Syncing branch {ff_branch} defined in `fast_forward_merge_into`",
@@ -1344,8 +1388,19 @@ The first dist-git commit to be synced is '{short_hash}'.
                             target_branch=ff_branch,
                             repo=self.dg,
                         )
+                elif fast_forward_merge_branches and dry_run:
+                    logger.info(
+                        "Dry run: skipping fast-forward merge branches: %s",
+                        fast_forward_merge_branches,
+                    )
             else:
-                self.dg.push(refspec=f"HEAD:{dist_git_branch}")
+                if dry_run:
+                    logger.info(
+                        "Dry run: skipping push to %s",
+                        dist_git_branch,
+                    )
+                else:
+                    self.dg.push(refspec=f"HEAD:{dist_git_branch}")
         finally:
             # version should hold the plain version string
             if version.startswith("v"):
@@ -1774,6 +1829,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         force_new_sources: bool,
         pkg_tool: str = "",
         env: Optional[dict] = None,
+        dry_run: bool = False,
     ):
         """Download upstream archive and upload it to dist-git lookaside cache.
 
@@ -1785,6 +1841,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                 you want to upload archive with the same name but different hash.
             pkg_tool: Tool to upload sources.
             env: Environment to pass to the `post-modifications` action.
+            dry_run: Skip uploading to lookaside cache if True.
         """
         # We need to download the sources beforehand! Previous solution was relying
         # on the HTTP index of the uploaded archives in the lookaside cache which
@@ -1818,21 +1875,31 @@ The first dist-git commit to be synced is '{short_hash}'.
         if (
             not self.should_archives_be_uploaded_to_lookaside(archives)
             and not force_new_sources
+            and not dry_run
         ):
             return
 
         # There is at least one archive to upload,
         # because it is missing from lookaside, sources file, or both,
         # or because force_new_sources is set.
-        self.init_kerberos_ticket()
+        if dry_run:
+            logger.info(
+                "Dry run: updating sources file without uploading "
+                "to lookaside cache for archives: %s",
+                [archive.name for archive in archives],
+            )
+        else:
+            self.init_kerberos_ticket()
+
         # Upload all of archives. If we uploaded only those that need uploading,
         # we would lose the unchanged ones from sources file,
         # because upload_to_lookaside_cache maintains the sources file in addition
         # to uploading, and it replaces it entirely, losing the previous content
+        # In dry-run mode, use offline=True to update the sources file without uploading
         self.dg.upload_to_lookaside_cache(
             archives=archives,
             pkg_tool=pkg_tool,
-            offline=not self.package_config.upload_sources,
+            offline=dry_run or not self.package_config.upload_sources,
         )
 
     def should_archives_be_uploaded_to_lookaside(self, archives: list[Path]) -> bool:
