@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import itertools
 import logging
 from datetime import datetime, timedelta
 
@@ -42,16 +43,12 @@ class Status:
         :param number_of_prs: int
         :return: List of downstream PRs
         """
-        table: list[tuple[int, str, str]] = []
-        pr_list = self.dg.local_project.git_project.get_pr_list()
+        pr_list = itertools.islice(
+            self.dg.local_project.git_project.get_pr_list(),
+            number_of_prs,
+        )
         logger.debug("Downstream PRs fetched.")
-        if len(pr_list) > 0:
-            # take last `number_of_prs` PRs
-            pr_list = (
-                pr_list[:number_of_prs] if len(pr_list) > number_of_prs else pr_list
-            )
-            table = [(pr.id, pr.title, pr.url) for pr in pr_list]
-        return table
+        return [(pr.id, pr.title, pr.url) for pr in pr_list]
 
     def get_dg_versions(self) -> dict:
         """
