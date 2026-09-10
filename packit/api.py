@@ -32,7 +32,7 @@ import git
 import yaml
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
-from ogr.exceptions import PagureAPIException
+from ogr.exceptions import APIException
 from ogr.services.gitlab.project import GitlabProject
 from ogr.services.pagure.project import PagureProject
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
@@ -1743,7 +1743,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             )
             try:
                 pr.update_info(pr_title, pr_description)
-            except PagureAPIException as exc:
+            except APIException as exc:
                 logger.error(f"Update of existing PR {pr.url} failed: {exc}")
                 raise PackitException(f"Update of existing PR {pr.url} failed") from exc
         return pr
