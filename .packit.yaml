@@ -112,7 +112,6 @@ jobs:
 
   - job: koji_build
     trigger: commit | koji_build
-    packit_instances: ["stg"]
     allowed_pr_authors: ["packit-stg", "packit"]
     sidetag_group: packit-specfile-ogr-releases
     dependencies:
@@ -124,7 +123,6 @@ jobs:
 
   - job: bodhi_update
     trigger: koji_build
-    packit_instances: ["stg"]
     allowed_builders: ["packit-stg", "packit"]
     sidetag_group: packit-specfile-ogr-releases
     dependencies:
