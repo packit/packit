@@ -283,3 +283,11 @@ HTTP_REQUEST_TIMEOUT = (10, 30)
 FAST_FORWARD_MERGE_INTO_KEY = "fast_forward_merge_into"
 
 PACKAGE_CONFIG_HEADERS = {"Accept": "application/yaml"}
+
+USER_CONFIG_FILE_DOCS_URL = (
+    "https://packit.dev/docs/configuration#user-configuration-file"
+)
+PAGURE_API_KEY_ERROR_MSG = (
+    "You need to add an API key for Pagure in your packit config file. "
+    f"See {USER_CONFIG_FILE_DOCS_URL} for details."
+)
