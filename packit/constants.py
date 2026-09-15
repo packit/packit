@@ -218,6 +218,7 @@ SYNC_RELEASE_PR_DESCRIPTION = (
     "{upstream_commit_info}\n"
     "{release_monitoring_info}"
     "{resolved_bugzillas_info}"
+    "{automatic_steps_info}"
 )
 
 SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS = (

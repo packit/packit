@@ -41,6 +41,7 @@ def package_config_mock():
         parse_time_macros={},
         version_suffix=None,
         release_suffix=None,
+        jobs=[],
     )
     mock.should_receive("get_base_env").and_return({})
     mock.should_receive("get_all_files_to_sync").and_return(files_to_sync)
