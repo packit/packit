@@ -8,6 +8,7 @@ from typing import Optional, Union
 import pytest
 from distro import linux_distribution
 from flexmock import flexmock
+from ogr.services.pagure import PagureService
 from specfile import Specfile
 from specfile.changelog import ChangelogEntry
 
@@ -17,6 +18,7 @@ from packit.command_handler import LocalCommandHandler
 from packit.config import CommonPackageConfig, Config, PackageConfig, RunCommandType
 from packit.config.sources import SourcesItem
 from packit.distgit import DistGit
+from packit.exceptions import PackitException
 from packit.local_project import LocalProject, LocalProjectBuilder
 from packit.upstream import GitUpstream
 from packit.utils import commands
@@ -1162,3 +1164,49 @@ def test_default_macro_definitions(
     )
     dist_git._specfile_path = distgit_spec_path
     assert dist_git.specfile.macros == result
+
+
+def _base_with_service(service):
+    base = PackitRepositoryBase(config=flexmock(), package_config=flexmock())
+    base.local_project = flexmock(git_service=service)
+    return base
+
+
+def test_get_user_pagure_auth_failure_raises_clear_message():
+    service = PagureService(
+        token="invalid-token",
+        instance_url="https://src.fedoraproject.org",
+    )
+    flexmock(service).should_receive("user").and_raise(
+        requests.exceptions.ConnectionError(
+            "HTTPSConnectionPool(host='src.fedoraproject.org', port=443): "
+            "Max retries exceeded with url: /api/0/-/whoami "
+            "(Caused by ResponseError('too many 401 error responses'))",
+        ),
+    )
+
+    with pytest.raises(PackitException, match="API key for pagure"):
+        _base_with_service(service).get_user()
+
+
+def test_get_user_pagure_non_auth_network_error_propagates():
+    service = PagureService(
+        token="valid-looking-token",
+        instance_url="https://src.fedoraproject.org",
+    )
+    original = requests.exceptions.ConnectionError("Connection refused")
+    flexmock(service).should_receive("user").and_raise(original)
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        _base_with_service(service).get_user()
+
+
+def test_get_user_non_pagure_auth_failure_propagates():
+    service = flexmock()
+    original = requests.exceptions.ConnectionError(
+        "Max retries exceeded (Caused by ResponseError('too many 401 error responses'))",
+    )
+    flexmock(service).should_receive("user").and_raise(original)
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        _base_with_service(service).get_user()
