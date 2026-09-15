@@ -231,10 +231,11 @@ SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS = (
     "(maintainer edits should be allowed on this pull request):\n"
     "```\n"
     "cd {package}\n"
-    "git fetch ssh://git@pkgs.fedoraproject.org/{user}/{package}.git {branch}:{branch}\n"
+    "git remote add packit ssh://git@pkgs.fedoraproject.org/{user}/{package}.git\n"
+    "git fetch packit refs/heads/{branch}\n"
     "git switch {branch}\n"
     "# make your changes, then:\n"
-    "git push ssh://git@pkgs.fedoraproject.org/{user}/{package}.git {branch}\n"
+    "git push packit {branch}\n"
     "```"
 )
 
