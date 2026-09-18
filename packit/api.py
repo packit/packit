@@ -33,6 +33,7 @@ import yaml
 from git.exc import GitCommandError
 from ogr.abstract import PullRequest
 from ogr.exceptions import APIException
+from ogr.services.forgejo.project import ForgejoProject
 from ogr.services.gitlab.project import GitlabProject
 from ogr.services.pagure.project import PagureProject
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
@@ -60,6 +61,7 @@ from packit.constants import (
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
     SYNC_RELEASE_PR_CHECKLIST,
     SYNC_RELEASE_PR_DESCRIPTION,
+    SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS,
     SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS,
     SYNC_RELEASE_PR_KOJI_NOTE,
     SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS,
@@ -1485,6 +1487,8 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns: instructions to include in PR
         """
         instructions: list[str] = []
+
+        # TODO: remove this after the migration to Forgejo dist-git
         if isinstance(self.dg.local_project.git_project, PagureProject):
             instructions.append(
                 SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS.format(
@@ -1493,6 +1497,21 @@ The first dist-git commit to be synced is '{short_hash}'.
                     user=self.config.fas_user,
                 ),
             )
+
+        if isinstance(self.dg.local_project.git_project, ForgejoProject):
+            instructions.append(
+                SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS.format(
+                    package=self.dg.local_project.repo_name,
+                    branch=local_pr_branch,
+                    user=self.config.fas_user,
+                ),
+            )
+
+        # TODO: remove PagureProject after the migration to Forgejo dist-git
+        if isinstance(
+            self.dg.local_project.git_project,
+            (ForgejoProject, PagureProject),
+        ):
             # TODO once Koji builds work for GitLab, this should be handled differently
             instructions.append(SYNC_RELEASE_PR_KOJI_NOTE)
 

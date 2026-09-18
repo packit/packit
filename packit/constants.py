@@ -225,6 +225,20 @@ SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS = (
     "the instructions under `Code -> Check out branch` in the right sidebar."
 )
 
+SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS = (
+    "If you need to do any change in this pull request, you can fetch the source "
+    "branch from Packit's fork and push directly to it "
+    "(maintainer edits should be allowed on this pull request):\n"
+    "```\n"
+    "cd {package}\n"
+    "git remote add packit ssh://git@pkgs.fedoraproject.org/{user}/{package}.git\n"
+    "git fetch packit refs/heads/{branch}\n"
+    "git switch {branch}\n"
+    "# make your changes, then:\n"
+    "git push packit {branch}\n"
+    "```"
+)
+
 SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS = (
     "If you need to do any change in this pull request, you can clone Packit's fork "
     "and push directly to the source branch of this PR (provided you have commit access "
