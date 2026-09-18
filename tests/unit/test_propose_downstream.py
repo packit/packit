@@ -5,6 +5,7 @@ import pytest
 from flexmock import flexmock
 
 from packit.api import PackitAPI
+from packit.cli import propose_downstream
 from packit.cli.propose_downstream import get_dg_branches
 from packit.config import (
     CommonPackageConfig,
@@ -278,3 +279,54 @@ def test_get_dist_git_branches(package_config, cmdline, expected):
     api.dg = flexmock(local_project=local_project)
 
     assert get_dg_branches(api, cmdline) == expected
+
+
+def _dry_run_api():
+    """Build a PackitAPI whose forge lookup (git_project.default_branch) raises
+    if it is ever accessed, so tests can prove dry-run stays offline."""
+    api = flexmock(PackitAPI)
+    api.package_config = PackageConfig(
+        packages={"package": CommonPackageConfig(specfile_path="xxx")},
+        jobs=[
+            JobConfig(
+                type=JobType.propose_downstream,
+                trigger=JobConfigTriggerType.pull_request,
+                packages={"package": CommonPackageConfig(specfile_path="xxx")},
+            ),
+        ],
+    )
+    git_repo = flexmock()
+    git_project = flexmock()
+    git_project.should_receive("default_branch").and_raise(
+        AssertionError("forge API must not be queried in dry-run mode"),
+    )
+    local_project = flexmock(git_repo=git_repo, git_project=git_project)
+    api.dg = flexmock(local_project=local_project)
+    return api, git_repo
+
+
+@pytest.mark.usefixtures("mock_get_aliases")
+def test_get_dist_git_branches_dry_run_no_branches():
+    """With no branches given, dry-run falls back to the local clone's default
+    branch instead of the forge API."""
+    api, git_repo = _dry_run_api()
+    flexmock(propose_downstream).should_receive("get_default_branch").with_args(
+        git_repo,
+    ).and_return("local_default").once()
+
+    assert get_dg_branches(api, None, dry_run=True) == {"local_default"}
+
+
+@pytest.mark.usefixtures("mock_get_aliases")
+def test_get_dist_git_branches_dry_run_with_branches():
+    """When branches are given explicitly, dry-run uses them without querying
+    the forge API for the default branch."""
+    api, git_repo = _dry_run_api()
+    flexmock(propose_downstream).should_receive("get_default_branch").with_args(
+        git_repo,
+    ).and_return("local_default")
+
+    assert get_dg_branches(api, "cmdline1,cmdline2", dry_run=True) == {
+        "cmdline1",
+        "cmdline2",
+    }
