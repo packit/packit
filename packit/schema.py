@@ -473,6 +473,7 @@ class JobMetadataSchema(Schema):
     fmf_ref = fields.String(load_default=None)
     fmf_path = fields.String(load_default=None)
     skip_build = fields.Boolean()
+    skip_install = fields.Boolean()
     env = fields.Dict(keys=fields.String(), load_default=None)
     enable_net = fields.Boolean(load_default=False)
     tmt_plan = fields.String(load_default=None)
@@ -725,6 +726,7 @@ class JobConfigSchema(Schema):
         },
     )
     skip_build = fields.Boolean()
+    skip_install = fields.Boolean()
     manual_trigger = fields.Boolean()
     labels = fields.List(fields.String(), load_default=None)
     packages = fields.Dict(

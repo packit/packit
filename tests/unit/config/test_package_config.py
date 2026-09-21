@@ -2183,6 +2183,75 @@ def test_specfile_path_not_defined_in_test_only_jobs(raw):
     assert PackageConfig.get_from_dict(raw_dict=raw, repo_name="package")
 
 
+def test_skip_install_defaults_to_false():
+    """The 'skip_install' option defaults to False on both the job config
+    and the package config.
+    """
+    config = PackageConfig.get_from_dict(
+        raw_dict={
+            "jobs": [
+                {
+                    "job": "tests",
+                    "trigger": "pull_request",
+                    "targets": ["fedora-stable"],
+                    "specfile_path": "package.spec",
+                },
+            ],
+        },
+        repo_name="package",
+    )
+    job = config.jobs[0]
+    assert job.skip_install is False
+    assert all(not p.skip_install for p in job.packages.values())
+
+
+def test_skip_install_loaded_from_job_config():
+    """The 'skip_install' option can be set at the job level and is
+    independent of 'skip_build'.
+    """
+    config = PackageConfig.get_from_dict(
+        raw_dict={
+            "jobs": [
+                {
+                    "job": "tests",
+                    "trigger": "pull_request",
+                    "targets": ["fedora-stable"],
+                    "specfile_path": "package.spec",
+                    "skip_install": True,
+                },
+            ],
+        },
+        repo_name="package",
+    )
+    job = config.jobs[0]
+    assert job.skip_install is True
+    assert job.skip_build is False
+
+
+def test_skip_install_loaded_from_deprecated_metadata():
+    """The 'skip_install' option can be set via the deprecated 'metadata'
+    dictionary, same as 'skip_build'.
+    """
+    config = PackageConfig.get_from_dict(
+        raw_dict={
+            "jobs": [
+                {
+                    "job": "tests",
+                    "trigger": "pull_request",
+                    "specfile_path": "package.spec",
+                    "metadata": {
+                        "targets": ["fedora-stable"],
+                        "skip_install": True,
+                    },
+                },
+            ],
+        },
+        repo_name="package",
+    )
+    job = config.jobs[0]
+    assert job.skip_install is True
+
+
 @pytest.mark.parametrize(
     "package_name,result",
     ((None, None), ("baz", "https://foo/bar/baz.git")),
