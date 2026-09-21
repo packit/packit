@@ -178,6 +178,9 @@ class CommonPackageConfig:
         fmf_path: - path to the fmf root
         use_internal_tf: if we want to use internal instance of Testing Farm
         skip_build: if we want to skip build phase for Testing Farm job
+        skip_install: if we want Testing Farm to skip installing the Copr build
+            artifacts (build still runs and artifacts are attached, but their
+            packages are not installed); independent of skip_build
         env: environment variables
         enable_net: if set to False, Copr builds have network disabled
         allowed_pr_authors: List of Fedora accounts for which distgit PRs we
@@ -271,6 +274,7 @@ class CommonPackageConfig:
         fmf_path: Optional[str] = None,
         use_internal_tf: bool = False,
         skip_build: bool = False,
+        skip_install: bool = False,
         env: Optional[dict[str, Any]] = None,
         enable_net: bool = False,
         allowed_pr_authors: Optional[list[str]] = None,
@@ -403,6 +407,7 @@ class CommonPackageConfig:
         self.fmf_path: str = fmf_path
         self.use_internal_tf: bool = use_internal_tf
         self.skip_build: bool = skip_build
+        self.skip_install: bool = skip_install
         self.env: dict[str, Any] = env or {}
         self.enable_net = enable_net
         self.allowed_pr_authors = (

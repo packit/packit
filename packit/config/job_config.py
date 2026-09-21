@@ -51,6 +51,7 @@ class JobConfig(MultiplePackages):
         trigger: JobConfigTriggerType,
         packages: dict[str, CommonPackageConfig],
         skip_build: bool = False,
+        skip_install: bool = False,
         manual_trigger: bool = False,
         labels: Optional[list[str]] = None,
         sidetag_group: Optional[str] = None,
@@ -65,6 +66,7 @@ class JobConfig(MultiplePackages):
         self.__dict__["type"] = type
         self.__dict__["trigger"] = trigger
         self.__dict__["skip_build"] = skip_build
+        self.__dict__["skip_install"] = skip_install
         self.__dict__["manual_trigger"] = manual_trigger
         self.__dict__["labels"] = labels
         self.__dict__["sidetag_group"] = sidetag_group
@@ -132,6 +134,7 @@ class JobConfigView(JobConfig):
             job_config.trigger,
             job_config_view_packages,
             job_config.skip_build,
+            job_config.skip_install,
             job_config.manual_trigger,
             job_config.labels,
             job_config.sidetag_group,
