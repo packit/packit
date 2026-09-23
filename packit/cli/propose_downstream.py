@@ -20,11 +20,14 @@ from packit.constants import (
     PACKAGE_OPTION_HELP,
     PACKAGE_SHORT_OPTION,
 )
+from packit.utils import get_default_branch
 
 logger = logging.getLogger(__name__)
 
 
-def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
+def get_dist_git_branches(
+    api, dist_git_branch, pull_from_upstream=False, dry_run=False,
+):
     cmdline_dg_branches = dist_git_branch.split(",") if dist_git_branch else []
     config_dg_branches = []
     if isinstance(api.package_config, PackageConfig):
@@ -34,7 +37,14 @@ def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
             )
         )
 
-    default_dg_branch = api.dg.local_project.git_project.default_branch
+    if dry_run:
+        # In dry-run mode nothing is pushed to the remote, so avoid contacting
+        # the forge API (it fails for packages that don't exist on the remote,
+        # e.g. a local-only dist-git clone) and determine the default branch
+        # from the local dist-git clone instead.
+        default_dg_branch = get_default_branch(api.dg.local_project.git_repo)
+    else:
+        default_dg_branch = api.dg.local_project.git_project.default_branch
 
     dg_branches = (
         cmdline_dg_branches or config_dg_branches or default_dg_branch.split(",")
@@ -42,11 +52,12 @@ def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
     return dg_branches, default_dg_branch
 
 
-def get_dg_branches(api, dist_git_branch, pull_from_upstream=False):
+def get_dg_branches(api, dist_git_branch, pull_from_upstream=False, dry_run=False):
     dg_branches, default_dg_branch = get_dist_git_branches(
         api,
         dist_git_branch,
         pull_from_upstream,
+        dry_run=dry_run,
     )
     return get_branches(*dg_branches, default_dg_branch=default_dg_branch)
 
@@ -66,6 +77,7 @@ def sync_release(
     package_config,
     resolve_bug,
     sync_acls,
+    dry_run,
     check_for_non_git_upstream=False,
 ):
     api = get_packit_api(
@@ -82,6 +94,7 @@ def sync_release(
         api,
         dist_git_branch,
         pull_from_upstream=use_downstream_specfile,
+        dry_run=dry_run,
     )
 
     click.echo(
@@ -92,6 +105,7 @@ def sync_release(
         api,
         dist_git_branch,
         pull_from_upstream=use_downstream_specfile,
+        dry_run=dry_run,
     )
     branches_to_update = get_branches(
         *dist_git_branches,
@@ -109,6 +123,7 @@ def sync_release(
             use_downstream_specfile=use_downstream_specfile,
             resolved_bugs=resolve_bug,
             sync_acls=sync_acls,
+            dry_run=dry_run,
             fast_forward_merge_branches=get_fast_forward_merge_branches_for(
                 dist_git_branches=dist_git_branches,
                 source_branch=branch,
@@ -164,6 +179,13 @@ def sync_release_common_options(func):
         help="Sync ACLs between dist-git repo and the fork, is considered only with --pr option.",
     )
     @click.option(
+        "--dry-run",
+        is_flag=True,
+        default=False,
+        help="Prepare dist-git locally without pushing to remote "
+        "or uploading to lookaside cache.",
+    )
+    @click.option(
         PACKAGE_SHORT_OPTION,
         PACKAGE_LONG_OPTION,
         multiple=True,
@@ -215,6 +237,7 @@ def propose_downstream(
     sync_acls,
     resolve_bug,
     package_config,
+    dry_run,
 ):
     """
     Land a new upstream release in Fedora using upstream packit config.
@@ -240,6 +263,7 @@ def propose_downstream(
         package_config=package_config,
         resolve_bug=resolve_bug,
         sync_acls=sync_acls,
+        dry_run=dry_run,
     )
 
 
@@ -260,6 +284,7 @@ def pull_from_upstream(
     sync_acls,
     resolve_bug,
     package_config,
+    dry_run,
 ):
     """
     Land a new upstream release in Fedora using downstream packit config.
@@ -285,5 +310,6 @@ def pull_from_upstream(
         package_config=package_config,
         resolve_bug=resolve_bug,
         sync_acls=sync_acls,
+        dry_run=dry_run,
         check_for_non_git_upstream=True,
     )
