@@ -17,6 +17,13 @@ from packit import api as packit_api
 from packit.api import PackitAPI
 from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
 from packit.config.config import Config
+from packit.config.job_config import (
+    JobConfig as _JobConfig,
+)
+from packit.config.job_config import (
+    JobConfigTriggerType,
+    JobType,
+)
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, ReleaseSkippedPackitException
@@ -316,7 +323,11 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
     [
         pytest.param(
             (
-                "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+                "Upstream tag: _\nUpstream commit: _\n"
+                "\nWhen this PR is merged:\n"
+                "- Packit will **NOT** automatically build the package in Koji\n"
+                "- Packit will **NOT** automatically create a Bodhi update\n"
+                "\n---\n\n"
                 "If you need to do any change in this pull request, you can fetch the source "
                 "branch from Packit's fork and push directly to it "
                 "(maintainer edits should be allowed on this pull request):\n"
@@ -349,7 +360,11 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
         ),
         pytest.param(
             (
-                "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+                "Upstream tag: _\nUpstream commit: _\n"
+                "\nWhen this PR is merged:\n"
+                "- Packit will **NOT** automatically build the package in Koji\n"
+                "- Packit will **NOT** automatically create a Bodhi update\n"
+                "\n---\n\n"
                 "If you need to do any change in this pull request, you can clone Packit's fork "
                 "and push directly to the source branch of this PR (provided you have "
                 "commit access "
@@ -390,7 +405,11 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
         ),
         pytest.param(
             (
-                "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+                "Upstream tag: _\nUpstream commit: _\n"
+                "\nWhen this PR is merged:\n"
+                "- Packit will **NOT** automatically build the package in Koji\n"
+                "- Packit will **NOT** automatically create a Bodhi update\n"
+                "\n---\n\n"
                 "If you need to do any change in this pull request, follow "
                 "the instructions under `Code -> Check out branch` in the right sidebar.\n"
                 "\n---\n\n"
@@ -489,35 +508,52 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "",
             None,
             None,
-            "Upstream tag: 1.0.0\nUpstream commit: _\n",
+            "Upstream tag: 1.0.0\nUpstream commit: _\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
             "",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: _\n",
+            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: _\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
             "commit-link",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: [_](commit-link)\n",
+            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: [_](commit-link)\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
             "",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\n" "Upstream commit: _\n",
+            "Upstream tag: [1.0.0](tag-link)\n"
+            "Upstream commit: _\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
             "commit-link",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\n" "Upstream commit: [_](commit-link)\n",
+            "Upstream tag: [1.0.0](tag-link)\n"
+            "Upstream commit: [_](commit-link)\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -526,7 +562,10 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             None,
             "Upstream tag: [1.0.0](tag-link)\n"
             "Upstream commit: [_](commit-link)\n"
-            "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n",
+            "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -536,7 +575,10 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream tag: [1.0.0](tag-link)\n"
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
-            "Resolves: [rhbz#1234](https://bugzilla.redhat.com/show_bug.cgi?id=1234)\n",
+            "Resolves: [rhbz#1234](https://bugzilla.redhat.com/show_bug.cgi?id=1234)\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
         pytest.param(
             "tag-link",
@@ -546,7 +588,10 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "Upstream tag: [1.0.0](tag-link)\n"
             "Upstream commit: [_](commit-link)\n"
             "Release monitoring project: [12345](https://release-monitoring.org/project/12345)\n"
-            "Resolves: rhbz#not-a-number\n",
+            "Resolves: rhbz#not-a-number\n"
+            "\nWhen this PR is merged:\n"
+            "- Packit will **NOT** automatically build the package in Koji\n"
+            "- Packit will **NOT** automatically create a Bodhi update\n",
         ),
     ],
 )
@@ -568,6 +613,234 @@ def test_get_pr_description(
         )
         == result
     )
+
+
+class JobConfig(_JobConfig):
+    def __init__(self, *args, packages=None, **kwargs):
+        dist_git_branches = kwargs.pop("dist_git_branches", ...)
+        if packages is None:
+            pkg_kwargs = {}
+            if dist_git_branches is not ... and dist_git_branches is not None:
+                pkg_kwargs["dist_git_branches"] = dist_git_branches
+            packages = {"pkg": CommonPackageConfig(**pkg_kwargs)}
+        super().__init__(*args, packages=packages, **kwargs)
+        if dist_git_branches is None:
+            self.dist_git_branches = None
+
+
+def test_get_pr_description_with_jobs(config_mock, upstream_mock, distgit_mock):
+    """Test that automatic steps info reflects configured jobs correctly."""
+
+    def make_job(job_type):
+        return JobConfig(
+            type=job_type,
+            trigger=JobConfigTriggerType.commit,
+            packages={"pkg": CommonPackageConfig(dist_git_branches=["rawhide"])},
+        )
+
+    jobs = [
+        make_job(JobType.koji_build),
+        make_job(JobType.bodhi_update),
+    ]
+    package_config_mock = flexmock(jobs=jobs)
+    api = PackitAPI(config=config_mock, package_config=package_config_mock)
+    flexmock(api)
+    api._up = upstream_mock
+    api._dg = distgit_mock
+
+    flexmock(packit_api).should_receive("get_tag_link").and_return("tag-link")
+    flexmock(packit_api).should_receive("get_commit_link").and_return("commit-link")
+
+    result = api.get_pr_description("1.0.0", dist_git_branch="rawhide")
+    assert "When this PR is merged:" in result
+    assert "- Packit will **automatically** build the package in Koji" in result
+    assert "- Packit will **automatically** create a Bodhi update" in result
+    assert "**NOT** automatically" not in result
+
+
+def _make_filter_job(
+    job_type,
+    trigger=JobConfigTriggerType.commit,
+    dist_git_branches=None,
+    manual_trigger=False,
+    labels=None,
+    allowed_pr_authors=None,
+):
+    pkg_kwargs = {}
+    if dist_git_branches is not None:
+        pkg_kwargs["dist_git_branches"] = dist_git_branches
+    if allowed_pr_authors is not None:
+        pkg_kwargs["allowed_pr_authors"] = allowed_pr_authors
+
+    return JobConfig(
+        type=job_type,
+        trigger=trigger,
+        packages={"pkg": CommonPackageConfig(**pkg_kwargs)},
+        manual_trigger=manual_trigger,
+        labels=labels,
+    )
+
+
+@pytest.mark.parametrize(
+    "jobs, target_branch, fas_user, expected_koji, expected_bodhi",
+    (
+        pytest.param(
+            [
+                _make_filter_job(JobType.koji_build, dist_git_branches=["rawhide"]),
+                _make_filter_job(JobType.bodhi_update, dist_git_branches=["rawhide"]),
+            ],
+            "rawhide",
+            "packit",
+            True,
+            True,
+            id="standard rawhide match - both run",
+        ),
+        pytest.param(
+            [
+                _make_filter_job(
+                    JobType.koji_build,
+                    dist_git_branches=["rawhide"],
+                    manual_trigger=True,
+                ),
+                _make_filter_job(
+                    JobType.bodhi_update,
+                    dist_git_branches=["rawhide"],
+                    manual_trigger=True,
+                ),
+            ],
+            "rawhide",
+            "packit",
+            False,
+            False,
+            id="manual_trigger - neither runs",
+        ),
+        pytest.param(
+            [
+                _make_filter_job(JobType.koji_build, dist_git_branches=["rawhide"]),
+                _make_filter_job(JobType.bodhi_update, dist_git_branches=["rawhide"]),
+            ],
+            "f43",
+            "packit",
+            False,
+            False,
+            id="branch mismatch - neither runs",
+        ),
+        pytest.param(
+            [
+                _make_filter_job(JobType.koji_build, dist_git_branches=["fedora-all"]),
+                _make_filter_job(JobType.bodhi_update, dist_git_branches=["rawhide"]),
+            ],
+            "f43",
+            "packit",
+            True,
+            False,
+            id="dist-git alias match - koji runs",
+        ),
+        pytest.param(
+            [
+                _make_filter_job(
+                    JobType.koji_build,
+                    dist_git_branches=["rawhide"],
+                    allowed_pr_authors=["other-user"],
+                ),
+                _make_filter_job(
+                    JobType.bodhi_update,
+                    dist_git_branches=["rawhide"],
+                    allowed_pr_authors=["other-user"],
+                ),
+            ],
+            "rawhide",
+            "packit",
+            False,
+            False,
+            id="author restriction - neither runs",
+        ),
+        pytest.param(
+            [
+                _make_filter_job(
+                    JobType.koji_build,
+                    dist_git_branches=["rawhide"],
+                    labels=["needs-ci"],
+                ),
+                _make_filter_job(
+                    JobType.bodhi_update,
+                    dist_git_branches=["rawhide"],
+                    labels=["needs-ci"],
+                ),
+            ],
+            "rawhide",
+            "packit",
+            False,
+            False,
+            id="required labels - neither runs",
+        ),
+        # No dist_git_branches configured -> applies to all branches (including rawhide)
+        pytest.param(
+            [
+                _make_filter_job(JobType.koji_build, dist_git_branches=None),
+                _make_filter_job(JobType.bodhi_update, dist_git_branches=["f40"]),
+            ],
+            "rawhide",
+            "packit",
+            True,
+            False,
+            id="unspecified dist_git_branches - matches all branches",
+        ),
+        pytest.param(
+            [
+                _make_filter_job(
+                    JobType.koji_build,
+                    trigger=JobConfigTriggerType.pull_request,
+                    dist_git_branches=["rawhide"],
+                ),
+            ],
+            "rawhide",
+            "packit",
+            False,
+            False,
+            id="koji with PR trigger - does not run on merge",
+        ),
+    ),
+)
+def test_get_pr_description_job_filters(
+    config_mock,
+    upstream_mock,
+    distgit_mock,
+    jobs,
+    target_branch,
+    fas_user,
+    expected_koji,
+    expected_bodhi,
+):
+    config_mock.fas_user = fas_user
+    package_config_mock = flexmock(jobs=jobs)
+    api = PackitAPI(config=config_mock, package_config=package_config_mock)
+    flexmock(api)
+    api._up = upstream_mock
+    api._dg = distgit_mock
+
+    flexmock(packit_api).should_receive("get_tag_link").and_return("tag-link")
+    flexmock(packit_api).should_receive("get_commit_link").and_return("commit-link")
+    flexmock(packit_api).should_receive("get_branches").replace_with(
+        lambda *branches, **kwargs: (
+            {target_branch, "rawhide"} if "fedora-all" in branches else set(branches)
+        ),
+    )
+
+    result = api.get_pr_description("1.0.0", dist_git_branch=target_branch)
+
+    koji_msg = (
+        "- Packit will **automatically** build the package in Koji"
+        if expected_koji
+        else "- Packit will **NOT** automatically build the package in Koji"
+    )
+    bodhi_msg = (
+        "- Packit will **automatically** create a Bodhi update"
+        if expected_bodhi
+        else "- Packit will **NOT** automatically create a Bodhi update"
+    )
+    assert koji_msg in result
+    assert bodhi_msg in result
 
 
 @pytest.mark.parametrize(
