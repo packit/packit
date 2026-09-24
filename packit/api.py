@@ -46,6 +46,7 @@ from packit.base_git import PackitRepositoryBase
 from packit.config import Config, PackageConfig, RunCommandType
 from packit.config.aliases import get_branches
 from packit.config.common_package_config import MockBootstrapSetup, MultiplePackages
+from packit.config.job_config import JobConfigTriggerType, JobType
 from packit.config.package_config import find_packit_yaml, load_packit_yaml
 from packit.config.package_config_validator import PackageConfigValidator
 from packit.constants import (
@@ -1275,6 +1276,7 @@ The first dist-git commit to be synced is '{short_hash}'.
                     upstream_tag=upstream_tag,
                     release_monitoring_project_id=release_monitoring_project_id,
                     resolved_bugs=resolved_bugs,
+                    dist_git_branch=dist_git_branch,
                 )
                 pr_instructions = (
                     f"\n---\n\n{self.get_pr_instructions(local_pr_branch=local_pr_branch)}\n"
@@ -1404,6 +1406,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         upstream_tag: str,
         release_monitoring_project_id: Optional[int] = None,
         resolved_bugs: Optional[list[str]] = None,
+        dist_git_branch: Optional[str] = None,
     ) -> str:
         """
         Get the description used in pull requests for syncing release.
@@ -1455,11 +1458,67 @@ The first dist-git commit to be synced is '{short_hash}'.
             else ""
         )
 
+        target_branch = dist_git_branch or getattr(
+            getattr(self, "dg", None),
+            "branch",
+            None,
+        )
+        koji_will_run = False
+        bodhi_will_run = False
+        fas_user = getattr(getattr(self, "config", None), "fas_user", None)
+
+        jobs = getattr(self.package_config, "jobs", None) or []
+        for job in jobs:
+            if job.type not in (JobType.koji_build, JobType.bodhi_update):
+                continue
+            if getattr(job, "manual_trigger", False):
+                continue
+            if (
+                job.type == JobType.koji_build
+                and job.trigger != JobConfigTriggerType.commit
+            ):
+                continue
+            dist_git_branches = getattr(job, "dist_git_branches", None)
+            if dist_git_branches and (
+                not target_branch
+                or target_branch
+                not in get_branches(*dist_git_branches, with_aliases=True)
+            ):
+                continue
+            if getattr(job, "labels", None):
+                continue
+            allowed_authors = getattr(job, "allowed_pr_authors", None)
+            if allowed_authors and (not fas_user or fas_user not in allowed_authors):
+                continue
+            if job.type == JobType.koji_build:
+                koji_will_run = True
+            elif job.type == JobType.bodhi_update:
+                bodhi_will_run = True
+            if koji_will_run and bodhi_will_run:
+                break
+
+        automatic_steps = [
+            (
+                "- Packit will **automatically** build the package in Koji"
+                if koji_will_run
+                else "- Packit will **NOT** automatically build the package in Koji"
+            ),
+            (
+                "- Packit will **automatically** create a Bodhi update"
+                if bodhi_will_run
+                else "- Packit will **NOT** automatically create a Bodhi update"
+            ),
+        ]
+        automatic_steps_info = (
+            "\nWhen this PR is merged:\n" + "\n".join(automatic_steps) + "\n"
+        )
+
         return SYNC_RELEASE_PR_DESCRIPTION.format(
             upstream_tag_info=tag_info,
             upstream_commit_info=commit_info,
             release_monitoring_info=release_monitoring_info,
             resolved_bugzillas_info=resolved_bugzillas_info,
+            automatic_steps_info=automatic_steps_info,
         )
 
     def get_pr_default_title_and_description(self):
