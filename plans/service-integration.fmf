@@ -1,0 +1,24 @@
+discover:
+    how: fmf
+    url: https://github.com/mfocko/packit-service
+    ref: ci/tmt
+
+prepare:
+  - how: install
+    copr: packit/packit-dev
+
+  # make sure the Copr repo has higher priority than TF Tag Repository
+  - how: shell
+    script: sed -i -n '/^priority=/!p;$apriority=5' /etc/yum.repos.d/*:packit:packit-dev.repo
+
+adjust:
+  - when: "how == integration"
+    because: "provide latest packit rpm when running locally"
+    prepare+:
+      - name: packit rpm
+        how: install
+        directory: noarch/
+
+  - when: "distro != fedora-41"
+    because: "Packit Service is currently being deployed only on Fedora 41"
+    enabled: false
