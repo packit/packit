@@ -4,6 +4,7 @@
 """
 Functional tests for prepare-sources command
 """
+
 from pathlib import Path
 
 import pytest
