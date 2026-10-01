@@ -14,12 +14,15 @@ on:
   workflow_dispatch:
     inputs:
       event_type:
+        description: Type of event that triggered prioritization (e.g. issue, pull_request)
         required: true
         type: string
       source_repo:
+        description: Repository that triggered this workflow run (owner/repo)
         required: true
         type: string
       event_payload:
+        description: JSON-encoded payload of the triggering event
         required: true
         type: string
       project_number:
