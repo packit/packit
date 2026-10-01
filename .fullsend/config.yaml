@@ -1,0 +1,24 @@
+# fullsend per-repo configuration
+# https://github.com/fullsend-ai/fullsend
+#
+# This file configures fullsend for per-repo installation mode.
+# See https://fullsend.sh/docs/guides/infrastructure/layered-config-reference
+version: "1"
+runtime: claude
+roles:
+  - triage
+  - coder
+  - review
+  - fix
+allowed_remote_resources:
+  - https://raw.githubusercontent.com/fullsend-ai/fullsend/
+  - https://raw.githubusercontent.com/fullsend-ai/agents/
+create_issues:
+  allow_targets:
+    repos:
+      - packit/packit
+      - fullsend-ai/fullsend
+mint_url: https://mint.fullsend.sh
+inference:
+  project: it-gcp-ymir-fullsend
+  wif_provider: projects/923950484420/locations/global/workloadIdentityPools/fullsend-inference/providers/gh-packit-packit
