@@ -2016,6 +2016,7 @@ def test_specfile_path_from_downstream_package_name():
         PackageConfig(
             packages={
                 "main": CommonPackageConfig(
+                    use_copr_dist_git_build=True,
                     specfile_path="fedora/package.spec",
                     upstream_project_url="https://github.com/asd/qwe",
                     upstream_package_name="qwe",
@@ -2250,6 +2251,96 @@ def test_skip_install_loaded_from_deprecated_metadata():
     )
     job = config.jobs[0]
     assert job.skip_install is True
+
+
+def test_use_copr_dist_git_build():
+    config = PackageConfig.get_from_dict(
+        raw_dict={
+            "downstream_package_name": "package",
+            "specfile_path": "fedora/package.spec",
+            "use_copr_dist_git_build": True,
+            "jobs": [
+                {
+                    "job": "copr_build",
+                    "trigger": "commit",
+                    "metadata": {
+                        "targets": ["fedora-43"],
+                    },
+                },
+            ],
+        },
+        repo_name="package",
+    )
+
+    job = config.jobs[0]
+
+    assert job.use_copr_dist_git_build is True
+
+
+def test_use_copr_dist_git_build_default_value():
+    config = PackageConfig.get_from_dict(
+        raw_dict={
+            "downstream_package_name": "package",
+            "specfile_path": "fedora/package.spec",
+            "jobs": [
+                {
+                    "job": "copr_build",
+                    "trigger": "commit",
+                    "metadata": {
+                        "targets": ["fedora-44"],
+                    },
+                },
+            ],
+        },
+        repo_name="package",
+    )
+
+    job = config.jobs[0]
+
+    assert job.use_copr_dist_git_build is False
+
+
+def test_use_copr_dist_git_build_set_on_job_level():
+    config = PackageConfig.get_from_dict(
+        raw_dict={
+            "downstream_package_name": "package",
+            "specfile_path": "fedora/package.spec",
+            "jobs": [
+                {
+                    "job": "copr_build",
+                    "trigger": "commit",
+                    "identifier": "Fedora 44 job",
+                    "metadata": {
+                        "targets": ["fedora-44"],
+                    },
+                },
+                {
+                    "job": "copr_build",
+                    "trigger": "commit",
+                    "identifier": "Fedora 45 job",
+                    "metadata": {
+                        "use_copr_dist_git_build": True,
+                        "targets": ["fedora-45"],
+                    },
+                },
+            ],
+        },
+        repo_name="package",
+    )
+
+    job_f44 = config.jobs[0]
+    job_f45 = config.jobs[1]
+
+    # It is legal to set use_copr_dist_git_build on job-level,
+    # but it's prone to error as it's easy to omit it.
+    # The value of use_copr_dist_git_build is dependant on the
+    # format of the repo and so its value should not differ
+    # across jobs like this.
+    assert job_f44.use_copr_dist_git_build is False
+    assert job_f44.identifier == "Fedora 44 job"
+
+    assert job_f45.use_copr_dist_git_build is True
+    assert job_f45.identifier == "Fedora 45 job"
 
 
 @pytest.mark.parametrize(
