@@ -166,6 +166,29 @@ RPM_MACROS_FOR_PREP = [
     '%{__git} commit %{-q} -m %{-m*} -m "${metadata_commit_msg}" --author "%{__scm_author}"',
 ]
 
+COPR_DISTGIT_SOURCE_SCRIPT = """
+#!/bin/sh
+
+# exit on error
+set -e
+
+git config --global user.email "hello@packit.dev"
+git config --global user.name "Packit"
+
+dist-git-client clone {package} --dist-git {dist_git}
+cd {package}
+
+# custom steps
+# depend on whether this Copr build is submitted
+# as a result of a commit, pull-request or release trigger
+{custom_steps}
+
+dist-git-client sources
+dist-git-client srpm --outputdir .
+bsdtar xf *.src.rpm -C "$COPR_RESULTDIR"
+
+"""
+
 COPR_SOURCE_SCRIPT = """
 #!/bin/sh
 

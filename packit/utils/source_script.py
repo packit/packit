@@ -3,7 +3,57 @@
 
 from typing import Optional
 
-from packit.constants import COPR_SOURCE_SCRIPT
+from packit.constants import (
+    COPR_DISTGIT_SOURCE_SCRIPT,
+    COPR_SOURCE_SCRIPT,
+)
+
+
+def create_distgit_source_script(
+    package: str,
+    dist_git: str = "rhel",
+    ref: Optional[str] = None,
+    pr_id: Optional[str] = None,
+    url: Optional[str] = None,
+    merge_pr: Optional[bool] = True,
+    target_branch: Optional[str] = None,
+):
+    custom_steps: str
+
+    if pr_id and merge_pr:
+        custom_steps = "\n".join(
+            [
+                f"git remote add source {url}",
+                "",
+                f"git fetch source refs/merge-requests/{pr_id}/head:refs/packit/pr-head",
+                f"git fetch origin {target_branch}:refs/packit/target",
+                "",
+                "git checkout --detach refs/packit/target",
+                "git merge --no-ff --no-edit refs/packit/pr-head",
+            ],
+        )
+    elif pr_id:
+        custom_steps = "\n".join(
+            [
+                f"git remote add source {url}",
+                "",
+                f"git fetch source refs/merge-requests/{pr_id}/head",
+                "git checkout --detach FETCH_HEAD",
+            ],
+        )
+    else:
+        custom_steps = "\n".join(
+            [
+                f"git fetch origin {ref}",
+                "git checkout --detach FETCH_HEAD",
+            ],
+        )
+
+    return COPR_DISTGIT_SOURCE_SCRIPT.format(
+        package=package,
+        dist_git=dist_git,
+        custom_steps=custom_steps,
+    )
 
 
 def create_source_script(
