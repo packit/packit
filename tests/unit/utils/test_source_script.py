@@ -5,6 +5,7 @@ import textwrap
 
 import pytest
 
+from packit.exceptions import PackitException
 from packit.utils.source_script import (
     create_distgit_source_script,
     create_source_script,
@@ -208,3 +209,56 @@ def test_create_from_dist_git(
     )
 
     assert expected == result
+
+
+@pytest.mark.parametrize(
+    "ref, pr_id, merge_pr, target_branch, package, dist_git, url",
+    [
+        (
+            None,
+            "12345",
+            True,
+            None,
+            "ogr",
+            "rhel",
+            "https://gitlab.com/packit/ogr",
+        ),
+        (
+            None,
+            None,
+            False,
+            "main",
+            "ogr",
+            "rhel",
+            "https://gitlab.com/packit/ogr",
+        ),
+        (
+            None,
+            "12345",
+            False,
+            "main",
+            "ogr",
+            "rhel",
+            None,
+        ),
+    ],
+)
+def test_create_from_dist_git_raise_error_on_missing_required_arguments(
+    ref,
+    pr_id,
+    merge_pr,
+    target_branch,
+    package,
+    dist_git,
+    url,
+):
+    with pytest.raises(PackitException):
+        create_distgit_source_script(
+            ref=ref,
+            pr_id=pr_id,
+            url=url,
+            merge_pr=merge_pr,
+            target_branch=target_branch,
+            package=package,
+            dist_git=dist_git,
+        )

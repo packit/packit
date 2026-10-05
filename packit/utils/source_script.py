@@ -7,6 +7,7 @@ from packit.constants import (
     COPR_DISTGIT_SOURCE_SCRIPT,
     COPR_SOURCE_SCRIPT,
 )
+from packit.exceptions import PackitException
 
 
 def create_distgit_source_script(
@@ -20,7 +21,18 @@ def create_distgit_source_script(
 ):
     custom_steps: str
 
+    if pr_id and not url:
+        raise PackitException(
+            "Pull/merge request ID was given, but clone URL is missing.",
+        )
+
     if pr_id and merge_pr:
+        if not target_branch:
+            raise PackitException(
+                "The merge_pr_in_ci option is enabled, but no target branch was given, "
+                "therefore Packit cannot merge this PR.",
+            )
+
         custom_steps = "\n".join(
             [
                 f"git remote add source {url}",
@@ -41,12 +53,18 @@ def create_distgit_source_script(
                 "git checkout --detach FETCH_HEAD",
             ],
         )
-    else:
+    elif ref:
         custom_steps = "\n".join(
             [
                 f"git fetch origin {ref}",
                 "git checkout --detach FETCH_HEAD",
             ],
+        )
+
+    else:
+        raise PackitException(
+            "No pull request ID, commit sha or tag was given when creating a custom "
+            "script to be used by Copr when submitting a build from a dist-git repo.",
         )
 
     return COPR_DISTGIT_SOURCE_SCRIPT.format(
