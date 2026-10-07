@@ -19,7 +19,36 @@ def create_distgit_source_script(
     merge_pr: Optional[bool] = True,
     target_branch: Optional[str] = None,
 ):
-    custom_steps: str
+    """
+    Returns a source script for Copr builds from dist-git repos intended
+    to be submitted via Copr's BuildProxy.create_from_custom().
+    The script is based on the template from the Copr user documentation:
+
+    https://docs.copr.fedorainfracloud.org/user_documentation.html#faq-autospec
+
+    When it comes to pull/merge requests, only GitLab MRs are currently supported.
+
+    Args:
+        package: Package name.
+        dist_git: Dist-git instance to be used by dist-git-client.
+        ref: Commit SHA, tag or a branch.
+        pr_id: Pull/merge request ID, if applicable.
+        url: Clone URL of the project containing the MR ref.
+            Only needed for pull/merge requests.
+        merge_pr: Whether to merge the given PR into the
+            target branch before submitting a build in Copr.
+            Refer to the merge_pr_in_ci config option for reference.
+            Only applicable to pull/merge requests.
+        target_branch: Pull/merge request target branch, if applicable.
+
+    Returns:
+        String representation of the source script to be passed to Copr
+            when submitting Copr builds from a dist-git repo.
+
+    Raises:
+        PackitException: If neither ref nor pr_id is provided; if a pull/merge request
+            has no URL; or if merging a pull/merge request without a target branch.
+    """
 
     if pr_id and not url:
         raise PackitException(
@@ -33,6 +62,7 @@ def create_distgit_source_script(
                 "therefore Packit cannot merge this PR.",
             )
 
+        # TODO: these git commands are GitLab-specific
         custom_steps = "\n".join(
             [
                 f"git remote add source {url}",
@@ -45,6 +75,7 @@ def create_distgit_source_script(
             ],
         )
     elif pr_id:
+        # TODO: these git commands are GitLab-specific
         custom_steps = "\n".join(
             [
                 f"git remote add source {url}",
@@ -86,6 +117,31 @@ def create_source_script(
     package: Optional[str] = None,
     merged_ref: Optional[str] = None,
 ):
+    """
+    Returns a source script for Copr builds from upstream repos intended
+    to be submitted via Copr's BuildProxy.create_from_custom().
+    The script uses Packit's prepare-sources CLI option to prepare the files
+    required for an SRPM build.
+
+    Args:
+        url: Path or URL of the upstream repository.
+        ref: Commit SHA, tag or a branch.
+        pr_id: Pull/merge request ID, if applicable.
+        merge_pr: Whether to merge the given PR into the
+            target branch before submitting a build in Copr.
+            Refer to the merge_pr_in_ci config option for reference.
+            Only applicable to pull/merge requests.
+        target_branch: Pull/merge request target branch, if applicable.
+        job_config_index: Override of package config with a specific job config.
+        update_release: Whether to update the package's release.
+        release_suffix: Override of the default release suffix.
+        package: Package name.
+        merged_ref: Git ref used to identify correct most recent tag.
+
+    Returns:
+        String representation of the source script to be passed to Copr
+            when submitting Copr builds from an upstream repo.
+    """
     options = []
     if ref:
         options += ["--ref", ref]
