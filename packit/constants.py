@@ -220,6 +220,12 @@ SYNC_RELEASE_PR_DESCRIPTION = (
     "{resolved_bugzillas_info}"
 )
 
+SYNC_RELEASE_PR_FORCE_PUSH_WARNING = (
+    "**Warning:** Packit uses force push when updating this pull request. "
+    "If a new upstream release is synced, any changes you push to this branch "
+    "will be overwritten."
+)
+
 SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS = (
     "If you need to do any change in this pull request, follow "
     "the instructions under `Code -> Check out branch` in the right sidebar."
