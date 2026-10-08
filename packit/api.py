@@ -61,6 +61,7 @@ from packit.constants import (
     SYNC_RELEASE_DEFAULT_COMMIT_DESCRIPTION,
     SYNC_RELEASE_PR_CHECKLIST,
     SYNC_RELEASE_PR_DESCRIPTION,
+    SYNC_RELEASE_PR_FORCE_PUSH_WARNING,
     SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS,
     SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS,
     SYNC_RELEASE_PR_KOJI_NOTE,
@@ -1491,7 +1492,9 @@ The first dist-git commit to be synced is '{short_hash}'.
         # TODO: remove this after the migration to Forgejo dist-git
         if isinstance(self.dg.local_project.git_project, PagureProject):
             instructions.append(
-                SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS.format(
+                SYNC_RELEASE_PR_FORCE_PUSH_WARNING
+                + "\n\n"
+                + SYNC_RELEASE_PR_PAGURE_CLONE_INSTRUCTIONS.format(
                     package=self.dg.local_project.repo_name,
                     branch=local_pr_branch,
                     user=self.config.fas_user,
@@ -1500,7 +1503,9 @@ The first dist-git commit to be synced is '{short_hash}'.
 
         if isinstance(self.dg.local_project.git_project, ForgejoProject):
             instructions.append(
-                SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS.format(
+                SYNC_RELEASE_PR_FORCE_PUSH_WARNING
+                + "\n\n"
+                + SYNC_RELEASE_PR_FORGEJO_CLONE_INSTRUCTIONS.format(
                     package=self.dg.local_project.repo_name,
                     branch=local_pr_branch,
                     user=self.config.fas_user,
@@ -1516,7 +1521,11 @@ The first dist-git commit to be synced is '{short_hash}'.
             instructions.append(SYNC_RELEASE_PR_KOJI_NOTE)
 
         if isinstance(self.dg.local_project.git_project, GitlabProject):
-            instructions.append(SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS)
+            instructions.append(
+                SYNC_RELEASE_PR_FORCE_PUSH_WARNING
+                + "\n\n"
+                + SYNC_RELEASE_PR_GITLAB_CLONE_INSTRUCTIONS,
+            )
 
         instructions.append(SYNC_RELEASE_PR_CHECKLIST)
 

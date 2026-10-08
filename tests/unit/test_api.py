@@ -17,6 +17,9 @@ from packit import api as packit_api
 from packit.api import PackitAPI
 from packit.config import CommonPackageConfig, PackageConfig, RunCommandType
 from packit.config.config import Config
+from packit.constants import (
+    SYNC_RELEASE_PR_FORCE_PUSH_WARNING,
+)
 from packit.copr_helper import CoprHelper
 from packit.distgit import DistGit
 from packit.exceptions import PackitException, ReleaseSkippedPackitException
@@ -317,6 +320,9 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
         pytest.param(
             (
                 "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+                "**Warning:** Packit uses force push when updating this pull request. "
+                "If a new upstream release is synced, any changes you push to this branch "
+                "will be overwritten.\n\n"
                 "If you need to do any change in this pull request, you can fetch the source "
                 "branch from Packit's fork and push directly to it "
                 "(maintainer edits should be allowed on this pull request):\n"
@@ -350,6 +356,9 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
         pytest.param(
             (
                 "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+                "**Warning:** Packit uses force push when updating this pull request. "
+                "If a new upstream release is synced, any changes you push to this branch "
+                "will be overwritten.\n\n"
                 "If you need to do any change in this pull request, you can clone Packit's fork "
                 "and push directly to the source branch of this PR (provided you have "
                 "commit access "
@@ -391,6 +400,9 @@ def test_sync_release_sync_files_call(config_mock, upstream_mock, distgit_mock):
         pytest.param(
             (
                 "Upstream tag: _\nUpstream commit: _\n\n---\n\n"
+                "**Warning:** Packit uses force push when updating this pull request. "
+                "If a new upstream release is synced, any changes you push to this branch "
+                "will be overwritten.\n\n"
                 "If you need to do any change in this pull request, follow "
                 "the instructions under `Code -> Check out branch` in the right sidebar.\n"
                 "\n---\n\n"
@@ -433,6 +445,12 @@ def test_sync_release_check_pr_instructions(api_mock, pr_description, project):
         dist_git_branch="_",
         add_pr_instructions=True,
     )
+
+
+def test_sync_release_pr_instructions_contain_force_push_warning():
+    """The force-push warning constant should contain the expected text."""
+    assert "force push" in SYNC_RELEASE_PR_FORCE_PUSH_WARNING.lower()
+    assert "overwritten" in SYNC_RELEASE_PR_FORCE_PUSH_WARNING.lower()
 
 
 def test_sync_release_downgrade(api_mock):
@@ -510,14 +528,14 @@ def test_get_default_commit_description(api_mock, resolved_bugs, result):
             "",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\n" "Upstream commit: _\n",
+            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: _\n",
         ),
         pytest.param(
             "tag-link",
             "commit-link",
             None,
             None,
-            "Upstream tag: [1.0.0](tag-link)\n" "Upstream commit: [_](commit-link)\n",
+            "Upstream tag: [1.0.0](tag-link)\nUpstream commit: [_](commit-link)\n",
         ),
         pytest.param(
             "tag-link",
