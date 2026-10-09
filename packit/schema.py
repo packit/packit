@@ -457,6 +457,7 @@ class JobMetadataSchema(Schema):
     """
 
     _targets = Targets(load_default=None, data_key="targets")
+    use_copr_dist_git_build = fields.Bool(load_default=False)
     timeout = fields.Integer()
     owner = fields.String(load_default=None)
     project = fields.String(load_default=None)
@@ -607,6 +608,7 @@ class CommonConfigSchema(Schema):
 
     # Former 'metadata' keys
     _targets = Targets(load_default=None, data_key="targets")
+    use_copr_dist_git_build = fields.Bool(load_default=False)
     timeout = fields.Integer()
     owner = fields.String(load_default=None)
     project = fields.String(load_default=None)
