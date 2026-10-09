@@ -102,6 +102,11 @@ MONOREPO_CONFIG_YAML = """
     """
 
 
+@pytest.mark.skip(
+    "Test fails after dist-git service mapping update in ogr"
+    " because it makes an API call against Forgejo dist-git."
+    " Requires re-recording once Forgejo dist-git is deployed.",
+)
 @pytest.mark.parametrize(
     "package_config_yaml,how_many_builds",
     [
