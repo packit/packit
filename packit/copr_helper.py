@@ -254,10 +254,11 @@ class CoprHelper:
         except (CoprException, CoprRequestException) as ex:
             response = ex.result.__response__
             if response and response.status_code >= 500:
+                copr_url = self.copr_client.config.get("copr_url")
                 error = (
                     f"Packit received HTTP {response.status_code} {response.reason} "
                     "from Copr Service. "
-                    "Check the Copr status page: https://copr.fedorainfracloud.org/status/stats/, "
+                    f"Check the Copr status page: {copr_url}/status/stats/, "
                     "or ask for help in Fedora Build System matrix channel: "
                     "https://matrix.to/#/#buildsys:fedoraproject.org."
                 )
