@@ -4,6 +4,7 @@
 import logging
 import time
 from datetime import datetime, timedelta
+from functools import cached_property
 from typing import Any, Callable, Optional
 
 import backoff
@@ -58,14 +59,17 @@ class CoprHelper:
             self._copr_client = self.get_copr_client()
         return self._copr_client
 
+    @cached_property
+    def copr_url(self) -> str:
+        return self.copr_client.config.get("copr_url")
+
     @property
     def configured_owner(self) -> Optional[str]:
         return self.copr_client.config.get("username")
 
     def copr_web_build_url(self, build: Munch) -> str:
         """Construct web frontend url because build.repo_url is not much user-friendly."""
-        copr_url = self.copr_client.config.get("copr_url")
-        return f"{copr_url}/coprs/build/{build.id}/"
+        return f"{self.copr_url}/coprs/build/{build.id}/"
 
     def get_copr_settings_url(
         self,
@@ -73,14 +77,13 @@ class CoprHelper:
         project: str,
         section: Optional[str] = None,
     ):
-        copr_url = self.copr_client.config.get("copr_url")
         section = section or "edit"
 
         # COPR groups starts with '@' but url have '/g/owner'
         if owner.startswith("@"):
             owner = f"g/{owner[1:]}"
 
-        return f"{copr_url}/coprs/{owner}/{project}/{section}/"
+        return f"{self.copr_url}/coprs/{owner}/{project}/{section}/"
 
     def get_valid_build_targets(
         self,
@@ -257,7 +260,7 @@ class CoprHelper:
                 error = (
                     f"Packit received HTTP {response.status_code} {response.reason} "
                     "from Copr Service. "
-                    "Check the Copr status page: https://copr.fedorainfracloud.org/status/stats/, "
+                    f"Check the Copr status page: {self.copr_url}/status/stats/, "
                     "or ask for help in Fedora Build System matrix channel: "
                     "https://matrix.to/#/#buildsys:fedoraproject.org."
                 )
