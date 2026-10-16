@@ -6,7 +6,7 @@
 %endif
 
 Name:           packit
-Version:        1.16.3
+Version:        1.17.0
 Release:        1%{?dist}
 Summary:        A tool for integrating upstream projects with Fedora operating system
 
@@ -78,6 +78,9 @@ cp files/bash-completion/packit %{buildroot}%{bash_completions_dir}/packit
 %doc README.md
 
 %changelog
+* Fri Oct 16 2026 Packit Team <hello@packit.dev> - 1.17.0-1
+- New upstream release 1.17.0
+
 * Fri Sep 04 2026 Packit Team <hello@packit.dev> - 1.16.3-1
 - New upstream release 1.16.3
 

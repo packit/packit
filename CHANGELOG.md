@@ -1,3 +1,10 @@
+# 1.17.0
+
+- Packit now supports the `use_copr_dist_git_build` config option, which is used to indicate that the git project is in the dist-git format so that Packit selects the appropriate workflow when submitting Copr build jobs. This option is currently only intended to be used in CI once support is added to the service. When used in the CLI, this config option is disregarded. (#2778)
+- Pull requests created by Packit in Fedora Dist-git now contain information in their descriptions that Packit force-pushes to its own PR branches when a new upstream PR lands. (#2780)
+- New `skip_install` option for test jobs to omit automatic installation of COPR packages on Testing Farm runner. (#2776)
+- Status.get_downstream_prs() now uses itertools.islice() to consume only the required number of PRs from the Iterable returned by ForgejoProject.get_pr_list(), avoiding loading all PRs into memory. (#2771)
+
 # 1.16.3
 
 - Packit now retries when it encounters connection errors during authentication when attempting to create a Bodhi update. (#2749)
