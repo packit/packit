@@ -13,16 +13,9 @@ from typing import Optional
 
 import click
 from lazy_object_proxy import Proxy
-from ogr import (
-    GithubService,
-    PagureService,
-    get_instances_from_dict,
-    get_project,
-    get_service_class,
-)
+from ogr import GithubService, PagureService, get_instances_from_dict, get_project
 from ogr.abstract import GitProject, GitService
 from ogr.exceptions import OgrException
-from ogr.parsing import parse_git_repo
 from yaml import safe_load
 
 from packit.constants import (
@@ -257,7 +250,6 @@ class Config:
             PackitConfigException if the underlying get_project() call fails
             and required is True.
         """
-        self._check_pagure_token(url)
         get_project_kwargs = get_project_kwargs or {}
         try:
             project = get_project(
@@ -272,46 +264,6 @@ class Config:
                 raise PackitConfigException(msg) from ex
             return None
         return project
-
-    def _check_pagure_token(self, url: str) -> None:
-        """
-        Check that an API token is configured for the Pagure instance
-        the URL belongs to.
-
-        Without a token, the follow-up Pagure API calls fail with an unclear
-        authentication error, so fail early with a helpful message instead.
-
-        Raises:
-            PackitConfigException if the URL points to a Pagure instance
-            with no API token configured.
-        """
-        try:
-            mapping = {
-                instance.hostname: instance.__class__
-                for instance in self.services
-                if instance.hostname
-            }
-            if (
-                get_service_class(url=url, service_mapping_update=mapping)
-                is not PagureService
-            ):
-                return
-            hostname = parse_git_repo(potential_url=url).hostname
-        except (OgrException, AttributeError):
-            # not a parseable URL or no matching service - let the regular
-            # flow handle it
-            return
-        if not any(
-            isinstance(service, PagureService)
-            and service.hostname == hostname
-            and "Authorization" in service.header
-            for service in self.services
-        ) and not getattr(self, "_pagure_user_token", None):
-            raise PackitConfigException(
-                "You need to add an API key for pagure in your packit config file. "
-                "See https://packit.dev/docs/configuration#user-configuration-file "
-                "for details.",
-            )
 
     def get_project(
         self,
