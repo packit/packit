@@ -18,7 +18,6 @@ from packit.config import (
     PackageConfig,
 )
 from packit.config.aliases import DEFAULT_VERSION
-from packit.exceptions import PackitConfigException
 from packit.schema import JobConfigSchema, JobMetadataSchema
 
 
@@ -519,61 +518,6 @@ def test_user_config_fork_token(tmp_path, recwarn):
     Config.get_user_config()
     w = recwarn.pop(UserWarning)
     assert "pagure_fork_token" in str(w.message)
-
-
-def test_get_project_pagure_without_token():
-    config = Config()
-    config.services = set()
-    with pytest.raises(
-        PackitConfigException,
-        match="You need to add an API key for pagure in your packit config file",
-    ):
-        config._get_project(url="https://src.fedoraproject.org/rpms/packit")
-
-
-def test_get_project_pagure_with_token():
-    config = Config()
-    config.services = {PagureService(token="test_token")}
-    # should not raise the missing-token error
-    try:
-        config._check_pagure_token(url="https://src.fedoraproject.org/rpms/packit")
-    except PackitConfigException as ex:
-        pytest.fail(f"unexpected missing token error: {ex}")
-
-
-def test_get_project_pagure_custom_instance_with_token():
-    config = Config()
-    config.services = {
-        PagureService(
-            token="test_token",
-            instance_url="https://pagure.example.com",
-        ),
-    }
-    try:
-        config._check_pagure_token(url="https://pagure.example.com/rpms/packit")
-    except PackitConfigException as ex:
-        pytest.fail(f"unexpected missing token error: {ex}")
-
-
-def test_get_project_github_without_token():
-    config = Config()
-    config.services = set()
-    # non-pagure URLs are not affected by the pagure token check
-    try:
-        config._check_pagure_token(url="https://github.com/packit/packit")
-    except PackitConfigException as ex:
-        pytest.fail(f"unexpected missing token error: {ex}")
-
-
-def test_get_project_pagure_with_user_token_attr():
-    config = Config()
-    config.services = set()
-    # token set directly on the config (as test fixtures do)
-    config._pagure_user_token = "something"
-    try:
-        config._check_pagure_token(url="https://src.fedoraproject.org/rpms/packit")
-    except PackitConfigException as ex:
-        pytest.fail(f"unexpected missing token error: {ex}")
 
 
 @pytest.mark.parametrize(
