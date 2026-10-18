@@ -306,7 +306,7 @@ class Config:
             and service.hostname == hostname
             and "Authorization" in service.header
             for service in self.services
-        ):
+        ) and not getattr(self, "_pagure_user_token", None):
             raise PackitConfigException(
                 "You need to add an API key for pagure in your packit config file. "
                 "See https://packit.dev/docs/configuration#user-configuration-file "

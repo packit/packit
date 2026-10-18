@@ -565,6 +565,17 @@ def test_get_project_github_without_token():
         pytest.fail(f"unexpected missing token error: {ex}")
 
 
+def test_get_project_pagure_with_user_token_attr():
+    config = Config()
+    config.services = set()
+    # token set directly on the config (as test fixtures do)
+    config._pagure_user_token = "something"
+    try:
+        config._check_pagure_token(url="https://src.fedoraproject.org/rpms/packit")
+    except PackitConfigException as ex:
+        pytest.fail(f"unexpected missing token error: {ex}")
+
+
 @pytest.mark.parametrize(
     "config",
     [
