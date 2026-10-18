@@ -6,12 +6,14 @@ import re
 
 import pytest
 from flexmock import flexmock
+from ogr.exceptions import OgrException
 from specfile import Specfile
 
 from packit.cli.utils import get_packit_api
 from packit.config import CommonPackageConfig, Config, PackageConfig
 from packit.constants import DISTGIT_HOSTNAME_CANDIDATES, EXISTING_BODHI_UPDATE_REGEX
 from packit.distgit import DistGit
+from packit.exceptions import PackitException
 from packit.local_project import LocalProjectBuilder
 from packit.pkgtool import PkgTool
 
@@ -301,3 +303,39 @@ def test_pkg_tool_details():
             flexmock(PkgTool).should_receive("clone").and_return()
 
         api.dg.clone_package("/tmp")
+
+
+def test_push_to_fork_pagure_auth_error(distgit_mock):
+    distgit_mock.local_project.git_repo.remotes = []
+    distgit_mock.local_project.git_project.should_receive("get_fork").and_raise(
+        OgrException(
+            "HTTPSConnectionPool(host='src.fedoraproject.org', port=443): "
+            "Max retries exceeded with url: /api/0/-/whoami "
+            "(Caused by ResponseError('too many 401 error responses'))",
+        ),
+    )
+    with pytest.raises(PackitException) as excinfo:
+        distgit_mock.push_to_fork(branch_name="f36", fork_remote_name="fork-remote")
+    assert "You need to add an API key for Pagure in your packit config file" in str(
+        excinfo.value,
+    )
+
+
+def test_create_pull_pagure_auth_error(distgit_mock):
+    distgit_mock.local_project.git_project.should_receive("get_fork").and_raise(
+        OgrException(
+            "HTTPSConnectionPool(host='src.fedoraproject.org', port=443): "
+            "Max retries exceeded with url: /api/0/-/whoami "
+            "(Caused by ResponseError('too many 401 error responses'))",
+        ),
+    )
+    with pytest.raises(PackitException) as excinfo:
+        distgit_mock.create_pull(
+            pr_title="Update to 0.4.0",
+            pr_description="Upstream update",
+            source_branch="f36-update",
+            target_branch="f36",
+        )
+    assert "You need to add an API key for Pagure in your packit config file" in str(
+        excinfo.value,
+    )
