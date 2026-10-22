@@ -7,6 +7,8 @@ import unittest
 from pathlib import Path
 from subprocess import CalledProcessError, check_output
 
+from ogr.services.forgejo import ForgejoService
+
 import packit.distgit
 import packit.upstream
 from packit.config import Config, get_package_config_from_repo
@@ -31,10 +33,48 @@ class PackitTest(unittest.TestCase):
         self._lp = None
         self._upstream = None
 
+        self._forgejo_distgit_token = None
+        self._dg_service = None
+        self._dg_project = None
+        self._dg_project_fork = None
+
     def tearDown(self):
         if self._static_tmp and os.path.exists(self._static_tmp):
             shutil.rmtree(self.static_tmp, ignore_errors=True)
             self._static_tmp = None
+
+    @property
+    def forgejo_distgit_token(self):
+        if not self._forgejo_distgit_token:
+            self._forgejo_distgit_token = os.getenv("FORGEJO_DISTGIT_TOKEN")
+        return self._forgejo_distgit_token
+
+    @property
+    def dg_service(self):
+        if not self._dg_service:
+            self._dg_service = ForgejoService(
+                instance_url="https://forgejo-src.stg.fedoraproject.org",
+                token=self.forgejo_distgit_token,
+            )
+        return self._dg_service
+
+    @property
+    def dg_project(self):
+        if not self._dg_project:
+            self._dg_project = self.dg_service.get_project(
+                namespace="rpms",
+                repo="python-requre",
+            )
+        return self._dg_project
+
+    @property
+    def dg_project_fork(self):
+        if not self._dg_project_fork:
+            self._dg_project_fork = self.dg_service.get_project(
+                namespace="betulependule",
+                repo="python-requre",
+            )
+        return self._dg_project_fork
 
     @property
     def static_tmp(self):

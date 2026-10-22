@@ -1,0 +1,456 @@
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+httpx._client:
+  send:
+    GET:
+      https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre:
+      - metadata:
+          latency: 0.14214515686035156
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_distgit
+          - packit.config.package_config
+          - ogr.services.forgejo.project
+          - functools
+          - ogr.services.forgejo.project
+          - pyforgejo.repository.client
+          - pyforgejo.repository.raw_client
+          - pyforgejo.core.http_client
+          - httpx._client
+          - requre.objects
+          - requre.cassette
+          - httpx._client
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            allow_fast_forward_only_merge: true
+            allow_merge_commits: true
+            allow_rebase: true
+            allow_rebase_explicit: true
+            allow_rebase_update: true
+            allow_squash_merge: true
+            archived: false
+            archived_at: '1970-01-01T00:00:00Z'
+            avatar_url: ''
+            clone_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre.git
+            created_at: '2026-10-22T15:18:54Z'
+            default_allow_maintainer_edit: false
+            default_branch: rawhide
+            default_delete_branch_after_merge: false
+            default_merge_style: merge
+            default_update_style: merge
+            description: The python-requre package
+            empty: false
+            fork: true
+            forks_count: 0
+            full_name: betulependule/python-requre
+            globally_editable_wiki: false
+            has_actions: false
+            has_issues: false
+            has_packages: false
+            has_projects: false
+            has_pull_requests: true
+            has_releases: false
+            has_wiki: false
+            has_wiki_contents: false
+            html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre
+            id: 272609
+            ignore_whitespace_conflicts: false
+            internal: false
+            language: ''
+            languages_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/languages
+            link: ''
+            mirror: false
+            mirror_interval: ''
+            mirror_updated: '0001-01-01T00:00:00Z'
+            name: python-requre
+            object_format_name: sha1
+            open_issues_count: 0
+            open_pr_counter: 1
+            original_url: ''
+            owner:
+              active: false
+              avatar_url: https://seccdn.libravatar.org/avatar/2551407a246575fdc432de2187a1e34f?d=identicon
+              created: '2026-09-17T12:14:56Z'
+              description: ''
+              email: betulependule@noreply.forgejo-src.stg.fedoraproject.org
+              followers_count: 0
+              following_count: 0
+              full_name: Alzbeta Kucerova
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule
+              id: 1470
+              is_admin: false
+              language: ''
+              last_login: '0001-01-01T00:00:00Z'
+              location: ''
+              login: betulependule
+              login_name: ''
+              prohibit_login: false
+              pronouns: ''
+              restricted: false
+              source_id: 0
+              starred_repos_count: 0
+              username: betulependule
+              visibility: public
+              website: ''
+            parent:
+              allow_fast_forward_only_merge: true
+              allow_merge_commits: true
+              allow_rebase: true
+              allow_rebase_explicit: true
+              allow_rebase_update: true
+              allow_squash_merge: true
+              archived: false
+              archived_at: '1970-01-01T00:00:00Z'
+              avatar_url: ''
+              clone_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre.git
+              created_at: '2026-10-13T11:50:16Z'
+              default_allow_maintainer_edit: false
+              default_branch: rawhide
+              default_delete_branch_after_merge: false
+              default_merge_style: rebase-merge
+              default_update_style: rebase
+              description: The python-requre package
+              empty: false
+              fork: false
+              forks_count: 1
+              full_name: rpms/python-requre
+              globally_editable_wiki: false
+              has_actions: true
+              has_issues: true
+              has_packages: false
+              has_projects: false
+              has_pull_requests: true
+              has_releases: false
+              has_wiki: false
+              has_wiki_contents: false
+              html_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre
+              id: 241334
+              ignore_whitespace_conflicts: false
+              internal: false
+              internal_tracker:
+                allow_only_contributors_to_track_time: true
+                enable_issue_dependencies: true
+                enable_time_tracker: true
+              language: ''
+              languages_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre/languages
+              link: ''
+              mirror: false
+              mirror_interval: ''
+              mirror_updated: '0001-01-01T00:00:00Z'
+              name: python-requre
+              object_format_name: sha1
+              open_issues_count: 0
+              open_pr_counter: 1
+              original_url: https://src.fedoraproject.org/rpms/python-requre
+              owner:
+                active: false
+                avatar_url: https://forgejo-src.stg.fedoraproject.org/avatars/e95483cbc482269e355de71394f14c10
+                created: '2026-09-10T03:31:12Z'
+                description: ''
+                email: ''
+                followers_count: 0
+                following_count: 0
+                full_name: ''
+                html_url: https://forgejo-src.stg.fedoraproject.org/rpms
+                id: 1459
+                is_admin: false
+                language: ''
+                last_login: '0001-01-01T00:00:00Z'
+                location: ''
+                login: rpms
+                login_name: ''
+                prohibit_login: false
+                pronouns: ''
+                restricted: false
+                source_id: 0
+                starred_repos_count: 0
+                username: rpms
+                visibility: public
+                website: ''
+              parent: null
+              permissions:
+                admin: true
+                pull: true
+                push: true
+              private: false
+              release_counter: 0
+              repo_transfer: null
+              size: 277
+              ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/rpms/python-requre.git
+              stars_count: 0
+              template: false
+              topics:
+              - b.epel10
+              - b.f43
+              - b.f44
+              - b.f45
+              - b.rawhide
+              - m.mfocko
+              updated_at: '2026-10-21T00:21:55Z'
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre
+              watchers_count: 6
+              website: ''
+              wiki_branch: main
+              wiki_clone_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre.wiki.git
+              wiki_ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/rpms/python-requre.wiki.git
+            permissions:
+              admin: true
+              pull: true
+              push: true
+            private: false
+            release_counter: 0
+            repo_transfer: null
+            size: 214
+            ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/betulependule/python-requre.git
+            stars_count: 0
+            template: false
+            topics: []
+            updated_at: '2026-10-23T07:06:29Z'
+            url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre
+            watchers_count: 1
+            website: ''
+            wiki_clone_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre.wiki.git
+            wiki_ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/betulependule/python-requre.wiki.git
+          _elapsed: 0.141964
+          encoding: utf-8
+          headers:
+            apptime: D=15803
+            cache-control: max-age=0, private, must-revalidate, no-transform
+            connection: Keep-Alive
+            content-type: application/json;charset=utf-8
+            date: Fri, 23 Oct 2026 07:06:34 GMT
+            gap-upstream-address: 127.0.0.1:3000
+            keep-alive: timeout=15
+            referrer-policy: same-origin
+            server: Apache
+            strict-transport-security: max-age=31536000; includeSubDomains; preload
+            transfer-encoding: chunked
+            x-content-type-options: nosniff, nosniff
+            x-fedora-proxyserver: proxy01.stg.rdu3.fedoraproject.org
+            x-fedora-requestid: atsHegQeqEJQ4JBz-6X49wAAJwY
+            x-frame-options: SAMEORIGIN, SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          next_request: null
+          status_code: 200
+      ? https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.packit.yaml?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+      : - metadata:
+            latency: 0.32066845893859863
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_distgit
+            - packit.config.package_config
+            - ogr.abstract.exception
+            - ogr.services.forgejo.project
+            - pyforgejo.repository.client
+            - pyforgejo.repository.raw_client
+            - pyforgejo.core.http_client
+            - httpx._client
+            - requre.objects
+            - requre.cassette
+            - httpx._client
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+              _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/e69beaed5e3d3da6c8ae41f546c58a9e7c7b5c64
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.packit.yaml
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.packit.yaml?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: LS0tCiMgV2Ugd2FudCB0byB1c2UgYm90aCBpbnN0YW5jZXMgZm9yIGFsbCB1cHN0cmVhbSBqb2JzIGluY2x1ZGluZyB0aGUgYHByb3Bvc2UtZG93bnN0cmVhbWAgb25lLgojIEZvciBkb3duc3RyZWFtLCB3ZSBuZWVkIHRvIHBpY2sganVzdCBvbmUgaW5zdGFuY2UgKGBzdGdgIGluIG91ciBjYXNlKQojIGFuZCByZWRlZmluZSBpdCBmb3IgdGhlIGBrb2ppX2J1aWxkYCBhbmQgYGJvZGhpX3VwZGF0ZWAgam9icy4KcGFja2l0X2luc3RhbmNlczogWyJwcm9kIiwgInN0ZyJdCnNwZWNmaWxlX3BhdGg6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMKIyBodHRwczovL3BhY2tpdC5kZXYvZG9jcy9jb25maWd1cmF0aW9uLyN0b3AtbGV2ZWwta2V5cwpkb3duc3RyZWFtX3BhY2thZ2VfbmFtZTogcHl0aG9uLXJlcXVyZQp1cHN0cmVhbV9wcm9qZWN0X3VybDogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC9yZXF1cmUKaXNzdWVfcmVwb3NpdG9yeTogaHR0cHM6Ly9naXRodWIuY29tL3BhY2tpdC9yZXF1cmUKCiMgd2UgYXJlIHNldHRpbmcgdGhpcyBzbyB3ZSBjYW4gdXNlIHBhY2tpdCBmcm9tIHJlcXVyZSdzIGRpc3QtZ2l0CiMgcGFja2l0IGNhbid0IGtub3cgd2hhdCdzIHRoZSB1cHN0cmVhbSBuYW1lIHdoZW4gcnVubmluZyBmcm9tIGRpc3RnaXQKdXBzdHJlYW1fcGFja2FnZV9uYW1lOiByZXF1cmUKIyBVc2UgcmVsZWFzZSBkZXNjcmlwdGlvbiBmcm9tIEdpdEh1YiB3aGVuIHVwZGF0aW5nIHRoZQojIGNoYW5nZWxvZyBpbiBGZWRvcmEuCmNvcHlfdXBzdHJlYW1fcmVsZWFzZV9kZXNjcmlwdGlvbjogdHJ1ZQphY3Rpb25zOgogICMgd2UgbmVlZCB0aGlzIGIvYyBgZ2l0IGFyY2hpdmVgIGRvZXNuJ3QgcHV0IGFsbCB0aGUgbWV0YWRhdGEgaW4gdGhlIHRhcmJhbGw6CiAgIyAgIExvb2t1cEVycm9yOiBzZXR1cHRvb2xzLXNjbSB3YXMgdW5hYmxlIHRvIGRldGVjdCB2ZXJzaW9uIGZvciAnL2J1aWxkZGlyL2J1aWxkL0JVSUxEL3JlcXVyZS0wLjExLjEnLgogICMgICBNYWtlIHN1cmUgeW91J3JlIGVpdGhlciBidWlsZGluZyBmcm9tIGEgZnVsbHkgaW50YWN0IGdpdCByZXBvc2l0b3J5IG9yIFB5UEkgdGFyYmFsbHMuCiAgY3JlYXRlLWFyY2hpdmU6CiAgICAtIHB5dGhvbjMgLW0gYnVpbGQgLS1zZGlzdCAtLW91dGRpciAuL2ZlZG9yYS8KICAgIC0gYmFzaCAtYyAibHMgLTF0IC4vZmVkb3JhLyoudGFyLmd6IHwgaGVhZCAtbiAxIgogIGdldC1jdXJyZW50LXZlcnNpb246CiAgICAtIGhhdGNoIHZlcnNpb24KCmZpbGVzX3RvX3N5bmM6CiAgLSBzcmM6IGZlZG9yYS9weXRob24tcmVxdXJlLnNwZWMKICAgIGRlc3Q6IC4KICAtIC5wYWNraXQueWFtbAoKc3JwbV9idWlsZF9kZXBzOgogIC0gcHl0aG9uMy1idWlsZAogIC0gaGF0Y2gKICAtIHB5dGhvbjMtaGF0Y2gtdmNzCgpqb2JzOgogICMgUFIgam9icwogIC0gam9iOiBjb3ByX2J1aWxkCiAgICB0cmlnZ2VyOiBwdWxsX3JlcXVlc3QKICAgIHRhcmdldHM6CiAgICAgIC0gZmVkb3JhLWFsbAogICAgICAtIGVwZWwtOQoKICAtIGpvYjogdGVzdHMKICAgIHRyaWdnZXI6IHB1bGxfcmVxdWVzdAogICAgdGFyZ2V0czoKICAgICAgLSBmZWRvcmEtYWxsCiAgICAgIC0gZXBlbC05CgogICMgTGF0ZXN0LWdyZWF0ZXN0IGRldmVsb3BtZW50IGJ1aWxkCiAgLSBqb2I6IGNvcHJfYnVpbGQKICAgIHRyaWdnZXI6IGNvbW1pdAogICAgYnJhbmNoOiBtYWluCiAgICBwcm9qZWN0OiBwYWNraXQtZGV2CiAgICB0YXJnZXRzOgogICAgICAtIGZlZG9yYS1hbGwKICAgICAgLSBlcGVsLTkKICAgIGxpc3Rfb25faG9tZXBhZ2U6IFRydWUKICAgIHByZXNlcnZlX3Byb2plY3Q6IFRydWUKCiAgIyBKb2JzIG9uIHJlbGVhc2UKICAtIGpvYjogcHJvcG9zZV9kb3duc3RyZWFtCiAgICB0cmlnZ2VyOiByZWxlYXNlCiAgICBkaXN0X2dpdF9icmFuY2hlczoKICAgICAgLSBmZWRvcmEtYWxsCgogIC0gam9iOiBjb3ByX2J1aWxkCiAgICB0cmlnZ2VyOiByZWxlYXNlCiAgICBwcm9qZWN0OiBwYWNraXQtcmVsZWFzZXMKICAgIHRhcmdldHM6CiAgICAgIC0gZmVkb3JhLWFsbAogICAgICAtIGVwZWwtOQogICAgbGlzdF9vbl9ob21lcGFnZTogVHJ1ZQogICAgcHJlc2VydmVfcHJvamVjdDogVHJ1ZQoKICAjIERvd25zdHJlYW0gYXV0b21hdGlvbgogIC0gam9iOiBrb2ppX2J1aWxkCiAgICB0cmlnZ2VyOiBjb21taXQKICAgIHBhY2tpdF9pbnN0YW5jZXM6IFsic3RnIl0KICAgIGRpc3RfZ2l0X2JyYW5jaGVzOgogICAgICAtIGZlZG9yYS1hbGwKICAgICAgLSBlcGVsLTkKCiAgLSBqb2I6IGJvZGhpX3VwZGF0ZQogICAgdHJpZ2dlcjogY29tbWl0CiAgICBwYWNraXRfaW5zdGFuY2VzOiBbInN0ZyJdCiAgICBkaXN0X2dpdF9icmFuY2hlczoKICAgICAgLSBmZWRvcmEtbGF0ZXN0ICMgYnJhbmNoZWQgdmVyc2lvbiwgcmF3aGlkZSB1cGRhdGVzIGFyZSBjcmVhdGVkIGF1dG9tYXRpY2FsbHkKICAgICAgLSBmZWRvcmEtc3RhYmxlCiAgICAgIC0gZXBlbC05Cg==
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.packit.yaml
+              encoding: base64
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/e69beaed5e3d3da6c8ae41f546c58a9e7c7b5c64
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.packit.yaml
+              last_commit_sha: 6e25e51526b522d9c03fd4f818fc6cf10394a945
+              last_commit_when: '2025-02-14T14:11:23Z'
+              name: .packit.yaml
+              path: .packit.yaml
+              sha: e69beaed5e3d3da6c8ae41f546c58a9e7c7b5c64
+              size: 2473
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.packit.yaml?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            _elapsed: 0.320477
+            encoding: utf-8
+            headers:
+              apptime: D=95592
+              cache-control: max-age=0, private, must-revalidate, no-transform
+              connection: Keep-Alive
+              content-type: application/json;charset=utf-8
+              date: Fri, 23 Oct 2026 07:06:35 GMT
+              gap-upstream-address: 127.0.0.1:3000
+              keep-alive: timeout=15
+              referrer-policy: same-origin
+              server: Apache
+              strict-transport-security: max-age=31536000; includeSubDomains; preload
+              transfer-encoding: chunked
+              x-content-type-options: nosniff, nosniff
+              x-fedora-proxyserver: proxy01.stg.rdu3.fedoraproject.org
+              x-fedora-requestid: atsHewQeqEJQ4JBz-6X4-AAAJwo
+              x-frame-options: SAMEORIGIN, SAMEORIGIN
+              x-xss-protection: 1; mode=block
+            next_request: null
+            status_code: 200
+      ? https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+      : - metadata:
+            latency: 0.7958829402923584
+            module_call_list:
+            - unittest.case
+            - requre.record_and_replace
+            - tests_recording.test_distgit
+            - packit.config.package_config
+            - ogr.services.forgejo.project
+            - pyforgejo.repository.client
+            - pyforgejo.repository.raw_client
+            - pyforgejo.core.http_client
+            - httpx._client
+            - requre.objects
+            - requre.cassette
+            - httpx._client
+            - send
+          output:
+            __store_indicator: 2
+            _content:
+            - _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/c955780b0aaae95e1e99b15df4b3f4954989585f
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.gitignore
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.gitignore?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: null
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.gitignore
+              encoding: null
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/c955780b0aaae95e1e99b15df4b3f4954989585f
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.gitignore
+              last_commit_sha: 8473194f92b3ded62a7c60efddb20ad367970f7b
+              last_commit_when: '2025-03-21T10:18:42Z'
+              name: .gitignore
+              path: .gitignore
+              sha: c955780b0aaae95e1e99b15df4b3f4954989585f
+              size: 336
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.gitignore?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            - _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/e69beaed5e3d3da6c8ae41f546c58a9e7c7b5c64
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.packit.yaml
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.packit.yaml?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: null
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.packit.yaml
+              encoding: null
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/e69beaed5e3d3da6c8ae41f546c58a9e7c7b5c64
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/.packit.yaml
+              last_commit_sha: 6e25e51526b522d9c03fd4f818fc6cf10394a945
+              last_commit_when: '2025-02-14T14:11:23Z'
+              name: .packit.yaml
+              path: .packit.yaml
+              sha: e69beaed5e3d3da6c8ae41f546c58a9e7c7b5c64
+              size: 2473
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/.packit.yaml?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            - _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/cc1a7c3f4789eba1f7a06e824a7d5d36f6e1fefc
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/README.md
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/README.md?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: null
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/README.md
+              encoding: null
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/cc1a7c3f4789eba1f7a06e824a7d5d36f6e1fefc
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/README.md
+              last_commit_sha: 36fb2e9cb694de0c33731da7ba255f9522e6ae75
+              last_commit_when: '2020-04-06T13:13:59Z'
+              name: README.md
+              path: README.md
+              sha: cc1a7c3f4789eba1f7a06e824a7d5d36f6e1fefc
+              size: 42
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/README.md?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            - _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/ad2b8e5bc3f3161992310d57cc2d4beb5b0994c7
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/README.packit
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/README.packit?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: null
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/README.packit
+              encoding: null
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/ad2b8e5bc3f3161992310d57cc2d4beb5b0994c7
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/README.packit
+              last_commit_sha: 8473194f92b3ded62a7c60efddb20ad367970f7b
+              last_commit_when: '2025-03-21T10:18:42Z'
+              name: README.packit
+              path: README.packit
+              sha: ad2b8e5bc3f3161992310d57cc2d4beb5b0994c7
+              size: 125
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/README.packit?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            - _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/a4f33a93e5c9c276537886c7cd595e8b82b214a6
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/python-requre.spec
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/python-requre.spec?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: null
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/python-requre.spec
+              encoding: null
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/a4f33a93e5c9c276537886c7cd595e8b82b214a6
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/python-requre.spec
+              last_commit_sha: a350f973f96ae1872fb97072d11adcc2881cbea1
+              last_commit_when: '2026-07-16T21:35:09Z'
+              name: python-requre.spec
+              path: python-requre.spec
+              sha: a4f33a93e5c9c276537886c7cd595e8b82b214a6
+              size: 8991
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/python-requre.spec?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            - _links:
+                git: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/2b71177ae91c13ee80e5a0b91b3a804562dd8ec0
+                html: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/sources
+                self: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/sources?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+              content: null
+              download_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/raw/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/sources
+              encoding: null
+              git_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/git/blobs/2b71177ae91c13ee80e5a0b91b3a804562dd8ec0
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre/src/commit/a350f973f96ae1872fb97072d11adcc2881cbea1/sources
+              last_commit_sha: 8473194f92b3ded62a7c60efddb20ad367970f7b
+              last_commit_when: '2025-03-21T10:18:42Z'
+              name: sources
+              path: sources
+              sha: 2b71177ae91c13ee80e5a0b91b3a804562dd8ec0
+              size: 160
+              submodule_git_url: null
+              target: null
+              type: file
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/contents/sources?ref=a350f973f96ae1872fb97072d11adcc2881cbea1
+            _elapsed: 0.795709
+            encoding: utf-8
+            headers:
+              apptime: D=398366
+              cache-control: max-age=0, private, must-revalidate, no-transform
+              connection: Keep-Alive
+              content-type: application/json;charset=utf-8
+              date: Fri, 23 Oct 2026 07:06:34 GMT
+              gap-upstream-address: 127.0.0.1:3000
+              keep-alive: timeout=15
+              referrer-policy: same-origin
+              server: Apache
+              set-cookie: a 'b';
+              strict-transport-security: max-age=31536000; includeSubDomains; preload
+              transfer-encoding: chunked
+              x-content-type-options: nosniff, nosniff
+              x-fedora-proxyserver: proxy01.stg.rdu3.fedoraproject.org
+              x-fedora-requestid: atsHej7Ay_59GtGhNm-ycAAAJok
+              x-frame-options: SAMEORIGIN, SAMEORIGIN
+              x-xss-protection: 1; mode=block
+            next_request: null
+            status_code: 200
