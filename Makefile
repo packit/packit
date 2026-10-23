@@ -37,6 +37,7 @@ check-in-container:
 		--env TEST_TARGET \
 		--env COV_REPORT \
 		--env COLOR \
+		--env FORGEJO_DISTGIT_TOKEN \
 		$(TEST_IMAGE) $(CONTAINER_TEST_COMMAND)
 
 # Mounts your ~/.config/ where .packit.yaml with your github/gitlab tokens is expected
