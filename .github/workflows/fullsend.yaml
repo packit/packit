@@ -48,7 +48,7 @@ jobs:
       issues: write
       packages: read
       pull-requests: write
-    uses: fullsend-ai/fullsend/.github/workflows/reusable-dispatch.yml@d5f36921ac754705619f38c637ef692873809fbc # v0.43.0
+    uses: fullsend-ai/fullsend/.github/workflows/reusable-dispatch.yml@5163a55332d09571fa9c33d78a66155eb70fc6ea # v0.50.0
     with:
       event_action: ${{ github.event.action }}
       install_mode: per-repo
@@ -56,6 +56,7 @@ jobs:
       gcp_region: ${{ vars.FULLSEND_GCP_REGION }}
       project_number: ${{ vars.FULLSEND_PROJECT_NUMBER }}
       runner_image: ubuntu-24.04
+      fullsend_version: v0.50.0
     secrets:
       FULLSEND_GCP_WIF_PROVIDER: ${{ secrets.FULLSEND_GCP_WIF_PROVIDER }}
       FULLSEND_GCP_PROJECT_ID: ${{ secrets.FULLSEND_GCP_PROJECT_ID }}
