@@ -609,6 +609,7 @@ class CommonConfigSchema(Schema):
     # Former 'metadata' keys
     _targets = Targets(load_default=None, data_key="targets")
     use_copr_dist_git_build = fields.Bool(load_default=False)
+    copr_dist_git = fields.String(load_default="fedora")
     timeout = fields.Integer()
     owner = fields.String(load_default=None)
     project = fields.String(load_default=None)

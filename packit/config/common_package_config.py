@@ -164,6 +164,8 @@ class CommonPackageConfig:
             backward compatibility.
         use_copr_dist_git_build: copr_build, whether to use the dist-git build
             workflow when submitting a Copr build.
+        copr_dist_git: DistGit instance configured in Copr to be used for the
+            dist-git build.
         timeout: copr_build, give up watching a build after timeout, defaults to 7200s
         owner: copr_build, a namespace in COPR where the build should happen
         project: copr_build, a name of the copr project
@@ -261,6 +263,7 @@ class CommonPackageConfig:
         # Former JobMetadataConfig attributes
         _targets: Union[list[str], dict[str, dict[str, Any]], None] = None,
         use_copr_dist_git_build: bool = False,
+        copr_dist_git: str = "fedora",
         timeout: int = 7200,
         owner: Optional[str] = None,
         project: Optional[str] = None,
@@ -387,6 +390,7 @@ class CommonPackageConfig:
         else:
             self._targets = _targets or {}
         self.use_copr_dist_git_build: bool = use_copr_dist_git_build
+        self.copr_dist_git: str = copr_dist_git
         self.timeout: int = timeout
         self.owner: str = owner
         self.project: str = project
