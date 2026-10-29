@@ -2298,6 +2298,7 @@ def test_use_copr_dist_git_build_default_value():
     job = config.jobs[0]
 
     assert job.use_copr_dist_git_build is False
+    assert job.copr_dist_git == "fedora"
 
 
 def test_use_copr_dist_git_build_set_on_job_level():
