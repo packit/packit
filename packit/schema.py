@@ -654,6 +654,7 @@ class CommonConfigSchema(Schema):
 
     parse_time_macros = fields.Dict(load_default=None)
     osh_diff_scan_after_copr_build = fields.Boolean(load_default=True)
+    log_detective_enabled = fields.Boolean(load_default=True)
 
     csmock_args = fields.String(load_default=None)
     osh_options = fields.Nested(OshOptionsSchema)
