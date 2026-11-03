@@ -215,6 +215,8 @@ class CommonPackageConfig:
         sig: Special interest group (SIG) that maintains the “downstream” package.
         osh_diff_scan_after_copr_build: Whether to run a differential scan in
             OpenScanHub after successful Copr build.
+        log_detective_enabled: Whether to analyze Copr build logs with
+            Log Detective. True by default.
         csmock_args: Pass additional arguments to csmock
         use_target_repo_for_fmf_url: If the target repo should be used for test.fmf.url
             field in a Testing Farm request (useful for PRs coming from a fork,
@@ -313,6 +315,7 @@ class CommonPackageConfig:
         sync_test_job_statuses_with_builds: bool = True,
         sig: Optional[str] = None,
         osh_diff_scan_after_copr_build: Optional[bool] = True,
+        log_detective_enabled: bool = True,
         csmock_args: Optional[str] = None,
         use_target_repo_for_fmf_url: Optional[bool] = False,
         clone_repos_before_run_condition: Optional[bool] = False,
@@ -442,6 +445,7 @@ class CommonPackageConfig:
         self.parse_time_macros = parse_time_macros or {}
 
         self.osh_diff_scan_after_copr_build = osh_diff_scan_after_copr_build
+        self.log_detective_enabled = log_detective_enabled
 
         self.csmock_args = csmock_args
         self.osh_options = osh_options or OshOptionsConfig()

@@ -2592,6 +2592,57 @@ def test_package_naming():
     assert config1.packages["baar"].paths == config2.packages["baar"].paths == ["./"]
 
 
+@pytest.mark.parametrize(
+    "package_setting,job_setting,expected_package,expected_job",
+    [
+        (None, None, True, True),
+        (False, None, False, False),
+        (False, True, False, True),
+        (True, False, True, False),
+    ],
+)
+def test_log_detective_enabled(
+    package_setting,
+    job_setting,
+    expected_package,
+    expected_job,
+):
+    """Copr build analysis defaults to on and can be overridden per job."""
+    config = {
+        "downstream_package_name": "package",
+        "specfile_path": "package.spec",
+        "jobs": [{"job": "copr_build", "trigger": "pull_request"}],
+    }
+    if package_setting is not None:
+        config["log_detective_enabled"] = package_setting
+    if job_setting is not None:
+        config["jobs"][0]["log_detective_enabled"] = job_setting
+
+    loaded_config = PackageConfigSchema().load(config)
+    assert loaded_config.log_detective_enabled is expected_package
+    assert loaded_config.jobs[0].log_detective_enabled is expected_job
+
+
+def test_log_detective_enabled_per_package():
+    """Individual packages can opt out without changing other packages."""
+    config = {
+        "packages": {
+            "first": {
+                "specfile_path": "first.spec",
+                "log_detective_enabled": False,
+            },
+            "second": {"specfile_path": "second.spec"},
+        },
+        "jobs": [{"job": "copr_build", "trigger": "pull_request"}],
+    }
+
+    loaded_config = PackageConfigSchema().load(config)
+    assert loaded_config.packages["first"].log_detective_enabled is False
+    assert loaded_config.packages["second"].log_detective_enabled is True
+    assert loaded_config.jobs[0].packages["first"].log_detective_enabled is False
+    assert loaded_config.jobs[0].packages["second"].log_detective_enabled is True
+
+
 def test_multiple_packages():
     """A configuration with multiple packages can be loaded.
     Values can be accessed only through the 'packages' attribute."""
