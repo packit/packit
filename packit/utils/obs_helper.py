@@ -9,7 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from osc import conf, core
+try:
+    from osc import conf, core
+
+    _OSC_AVAILABLE = True
+except ImportError:
+    _OSC_AVAILABLE = False
 
 from packit.config import PackageConfig
 from packit.config.aliases import DEPRECATED_TARGET_MAP
@@ -17,6 +22,14 @@ from packit.config.aliases import DEPRECATED_TARGET_MAP
 logger = logging.getLogger(__name__)
 
 _API_URL = "https://api.opensuse.org"
+
+
+def _require_osc() -> None:
+    if not _OSC_AVAILABLE:
+        raise RuntimeError(
+            "The osc library is not installed. Install it with "
+            "'pip install packit[osc]' to use the OBS functionality.",
+        )
 
 
 @dataclass(frozen=True)
@@ -283,6 +296,7 @@ def create_package(project_name: str, package_name: str) -> None:
     root.append(title)
     root.append(descr)
 
+    _require_osc()
     package_url = core.makeurl(
         _API_URL,
         ["source", project_name, package_name, "_meta"],
@@ -315,6 +329,7 @@ def create_obs_project(
     Raises:
         ValueError: If the provided package_config contains multiple packages.
     """
+    _require_osc()
     conf.get_config()
     owner = owner or conf.config["api_host_options"][_API_URL]["user"]
     project_name = project or f"home:{owner}:packit"
@@ -369,6 +384,7 @@ def init_obs_project(
     Returns:
         Path: Path to the empty package directory within the OBS project.
     """
+    _require_osc()
     core.Project.init_project(
         _API_URL,
         (prj_dir := Path(build_dir)),
@@ -420,6 +436,7 @@ def commit_srpm_and_get_build_results(
     """
     # don't use the files argument of unpack_srcrpm, it allows for shell
     # injection unless sanitized carefully
+    _require_osc()
     core.unpack_srcrpm(str(srpm), package_dir)
 
     create_changes_file(package_dir=package_dir)
