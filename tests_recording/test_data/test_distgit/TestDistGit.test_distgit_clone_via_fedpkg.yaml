@@ -1,0 +1,30 @@
+X:
+  file:
+    tar:
+      StoreFiles:
+        TestDistGit.test_distgit_clone_via_fedpkg.yaml:
+          target_path:
+          - metadata:
+              latency: 0
+            output:
+              filename: TestDistGit.test_distgit_clone_via_fedpkg.yaml.requre_1.tar.xz
+              return_value: null
+              target_path: /tmp/tmp7022j5cu/requre
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+tempfile:
+  mkdtemp:
+  - metadata:
+      latency: 6.961822509765625e-05
+      module_call_list:
+      - unittest.case
+      - requre.record_and_replace
+      - tests_recording.test_distgit
+      - tests_recording.testbase
+      - requre.objects
+      - requre.cassette
+      - tempfile
+      - mkdtemp
+    output: /tmp/tmp7022j5cu

@@ -9,6 +9,7 @@
       - rpmdevtools
       - bodhi-client
       - fedpkg
+      - fedpkg-stage
       - rsync
     state: present
     # needed when installing from koji - there are no GPG-signed packages
