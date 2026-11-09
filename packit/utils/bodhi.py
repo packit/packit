@@ -7,6 +7,7 @@ Bodhi 6+ prints a URL which you need to open in browser and paste 'code=XXX...' 
 terminal which the bodhi-client will save to `~/.config/bodhi/client.json`.
 Bodhi 6 does not use username, password nor keytab.
 """
+
 import os
 
 from bodhi.client.bindings import BodhiClient
