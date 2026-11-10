@@ -125,6 +125,9 @@ def get_packit_version() -> str:
 def _in_mock_group() -> bool:
     if grp is None:
         return True
+    if os.geteuid() == 0:
+        # root can use mock without the group, mock just authenticates as root
+        return True
     try:
         mock_gid = grp.getgrnam("mock").gr_gid
     except KeyError:
