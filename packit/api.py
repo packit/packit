@@ -9,6 +9,7 @@ This is the official python interface for packit.
 import asyncio
 import contextlib
 import copy
+import grp
 import logging
 import os
 import re
@@ -2726,6 +2727,23 @@ The first dist-git commit to be synced is '{short_hash}'.
         )
         sgg.create_from_upstream()
 
+    @staticmethod
+    def is_user_in_mock_group() -> bool:
+        """
+        Check whether the current user is a member of the `mock` group.
+
+        Returns:
+            True when the user is in the group, or when the group does not
+            exist on this system (mock is not installed, so there is nothing
+            to check). False only when the group exists and the user is not
+            a member of it.
+        """
+        try:
+            mock_gid = grp.getgrnam("mock").gr_gid
+        except KeyError:
+            return True
+        return mock_gid in os.getgroups() or mock_gid == os.getgid()
+
     def run_mock_build(
         self,
         srpm_path: Path,
@@ -2747,6 +2765,13 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             List of paths to the built RPMs.
         """
+        if not self.is_user_in_mock_group():
+            logger.warning(
+                "You are not in the `mock` group. "
+                "The mock build is likely to fail. "
+                "See https://rpm-software-management.github.io/mock/#setup",
+            )
+
         cmd = ["mock", "--root", root]
         if resultdir is not None:
             cmd.append("--resultdir")
