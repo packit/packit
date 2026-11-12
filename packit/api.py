@@ -2759,6 +2759,11 @@ The first dist-git commit to be synced is '{short_hash}'.
         try:
             cmd_result = self.up.command_handler.run_command(cmd, return_output=True)
         except PackitCommandFailedError as ex:
+            # Mock prints the missing-group diagnostic at DEBUG level. Surface it
+            # directly so users can fix their local permissions without -d.
+            for line in (ex.stderr_output or "").splitlines():
+                if "You are not in the `mock` group" in line:
+                    logger.error(line.strip())
             logger.error(f"The `mock` command failed: {ex!r}")
             raise PackitFailedToCreateRPMException(
                 f"reason:\n"
