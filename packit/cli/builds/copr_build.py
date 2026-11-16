@@ -161,7 +161,7 @@ def copr(
     it defaults to the current working directory.
 
     Copr configuration needs to be set before usage.
-    https://docs.pagure.org/copr.copr/user_documentation.html#quick-start
+    https://docs.copr.fedorainfracloud.org/user_documentation.html#quick-start
     """
     api = get_packit_api(
         config=config,

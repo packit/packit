@@ -1375,7 +1375,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         In case the autochangelog is used, the bugs should be referenced in the commits.
         """
         resolved_bugs_msg = ""
-        # https://docs.pagure.org/Fedora-Infra.rpmautospec/autochangelog.html#
+        # https://fedora-infra.github.io/rpmautospec-docs/autochangelog.html#
         # changelog-entries-generated-from-commit-messages
         # for autochangelog generated from commits, the text that
         # should be included needs to be prefixed with dash

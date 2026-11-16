@@ -129,7 +129,7 @@ def create_update(
                 f"There was a problem while creating an update for {branch}:\n{ex}\n\n"
                 "Please try again later if this looks like a transient issue.\n"
                 "If you believe this is a bug, please contact Fedora infrastructure:\n"
-                "  https://pagure.io/fedora-infrastructure\n\n"
+                "  https://forge.fedoraproject.org/infra/tickets/issues\n\n"
                 "You are always welcome to contact the Packit team:\n"
                 "  https://github.com/packit/packit/issues",
                 err=True,
