@@ -3,6 +3,7 @@
 
 from subprocess import check_output
 
+import pytest
 from bugzilla import Bugzilla
 from flexmock import flexmock
 from ogr.services.github.project import GithubProject
@@ -109,6 +110,11 @@ class ProposeUpdate(PackitTest):
         )
         self.api.sync_release(versions=["0.8.1"])
 
+    @pytest.mark.skip(
+        "Test fails after dist-git service mapping update in ogr"
+        " because it makes an API call against Forgejo dist-git."
+        " Requires re-recording once Forgejo dist-git is deployed.",
+    )
     def test_changelog_sync(self):
         """
         Bump version two times and see if the changelog is synced
