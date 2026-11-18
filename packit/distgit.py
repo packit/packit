@@ -11,10 +11,12 @@ from typing import Optional, Union
 
 import cccolutils
 import git
+import requests
 from bodhi.client.bindings import BodhiClientException
 from bodhi.client.oidcclient import OIDCClientError
 from lazy_object_proxy import Proxy
 from ogr.abstract import PullRequest
+from ogr.exceptions import OgrException
 from ogr.services.pagure import PagureProject
 from specfile.utils import NEVR
 
@@ -26,7 +28,11 @@ from packit.config import (
     PackageConfig,
     get_local_package_config,
 )
-from packit.constants import DEFAULT_BODHI_UPDATE_TYPE, EXISTING_BODHI_UPDATE_REGEX
+from packit.constants import (
+    DEFAULT_BODHI_UPDATE_TYPE,
+    EXISTING_BODHI_UPDATE_REGEX,
+    PAGURE_API_KEY_ERROR_MSG,
+)
 from packit.exceptions import (
     PackitBodhiException,
     PackitConfigException,
@@ -297,10 +303,25 @@ class DistGit(PackitRepositoryBase):
         if fork_remote_name not in [
             remote.name for remote in self.local_project.git_repo.remotes
         ]:
-            fork = self.local_project.git_project.get_fork()
-            if not fork:
-                self.local_project.git_project.fork_create()
+            try:
                 fork = self.local_project.git_project.get_fork()
+                if not fork:
+                    self.local_project.git_project.fork_create()
+                    fork = self.local_project.git_project.get_fork()
+            except (OgrException, requests.exceptions.RequestException) as ex:
+                cause = str(getattr(ex, "__cause__", "") or "")
+                if (
+                    "whoami" in str(ex)
+                    or "whoami" in cause
+                    or "401" in str(ex)
+                    or "401" in cause
+                ):
+                    raise PackitException(PAGURE_API_KEY_ERROR_MSG) from ex
+                raise PackitException(
+                    f"Failed to create/get a fork for "
+                    f"{self.local_project.git_project.full_repo_name}: {ex}",
+                ) from ex
+
             if not fork:
                 raise PackitException(
                     "Unable to create a fork of repository "
@@ -340,10 +361,21 @@ class DistGit(PackitRepositoryBase):
         )
         project = self.local_project.git_project
 
-        project_fork = project.get_fork()
-        if not project_fork:
-            project.fork_create()
+        try:
             project_fork = project.get_fork()
+            if not project_fork:
+                project.fork_create()
+                project_fork = project.get_fork()
+        except (OgrException, requests.exceptions.RequestException) as ex:
+            cause = str(getattr(ex, "__cause__", "") or "")
+            if (
+                "whoami" in str(ex)
+                or "whoami" in cause
+                or "401" in str(ex)
+                or "401" in cause
+            ):
+                raise PackitException(PAGURE_API_KEY_ERROR_MSG) from ex
+            raise
 
         # [XXX] once dist-git migration is complete, allow_maintainer_edit
         # can be set to True directly without the check for PagureProject
