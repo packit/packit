@@ -1,3 +1,7 @@
+# 1.18.0
+
+- Packit now accepts two new config options: `copr_dist_git` (default `fedora`) selects the dist-git instance for Copr jobs that use `use_copr_dist_git_build: true`, and `log_detective_enabled` (enabled by default) controls Log Detective analysis of Copr build logs. (#2786, #2788)
+
 # 1.17.0
 
 - Packit now supports the `use_copr_dist_git_build` config option, which is used to indicate that the git project is in the dist-git format so that Packit selects the appropriate workflow when submitting Copr build jobs. This option is currently only intended to be used in CI once support is added to the service. When used in the CLI, this config option is disregarded. (#2778)
