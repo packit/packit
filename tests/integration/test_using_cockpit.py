@@ -4,6 +4,7 @@
 """
 E2E tests which utilize cockpit projects
 """
+
 import shutil
 from pathlib import Path
 
