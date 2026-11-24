@@ -240,6 +240,7 @@ def test_run_action_in_sandcastle(
     caplog,
 ):
     from sandcastle import Sandcastle
+    from sandcastle.api import SandcastleCommandOutput
 
     flexmock(Sandcastle).should_receive("get_api_client").and_return(None).once()
     flexmock(Sandcastle).should_receive("run").and_return(None).once()
@@ -260,7 +261,10 @@ def test_run_action_in_sandcastle(
             )
         raise Exception("This command was not expected")
 
-    flexmock(Sandcastle, exec=mocked_exec)
+    def mocked_exec_with_output(*args, **kwargs):
+        return SandcastleCommandOutput(stdout=mocked_exec(*args, **kwargs), stderr="")
+
+    flexmock(Sandcastle, exec_with_output=mocked_exec_with_output)
     flexmock(Sandcastle).should_receive("delete_pod").once().and_return(None)
     with caplog.at_level(logging.INFO, logger="packit"):
         packit_repository_base_with_sandcastle_object.actions_handler.run_action(
