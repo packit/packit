@@ -216,18 +216,22 @@ class SandcastleCommandHandler(CommandHandler):
                 cwd = cwd.relative_to(self.config.command_handler_work_dir)
             except ValueError as ex:
                 raise SandcastleCommandFailed(
-                    f"Absolute working directory '{cwd}' is not within "
-                    f"Sandcastle working directory '{self.config.command_handler_work_dir}'. "
-                    "All absolute paths for Sandcastle commands must be relative to its root.",
+                    output="",
+                    reason=(
+                        f"Absolute working directory '{cwd}' is not within "
+                        f"Sandcastle working directory '{self.config.command_handler_work_dir}'. "
+                        "All absolute paths for Sandcastle commands must be relative to its root."
+                    ),
+                    rc=1,
                 ) from ex
         logger.info(f"Running command: {' '.join(command)} on dir {cwd}")
 
-        out = ""
         try:
-            out = self.sandcastle.exec(command=command, env=env, cwd=cwd)
+            output = self.sandcastle.exec_with_output(command=command, env=env, cwd=cwd)
 
             logger.info(f"Output of {command!r}:")
-            self._print_logs(out)
+            self._print_logs(output.stdout)
+            self._print_logs(output.stderr)
         except SandcastleCommandFailed as ex:
             # TODO: Maybe consider logging as an error? Would spam Sentry though
             logger.info(f"Command {command!r} failed:")
@@ -236,7 +240,8 @@ class SandcastleCommandHandler(CommandHandler):
 
         return commands.CommandResult(
             success=True,
-            stdout=out if return_output else None,
+            stdout=output.stdout if return_output else None,
+            stderr=output.stderr if return_output else None,
         )
 
     def clean(self) -> None:
