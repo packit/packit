@@ -156,6 +156,7 @@ def test_copr_build_existing_project_munch_no_settings_change(
     project_mock = munchify(
         {
             "additional_repos": [],
+            "runtime_dependencies": [],
             "auto_prune": True,
             "chroot_repos": {
                 "fedora-rawhide-x86_64": "https://download.copr.fedorainfracloud.org/"
@@ -516,6 +517,7 @@ def test_copr_build_existing_project_error_on_change_settings(
         unlisted_on_hp=True,
         delete_after_days=60,
         additional_repos=[],
+        runtime_dependencies=[],
         ownername=owner,
         module_hotfixes=False,
     )
