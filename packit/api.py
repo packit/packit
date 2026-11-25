@@ -26,6 +26,12 @@ from typing import (
     overload,
 )
 
+try:
+    import grp
+except ImportError:
+    # grp is not available on Windows, where mock builds aren't supported either
+    grp = None
+
 import bugzilla
 import click
 import git
@@ -117,6 +123,20 @@ def get_packit_version() -> str:
         return version("packitos")
     except PackageNotFoundError:
         return "NOT_INSTALLED"
+
+
+def _in_mock_group() -> bool:
+    if grp is None:
+        return True
+    if os.geteuid() == 0:
+        # root can use mock without the group, mock just authenticates as root
+        return True
+    try:
+        mock_gid = grp.getgrnam("mock").gr_gid
+    except KeyError:
+        # the mock group doesn't even exist, mock can't work anyway
+        return False
+    return mock_gid == os.getgid() or mock_gid in os.getgroups()
 
 
 class SynchronizationStatus:
@@ -2747,6 +2767,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         Returns:
             List of paths to the built RPMs.
         """
+        if not _in_mock_group():
+            logger.warning(
+                "You are not in the `mock` group. Mock builds may fail. "
+                "See https://rpm-software-management.github.io/mock/#setup",
+            )
+
         cmd = ["mock", "--root", root]
         if resultdir is not None:
             cmd.append("--resultdir")

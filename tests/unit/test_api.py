@@ -1,6 +1,7 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import logging
 import pathlib
 from contextlib import suppress as does_not_raise
 
@@ -841,3 +842,44 @@ def test_get_local_archives_to_upload_skips_git_tracked(
     result = api_mock.get_local_archives_to_upload()
 
     assert result == [tmp_path / name for name in expected_to_upload]
+
+
+def test_in_mock_group_true_when_process_gid_matches(monkeypatch):
+    monkeypatch.setattr(api, "grp", Munch(getgrnam=lambda name: Munch(gr_gid=1000)))
+    monkeypatch.setattr(api.os, "geteuid", lambda: 1000)
+    monkeypatch.setattr(api.os, "getgid", lambda: 1000)
+    assert api._in_mock_group() is True
+
+
+def test_in_mock_group_true_for_root(monkeypatch):
+    monkeypatch.setattr(api, "grp", Munch(getgrnam=lambda name: Munch(gr_gid=135)))
+    monkeypatch.setattr(api.os, "geteuid", lambda: 0)
+    assert api._in_mock_group() is True
+
+
+def test_in_mock_group_false_when_group_missing(monkeypatch):
+    def getgrnam(name):
+        raise KeyError(name)
+
+    monkeypatch.setattr(api, "grp", Munch(getgrnam=getgrnam))
+    monkeypatch.setattr(api.os, "geteuid", lambda: 1000)
+    monkeypatch.setattr(api.os, "getgid", lambda: 1000)
+    monkeypatch.setattr(api.os, "getgroups", lambda: [1000])
+    assert api._in_mock_group() is False
+
+
+def test_run_mock_build_warns_when_not_in_mock_group(caplog, monkeypatch, tmp_path):
+    monkeypatch.setattr(api, "_in_mock_group", lambda: False)
+    (tmp_path / "pkg.rpm").touch()
+    fake_api = Munch(
+        up=Munch(
+            command_handler=Munch(
+                run_command=lambda *args, **kwargs: Munch(
+                    stderr=f"Results and/or logs in: {tmp_path}",
+                ),
+            ),
+        ),
+    )
+    with caplog.at_level(logging.WARNING, logger="packit"):
+        PackitAPI.run_mock_build(fake_api, pathlib.Path("pkg.src.rpm"))
+    assert "not in the `mock` group" in caplog.text
