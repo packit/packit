@@ -34,7 +34,10 @@ def get_dist_git_branches(api, dist_git_branch, pull_from_upstream=False):
             )
         )
 
-    default_dg_branch = api.dg.local_project.git_project.default_branch
+    try:
+        default_dg_branch = api.dg.local_project.git_project.default_branch
+    except Exception:
+        default_dg_branch = "main"
 
     dg_branches = (
         cmdline_dg_branches or config_dg_branches or default_dg_branch.split(",")
