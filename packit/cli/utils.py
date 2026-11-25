@@ -12,6 +12,7 @@ from typing import Optional, Union
 
 import click
 from github import GithubException
+from ogr.exceptions import OgrException
 from ogr.parsing import parse_git_repo
 from ogr.services.github import GithubService
 
@@ -23,8 +24,10 @@ from packit.constants import (
     CONFIG_FILE_NAMES,
     DISTRO_DIR,
     PACKIT_NAMESPACE,
+    PAGURE_API_KEY_ERROR_MSG,
     PRECOMMIT_HOOK_REPO,
     SRC_GIT_CONFIG,
+    USER_CONFIG_FILE_DOCS_URL,
 )
 from packit.exceptions import PackitException, PackitNotAGitRepoException
 from packit.local_project import LocalProject
@@ -75,10 +78,42 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                         "https://github.com/packit/packit/tree/master/docs\n",
                     )
                 sys.exit(exit_code or 3)
-            except Exception as exc:
+            except OgrException as exc:
                 if config and config.debug:
                     logger.exception(exc)
                 else:
+                    msg = str(exc)
+                    cause = str(getattr(exc, "__cause__", "") or "")
+                    if (
+                        "whoami" in msg
+                        or "whoami" in cause
+                        or "401" in msg
+                        or "401" in cause
+                    ):
+                        logger.error(PAGURE_API_KEY_ERROR_MSG)
+                    else:
+                        logger.error(
+                            f"We've encountered an error while talking to Git service API: {exc}\n"
+                            "Please check that your API token is set and has correct permissions.\n"
+                            f"See {USER_CONFIG_FILE_DOCS_URL} for details.",
+                        )
+                sys.exit(exit_code or 2)
+            except Exception as exc:
+                if config and config.debug:
+                    logger.exception(exc)
+                    sys.exit(exit_code or 4)
+                else:
+                    msg = str(exc)
+                    cause = str(getattr(exc, "__cause__", "") or "")
+                    if ("whoami" in msg or "whoami" in cause) and (
+                        "401" in msg
+                        or "401" in cause
+                        or "src.fedoraproject.org" in msg
+                        or "src.fedoraproject.org" in cause
+                    ):
+                        logger.error(PAGURE_API_KEY_ERROR_MSG)
+                        sys.exit(exit_code or 2)
+                        return
                     logger.error(exc)
                     click.echo(
                         "Unexpected exception occurred,\n"
@@ -86,7 +121,7 @@ def cover_packit_exception(_func=None, *, exit_code=None):
                         "https://github.com/packit/packit/issues",
                         err=True,
                     )
-                sys.exit(exit_code or 4)
+                    sys.exit(exit_code or 4)
 
         return covered_func
 
