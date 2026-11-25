@@ -24,6 +24,7 @@ You can do it on your computer as the easiest way, because you have
 all credentials there eg:
 
 - github token
+- forgejo dist-git token
 - pagure token
 - kerberos tickets
 - ssh keys
@@ -37,6 +38,12 @@ all credentials there eg:
 
 ```
 pytest-3 -v tests_recording
+```
+
+Or run the tests in a container:
+
+```
+make check-in-container TEST_TARGET=tests_recording
 ```
 
 ### Postprocessing

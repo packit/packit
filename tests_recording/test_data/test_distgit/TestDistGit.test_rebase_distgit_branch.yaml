@@ -1,0 +1,540 @@
+X:
+  file:
+    tar:
+      StoreFiles:
+        TestDistGit.test_rebase_distgit_branch.yaml:
+          to_path:
+          - metadata:
+              latency: 0
+            output:
+              filename: TestDistGit.test_rebase_distgit_branch.yaml.requre_1.tar.xz
+              return_value:
+                _bare: false
+                _common_dir: ''
+                _working_tree_dir: /tmp/tmp3jo6rr0p/requre
+                git_dir: /tmp/tmp3jo6rr0p/requre/.git
+                working_dir: /tmp/tmp3jo6rr0p/requre
+              target_path: /tmp/tmp3jo6rr0p/requre
+_requre:
+  DataTypes: 1
+  key_strategy: StorageKeysInspectSimple
+  version_storage_file: 3
+git.remote:
+  push:
+  - metadata:
+      latency: 15.064945697784424
+      module_call_list:
+      - unittest.case
+      - requre.record_and_replace
+      - tests_recording.test_distgit
+      - packit.distgit
+      - packit.base_git
+      - requre.objects
+      - requre.helpers.git.pushinfo
+      - requre.objects
+      - requre.cassette
+      - git.remote
+      - push
+    output:
+    - _old_commit_sha: null
+      flags: 2
+      local_ref:
+      - /tmp/tmp3jo6rr0p/requre/.git
+      - refs/heads/testing-rebase-branch
+      remote_ref_string: refs/heads/testing-rebase-branch
+      summary: '[new branch]
+
+        '
+  - metadata:
+      latency: 6.065385103225708
+      module_call_list:
+      - unittest.case
+      - requre.record_and_replace
+      - tests_recording.test_distgit
+      - packit.distgit
+      - packit.base_git
+      - requre.objects
+      - requre.helpers.git.pushinfo
+      - requre.objects
+      - requre.cassette
+      - git.remote
+      - push
+    output:
+    - _old_commit_sha: 3ccead6
+      flags: 128
+      local_ref:
+      - /tmp/tmp3jo6rr0p/requre/.git
+      - refs/heads/testing-rebase-branch
+      remote_ref_string: refs/heads/testing-rebase-branch
+      summary: '3ccead6...8f7494c (forced update)
+
+        '
+httpx._client:
+  send:
+    GET:
+      https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre:
+      - metadata:
+          latency: 0.1452503204345703
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_distgit
+          - packit.distgit
+          - ogr.abstract.exception
+          - ogr.services.forgejo.project
+          - ogr.abstract.exception
+          - ogr.services.forgejo.project
+          - functools
+          - ogr.services.forgejo.project
+          - pyforgejo.repository.client
+          - pyforgejo.repository.raw_client
+          - pyforgejo.core.http_client
+          - httpx._client
+          - requre.objects
+          - requre.cassette
+          - httpx._client
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            allow_fast_forward_only_merge: true
+            allow_merge_commits: true
+            allow_rebase: true
+            allow_rebase_explicit: true
+            allow_rebase_update: true
+            allow_squash_merge: true
+            archived: false
+            archived_at: '1970-01-01T00:00:00Z'
+            avatar_url: ''
+            clone_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre.git
+            created_at: '2026-10-22T15:18:54Z'
+            default_allow_maintainer_edit: false
+            default_branch: rawhide
+            default_delete_branch_after_merge: false
+            default_merge_style: merge
+            default_update_style: merge
+            description: The python-requre package
+            empty: false
+            fork: true
+            forks_count: 0
+            full_name: betulependule/python-requre
+            globally_editable_wiki: false
+            has_actions: false
+            has_issues: false
+            has_packages: false
+            has_projects: false
+            has_pull_requests: true
+            has_releases: false
+            has_wiki: false
+            has_wiki_contents: false
+            html_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre
+            id: 272609
+            ignore_whitespace_conflicts: false
+            internal: false
+            language: ''
+            languages_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre/languages
+            link: ''
+            mirror: false
+            mirror_interval: ''
+            mirror_updated: '0001-01-01T00:00:00Z'
+            name: python-requre
+            object_format_name: sha1
+            open_issues_count: 0
+            open_pr_counter: 1
+            original_url: ''
+            owner:
+              active: false
+              avatar_url: https://seccdn.libravatar.org/avatar/2551407a246575fdc432de2187a1e34f?d=identicon
+              created: '2026-09-17T12:14:56Z'
+              description: ''
+              email: betulependule@noreply.forgejo-src.stg.fedoraproject.org
+              followers_count: 0
+              following_count: 0
+              full_name: Alzbeta Kucerova
+              html_url: https://forgejo-src.stg.fedoraproject.org/betulependule
+              id: 1470
+              is_admin: false
+              language: ''
+              last_login: '0001-01-01T00:00:00Z'
+              location: ''
+              login: betulependule
+              login_name: ''
+              prohibit_login: false
+              pronouns: ''
+              restricted: false
+              source_id: 0
+              starred_repos_count: 0
+              username: betulependule
+              visibility: public
+              website: ''
+            parent:
+              allow_fast_forward_only_merge: true
+              allow_merge_commits: true
+              allow_rebase: true
+              allow_rebase_explicit: true
+              allow_rebase_update: true
+              allow_squash_merge: true
+              archived: false
+              archived_at: '1970-01-01T00:00:00Z'
+              avatar_url: ''
+              clone_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre.git
+              created_at: '2026-10-13T11:50:16Z'
+              default_allow_maintainer_edit: false
+              default_branch: rawhide
+              default_delete_branch_after_merge: false
+              default_merge_style: rebase-merge
+              default_update_style: rebase
+              description: The python-requre package
+              empty: false
+              fork: false
+              forks_count: 1
+              full_name: rpms/python-requre
+              globally_editable_wiki: false
+              has_actions: true
+              has_issues: true
+              has_packages: false
+              has_projects: false
+              has_pull_requests: true
+              has_releases: false
+              has_wiki: false
+              has_wiki_contents: false
+              html_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre
+              id: 241334
+              ignore_whitespace_conflicts: false
+              internal: false
+              internal_tracker:
+                allow_only_contributors_to_track_time: true
+                enable_issue_dependencies: true
+                enable_time_tracker: true
+              language: ''
+              languages_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre/languages
+              link: ''
+              mirror: false
+              mirror_interval: ''
+              mirror_updated: '0001-01-01T00:00:00Z'
+              name: python-requre
+              object_format_name: sha1
+              open_issues_count: 0
+              open_pr_counter: 3
+              original_url: https://src.fedoraproject.org/rpms/python-requre
+              owner:
+                active: false
+                avatar_url: https://forgejo-src.stg.fedoraproject.org/avatars/e95483cbc482269e355de71394f14c10
+                created: '2026-09-10T03:31:12Z'
+                description: ''
+                email: ''
+                followers_count: 0
+                following_count: 0
+                full_name: ''
+                html_url: https://forgejo-src.stg.fedoraproject.org/rpms
+                id: 1459
+                is_admin: false
+                language: ''
+                last_login: '0001-01-01T00:00:00Z'
+                location: ''
+                login: rpms
+                login_name: ''
+                prohibit_login: false
+                pronouns: ''
+                restricted: false
+                source_id: 0
+                starred_repos_count: 0
+                username: rpms
+                visibility: public
+                website: ''
+              parent: null
+              permissions:
+                admin: true
+                pull: true
+                push: true
+              private: false
+              release_counter: 0
+              repo_transfer: null
+              size: 277
+              ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/rpms/python-requre.git
+              stars_count: 0
+              template: false
+              topics:
+              - b.epel10
+              - b.f43
+              - b.f44
+              - b.f45
+              - b.rawhide
+              - m.mfocko
+              updated_at: '2026-10-21T00:21:55Z'
+              url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre
+              watchers_count: 6
+              website: ''
+              wiki_branch: main
+              wiki_clone_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre.wiki.git
+              wiki_ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/rpms/python-requre.wiki.git
+            permissions:
+              admin: true
+              pull: true
+              push: true
+            private: false
+            release_counter: 0
+            repo_transfer: null
+            size: 222
+            ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/betulependule/python-requre.git
+            stars_count: 0
+            template: false
+            topics: []
+            updated_at: '2026-10-29T13:59:50Z'
+            url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/betulependule/python-requre
+            watchers_count: 1
+            website: ''
+            wiki_clone_url: https://forgejo-src.stg.fedoraproject.org/betulependule/python-requre.wiki.git
+            wiki_ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/betulependule/python-requre.wiki.git
+          _elapsed: 0.145117
+          encoding: utf-8
+          headers:
+            apptime: D=10941
+            cache-control: max-age=0, private, must-revalidate, no-transform
+            connection: Keep-Alive
+            content-type: application/json;charset=utf-8
+            date: Thu, 29 Oct 2026 13:59:56 GMT
+            gap-upstream-address: 127.0.0.1:3000
+            keep-alive: timeout=15
+            referrer-policy: same-origin
+            server: Apache
+            strict-transport-security: max-age=31536000; includeSubDomains; preload
+            transfer-encoding: chunked
+            x-content-type-options: nosniff, nosniff
+            x-fedora-proxyserver: proxy01.stg.rdu3.fedoraproject.org
+            x-fedora-requestid: auNRXNJYcZB50HKPqSTCZQAAJcs
+            x-frame-options: SAMEORIGIN, SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          next_request: null
+          status_code: 200
+      https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre:
+      - metadata:
+          latency: 0.4166269302368164
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_distgit
+          - packit.local_project
+          - ogr.abstract.exception
+          - ogr.services.forgejo.project
+          - functools
+          - ogr.services.forgejo.project
+          - pyforgejo.repository.client
+          - pyforgejo.repository.raw_client
+          - pyforgejo.core.http_client
+          - httpx._client
+          - requre.objects
+          - requre.cassette
+          - httpx._client
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            allow_fast_forward_only_merge: true
+            allow_merge_commits: true
+            allow_rebase: true
+            allow_rebase_explicit: true
+            allow_rebase_update: true
+            allow_squash_merge: true
+            archived: false
+            archived_at: '1970-01-01T00:00:00Z'
+            avatar_url: ''
+            clone_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre.git
+            created_at: '2026-10-13T11:50:16Z'
+            default_allow_maintainer_edit: false
+            default_branch: rawhide
+            default_delete_branch_after_merge: false
+            default_merge_style: rebase-merge
+            default_update_style: rebase
+            description: The python-requre package
+            empty: false
+            fork: false
+            forks_count: 1
+            full_name: rpms/python-requre
+            globally_editable_wiki: false
+            has_actions: true
+            has_issues: true
+            has_packages: false
+            has_projects: false
+            has_pull_requests: true
+            has_releases: false
+            has_wiki: false
+            has_wiki_contents: false
+            html_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre
+            id: 241334
+            ignore_whitespace_conflicts: false
+            internal: false
+            internal_tracker:
+              allow_only_contributors_to_track_time: true
+              enable_issue_dependencies: true
+              enable_time_tracker: true
+            language: ''
+            languages_url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre/languages
+            link: ''
+            mirror: false
+            mirror_interval: ''
+            mirror_updated: '0001-01-01T00:00:00Z'
+            name: python-requre
+            object_format_name: sha1
+            open_issues_count: 0
+            open_pr_counter: 3
+            original_url: https://src.fedoraproject.org/rpms/python-requre
+            owner:
+              active: false
+              avatar_url: https://forgejo-src.stg.fedoraproject.org/avatars/e95483cbc482269e355de71394f14c10
+              created: '2026-09-10T03:31:12Z'
+              description: ''
+              email: ''
+              followers_count: 0
+              following_count: 0
+              full_name: ''
+              html_url: https://forgejo-src.stg.fedoraproject.org/rpms
+              id: 1459
+              is_admin: false
+              language: ''
+              last_login: '0001-01-01T00:00:00Z'
+              location: ''
+              login: rpms
+              login_name: ''
+              prohibit_login: false
+              pronouns: ''
+              restricted: false
+              source_id: 0
+              starred_repos_count: 0
+              username: rpms
+              visibility: public
+              website: ''
+            parent: null
+            permissions:
+              admin: false
+              pull: true
+              push: false
+            private: false
+            release_counter: 0
+            repo_transfer: null
+            size: 277
+            ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/rpms/python-requre.git
+            stars_count: 0
+            template: false
+            topics:
+            - b.epel10
+            - b.f43
+            - b.f44
+            - b.f45
+            - b.rawhide
+            - m.mfocko
+            updated_at: '2026-10-21T00:21:55Z'
+            url: https://forgejo-src.stg.fedoraproject.org/api/v1/repos/rpms/python-requre
+            watchers_count: 6
+            website: ''
+            wiki_branch: main
+            wiki_clone_url: https://forgejo-src.stg.fedoraproject.org/rpms/python-requre.wiki.git
+            wiki_ssh_url: ssh://1001290000@forgejo-src.stg.fedoraproject.org/rpms/python-requre.wiki.git
+          _elapsed: 0.416478
+          encoding: utf-8
+          headers:
+            apptime: D=15864
+            cache-control: max-age=0, private, must-revalidate, no-transform
+            connection: Keep-Alive
+            content-type: application/json;charset=utf-8
+            date: Thu, 29 Oct 2026 13:59:55 GMT
+            gap-upstream-address: 127.0.0.1:3000
+            keep-alive: timeout=15
+            referrer-policy: same-origin
+            server: Apache
+            set-cookie: a 'b';
+            strict-transport-security: max-age=31536000; includeSubDomains; preload
+            transfer-encoding: chunked
+            x-content-type-options: nosniff, nosniff
+            x-fedora-proxyserver: proxy01.stg.rdu3.fedoraproject.org
+            x-fedora-requestid: auNRWw1QekZhsDqpOR13sAAAJYg
+            x-frame-options: SAMEORIGIN, SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          next_request: null
+          status_code: 200
+      https://forgejo-src.stg.fedoraproject.org/api/v1/user:
+      - metadata:
+          latency: 0.14896154403686523
+          module_call_list:
+          - unittest.case
+          - requre.record_and_replace
+          - tests_recording.test_distgit
+          - packit.distgit
+          - ogr.abstract.exception
+          - ogr.services.forgejo.project
+          - ogr.abstract.exception
+          - ogr.services.forgejo.project
+          - ogr.abstract.exception
+          - ogr.services.forgejo.user
+          - functools
+          - ogr.services.forgejo.user
+          - pyforgejo.user.client
+          - pyforgejo.user.raw_client
+          - pyforgejo.core.http_client
+          - httpx._client
+          - requre.objects
+          - requre.cassette
+          - httpx._client
+          - send
+        output:
+          __store_indicator: 2
+          _content:
+            active: true
+            avatar_url: https://seccdn.libravatar.org/avatar/2551407a246575fdc432de2187a1e34f?d=identicon
+            created: '2026-09-17T12:14:56Z'
+            description: ''
+            email: betulependule@gmail.com
+            followers_count: 0
+            following_count: 0
+            full_name: Alzbeta Kucerova
+            html_url: https://forgejo-src.stg.fedoraproject.org/betulependule
+            id: 1470
+            is_admin: false
+            language: en-US
+            last_login: '2026-10-29T12:58:51Z'
+            location: ''
+            login: betulependule
+            login_name: betulependule
+            prohibit_login: false
+            pronouns: ''
+            restricted: false
+            source_id: 1
+            starred_repos_count: 0
+            username: betulependule
+            visibility: public
+            website: ''
+          _elapsed: 0.148881
+          encoding: utf-8
+          headers:
+            apptime: D=9545
+            cache-control: max-age=0, private, must-revalidate, no-transform
+            connection: Keep-Alive
+            content-length: '642'
+            content-type: application/json;charset=utf-8
+            date: Thu, 29 Oct 2026 13:59:56 GMT
+            gap-upstream-address: 127.0.0.1:3000
+            keep-alive: timeout=15
+            referrer-policy: same-origin
+            server: Apache
+            strict-transport-security: max-age=31536000; includeSubDomains; preload
+            x-content-type-options: nosniff, nosniff
+            x-fedora-proxyserver: proxy01.stg.rdu3.fedoraproject.org
+            x-fedora-requestid: auNRXA1QekZhsDqpOR13uAAAJYs
+            x-frame-options: SAMEORIGIN, SAMEORIGIN
+            x-xss-protection: 1; mode=block
+          next_request: null
+          status_code: 200
+tempfile:
+  mkdtemp:
+  - metadata:
+      latency: 6.031990051269531e-05
+      module_call_list:
+      - unittest.case
+      - requre.record_and_replace
+      - tests_recording.test_distgit
+      - tests_recording.testbase
+      - requre.objects
+      - requre.cassette
+      - tempfile
+      - mkdtemp
+    output: /tmp/tmp3jo6rr0p
