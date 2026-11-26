@@ -517,6 +517,7 @@ class DistGit(PackitRepositoryBase):
         scratch: bool = False,
         nowait: bool = False,
         koji_target: Optional[str] = None,
+        wait_repo: bool = False,
     ):
         """
         Perform a `koji build` in the repository
@@ -524,6 +525,7 @@ class DistGit(PackitRepositoryBase):
         :param scratch: should the build be a scratch build?
         :param nowait: don't wait on build?
         :param koji_target: koji target to pick (see `koji list-targets`)
+        :param wait_repo: wait for repository regeneration after the build?
 
         Returns:
             The 'stdout' of the build command.
@@ -533,6 +535,8 @@ class DistGit(PackitRepositoryBase):
             cmd.append("--scratch")
         if nowait:
             cmd.append("--nowait")
+        if wait_repo:
+            cmd.append("--wait-repo")
         if koji_target:
             cmd.append(koji_target)
         else:

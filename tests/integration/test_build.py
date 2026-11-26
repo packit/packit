@@ -4,6 +4,7 @@
 from pathlib import Path
 from typing import Optional, Union
 
+import pytest
 from flexmock import flexmock
 
 from packit.local_project import LocalProject
@@ -11,10 +12,19 @@ from packit.utils import commands
 from tests.integration.conftest import DOWNSTREAM_PROJECT_URL
 
 
+@pytest.mark.parametrize(
+    "koji_target, wait_repo",
+    [
+        ("asdqwe", False),
+        ("f31-build-side-18630", True),
+    ],
+)
 def test_basic_build(
     cwd_upstream_or_distgit,
     api_instance,
     mock_remote_functionality_upstream,
+    koji_target,
+    wait_repo,
 ):
     u, d, api = api_instance
     flexmock(api).should_receive("init_kerberos_ticket").at_least().once()
@@ -28,7 +38,11 @@ def test_basic_build(
         env=None,
         print_live=False,
     ):
-        assert cmd[:-1] == ["koji", "build", "--scratch", "--nowait", "asdqwe"]
+        expected = ["koji", "build", "--scratch", "--nowait"]
+        if wait_repo:
+            expected.append("--wait-repo")
+        expected.append(koji_target)
+        assert cmd[:-1] == expected
         assert cmd[-1].startswith(f"git+{DOWNSTREAM_PROJECT_URL}")
         assert cwd == api.dg.local_project.working_dir
         assert fail
@@ -40,7 +54,13 @@ def test_basic_build(
         run_command_remote,
     ).once()
 
-    api.build("main", scratch=True, nowait=True, koji_target="asdqwe")
+    api.build(
+        "main",
+        scratch=True,
+        nowait=True,
+        koji_target=koji_target,
+        wait_repo=wait_repo,
+    )
 
 
 def test_build_from_upstream(
