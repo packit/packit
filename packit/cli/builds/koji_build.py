@@ -53,6 +53,12 @@ logger = logging.getLogger(__name__)
     default=False,
     help="Submit a scratch koji build",
 )
+@click.option(
+    "--wait-repo",
+    is_flag=True,
+    default=False,
+    help="Wait for repository regeneration after the build.",
+)
 @click.option("--wait/--no-wait", default=True, help="Wait for the build to finish")
 @click.option(
     "--release-suffix",
@@ -87,6 +93,7 @@ def koji(
     from_upstream,
     koji_target,
     scratch,
+    wait_repo,
     wait,
     release_suffix,
     default_release_suffix,
@@ -153,6 +160,7 @@ def koji(
                         scratch=scratch,
                         nowait=not wait,
                         koji_target=target,
+                        wait_repo=wait_repo,
                         from_upstream=from_upstream,
                         release_suffix=release_suffix,
                         srpm_path=config.srpm_path,

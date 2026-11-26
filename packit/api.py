@@ -1906,6 +1906,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         from_upstream: bool = False,
         release_suffix: Optional[str] = None,
         srpm_path: Optional[Path] = None,
+        wait_repo: bool = False,
     ):
         """
         Build component in Fedora infra (defaults to koji).
@@ -1916,6 +1917,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             nowait: Defines whether packit should wait for the build to finish
                 or not.
             koji_target: Koji target to build for, see `koji list-targets`.
+            wait_repo: Whether to wait for repository regeneration after the build.
             from_upstream: Specifies whether the build should be done directly
                 from the upstream checkout.
             release_suffix: Specifies release suffix to be used for SRPM build.
@@ -1951,7 +1953,12 @@ The first dist-git commit to be synced is '{short_hash}'.
         self.dg.update_branch(dist_git_branch)
         self.dg.switch_branch(dist_git_branch)
 
-        return self.dg.build(scratch=scratch, nowait=nowait, koji_target=koji_target)
+        return self.dg.build(
+            scratch=scratch,
+            nowait=nowait,
+            koji_target=koji_target,
+            wait_repo=wait_repo,
+        )
 
     def create_update(
         self,
