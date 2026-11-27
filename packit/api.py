@@ -2353,6 +2353,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 automatically deleted after specific period.
             additional_packages: Buildroot packages for the chroot [DOES NOT WORK YET].
             additional_repos: Buildroot additional additional_repos.
+            runtime_dependencies: External repositories that will be enabled together
+                with project repository.
             bootstrap: mock bootstrap feature setup.
             request_admin_if_needed: Specifies whether to ask for admin privileges,
                 if changes to configuration of Copr project are required.
