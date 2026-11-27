@@ -2333,6 +2333,7 @@ The first dist-git commit to be synced is '{short_hash}'.
         preserve_project: bool = False,
         additional_packages: Optional[list[str]] = None,
         additional_repos: Optional[list[str]] = None,
+        runtime_dependencies: Optional[list[str]] = None,
         bootstrap: Optional[MockBootstrapSetup] = None,
         request_admin_if_needed: bool = False,
         enable_net: bool = False,
@@ -2359,6 +2360,8 @@ The first dist-git commit to be synced is '{short_hash}'.
                 automatically deleted after specific period.
             additional_packages: Buildroot packages for the chroot [DOES NOT WORK YET].
             additional_repos: Buildroot additional additional_repos.
+            runtime_dependencies: External repositories that will be enabled together
+                with project repository.
             bootstrap: mock bootstrap feature setup.
             request_admin_if_needed: Specifies whether to ask for admin privileges,
                 if changes to configuration of Copr project are required.
@@ -2399,6 +2402,7 @@ The first dist-git commit to be synced is '{short_hash}'.
             preserve_project=preserve_project,
             additional_packages=additional_packages,
             additional_repos=additional_repos,
+            runtime_dependencies=runtime_dependencies,
             bootstrap=bootstrap,
             request_admin_if_needed=request_admin_if_needed,
             module_hotfixes=module_hotfixes,

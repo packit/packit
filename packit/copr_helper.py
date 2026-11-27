@@ -203,6 +203,7 @@ class CoprHelper:
         preserve_project: Optional[bool] = False,
         additional_packages: Optional[list[str]] = None,
         additional_repos: Optional[list[str]] = None,
+        runtime_dependencies: Optional[list[str]] = None,
         bootstrap: Optional[MockBootstrapSetup] = None,
         request_admin_if_needed: bool = False,
         targets_dict: Optional[dict] = None,  # chroot specific configuration
@@ -235,6 +236,10 @@ class CoprHelper:
             None if preserve_project is None else -1 if preserve_project else 60
         )
 
+        # Default runtime_dependencies to additional_repos
+        if runtime_dependencies is None:
+            runtime_dependencies = additional_repos
+
         logger.info(f"Creating {owner}/{project} Copr project.")
         try:
             copr_proj = self.copr_client.project_proxy.add(
@@ -248,6 +253,7 @@ class CoprHelper:
                 # delete project after the specified period of time
                 delete_after_days=delete_after_days,
                 additional_repos=additional_repos,
+                runtime_dependencies=runtime_dependencies,
                 bootstrap=bootstrap.value if bootstrap is not None else None,
                 instructions=instructions or default_instructions,
                 module_hotfixes=module_hotfixes,
@@ -292,6 +298,7 @@ class CoprHelper:
                 fields_to_change = self.get_fields_to_change(
                     copr_proj=copr_proj,
                     additional_repos=additional_repos,
+                    runtime_dependencies=runtime_dependencies,
                     chroots=chroots,
                     description=description,
                     instructions=instructions,
@@ -396,6 +403,7 @@ class CoprHelper:
         self,
         copr_proj,
         additional_repos: Optional[list[str]] = None,
+        runtime_dependencies: Optional[list[str]] = None,
         chroots: Optional[list[str]] = None,
         description: Optional[str] = None,
         instructions: Optional[str] = None,
@@ -463,6 +471,15 @@ class CoprHelper:
             fields_to_change["additional_repos"] = (
                 copr_proj.additional_repos,
                 additional_repos,
+            )
+
+        if (
+            runtime_dependencies is not None
+            and copr_proj.runtime_dependencies != runtime_dependencies
+        ):
+            fields_to_change["runtime_dependencies"] = (
+                copr_proj.runtime_dependencies,
+                runtime_dependencies,
             )
 
         if module_hotfixes is not None and copr_proj.module_hotfixes != module_hotfixes:

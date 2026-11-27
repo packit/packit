@@ -196,6 +196,7 @@ class TestCoprProjectEditRetry:
             unlisted_on_hp=True,
             delete_after_days=60,
             additional_repos=[],
+            runtime_dependencies=[],
             module_hotfixes=False,
             bootstrap="default",
         )
